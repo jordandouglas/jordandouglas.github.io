@@ -846,7 +846,7 @@ function updateForce_controller(){
 function transcribe_controller(nbasesToTranscribe = null, fastMode = false, resolve = function() { }){
 
 
-	
+	if ($("#transcribeBtn").hasClass("toolbarIconDisabled")) return;
 
 	disable_all_buttons();
 
@@ -859,11 +859,17 @@ function transcribe_controller(nbasesToTranscribe = null, fastMode = false, reso
 		clickMisincorporation = true;
 	}
 
+
+	// Hide the simulate button and show the stop button
+	hideButtonAndShowStopButton("transcribe");
+
+
 	var updateDOM = function(){
 		reactivate_buttons();
 		setNextBaseToAdd_controller();
 		renderObjects();
 		if (clickMisincorporation) $("#deactivateUponMisincorporation").click();
+		hideStopButtonAndShow("transcribe");
 		resolve();
 
 	};
@@ -893,7 +899,7 @@ function transcribe_controller(nbasesToTranscribe = null, fastMode = false, reso
 
 function stutter_controller(nbasesToStutter = null, fastMode = false, resolve = function() { }){
 
-
+	if ($("#stutterBtn").hasClass("toolbarIconDisabled")) return;
 	disable_all_buttons();
 
 	if (nbasesToStutter == null) nbasesToStutter = parseFloat($('#nbasesToSimulate').val());
@@ -903,8 +909,12 @@ function stutter_controller(nbasesToStutter = null, fastMode = false, resolve = 
 		setNextBaseToAdd_controller();
 		renderObjects();
 		reactivate_buttons();
+		hideStopButtonAndShow("stutter");
 		resolve();
 	};
+
+	// Hide the simulate button and show the stop button
+	hideButtonAndShowStopButton("stutter");
 
 
 	// If this is in animation mode, then this process is synchronous with rendering so we return in between operators
@@ -1524,12 +1534,17 @@ function getCurrentState_controller(resolve = function(state) { }){
 function startTrials_controller(){
 
 
-
+	if ($("#simulateBtn").hasClass("toolbarIconDisabled")) return;
 	if ($("#SelectPrimerType").val().substring(0,2) == "ds") return;
 	
 	if(simulating) return;
 	simulating = true;
-	
+
+
+	// Hide the simulate button and show the stop button
+	hideButtonAndShowStopButton("simulate");
+
+
 	
 	// If the sequence is big and WebWorker is connected then switch to hidden mode for efficiency
 	getCurrentState_controller(function(result) {
@@ -1561,7 +1576,7 @@ function startTrials_controller(){
 			drawPlots();
 			console.log("Updating dom");
 			simulating = false;
-
+			hideStopButtonAndShow("simulate");
 
 			$("#numSimSpan").show(true);
 			$("#progressSimSpan").html("");

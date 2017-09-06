@@ -1026,7 +1026,7 @@ function changeSpeed_WW(speed, resolve = function() { }, msgID = null){
 	if (speed != "hidden" && ANIMATION_TIME_TEMP == 0) generateEverythingAgain = true;
 
 
-	if (speed == "slow") ANIMATION_TIME_TEMP = 300;
+	if (speed == "slow") ANIMATION_TIME_TEMP = 200;
 	else if (speed == "medium") ANIMATION_TIME_TEMP = 100;
 	else if (speed == "fast") ANIMATION_TIME_TEMP = 5;
 	else if (speed == "ultrafast") ANIMATION_TIME_TEMP = 1;

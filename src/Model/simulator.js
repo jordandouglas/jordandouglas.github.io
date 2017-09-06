@@ -69,8 +69,8 @@ function startTrials_WW(n, resolve = function() { }, msgID = null){
 
 			if (ANIMATION_TIME == 0) renderPlotsHidden();
 
-			// Use the geometric sampling speed up only if the speed is set to hidden, ultrafast or fast.
-			ELONGATION_MODELS[currentElongationModel]["allowGeometricCatalysis"] = ANIMATION_TIME == 0 || ANIMATION_TIME == 1 || ANIMATION_TIME == 5; 
+			// Use the geometric sampling speed up only if the speed is not set to slow
+			ELONGATION_MODELS[currentElongationModel]["allowGeometricCatalysis"] = ANIMATION_TIME < 200; 
 
 
 			n_simulations_WW(n, stateC, resolve, msgID);

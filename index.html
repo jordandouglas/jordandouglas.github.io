@@ -26,7 +26,7 @@
 
 <html>
 <head>
-<title>SNAPdragon</title>
+<title>SNAP</title>
 <link rel="icon" href="src/Images/transcribe.png">
 <meta name="viewport" content="width=device-width, initial-scale=0.41, maximum-scale=1" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -151,11 +151,13 @@ function init(){
 
 
    		// Add swiping support esp. for mobile devices using hammer.js library
-   		var myElement = document.getElementById('mySidenav');
-		var mc = new Hammer(myElement);
-		mc.on("swipeleft", function(ev) { // Close the navigation menu when it is swiped
-		   	closeNav();
-		});
+   		if (IS_MOBILE){
+	   		var myElement = document.getElementById('mySidenav');
+			var mc = new Hammer(myElement);
+			mc.on("swipeleft", function(ev) { // Close the navigation menu when it is swiped
+			   	closeNav();
+			});
+		}
 
 
 
@@ -469,15 +471,13 @@ function refresh(resolve = function(){}){
 		set_state_desc();
 
 
-		if (!IS_MOBILE && $("#SelectPrimerType").val() == "ssRNA") $("#foldBtnDiv").show(true); // Can only fold ssRNA
-		else $("#foldBtnDiv").hide(true);
 
 
 		if ($("#SelectPrimerType").val().substring(0,2) == "ss") $(".simulateRow").show(true); // Can only simulate if single-stranded nascent
 		else $(".simulateRow").hide(true);
 
-
-
+		if (!IS_MOBILE && $("#SelectPrimerType").val() == "ssRNA") $("#foldBtnDiv").show(true); // Can only fold ssRNA
+		else $("#foldBtnDiv").hide(true);
 
 
 		var toDoAfterRefresh = function(){
@@ -1659,6 +1659,41 @@ function mutate(){
 }
 
 
+function hideButtonAndShowStopButton(toHide){
+
+	// toHide \in {"simulate", "transcribe", "stutter"}
+
+	// Makes toHide hidden and displays the stop button associated with it
+	$("#" + toHide + "Btn").hide(true);
+	$("#stopBtn_" + toHide).show(true);
+
+	// Makes the other possible values entries turn grey 
+	var btns = ["simulate", "transcribe", "stutter"]
+	for (var i = 0; i < btns.length; i ++){
+		if (btns[i] == toHide) continue;
+		$("#" + btns[i] + "Btn").addClass("toolbarIconDisabled");
+		$("#" + btns[i] + "Btn").css("cursor", "auto");
+	}
+
+}
+
+
+function hideStopButtonAndShow(toShow){
+
+	// Makes toShow no longer hidden and hides the stop button associated with it
+	$("#" + toShow + "Btn").show(true);
+	$("#stopBtn_" + toShow).hide(true);
+
+
+	// Makes the other possible values entries turn back from grey 
+	var btns = ["simulate", "transcribe", "stutter"]
+	for (var i = 0; i < btns.length; i ++){
+		if (btns[i] == toShow) continue;
+		$("#" + btns[i] + "Btn").removeClass("toolbarIconDisabled");
+		$("#" + btns[i] + "Btn").css("cursor", "pointer");
+	}
+
+}
 
 
 function openNav() {
@@ -2107,12 +2142,12 @@ function closeNav() {
 			</div>
 			
 
-			<div style="display:none; background-color:#FFFFB2; padding: 5 2 5 2; width:95%; text-align:center;  margin: auto; font-size: 14px;" id="badBrowser"> There was a javascript error which will prevent this page from operating. Please update your web browser and ensure that javascript is enabled. </div>
-			<div style="display:none; background-color:#FFFFB2; padding: 5 2 5 2; width:95%; text-align:center;  margin: auto; font-size: 14px;" id="browserWWdisabled">This program employs a Web Worker to speed up the simulation. 
+			<div class="errorMsg" id="badBrowser" style="display:none"> There was a javascript error which will prevent this page from operating. Please update your web browser and ensure that javascript is enabled. </div>
+			<div class="errorMsg" id="browserWWdisabled" style="display:none">This program employs a Web Worker to speed up the simulation. 
 			There was a problem connecting. For maximum performance please upgrade your browser or change your browser settings to allow the Web Worker to register. </div>
 
 
-			<div id="landscapeRequest" style="background-color:#FFFFB2; padding: 5 2 5 2; width:95%; text-align:center;  margin: auto; font-size: 25px;">
+			<div class="errorMsg" id="landscapeRequest" style="font-size: 25px;">
 				We recommend you view this page in landscape mode! </div>
 
 			<table style="width:100%">
@@ -2134,25 +2169,44 @@ function closeNav() {
 											<div class="toolbarIcon" style="cursor:pointer;" onClick="resetBtn();" title="Reinitiate the polymerase"> <img id='refresh'   src="src/Images/reset.png" style="padding:5 0; width:35px; height:25px;"> </div>
 										</td>
 
+
 										<td>
-											<div class="toolbarIcon" style="cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="src/Images/stop.png" style="width:35px; height:35px;"> </div>
+											<div id="simulateBtn" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="startTrials_controller()" title="Perform N simulations stochastically"> <img id='startTrials'   src="src/Images/dice.png" style="vertical-align: middle; width:35px; height:35px;">   </div>
+											<div id="stopBtn_simulate" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="src/Images/stop.png" style="width:35px; height:35px;"> </div>
 										</td>
+
+
 									</tr>
 									<tr>
+
+										
+
 										<td>
-											<div class="toolbarIcon" style="cursor:pointer;" onClick=transcribe_controller()  title="Replicate/transcribe N bases"> <img id='trans'  src="src/Images/transcribe.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
+											<div class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="clearKineticDataCache();" title="Clear kinetic data from the cache" > 
+												<img id='deleteAllData' src="src/Images/close.png" style="padding:5 0; height:25px;">
+											</div>
 										</td>
+
+
 										<td>
-											<div class="toolbarIcon simulateRow" style="cursor:pointer;" onClick=stutter_controller() title="Stutter N times" > <img id='stutter'  src="src/Images/stutter.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
+											<div id="transcribeBtn" class="toolbarIcon" style="cursor:pointer;" onClick=transcribe_controller()  title="Replicate/transcribe N bases"> <img id='trans'  src="src/Images/transcribe.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
+											<div id="stopBtn_transcribe" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="src/Images/stop.png" style="width:35px; height:35px;"> </div>
+										
 										</td>
+
 									</tr>
-									<tr class="simulateRow">
+									<tr>
+
 										<td>
-											<div id="foldBtnDiv" class="toolbarIcon" style="cursor:pointer;" onClick="getMFESequenceBonds_controller()" title="Fold the mRNA"> <img  src="src/Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
+											<div id="foldBtnDiv" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="getMFESequenceBonds_controller()" title="Fold the mRNA"> <img  src="src/Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
 										</td>
+
 										<td>
-											<div class="toolbarIcon" style="cursor:pointer;" onClick="startTrials_controller()" title="Perform N simulations stochastically"> <img id='startTrials'   src="src/Images/dice.png" style="vertical-align: middle; width:35px; height:35px;">   </div>
+											<div id="stutterBtn" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick=stutter_controller() title="Stutter N times" > <img id='stutter'  src="src/Images/stutter.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
+											<div id="stopBtn_stutter" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="src/Images/stop.png" style="width:35px; height:35px;"> </div>
+										
 										</td>
+
 
 									<tr>
 										<td colspan=2>
@@ -2180,19 +2234,6 @@ function closeNav() {
 									</tr>
 									
 									
-									</tr>
-
-
-
-									<tr class="simulateRow">
-										<td>
-										</td>
-
-										<td>
-											<div class="toolbarIcon" style="cursor:pointer;" onClick="clearKineticDataCache();" title="Clear kinetic data from the cache" > 
-												<img id='deleteAllData' src="src/Images/close.png" style="padding:5 0; height:25px;">
-											</div>
-										</td>
 									</tr>
 
 
