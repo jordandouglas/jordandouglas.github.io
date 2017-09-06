@@ -1,0 +1,459 @@
+/* 
+	--------------------------------------------------------------------
+	--------------------------------------------------------------------
+	This file is part of SNAPdragon.
+
+    SNAPdragon is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    SNAPdragon is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with SNAPdragon.  If not, see <http://www.gnu.org/licenses/>. 
+    --------------------------------------------------------------------
+    --------------------------------------------------------------------
+-*/
+
+
+
+canvas {
+	Vertical-align: middle;
+}
+
+
+label {
+  -webkit-user-select: none;  
+  -moz-user-select: none;    
+  -ms-user-select: none;      
+  user-select: none;
+}
+
+
+img {
+  -webkit-user-select: none;  
+  -moz-user-select: none;    
+  -ms-user-select: none;      
+   user-select: none;
+}
+
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+input[type=number] {
+    -moz-appearance:textfield;
+}
+
+:focus {
+	outline: 0;
+}
+
+.logo{
+	cursor:pointer;
+
+}
+
+div.vertical{
+  margin-right: -40px;
+  transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg); /* Safari/Chrome */
+  -moz-transform: rotate(-90deg);    /* Firefox */
+  -o-transform: rotate(-90deg);      /* Opera */
+  -ms-transform: rotate(-90deg);     /* IE 9 */
+}
+
+.rotate10 {
+  transform: rotate(20deg) translateY(-100%);
+  -webkit-transform: rotate(20deg) translateY(-100%);
+  -ms-transform: rotate(20deg) translateY(-100%);
+}
+
+.rotate350 {
+  transform: rotate(340deg) translateY(-100%);
+  -webkit-transform: rotate(340deg) translateY(-100%);
+  -ms-transform: rotate(340deg) translateY(-100%);
+}
+
+
+
+
+
+.landscape {
+    background-color: #ebe9e7;
+    border: none;
+    color: black;
+    padding: 10px 10px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 18px;
+	width:450px;
+}
+
+
+.rotate180 {
+  -webkit-transform: rotate(180deg);     /* Chrome and other webkit browsers */
+  -moz-transform: rotate(180deg);        /* FF */
+  -o-transform: rotate(180deg);          /* Opera */
+  -ms-transform: rotate(180deg);         /* IE9 */
+  transform: rotate(180deg);             /* W3C compliant browsers */
+
+  /* IE8 and below */
+  filter: progid:DXImageTransform.Microsoft.Matrix(M11=-1, M12=0, M21=0, M22=-1, DX=0, DY=0, SizingMethod='auto expand');
+} 
+
+
+.scrollbar::-webkit-scrollbar {
+	width: 12px;
+	background-color: #ebe9e7;
+}
+
+.scrollbar::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #008cba;
+}
+
+
+.main-block{
+
+	%border:1px solid black;
+	background-color: #858280;
+	width:80%;
+	font-family:Arial;
+	margin:auto;
+	padding: 5 5;
+
+
+}
+
+.main-block-inner{
+	background-color:white;
+	
+
+}
+
+.about-block{
+	
+	padding:20 20; 
+	font-family:Arial;
+	%background-color: #ebe9e7;
+	font-size: 18px;
+	display:block;
+	text-align: justify;
+
+}
+
+.about-block-inner{
+	%border:1px solid black;
+	%background-color: white;
+
+}
+
+
+.block-title{
+	text-align:center; 
+	font-size:45px; 
+	font:bold; 
+	color:#008CBA;
+}
+
+.block-title > .minimise{
+	width:30px; 
+	height:30px; 
+	font-size:20;
+}
+
+
+
+
+.block-subtitle{
+	text-align:center; 
+	font-size:40px; 
+	font:bold; 
+	color:#008CBA
+}
+
+.block-subsubtitle{
+	text-align:center; 
+	font-size:25px; 
+	color:#008CBA
+}
+
+.toolbar {
+	background-color: #424f4f;
+	width:60px;
+	padding: 2 2;
+	text-align:center;
+	-webkit-user-select: none;  
+	-moz-user-select: none;    
+	-ms-user-select: none;      
+	user-select: none;
+
+}
+
+
+
+.toolbarIcon {
+	background-color: #ebe9e7;
+	padding: 5 5;
+	text-align:center;
+
+}
+
+.operation {
+    background-color: #008CBA;
+    border: none;
+    color: white;
+    padding: 5px 0px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+	vertical-align: middle; 
+	width:110px;
+	cursor:pointer;
+}
+
+
+
+.ntp {
+    background-color: #008CBA;
+	color: white;
+    border: none;
+    padding: 0px 0px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+	vertical-align: middle; 
+	width:18px;
+	height:18px;
+	cursor:pointer;
+}
+
+.ntp-selected {
+    background-color: #b20000;
+	cursor:auto;
+}
+
+.minimise {
+    background-color: #008CBA;
+	opacity: 1.0;
+    border: none;
+    color: white;
+    padding: 0px 0px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 15px;
+	vertical-align: middle; 
+	width:20px;
+	height:20px;
+	cursor:pointer;
+}
+
+.spacer {
+	width:10px;
+	height:10px;	
+}
+
+
+
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 4;
+    top: 0;
+    left: 0;
+    background-color: #008CBA; /*baafab*/
+    overflow-x: hidden;
+    overflow-y:scroll;
+    transition: 0.5s;
+    padding-top: 50px;
+	text-align:left;
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover, .offcanvas a:focus{
+    color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+    color:#baafab;
+}
+
+#main {
+    transition: margin-left .5s;
+    padding: 15px;
+}
+
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+
+
+.parameter-bg {
+	background-color: #ebe9e7;
+    border: none;
+    color: black;
+    padding: 10px 10px;
+    text-align: left;
+    text-decoration: none;
+    font-size: 14px;
+	transition: 0.5s;
+	
+}
+
+.parameter-title {
+	font-size: 18px;
+	text-decoration: none;
+	text-align: center;
+	
+}
+
+.header {
+	
+	background-color: #ebe9e7;
+	width:100%;
+	padding: 5px 5px;
+	text-align: center;
+	font-family: "Palatino";
+	
+	
+}
+
+.plot-dropdown {
+    position: relative; 
+	font-family: "Arial";
+    padding: 5px;
+	font-size:18px;
+    margin: 0 auto;
+    background: #008CBA;
+    color: white;
+    outline: none;
+    cursor: pointer;
+}
+
+.dropdown {
+    position: relative; 
+	font-family: "Arial";
+    padding: 5px;
+	font-size:14px;
+    margin: 0 auto;
+    background: #008CBA;
+    color: white;
+    outline: none;
+    cursor: pointer;
+
+}
+
+.dropdown-disabled {
+    position: relative; 
+	font-family: "Arial";
+    padding: 2px 3px;
+	font-size:14px;
+    margin: 0 auto;
+    background: #858280;
+    color: white;
+    outline: none;
+    cursor: default;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	text-overflow: '';
+}
+
+.variable{
+	color:white;
+	background-color: #008CBA;
+	font-size:14px;
+}
+
+.parameter-disabled {
+	
+    margin: 0 auto;
+    background: #858280;
+    outline: none;
+    cursor: default;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	text-overflow: '';
+	color: white;
+	-webkit-text-fill-color:white;
+	
+	
+}
+
+
+:disabled {
+	cursor:auto;
+	
+}
+
+input {
+	box-shadow: none;
+}
+
+
+
+.textboxBlue{
+	color:white;
+	background-color: #008CBA;
+
+
+}
+
+
+.textboxBlue::-webkit-input-placeholder{
+    color:white;
+}
+
+.textboxBlue::-moz-placeholder{
+    color:white;
+}
+
+
+.variable-active{
+	background-color: #1e7d1e;
+	color:white;
+	cursor:pointer;
+}
+
+.variable-cursor{
+	cursor: url("Images/cursorHover.png"), pointer;
+}
+
+.distn{
+	padding: 3 3;
+	vertical-align: middle; 
+	width:38px; 
+	height:12px;
+	float:right;
+}
+
+
+
