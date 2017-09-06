@@ -26,6 +26,20 @@ canvas {
 }
 
 
+@media screen and (orientation:portrait) {
+  #landscapeRequest {
+	display:block;
+  }
+}
+
+
+@media screen and (orientation:landscape) {
+  #landscapeRequest {
+	display:none;
+  }
+}
+
+
 label {
   -webkit-user-select: none;  
   -moz-user-select: none;    
@@ -35,6 +49,14 @@ label {
 
 
 img {
+  -webkit-user-select: none;  
+  -moz-user-select: none;    
+  -ms-user-select: none;      
+   user-select: none;
+}
+
+
+noselect {
   -webkit-user-select: none;  
   -moz-user-select: none;    
   -ms-user-select: none;      
@@ -339,7 +361,7 @@ div.vertical{
 .header {
 	
 	background-color: #ebe9e7;
-	width:100%;
+	min-width:100%;
 	padding: 5px 5px;
 	text-align: center;
 	font-family: "Palatino";

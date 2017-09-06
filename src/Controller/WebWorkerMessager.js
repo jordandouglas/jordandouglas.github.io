@@ -55,7 +55,7 @@ function register_WebWorker(){
 					WEB_WORKER = null;
 					removeWebworkerRegistrationHTML();
 					console.log('WebWorker registration failed', err);
-					$("#browserWWdisabled").show(true);
+					//$("#browserWWdisabled").show(true);
 
 					// Tell the WebWorker to initialise
    					init_WW(false);
@@ -65,7 +65,7 @@ function register_WebWorker(){
     } else {
        	console.log('WebWorker registration failed');
        	removeWebworkerRegistrationHTML();
-		$("#browserWWdisabled").show(true);
+		//$("#browserWWdisabled").show(true);
     }
 
 
@@ -1848,8 +1848,9 @@ function getMisbindMatrix_controller(resolve = function(x) { }){
 
 function getMFESequenceBonds_controller(){
 
-
-	if ($("#PreExp").val() == "hidden") return;
+	
+	// No RNA secondary structure display on mobile phones beause svg is not well supported
+	if ($("#PreExp").val() == "hidden" || IS_MOBILE) return;
 
 	var updateDOM = function(graphInfo){
 
