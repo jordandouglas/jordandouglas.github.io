@@ -3090,7 +3090,7 @@ function highlightVariables(plotCanvasID, axis){
 
 
 	// Change the cursor symbol
-	//$('body, html').css('cursor', 'url(Images/cursor.png), auto');
+	//$('body, html').css('cursor', 'url(src/Images/cursor.png), auto');
 	
 	
 	// Set each appropriate button to full opacity and green color

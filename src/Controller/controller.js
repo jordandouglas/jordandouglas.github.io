@@ -67,8 +67,8 @@ function renderTermination(result){
 
 		firstLine += "&nbsp;&nbsp;&nbsp;";
 		firstLine += `<input type=button class='minimise' id='hideSequences'  value='-' title='Hide/show the sequence window' onClick=toggleSequences()>&nbsp;`;
-		firstLine += '<input type="image" style="vertical-align: middle; height:20px;  padding: 5 0" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="Images/download.png"> </input>'; 
-		firstLine += ' <input type="image" style="vertical-align: middle; width:20px; height:20px;  padding: 5 0" title="Delete all sequences and close sequence window" id="clearSeqs" onClick="clearSequences()" src="Images/close.png"></input>'; 
+		firstLine += '<input type="image" style="vertical-align: middle; height:20px;  padding: 5 0" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="src/Images/download.png"> </input>'; 
+		firstLine += ' <input type="image" style="vertical-align: middle; width:20px; height:20px;  padding: 5 0" title="Delete all sequences and close sequence window" id="clearSeqs" onClick="clearSequences()" src="src/Images/close.png"></input>'; 
 
 		// Add a table with site numbers
 		var tableHTML = "<table id='sequencesTable' style='position:absolute; font-family:\"Courier New\"; font-size:18px; border-spacing: 0; border-collapse: collapse;'></table>";
@@ -536,7 +536,7 @@ function renderObjects(override = false, resolve = function(){}){
 
 						var img = $("<img></img>");
 						img.attr("id", nt["id"]);
-						img.attr("src", "Images/" + nt["src"] + ".png");
+						img.attr("src", "src/Images/" + nt["src"] + ".png");
 						img.css("left", nt["x"] == parseInt(nt["x"], 10) ? nt["x"] + "px" : nt["x"]); // If there are no units then use pixels
 						img.css("top",  nt["y"] == parseInt(nt["y"], 10) ? nt["y"] + "px" : nt["y"]);
 						img.css("width", nt["width"] == parseInt(nt["width"], 10) ? nt["width"] + "px" : nt["width"]); 
@@ -572,7 +572,7 @@ function renderObjects(override = false, resolve = function(){}){
 						generatePol(nt);
 					}else{
 						$("#" + nt["id"]).finish();
-						$("#" + nt["id"]).attr("src", "Images/" + nt["src"] + ".png");
+						$("#" + nt["id"]).attr("src", "src/Images/" + nt["src"] + ".png");
 					}
 
 					nt["needsSourceUpdate"] = false;
@@ -692,7 +692,7 @@ function add_triphosphate(pos, x, y){
 	//console.log("Adding", "#phos" + pos);
 	var img = $("<img></img>");
 	img.attr("id", "phos" + pos);
-	img.attr("src", "Images/TP.png");
+	img.attr("src", "src/Images/TP.png");
 	img.css("left", x+15 + "px");
 	img.css("top", y+15 + "px");
 	img.css("width", "20px");

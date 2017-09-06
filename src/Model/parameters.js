@@ -497,8 +497,8 @@ function updateForce_WW(newFAssist = null, resolve = function() { }, msgID = nul
 				change_src_of_object_WW(HTMLobjects["forceArrow1"], "leftForce");
 				change_src_of_object_WW(HTMLobjects["forceArrow2"], "leftForce");
 
-			//$("#forceArrow1").attr("src", "Images/leftForce.png");
-			//$("#forceArrow2").attr("src", "Images/leftForce.png");
+			//$("#forceArrow1").attr("src", "src/Images/leftForce.png");
+			//$("#forceArrow2").attr("src", "src/Images/leftForce.png");
 			
 			}else if (PHYSICAL_PARAMETERS["FAssist"]["val"] < 0 && newFAssist > 0){
 			

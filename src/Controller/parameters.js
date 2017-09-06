@@ -91,11 +91,11 @@ function updateForce(){
 		
 		// Set arrow direction
 		if (PHYSICAL_PARAMETERS["FAssist"]["val"] > 0 && newFAssist < 0){
-			$("#forceArrow1").attr("src", "Images/leftForce.png");
-			$("#forceArrow2").attr("src", "Images/leftForce.png");
+			$("#forceArrow1").attr("src", "src/Images/leftForce.png");
+			$("#forceArrow2").attr("src", "src/Images/leftForce.png");
 		}else if (PHYSICAL_PARAMETERS["FAssist"]["val"] < 0 && newFAssist > 0){
-			$("#forceArrow1").attr("src", "Images/rightForce.png");
-			$("#forceArrow2").attr("src", "Images/rightForce.png");
+			$("#forceArrow1").attr("src", "src/Images/rightForce.png");
+			$("#forceArrow2").attr("src", "src/Images/rightForce.png");
 		}
 		
 		// Set arrow size

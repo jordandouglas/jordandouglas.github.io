@@ -77,7 +77,7 @@ function init_WW(isWW){
 
 	//refresh_WW();
 
-
+	console.log("ww connected");
 
 }
 

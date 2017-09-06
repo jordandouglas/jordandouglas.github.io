@@ -43,13 +43,13 @@ function renderSecondaryStructure(data){
 		var svg = d3.select("#mRNAsvg");
 
 		 var nodes = [{
-		     "src": "Images/Cm.png"
+		     "src": "src/Images/Cm.png"
 		 }, {
-		     "src": "Images/Gm.png"
+		     "src": "src/Images/Gm.png"
 		 }, {
-		     "src": "Images/Um.png"
+		     "src": "src/Images/Um.png"
 		 }, {
-		     "src": "Images/Am.png"
+		     "src": "src/Images/Am.png"
 		 }];
 		
 		nodes = data["vertices"];
@@ -112,7 +112,7 @@ function renderSecondaryStructure(data){
 
 
 		 var nodeImage = node.append("image")
-		     .attr("xlink:href", d => "Images/" + d.src + ".png")
+		     .attr("xlink:href", d => "src/Images/" + d.src + ".png")
 		     .attr("height", "22px")
 		     .attr("width", d => d.fixed ? 0 : "22px" )
 		     .attr("x", d => d.fixed ? d.fx - $("#bases").scrollLeft() : d.startX)

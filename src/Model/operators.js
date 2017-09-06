@@ -312,11 +312,11 @@ function forward_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdates)
 	// If pol moves into special site then change its picture
 	if (nucleoproteinPhase == -1 && UPDATE_COORDS && state["rightGBase"] == specialSite-1){
 		//TODO: pause state image  polMol = document.getElementById('pol');
-		//polMol.setAttribute('src', "Images/polS.png");
+		//polMol.setAttribute('src', "src/Images/polS.png");
 	}
 	else if (nucleoproteinPhase == -1 && UPDATE_COORDS && state["rightGBase"] == specialSite){
 		//polMol = document.getElementById('pol');
-		//polMol.setAttribute('src', "Images/pol.png");
+		//polMol.setAttribute('src', "src/Images/pol.png");
 	}
 	
 	
@@ -479,11 +479,11 @@ function backwards_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdate
 		// If pol moves into special site then change its picture
 		if (nucleoproteinPhase == -1 && UPDATE_COORDS && state["rightGBase"] == specialSite-1){
 			//TODO: polMol = document.getElementById('pol');
-			//polMol.setAttribute('src', "Images/polS.png");
+			//polMol.setAttribute('src', "src/Images/polS.png");
 		}
 		else if (nucleoproteinPhase == -1 && UPDATE_COORDS && state["rightGBase"] == specialSite-2){
 			//polMol = document.getElementById('pol');
-			//polMol.setAttribute('src', "Images/pol.png");
+			//polMol.setAttribute('src', "src/Images/pol.png");
 		}
 		state["mRNAPosInActiveSite"]--;
 		

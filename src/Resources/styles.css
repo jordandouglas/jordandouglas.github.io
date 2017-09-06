@@ -444,7 +444,7 @@ input {
 }
 
 .variable-cursor{
-	cursor: url("Images/cursorHover.png"), pointer;
+	cursor: url("src/Images/cursorHover.png"), pointer;
 }
 
 .distn{

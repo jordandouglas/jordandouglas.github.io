@@ -2,7 +2,7 @@
 
 
 
-png("F:/STOREDFILES/Research/OverprintingDisorder/Animations/bin/TutorialImages/exponential.png", width = 1000, height = 500, res = 120)
+png("F:/STOREDFILES/Research/OverprintingDisorder/Animations/bin/Tutorialsrc/Images/exponential.png", width = 1000, height = 500, res = 120)
 
 par(mfrow = c(1,2))
 

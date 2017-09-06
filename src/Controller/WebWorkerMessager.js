@@ -42,7 +42,7 @@ function register_WebWorker(){
 	if(typeof(Worker) !== "undefined") {
         	if(WEB_WORKER == null) {
 				try {
-            			WEB_WORKER = new Worker("Model/WebWorker.js");
+            			WEB_WORKER = new Worker("src/Model/WebWorker.js");
 
             			// Tell the WebWorker to initialise
    						callWebWorkerFunction(function() { init_WW(true); });
