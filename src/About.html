@@ -1,0 +1,961 @@
+<html>
+<head>
+<title>About SNAPdragon</title>
+<link rel="icon" href="Images/transcribe.png">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="Resources/styles.css">
+<script language='JavaScript' type='text/JavaScript' src="Resources/jquery-3.1.1.min.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="Resources/bibliography.js"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+
+<script language='JavaScript' type='text/JavaScript'>
+<!--
+
+function init(){
+
+
+	
+	numReferences = 0;
+	referenceNumbers = {};
+	addCitations();
+	
+}
+
+
+function minimiseSection(element){
+
+	var toHide = $(element).attr("id");
+	toHide = toHide.substring(0, toHide.length-3); // Remove 'Btn' from the end
+	console.log(toHide);
+
+	if($(element).val() == "-"){
+		$(element).val("+")
+		$("#" + toHide).hide(300);
+	}
+	else{
+		$(element).val("-")
+		$("#" + toHide).show(300);
+	}
+
+}
+
+function addCitations(){
+
+
+	var citationTags = $("cite");
+	for (var i = 0; i < citationTags.length; i ++){
+	
+		
+		var val = $(citationTags[i]).attr("val");
+		
+		// Add the reference to the bottom of the page if it does not already exist
+		if ($("#" + val).length == 0){
+		
+			numReferences++;
+			referenceNumbers[val] = numReferences;
+			var referenceString = BIBLIOGRAPHY[val];
+			$("#references").append('<div class="ref" id="' + val + '">' + numReferences + ') ' +  referenceString + '</div><br>');
+		
+		
+		}
+		
+		
+		// Create the link to the reference
+		$(citationTags[i]).append(`<sup><a style="text-decoration: none; color:#008CBA" href="#` + val + `">(` + referenceNumbers[val] + `) </a></sup>`);
+		
+		
+		
+		
+	
+	}
+
+
+
+};
+
+
+
+</script>
+
+</head>
+
+<body onload="init()">
+	<div id="screenContainer" style="position:relative">
+		<div id="screen" style="opacity:1;">
+
+
+				
+
+			<div id="main" style="background-color:white">
+				
+				
+				<div id="header" class="header" style="width:100%; ">
+					<table style="margin: 0px auto; width:100%">
+						
+
+						
+						<tr>
+							<td style="height:30px; width: 20%; vertical-align:bottom; ">
+								
+								
+							</td>
+
+							<td  style="text-align:center; font-size: 20px; vertical-align:top; font-family: 'Palatino'; width: 60%;"> 
+								<div style="width:100%; text-align:center">
+									<a href="SNAPdragon.html" ><img src="Images/logo2.png" style="height:120px; vertical-align:middle;"></a>
+								</div>
+										
+							</td>
+							
+							
+
+							<td style="height:30px; width: 20%; vertical-align:bottom; text-align:right;"> 
+								<span style="padding:5 5; color:white; background-color:#008CBA">About</span> &nbsp;
+								<span style="padding:5 5;"> <a href="Download.html">Download</a> </span> &nbsp;
+								<span style="padding:5 5;"> <a href="Contact.html">Contact us</a> </span> &nbsp;
+							</td>
+						</tr>
+
+						
+					</table>
+				</div>
+			   
+				
+				
+
+				<br>
+				<div class="about-block" style="width:70%; margin:auto">
+					<div class="about-block-inner">
+						<div class="block-subtitle" style="font-size:45px"> An interactive graphical simulation of nucleic acid polymerases </div> <br>
+					
+						SNAPdragon is a free open-source web-based program aimed to help researchers, teachers and students visualise transcription at the level of a single molecule. Transcription is the copying of a template (typically DNA) 
+						into messenger RNA (mRNA) and is one of the most central processes in all of biology. The copying process is carried out by a protein called RNA polymerase. RNA polymerase runs along the template 
+						as it extends the mRNA. While this main pathway of transcription is fairly straightfoward, some of the less-common and off-pathway events can be	cause complications. For example, sometimes	
+						RNA polymerase moves very far in the wrong direction (backtracking), sometimes a nucleotide is copied incorrectly (a misincorporation), and sometimes the template and mRNA slip along each other (which can cause an insertion or deletion).
+						Researchers have built kinetic models of transcription to describe and quantify the main pathway and some of these off-pathway processes.
+						<br><br>
+
+						
+						This program has two main functions: (1) <b>Visualisation</b> of transcription elongation, misincorporations and transcriptional slippage, and for more advanced users (2) <b>Simulation</b> of transcription elongation  
+						with kinetic models. This webpage contains tutorials on how to use SNAPdragon.   <br><br>
+						
+						
+
+						
+				
+					</div>
+				</div>
+				
+				
+				
+				<br><br><br>
+				<div class="main-block" >
+					<div class="main-block-inner">
+						<div class="block-title"> <input type=button id='gettingStartedBtn' class='minimise' value='-' onClick="minimiseSection(this)"> Getting Started </div> 
+						<div id="gettingStarted">
+
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+									<div class="block-subtitle"> Sequence selection </div> <br>
+									
+									
+									<img src="TutorialImages/sequenceParams.png" style="height:300px; padding: 10 30;" align=left></img>
+									
+									<br><br><br>
+									
+									The first thing you will want to do is choose your sequence.
+									There are several example sequences preloaded into the system, or you may upload your own nucleic acid sequence from the &#9776; Parameters side-navigation menu. The models in SNAPdragon are designed for and have only been tested on
+									DNA-dependent RNA-polymerases. However, you do have the option to play around with other polymerase classes (eg. DNA polymerases or RNA-dependent RNA-polymerases) but be warned that the science behind them is not yet clear.
+									Your choice of sequence type will determine the NTP or dNTP concentrations, and which of the three sets of thermodynamic parameters are used 
+									- Turner's RNA/RNA parameters<cite val="xia1998thermodynamic"></cite>, Sugimoto's DNA/RNA parameters<cite val="wu2002temperature"></cite>, or SantaLucia's DNA/DNA parameters<cite val="santalucia1998unified"></cite>. <br><br>
+
+
+									<br><br><br>
+									
+
+							
+								</div>
+							</div>
+
+
+
+
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+									<div class="block-subtitle"> Polymerase structure </div> <br>
+								
+
+
+									Polymerases read the template strand (eg. the genome) in the 3' &rarr; 5' direction, and copy it to create the nascent strand (eg. mRNA) which grows in the 5' &rarr; 3' direction. You can control the polymerase using the Navigation panel
+									(described in the section below). RNA polymerases typically contain four channels: a template entry channel, a template exit channel, a nascent strand exit channel and an NTP entry pore. Within the RNA polymerase, 
+									the template and nascent strand basepair to form a hybrid. If the template is double-stranded then RNA polymerase needs to melt the template in order to access the strand which is being copied. 
+									This set of bases which are melted comprises the transcription bubble. In the example below, the transcription bubble contains 2 + 9 + 1 = 12bp.  <br><br>
+									
+
+									<img src="TutorialImages/polStructure.png" style="height:200px; padding: 10 30;" align=left></img>
+									<img src="TutorialImages/structureParams.png" style="height:200px; padding: 10 30;" align=right></img>
+									
+									 <br><br><br><br><br><br><br><br><br><br><br><br>
+									The number of template bases within the transcription bubble differs between polymerases.
+									These three parameters may have an effect on the activity of the polymerase and can be changed from the &#9776; Parameters side-navigation menu. 
+
+							
+								</div>
+							</div>
+
+
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+									<div class="block-subtitle" > Applying chemical reactions </div> <br>
+								
+
+									
+									You can control the polymerase directly using the Navigation panel at the bottom of the main page. You should play around with the different reactions to see how they work. Advanced users will wish to
+									Simulate <img src="Images/dice.png"  style="vertical-align:middle; width:25px; height:25px;"></img> reactions, whereby the reactions described below are selected randomly based off experimental parameters.
+									
+								
+									<br><br>
+									<span class="block-subsubtitle" > Translocation. </span> There are two translocation operations: <input type=button value='Backwards' class="operation variable;" style="cursor:auto">
+									and <input type=button value='Forward' class="operation variable;" style="cursor:auto">. These operations move the polymerase one base-pair left and right respectively, with respect to the 
+									template and nascent strand. These operations involve reconfiguring the base-pairs within the hybrid, and within the chromosome if it is double-stranded. If the polymerase moves beyond the 3' end of the nascent strand, 
+									then the nascent strand will be released (termination). 
+									
+
+									<br><br><br>
+									<span class="block-subsubtitle" > Catalysis. </span> 
+									<span style="line-height:30px">
+										If the active site is free and next to the 3' end of the nascent strand, then the polymerase may  <input type=button value='Bind NTP' class="operation variable;" style="cursor:auto">.
+										Once bound, the polymerase may <input type=button value='Polymerise' class="operation variable;" style="cursor:auto"> by catalysing the reaction, or it may 
+										<input type=button value='Release NTP' class="operation variable;" style="cursor:auto"> back into the cell. Reverse-catalysis is also possible in SNAPdragon using 
+										<input type=button value='Decay' class="operation variable;" style="cursor:auto">, although it is very improbable in nature. The canonical pathway of transcription 
+										elongation is a three step cycle: 1) forward translocation, 2) NTP binding, 3) catalysis. This may also be achieved with the Copy 
+										<img src="Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function. 
+									</span>
+									
+									
+									<br><br><br>
+									<span class="block-subsubtitle" > Deactivation. </span>  RNA polymerases are believed to occassionally <input type=button value='Deactivate' class="operation variable;" style="cursor:auto"> whereby they undergo 
+									conformational changes and enter a catalytically inactive state, sometimes known as the intermediate state. In this state the protein cannot polymerise but it may still translocate. Factors known to increase the 
+									rate of entering the inactive state are 1) weak basepairing in the hybrid, 2) interactions between the polymerase and upstream or downstream elements of the template, and 3) interactions between the polymerase and
+									a secondary structure in the nascent strand <cite val="artsimovitch2000pausing"></cite> <cite val="depken2009origin"></cite> <cite val="imashimizu2013intrinsic"></cite>. Inactivation causes the polymerase to pause indefinitely, and elongation can only resume following an
+									<input type=button value='Activate' class="operation variable;" style="cursor:auto">.
+									
+									
+									<br><br><br>
+									<span class="block-subsubtitle" > Slippage. </span> <span style="line-height:30px"> Sometimes the nascent and template strand temporarily melt and a bulge forms in one of the strands. This can be performed by <input type=button value='Form bulge' class="operation variable;" style="cursor:auto">.
+									When this happens, a kink (bulge) forms within the duplex. This can occur within either the template or nascent strand (although in SNAPdragon it can currently only occur within the nascent strand). When a bulge forms,
+									the active site may be opened up, allowing one of the template bases to be copied twice. This would lead to an insertion. The bulge may 
+									 <input type=button value='Diffuse left' class="operation variable;" style="cursor:auto"> or  <input type=button value='Diffuse right' class="operation variable;" style="cursor:auto"> along the
+									 hybrid. This process is favoured if the hybrid sequence is repetitive (eg. AAAAAAAAA/UUUUUUUUU). When positioned at either end of the hybrid, the bulge may be absorbed <input type=button value='Absorb bulge' class="operation variable;" style="cursor:auto">. This three step process (bulge formation, diffusion and absorption)
+									 was inspired by Neher et al.<cite val="neher2004dynamics"></cite><cite val="kuhner2007force"></cite> and is believed to be the mechanism behind transcriptional slippage. Iterative slippage and elongation can lead to large insertions. This is sometimes called stuttering and
+									can also be achieved with the Stutter <img src="Images/stutter.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function.</span>
+							
+								</div>
+							</div>
+
+
+
+
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+									<div class="block-subtitle"> Tools menu </div> <br>
+
+
+
+								<table style="width:80%; margin:auto">
+									<tr>
+										<td style="width:150px">
+											<table class="toolbar" cellpadding=3>
+
+												<tr>
+													<td>
+														<div class="toolbarIcon" title="Reinitiate the polymerase"> <img id='refresh'   src="Images/reset.png" style="padding:5 0; width:35px; height:25px;"> </div>
+													</td>
+
+													<td>
+														<div class="toolbarIcon" title="Stop (esc)" > <img id='stop'  src="Images/stop.png" style="width:35px; height:35px;"> </div>
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<div class="toolbarIcon"  title="Replicate/transcribe N bases"> <img id='trans'  src="Images/transcribe.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
+													</td>
+													<td>
+														<div class="toolbarIcon"  title="Stutter N times" > <img id='stutter'  src="Images/stutter.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<div class="toolbarIcon"  title="Fold the mRNA"> <img  src="Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
+													</td>
+													<td>
+														<div class="toolbarIcon"  title="Perform N simulations stochastically"> <img id='startTrials'   src="Images/dice.png" style="vertical-align: middle; width:35px; height:35px;">   </div>
+													</td>
+												
+												
+
+												<tr>
+													<td colspan=2>
+														<div class="toolbarIcon" style="width:90px"> <span id="progressSimSpan" style="font-size: 16px; display:none; cursor: auto"></span> <span id="numSimSpan"> <b>N=</b><input type="number" name="nbasesToSimulate" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:right; width: 60px; background-color: #008CBA; color:white"> </span> </div>
+													</td>
+
+												</tr>
+												
+												
+
+
+												<tr>
+													<td colspan=2>
+														<div class="toolbarIcon">
+															<select class="dropdown" title="Duration of each reaction" id = "PreExp"style="vertical-align: middle; text-align:right;">
+																<option value="slow">Slow</option>
+																<option value="medium">Medium</option>
+																<option value="fast">Fast</option>
+																<option value="ultrafast">Ultrafast</option>
+																<option value="hidden">Hidden</option>
+															</select>
+														</div>
+													</td>
+
+												</tr>
+
+
+
+												<tr>
+													<td>
+													</td>
+
+													<td>
+														<div class="toolbarIcon" title="Clear kinetic data from the cache" > 
+															<img id='deleteAllData' src="Images/close.png" style="padding:5 0; height:25px;">
+														</div>
+													</td>
+												</tr>
+												
+												
+												</tr>
+												
+													<tr>
+													<td>
+														<div class="toolbarIcon"  title="Download the current session in xml format"> <img id='saveSessionID'   src="Images/downloadGreen.png" style="padding:5 0; height:25px;"> </div>
+													</td>
+
+													<td>
+														<div class="toolbarIcon"title="Upload a session in xml format" > 
+															<img id='loadSessionID' class="rotate180" src="Images/downloadGreen.png" style="padding:5 0; height:25px;">
+														</div>
+
+													</td>
+												</tr>
+
+
+
+											<!-- <div class="toolbarIcon" style="display:none;"> <input type=image id='mutateBtn' title="Mutate a random base" onClick=mutate() src="Images/lightning.png" style="vertical-align: middle; width:30px; height:30px;"> </div> -->
+
+											</table>
+										</td>
+										<td style="font-size:18px; text-align:justify">
+
+											<i>The tools menu contains some essential functions which you should familiarise yourself with.</i> <br><br>
+
+											<b>Reinitiate</b> <img src="Images/reset.png"  style="vertical-align:middle; width:25px; height:20px;"> will reset the polymerase to its initial position. This will
+											not affect plots or any other outputs. If you have added a background distribution behind any parameters then they will be resampled. <br><br>
+
+
+											<b>Stop</b> <img src="Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> will immediately halt any polymerase acitivies taking place.
+											This will not affect any parameters, plots or other outputs.  <br><br>
+
+
+											<b>N = </b><input type="number" value=30 style="vertical-align: middle; text-align:right; width: 60px; background-color: #008CBA; color:white"> is a variable. The meaning of <b>N</b> depends on which
+											tool is being used.  <br><br>
+
+
+
+											<b>Copy</b> <img src="Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"> transcribes/replicates/copies the next <b>N</b> bases. The duration of this process is determined by <b>Speed</b>.
+											Copying can be stopped early using the Stop <img src="Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button. <br><br>
+
+
+											<b>Stutter</b> <img src="Images/stutter.png"  style="vertical-align:middle; width:25px; height:25px;"> copies the current base <b>N</b> times, therefore adding an insertion of
+											size <b>N</b> into the nascent strand. Insertions are added through slippage. The duration of this process is determined by <b>Speed</b>.
+											Stuttering can be stopped early using the Stop <img src="Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button. <br><br>
+
+
+											<b>Fold</b> <img src="Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"> folds the mRNA into its predicted secondary structure and renders it onto the nascent strand. This function will only work
+											if the nascent strand is single-stranded RNA. Note that this function is only cosmetic and will not affect the polymerase. If you want the mRNA secondary structure to affect reactions
+											then make sure that "Allow mRNA folding" is enabled. <br><br>
+
+
+											<b>Simulate</b> <img src="Images/dice.png"  style="vertical-align:middle; width:25px; height:25px;"> begins the random simulation starting from the current position
+											of the polymerase. During the simulation, reactions are
+											randomly sampled according to their rate constants, which can be tweaked in the parameters menu. <b>N</b> trials are performed in the simulation. When the polymerase
+											finishes copying the sequence (or prematurely terminates) the next trial begins. The duration of each reaction in the simulation is determined by <b>Speed</b>.
+											The simulation can be stopped early using the Stop <img src="Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button.  <br><br>
+
+
+
+											<b>Speed</b> <select class="dropdown" title="Duration of each reaction" style="vertical-align: middle; text-align:right;">
+												<option value="slow">Slow</option>
+												<option value="medium">Medium</option>
+												<option value="fast">Fast</option>
+												<option value="ultrafast">Ultrafast</option>
+												<option value="hidden">Hidden</option>
+											</select>
+
+											is a variable which controls the speed of the animation while Copying, Stuttering or Simulating. If the speed is set to <b>slow</b>,
+											<b>medium</b> or <b>fast</b>, then the polymerase will animate each reaction at a slow, medium or fast speed, respectively. If the speed is <b>ultrafast</b>,
+											then the animation will not show every reaction and will only update periodically. If the speed is <b>hidden</b>, then this is the same as
+											<b>ultrafast</b> except that the polymerase is no longer displayed and will not animate at all. <b>Hidden</b> is the fastest setting. <br><br>
+											
+											
+											<b>Clear cache</b> <img src="Images/close.png"  style="vertical-align:middle; height:20px;"> opens up a dialog where you can delete any kinetic data which has been saved
+											during the simulation. The kinetic data is displayed in plots so think of this button as resetting the plots.  <br><br>
+
+
+											<b>Save</b> <img src="Images/downloadGreen.png"  style="vertical-align:middle; height:20px;"> downloads the current session in XML format.  <br><br>
+
+
+											<b>Load</b> <img src="Images/downloadGreen.png" class="rotate180"  style="vertical-align:middle; height:20px;"> uploads a saved XML session file from your computer.
+											 <br><br>
+
+										</td>
+									</tr>
+								</table>
+							
+								</div>
+							</div>
+
+
+
+
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+									<div class="block-subtitle"> Saving and loading your session </div> <br>
+
+							
+								</div>
+							</div>
+
+
+
+
+
+
+
+							<br><br>
+
+							
+
+						</div>
+					</div>
+				</div>
+
+
+				<br><br><br><br>
+				<div class="main-block" >
+					<div class="main-block-inner">
+						<div class="block-title"> <input type=button id='displayingPlotsBtn' class='minimise' value='+' onClick="minimiseSection(this)"> Displaying Plots </div> 
+						<div id="displayingPlots"  style="display:none">
+
+							
+								<div class="about-block">
+									<div class="about-block-inner">
+										Plots are cool
+
+
+
+									</div>
+								</div>
+
+						</div>
+					</div>		
+				</div>
+				
+
+
+
+				<br><br><br><br>
+				<div class="main-block" >
+					<div class="main-block-inner">
+						<div class="block-title"> <input type=button id='parametersBtn' class='minimise' value='+' onClick="minimiseSection(this)"> Parameters </div> 
+						<div id="parameters"  style="display:none">
+				
+		
+								
+								
+								<div class="about-block">
+									<div class="about-block-inner">
+										
+											
+											<div style="background-color: #008CBA; width:100%">
+											
+
+												<div class="parameter-bg" style="font-size:18px">
+													
+													<div class="parameter-title" style="font-size:30px">NTP Concentrations </div>  
+													<div class="parameter-title" style="font-size:18px">The concentrations of NTP (or dNTP if the nascent strand is DNA). The default values are estimated averages across multiple species and
+																have been borrowed from Traut 1994.<cite val="traut1994physiological"></cite> It is recommended that you change these values if you know what they are for your system.</div>  <br> 
+													
+														<b>[ATP]</b> - concentration of ATP (or dATP). Default: 3152&mu;M (or 24&mu;M) <br><br>
+
+														<b>[CTP]</b> - concentration of CTP (or dCTP). Default: 278&mu;M (or 29&mu;M) <br><br>
+
+														<b>[GTP]</b> - concentration of GTP (or dGTP). Default: 468&mu;M (or 5.2&mu;M) <br><br>
+					
+														<b>[UTP]</b> - concentration of UTP (or dTTP). Default: 567&mu;M (or 37&mu;M) <br><br>
+																			   
+														
+									
+												</div>
+
+
+
+												<br><br>
+												<div class="parameter-bg" style="font-size:18px">
+													
+													<div class="parameter-title" style="font-size:30px">Structural Parameters </div>  
+													<div class="parameter-title" style="font-size:18px">Basepairing configuration within the transcription bubble and polymerase.</div>  <br> 
+													
+														<b>Hybrid length</b> - number of basepairs in the template/primer hybrid within the polymerase. As translocation rates are determined from sequence composition, this value may affect
+																			   the predicted location of pause sites. In eukaryotes and prokaryotes, RNA polymerase contains a hybrid of 8 or 9bp<cite val="komissarova1997transcriptional"></cite>
+																			<cite val="gnatt2001structural"></cite> <cite val="nudler1997rna"></cite>. Default: 9bp <br><br>
+																			   
+																			   
+														<b>Bubble size 3'</b> - number of unpaired template bases 3' (left hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 2bp<cite val="maoileidigh2011unified"></cite> <br><br>
+														
+														<b>Bubble size 5'</b> - number of unpaired template bases 5' (right hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 1bp<cite val="maoileidigh2011unified"></cite> <br><br>
+
+									
+												</div>
+
+
+
+												<br><br>
+												<div class="parameter-bg" style="font-size:18px">
+													
+													<div class="parameter-title" style="font-size:30px">Translocation Parameters </div>  
+													<div class="parameter-title" style="font-size:18px">Energetics of translocation reactions and forces.</div>  <br> 
+													
+														<b style="font-size:20px">$\Delta G^\dagger_{slide}$</b> - free energy barrier height of translocation. To translocate forwards or backwards, several
+																	basepairs may need to be broken. The energy barrier which must be overcome in order to translocate is estimated as the energy needed to break these basepairs
+																	plus the value of this parameter. Increasing this value will make translocation slower. Default: 5RT<cite val="maoileidigh2011unified"></cite> <br><br>
+
+
+														
+
+
+														<b style="font-size:20px">$F_{assist}$</b> - the size of the force being applied to the polymerase during a single-molecule experiment. Positive forces are assisting loads and increase
+																	the rate of transcription. Negative forces are hindering loads and decrease the rate of transcription. When this force reaches a critical value, $k_{cat}$ becomes
+																	the rate limiting step. Default: 0pN <br><br>
+
+
+
+														<b>Arrest time </b> - the amount of time the polymerase may take to copy a base before the simulation trial is aborted. When the timeout is
+																	reached, copying will prematurely terminate and the next trial will begin. Default: 600s <br><br>
+																	
+																	
+														<b style="font-size:20px">$\Delta G^\dagger_{backtrack}$</b> - increase in barrier height when translocating from pretranslocated to backtracked state. 
+																	This parameter is experimental and is for advanced users. It not applicable under the default model settings. Default: 10RT <br><br>
+
+																			   
+
+									
+												</div>
+
+
+
+												<br><br>
+												<div class="parameter-bg" style="font-size:18px">
+													
+													<div class="parameter-title" style="font-size:30px">NTP Binding Parameters </div>  
+													<div class="parameter-title" style="font-size:18px">Kinetics of binding/releasing NTP, and catalysing polymerisation.</div>  <br> 
+													
+														<b style="font-size:20px">$k_{bind}$</b> - used to calculate rate constant of binding the complementary NTP, which is calculated as [NTP] k<sub>bind</sub>. 
+																	See k<sub>misbind</sub> for the rate of binding a non-complementary NTP. Default: 250s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> <br><br>
+
+
+
+
+
+														<b style="font-size:20px">$k_{release}$</b> - rate constant of releasing bound NTP. Since this value is around 50&times; the value of $k_{cat}$, the polymerase
+																	will bind and release the NTP on average 50 times before catalysis occurs. Fast, ultrafast and hidden simulations in SNAPdragon are optimised to  
+																	perform the binding step without rendering any visual changes. Default: 1000s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> <br><br>
+
+
+
+														<b style="font-size:20px">$k_{cat}$</b> - rate constant of catalysing bound NTP, thus extending the nascent chain by one base. When translocation is fast,
+																	catalysis is the rate limiting step in transcription. Default: 20s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> <br><br>
+																	
+																	
+														<b style="font-size:20px">$k_{misbind}$</b> - used to calculate rate constant of binding a non-complementary NTP, which is calculated as [NTP] k<sub>misbind</sub>. 
+																	If the bound NTP is added onto the end of the chain without correction then there is a misincorporation event. This parameter is only applicable when "Allow inactivation" is enabled. The overall rate of uncorrected misincorpations during transcription is
+																	around 1 in 10<sup>4</sup> - 10<sup>5</sup> bases<cite val="imashimizu2013direct"></cite><cite val="rosenberger1981estimate"></cite><cite val="shaw2002use"></cite>. Default: 0.25s<sup>-1</sup> <br><br>
+
+
+
+
+														<b style="font-size:20px">$k_{transition} / k_{transversion}$</b> - the ratio between transition and transversion rates. This parameter is only applicable when "Allow inactivation" is enabled. Default: 2 <br><br>
+
+
+														
+																			   
+
+									
+												</div>
+
+
+												<br><br>
+												<div class="parameter-bg" style="font-size:18px">
+													
+													<div class="parameter-title" style="font-size:30px">Unactivated State Parameters </div>  
+													<div class="parameter-title" style="font-size:18px">Kinetics of entering/exiting a catalytically inactive state.</div>  <br> 
+													
+														<b style="font-size:20px">$k_{U}$</b> - rate constant of polymerase entering the unactive state. When in the unactive state, the polymerase may
+																translocate but it may not bind NTP or catalyse. Elongation may only continue when the polymerase reactivates. Default: 0.23s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> <br><br>
+
+
+
+														<b style="font-size:20px">$k_{A}$</b> - rate constant of polymerase entering the active state. Default: 3s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> <br><br>
+
+												</div>
+
+
+
+
+												<br><br>
+												<div class="parameter-bg" style="font-size:18px">
+													
+													<div class="parameter-title" style="font-size:30px">RNA Folding Parameters  </div>  
+													<div class="parameter-title" style="font-size:18px">Settings behind folding the nascent RNA strand.</div>  <br> 
+													
+														<b>Allow mRNA folding </b> - whether or not the nascent RNA strand will fold automatically during the simulation. The predicted energy barrier 
+																of unfolding secondary structures in the mRNA may need to be overcome when the polymerase translocates backwards. When the nascent strand
+																is DNA or dsRNA this feature is not applicable. Note that enabling this feature will slow down the first trial of the simulation as we compute
+																the predicted (MFE<cite val="zuker1981optimal"></val></cite>) secondary structure of the RNA. You can view the RNA secondary structure with the Fold 
+																<img src="Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"></img> button. Default: TRUE <br><br>
+
+
+
+														<b>Number of bases to fold </b> - the number of most recently added bases in the nascent strand to fold (if "Allow mRNA folding" is enabled). The timescale
+																of transcription is probably not long enough to allow the whole mRNA chain to fold<cite val="maoileidigh2011unified"></cite>, especially in vivo, and folding the entire chain is
+																computationally expensive. For these two reasons we do not fold the entire mRNA but only the most recently added bases. Default: 150nt<cite val="maoileidigh2011unified"></cite> <br><br>
+
+												</div>
+
+
+
+
+												<br><br>
+											
+										
+											
+											</div>
+											
+										
+									</div>
+								</div>
+
+
+
+								
+
+
+
+								
+								
+								<br><br>
+								<div class="about-block">
+									<div class="about-block-inner">
+										<div class="block-subtitle" > Adding a background distribution to a parameter</div> <br>
+											
+											
+											
+											<img src="TutorialImages/prior.gif" style="height:400px; width:400px; padding: 10 30; display:inline-block" align=left></img>
+											<br>
+											If you are uncertain about the value of a parameter you can give it a background distribution <img src="Images/distn.png" style="vertical-align:middle; width:38px; height:12px;"></img> 
+											to capture your uncertainty. The probability distributions supported are uniform, normal, lognormal, exponential, and gamma. The parameter is resampled at the beginning of each simulation. 
+											All parameters are sampled independently of each other.
+											<br><br>
+											
+											<b>Example 1:</b> [ATP] is defaulted to Traut 1994’s<cite val="traut1994physiological"></cite> estimate of the mean ATP concentration (3152&mu;M) but one may wish to refine this value to reflect their own 
+											experimental settings. Or one may recognise that cellular NTP concentrations are not constant, and they fluctuate throughout the cell cycle. In this case, it may be more accurate to 
+											add a prior distribution behind [ATP]. Yaginuma et al. 2014 <cite val="yaginuma2014diversity"></cite> describe heterogeneity in [ATP] across E.coli cells with [ATP] following a positive-skewed modal distribution 
+											(mean: 1540&mu;M, SD: 1220&mu;M). Using SNAPdragon and some algebra, one could model [ATP] approximately with a lognormal distribution (where &mu; = 7.10, &sigma; = 0.698). Then the ATP 
+											concentration would be resampled from this distribution at the beginning of each trial. <br><br>
+											
+											
+											<b>Example 2:</b> There can be a great deal of heterogeneity between different RNA polymerase units. The standard deviation of transcription velocity 
+											across different RNA polymerase units in E.coli is quite high: around 4-6bp/s<cite val="adelman2002single"></cite><cite val="tolic2004diversity"></cite>. Compare this to the mean velocity of 
+											14-20bp/s. One of many methods to account for polymerase heterogeneity is to add a normal prior distribution behind $k_{cat}$ with a standard deviation of, for example, 5.<cite val="maoileidigh2011unified"></cite>
+
+											
+											
+
+									</div>
+								</div>
+
+
+								<br><br><br>
+
+
+						</div>
+					</div>		
+				</div>
+
+
+
+
+
+				<br><br><br><br>
+				<div class="main-block" >
+					<div class="main-block-inner">
+						<div class="block-title"> <input type=button id='kineticsBtn' class='minimise' value='+' onClick="minimiseSection(this)"> Kinetics and Thermodynamics </div> 
+						<div id="kinetics"  style="display:none">
+
+
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+									<div class="block-subtitle" > Calculating translocation rates</div> <br>
+								
+										Basepairs may need to be broken in order for the polymerase to translocate forwards (right) or backwards (left) from its current position. For example, consider the image below. 
+
+										<br><br>
+
+
+										<img src="TutorialImages/breakingPairs.png" style="width:1200px; display:block;  margin: 0 auto;" border="1" ></img>
+
+										<br><br>
+
+										<div style="line-height:35px">
+											For the polymerase to move one step to the left, the 
+										
+											<span style="position:absolute; width:33px; "> 
+												<img src="Images/Ag.png" style="width:15px; height:15px; position:absolute; left:0px"></img>
+												<img src="Images/Gg.png" style="width:15px; height:15px; position:absolute; left:18px"></img>
+												<img src="Images/Tm.png" style="width:15px; height:15px; top:18px; position:absolute; left:0px"></img>
+												<img src="Images/Cm.png" style="width:15px; height:15px; top:18px; position:absolute; left:18px"></img>
+											</span> 
+
+
+
+											<span style="width:33;  display:inline-block;"></span> doublet on the left of the transcription bubble and the 
+
+
+
+											<span style="position:absolute; width:33px; "> 
+												<img src="Images/Ag.png" style="width:15px; height:15px; position:absolute; left:0px"></img>
+												<img src="Images/Cg.png" style="width:15px; height:15px; position:absolute; left:18px"></img>
+												<img src="Images/Um.png" style="width:15px; height:15px; top:18px; position:absolute; left:0px"></img>
+												<img src="Images/Gm.png" style="width:15px; height:15px; top:18px; position:absolute; left:18px"></img>
+											</span> 
+
+
+											<span style="width:33;  display:inline-block;"></span> doublet on the right of the hybrid must both be broken. Additionally, the mRNA must be refolded into a different conformation. For the polymerase
+											to move one step to the right, the 
+
+
+
+
+											<span style="position:absolute; width:33px; "> 
+												<img src="Images/Gg.png" style="width:15px; height:15px; position:absolute; left:0px"></img>
+												<img src="Images/Tg.png" style="width:15px; height:15px; position:absolute; left:18px"></img>
+												<img src="Images/Cm.png" style="width:15px; height:15px; top:18px; position:absolute; left:0px"></img>
+												<img src="Images/Am.png" style="width:15px; height:15px; top:18px; position:absolute; left:18px"></img>
+											</span> 
+
+
+											<span style="width:33;  display:inline-block;"></span> doublet on the right of the transcription bubble and the 
+
+
+
+											<span style="position:absolute; width:33px; "> 
+												<img src="Images/Ag.png" style="width:15px; height:15px; position:absolute; left:0px"></img>
+												<img src="Images/Ag.png" style="width:15px; height:15px; position:absolute; left:18px"></img>
+												<img src="Images/Um.png" style="width:15px; height:15px; top:18px; position:absolute; left:0px"></img>
+												<img src="Images/Um.png" style="width:15px; height:15px; top:18px; position:absolute; left:18px"></img>
+											</span> 
+
+
+											<span style="width:33;  display:inline-block;"></span> doublet on the left of the hybrid must both be broken. 
+
+										</div>
+
+										The estimated basepairing contribution to free energy for any given state can readily be calculated using RNA or DNA free energy parameters. This program uses these values to estimate the free energy 
+										barrier heights of translocating forwards and backwards. Let $\Delta G_x$ and $\Delta G_y$ be the basepairing free energies of neighbouring states x and y, respectively. Then, the free energy barrier
+										height of transition from state x to y is calculated as 
+										
+										$$
+											\Delta G^\dagger_{x,y} = \frac{\Delta G_x + \Delta G_y}{2} + \Delta G^\dagger_{slide},
+										$$
+										
+									
+										
+										where the value of parameter $\Delta G^\dagger_{slide}$ can be manually tweaked. This is a very simplistic estimation of translocation barrier heights. 
+										The rate constants of translocation are derived from the free energy barrier heights using the Arrhenius equation with a pre-exponential constant of $10^6$ s<sup>-1</sup>:
+
+										
+										$$
+											k_{x \rightarrow y} = 10^6 e^{-(\Delta G_{x,y}^\dagger - \Delta G_x)}.
+										$$
+										
+				
+										This model of translocation has been borrowed from Tadigotla et al.<cite val="maoileidigh2011unified"></cite><cite val="tadigotla2006thermodynamic"></cite>
+
+
+								
+							
+								</div>
+							</div>
+
+
+
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+									<div class="block-subtitle"> Poisson processes: how a reaction is randomly sampled </div> <br>
+								
+									A critical assumption is that these reactions are Poisson processes; the amount of time until a reaction occurs is independent of all other reactions and independent of how long you have already waited. 
+									If you were to keep flipping a coin until it landed on tails, the probability of getting tails on the next flip is not affected by how many times you have already flipped, and is not affected by how 
+									many times your friend has flipped their coin. Similarly, whether you have been waiting 1 second or 1 hour for a chemical reaction to occur, the probability of it happening right now is always the same.
+									The amount of time until reaction X &rarr; Y occurs follows the exponential distribution with rate k. <br><br>
+									
+									<img src="TutorialImages/exponential.png" style="height:350px; padding: 10 30;" align=left></img>
+									
+									If there are multiple chemical reactions competing with each other, then the reaction with the shortest reaction time will be selected. For example, suppose that you have a test-tube containing 
+									a single molecule of compound A, which can spontaneously undergo two reactions: A &rarr; B or A &rarr; C, with rate constants 0.001s<sup>-1</sup> and 0.002s<sup>-1</sup> respectively. 
+									The test-tube will flash a different colour of light for each reaction. <br><br>
+									
+									
+									The amount of time until either one of these reactions occurs is random, and exponentially distributed (see figures on the left). If we were to simulate this on a computer, we could 
+									generate two exponential random variables, one from each distribution. For example, suppose we sampled time 769.14s for Exponential(0.001) and 339.81s for Exponential(0.002). Then 
+									reaction A &rarr; C would be selected because it has the shorter reaction time. The probability of sampling reaction A &rarr; B is 0.001 / (0.001 + 0.002) = 1/3, and the probability 
+									of sampling reaction A &rarr; C is 0.002 / (0.001 + 0.002) = 2/3. <br><br>
+									
+									Reactions are sampled this way when you press the Simulate <img src="Images/dice.png"  style="vertical-align:middle; width:25px; height:25px;"></img> button.
+									
+									
+									
+									<br><br><br><br>
+							
+								</div>
+							</div>
+				
+
+
+					
+						</div>
+					</div>
+				</div>
+
+
+
+
+				
+				
+			
+				
+				
+				
+				<br><br><br><br>
+				<div class="main-block" >
+					<div class="main-block-inner">
+						<div class="block-title"> <input type=button id='performanceBtn' class='minimise' value='+' onClick="minimiseSection(this)"> Improving Software Performance </div> 
+						<div id="performance"  style="display:none">
+				
+				
+
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+									<div class="block-subtitle" > Web browser performance </div> <br>
+										
+										Rendering elements onto the screen (for example polymerase motion, plots, simulated sequences) can be computationally costly and can slow down the whole program.  If you are running a complex simulation on a 
+										long sequence over a large number of trials, you may notice the simulation begin to slow down eventually. Maximising the performance of this program requires you as the user to regulate when rendering does or 
+										does not occur. If the program starts to slow down, you should hide components of the interface with its respective minimise <input type=button class='minimise' value='&minus;' style="cursor:auto; font-size: 12px;"> 
+										button. If a component is minimised then rendering will not occur. The polymerase animation can be minimised by setting the speed to <b>hidden</b>. This will happen automatically when simulating large sequences.
+
+
+
+
+								</div>
+							</div>
+
+
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+									<div class="block-subtitle" > Web workers </div> <br>
+										
+										Setting the simulation speed to <b>slow</b>, <b>medium</b> or <b>fast</b> will determine the animation time of each reaction.
+										If you don't need to see the animations then you can set the speed to <b>ultrafast</b> or <b>hidden</b>. In these modes,
+										the operations all occur behind the scenes and the HTML will only update periodically or not at all. Sampling reactions is resource intensive 
+										and can make the browser unresponsive. For this reason we try to run these background processes in a Web Worker while rendering the animation is done in the main window. <br><br>
+										
+										A Web Worker is like a socket, or an invisible tab your browser opens which runs on its own thread and can communicate
+										with the main window. <a href="https://www.w3schools.com/html/html5_webworkers.asp">Most modern browsers support Web Workers</a> but if 
+										your browser is not up to date or if you have an overzealous third-party plugin then the Web Worker may not register (SNAPdragon will notify you with an error message). 
+										We recommend that you allow the Web Worker to register, to ensure the whole program runs smoothly and you can run simulations in <b>ultrafast</b> or <b>hidden</b> mode.
+
+								</div>
+							</div>
+				
+				
+				
+				
+						</div>
+					</div>
+				</div>
+
+	
+	
+	<br> <br> <br> <br> 
+	<div class="about-block" style="width:80%; margin:auto">
+		<div class="about-block-inner"  id="references">
+			<div class="block-subtitle"> References </div> <br>
+				
+				
+				
+
+		</div>
+	</div>
+	
+	
+	
+	
+	
+	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
+	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
+
+	
+	
+		<div class="header" style="width:100%; ">
+			SNAPdragon v1.00, Lab of Structural Biology & Centre for Computational Evolution, University of Auckland
+		</div>
+	
+
+
+		</div>
+	</div>
+
+
+</div>
+</body>
+</html>
