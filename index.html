@@ -27,10 +27,10 @@
 <html>
 <head>
 <title>SNAPdragon</title>
-<link rel="icon" href="Images/transcribe.png">
+<link rel="icon" href="src/Images/transcribe.png">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rel="stylesheet" type="text/css" href="Resources/styles.css">
+<link rel="stylesheet" type="text/css" href="src/Resources/styles.css">
 <script language='JavaScript' type='text/JavaScript' src="src/Resources/jquery-3.1.1.min.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Resources/mersenne-twister.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Resources/jstat.min.js"></script>
@@ -89,7 +89,7 @@ function init(){
 	// jstat library for gamma   - http://wiki.q-researchsoftware.com/wiki/Accessing_Common_Distributions_When_Writing_JavaScript_in_Q#Density_7
 	//							 - https://github.com/jstat/jstat
 
-
+	$("#badBrowser").hide(true);
 	nrefreshes = 1;
 
 	try{
@@ -150,7 +150,7 @@ function init(){
 	}
 	
 	// Hide error message if everything went okay
-	$("#badBrowser").hide(true);
+	//$("#badBrowser").hide(true);
 	
 	
 
@@ -1270,7 +1270,7 @@ function form_bulge_T(form_left){
 		// If pol moves out of special site then change its picture
 		if (nucleoproteinPhase == -1 && rightGBase != specialSite-2){
 			polMol = document.getElementById('pol');
-			polMol.setAttribute('src', "Images/pol.png");
+			polMol.setAttribute('src', "src/Images/pol.png");
 		}
 		
 		
@@ -1481,7 +1481,7 @@ function absorb_T(absorb_right = false){
 		
 		if (nucleoproteinPhase == -1 && rightGBase == specialSite-1){
 			polMol = document.getElementById('pol');
-			polMol.setAttribute('src', "Images/polS.png");
+			polMol.setAttribute('src', "src/Images/polS.png");
 		}
 		
 		enable_buttons();
@@ -1702,7 +1702,7 @@ function closeNav() {
 			  
 			 <div  class="parameter-bg">
 				 <div class="parameter-title" style="font-size: 28px;">Parameters
-						<input type=image id='viewModelBtn' title="View the kinetic diagram of this model" onClick="viewModel()" src="Images/diagram.png" style="position:absolute; padding: 3 3; left: 300px; width:50px; height:25px; float:right; vertical-align: middle; ">  
+						<input type=image id='viewModelBtn' title="View the kinetic diagram of this model" onClick="viewModel()" src="src/Images/diagram.png" style="position:absolute; padding: 3 3; left: 300px; width:50px; height:25px; float:right; vertical-align: middle; ">  
 					</div>
 				 
 				 </div>
@@ -1735,7 +1735,7 @@ function closeNav() {
 						<div style="width:100%; margin:auto; text-align:center;">
 							<label style="font-size:16px;"><input type="radio" onclick="changeInputSequenceType()" name="inputSeqType" value="inputTemplateSeq"  checked=true> </input> Template </label>
 							<label style="font-size:16px;"><input type="radio" onclick="changeInputSequenceType()" name="inputSeqType" value="inputNascentSeq">  </input> Nascent  </label>
-							<input type=image onClick="submitCustomSequence()" src="Images/go.png" style="float:right; vertical-align: bottom; width:20px; height:20px;" title="Submit sequence">  </input>
+							<input type=image onClick="submitCustomSequence()" src="src/Images/go.png" style="float:right; vertical-align: bottom; width:20px; height:20px;" title="Submit sequence">  </input>
 						</div>
 				</div>
 				<br>
@@ -1752,26 +1752,26 @@ function closeNav() {
 			
 			<div class="parameter-bg">
 				
-				<div class="parameter-title" ><span  id="NTPtitle"> </span> <input type=image id='refreshNTP' onClick=refreshNTP() src="Images/refresh.png" style="vertical-align: middle; width:20px; height:20px;"> </div> <br>
+				<div class="parameter-title" ><span  id="NTPtitle"> </span> <input type=image id='refreshNTP' onClick=refreshNTP() src="src/Images/refresh.png" style="vertical-align: middle; width:20px; height:20px;"> </div> <br>
 				
 				<div id="ATPconc_container">
 					<span id="ATPname"></span> = <input class="variable"   type="number" onChange="update_this_parameter_controller(this)" id="ATPconc" style="vertical-align: middle; text-align:right; width: 70px">&mu;M 
-					<input type=image id='ATPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">  
+					<input type=image id='ATPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>	
 					
 				<div id="CTPconc_container">
 					<span id="CTPname"></span> = <input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="CTPconc" style="vertical-align: middle; text-align:right; width: 70px">&mu;M
-					<input type=image id='CTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">  
+					<input type=image id='CTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>	
 				
 				<div id="GTPconc_container">
 					<span id="GTPname"></span> = <input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="GTPconc" style="vertical-align: middle; text-align:right; width: 70px">&mu;M
-					<input type=image id='GTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">  
+					<input type=image id='GTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 					
 				<div id="UTPconc_container">
 					<span id="UTPname"></span> = <input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="UTPconc" style="vertical-align: middle; text-align:right; width: 70px">&mu;M	
-					<input type=image id='UTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">  
+					<input type=image id='UTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 				
 			</div>
@@ -1781,17 +1781,17 @@ function closeNav() {
 				<div class="parameter-title">Structural Parameters </div>  <br> 
 				<div id="hybridLength_container">
 			    	Hybrid length = <input class="variable"  type="number"  id="hybridLength" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
-					<input type=image id='hybridLength_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">  
+					<input type=image id='hybridLength_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 				
 				<div id="bubbleSizeLeft_container">
 					Bubble size 3' = <input class="variable"  type="number"  id="bubbleSizeLeft" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
-					<input type=image id='bubbleSizeLeft_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">
+					<input type=image id='bubbleSizeLeft_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
 				</div>
 				
 				<div id="bubbleSizeRight_container">
 					Bubble size 5' = <input class="variable"  type="number"  id="bubbleSizeRight" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
-					<input type=image id='bubbleSizeRight_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">
+					<input type=image id='bubbleSizeRight_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
 				</div>
 
 			</div>
@@ -1807,30 +1807,30 @@ function closeNav() {
 				
 				<div id="GDaggerSlide_container">
 					&Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>slide</sub> = <input class="variable"  type="number" id="GDaggerSlide" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
-					<input type=image id='GDaggerSlide_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn"> 
+					<input type=image id='GDaggerSlide_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
 				</div>
 
 
 				<div id="GDaggerBacktrack_container">
 					&Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>backtrack</sub> = <input class="variable"  type="number" id="GDaggerBacktrack" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">
-					<input type=image id='GDaggerBacktrack_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn"> 
+					<input type=image id='GDaggerBacktrack_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
 				</div>
 
 				<div id="GsecondarySitePenalty_container">
 					&Delta;G<sub>NTP2</sub> = <input class="variable"  type="number" id="GsecondarySitePenalty" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">
-					<input type=image id='GsecondarySitePenalty_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn"> 
+					<input type=image id='GsecondarySitePenalty_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
 				</div>
 
 
 				
 				<div id="FAssist_container">
 					F<sub>assist</sub> = <input type="number" class="variable"  id="FAssist" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">pN
-					<input type=image id='FAssist_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn"> 
+					<input type=image id='FAssist_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
 				</div>
 
 				<div id="arrestTimeout_container">
 					Arrest time: <input type="number" class="variable" id="arrestTimeout" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">s
-					<input type=image id='arrestTimeout_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn"> 
+					<input type=image id='arrestTimeout_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
 				</div>
 
 				<div style="display:none">
@@ -1847,24 +1847,24 @@ function closeNav() {
 			<div class="parameter-bg">
 				<div class="parameter-title">NTP Binding Parameters 
 
-				<input type=image id='viewNTPModelBtn' title="View the NTP binding rates" onClick="viewMisincorporationModel()" src="Images/bindingIcon.png" style="position: absolute; left: 310px; padding: 3 3; width:30px; height:30px; float:right; vertical-align: middle; ">   <br></div>
+				<input type=image id='viewNTPModelBtn' title="View the NTP binding rates" onClick="viewMisincorporationModel()" src="src/Images/bindingIcon.png" style="position: absolute; left: 310px; padding: 3 3; width:30px; height:30px; float:right; vertical-align: middle; ">   <br></div>
 
 				<br>
 
 				<div id="RateBind_container">	
 			 		k<sub>bind</sub> =  <input class="variable"  type="number" id="RateBind" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M<sup>-1</sup>.s<sup>-1</sup> 
-			 		<input type=image id='RateBind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">  
+			 		<input type=image id='RateBind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 			 
 
 				<div id="RateUnbind_container">
 					k<sub>release</sub> =  <input class="variable"  type="number" id="RateUnbind" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> s<sup>-1</sup> 
-					<input type=image id='RateUnbind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">  
+					<input type=image id='RateUnbind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 				
 				<div id="RatePolymerise_container">
 		    		k<sub>cat</sub> = <input class="variable"  type="number"id="RatePolymerise" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> s<sup>-1</sup> 
-					<input type=image id='RatePolymerise_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">  
+					<input type=image id='RatePolymerise_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 					
 				<br>
@@ -1878,12 +1878,12 @@ function closeNav() {
 				
 				<div id="RateMisbind_container">
 				 	k<sub>misbind</sub> =  <input class="variable"  type="number" id="RateMisbind" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M<sup>-1</sup>.s<sup>-1</sup> 
-				 	<input type=image id='RateMisbind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">  
+				 	<input type=image id='RateMisbind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				 </div>
 				 
 				<div id="TransitionTransversionRatio_container">
 					k<sub>transition</sub> / k<sub>transversion</sub> = <input class="variable"  type="number" id="TransitionTransversionRatio" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> 
-					<input type=image id='TransitionTransversionRatio_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">  
+					<input type=image id='TransitionTransversionRatio_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 
 			</div>
@@ -1902,12 +1902,12 @@ function closeNav() {
 				
 				<div id="kU_container">
 					k<sub>U</sub> = <input class="variable"  type="number" id="kU"  style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
-					<input type=image id='kU_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">  
+					<input type=image id='kU_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 				
 				<div id="kA_container">
 					k<sub>A</sub> = <input class="variable"  type="number" id="kA" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
-					<input type=image id='kA_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">
+					<input type=image id='kA_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
 				</div>
 				
 				<span style="display:none"> <br> &Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>special</sub> = <input class="variable"  type="number" title="Free energy barrier height of sliding in or out of the edit site" name="GDaggerSpecial" id="GDaggerSpecial" value=0 style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T <br> </span>  
@@ -1915,12 +1915,12 @@ function closeNav() {
 				
 				<div id="kUspecial_container">
 				 	<span style="">k<sup>`</sup><sub style='position: relative; left: -.20em;'>U</sub> = <input class="variable"  type="number"  id="kUspecial"  style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> </span> 
-					<input type=image id='kUspecial_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">  		
+					<input type=image id='kUspecial_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  		
 				</div>
 				
 				<div id="kAspecial_container">
 					<span style="">k<sup>`</sup><sub style='position: relative; left: -.20em;'>A</sub> = <input class="variable"  type="number" id="kAspecial" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> </span>  
-					<input type=image id='kAspecial_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">   
+					<input type=image id='kAspecial_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">   
 				</div>
 				
 				<span style="display:none">Special site = <input class="variable"  type="number" name="specialSite" id="specialSite" value=33 style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"></span>
@@ -1945,7 +1945,7 @@ function closeNav() {
 					<div id="nbasesToFold_container">
 						
 						Number of bases to fold = <input class="variable"  type="number" id="nbasesToFold"  style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">  nt</sup> 
-						<input type=image id='nbasesToFold_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn">  
+						<input type=image id='nbasesToFold_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 						<br><br>The first simulation may take longer as we calculate the MFE structure of the nascent strand. 
 
 					</div>
@@ -1991,7 +1991,7 @@ function closeNav() {
 				
 				<div id="GDaggerDiffuse_container">
 				 	<br>&Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>bulgePrimer</sub> = <input class="variable"  type="number" id="GDaggerDiffuse"  style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T </input> 
-					<input type=image id='GDaggerDiffuse_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="Images/distn.png" class="distn"> 
+					<input type=image id='GDaggerDiffuse_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
 				</div>
 				
 				
@@ -2069,7 +2069,7 @@ function closeNav() {
 
 						<td  style="text-align:center; font-size: 20px; vertical-align:top; font-family: 'Palatino'; width: 60%;"> 
 							<div style="width:100%; text-align:center">
-								<a href="SNAPdragon.html" ><img src="Images/logo2.png" style="height:120px; vertical-align:middle;"></a>
+								<a href="index.html" ><img src="src/Images/logo2.png" style="height:120px; vertical-align:middle;"></a>
 							</div>
 									
 						</td>
@@ -2077,9 +2077,9 @@ function closeNav() {
 						
 
 						<td style="height:30px; width: 20%; vertical-align:bottom; text-align:right;"> 
-							<span style="padding:5 5;"> <a href="About.html">About</a></span> &nbsp;
-							<span style="padding:5 5;"> <a href="Download.html">Download</a> </span> &nbsp;
-							<span style="padding:5 5;"> <a href="Contact.html">Contact us</a> </span> &nbsp;
+							<span style="padding:5 5;"> <a href="src/About.html">About</a></span> &nbsp;
+							<span style="padding:5 5;"> <a href="src/Download.html">Download</a> </span> &nbsp;
+							<span style="padding:5 5;"> <a href="src/Contact.html">Contact us</a> </span> &nbsp;
 						</td>
 					</tr>
 
@@ -2109,27 +2109,27 @@ function closeNav() {
 
 									<tr>
 										<td>
-											<div class="toolbarIcon" style="cursor:pointer;" onClick="resetBtn();" title="Reinitiate the polymerase"> <img id='refresh'   src="Images/reset.png" style="padding:5 0; width:35px; height:25px;"> </div>
+											<div class="toolbarIcon" style="cursor:pointer;" onClick="resetBtn();" title="Reinitiate the polymerase"> <img id='refresh'   src="src/Images/reset.png" style="padding:5 0; width:35px; height:25px;"> </div>
 										</td>
 
 										<td>
-											<div class="toolbarIcon" style="cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="Images/stop.png" style="width:35px; height:35px;"> </div>
+											<div class="toolbarIcon" style="cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="src/Images/stop.png" style="width:35px; height:35px;"> </div>
 										</td>
 									</tr>
 									<tr>
 										<td>
-											<div class="toolbarIcon" style="cursor:pointer;" onClick=transcribe_controller()  title="Replicate/transcribe N bases"> <img id='trans'  src="Images/transcribe.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
+											<div class="toolbarIcon" style="cursor:pointer;" onClick=transcribe_controller()  title="Replicate/transcribe N bases"> <img id='trans'  src="src/Images/transcribe.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
 										</td>
 										<td>
-											<div class="toolbarIcon simulateRow" style="cursor:pointer;" onClick=stutter_controller() title="Stutter N times" > <img id='stutter'  src="Images/stutter.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
+											<div class="toolbarIcon simulateRow" style="cursor:pointer;" onClick=stutter_controller() title="Stutter N times" > <img id='stutter'  src="src/Images/stutter.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
 										</td>
 									</tr>
 									<tr class="simulateRow">
 										<td>
-											<div id="foldBtnDiv" class="toolbarIcon" style="cursor:pointer;" onClick="getMFESequenceBonds_controller()" title="Fold the mRNA"> <img  src="Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
+											<div id="foldBtnDiv" class="toolbarIcon" style="cursor:pointer;" onClick="getMFESequenceBonds_controller()" title="Fold the mRNA"> <img  src="src/Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
 										</td>
 										<td>
-											<div class="toolbarIcon" style="cursor:pointer;" onClick="startTrials_controller()" title="Perform N simulations stochastically"> <img id='startTrials'   src="Images/dice.png" style="vertical-align: middle; width:35px; height:35px;">   </div>
+											<div class="toolbarIcon" style="cursor:pointer;" onClick="startTrials_controller()" title="Perform N simulations stochastically"> <img id='startTrials'   src="src/Images/dice.png" style="vertical-align: middle; width:35px; height:35px;">   </div>
 										</td>
 
 									<tr>
@@ -2168,7 +2168,7 @@ function closeNav() {
 
 										<td>
 											<div class="toolbarIcon" style="cursor:pointer;" onClick="clearKineticDataCache();" title="Clear kinetic data from the cache" > 
-												<img id='deleteAllData' src="Images/close.png" style="padding:5 0; height:25px;">
+												<img id='deleteAllData' src="src/Images/close.png" style="padding:5 0; height:25px;">
 											</div>
 										</td>
 									</tr>
@@ -2177,12 +2177,12 @@ function closeNav() {
 									
 									<tr>
 										<td>
-											<div class="toolbarIcon" style="cursor:pointer;" onClick="saveSession();" title="Download the current session in xml format"> <img id='saveSessionID'   src="Images/downloadGreen.png" style="padding:5 0; height:25px;"> </div>
+											<div class="toolbarIcon" style="cursor:pointer;" onClick="saveSession();" title="Download the current session in xml format"> <img id='saveSessionID'   src="src/Images/downloadGreen.png" style="padding:5 0; height:25px;"> </div>
 										</td>
 
 										<td>
 											<div class="toolbarIcon" style="cursor:pointer;" onClick="loadSession();" title="Upload a session in xml format" > 
-												<img id='loadSessionID' class="rotate180" src="Images/downloadGreen.png" style="padding:5 0; height:25px;">
+												<img id='loadSessionID' class="rotate180" src="src/Images/downloadGreen.png" style="padding:5 0; height:25px;">
 											</div>
 											<input style="display:none" type="file" id="uploadSessionFile" accept=".xml"> 
 										</td>
@@ -2190,7 +2190,7 @@ function closeNav() {
 
 
 
-									<!-- <div class="toolbarIcon" style="display:none;"> <input type=image id='mutateBtn' title="Mutate a random base" onClick=mutate() src="Images/lightning.png" style="vertical-align: middle; width:30px; height:30px;"> </div> -->
+									<!-- <div class="toolbarIcon" style="display:none;"> <input type=image id='mutateBtn' title="Mutate a random base" onClick=mutate() src="src/Images/lightning.png" style="vertical-align: middle; width:30px; height:30px;"> </div> -->
 
 								</table>
 
@@ -2226,8 +2226,8 @@ function closeNav() {
 									</select>
 								
 								<input type=button id='showPlot1' class='minimise' value='+' onClick=showPlot(1) style="display:none">
-								<input type=image id='plotOptions1' title="Change the settings of this plot" onClick=plotOptions(1) src="Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
-								<input type=image id='downloadPlot1' title="Download the data displayed in this plot" onClick=downloadPlot(1) src="Images/download.png" style="vertical-align: middle; height:20px; display:none">  
+								<input type=image id='plotOptions1' title="Change the settings of this plot" onClick=plotOptions(1) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
+								<input type=image id='downloadPlot1' title="Download the data displayed in this plot" onClick=downloadPlot(1) src="src/Images/download.png" style="vertical-align: middle; height:20px; display:none">  
 								
 								
 								<div id="plotDIV1" style="display:none">
@@ -2254,8 +2254,8 @@ function closeNav() {
 								</select>
 							
 							<input type=button id='showPlot2' class='minimise' value='+' onClick=showPlot(2) style="display:none">
-							<input type=image id='plotOptions2' title="Change the settings of this plot" onClick=plotOptions(2) src="Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
-							<input type=image id='downloadPlot2' title="Download the data displayed in this plot" onClick=downloadPlot(2) src="Images/download.png" style="vertical-align: middle;  height:20px; display:none ">  
+							<input type=image id='plotOptions2' title="Change the settings of this plot" onClick=plotOptions(2) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
+							<input type=image id='downloadPlot2' title="Download the data displayed in this plot" onClick=downloadPlot(2) src="src/Images/download.png" style="vertical-align: middle;  height:20px; display:none ">  
 							
 							
 							
@@ -2286,8 +2286,8 @@ function closeNav() {
 							</select>
 						
 						<input type=button id='showPlot3' class='minimise' value='+' onClick=showPlot(3) style="display:none">
-						<input type=image id='plotOptions3' title="Change the settings of this plot" onClick=plotOptions(3) src="Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
-						<input type=image id='downloadPlot3' title="Download the data displayed in this plot" onClick=downloadPlot(3) src="Images/download.png" style="display:none; vertical-align: middle; height:20px; ">  
+						<input type=image id='plotOptions3' title="Change the settings of this plot" onClick=plotOptions(3) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
+						<input type=image id='downloadPlot3' title="Download the data displayed in this plot" onClick=downloadPlot(3) src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px; ">  
 					
 						
 						
@@ -2317,7 +2317,7 @@ function closeNav() {
 
 
 
-			<input type=image id='resetSimBtn' title="Reset simulation results" onClick=barchart(true) src="Images/close.png" style="display:none; vertical-align: middle; width:20px; height:20px; float:right">
+			<input type=image id='resetSimBtn' title="Reset simulation results" onClick=barchart(true) src="src/Images/close.png" style="display:none; vertical-align: middle; width:20px; height:20px; float:right">
 				
 
 
@@ -2343,8 +2343,8 @@ function closeNav() {
 
 
 						<input type=button id='showPlot4' class='minimise' value='+' onClick=showPlot(4) style="display:none;">
-						<input type=image id='plotOptions4' title="Change the settings of this plot" onClick=plotOptions(4) src="Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
-						<input type=image id='downloadPlot4' title="Download the data displayed in this plot" onClick=downloadPlot(4) src="Images/download.png" style="display:none; vertical-align: middle; height:20px;">  
+						<input type=image id='plotOptions4' title="Change the settings of this plot" onClick=plotOptions(4) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
+						<input type=image id='downloadPlot4' title="Download the data displayed in this plot" onClick=downloadPlot(4) src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px;">  
 
 						<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot4" OnChange="selectPlot(4);" style="vertical-align: middle; text-align:right; width:200px">
 						  <option value="none">Display a plot...</option>
