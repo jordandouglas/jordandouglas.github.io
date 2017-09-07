@@ -222,10 +222,18 @@ div.vertical{
 	color:#008CBA
 }
 
+
+#theToolbar{
+	border-style: solid; 
+	border-width: 2px; 
+	border-color:#b20000; 
+	
+	
+}
+
 .toolbar {
 	background-color: #424f4f;
 	width:60px;
-	padding: 2 2;
 	text-align:center;
 	-webkit-user-select: none;  
 	-moz-user-select: none;    
