@@ -43,13 +43,16 @@ function setImageSizes(){
 
 									
 	if(IS_MOBILE){
-		$("#polStructure").width("90%");
+
+		$(".main-block").css("width", "90%");
+
+		$("#polStructure").width("80%");
 		$("#polStructure").css("height", "");
-		$("#structureParams").width("90%");
+		$("#structureParams").width("80%");
 		$("#structureParams").css("height", "");
-		$("#breakingPairs").width("90%");
+		$("#breakingPairs").width("80%");
 		$("#breakingPairs").css("height", "");
-		$("#exponential").width("90%");
+		$("#exponential").width("80%");
 		$("#exponential").css("height", "");
 
 	}
@@ -187,6 +190,7 @@ function addCitations(){
 				
 				<br><br><br>
 				<div class="main-block" >
+
 					<div class="main-block-inner">
 						<div class="block-title"> <input type=button id='gettingStartedBtn' class='minimise' value='-' onClick="minimiseSection(this)"> Getting Started </div> 
 						<div id="gettingStarted">
@@ -234,7 +238,7 @@ function addCitations(){
 									<img id="polStructure" src="../src/TutorialImages/polStructure.png" style="height:200px; padding: 10 30;" align=left></img>
 									<img id="structureParams" src="../src/TutorialImages/structureParams.png" style="height:200px; padding: 10 30;" align=right></img>
 									
-									 <br><br><br><br><br><br><br><br><br><br><br><br>
+									 <br><br><br><br><br><br><br><br><br><br><br><br><br>
 									The number of template bases within the transcription bubble differs between polymerases.
 									These three parameters may have an effect on the activity of the polymerase and can be changed from the &#9776; Parameters side-navigation menu. 
 
@@ -303,127 +307,110 @@ function addCitations(){
 
 
 
+
+
 								<table style="width:80%; margin:auto">
 									<tr>
 										<td style="width:150px">
-											<table class="toolbar" cellpadding=3>
 
-												<tr>
-													<td>
-														<div class="toolbarIcon" title="Reinitiate the polymerase"> <img id='refresh'   src="../src/Images/reset.png" style="padding:5 0; width:35px; height:25px;"> </div>
-													</td>
+										<table class="toolbar" cellpadding=3>
+											
+											<tr>
+												<td>
+													<div class="toolbarIcon" title="Reinitiate the polymerase"> <img src="../src/Images/reset.png" style="padding:5 0; width:35px; height:25px;"> </div>
+												</td>
 
-													<td>
-														<div class="toolbarIcon" title="Stop (esc)" > <img id='stop'  src="../src/Images/stop.png" style="width:35px; height:35px;"> </div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														<div class="toolbarIcon"  title="Replicate/transcribe N bases"> <img id='trans'  src="../src/Images/transcribe.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
-													</td>
-													<td>
-														<div class="toolbarIcon"  title="Stutter N times" > <img id='stutter'  src="../src/Images/stutter.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														<div class="toolbarIcon"  title="Fold the mRNA"> <img  src="../src/Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
-													</td>
-													<td>
-														<div class="toolbarIcon"  title="Perform N simulations stochastically"> <img id='startTrials'   src="../src/Images/dice.png" style="vertical-align: middle; width:35px; height:35px;">   </div>
-													</td>
-												
+
+												<td>
+													<div class="toolbarIcon simulateRow" title="Perform N simulations stochastically"> <img  src="../src/Images/dice.png" style="vertical-align: middle; width:35px; height:35px;">   </div>
+												</td>
+
+
+											</tr>
+											<tr>
+
 												
 
-												<tr>
-													<td colspan=2>
-														<div class="toolbarIcon" style="width:90px"> <span id="progressSimSpan" style="font-size: 16px; display:none; cursor: auto"></span> <span id="numSimSpan"> <b>N=</b><input type="number" name="nbasesToSimulate" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:right; width: 60px; background-color: #008CBA; color:white"> </span> </div>
-													</td>
+												<td>
+													<div class="toolbarIcon" title="Clear kinetic data from the cache" > 
+														<img src="../src/Images/close.png" style="padding:5 0; height:25px;">
+													</div>
+												</td>
 
-												</tr>
+
+												<td>
+													<div class="toolbarIcon" title="Replicate/transcribe N bases"> <img id='trans'  src="../src/Images/transcribe.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
 												
+												</td>
+
+											</tr>
+											<tr>
+
+												<td>
+													<div id="foldBtnDiv" class="toolbarIcon"  title="Fold the mRNA"> <img  src="../src/Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
+												</td>
+
+												<td>
+													<div id="stutterBtn" class="toolbarIcon" title="Stutter N times" > <img src="../src/Images/stutter.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
 												
+												</td>
 
 
-												<tr>
-													<td colspan=2>
-														<div class="toolbarIcon">
-															<select class="dropdown" title="Duration of each reaction" id = "PreExp"style="vertical-align: middle; text-align:right;">
-																<option value="slow">Slow</option>
-																<option value="medium">Medium</option>
-																<option value="fast">Fast</option>
-																<option value="ultrafast">Ultrafast</option>
-																<option value="hidden">Hidden</option>
-															</select>
-														</div>
-													</td>
+											<tr>
+												<td colspan=2>
+													<div class="toolbarIcon" style="width:90px"> <span style="font-size: 16px; display:none; cursor: auto"></span> <span id="numSimSpan"> <b>N=</b><input type="number" name="nbasesToSimulate" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:right; width: 60px; background-color: #008CBA; color:white"> </span> </div>
+												</td>
 
-												</tr>
+											</tr>
+											
+											
 
 
+											<tr>
+												<td colspan=2>
+													<div class="toolbarIcon">
+														<select class="dropdown" title="Duration of each reaction" style="vertical-align: middle; text-align:right;">
+															<option value="slow">Slow</option>
+															<option value="medium">Medium</option>
+															<option value="fast">Fast</option>
+															<option value="ultrafast">Ultrafast</option>
+															<option value="hidden">Hidden</option>
+														</select>
+													</div>
+												</td>
 
-												<tr>
-													<td>
-													</td>
-
-													<td>
-														<div class="toolbarIcon" title="Clear kinetic data from the cache" > 
-															<img id='deleteAllData' src="../src/Images/close.png" style="padding:5 0; height:25px;">
-														</div>
-													</td>
-												</tr>
-												
-												
-												</tr>
-												
-													<tr>
-													<td>
-														<div class="toolbarIcon"  title="Download the current session in xml format"> <img id='saveSessionID'   src="../src/Images/downloadGreen.png" style="padding:5 0; height:25px;"> </div>
-													</td>
-
-													<td>
-														<div class="toolbarIcon"title="Upload a session in xml format" > 
-															<img id='loadSessionID' class="rotate180" src="../src/Images/downloadGreen.png" style="padding:5 0; height:25px;">
-														</div>
-
-													</td>
-												</tr>
+											</tr>
+											
+											
+											</tr>
 
 
+											
+											<tr>
+												<td>
+													<div class="toolbarIcon"  title="Download the current session in xml format"> <img id='saveSessionID'   src="../src/Images/downloadGreen.png" style="padding:5 0; height:25px;"> </div>
+												</td>
 
-											<!-- <div class="toolbarIcon" style="display:none;"> <input type=image id='mutateBtn' title="Mutate a random base" onClick=mutate() src="../src/Images/lightning.png" style="vertical-align: middle; width:30px; height:30px;"> </div> -->
+												<td>
+													<div class="toolbarIcon"  title="Upload a session in xml format" > 
+														<img id='loadSessionID' class="rotate180" src="../src/Images/downloadGreen.png" style="padding:5 0; height:25px;">
+													</div>
+												</td>
+											</tr>
 
-											</table>
+										</table>
 										</td>
 										<td style="font-size:18px; text-align:justify">
-
 											<i>The tools menu contains some essential functions which you should familiarise yourself with.</i> <br><br>
 
 											<b>Reinitiate</b> <img src="../src/Images/reset.png"  style="vertical-align:middle; width:25px; height:20px;"> will reset the polymerase to its initial position. This will
 											not affect plots or any other outputs. If you have added a background distribution behind any parameters then they will be resampled. <br><br>
 
-
 											<b>Stop</b> <img src="../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> will immediately halt any polymerase acitivies taking place.
 											This will not affect any parameters, plots or other outputs.  <br><br>
 
-
 											<b>N = </b><input type="number" value=30 style="vertical-align: middle; text-align:right; width: 60px; background-color: #008CBA; color:white"> is a variable. The meaning of <b>N</b> depends on which
 											tool is being used.  <br><br>
-
-
-
-											<b>Copy</b> <img src="../src/Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"> transcribes/replicates/copies the next <b>N</b> bases. The duration of this process is determined by <b>Speed</b>.
-											Copying can be stopped early using the Stop <img src="../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button. <br><br>
-
-
-											<b>Stutter</b> <img src="../src/Images/stutter.png"  style="vertical-align:middle; width:25px; height:25px;"> copies the current base <b>N</b> times, therefore adding an insertion of
-											size <b>N</b> into the nascent strand. Insertions are added through slippage. The duration of this process is determined by <b>Speed</b>.
-											Stuttering can be stopped early using the Stop <img src="../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button. <br><br>
-
-
-											<b>Fold</b> <img src="../src/Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"> folds the mRNA into its predicted secondary structure and renders it onto the nascent strand. This function will only work
-											if the nascent strand is single-stranded RNA. Note that this function is only cosmetic and will not affect the polymerase. If you want the mRNA secondary structure to affect reactions
-											then make sure that "Allow mRNA folding" is enabled. <br><br>
 
 
 											<b>Simulate</b> <img src="../src/Images/dice.png"  style="vertical-align:middle; width:25px; height:25px;"> begins the random simulation starting from the current position
@@ -431,6 +418,22 @@ function addCitations(){
 											randomly sampled according to their rate constants, which can be tweaked in the parameters menu. <b>N</b> trials are performed in the simulation. When the polymerase
 											finishes copying the sequence (or prematurely terminates) the next trial begins. The duration of each reaction in the simulation is determined by <b>Speed</b>.
 											The simulation can be stopped early using the Stop <img src="../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button.  <br><br>
+
+
+											<b>Clear cache</b> <img src="../src/Images/close.png"  style="vertical-align:middle; height:20px;"> opens up a dialog where you can delete any kinetic data which has been saved
+											during the simulation. The kinetic data is displayed in plots so think of this button as resetting the plots.  <br><br>
+
+
+											<b>Copy</b> <img src="../src/Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"> transcribes/replicates/copies the next <b>N</b> bases. The duration of this process is determined by <b>Speed</b>.
+											Copying can be stopped early using the Stop <img src="../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button. <br><br>
+
+											<b>Stutter</b> <img src="../src/Images/stutter.png"  style="vertical-align:middle; width:25px; height:25px;"> copies the current base <b>N</b> times, therefore adding an insertion of
+											size <b>N</b> into the nascent strand. Insertions are added through slippage. The duration of this process is determined by <b>Speed</b>.
+											Stuttering can be stopped early using the Stop <img src="../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button. <br><br>
+
+											<b>Fold</b> <img src="../src/Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"> folds the mRNA into its predicted secondary structure and renders it onto the nascent strand. This function will only work
+											if the nascent strand is single-stranded RNA. Note that this function is only cosmetic and will not affect the polymerase. If you want the mRNA secondary structure to affect reactions
+											then make sure that "Allow mRNA folding" is enabled. This function is disabled on mobile devices. <br><br>
 
 
 
@@ -441,29 +444,20 @@ function addCitations(){
 												<option value="ultrafast">Ultrafast</option>
 												<option value="hidden">Hidden</option>
 											</select>
-
 											is a variable which controls the speed of the animation while Copying, Stuttering or Simulating. If the speed is set to <b>slow</b>,
 											<b>medium</b> or <b>fast</b>, then the polymerase will animate each reaction at a slow, medium or fast speed, respectively. If the speed is <b>ultrafast</b>,
 											then the animation will not show every reaction and will only update periodically. If the speed is <b>hidden</b>, then this is the same as
 											<b>ultrafast</b> except that the polymerase is no longer displayed and will not animate at all. <b>Hidden</b> is the fastest setting. <br><br>
 											
-											
-											<b>Clear cache</b> <img src="../src/Images/close.png"  style="vertical-align:middle; height:20px;"> opens up a dialog where you can delete any kinetic data which has been saved
-											during the simulation. The kinetic data is displayed in plots so think of this button as resetting the plots.  <br><br>
-
-
 											<b>Save</b> <img src="../src/Images/downloadGreen.png"  style="vertical-align:middle; height:20px;"> downloads the current session in XML format.  <br><br>
-
 
 											<b>Load</b> <img src="../src/Images/downloadGreen.png" class="rotate180"  style="vertical-align:middle; height:20px;"> uploads a saved XML session file from your computer.
 											 <br><br>
 
+
 										</td>
 									</tr>
 								</table>
-							
-								</div>
-							</div>
 
 
 
