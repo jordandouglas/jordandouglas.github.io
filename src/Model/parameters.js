@@ -143,6 +143,8 @@ function setStructuralParameters_WW(){
 
 function refreshNTP_WW(){
 
+	console.log("needToRefreshNTPParameters", needToRefreshNTPParameters);
+	if(!needToRefreshNTPParameters) return;
 	if (all_sequences[sequenceID]["primer"].substring(2) == "RNA"){
 		
 		
@@ -208,6 +210,7 @@ function refreshNTP_WW(){
 	
 	}
 
+	needToRefreshNTPParameters = false;
 	initMisbindingMatrix();
 	
 

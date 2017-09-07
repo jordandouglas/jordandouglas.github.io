@@ -45,7 +45,7 @@ function init_WW(isWW){
 	}
 
 
-
+	needToRefreshNTPParameters = true;
 	for (sequenceID in all_sequences){ break }; // Set the current sequence to the first sequence in the dict
 	init_misincorporation_pairs();
 	initFreeEnergy_WW();
@@ -68,6 +68,7 @@ function init_WW(isWW){
 	TbulgedBase = -1;
 	TbulgeSize = 0;
 
+	
 	stopRunning_WW = true;
 	simulating = false;
 	simulationOnPause = false;
@@ -789,6 +790,8 @@ function userInputSequence_WW(newSeq, newTemplateType, newPrimerType, inputSeque
 	// Only apply changes if there is one
 	if (sequenceID != newSeq.substring(0, 15) || newSeq != all_sequences[sequenceID]["seq"] || newTemplateType != all_sequences[sequenceID]["template"] || newPrimerType != all_sequences[sequenceID]["primer"]){
 
+	
+		if (newPrimerType.substring(2) != all_sequences[sequenceID]["primer"].substring(2)) needToRefreshNTPParameters = true;  // Refresh the NTP concentrations if nascent strand changed from DNA to RNA or vice versa
 
 		sequenceID = newSeq.substring(0, 15);
 		all_sequences[sequenceID] = {};
@@ -823,6 +826,10 @@ function userSelectSequence_WW(newSequenceID, newTemplateType, newPrimerType, ms
 
 	// Only apply change if there is one
 	if (newSequenceID != sequenceID ||newTemplateType != all_sequences[sequenceID]["template"] || newPrimerType != all_sequences[sequenceID]["primer"]){
+	
+		console.log(newPrimerType == null, newPrimerType, all_sequences[sequenceID]["primer"]);
+		if (newPrimerType == null && all_sequences[newSequenceID]["primer"].substring(2) != all_sequences[sequenceID]["primer"].substring(2)) needToRefreshNTPParameters = true; // Refresh the NTP concentrations if nascent strand changed from DNA to RNA or vice versa
+		else if (newPrimerType != null && newPrimerType != all_sequences[sequenceID]["primer"].substring(2)) needToRefreshNTPParameters = true;
 	
 		sequenceID = newSequenceID;
 		if (newTemplateType != null) all_sequences[sequenceID]["template"] = newTemplateType;
