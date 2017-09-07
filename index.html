@@ -1011,13 +1011,13 @@ function changeToHiddenModeAndShowNotification(){
 	
 	
 	$("#PreExp").val("hidden");
-	var x = $("#startTrials").offset().left + 50;
-	var y = $("#startTrials").offset().top + "px";
+	var x = $("#PreExp").offset().left + 100;
+	var y = $("#PreExp").offset().top - 20 + "px";
 	var notificationHTML = `
 	
-		<div id='hiddenNotification' style='background-color:adadad; padding: 1 1; position:absolute; left:` + x + `px; top:` + y + `; width:220px'>
+		<div id='hiddenNotification' style='position:absolute; left:` + x + `px; top:` + y + `; width:220px'>
 			
-			<div style='background-color: FFFFB2; text-align:center; font-size:15; font-family:Arial; position:relative; padding:3 3'>
+			<div class="errorMsg" style='position:relative; padding:3 3'>
 				
 				That is a very big sequence to animate! We have switched to hidden mode to improve performance. 
 				<input id="deleteNotification" type="button" style="background-color: #008CBA; color: white; cursor:pointer; vertical-align: middle; width:40px;" onclick='deleteHiddenModeNotification()' value="OK">
