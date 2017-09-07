@@ -2699,6 +2699,8 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 			xPrime = widthScale * (xvals[valIndex] - range[0]) + axisGap;
 			yPrime = plotHeight - heightScale * (yvals[valIndex] - range[2]);
 			
+			if (xPrime < axisGap || yPrime > plotHeight - axisGap) continue; // Don't plot if out of range
+			
 			// Add circle
 			ctx.beginPath();
 			ctx.fillStyle = col;
