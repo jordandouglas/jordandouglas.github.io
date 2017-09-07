@@ -27,15 +27,15 @@
 <html>
 <head>
 <title>SNAP</title>
+
 <link rel="icon" href="src/Images/transcribe.png">
 <meta name="viewport" content="width=device-width, initial-scale=0.41, maximum-scale=1" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" type="text/css" href="src/Resources/styles.css">
-<script language='JavaScript' type='text/JavaScript' src="src/Resources/jquery-3.1.1.min.js"></script>
+<!--<script language='JavaScript' type='text/JavaScript' src="src/Resources/jquery-3.1.1.min.js"></script>-->
 <script language='JavaScript' type='text/JavaScript' src="src/Resources/mersenne-twister.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Resources/jstat.min.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Resources/random.js"></script>
-<script language='JavaScript' type='text/JavaScript' src="src/Resources/jquery-resizable.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Resources/XMLWriter-master/XMLWriter.js"></script>
 <script language='JavaScript' type="text/javascript" src="src/Resources/xml_for_script-3.1/jsXMLParser/xmlsax.js"></script>
 <script language='JavaScript' type="text/javascript" src="src/Resources/hammer.js"></script>
@@ -47,6 +47,10 @@
 <script language='JavaScript' type="text/javascript" src="https://rawgit.com/eligrey/FileSaver.js/master/FileSaver.js"></script>
 <script language='JavaScript' type="text/javascript" src ="https://rawgit.com/eligrey/canvas-toBlob.js/master/canvas-toBlob.js"></script>
 
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 
 
 <script language='JavaScript' type='text/JavaScript' src="src/Model/sequences.js"></script>
@@ -141,6 +145,8 @@ function init(){
 		//refreshNTP();
 
 		removeWebworkerRegistrationHTML();
+		movedToolbarRight = true;
+
 
 
 		IS_MOBILE = false; 
@@ -148,7 +154,12 @@ function init(){
    			 || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0,4)));
 
 
+		$("#theToolbar").draggable({
+			containment: "#main",
+			cursor: "crosshair"
+		});
 
+			 
 
    		// Add swiping support esp. for mobile devices using hammer.js library
    		if (IS_MOBILE){
@@ -160,12 +171,13 @@ function init(){
 		}
 
 
-
 		barchart(true);
+		
+		
 	}catch(e){
-
-		$("#badBrowser").show(true);
+	
 		console.log("Caught error:", e);
+		$("#badBrowser").show(true);
 		return;
 		
 		
@@ -175,7 +187,6 @@ function init(){
 
 
 }
-
 
 
 
@@ -278,8 +289,11 @@ function submitCustomSequence(resolveAfterRefresh = function() { }){
 		var refr = () => new Promise((resolve) => refresh(resolve));
 		var sequenceChangeRefreshTemp = function(){
 			
+			refreshPlotDataSequenceChangeOnly_controller();
 			sequenceChangeRefresh();
+			drawPlots();
 			resolveAfterRefresh();
+
 		};
 		refr().then(() => sequenceChangeRefreshTemp());
 		
@@ -1680,8 +1694,9 @@ function hideButtonAndShowStopButton(toHide){
 
 function hideStopButtonAndShow(toShow){
 
+
 	// Makes toShow no longer hidden and hides the stop button associated with it
-	$("#" + toShow + "Btn").show(true);
+	if(toShow == "transcribe" || $("#SelectPrimerType").val().substring(0,2) == "ss") $("#" + toShow + "Btn").show(true);
 	$("#stopBtn_" + toShow).hide(true);
 
 
@@ -1706,13 +1721,27 @@ function openNav() {
 	}
 
 
+	// Move the toolbar rightwards unless it will go over the right side of the page
+	if(parseFloat($("#theToolbar").offset().left) < parseFloat($("#main").width()) - 500){
+	
+		movedToolbarRight = true;
+		$("#theToolbar").css("transition", "0.5s");
+		document.getElementById("theToolbar").style.left = parseFloat(document.getElementById("theToolbar").style.left) + 380 + "px";
+		setTimeout(function(){
+			$("#theToolbar").css("transition", "");
+		}, 500);
+
+	}else movedToolbarRight = false;
+	
 	document.getElementById("mySidenav").style.width = "380px";
 	document.getElementById("main").style.marginLeft = "380px";
+	
+
 
 	$("#bases_container").animate({
     	width: '-=30px'
 	}, 100);
-	
+
 
 	$("#hiddenNotification").animate( {left: "+=" + 380}, 100 );
 
@@ -1720,13 +1749,32 @@ function openNav() {
 
 function closeNav() {
 	
+	
+	
+	
+	
+	// Move the toolbar leftwards if we moved it right when the navigation was opened
+	if (movedToolbarRight){
+		$("#theToolbar").css("transition", "0.5s");
+		document.getElementById("theToolbar").style.left = parseFloat(document.getElementById("theToolbar").style.left) - 380 + "px";
+		setTimeout(function(){
+			$("#theToolbar").css("transition", "");
+		}, 500);
+	}
+	
+	
+	
+	
 
 	document.getElementById("mySidenav").style.width = "0";
 	document.getElementById("main").style.marginLeft= "0";
+		
 
+	
 	$("#bases_container").animate({
         width: '+=30px'
     }, 100);
+	
 
 
 	$("#hiddenNotification").animate( {left: "+=" + -380}, 100 );
@@ -2150,9 +2198,112 @@ function closeNav() {
 				We recommend you view this page in landscape mode! </div>
 
 
+			<div id="theToolbar" style="position:fixed; top:25%; left:25px; z-index:5;">
+				<table class="toolbar" cellpadding=3>
+						
+
+					<tr style="height:20px">
+						<td></td>
+						<td></td>
+					</tr>
+						
+					<tr>
+						<td>
+							<div class="toolbarIcon" style="cursor:pointer;" onClick="resetBtn();" title="Reinitiate the polymerase"> <img id='refresh'   src="src/Images/reset.png" style="padding:5 0; width:35px; height:25px;"> </div>
+						</td>
 
 
+						<td>
+							<div id="simulateBtn" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="startTrials_controller()" title="Perform N simulations stochastically"> <img id='startTrials'   src="src/Images/dice.png" style="vertical-align: middle; width:35px; height:35px;">   </div>
+							<div id="stopBtn_simulate" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="src/Images/stop.png" style="width:35px; height:35px;"> </div>
+						</td>
 
+
+					</tr>
+					<tr>
+
+						
+
+						<td>
+							<div class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="clearKineticDataCache();" title="Clear kinetic data from the cache" > 
+								<img id='deleteAllData' src="src/Images/close.png" style="padding:5 0; height:25px;">
+							</div>
+						</td>
+
+
+						<td>
+							<div id="transcribeBtn" class="toolbarIcon" style="cursor:pointer;" onClick=transcribe_controller()  title="Replicate/transcribe N bases"> <img id='trans'  src="src/Images/transcribe.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
+							<div id="stopBtn_transcribe" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="src/Images/stop.png" style="width:35px; height:35px;"> </div>
+						
+						</td>
+
+					</tr>
+					<tr>
+
+						<td>
+							<div id="foldBtnDiv" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="getMFESequenceBonds_controller()" title="Fold the mRNA"> <img  src="src/Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
+						</td>
+
+						<td>
+							<div id="stutterBtn" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick=stutter_controller() title="Stutter N times" > <img id='stutter'  src="src/Images/stutter.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
+							<div id="stopBtn_stutter" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="src/Images/stop.png" style="width:35px; height:35px;"> </div>
+						
+						</td>
+
+
+					<tr>
+						<td colspan=2>
+							<div class="toolbarIcon" style="width:90px; height:22px; vertical-align:middle"> 
+								<span id="progressSimSpan" style="font-size: 16px; display:none; cursor: auto;"></span> 
+								<span id="numSimSpan"> <b>N=</b><input type="number" name="nbasesToSimulate" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:right; width: 60px; background-color: #008CBA; color:white"> </span> </div>
+						</td>
+
+					</tr>
+					
+					
+
+
+					<tr>
+						<td colspan=2>
+							<div class="toolbarIcon">
+								<select class="dropdown" title="Duration of each reaction" id = "PreExp" OnChange="changeSpeed_controller();" style="vertical-align: middle; text-align:right;">
+									<option value="slow">Slow</option>
+									<option value="medium">Medium</option>
+									<option value="fast">Fast</option>
+									<option value="ultrafast">Ultrafast</option>
+									<option value="hidden">Hidden</option>
+								</select>
+							</div>
+						</td>
+
+					</tr>
+					
+					
+					</tr>
+
+
+					
+					<tr>
+						<td>
+							<div class="toolbarIcon" style="cursor:pointer;" onClick="saveSession();" title="Download the current session in xml format"> <img id='saveSessionID'   src="src/Images/downloadGreen.png" style="padding:5 0; height:25px;"> </div>
+						</td>
+
+						<td>
+							<div class="toolbarIcon" style="cursor:pointer;" onClick="loadSession();" title="Upload a session in xml format" > 
+								<img id='loadSessionID' class="rotate180" src="src/Images/downloadGreen.png" style="padding:5 0; height:25px;">
+							</div>
+							<input style="display:none" type="file" id="uploadSessionFile" accept=".xml"> 
+						</td>
+					</tr>
+					
+					
+					<tr style="height:20px">
+						<td></td>
+						<td></td>
+					</tr>
+
+				</table>
+			</div>
 
 
 
@@ -2161,102 +2312,11 @@ function closeNav() {
 			<table cellspacing="0" style="float:left;">
 				
 				
-				
+
 				<tr style="text-align:center;">
 					
 
-					<td rowspan=6 style="padding:5 50 5 0;">
-
-						<table class="toolbar" cellpadding=3>
-							
-							<tr>
-								<td>
-									<div class="toolbarIcon" style="cursor:pointer;" onClick="resetBtn();" title="Reinitiate the polymerase"> <img id='refresh'   src="src/Images/reset.png" style="padding:5 0; width:35px; height:25px;"> </div>
-								</td>
-
-
-								<td>
-									<div id="simulateBtn" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="startTrials_controller()" title="Perform N simulations stochastically"> <img id='startTrials'   src="src/Images/dice.png" style="vertical-align: middle; width:35px; height:35px;">   </div>
-									<div id="stopBtn_simulate" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="src/Images/stop.png" style="width:35px; height:35px;"> </div>
-								</td>
-
-
-							</tr>
-							<tr>
-
-								
-
-								<td>
-									<div class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="clearKineticDataCache();" title="Clear kinetic data from the cache" > 
-										<img id='deleteAllData' src="src/Images/close.png" style="padding:5 0; height:25px;">
-									</div>
-								</td>
-
-
-								<td>
-									<div id="transcribeBtn" class="toolbarIcon" style="cursor:pointer;" onClick=transcribe_controller()  title="Replicate/transcribe N bases"> <img id='trans'  src="src/Images/transcribe.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
-									<div id="stopBtn_transcribe" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="src/Images/stop.png" style="width:35px; height:35px;"> </div>
-								
-								</td>
-
-							</tr>
-							<tr>
-
-								<td>
-									<div id="foldBtnDiv" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="getMFESequenceBonds_controller()" title="Fold the mRNA"> <img  src="src/Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
-								</td>
-
-								<td>
-									<div id="stutterBtn" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick=stutter_controller() title="Stutter N times" > <img id='stutter'  src="src/Images/stutter.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
-									<div id="stopBtn_stutter" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="src/Images/stop.png" style="width:35px; height:35px;"> </div>
-								
-								</td>
-
-
-							<tr>
-								<td colspan=2>
-									<div class="toolbarIcon" style="width:90px"> <span id="progressSimSpan" style="font-size: 16px; display:none; cursor: auto"></span> <span id="numSimSpan"> <b>N=</b><input type="number" name="nbasesToSimulate" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:right; width: 60px; background-color: #008CBA; color:white"> </span> </div>
-								</td>
-
-							</tr>
-							
-							
-
-
-							<tr>
-								<td colspan=2>
-									<div class="toolbarIcon">
-										<select class="dropdown" title="Duration of each reaction" id = "PreExp" OnChange="changeSpeed_controller();" style="vertical-align: middle; text-align:right;">
-											<option value="slow">Slow</option>
-											<option value="medium">Medium</option>
-											<option value="fast">Fast</option>
-											<option value="ultrafast">Ultrafast</option>
-											<option value="hidden">Hidden</option>
-										</select>
-									</div>
-								</td>
-
-							</tr>
-							
-							
-							</tr>
-
-
-							
-							<tr>
-								<td>
-									<div class="toolbarIcon" style="cursor:pointer;" onClick="saveSession();" title="Download the current session in xml format"> <img id='saveSessionID'   src="src/Images/downloadGreen.png" style="padding:5 0; height:25px;"> </div>
-								</td>
-
-								<td>
-									<div class="toolbarIcon" style="cursor:pointer;" onClick="loadSession();" title="Upload a session in xml format" > 
-										<img id='loadSessionID' class="rotate180" src="src/Images/downloadGreen.png" style="padding:5 0; height:25px;">
-									</div>
-									<input style="display:none" type="file" id="uploadSessionFile" accept=".xml"> 
-								</td>
-							</tr>
-
-						</table>
+					<td rowspan=6 style="width:130px">
 
 					</td>
 
@@ -2385,10 +2445,10 @@ function closeNav() {
 
 
 				<tr>
-					<td style="width:30px"></td>
-					<td id="bases_container" style="position:relative; width: 100%">
+					<td style="width:130px"></td>
+					<td id="bases_container" style="position:relative;">
 
-							<div class="scrollbar" id="bases" style="height:300px; width:95%; display:block; overflow-x:scroll; overflow-y:auto; position:relative">
+							<div class="scrollbar" id="bases" style="height:300px; width:100%; display:block; overflow-x:scroll; overflow-y:auto; position:relative">
 								
 							</div> 
 					</td>
@@ -2406,6 +2466,11 @@ function closeNav() {
 			<table cellspacing="0" style="width:100%;">
 				
 				<tr>
+				
+					<td style="width:130px">
+
+					</td>
+				
 					<td style="width:200px; vertical-align:top;">
 
 
@@ -2443,7 +2508,12 @@ function closeNav() {
 				<tr style="text-align:center;">
 				
 
-					<td style="width:33%; vertical-align: top; ">
+					<td style="width:130px">
+
+					</td>
+				
+				
+					<td style="width:30%; vertical-align: top; ">
 				
 
 								<div id="plotDIV1" style="display:none">
@@ -2473,7 +2543,7 @@ function closeNav() {
 					</td>
 					
 					
-					<td style="width:33%; vertical-align: top;">
+					<td style="width:30%; vertical-align: top;">
 
 
 							<div id="plotDIV2" style="display:none">
@@ -2508,7 +2578,7 @@ function closeNav() {
 					
 
 					
-					<td style="width:33%; vertical-align: top;">
+					<td style="width:30%; vertical-align: top;">
 
 
 						<div id="plotDIV3"  style="display:none">
@@ -2553,15 +2623,17 @@ function closeNav() {
 			</table>
 
 
-			<br><br<
+			<br><br>
+			
+			
 			<table style="width:100%;">
 
 
 				<tr>
-					<td style="width:50px"></td>
+					<td style="width:130px"></td>
 
-					<td rowspan=2>
-						<div id="sequences" class="scrollbar parameter-bg" style="position:relative; display:block none; height:0px; width:95%; overflow-x:scroll; transition: 0s;"></div><br>
+					<td>
+						<div id="sequences" class="scrollbar parameter-bg" style="position:relative; display:block none; height:0px; width:100%; overflow-x:scroll; transition: 0s;"></div><br>
 					</td>
 
 				<tr>
