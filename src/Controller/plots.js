@@ -453,7 +453,6 @@ function update_simulatedInsertDistribution(ninsert){
 	}
 
 
-	$("#resetSimBtn").show(true);
 	$("#downloadSimBtn").show(true);
 
 
@@ -509,7 +508,6 @@ function barchart(newBarchart = true) {
 	
 
 	if (observedInsertDistribution_temp.length == 0) {
-		$("#resetSimBtn").hide(true);
 		$("#downloadSimBtn").hide(true);
 		return;
 	}
@@ -522,7 +520,6 @@ function barchart(newBarchart = true) {
 
 	if (newBarchart) {
 
-		$("#resetSimBtn").hide(true);
 		$("#downloadSimBtn").hide(true);
 
 		nsimulations = 0;
