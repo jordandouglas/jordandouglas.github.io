@@ -20,7 +20,6 @@
 -*/
 
 
-
 canvas {
 	Vertical-align: middle;
 }
@@ -41,6 +40,8 @@ canvas {
   #landscapeRequest {
 	display:block;
   }
+
+
 }
 
 
@@ -492,6 +493,5 @@ input {
 	height:12px;
 	float:right;
 }
-
 
 
