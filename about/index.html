@@ -259,8 +259,8 @@ function addCitations(){
 									
 								
 									<br><br>
-									<span class="block-subsubtitle" > Translocation. </span> There are two translocation operations: <input type=button value='Backwards' class="operation variable;" style="cursor:auto">
-									and <input type=button value='Forward' class="operation variable;" style="cursor:auto">. These operations move the polymerase one base-pair left and right respectively, with respect to the 
+									<span class="block-subsubtitle" > Translocation. </span> There are two translocation operations: </input type=button value='Backwards' class="operation variable;" style="cursor:auto">
+									and </input type=button value='Forward' class="operation variable;" style="cursor:auto">. These operations move the polymerase one base-pair left and right respectively, with respect to the 
 									template and nascent strand. These operations involve reconfiguring the base-pairs within the hybrid, and within the chromosome if it is double-stranded. If the polymerase moves beyond the 3' end of the nascent strand, 
 									then the nascent strand will be released (termination). 
 									
@@ -268,29 +268,29 @@ function addCitations(){
 									<br><br><br>
 									<span class="block-subsubtitle" > Catalysis. </span> 
 									<span style="line-height:30px">
-										If the active site is free and next to the 3' end of the nascent strand, then the polymerase may  <input type=button value='Bind NTP' class="operation variable;" style="cursor:auto">.
-										Once bound, the polymerase may <input type=button value='Polymerise' class="operation variable;" style="cursor:auto"> by catalysing the reaction, or it may 
-										<input type=button value='Release NTP' class="operation variable;" style="cursor:auto"> back into the cell. Reverse-catalysis is also possible in SNAPdragon using 
-										<input type=button value='Decay' class="operation variable;" style="cursor:auto">, although it is very improbable in nature. The canonical pathway of transcription 
+										If the active site is free and next to the 3' end of the nascent strand, then the polymerase may  </input type=button value='Bind NTP' class="operation variable;" style="cursor:auto">.
+										Once bound, the polymerase may </input type=button value='Polymerise' class="operation variable;" style="cursor:auto"> by catalysing the reaction, or it may 
+										</input type=button value='Release NTP' class="operation variable;" style="cursor:auto"> back into the cell. Reverse-catalysis is also possible in SNAPdragon using 
+										</input type=button value='Decay' class="operation variable;" style="cursor:auto">, although it is very improbable in nature. The canonical pathway of transcription 
 										elongation is a three step cycle: 1) forward translocation, 2) NTP binding, 3) catalysis. This may also be achieved with the Copy 
 										<img src="../src/Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function. 
 									</span>
 									
 									
 									<br><br><br>
-									<span class="block-subsubtitle" > Deactivation. </span>  RNA polymerases are believed to occassionally <input type=button value='Deactivate' class="operation variable;" style="cursor:auto"> whereby they undergo 
+									<span class="block-subsubtitle" > Deactivation. </span>  RNA polymerases are believed to occassionally </input type=button value='Deactivate' class="operation variable;" style="cursor:auto"> whereby they undergo 
 									conformational changes and enter a catalytically inactive state, sometimes known as the intermediate state. In this state the protein cannot polymerise but it may still translocate. Factors known to increase the 
 									rate of entering the inactive state are 1) weak basepairing in the hybrid, 2) interactions between the polymerase and upstream or downstream elements of the template, and 3) interactions between the polymerase and
 									a secondary structure in the nascent strand <cite val="artsimovitch2000pausing"></cite> <cite val="depken2009origin"></cite> <cite val="imashimizu2013intrinsic"></cite>. Inactivation causes the polymerase to pause indefinitely, and elongation can only resume following an
-									<input type=button value='Activate' class="operation variable;" style="cursor:auto">.
+									</input type=button value='Activate' class="operation variable;" style="cursor:auto">.
 									
 									
 									<br><br><br>
 									<span class="block-subsubtitle" > Slippage. </span> <span style="line-height:30px"> Sometimes the nascent and template strand temporarily melt and a bulge forms in one of the strands. This can be performed by <input type=button value='Form bulge' class="operation variable;" style="cursor:auto">.
 									When this happens, a kink (bulge) forms within the duplex. This can occur within either the template or nascent strand (although in SNAPdragon it can currently only occur within the nascent strand). When a bulge forms,
 									the active site may be opened up, allowing one of the template bases to be copied twice. This would lead to an insertion. The bulge may 
-									 <input type=button value='Diffuse left' class="operation variable;" style="cursor:auto"> or  <input type=button value='Diffuse right' class="operation variable;" style="cursor:auto"> along the
-									 hybrid. This process is favoured if the hybrid sequence is repetitive (eg. AAAAAAAAA/UUUUUUUUU). When positioned at either end of the hybrid, the bulge may be absorbed <input type=button value='Absorb bulge' class="operation variable;" style="cursor:auto">. This three step process (bulge formation, diffusion and absorption)
+									 </input type=button value='Diffuse left' class="operation variable;" style="cursor:auto"> or  </input type=button value='Diffuse right' class="operation variable;" style="cursor:auto"> along the
+									 hybrid. This process is favoured if the hybrid sequence is repetitive (eg. AAAAAAAAA/UUUUUUUUU). When positioned at either end of the hybrid, the bulge may be absorbed </input type=button value='Absorb bulge' class="operation variable;" style="cursor:auto">. This three step process (bulge formation, diffusion and absorption)
 									 was inspired by Neher et al.<cite val="neher2004dynamics"></cite><cite val="kuhner2007force"></cite> and is believed to be the mechanism behind transcriptional slippage. Iterative slippage and elongation can lead to large insertions. This is sometimes called stuttering and
 									can also be achieved with the Stutter <img src="../src/Images/stutter.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function.</span>
 							
@@ -322,7 +322,7 @@ function addCitations(){
 
 
 												<td>
-													<div class="toolbarIcon simulateRow" title="Perform N simulations stochastically"> <img  src="../src/Images/dice.png" style="vertical-align: middle; width:35px; height:35px;">   </div>
+													<div class="toolbarIcon simulateRow" title="Perform N simulations stochastically"> <img src="../src/Images/dice.png" style="vertical-align: middle; width:35px; height:35px;">   </div>
 												</td>
 
 
@@ -358,7 +358,7 @@ function addCitations(){
 
 											<tr>
 												<td colspan=2>
-													<div class="toolbarIcon" style="width:90px"> <span style="font-size: 16px; display:none; cursor: auto"></span> <span id="numSimSpan"> <b>N=</b><input type="number" name="nbasesToSimulate" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:right; width: 60px; background-color: #008CBA; color:white"> </span> </div>
+													<div class="toolbarIcon" style="width:90px"> <span style="font-size: 16px; display:none; cursor: auto"></span> <span id="numSimSpan"> <b>N=</b></input type="number" name="nbasesToSimulate" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:right; width: 60px; background-color: #008CBA; color:white"> </span> </div>
 												</td>
 
 											</tr>
@@ -382,10 +382,6 @@ function addCitations(){
 											</tr>
 											
 											
-											</tr>
-
-
-											
 											<tr>
 												<td>
 													<div class="toolbarIcon"  title="Download the current session in xml format"> <img id='saveSessionID'   src="../src/Images/downloadGreen.png" style="padding:5 0; height:25px;"> </div>
@@ -400,67 +396,70 @@ function addCitations(){
 
 										</table>
 										</td>
-										<td style="font-size:18px; text-align:justify">
-											<i>The tools menu contains some essential functions which you should familiarise yourself with.</i> <br><br>
+										<td>
 
-											<b>Reinitiate</b> <img src="../src/Images/reset.png"  style="vertical-align:middle; width:25px; height:20px;"> will reset the polymerase to its initial position. This will
-											not affect plots or any other outputs. If you have added a background distribution behind any parameters then they will be resampled. <br><br>
+											<div style="font-size:18px; text-align:justify">
+												<i>The tools menu contains some essential functions which you should familiarise yourself with.</i> <br><br>
 
-											<b>Stop</b> <img src="../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> will immediately halt any polymerase acitivies taking place.
-											This will not affect any parameters, plots or other outputs.  <br><br>
+												<b>Reinitiate</b> <img src="../src/Images/reset.png"  style="vertical-align:middle; width:25px; height:20px;"> will reset the polymerase to its initial position. This will
+												not affect plots or any other outputs. If you have added a background distribution behind any parameters then they will be resampled. <br><br>
 
-											<b>N = </b><input type="number" value=30 style="vertical-align: middle; text-align:right; width: 60px; background-color: #008CBA; color:white"> is a variable. The meaning of <b>N</b> depends on which
-											tool is being used.  <br><br>
+												<b>Stop</b> <img src="../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> will immediately halt any polymerase acitivies taking place.
+												This will not affect any parameters, plots or other outputs.  <br><br>
 
-
-											<b>Simulate</b> <img src="../src/Images/dice.png"  style="vertical-align:middle; width:25px; height:25px;"> begins the random simulation starting from the current position
-											of the polymerase. During the simulation, reactions are
-											randomly sampled according to their rate constants, which can be tweaked in the parameters menu. <b>N</b> trials are performed in the simulation. When the polymerase
-											finishes copying the sequence (or prematurely terminates) the next trial begins. The duration of each reaction in the simulation is determined by <b>Speed</b>.
-											The simulation can be stopped early using the Stop <img src="../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button.  <br><br>
+												<b>N = </b></input type="number" value=30 style="vertical-align: middle; text-align:right; width: 60px; background-color: #008CBA; color:white"> is a variable. The meaning of <b>N</b> depends on which
+												tool is being used.  <br><br>
 
 
-											<b>Clear cache</b> <img src="../src/Images/close.png"  style="vertical-align:middle; height:20px;"> opens up a dialog where you can delete any kinetic data which has been saved
-											during the simulation. The kinetic data is displayed in plots so think of this button as resetting the plots.  <br><br>
+												<b>Simulate</b> <img src="../src/Images/dice.png"  style="vertical-align:middle; width:25px; height:25px;"> begins the random simulation starting from the current position
+												of the polymerase. During the simulation, reactions are
+												randomly sampled according to their rate constants, which can be tweaked in the parameters menu. <b>N</b> trials are performed in the simulation. When the polymerase
+												finishes copying the sequence (or prematurely terminates) the next trial begins. The duration of each reaction in the simulation is determined by <b>Speed</b>.
+												The simulation can be stopped early using the Stop <img src="../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button.  <br><br>
 
 
-											<b>Copy</b> <img src="../src/Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"> transcribes/replicates/copies the next <b>N</b> bases. The duration of this process is determined by <b>Speed</b>.
-											Copying can be stopped early using the Stop <img src="../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button. <br><br>
-
-											<b>Stutter</b> <img src="../src/Images/stutter.png"  style="vertical-align:middle; width:25px; height:25px;"> copies the current base <b>N</b> times, therefore adding an insertion of
-											size <b>N</b> into the nascent strand. Insertions are added through slippage. The duration of this process is determined by <b>Speed</b>.
-											Stuttering can be stopped early using the Stop <img src="../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button. <br><br>
-
-											<b>Fold</b> <img src="../src/Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"> folds the mRNA into its predicted secondary structure and renders it onto the nascent strand. This function will only work
-											if the nascent strand is single-stranded RNA. Note that this function is only cosmetic and will not affect the polymerase. If you want the mRNA secondary structure to affect reactions
-											then make sure that "Allow mRNA folding" is enabled. This function is disabled on mobile devices. <br><br>
+												<b>Clear cache</b> <img src="../src/Images/close.png"  style="vertical-align:middle; height:20px;"> opens up a dialog where you can delete any kinetic data which has been saved
+												during the simulation. The kinetic data is displayed in plots so think of this button as resetting the plots.  <br><br>
 
 
+												<b>Copy</b> <img src="../src/Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"> transcribes/replicates/copies the next <b>N</b> bases. The duration of this process is determined by <b>Speed</b>.
+												Copying can be stopped early using the Stop <img src="../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button. <br><br>
 
-											<b>Speed</b> <select class="dropdown" title="Duration of each reaction" style="vertical-align: middle; text-align:right;">
-												<option value="slow">Slow</option>
-												<option value="medium">Medium</option>
-												<option value="fast">Fast</option>
-												<option value="ultrafast">Ultrafast</option>
-												<option value="hidden">Hidden</option>
-											</select>
-											is a variable which controls the speed of the animation while Copying, Stuttering or Simulating. If the speed is set to <b>slow</b>,
-											<b>medium</b> or <b>fast</b>, then the polymerase will animate each reaction at a slow, medium or fast speed, respectively. If the speed is <b>ultrafast</b>,
-											then the animation will not show every reaction and will only update periodically. If the speed is <b>hidden</b>, then this is the same as
-											<b>ultrafast</b> except that the polymerase is no longer displayed and will not animate at all. <b>Hidden</b> is the fastest setting. <br><br>
-											
-											<b>Save</b> <img src="../src/Images/downloadGreen.png"  style="vertical-align:middle; height:20px;"> downloads the current session in XML format.  <br><br>
+												<b>Stutter</b> </img src="../src/Images/stutter.png"  style="vertical-align:middle; width:25px; height:25px;"> copies the current base <b>N</b> times, therefore adding an insertion of
+												size <b>N</b> into the nascent strand. Insertions are added through slippage. The duration of this process is determined by <b>Speed</b>.
+												Stuttering can be stopped early using the Stop </img src="../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button. <br><br>
 
-											<b>Load</b> <img src="../src/Images/downloadGreen.png" class="rotate180"  style="vertical-align:middle; height:20px;"> uploads a saved XML session file from your computer.
-											 <br><br>
+												<b>Fold</b> <img src="../src/Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"> folds the mRNA into its predicted secondary structure and renders it onto the nascent strand. This function will only work
+												if the nascent strand is single-stranded RNA. Note that this function is only cosmetic and will not affect the polymerase. If you want the mRNA secondary structure to affect reactions
+												then make sure that "Allow mRNA folding" is enabled. This function is disabled on mobile devices. <br><br>
 
 
+
+												<b>Speed</b> <select class="dropdown" title="Duration of each reaction" style="vertical-align: middle; text-align:right;">
+													<option value="slow">Slow</option>
+													<option value="medium">Medium</option>
+													<option value="fast">Fast</option>
+													<option value="ultrafast">Ultrafast</option>
+													<option value="hidden">Hidden</option>
+												</select>
+												is a variable which controls the speed of the animation while Copying, Stuttering or Simulating. If the speed is set to <b>slow</b>,
+												<b>medium</b> or <b>fast</b>, then the polymerase will animate each reaction at a slow, medium or fast speed, respectively. If the speed is <b>ultrafast</b>,
+												then the animation will not show every reaction and will only update periodically. If the speed is <b>hidden</b>, then this is the same as
+												<b>ultrafast</b> except that the polymerase is no longer displayed and will not animate at all. <b>Hidden</b> is the fastest setting. <br><br>
+												
+												<b>Save</b> <img src="../src/Images/downloadGreen.png"  style="vertical-align:middle; height:20px;"> downloads the current session in XML format.  <br><br>
+
+												<b>Load</b> <img src="../src/Images/downloadGreen.png" class="rotate180"  style="vertical-align:middle; height:20px;"> uploads a saved XML session file from your computer.
+												 <br><br>
+
+											</div>
 										</td>
 									</tr>
 								</table>
 
 
-
+							</div></div>
+								
 
 							<br><br>
 							<div class="about-block">
@@ -476,11 +475,9 @@ function addCitations(){
 
 
 
-
 							<br><br>
 
 							
-
 						</div>
 					</div>
 				</div>
@@ -907,7 +904,7 @@ function addCitations(){
 										
 										Rendering elements onto the screen (for example polymerase motion, plots, simulated sequences) can be computationally costly and can slow down the whole program.  If you are running a complex simulation on a 
 										long sequence over a large number of trials, you may notice the simulation begin to slow down eventually. Maximising the performance of this program requires you as the user to regulate when rendering does or 
-										does not occur. If the program starts to slow down, you should hide components of the interface with its respective minimise <input type=button class='minimise' value='&minus;' style="cursor:auto; font-size: 12px;"> 
+										does not occur. If the program starts to slow down, you should hide components of the interface with its respective minimise </input type=button class='minimise' value='&minus;' style="cursor:auto; font-size: 12px;"> 
 										button. If a component is minimised then rendering will not occur. The polymerase animation can be minimised by setting the speed to <b>hidden</b>. This will happen automatically when simulating large sequences.
 
 
@@ -915,6 +912,8 @@ function addCitations(){
 
 								</div>
 							</div>
+
+
 
 
 							<br><br>
@@ -934,7 +933,8 @@ function addCitations(){
 
 								</div>
 							</div>
-				
+
+
 				
 				
 				
