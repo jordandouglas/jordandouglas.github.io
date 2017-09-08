@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>About SNAPdragon</title>
+<title>About Simpol</title>
 <link rel="icon" href="../src/Images/transcribe.png">
 <meta name="viewport" content="width=device-width, initial-scale=0.41, maximum-scale=1" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -142,7 +142,17 @@ function addCitations(){
 
 							<td  style="text-align:center; font-size: 20px; vertical-align:top; font-family: 'Palatino'; width: 60%;"> 
 								<div style="width:100%; text-align:center">
-									<a href="../" ><img src="../src/Images/logo2.png" style="height:120px; vertical-align:middle;"></a>
+									<a href="../" style="text-decoration: none; width:300px; vertical-align:middle"" >
+										<div style="font-family: 'Palatino'; font-size:70px; text-decoration: none; color:black; vertical-align:middle"">
+										Simpol 
+										<img style="height:60px; width:100px; vertical-align:middle" src="../src/Images/logo.png">
+										</div>
+										<div style="font-family: 'Palatino'; font-size:19px; text-decoration: none; color:black">
+										Simulation of Nucleic Acid Polymerases
+										</div>
+									
+										<!--<img src="src/Images/logo.png" style="height:120px; vertical-align:middle;">-->
+									</a>
 								</div>
 										
 							</td>
@@ -168,7 +178,7 @@ function addCitations(){
 					<div class="about-block-inner">
 						<div class="block-subtitle" style="font-size:45px"> An interactive graphical simulation of nucleic acid polymerases </div> <br>
 					
-						SNAPdragon is a free open-source web-based program aimed to help researchers, teachers and students visualise transcription at the level of a single molecule. Transcription is the copying of a template (typically DNA) 
+						Simpol is a free open-source web-based program aimed to help researchers, teachers and students visualise transcription at the level of a single molecule. Transcription is the copying of a template (typically DNA) 
 						into messenger RNA (mRNA) and is one of the most central processes in all of biology. The copying process is carried out by a protein called RNA polymerase. RNA polymerase runs along the template 
 						as it extends the mRNA. While this main pathway of transcription is fairly straightfoward, some of the less-common and off-pathway events can be	cause complications. For example, sometimes	
 						RNA polymerase moves very far in the wrong direction (backtracking), sometimes a nucleotide is copied incorrectly (a misincorporation), and sometimes the template and mRNA slip along each other (which can cause an insertion or deletion).
@@ -177,7 +187,7 @@ function addCitations(){
 
 						
 						This program has two main functions: (1) <b>Visualisation</b> of transcription elongation, misincorporations and transcriptional slippage, and for more advanced users (2) <b>Simulation</b> of transcription elongation  
-						with kinetic models. This webpage contains tutorials on how to use SNAPdragon.   <br><br>
+						with kinetic models. This webpage contains tutorials on how to use Simpol.   <br><br>
 						
 						
 
@@ -206,7 +216,7 @@ function addCitations(){
 									<br><br><br>
 									
 									The first thing you will want to do is choose your sequence.
-									There are several example sequences preloaded into the system, or you may upload your own nucleic acid sequence from the &#9776; Parameters side-navigation menu. The models in SNAPdragon are designed for and have only been tested on
+									There are several example sequences preloaded into the system, or you may upload your own nucleic acid sequence from the &#9776; Parameters side-navigation menu. The models in Simpol are designed for and have only been tested on
 									DNA-dependent RNA-polymerases. However, you do have the option to play around with other polymerase classes (eg. DNA polymerases or RNA-dependent RNA-polymerases) but be warned that the science behind them is not yet clear.
 									Your choice of sequence type will determine the NTP or dNTP concentrations, and which of the three sets of thermodynamic parameters are used 
 									- Turner's RNA/RNA parameters<cite val="xia1998thermodynamic"></cite>, Sugimoto's DNA/RNA parameters<cite val="wu2002temperature"></cite>, or SantaLucia's DNA/DNA parameters<cite val="santalucia1998unified"></cite>. <br><br>
@@ -270,7 +280,7 @@ function addCitations(){
 									<span style="line-height:30px">
 										If the active site is free and next to the 3' end of the nascent strand, then the polymerase may  </input type=button value='Bind NTP' class="operation variable;" style="cursor:auto">.
 										Once bound, the polymerase may </input type=button value='Polymerise' class="operation variable;" style="cursor:auto"> by catalysing the reaction, or it may 
-										</input type=button value='Release NTP' class="operation variable;" style="cursor:auto"> back into the cell. Reverse-catalysis is also possible in SNAPdragon using 
+										</input type=button value='Release NTP' class="operation variable;" style="cursor:auto"> back into the cell. Reverse-catalysis is also possible in Simpol using 
 										</input type=button value='Decay' class="operation variable;" style="cursor:auto">, although it is very improbable in nature. The canonical pathway of transcription 
 										elongation is a three step cycle: 1) forward translocation, 2) NTP binding, 3) catalysis. This may also be achieved with the Copy 
 										<img src="../src/Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function. 
@@ -287,7 +297,7 @@ function addCitations(){
 									
 									<br><br><br>
 									<span class="block-subsubtitle" > Slippage. </span> <span style="line-height:30px"> Sometimes the nascent and template strand temporarily melt and a bulge forms in one of the strands. This can be performed by <input type=button value='Form bulge' class="operation variable;" style="cursor:auto">.
-									When this happens, a kink (bulge) forms within the duplex. This can occur within either the template or nascent strand (although in SNAPdragon it can currently only occur within the nascent strand). When a bulge forms,
+									When this happens, a kink (bulge) forms within the duplex. This can occur within either the template or nascent strand (although in Simpol it can currently only occur within the nascent strand). When a bulge forms,
 									the active site may be opened up, allowing one of the template bases to be copied twice. This would lead to an insertion. The bulge may 
 									 </input type=button value='Diffuse left' class="operation variable;" style="cursor:auto"> or  </input type=button value='Diffuse right' class="operation variable;" style="cursor:auto"> along the
 									 hybrid. This process is favoured if the hybrid sequence is repetitive (eg. AAAAAAAAA/UUUUUUUUU). When positioned at either end of the hybrid, the bulge may be absorbed </input type=button value='Absorb bulge' class="operation variable;" style="cursor:auto">. This three step process (bulge formation, diffusion and absorption)
@@ -608,7 +618,7 @@ function addCitations(){
 
 
 														<b style="font-size:20px">$k_{release}$</b> - rate constant of releasing bound NTP. Since this value is around 50&times; the value of $k_{cat}$, the polymerase
-																	will bind and release the NTP on average 50 times before catalysis occurs. Fast, ultrafast and hidden simulations in SNAPdragon are optimised to  
+																	will bind and release the NTP on average 50 times before catalysis occurs. Fast, ultrafast and hidden simulations in Simpol are optimised to  
 																	perform the binding step without rendering any visual changes. Default: 1000s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> <br><br>
 
 
@@ -710,7 +720,7 @@ function addCitations(){
 											<b>Example 1:</b> [ATP] is defaulted to Traut 1994’s<cite val="traut1994physiological"></cite> estimate of the mean ATP concentration (3152&mu;M) but one may wish to refine this value to reflect their own 
 											experimental settings. Or one may recognise that cellular NTP concentrations are not constant, and they fluctuate throughout the cell cycle. In this case, it may be more accurate to 
 											add a prior distribution behind [ATP]. Yaginuma et al. 2014 <cite val="yaginuma2014diversity"></cite> describe heterogeneity in [ATP] across E.coli cells with [ATP] following a positive-skewed modal distribution 
-											(mean: 1540&mu;M, SD: 1220&mu;M). Using SNAPdragon and some algebra, one could model [ATP] approximately with a lognormal distribution (where &mu; = 7.10, &sigma; = 0.698). Then the ATP 
+											(mean: 1540&mu;M, SD: 1220&mu;M). Using Simpol and some algebra, one could model [ATP] approximately with a lognormal distribution (where &mu; = 7.10, &sigma; = 0.698). Then the ATP 
 											concentration would be resampled from this distribution at the beginning of each trial. <br><br>
 											
 											
@@ -919,7 +929,7 @@ function addCitations(){
 										
 										A Web Worker is like a socket, or an invisible tab your browser opens which runs on its own thread and can communicate
 										with the main window. <a href="https://www.w3schools.com/html/html5_webworkers.asp">Most modern browsers support Web Workers</a> but if 
-										your browser is not up to date or if you have an overzealous third-party plugin then the Web Worker may not register (SNAPdragon will notify you with an error message). 
+										your browser is not up to date or if you have an overzealous third-party plugin then the Web Worker may not register (Simpol will notify you with an error message). 
 										We recommend that you allow the Web Worker to register, to ensure the whole program runs smoothly and you can run simulations in <b>ultrafast</b> or <b>hidden</b> mode.
 
 								</div>
@@ -956,7 +966,7 @@ function addCitations(){
 	
 	
 		<div class="header" style="width:100%; ">
-			SNAPdragon, Lab of Structural Biology & Centre for Computational Evolution, University of Auckland
+			Simpol, Lab of Structural Biology & Centre for Computational Evolution, University of Auckland
 		</div>
 	
 

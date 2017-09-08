@@ -2,20 +2,20 @@
 /* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
-	This file is part of SNAPdragon.
+	This file is part of Simpol.
 
-    SNAPdragon is free software: you can redistribute it and/or modify
+    Simpol is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    SNAPdragon is distributed in the hope that it will be useful,
+    Simpol is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with SNAPdragon.  If not, see <http://www.gnu.org/licenses/>. 
+    along with Simpol.  If not, see <http://www.gnu.org/licenses/>. 
     --------------------------------------------------------------------
     --------------------------------------------------------------------
 -*/
@@ -851,7 +851,7 @@ function saveSession(){
 		
 		
 		
-		download("SNAPdragon-" + datetime + ".xml", saveXML.flush());
+		download("Simpol-" + datetime + ".xml", saveXML.flush());
 		
 	});
 	
