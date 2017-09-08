@@ -1019,7 +1019,10 @@ function clearCache(){
 	var sequences_cleardata = $("#sequences_cleardata").prop('checked');
 	if (sequences_cleardata) clearSequences();
 
-	if (!distanceVsTime_cleardata && !timeHistogram_cleardata && !timePerSite_cleardata && !customPlot_cleardata) return;
+	if (!distanceVsTime_cleardata && !timeHistogram_cleardata && !timePerSite_cleardata && !customPlot_cleardata) {
+		closeKineticCachePopup();
+		return;
+	}
 
 
 	if (distanceVsTime_cleardata){
