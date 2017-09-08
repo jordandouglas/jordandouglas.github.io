@@ -2587,116 +2587,117 @@ function closeNav() {
 
 				<span style="font-size:18px; font-family:Bookman; position:absolute"><b>Plot panel</b></span>
 
-
-				<table style="width:100%">
-					<tr style="text-align:center; ">
-					
-							
-					
-						<td style="width:33%; vertical-align: top; ">
+					<div class="scrollbar" style="overflow-x:scroll">
+					<table style="width:100%">
+						<tr style="text-align:center; ">
+						
 								
+						
+							<td style="width:33%; vertical-align: top; ">
+									
 
-									<div id="plotDIV1" style="display:none">
+										<div id="plotDIV1" style="display:none">
+											<br>
+											<div id="plotLabel1"></div>
+											<div id="plotCanvasContainer1"> 
+												<canvas id="plotCanvas1" width="500px" height="300px"></canvas> 
+											</div>
+										</div>
+									
 										<br>
-										<div id="plotLabel1"></div>
-										<div id="plotCanvasContainer1"> 
-											<canvas id="plotCanvas1" width="500px" height="300px"></canvas> 
+											<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot1" OnChange="selectPlot(1);" style="vertical-align: middle; text-align:right;">
+														  <option value="none">Display a plot...</option>
+														  <option value="distanceVsTime">Distance vs time</option>
+														  <option value="pauseHistogram">Time histogram</option>
+														  <option value="velocityHistogram">Velocity histogram</option>
+														  <option value="custom">Parameter plot</option>
+											</select>
+										
+										<input type=button id='showPlot1' class='minimise' value='+' onClick=showPlot(1) style="display:none">
+										<input type=image id='plotOptions1' title="Change the settings of this plot" onClick=plotOptions(1) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
+										<input type=image id='downloadPlot1' title="Download the data displayed in this plot" onClick=downloadPlot(1) src="src/Images/download.png" style="vertical-align: middle; height:20px; display:none">  
+										
+
+
+
+							</td>
+							
+							
+							<td style="width:33%; vertical-align: top;">
+
+
+									<div id="plotDIV2" style="display:none">
+										<br>
+										<div id="plotLabel2"></div>
+										<div id="plotCanvasContainer2"> 
+											<canvas id="plotCanvas2" width="500px" height="300px"></canvas>
 										</div>
 									</div>
-								
+
+
 									<br>
-										<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot1" OnChange="selectPlot(1);" style="vertical-align: middle; text-align:right;">
-													  <option value="none">Display a plot...</option>
-													  <option value="distanceVsTime">Distance vs time</option>
-													  <option value="pauseHistogram">Time histogram</option>
-													  <option value="velocityHistogram">Velocity histogram</option>
-													  <option value="custom">Parameter plot</option>
+										<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot2" OnChange="selectPlot(2);" style="vertical-align: middle; text-align:right;">
+														  <option value="none">Display a plot...</option>
+														  <option value="distanceVsTime">Distance vs time</option>
+														  <option value="pauseHistogram">Time histogram</option>
+														  <option value="velocityHistogram">Velocity histogram</option>
+															<option value="custom">Parameter plot</option>
 										</select>
 									
-									<input type=button id='showPlot1' class='minimise' value='+' onClick=showPlot(1) style="display:none">
-									<input type=image id='plotOptions1' title="Change the settings of this plot" onClick=plotOptions(1) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
-									<input type=image id='downloadPlot1' title="Download the data displayed in this plot" onClick=downloadPlot(1) src="src/Images/download.png" style="vertical-align: middle; height:20px; display:none">  
+									<input type=button id='showPlot2' class='minimise' value='+' onClick=showPlot(2) style="display:none">
+									<input type=image id='plotOptions2' title="Change the settings of this plot" onClick=plotOptions(2) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
+									<input type=image id='downloadPlot2' title="Download the data displayed in this plot" onClick=downloadPlot(2) src="src/Images/download.png" style="vertical-align: middle;  height:20px; display:none ">  
+									
+									
+									
 									
 
 
 
-						</td>
-						
-						
-						<td style="width:33%; vertical-align: top;">
+							</td>
+							
+
+							
+							<td style="width:33%; vertical-align: top;">
 
 
-								<div id="plotDIV2" style="display:none">
+								<div id="plotDIV3"  style="display:none">
 									<br>
-									<div id="plotLabel2"></div>
-									<div id="plotCanvasContainer2"> 
-										<canvas id="plotCanvas2" width="500px" height="300px"></canvas>
+									<div id="plotLabel3"></div>
+									<div id="plotCanvasContainer3"> 
+										<canvas id="plotCanvas3" width="500px" height="300px"></canvas>
 									</div>
 								</div>
 
-
 								<br>
-									<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot2" OnChange="selectPlot(2);" style="vertical-align: middle; text-align:right;">
-													  <option value="none">Display a plot...</option>
-													  <option value="distanceVsTime">Distance vs time</option>
-													  <option value="pauseHistogram">Time histogram</option>
-													  <option value="velocityHistogram">Velocity histogram</option>
-												   		<option value="custom">Parameter plot</option>
+									<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot3" OnChange="selectPlot(3);" style="vertical-align: middle; text-align:right;">
+														  <option value="none">Display a plot...</option>
+														  <option value="distanceVsTime">Distance vs time</option>
+														  <option value="pauseHistogram">Time histogram</option>
+														  <option value="velocityHistogram">Velocity histogram</option>
+														  <option value="custom">Parameter plot</option>
+												
 									</select>
 								
-								<input type=button id='showPlot2' class='minimise' value='+' onClick=showPlot(2) style="display:none">
-								<input type=image id='plotOptions2' title="Change the settings of this plot" onClick=plotOptions(2) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
-								<input type=image id='downloadPlot2' title="Download the data displayed in this plot" onClick=downloadPlot(2) src="src/Images/download.png" style="vertical-align: middle;  height:20px; display:none ">  
+								<input type=button id='showPlot3' class='minimise' value='+' onClick=showPlot(3) style="display:none">
+								<input type=image id='plotOptions3' title="Change the settings of this plot" onClick=plotOptions(3) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
+								<input type=image id='downloadPlot3' title="Download the data displayed in this plot" onClick=downloadPlot(3) src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px; ">  
+							
 								
 								
 								
-								
 
-
-
-						</td>
-						
-
-						
-						<td style="width:33%; vertical-align: top;">
-
-
-							<div id="plotDIV3"  style="display:none">
-								<br>
-								<div id="plotLabel3"></div>
-								<div id="plotCanvasContainer3"> 
-									<canvas id="plotCanvas3" width="500px" height="300px"></canvas>
-								</div>
-							</div>
-
-							<br>
-								<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot3" OnChange="selectPlot(3);" style="vertical-align: middle; text-align:right;">
-													  <option value="none">Display a plot...</option>
-													  <option value="distanceVsTime">Distance vs time</option>
-													  <option value="pauseHistogram">Time histogram</option>
-													  <option value="velocityHistogram">Velocity histogram</option>
-													  <option value="custom">Parameter plot</option>
-											
-								</select>
 							
-							<input type=button id='showPlot3' class='minimise' value='+' onClick=showPlot(3) style="display:none">
-							<input type=image id='plotOptions3' title="Change the settings of this plot" onClick=plotOptions(3) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
-							<input type=image id='downloadPlot3' title="Download the data displayed in this plot" onClick=downloadPlot(3) src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px; ">  
-						
-							
-							
+							</td>
 							
 
+							
 						
-						</td>
-						
-
-						
-					
-					</tr>
+						</tr>
 
 
-				</table>
+					</table>
+				</div>
 			</div>
 
 			<br>
