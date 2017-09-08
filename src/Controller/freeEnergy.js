@@ -704,7 +704,7 @@ function getModelDiagramTemplate(){
 				<div style='padding:2; font-size:22px;'> XX_DESC_XX </div>
 
 				<div id="modelDiagramDiv">
-					<canvas id="modelDiagramCanvas" style="padding:10 10;" width=1000px height=600px></canvas>
+					<canvas id="modelDiagramCanvas" class="noselect" style="padding:10 10;" width=1000px height=600px></canvas>
 				</div>
 				
 
@@ -836,10 +836,10 @@ function drawModelDiagramCanvas(){
 		plotState(ctx, "S(" + m + ",+1)", xCoordOfMainState, yCoordOfMainState, "The polymerase is <b>posttranslocated</b> and ready to bind the next NTP. The next base to be copied is at position " + m + ".", isCurrentState);
 
 		var rateSum = result["kbind"] + result["k +1,0"] + (ELONGATION_MODEL_TEMP["allowHypertranslocation"] ? result["k +1,+2"] : 0) + (ELONGATION_MODEL_TEMP["allowInactivation"] ? kU : 0);
-		plotArrow(ctx, xCoordOfMainState + arrowSpace, yCoordOfMainState - arrowSpace, "up", "kbind", result["kbind"], rateSum);
-		plotArrow(ctx, xCoordOfMainState - arrowSpace, yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", result["k +1,0"], rateSum);
-		if (ELONGATION_MODEL_TEMP["allowHypertranslocation"]) plotArrow(ctx, xCoordOfMainState + stateWidth + arrowSpace, yCoordOfMainState + arrowSpace, "right", "kfwd", result["k +1,+2"], rateSum);
-		if (ELONGATION_MODEL_TEMP["allowInactivation"]) plotArrow(ctx, xCoordOfMainState + stateWidth - arrowSpace, yCoordOfMainState + stateHeight + arrowSpace, "down", "kU", kU, rateSum);
+		plotArrow_stateDiagram(ctx, xCoordOfMainState + arrowSpace, yCoordOfMainState - arrowSpace, "up", "kbind", result["kbind"], rateSum);
+		plotArrow_stateDiagram(ctx, xCoordOfMainState - arrowSpace, yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", result["k +1,0"], rateSum);
+		if (ELONGATION_MODEL_TEMP["allowHypertranslocation"]) plotArrow_stateDiagram(ctx, xCoordOfMainState + stateWidth + arrowSpace, yCoordOfMainState + arrowSpace, "right", "kfwd", result["k +1,+2"], rateSum);
+		if (ELONGATION_MODEL_TEMP["allowInactivation"]) plotArrow_stateDiagram(ctx, xCoordOfMainState + stateWidth - arrowSpace, yCoordOfMainState + stateHeight + arrowSpace, "down", "kU", kU, rateSum);
 		///////////////
 
 
@@ -851,10 +851,10 @@ function drawModelDiagramCanvas(){
 		plotState(ctx, "S(" + m + ",0)", 		xCoordOfMainState - spacingBetweenStates - stateWidth,	yCoordOfMainState, pretranslocatedDesc, isCurrentState);
 
 		rateSum = result["k 0,+1"] + (canBT ? result["k 0,-1"] : 0) + (ELONGATION_MODEL_TEMP["id"] == "twoSiteBrownian" ? result["k bind0"] : 0)  + (ELONGATION_MODEL_TEMP["allowInactivation"] ? kU : 0);
-		plotArrow(ctx, xCoordOfMainState + arrowSpace - spacingBetweenStates,	yCoordOfMainState + arrowSpace, "right", "kfwd", result["k 0,+1"], rateSum);
-		if (canBT) plotArrow(ctx, xCoordOfMainState + -1*spacingBetweenStates - stateWidth - arrowSpace,	yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", result["k 0,-1"], rateSum);
-		if (ELONGATION_MODEL_TEMP["id"] == "twoSiteBrownian") plotArrow(ctx, xCoordOfMainState + arrowSpace - spacingBetweenStates - stateWidth, yCoordOfMainState - arrowSpace, "up", "kbind", result["k bind0"], rateSum);
-		if (ELONGATION_MODEL_TEMP["allowInactivation"]) plotArrow(ctx, xCoordOfMainState  - arrowSpace  - spacingBetweenStates, yCoordOfMainState + stateHeight + arrowSpace, "down", "kU", kU, rateSum);
+		plotArrow_stateDiagram(ctx, xCoordOfMainState + arrowSpace - spacingBetweenStates,	yCoordOfMainState + arrowSpace, "right", "kfwd", result["k 0,+1"], rateSum);
+		if (canBT) plotArrow_stateDiagram(ctx, xCoordOfMainState + -1*spacingBetweenStates - stateWidth - arrowSpace,	yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", result["k 0,-1"], rateSum);
+		if (ELONGATION_MODEL_TEMP["id"] == "twoSiteBrownian") plotArrow_stateDiagram(ctx, xCoordOfMainState + arrowSpace - spacingBetweenStates - stateWidth, yCoordOfMainState - arrowSpace, "up", "kbind", result["k bind0"], rateSum);
+		if (ELONGATION_MODEL_TEMP["allowInactivation"]) plotArrow_stateDiagram(ctx, xCoordOfMainState  - arrowSpace  - spacingBetweenStates, yCoordOfMainState + stateHeight + arrowSpace, "down", "kU", kU, rateSum);
 		///////////////
 
 
@@ -865,9 +865,9 @@ function drawModelDiagramCanvas(){
 		plotState(ctx, "S(" + m + ",+1)\u1D3A", xCoordOfMainState,	yCoordOfMainState - spacingBetweenStates - stateHeight, "The polymerase is <b>posttranslocated</b> with NTP bound and ready for catalysis. The base being copied is at position " + m + ".", isCurrentState, "#328332");
 
 		rateSum = krelease + kcat + (ELONGATION_MODEL_TEMP["id"] == "twoSiteBrownian" ? result["kN +1,0"] : 0);
-		plotArrow(ctx, xCoordOfMainState + stateWidth -  arrowSpace, yCoordOfMainState - spacingBetweenStates + arrowSpace, "down", "krelease", krelease, rateSum);
-		plotArrow(ctx, xCoordOfMainState + arrowSpace + stateWidth,	yCoordOfMainState - spacingBetweenStates - stateHeight/2, "right", "kcat", kcat, rateSum);
-		if (ELONGATION_MODEL_TEMP["id"] == "twoSiteBrownian") plotArrow(ctx, xCoordOfMainState - arrowSpace, yCoordOfMainState - spacingBetweenStates - arrowSpace, "left", "kbck", result["kN +1,0"], rateSum);
+		plotArrow_stateDiagram(ctx, xCoordOfMainState + stateWidth -  arrowSpace, yCoordOfMainState - spacingBetweenStates + arrowSpace, "down", "krelease", krelease, rateSum);
+		plotArrow_stateDiagram(ctx, xCoordOfMainState + arrowSpace + stateWidth,	yCoordOfMainState - spacingBetweenStates - stateHeight/2, "right", "kcat", kcat, rateSum);
+		if (ELONGATION_MODEL_TEMP["id"] == "twoSiteBrownian") plotArrow_stateDiagram(ctx, xCoordOfMainState - arrowSpace, yCoordOfMainState - spacingBetweenStates - arrowSpace, "left", "kbck", result["kN +1,0"], rateSum);
 		////////////////
 
 
@@ -885,8 +885,8 @@ function drawModelDiagramCanvas(){
 			isCurrentState = currentState["mRNAPosInActiveSite"] == 0 && currentState["activated"] && currentState["NTPbound"];
 			plotState(ctx, "S(" + m + ",0)\u1D3A", xCoordOfMainState - spacingBetweenStates - stateWidth, yCoordOfMainState - spacingBetweenStates - stateHeight, "The polymerase is <b>pretranslocated</b> with NTP bound in the secondary binding site. The base being copied is at position " + m + ".", isCurrentState, "#328332");
 			rateSum = result["k release0"] + result["kN 0,+1"];
-			plotArrow(ctx, xCoordOfMainState  - arrowSpace  - spacingBetweenStates, yCoordOfMainState - spacingBetweenStates + arrowSpace, "down", "krelease", result["k release0"], rateSum);
-			plotArrow(ctx, xCoordOfMainState + arrowSpace - spacingBetweenStates, yCoordOfMainState - spacingBetweenStates - stateHeight + arrowSpace, "right", "kfwd", result["kN 0,+1"], rateSum);
+			plotArrow_stateDiagram(ctx, xCoordOfMainState  - arrowSpace  - spacingBetweenStates, yCoordOfMainState - spacingBetweenStates + arrowSpace, "down", "krelease", result["k release0"], rateSum);
+			plotArrow_stateDiagram(ctx, xCoordOfMainState + arrowSpace - spacingBetweenStates, yCoordOfMainState - spacingBetweenStates - stateHeight + arrowSpace, "right", "kfwd", result["kN 0,+1"], rateSum);
 			/////////////////
 
 		}
@@ -901,14 +901,14 @@ function drawModelDiagramCanvas(){
 			isCurrentState = currentState["mRNAPosInActiveSite"] == -1 && currentState["activated"];
 			plotState(ctx, "S(" + m + ",-1)", xCoordOfMainState  + 2*(-spacingBetweenStates - stateWidth), yCoordOfMainState, "The polymerase is <b>backtracked</b> by 1 base. The next base to be copied is at position " + m + ".", isCurrentState);
 			rateSum = result["k -1,-2"] + (canBT ? result["k -1,0"] : 0) + (ELONGATION_MODEL_TEMP["allowInactivation"] ? kU : 0);
-			plotArrow(ctx, xCoordOfMainState + -2*spacingBetweenStates - 2*stateWidth - arrowSpace,	yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", result["k -1,-2"], rateSum);
-			if (canBT) plotArrow(ctx, xCoordOfMainState + -2*spacingBetweenStates - stateWidth + arrowSpace,	yCoordOfMainState + arrowSpace, "right", "kfwd", result["k -1,0"], rateSum);
-			if (ELONGATION_MODEL_TEMP["allowInactivation"]) plotArrow(ctx, xCoordOfMainState  - arrowSpace  - 2*spacingBetweenStates -stateWidth, yCoordOfMainState + stateHeight + arrowSpace, "down", "kU", kU, rateSum);
+			plotArrow_stateDiagram(ctx, xCoordOfMainState + -2*spacingBetweenStates - 2*stateWidth - arrowSpace,	yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", result["k -1,-2"], rateSum);
+			if (canBT) plotArrow_stateDiagram(ctx, xCoordOfMainState + -2*spacingBetweenStates - stateWidth + arrowSpace,	yCoordOfMainState + arrowSpace, "right", "kfwd", result["k -1,0"], rateSum);
+			if (ELONGATION_MODEL_TEMP["allowInactivation"]) plotArrow_stateDiagram(ctx, xCoordOfMainState  - arrowSpace  - 2*spacingBetweenStates -stateWidth, yCoordOfMainState + stateHeight + arrowSpace, "down", "kU", kU, rateSum);
 			/////////////////
 
 
 			// Dot dot dot arrows
-			plotArrow(ctx, xCoordOfMainState + -3*spacingBetweenStates - 2*stateWidth + arrowSpace,	yCoordOfMainState + arrowSpace, "right", "kfwd", result["k -2,-1"]);
+			plotArrow_stateDiagram(ctx, xCoordOfMainState + -3*spacingBetweenStates - 2*stateWidth + arrowSpace,	yCoordOfMainState + arrowSpace, "right", "kfwd", result["k -2,-1"]);
 
 
 		}
@@ -923,14 +923,14 @@ function drawModelDiagramCanvas(){
 			isCurrentState = currentState["mRNAPosInActiveSite"] == 2 && currentState["activated"];
 			plotState(ctx, "S(" + m + ",+2)", xCoordOfMainState + spacingBetweenStates + stateWidth, yCoordOfMainState, "The polymerase is <b>hypertranslocated</b> by 1 base. The next base to be copied is at position " + m + ".", isCurrentState);
 			rateSum = result["k +2,+3"] + result["k +2,+1"] + (ELONGATION_MODEL_TEMP["allowInactivation"] ? kU : 0);
-			plotArrow(ctx, xCoordOfMainState + spacingBetweenStates + 2*stateWidth + arrowSpace, yCoordOfMainState + arrowSpace, "right", "kfwd", result["k +2,+3"], rateSum);
-			plotArrow(ctx, xCoordOfMainState + spacingBetweenStates + stateWidth - arrowSpace, yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", result["k +2,+1"], rateSum);
-			if (ELONGATION_MODEL_TEMP["allowInactivation"]) plotArrow(ctx, xCoordOfMainState - arrowSpace + 1*spacingBetweenStates + 2*stateWidth, yCoordOfMainState + stateHeight + arrowSpace, "down", "kU", kU, rateSum);
+			plotArrow_stateDiagram(ctx, xCoordOfMainState + spacingBetweenStates + 2*stateWidth + arrowSpace, yCoordOfMainState + arrowSpace, "right", "kfwd", result["k +2,+3"], rateSum);
+			plotArrow_stateDiagram(ctx, xCoordOfMainState + spacingBetweenStates + stateWidth - arrowSpace, yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", result["k +2,+1"], rateSum);
+			if (ELONGATION_MODEL_TEMP["allowInactivation"]) plotArrow_stateDiagram(ctx, xCoordOfMainState - arrowSpace + 1*spacingBetweenStates + 2*stateWidth, yCoordOfMainState + stateHeight + arrowSpace, "down", "kU", kU, rateSum);
 			/////////////////
 
 
 			// Dot dot dot arrows
-			plotArrow(ctx, xCoordOfMainState + 2*spacingBetweenStates + 2*stateWidth - arrowSpace, yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", result["k +3,+2"]);
+			plotArrow_stateDiagram(ctx, xCoordOfMainState + 2*spacingBetweenStates + 2*stateWidth - arrowSpace, yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", result["k +3,+2"]);
 
 		}
 
@@ -943,9 +943,9 @@ function drawModelDiagramCanvas(){
 			isCurrentState = currentState["mRNAPosInActiveSite"] == 1 && !currentState["activated"];
 			plotState(ctx, "S(" + m + ",+1)\u2071", xCoordOfMainState, yCoordOfMainState + stateHeight + spacingBetweenStates, "The polymerase is <b>posttranslocated</b> and catalytically inactive. The next base to be copied is at position " + m + ".", isCurrentState, "#c0306d");
 			rateSum = kA + result["k +1,0"] + (ELONGATION_MODEL_TEMP["allowHypertranslocation"] ? result["k +1,+2"] : 0);
-			plotArrow(ctx, xCoordOfMainState + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates - arrowSpace, "up", "kA", kA, rateSum);
-			plotArrow(ctx, xCoordOfMainState - arrowSpace, yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", result["k +1,0"], rateSum);
-			if (ELONGATION_MODEL_TEMP["allowHypertranslocation"]) plotArrow(ctx, xCoordOfMainState + stateWidth + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right",  "kfwd", result["k +1,+2"], rateSum);
+			plotArrow_stateDiagram(ctx, xCoordOfMainState + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates - arrowSpace, "up", "kA", kA, rateSum);
+			plotArrow_stateDiagram(ctx, xCoordOfMainState - arrowSpace, yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", result["k +1,0"], rateSum);
+			if (ELONGATION_MODEL_TEMP["allowHypertranslocation"]) plotArrow_stateDiagram(ctx, xCoordOfMainState + stateWidth + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right",  "kfwd", result["k +1,+2"], rateSum);
 			/////////////////
 
 
@@ -955,9 +955,9 @@ function drawModelDiagramCanvas(){
 			isCurrentState = currentState["mRNAPosInActiveSite"] == 0 && !currentState["activated"];
 			plotState(ctx, "S(" + m + ",0)\u2071",  xCoordOfMainState - spacingBetweenStates - stateWidth, yCoordOfMainState + stateHeight + spacingBetweenStates, "The polymerase is <b>pretranslocated</b> and catalytically inactive. The next base to be copied is at position " + m + ".", isCurrentState, "#c0306d");
 			rateSum = kA + result["k 0,+1"] + (ELONGATION_MODEL_TEMP["allowBacktracking"] ? result["k 0,-1"] : 0);
-			plotArrow(ctx, xCoordOfMainState - spacingBetweenStates + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right", "kfwd", result["k 0,+1"], rateSum);
-			plotArrow(ctx, xCoordOfMainState + arrowSpace - spacingBetweenStates - stateWidth, yCoordOfMainState + stateHeight + spacingBetweenStates - arrowSpace, "up", "kA", kA, rateSum);
-			if (ELONGATION_MODEL_TEMP["allowBacktracking"]) plotArrow(ctx, xCoordOfMainState + -1*spacingBetweenStates - stateWidth - arrowSpace,	yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", result["k 0,-1"], rateSum);
+			plotArrow_stateDiagram(ctx, xCoordOfMainState - spacingBetweenStates + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right", "kfwd", result["k 0,+1"], rateSum);
+			plotArrow_stateDiagram(ctx, xCoordOfMainState + arrowSpace - spacingBetweenStates - stateWidth, yCoordOfMainState + stateHeight + spacingBetweenStates - arrowSpace, "up", "kA", kA, rateSum);
+			if (ELONGATION_MODEL_TEMP["allowBacktracking"]) plotArrow_stateDiagram(ctx, xCoordOfMainState + -1*spacingBetweenStates - stateWidth - arrowSpace,	yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", result["k 0,-1"], rateSum);
 			/////////////////
 
 
@@ -971,14 +971,14 @@ function drawModelDiagramCanvas(){
 				isCurrentState = currentState["mRNAPosInActiveSite"] == -1 && !currentState["activated"];
 				plotState(ctx, "S(" + m + ",-1)\u2071", xCoordOfMainState  + 2*(-spacingBetweenStates - stateWidth), yCoordOfMainState + stateHeight + spacingBetweenStates, "The polymerase is <b>backtracked</b> by 1 base and catalytically inactive. The next base to be copied is at position " + m + ".", isCurrentState, "#c0306d");
 				rateSum = result["k -1,0"] + kA + result["k -1,-2"];
-				plotArrow(ctx, xCoordOfMainState + -2*spacingBetweenStates - stateWidth + arrowSpace,	yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right", "kfwd", result["k -1,0"], rateSum);
-				plotArrow(ctx, xCoordOfMainState + arrowSpace  - 2*spacingBetweenStates - 2*stateWidth, yCoordOfMainState + stateHeight + spacingBetweenStates - arrowSpace, "up", "kA", kA, rateSum);
-				plotArrow(ctx, xCoordOfMainState + -2*spacingBetweenStates - 2*stateWidth - arrowSpace,	yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", result["k -1,-2"], rateSum);
+				plotArrow_stateDiagram(ctx, xCoordOfMainState + -2*spacingBetweenStates - stateWidth + arrowSpace,	yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right", "kfwd", result["k -1,0"], rateSum);
+				plotArrow_stateDiagram(ctx, xCoordOfMainState + arrowSpace  - 2*spacingBetweenStates - 2*stateWidth, yCoordOfMainState + stateHeight + spacingBetweenStates - arrowSpace, "up", "kA", kA, rateSum);
+				plotArrow_stateDiagram(ctx, xCoordOfMainState + -2*spacingBetweenStates - 2*stateWidth - arrowSpace,	yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", result["k -1,-2"], rateSum);
 				/////////////////
 
 
 				// Dot dot dot arrows
-				plotArrow(ctx, xCoordOfMainState + -3*spacingBetweenStates - 2*stateWidth + arrowSpace,	yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right", "kfwd", result["k -2,-1"]);
+				plotArrow_stateDiagram(ctx, xCoordOfMainState + -3*spacingBetweenStates - 2*stateWidth + arrowSpace,	yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right", "kfwd", result["k -2,-1"]);
 
 
 
@@ -993,13 +993,13 @@ function drawModelDiagramCanvas(){
 				isCurrentState = currentState["mRNAPosInActiveSite"] == 2 && !currentState["activated"];
 				plotState(ctx, "S(" + m + ",+2)\u2071", xCoordOfMainState + spacingBetweenStates + stateWidth, yCoordOfMainState + stateHeight + spacingBetweenStates, "The polymerase is <b>hypertranslocated</b> by 1 base and catalytically inactive. The next base to be copied is at position " + m + ".", isCurrentState, "#c0306d");
 				rateSum = result["k +2,+1"] + kA + result["k +2,+3"];
-				plotArrow(ctx, xCoordOfMainState + spacingBetweenStates + stateWidth - arrowSpace, yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", result["k +2,+1"], rateSum);
-				plotArrow(ctx, xCoordOfMainState + spacingBetweenStates + 2*stateWidth + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right", "kfwd", result["k +2,+3"], rateSum);
-				plotArrow(ctx, xCoordOfMainState + arrowSpace + 1*spacingBetweenStates + 1*stateWidth, yCoordOfMainState + stateHeight + spacingBetweenStates - arrowSpace, "up", "kA", kA, rateSum);
+				plotArrow_stateDiagram(ctx, xCoordOfMainState + spacingBetweenStates + stateWidth - arrowSpace, yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", result["k +2,+1"], rateSum);
+				plotArrow_stateDiagram(ctx, xCoordOfMainState + spacingBetweenStates + 2*stateWidth + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right", "kfwd", result["k +2,+3"], rateSum);
+				plotArrow_stateDiagram(ctx, xCoordOfMainState + arrowSpace + 1*spacingBetweenStates + 1*stateWidth, yCoordOfMainState + stateHeight + spacingBetweenStates - arrowSpace, "up", "kA", kA, rateSum);
 				/////////////////
 
 				// Dot dot dot arrows
-				plotArrow(ctx, xCoordOfMainState + 2*spacingBetweenStates + 2*stateWidth - arrowSpace, yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", result["k +3,+2"]);
+				plotArrow_stateDiagram(ctx, xCoordOfMainState + 2*spacingBetweenStates + 2*stateWidth - arrowSpace, yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", result["k +3,+2"]);
 
 
 			}
@@ -1045,7 +1045,7 @@ function drawModelDiagramCanvas(){
 
 }
 
-function plotArrow(ctx, fromx, fromy, direction, label = "", rate = 0, rateSum = 0){
+function plotArrow_stateDiagram(ctx, fromx, fromy, direction, label = "", rate = 0, rateSum = 0){
 
 	ctx.globalAlpha = 1;
 	var headlen = 10;
@@ -1137,6 +1137,10 @@ function plotArrow(ctx, fromx, fromy, direction, label = "", rate = 0, rateSum =
 	    	ctx.textBaseline="bottom"; 
 	        break;
 	}
+
+
+
+	if (label == "") return;
 
 	// Label
 	ctx.fillStyle = "black";
@@ -1245,4 +1249,7 @@ function plotState(ctx, label, xCoord, yCoord, desc = "", isCurrentState = false
 
 
 }
+
+
+
 

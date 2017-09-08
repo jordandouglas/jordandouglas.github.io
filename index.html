@@ -26,7 +26,7 @@
 
 <html>
 <head>
-<title>SNAP</title>
+<title>SNAPdragon</title>
 
 <link rel="icon" href="src/Images/transcribe.png">
 <meta name="viewport" content="width=device-width, initial-scale=0.41, maximum-scale=1" />
@@ -70,6 +70,7 @@
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/parameters.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/controller.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/MFE.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/navigationPanel.js"></script>
 
 
 
@@ -180,6 +181,9 @@ function init(){
 
 
 		barchart(true);
+
+
+
 		
 		
 	}catch(e){
@@ -551,8 +555,7 @@ function refresh(resolve = function(){}){
 			}
 			renderObjects(false, afterRender);
 	
-
-
+			refreshNavigationCanvases();
 
 			for (var i = 0; i < 10; i ++){
 				//console.log("rand", new Random().normal(10, 15));
@@ -594,6 +597,7 @@ function changeInputSequenceType(){
 function setNTP(ntpType){
 
 	//console.log("setNTP", ntpType);
+	if (simulating) return;
 
 	var ntpTypeHTML = ntpType;
 	if (ntpTypeHTML == "U") ntpTypeHTML = "T";
@@ -1812,7 +1816,7 @@ function closeNav() {
 			  
 			 <div  class="parameter-bg">
 				 <div class="parameter-title noselect" style="font-size: 28px;">Parameters
-						<input type=image id='viewModelBtn' title="View the kinetic diagram of this model" onClick="viewModel()" src="src/Images/diagram.png" style="position:absolute; padding: 3 3; left: 300px; width:50px; height:25px; float:right; vertical-align: middle; ">  
+						  
 					</div>
 				 
 				 </div>
@@ -1862,7 +1866,7 @@ function closeNav() {
 			
 			<div class="parameter-bg">
 				
-				<div class="parameter-title" ><span  id="NTPtitle"> </span> <input type=image id='refreshNTP' onClick=refreshNTP() src="src/Images/refresh.png" style="vertical-align: middle; width:20px; height:20px;"> </div> <br>
+				<div class="parameter-title" ><span  id="NTPtitle"> </span>  </div> <br>
 				
 				<div id="ATPconc_container">
 					<span id="ATPname"></span> = <input class="variable"   type="number" onChange="update_this_parameter_controller(this)" id="ATPconc" style="vertical-align: middle; text-align:right; width: 70px">&mu;M 
@@ -2173,13 +2177,13 @@ function closeNav() {
 					<tr>
 						<td style="height:30px; width: 20%; vertical-align:bottom; ">
 							<div id="mfeOutput" style="font-family:'Courier New'; "> </div>
-							<span id="openNavBtn" style="text-align:right;  font-size:20px;cursor:pointer; font-color: #858280;" onclick="openNav(); ">&#9776; Parameters</span>
+							<span id="openNavBtn" style="text-align:right;  font-size:20px;cursor:pointer; font-color: #858280; font-family:Palatino;" onclick="openNav(); ">&#9776; Parameters</span>
 							
 						</td>
 
 						<td  style="text-align:center; font-size: 20px; vertical-align:top; font-family: 'Palatino'; width: 60%;"> 
 							<div style="width:100%; text-align:center">
-								<a href="" ><img src="src/Images/logo2.png" style="height:120px; vertical-align:middle;"></a>
+								<a href="" ><img src="src/Images/logo.png" style="height:120px; vertical-align:middle;"></a>
 							</div>
 									
 						</td>
@@ -2206,7 +2210,7 @@ function closeNav() {
 				We recommend you view this page in landscape mode! </div>
 
 
-			<div id="theToolbar" style="position:fixed; top:25%; left:25px; z-index:5;">
+			<div id="theToolbar" style="position:fixed; top:170px; left:14px; z-index:5;">
 				<table class="toolbar" cellpadding=3>
 						
 
@@ -2233,7 +2237,7 @@ function closeNav() {
 						
 
 						<td>
-							<div class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="clearKineticDataCache();" title="Clear kinetic data from the cache" > 
+							<div class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="clearKineticDataCache();" title="Clear data from the cache" > 
 								<img id='deleteAllData' src="src/Images/close.png" style="padding:5 0; height:25px;">
 							</div>
 						</td>
@@ -2316,136 +2320,218 @@ function closeNav() {
 
 
 			<br><br>
-	 
-			<table cellspacing="0" style="float:left;">
-				
-				
 
-				<tr style="text-align:center;">
+
+
+
+			<div id="navigationPanel"  class="parameter-bg" style="background-color:#ebe9e7; margin-left:130px; transition:0.3s">
+
+				<span style="font-size:18px; font-family:Bookman;">
+					<input type=button id='showNavigationPanel' class='minimise' value='-' onClick=showNavigationPanel()> 
+					<b>Navigation panel</b> 
+						<!--<span style="font-size:14px; font-family:Arial; vertical-align:middle"> - Press any of the arrows below to apply a reaction-->
+						</span>
+ 
+
+					<input type=button id='viewModelBtn' onClick=viewModel() value='View model' title="View the kinetic diagram of this model" class="operation" style="z-index: 100; float:right">
+					<!--<input type=image id='viewModelBtn' title="View the kinetic diagram of this model" onClick="viewModel()" src="src/Images/diagram.png" style="padding: 3 3; width:50px; height:25px; vertical-align: middle; ">-->
+				</span>
+
 					
-
-					<td rowspan=6 style="width:130px">
-
-					</td>
-
-					<td class="landscape">
-						<canvas id="slideCanvas" width="410px" height="0px"></canvas>
-					</td>
-					
-					<td class="spacer"></td>
-
-					<td class="landscape">
-						<canvas id="bindCanvas" width="410px" height="0px"></canvas>
-					</td>
-					
-					<td class="spacer"></td>
-					
-					<td class="landscape">
-						<canvas id="pauseCanvas" width="410px" height="0px"></canvas>
-					</td>
+						<div id="navigationPanelTable">
+						<table  cellspacing="0" style="width:100%;">
 
 
-				</tr>
-				
-			
-				<tr style="text-align:center;">
-					
-					<td class="landscape">
-						<input type=button id='bck' onClick=backwards_controller() value='Backwards' title="Translocate the polymerase backwards (&larr; key)" class="operation" style="z-index: 100">
-						Translocation
-						<input type=button id='fwd' onClick=forward_controller() title="Translocate the polymerase forward (&rarr; key)" value='Forward' class="operation">
-						<input type=button id='hideSlide' class='minimise' value='+' onClick=toggleSlide()>
-						
-					</td>
-					
-					<td class="spacer"></td>
+							<tr style="text-align:center;">
 
-					<td class="landscape">
-						
-								<input type=button id='nntp' onClick=releaseNTP_controller() value='Release NTP' title="Release NTP or reverse-catalyse" class="operation"> 
-								NTP 
-								<input type=button id='ntp' onClick=bindNTP_controller() value='Bind NTP' title="Bind NTP or add NTP to the chain" class="operation">
+
+								<td style="width:25%; vertical-align:top">
+
+									<div style="font-size:18px; font-family:Arial;">
+										Translocation reactions
+									</div>
+
+									<div id="translocationCanvasDIV" style="position:relative; margin:auto; width: 350px">
+										<canvas id="translocationCanvas" height=70 width=350 ></canvas>
+									</div><br>
+
+									<input type=button id='bck' onClick=backwards_controller() value='Backwards' title="Translocate the polymerase backwards (&larr; key)" class="operation" style="z-index: 100">
+									<input type=button id='fwd' onClick=forward_controller() title="Translocate the polymerase forward (&rarr; key)" value='Forward' class="operation">
 								
-								<input type=button id='ntpA' onClick=userChangeNTPType('A') value='A' title="Set the NTP to A" class="ntp ntp-selected">
-								<input type=button id='ntpC' onClick=userChangeNTPType('C') value='C' title="Set the NTP to C" class="ntp">
-								<input type=button id='ntpG' onClick=userChangeNTPType('G') value='G' title="Set the NTP to G" class="ntp">
-								<input type=button id='ntpT' onClick=userChangeNTPType('T') value='T' title="Set the NTP to T" class="ntp">
+
+
+								</td>
+
+
+								<td style="width:25%; vertical-align:top">
+									<div style="width:100%;">
+									
+										<div style="font-size:18px; font-family:Arial; vertical-align:top">
+											NTP reactions
+										</div> <br><br>
+
+										<div id="ntpCanvasDIV" style="position:relative; margin:auto; width: 350px">
+											<canvas id="ntpCanvas"  height=70 width=350></canvas>
+										</div><br>
+
+
+										Base to add:
+										<input type=button id='ntpA' onClick=userChangeNTPType('A') value='A' title="Set the NTP to A" class="ntp ntp-selected">
+										<input type=button id='ntpC' onClick=userChangeNTPType('C') value='C' title="Set the NTP to C" class="ntp">
+										<input type=button id='ntpG' onClick=userChangeNTPType('G') value='G' title="Set the NTP to G" class="ntp">
+										<input type=button id='ntpT' onClick=userChangeNTPType('T') value='T' title="Set the NTP to T" class="ntp">
+									</div>
+
+								</td>
+
+
+								<td style="width:25%; vertical-align:top">
+
+									<div style="font-size:18px; font-family:Arial; vertical-align:top">
+										Activation reactions
+									</div> <br><br>
+									<div id="deactivationCanvasDIV">
+										<canvas id="deactivationCanvas"  height=70 width=350></canvas>
+									</div><br>
+
+
+								</td>
+
+
+
+								<td style="width:25%; vertical-align:top">
+
+									<div style="font-size:18px; font-family:Arial;">
+										Slippage reactions
+									</div>
+
+
+									<div id="slippageCanvasDIV" style="position:relative; margin:auto; width: 350px">
+										<canvas id="slippageCanvas" height=70 width=350 ></canvas>
+									</div><br>
+
+									<input type=button id='dbl0' onClick=slip_left_controller() value='Form bulge' title="Move a bulge to the left" class="operation">
+									<input type=button id='dbr0' onClick=slip_right_controller() value='Absorb bulge' title="Move a bulge to the right" class="operation">
+									
+
+
+								</td>
+
+
+
+
+							</tr>
+
+
+							<tr style="text-align:center; display:none">
 								
-								<input type=button id='hideBind' class='minimise'  value='+' onClick=toggleBind()>  
 
-					</td>
-					
-					<td class="spacer"></td>
-					
-					<td class="landscape">
-						<input type=button id='unpauseBtn' onClick=activate_controller() value='Activate' title="Activate the polymerase" class="operation">
-						Deactivation
-						<input type=button id='pauseBtn' onClick=deactivate_controller() value='Deactivate' title="Put the polymerase into a catalytically inactive state" class="operation">
-						<input type=button id='hidePause' class='minimise' value='+' onClick=togglePause()>
-					</td>
-					
-					
-				</tr>
-				
-				<tr class="spacer"></tr>
-				
-				
-				<tr style="text-align:center;" id="primerSlipGraphs">
+								<td class="landscape">
+									<canvas id="slideCanvas" width="410px" height="0px"></canvas>
+								</td>
+								
+								<td class="spacer"></td>
 
-					
+								<td class="landscape">
+									<canvas id="bindCanvas" width="410px" height="0px"></canvas>
+								</td>
+								
+								<td class="spacer"></td>
+								
+								<td class="landscape">
+									<canvas id="pauseCanvas" width="410px" height="0px"></canvas>
+								</td>
+
+
+							</tr>
+
 						
-					<td id='primerSlipCanvasCell0' class="landscape">
-						<canvas id="slipCanvas0" width="410px" height="0px"></canvas>
-					</td>
-					<td class="spacer" id="primerSlipCanvasCellSpacer0"></td>
+							<tr style="text-align:center; display:none">
+								
+								<td class="landscape">
+									<input type=button id='hideSlide' class='minimise' value='+' onClick=toggleSlide()>
+									
+								</td>
+								
+								<td class="spacer"></td>
 
-				</tr>
-					
-				<tr style="text-align:center;" id="primerSlipButtons" >
-					
-					<td id='primerSlipBtnCell0' class="landscape">
-						<input type=button id='dbl0' onClick=slip_left_controller() value='Form bulge' title="Move a bulge to the left" class="operation">
-						Slippage
-						<input type=button id='dbr0' onClick=slip_right_controller() value='Absorb bulge' title="Move a bulge to the right" class="operation">
-						<input type=button id='hideSlip0' class='minimise' value='+' onClick=toggleSlip(0)>
-					</td>
-					<td class="spacer" id="primerSlipBtnCellSpacer0"></td>
+								<td class="landscape">
+									
+											<input type=button id='nntp' onClick=releaseNTP_controller() value='Release NTP' title="Release NTP or reverse-catalyse" class="operation"> 
+											NTP 
+											<input type=button id='ntp' onClick=bindNTP_controller() value='Bind NTP' title="Bind NTP or add NTP to the chain" class="operation">
+											
+
+											
+											<input type=button id='hideBind' class='minimise'  value='+' onClick=toggleBind()>  
+
+								</td>
+								
+								<td class="spacer"></td>
+								
+								<td class="landscape">
+									<input type=button id='unpauseBtn' onClick=activate_controller() value='Activate' title="Activate the polymerase" class="operation">
+									Deactivation
+									<input type=button id='pauseBtn' onClick=deactivate_controller() value='Deactivate' title="Put the polymerase into a catalytically inactive state" class="operation">
+									<input type=button id='hidePause' class='minimise' value='+' onClick=togglePause()>
+								</td>
+								
+								
+							</tr>
+							
+
+							<tr style="text-align:center; display:none" id="primerSlipGraphs">
+
+								
+									
+								<td id='primerSlipCanvasCell0' class="landscape">
+									<canvas id="slipCanvas0" width="410px" height="0px"></canvas>
+								</td>
+								<td class="spacer" id="primerSlipCanvasCellSpacer0"></td>
+
+							</tr>
+								
+							<tr style="text-align:center; display:none" id="primerSlipButtons" >
+								
+								<td id='primerSlipBtnCell0' class="landscape">
+									<input type=button id='hideSlip0' class='minimise' value='+' onClick=toggleSlip(0)>
+								</td>
+								<td class="spacer" id="primerSlipBtnCellSpacer0"></td>
+									
+							</tr>
+							
+								
+								
+							<tr style="text-align:center; display:none">
+								
+								
+								
+								<td class="landscape">
+									<canvas id="TslipCanvas"  width="410px" height="100px"></canvas>
+								</td>
+								<td class="spacer"></td>
+
+							</tr>
+							
+							<tr style="text-align:center; display:none">
+
+
+
+								<td class="landscape">
+									<input type=button id='Tdbl' onClick=diffuse_left_T() value='Form bulge' title="Move a bulge to the left" class="operation">
+									Template Slippage
+									<input type=button id='Tdbr' onClick=diffuse_right_T() value='Absorb bulge' title="Move a bulge to the right" class="operation">
+									<input type=button id='ThideSlip' class='minimise'  value='+' onClick=toggleSlipT()>
+								</td>
+								<td class="spacer"></td>
+							</tr>
+							
+
+
 						
-				</tr>
-				
-				<tr class="spacer"></tr>
-					
-					
-				<tr style="text-align:center; display:none">
-					
-					
-					
-					<td class="landscape">
-						<canvas id="TslipCanvas"  width="410px" height="100px"></canvas>
-					</td>
-					<td class="spacer"></td>
-
-				</tr>
-				
-				<tr style="text-align:center; display:none">
-
-
-
-					<td class="landscape">
-						<input type=button id='Tdbl' onClick=diffuse_left_T() value='Form bulge' title="Move a bulge to the left" class="operation">
-						Template Slippage
-						<input type=button id='Tdbr' onClick=diffuse_right_T() value='Absorb bulge' title="Move a bulge to the right" class="operation">
-						<input type=button id='ThideSlip' class='minimise'  value='+' onClick=toggleSlipT()>
-					</td>
-					<td class="spacer"></td>
-				</tr>
-				
-				<tr class="spacer"></tr>
-				
-
-				
-			</table> 	
-
+						</table> 	
+					</div>
+				</div>
 
 
 			<table style="width:100%;">
@@ -2464,190 +2550,165 @@ function closeNav() {
 
 
 			</table>
-			<br><br>
+			<br>
 
 
 
 
 
-
-			<table cellspacing="0" style="width:100%;">
-				
-				<tr>
-				
-					<td style="width:130px">
-
-					</td>
-				
-					<td style="width:200px; vertical-align:top;">
+			<div id="plots4"  class="parameter-bg" style="background-color:#ebe9e7; margin-left:130px">
 
 
-						<input type=button id='showPlot4' class='minimise' value='+' onClick=showPlot(4) style="display:none;">
-						<input type=image id='plotOptions4' title="Change the settings of this plot" onClick=plotOptions(4) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
-						<input type=image id='downloadPlot4' title="Download the data displayed in this plot" onClick=downloadPlot(4) src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px;">  
-
-						<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot4" OnChange="selectPlot(4);" style="vertical-align: middle; text-align:right; width:200px">
-						  <option value="none">Display a plot...</option>
-						  <option value="pauseSite">Dwell time per site</option>
-						  <option value="abortionSite">Arrest probability per site</option>
-						  <option value="misincorporationSite">Misincorporations per site</option>
-						</select>
-						
-					</td>
-
-					<td style="width:20px;">
-					</td>
-
-					<td >
-						<div class="scrollbar" id="plotDIV4"  style="display:none; width: 95%; height:170px; display:block; overflow-x:scroll; overflow-y:auto;  position:relative"> 
-							<div id="plotCanvasContainer4" style="position:absolute"> 
-								<canvas height=150 id="plotCanvas4" style="position:absolute">
-							</div> 
-						</div> 
-					</td>
-				</tr>
-				
-			</table>	
+				<span style="font-size:18px; font-family:Bookman;">
+					<b>Sitewise panel</b>
+					&nbsp;&nbsp;&nbsp;
+					<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot4" OnChange="selectPlot(4);" style="vertical-align: middle; text-align:right;">
+							  <option value="none">Display a sitewise plot...</option>
+							  <option value="pauseSite">Dwell time per site</option>
+							  <option value="abortionSite">Arrest probability per site</option>
+							  <option value="misincorporationSite">Misincorporations per site</option>
+					</select>
+					&nbsp;&nbsp;&nbsp;
+					<input type=button id='showPlot4' class='minimise' value='+' onClick=showPlot(4) style="display:none;">
+					<input type=image id='plotOptions4' title="Change the settings of this plot" onClick=plotOptions(4) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
+					<input type=image id='downloadPlot4' title="Download the data displayed in this plot" onClick=downloadPlot(4) src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px;">  
 
 
-
-
-			<table style="width:100%">
-				<tr style="text-align:center;">
+				</span>
 				
 
-					<td style="width:130px">
+				<div class="scrollbar" id="plotDIV4"  style="display:none; width: 95%; height:170px; display:block; overflow-x:scroll; overflow-y:auto;  position:relative"> 
+					<div id="plotCanvasContainer4" style="position:absolute"> 
+						<canvas height=150 id="plotCanvas4" style="position:absolute">
+					</div> 
+				</div> 
+			</div>
 
-					</td>
-				
-				
-					<td style="width:30%; vertical-align: top; ">
-				
+			<br>
+			<div id="plots123"  class="parameter-bg" style="background-color:#ebe9e7;  margin-left:130px">
 
-								<div id="plotDIV1" style="display:none">
+				<span style="font-size:18px; font-family:Bookman; position:absolute"><b>Plot panel</b></span>
+
+
+				<table style="width:100%">
+					<tr style="text-align:center; ">
+					
+							
+					
+						<td style="width:33%; vertical-align: top; ">
+								
+
+									<div id="plotDIV1" style="display:none">
+										<br>
+										<div id="plotLabel1"></div>
+										<div id="plotCanvasContainer1"> 
+											<canvas id="plotCanvas1" width="500px" height="300px"></canvas> 
+										</div>
+									</div>
+								
 									<br>
-									<div id="plotLabel1"></div>
-									<div id="plotCanvasContainer1"> 
-										<canvas id="plotCanvas1" width="500px" height="300px"></canvas> 
+										<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot1" OnChange="selectPlot(1);" style="vertical-align: middle; text-align:right;">
+													  <option value="none">Display a plot...</option>
+													  <option value="distanceVsTime">Distance vs time</option>
+													  <option value="pauseHistogram">Time histogram</option>
+													  <option value="velocityHistogram">Velocity histogram</option>
+													  <option value="custom">Parameter plot</option>
+										</select>
+									
+									<input type=button id='showPlot1' class='minimise' value='+' onClick=showPlot(1) style="display:none">
+									<input type=image id='plotOptions1' title="Change the settings of this plot" onClick=plotOptions(1) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
+									<input type=image id='downloadPlot1' title="Download the data displayed in this plot" onClick=downloadPlot(1) src="src/Images/download.png" style="vertical-align: middle; height:20px; display:none">  
+									
+
+
+
+						</td>
+						
+						
+						<td style="width:33%; vertical-align: top;">
+
+
+								<div id="plotDIV2" style="display:none">
+									<br>
+									<div id="plotLabel2"></div>
+									<div id="plotCanvasContainer2"> 
+										<canvas id="plotCanvas2" width="500px" height="300px"></canvas>
 									</div>
 								</div>
-							
+
+
 								<br>
-									<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot1" OnChange="selectPlot(1);" style="vertical-align: middle; text-align:right;">
-												  <option value="none">Display a plot...</option>
-												  <option value="distanceVsTime">Distance vs time</option>
-												  <option value="pauseHistogram">Time histogram</option>
-												  <option value="velocityHistogram">Velocity histogram</option>
-												  <option value="custom">Parameter plot</option>
+									<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot2" OnChange="selectPlot(2);" style="vertical-align: middle; text-align:right;">
+													  <option value="none">Display a plot...</option>
+													  <option value="distanceVsTime">Distance vs time</option>
+													  <option value="pauseHistogram">Time histogram</option>
+													  <option value="velocityHistogram">Velocity histogram</option>
+												   		<option value="custom">Parameter plot</option>
 									</select>
 								
-								<input type=button id='showPlot1' class='minimise' value='+' onClick=showPlot(1) style="display:none">
-								<input type=image id='plotOptions1' title="Change the settings of this plot" onClick=plotOptions(1) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
-								<input type=image id='downloadPlot1' title="Download the data displayed in this plot" onClick=downloadPlot(1) src="src/Images/download.png" style="vertical-align: middle; height:20px; display:none">  
+								<input type=button id='showPlot2' class='minimise' value='+' onClick=showPlot(2) style="display:none">
+								<input type=image id='plotOptions2' title="Change the settings of this plot" onClick=plotOptions(2) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
+								<input type=image id='downloadPlot2' title="Download the data displayed in this plot" onClick=downloadPlot(2) src="src/Images/download.png" style="vertical-align: middle;  height:20px; display:none ">  
+								
+								
+								
 								
 
 
 
-					</td>
-					
-					
-					<td style="width:30%; vertical-align: top;">
+						</td>
+						
+
+						
+						<td style="width:33%; vertical-align: top;">
 
 
-							<div id="plotDIV2" style="display:none">
+							<div id="plotDIV3"  style="display:none">
 								<br>
-								<div id="plotLabel2"></div>
-								<div id="plotCanvasContainer2"> 
-									<canvas id="plotCanvas2" width="500px" height="300px"></canvas>
+								<div id="plotLabel3"></div>
+								<div id="plotCanvasContainer3"> 
+									<canvas id="plotCanvas3" width="500px" height="300px"></canvas>
 								</div>
 							</div>
 
-
 							<br>
-								<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot2" OnChange="selectPlot(2);" style="vertical-align: middle; text-align:right;">
-												  <option value="none">Display a plot...</option>
-												  <option value="distanceVsTime">Distance vs time</option>
-												  <option value="pauseHistogram">Time histogram</option>
-												  <option value="velocityHistogram">Velocity histogram</option>
-											   		<option value="custom">Parameter plot</option>
+								<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot3" OnChange="selectPlot(3);" style="vertical-align: middle; text-align:right;">
+													  <option value="none">Display a plot...</option>
+													  <option value="distanceVsTime">Distance vs time</option>
+													  <option value="pauseHistogram">Time histogram</option>
+													  <option value="velocityHistogram">Velocity histogram</option>
+													  <option value="custom">Parameter plot</option>
+											
 								</select>
 							
-							<input type=button id='showPlot2' class='minimise' value='+' onClick=showPlot(2) style="display:none">
-							<input type=image id='plotOptions2' title="Change the settings of this plot" onClick=plotOptions(2) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
-							<input type=image id='downloadPlot2' title="Download the data displayed in this plot" onClick=downloadPlot(2) src="src/Images/download.png" style="vertical-align: middle;  height:20px; display:none ">  
+							<input type=button id='showPlot3' class='minimise' value='+' onClick=showPlot(3) style="display:none">
+							<input type=image id='plotOptions3' title="Change the settings of this plot" onClick=plotOptions(3) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
+							<input type=image id='downloadPlot3' title="Download the data displayed in this plot" onClick=downloadPlot(3) src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px; ">  
+						
 							
 							
 							
-							
 
-
-
-					</td>
-					
-
-					
-					<td style="width:30%; vertical-align: top;">
-
-
-						<div id="plotDIV3"  style="display:none">
-							<br>
-							<div id="plotLabel3"></div>
-							<div id="plotCanvasContainer3"> 
-								<canvas id="plotCanvas3" width="500px" height="300px"></canvas>
-							</div>
-						</div>
-
-						<br>
-							<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot3" OnChange="selectPlot(3);" style="vertical-align: middle; text-align:right;">
-												  <option value="none">Display a plot...</option>
-												  <option value="distanceVsTime">Distance vs time</option>
-												  <option value="pauseHistogram">Time histogram</option>
-												  <option value="velocityHistogram">Velocity histogram</option>
-												  <option value="custom">Parameter plot</option>
-										
-							</select>
 						
-						<input type=button id='showPlot3' class='minimise' value='+' onClick=showPlot(3) style="display:none">
-						<input type=image id='plotOptions3' title="Change the settings of this plot" onClick=plotOptions(3) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
-						<input type=image id='downloadPlot3' title="Download the data displayed in this plot" onClick=downloadPlot(3) src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px; ">  
-					
-						
-						
+						</td>
 						
 
-					
-					</td>
-					
-
-					
-					<td >
 						
-					</td>
 					
-				
-				</tr>
+					</tr>
 
 
-			</table>
+				</table>
+			</div>
 
-
-			<br><br>
+			<br>
 			
-			
-			<table style="width:100%;">
 
+			<div style="margin-left:130px;">
 
-				<tr>
-					<td style="width:130px"></td>
+				<div id="sequences" class="scrollbar parameter-bg" style="position:relative; display:none; height:0px; width:99%; overflow-x:scroll; transition: 0s;"></div><br>
 
-					<td>
-						<div id="sequences" class="scrollbar parameter-bg" style="position:relative; display:block none; height:0px; width:100%; overflow-x:scroll; transition: 0s;"></div><br>
-					</td>
-
-				<tr>
-
-
-			</table>
+			</div>
 			
 
 

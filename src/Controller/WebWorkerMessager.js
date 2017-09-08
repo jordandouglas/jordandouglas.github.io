@@ -569,13 +569,25 @@ function setNextBaseToAdd_controller(){
 
 function userSetNextBaseToAdd_controller(ntpType){
 
+
+	var updateDOM = function(){
+		refreshNavigationCanvases();
+	}
+
+
+
 	if (WEB_WORKER == null) {
-		userSetNextBaseToAdd_WW(ntpType);
+		var toCall = () => new Promise((resolve) => userSetNextBaseToAdd_WW(ntpType, resolve));
+		toCall().then((result) => updateDOM(result));
 	}
 
 	else{
-		var fnStr = stringifyFunction("userSetNextBaseToAdd_WW", [ntpType]);
-		callWebWorkerFunction(fnStr);
+		var res = stringifyFunction("userSetNextBaseToAdd_WW", [ntpType, null], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => updateDOM(result));
+
 	}
 
 }
@@ -868,6 +880,7 @@ function transcribe_controller(nbasesToTranscribe = null, fastMode = false, reso
 		reactivate_buttons();
 		setNextBaseToAdd_controller();
 		renderObjects();
+		refreshNavigationCanvases();
 		if (clickMisincorporation) $("#deactivateUponMisincorporation").click();
 		hideStopButtonAndShow("transcribe");
 		resolve();
@@ -909,6 +922,7 @@ function stutter_controller(nbasesToStutter = null, fastMode = false, resolve = 
 		setNextBaseToAdd_controller();
 		renderObjects();
 		reactivate_buttons();
+		refreshNavigationCanvases();
 		hideStopButtonAndShow("stutter");
 		resolve();
 	};
@@ -948,6 +962,7 @@ function forward_controller(state = null, UPDATE_COORDS = true, resolve = functi
 	var updateDOM = function(DOMupdates){
 		enable_buttons();
 		set_state_desc();
+		refreshNavigationCanvases();
 		update_sliding_curve(1);
 		update_slipping_curve(0);
 		update_binding_curve(0);
@@ -1012,6 +1027,7 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 
 		enable_buttons();
 		set_state_desc();
+		refreshNavigationCanvases();
 		update_sliding_curve(-1);
 		update_slipping_curve(0);
 		update_binding_curve(0);
@@ -1079,6 +1095,7 @@ function bindNTP_controller(state = null, UPDATE_COORDS = true, resolve = functi
 	var updateDOM = function(x){
 		enable_buttons();
 		set_state_desc();
+		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(0);
 		update_binding_curve(1);
@@ -1118,6 +1135,7 @@ function releaseNTP_controller(state = null, UPDATE_COORDS = true, resolve = fun
 	var updateDOM = function(x){
 		enable_buttons();
 		set_state_desc();
+		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(0);
 		update_binding_curve(-1);
@@ -1157,6 +1175,7 @@ function activate_controller(state = null, UPDATE_COORDS = true, resolve = funct
 	var updateDOM = function(x){
 		enable_buttons();
 		set_state_desc();
+		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(0);
 		update_binding_curve(0);
@@ -1195,6 +1214,7 @@ function deactivate_controller(state = null, UPDATE_COORDS = true, resolve = fun
 	var updateDOM = function(x){
 		enable_buttons();
 		set_state_desc();
+		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(0);
 		update_binding_curve(0);
@@ -1235,6 +1255,7 @@ function slip_left_controller(S = 0, state = null, UPDATE_COORDS = true, resolve
 
 		enable_buttons();
 		set_state_desc();
+		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(-1, S);
 		update_binding_curve(0);
@@ -1297,6 +1318,7 @@ function slip_right_controller(S = 0, state = null, UPDATE_COORDS = true, resolv
 
 		enable_buttons();
 		set_state_desc();
+		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(1, S);
 		update_binding_curve(0);
@@ -1528,6 +1550,46 @@ function getCurrentState_controller(resolve = function(state) { }){
 }
 
 
+function getNTPCanvasData_controller(resolve = function(result){}){
+
+	if (WEB_WORKER == null) {
+		var toCall = () => new Promise((resolve) => getNTPCanvasData_WW(resolve));
+		toCall().then((result) => resolve(result));
+	}
+
+	else{
+		var res = stringifyFunction("getNTPCanvasData_WW", [null], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
+	}
+
+
+}
+
+
+
+function getDeactivationCanvasData_controller(resolve = function(result){}){
+
+	if (WEB_WORKER == null) {
+		var toCall = () => new Promise((resolve) => getDeactivationCanvasData_WW(resolve));
+		toCall().then((result) => resolve(result));
+	}
+
+	else{
+		var res = stringifyFunction("getDeactivationCanvasData_WW", [null], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
+	}
+
+
+
+}
 
 
 
@@ -1572,6 +1634,7 @@ function startTrials_controller(){
 			deleteHiddenModeNotification();
 			reactivate_buttons();
 			setNextBaseToAdd_controller();
+			refreshNavigationCanvases();
 			if($("#PreExp").val() != "hidden") renderObjects();
 			drawPlots();
 			console.log("Updating dom");

@@ -68,7 +68,7 @@ img {
 }
 
 
-noselect {
+.noselect {
   -webkit-user-select: none;  
   -moz-user-select: none;    
   -ms-user-select: none;      
@@ -354,7 +354,7 @@ div.vertical{
 
 #main {
     transition: margin-left .5s;
-    padding: 15px;
+    padding: 5px;
 }
 
 
@@ -385,8 +385,8 @@ div.vertical{
 
 .header {
 	
-	background-color: #ebe9e7;
-	min-width:100%;
+	background-color: #b3b3b3;
+	min-width:99%;
 	padding: 5px 5px;
 	text-align: center;
 	font-family: "Palatino";

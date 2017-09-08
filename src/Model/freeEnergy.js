@@ -21,8 +21,8 @@
 -*/
 
 ELONGATION_MODELS = {};
-ELONGATION_MODELS["simpleBrownian"] = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: true, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
-ELONGATION_MODELS["twoSiteBrownian"] = {id: "twoSiteBrownian",name: "Brownian ratchet model with 2 NTP binding sites", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation:true, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
+ELONGATION_MODELS["simpleBrownian"] = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: false, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
+ELONGATION_MODELS["twoSiteBrownian"] = {id: "twoSiteBrownian",name: "Brownian ratchet model with 2 NTP binding sites", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation:false, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
 currentElongationModel = "simpleBrownian";
 
 
@@ -1196,6 +1196,48 @@ function getStateDiagramInfo_WW(resolve = function() {}, msgID = null){
 	ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"] = temp;
 
 
+	if (msgID != null){
+		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+	}else{
+		resolve(toReturn);
+	}
+
+
+}
+
+
+function getNTPCanvasData_WW(resolve = function(result) { }, msgID = null){
+
+	// If the polymerase is post-translocated or hypertranslocated, then return the base to be transcribed next and the pair before it
+	// Otherwise return the most recently transcribed base
+	var deltaBase = currentState["mRNAPosInActiveSite"] <= 0 ? -1 : 0;
+	var toReturn = {state: convertFullStateToCompactState(currentState), 
+					NTPbound: currentState["NTPbound"],
+					mRNAPosInActiveSite: currentState["mRNAPosInActiveSite"],
+					baseToAdd: deltaBase == 0 ? currentState["NTPtoAdd"] : primerSequence[currentState["mRNALength"]-1]["base"],
+					kBind: currentState["rateOfBindingNextBase"],
+					kRelease: PHYSICAL_PARAMETERS["RateUnbind"]["val"], 
+					kCat: PHYSICAL_PARAMETERS["RatePolymerise"]["val"],
+					templateBaseBeingCopied: templateSequence[currentState["nextBaseToCopy"]+deltaBase]["base"],
+					previousTemplateBase: templateSequence[currentState["nextBaseToCopy"]-1+deltaBase]["base"],
+					previousNascentBase: primerSequence[currentState["mRNALength"]-1+deltaBase]["base"],
+					activated: currentState["activated"]
+	};
+
+	if (msgID != null){
+		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+	}else{
+		resolve(toReturn);
+	}
+
+
+}
+
+
+
+function getDeactivationCanvasData_WW(resolve = function(result) { }, msgID = null){
+
+	var toReturn = {state: convertFullStateToCompactState(currentState), kU: PHYSICAL_PARAMETERS["kU"]["val"], kA: PHYSICAL_PARAMETERS["kA"]["val"]};
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
 	}else{

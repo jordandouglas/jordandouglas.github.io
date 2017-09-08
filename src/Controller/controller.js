@@ -22,14 +22,19 @@
 
 
 
-slip_left_btn = function(S = 0){
-	slip_left(S);
-}
 
-slip_right_btn = function(S = 0){
-	slip_right(S);
-}
+function showNavigationPanel(){
 
+	if($("#showNavigationPanel").val() == "-"){
+		$("#showNavigationPanel").val("+");
+		$("#navigationPanelTable").slideUp(100);
+	}
+	else{
+		$("#showNavigationPanel").val("-");
+		$("#navigationPanelTable").slideDown(100);
+	}
+
+}
 
 
 function renderTermination(result){
@@ -57,8 +62,8 @@ function renderTermination(result){
 		var firstLine = "<div  style='font-family:\"Arial\"; font-size:18px;'>";
 		numSeqsDisplayed = 0;
 
-
-		firstLine += " <span style='font-size:22px'>Simulated sequences: &nbsp;&nbsp;&nbsp;</span>"
+		firstLine += `<input type=button class='minimise' id='hideSequences'  value='-' title='Hide/show the sequence window' onClick=toggleSequences()>`; 
+		firstLine += " <span style='font-size:18px; font-family:Bookman;'><b>Copied sequences</b> &nbsp;&nbsp;&nbsp;</span>"
 
 
 		firstLine += " <input type=button id='minus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='&larr;20' onClick=minusSequences() title='See previous 20 sequences'>"
@@ -66,9 +71,7 @@ function renderTermination(result){
 		firstLine += " <input type=button id='plus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='20&rarr;' onClick=plusSequences() title='See next 20 sequences'>"
 
 		firstLine += "&nbsp;&nbsp;&nbsp;";
-		firstLine += `<input type=button class='minimise' id='hideSequences'  value='-' title='Hide/show the sequence window' onClick=toggleSequences()>&nbsp;`;
 		firstLine += '<input type="image" style="vertical-align: middle; height:20px;  padding: 5 0" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="src/Images/download.png"> </input>'; 
-		firstLine += ' <input type="image" style="vertical-align: middle; width:20px; height:20px;  padding: 5 0" title="Delete all sequences and close sequence window" id="clearSeqs" onClick="clearSequences()" src="src/Images/close.png"></input>'; 
 
 		// Add a table with site numbers
 		var tableHTML = "<table id='sequencesTable' style='position:absolute; font-family:\"Courier New\"; font-size:18px; border-spacing: 0; border-collapse: collapse;'></table>";
@@ -257,7 +260,7 @@ function toggleSequences(){
 	if($("#hideSequences").val() == "-"){
 		$("#hideSequences").val("+");
 		$("#sequencesTable").hide(300);
-		$("#sequences").height(50 + "px");
+		$("#sequences").height(30 + "px");
 	}
 	else{
 		$("#hideSequences").val("-");
@@ -437,7 +440,7 @@ function generatePol(obj){
 	if (obj["src"] != "square"){
 
 		// Ellipse
-		ctx.fillStyle = "#b3b3b3";
+		ctx.fillStyle = "#b3b3b3"; 
 		ctx.beginPath();
 		
 		
@@ -464,7 +467,7 @@ function generatePol(obj){
 	var y = 130 - obj["y"]  - 3;
 	var width = obj["width"] - 75 + 5;
 	var height = 51;
-	ctx.fillStyle = obj["src"].split("_").length == 1 ? "#e6e6e6" : "black";
+	ctx.fillStyle = obj["src"].split("_").length == 1 ? "#e6e6e6" : "#708090";     
 	ctx.fillRect(x, y, width, height);
 	
 
@@ -913,3 +916,151 @@ function loadSession(){
 
 
 
+
+function getCacheClearTemplate(){
+
+
+	return `
+		<div id='clearCachePopup' style='background-color:adadad; padding: 10 10; position:fixed; width: 500px; left:35vw; top:50vh; z-index:5'>
+			<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto;'>
+				<span style='font-size: 22px'> Clear Cache </span>
+				<span style='font-size: 30px; cursor:pointer; position:absolute; left:490px; top:5px' onclick='closeKineticCachePopup()'>&times;</span>
+				<div style='padding:2; font-size:18px;'> Please select which data you would like to clear </div>
+				<table cellpadding=10 style='width:100%; margin:auto;'>
+				
+					<tr>
+						<td style="vertical-align:top; text-align:left; width:100%; font-size:16px"> 
+							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="distanceVsTime_cleardata">Distance versus time and velocity data (DVTSIZE values)</input> </label> <br>
+							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="timeHistogram_cleardata">Catalysis time data (TIMESIZE values)</input> </label> <br>
+							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="customPlot_cleardata">Parameter plot data (PARAMSIZE values)</input> </label> <br>
+							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="timePerSite_cleardata">Dwell time per site data</input> </label> <br>
+
+							<br>
+							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="sequences_cleardata">Copied sequences (NUMSEQ seqs)</input> </label> <br>
+							
+						</td>
+
+					</tr>
+
+
+					<tr >
+
+						<td style="vertical-align:top; text-align:center; width:100%"> 
+							<input type=button class="operation" onClick=clearCache() value='Delete' title="Removes all data which may be displayed in the plots" style="width:100px"></input>
+						</td>
+					</tr>
+					
+
+				</table>
+				
+
+
+			</div>
+		</div>
+	`;
+
+}
+
+
+
+
+
+function clearKineticDataCache(){
+
+
+	closeAllDialogs();
+	
+	$("#main").css("opacity", 0.5);
+	$("#mySidenav").css("opacity", 0.5);
+	
+	var popupHTML = getCacheClearTemplate();
+
+	getCacheSizes_controller(function(result){
+
+
+
+		popupHTML = popupHTML.replace("DVTSIZE", result["DVTsize"]);
+		popupHTML = popupHTML.replace("TIMESIZE", result["timeSize"]);
+		popupHTML = popupHTML.replace("PARAMSIZE", result["parameterPlotSize"]);
+		popupHTML = popupHTML.replace("NUMSEQ", terminatedSequences.length);
+		$(popupHTML).appendTo('body');
+		
+
+		window.setTimeout(function(){
+			
+			$("#main").click(function(){
+				closeKineticCachePopup();
+			});
+			
+			$("#mySidenav").click(function(){
+				closeKineticCachePopup();
+			});
+			
+		}, 50);
+
+
+	});
+
+
+}
+
+
+
+
+
+function clearCache(){
+
+	if( $("#clearCachePopup").length == 0) return;
+
+	var distanceVsTime_cleardata = $("#distanceVsTime_cleardata").prop('checked');
+	var timeHistogram_cleardata = $("#timeHistogram_cleardata").prop('checked');
+	var timePerSite_cleardata = $("#timePerSite_cleardata").prop('checked');
+	var customPlot_cleardata = $("#customPlot_cleardata").prop('checked');
+	var sequences_cleardata = $("#sequences_cleardata").prop('checked');
+	if (sequences_cleardata) clearSequences();
+
+	if (!distanceVsTime_cleardata && !timeHistogram_cleardata && !timePerSite_cleardata && !customPlot_cleardata) return;
+
+
+	if (distanceVsTime_cleardata){
+		DISTANCE_VS_TIME_CONTROLLER = [];
+		VELOCITIES = [];
+
+	} 
+
+	if (timeHistogram_cleardata){
+		DWELL_TIMES_CONTROLLER = [];
+	}
+
+
+
+	deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, function(plotData){
+
+		
+		update_PLOT_DATA(plotData)
+
+
+		window.requestAnimationFrame(function(){
+			for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
+				if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "none" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
+				else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
+			}
+		});
+
+		closeKineticCachePopup();
+	});
+
+
+
+}
+
+
+function closeKineticCachePopup(){
+
+	$("#mySidenav").unbind('click');
+	$("#main").unbind('click');
+	$("#clearCachePopup").remove();
+	$("#main").css("opacity", 1);
+	$("#mySidenav").css("opacity", 1);
+
+}

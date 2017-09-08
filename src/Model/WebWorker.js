@@ -951,7 +951,7 @@ function setNextBaseToAdd_WW(resolve = function() { }, msgID = null){
 
 }
 
-function userSetNextBaseToAdd_WW(ntpType){
+function userSetNextBaseToAdd_WW(ntpType, resolve = function() { }, msgID = null){
 
 	if (ntpType == "T" && all_sequences[sequenceID]["primer"].substring(2) == "RNA") ntpType = "U";
 	else if (ntpType == "U" && all_sequences[sequenceID]["primer"] == "DNA") ntpType = "T";
@@ -959,6 +959,13 @@ function userSetNextBaseToAdd_WW(ntpType){
 	currentState["NTPtoAdd"] = ntpType;
 	var baseToTranscribe = templateSequence[currentState["nextBaseToCopy"]]["base"];
 	currentState["rateOfBindingNextBase"] = misbindMatrix[baseToTranscribe][ntpType];
+
+
+	if (msgID != null){
+		postMessage(msgID + "~X~done");
+	}else{
+		resolve();
+	}
 }
 
 
