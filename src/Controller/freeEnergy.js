@@ -416,10 +416,6 @@ function updateModelDOM(elongation_model_temp){
 	$("#allowMisincorporation").prop('checked', elongation_model_temp["allowMisincorporation"]);
 	
 
-	if (elongation_model_temp["allowBacktracking"] && !(elongation_model_temp["allowInactivation"] && !elongation_model_temp["allowBacktrackWithoutInactivation"])) $("#GDaggerBacktrack_container").show(100);
-	else {
-		$("#GDaggerBacktrack_container").hide(100);
-	}
 
 	if (elongation_model_temp["allowBacktracking"] && elongation_model_temp["allowInactivation"]) $("#allowBacktrackWithoutInactivation_container").show(100);
 	else $("#allowBacktrackWithoutInactivation_container").hide(100);

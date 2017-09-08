@@ -360,8 +360,11 @@ function sampleAction_WW(stateC){
 	var kFwd = 0
 	if (!stateC[2]){
 		var rateFwdAndBack = getTranslocationRates(stateC);
-		kBck = rateFwdAndBack[0];
 		kFwd = rateFwdAndBack[1];
+		kBck = rateFwdAndBack[0];
+		
+		if (stateC[3] && stateC[1] == 0 && !ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"]) kBck = 0; // If state is active but we don't allow backtracking while active then set rate to zero
+		
 	}
 	var kRelease = stateC[2] ? PHYSICAL_PARAMETERS["RateUnbind"]["val"] : 0; // Can only release NTP if it is bound
 	var kAct = stateC[3] ? 0 : PHYSICAL_PARAMETERS["kA"]["val"]; // Can only activate if it is deactivated
@@ -370,6 +373,7 @@ function sampleAction_WW(stateC){
 	//if (kFwd != 0) kFwd = 36.9;
 	//if (kBck != 0) kBck = 57.5;
 
+	//console.log("state", stateC, "kbck", kBck);
 
 	//console.log("Rate back old", propSlideBackOLD, "rate back new", propSlideBack);
 	//console.log("Rate fwd old", propSlideFwdOLD, "rate fwd new", propSlideFwd);

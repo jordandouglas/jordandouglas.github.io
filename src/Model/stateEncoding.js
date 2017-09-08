@@ -188,11 +188,20 @@ function getTranslocationRates(compactState){
 
 		if (rates != false) return rates;
 
+		
+		// Temporarily set state to inactive so it lets us backtrack
+		var temp = compactState[3];
+		compactState[3] = false;
+		
 		// If rates are not in table then add them and return them
 		var thisFullState = convertCompactStateToFullState(compactState);
 		var slidingPeakHeights = update_slidingPeakHeights_WW(thisFullState, false);
 		var slidingTroughHeights = update_slidingTroughHeights_WW(thisFullState, false);
+		compactState[3] = temp;
+		
+		//console.log("compactState", compactState, "slidingPeakHeights", slidingPeakHeights);
 
+		
 
 
 		var kbck = 0;

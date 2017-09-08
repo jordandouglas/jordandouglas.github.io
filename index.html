@@ -649,6 +649,8 @@ window.onkeyup = function(e) {
 		$("#nbasesToSimulate").select();
 	}else if (key == 27) { // Escape
 		stop_controller();
+		getSlidingHeights_controller(function(result){ console.log(result)});
+		
 	}
 	
 
@@ -1925,10 +1927,6 @@ function closeNav() {
 				</div>
 
 
-				<div id="GDaggerBacktrack_container">
-					&Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>backtrack</sub> = <input class="variable"  type="number" id="GDaggerBacktrack" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">
-					<input type=image id='GDaggerBacktrack_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
-				</div>
 
 				<div id="GsecondarySitePenalty_container">
 					&Delta;G<sub>NTP2</sub> = <input class="variable"  type="number" id="GsecondarySitePenalty" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">
@@ -2324,7 +2322,7 @@ function closeNav() {
 
 
 
-			<div id="navigationPanel"  class="parameter-bg" style="background-color:#ebe9e7; margin-left:130px; transition:0.3s">
+			<div id="navigationPanel"  class="parameter-bg " style="background-color:#ebe9e7; margin-left:130px;  ">
 
 				<span style="font-size:18px; font-family:Bookman;">
 					<input type=button id='showNavigationPanel' class='minimise' value='-' onClick=showNavigationPanel()> 
@@ -2338,7 +2336,7 @@ function closeNav() {
 				</span>
 
 					
-						<div id="navigationPanelTable">
+						<div id="navigationPanelTable" class="scrollbar" style="overflow-x:scroll; width:100%">
 						<table  cellspacing="0" style="width:100%;">
 
 

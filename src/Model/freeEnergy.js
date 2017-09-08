@@ -55,7 +55,6 @@ function initFreeEnergy_WW(){
 	TerminalMismatchParams = init_terminal_mismatch_parameters_WW();
 
 
-	PHYSICAL_PARAMETERS["GDaggerBacktrack"]["hidden"] = !(ELONGATION_MODELS[currentElongationModel]["allowBacktracking"] && !(ELONGATION_MODELS[currentElongationModel]["allowInactivation"] && !ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"]));
 	PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["hidden"] = currentElongationModel != "twoSiteBrownian";
 	PHYSICAL_PARAMETERS["nbasesToFold"]["hidden"] = !ELONGATION_MODELS[currentElongationModel]["allowmRNAfolding"];
 
@@ -98,7 +97,6 @@ function userInputModel_WW(elongationModelID, translocationModelID, allowBacktra
 
 
 
-	PHYSICAL_PARAMETERS["GDaggerBacktrack"]["hidden"] = !(allowBacktracking && !(allowInactivation && !allowBacktrackWithoutInactivation));
 	PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["hidden"] = currentElongationModel != "twoSiteBrownian";
 	PHYSICAL_PARAMETERS["nbasesToFold"]["hidden"] = !allowmRNAfolding
 	
@@ -197,8 +195,6 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 			}
 
 
-
-
 			// Do not backtrack if it will cause the bubble to be open on the 3' end
 			if (statePreOperation["leftGBase"] - PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"] -1 <= 2){
 				slidingPeakHeightsTemp[pos] = maxHeight;
@@ -250,12 +246,6 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 
 			}
 
-
-			// Increase the energy barrier of going from 0 to -1 if the model allows it
-			if (ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"] && state["activated"] && state["mRNAPosInActiveSite"] == -1) {
-				slidingPeakHeightsTemp[pos] += PHYSICAL_PARAMETERS["GDaggerBacktrack"]["val"];
-			}
-			
 			
 			// Dislocating a nucleoprotein backwards is impossible.
 			if (nucleoproteinPhase != -1){
@@ -325,13 +315,6 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 			
 			}
 
-
-
-
-			// Increase the energy barrier of going from 0 to -1 if the model allows it
-			if (ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"] && state["activated"] && state["mRNAPosInActiveSite"] == 0) {
-				slidingPeakHeightsTemp[pos-1] += PHYSICAL_PARAMETERS["GDaggerBacktrack"]["val"];
-			}
 
 			
 			// Dislocating a nucleoprotein forwards has a penalty
@@ -1152,9 +1135,9 @@ function getStateDiagramInfo_WW(resolve = function() {}, msgID = null){
 		backwards_WW(stateToCalculateFor, false);
 	}
 
+	
+	stateToCalculateFor["activated"] = false; // Set to deactivated so we can backtrack
 
-	var temp = ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"];
-	ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"] = true; // Set this to true temporarily so that we can backtrack
 
 	var slidePeaks = update_slidingPeakHeights_WW(stateToCalculateFor);
 	var slideTroughs = update_slidingTroughHeights_WW(stateToCalculateFor);
@@ -1170,7 +1153,7 @@ function getStateDiagramInfo_WW(resolve = function() {}, msgID = null){
 	toReturn["k +2,+3"] = 1e6 * Math.exp(-(slidePeaks[5] - slideTroughs[5])); // From hypertranslocated 1 to hypertranslocated 2
 	toReturn["k +3,+2"] = 1e6 * Math.exp(-(slidePeaks[5] - slideTroughs[6])); // From hypertranslocated 2 to hypertranslocated 1
 
-
+	stateToCalculateFor["activated"] = true; 
 	toReturn["kbind"] = stateToCalculateFor["rateOfBindingNextBase"]; 
 
 	if (currentElongationModel == "twoSiteBrownian"){
@@ -1192,8 +1175,6 @@ function getStateDiagramInfo_WW(resolve = function() {}, msgID = null){
 
 	}
 
-
-	ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"] = temp;
 
 
 	if (msgID != null){
