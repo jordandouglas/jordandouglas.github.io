@@ -789,9 +789,7 @@ function update_this_parameter_controller(element){
 			
 			$(element).val(result["val"]);
 			update_sliding_curve(0);
-			update_binding_curve(0);
 			update_slipping_curve(0);
-			update_activation_curve(0);
 		};
 
 
@@ -960,16 +958,15 @@ function forward_controller(state = null, UPDATE_COORDS = true, resolve = functi
 
 
 	var updateDOM = function(DOMupdates){
-		enable_buttons();
-		set_state_desc();
-		refreshNavigationCanvases();
-		update_sliding_curve(1);
-		update_slipping_curve(0);
-		update_binding_curve(0);
-		update_activation_curve(0);
-		renderObjects();
-
-
+		if(DOMupdates["successfulOp"]){
+			enable_buttons();
+			set_state_desc();
+			refreshNavigationCanvases();
+			update_sliding_curve(1);
+			update_slipping_curve(0);
+			renderObjects();
+		}
+		
 
 		// Create any new slippage landscapes that are required
 		for (var i = 0; i < DOMupdates["where_to_create_new_slipping_landscape"].length; i ++){
@@ -1023,17 +1020,15 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 
 	var updateDOM = function(DOMupdates){
 
-		console.log("Calling function");
-
-		enable_buttons();
-		set_state_desc();
-		refreshNavigationCanvases();
-		update_sliding_curve(-1);
-		update_slipping_curve(0);
-		update_binding_curve(0);
-		update_activation_curve(0);
-		renderObjects();
-
+		if(DOMupdates["successfulOp"]){
+			enable_buttons();
+			set_state_desc();
+			refreshNavigationCanvases();
+			update_sliding_curve(-1);
+			update_slipping_curve(0);
+			renderObjects();
+		}
+		
 
 		// Create any new slippage landscapes that are required
 		for (var i = 0; i < DOMupdates["where_to_create_new_slipping_landscape"].length; i ++){
@@ -1098,8 +1093,6 @@ function bindNTP_controller(state = null, UPDATE_COORDS = true, resolve = functi
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(0);
-		update_binding_curve(1);
-		update_activation_curve(0);
 		setNextBaseToAdd_controller();
 		renderObjects();
 
@@ -1138,8 +1131,6 @@ function releaseNTP_controller(state = null, UPDATE_COORDS = true, resolve = fun
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(0);
-		update_binding_curve(-1);
-		update_activation_curve(0);
 		setNextBaseToAdd_controller();
 		renderObjects();
 
@@ -1178,8 +1169,6 @@ function activate_controller(state = null, UPDATE_COORDS = true, resolve = funct
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(0);
-		update_binding_curve(0);
-		update_activation_curve(-1);
 		renderObjects();
 		resolve(x);
 
@@ -1217,8 +1206,6 @@ function deactivate_controller(state = null, UPDATE_COORDS = true, resolve = fun
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(0);
-		update_binding_curve(0);
-		update_activation_curve(1);
 		renderObjects();
 		resolve(x);
 
@@ -1258,8 +1245,6 @@ function slip_left_controller(S = 0, state = null, UPDATE_COORDS = true, resolve
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(-1, S);
-		update_binding_curve(0);
-		update_activation_curve(0);
 		renderObjects();
 
 
@@ -1321,8 +1306,6 @@ function slip_right_controller(S = 0, state = null, UPDATE_COORDS = true, resolv
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(1, S);
-		update_binding_curve(0);
-		update_activation_curve(0);
 		renderObjects();
 
 		// Create any new slippage landscapes that are required
@@ -1380,10 +1363,10 @@ function changeSpeed_controller(){
 	var speed = $("#PreExp").val();
 
 
-	if (speed != ANIMATION_TIME_controller && ANIMATION_TIME_controller == "hidden") addSequenceLoadingHTML();
+	if (speed != ANIMATION_TIME_controller && SPEED_controller == "hidden") addSequenceLoadingHTML();
 	if (speed != "hidden") deleteHiddenModeNotification();
 
-	ANIMATION_TIME_controller = speed;
+	SPEED_controller = speed;
 
 	// If we are simulating this is not a webworker and the current speed is ultrafast then set it back to fast otherwise the browser will crash
 	if (simulating && WEB_WORKER == null && speed == "ultrafast" && speed != "hidden") {
@@ -1426,7 +1409,8 @@ function changeSpeed_controller(){
 
 
 
-	var updateDOM = function(){
+	var updateDOM = function(animationTime){
+		ANIMATION_TIME_controller = animationTime;
 		if (speed != "hidden" && !simulating) renderObjects();
 	}
 
@@ -1434,7 +1418,7 @@ function changeSpeed_controller(){
 
 	if (WEB_WORKER == null) {
 		var toCall = () => new Promise((resolve) => changeSpeed_WW(speed, resolve));
-		toCall().then(() => updateDOM());
+		toCall().then((res) => updateDOM(res));
 	}
 
 	else{
@@ -1443,7 +1427,7 @@ function changeSpeed_controller(){
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then(() => updateDOM());
+		toCall().then((res) => updateDOM(res));
 
 	}
 
@@ -1452,16 +1436,16 @@ function changeSpeed_controller(){
 
 
 
-function getSlidingHeights_controller(resolve = function(heights){ }){
+function getSlidingHeights_controller(ignoreModelOptions = false, resolve = function(heights){ }){
 
-	console.log("Asking for getSlidingHeights_controller");
+	//console.log("Asking for getSlidingHeights_controller");
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getSlidingHeights_WW(true, resolve));
+		var toCall = () => new Promise((resolve) => getSlidingHeights_WW(true, ignoreModelOptions, resolve));
 		toCall().then((result) => resolve(result));
 	}
 
 	else{
-		var res = stringifyFunction("getSlidingHeights_WW", [true, null], true);
+		var res = stringifyFunction("getSlidingHeights_WW", [true, ignoreModelOptions, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -1473,40 +1457,6 @@ function getSlidingHeights_controller(resolve = function(heights){ }){
 
 }
 
-
-
-function getBindingHeights_controller(resolve = function(heights){ }){
-	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getBindingHeights_WW(resolve));
-		toCall().then((result) => resolve(result));
-	}
-
-	else{
-		var res = stringifyFunction("getBindingHeights_WW", [null], true);
-		var fnStr = res[0];
-		var msgID = res[1];
-		//console.log("Sending function: " + fnStr);
-		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((result) => resolve(result));
-
-	}
-}
-
-function getActivationHeights_controller(resolve = function(heights){ }){
-	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getActivationHeights_WW(resolve));
-		toCall().then((result) => resolve(result));
-	}
-
-	else{
-		var res = stringifyFunction("getActivationHeights_WW", [null], true);
-		var fnStr = res[0];
-		var msgID = res[1];
-		//console.log("Sending function: " + fnStr);
-		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((result) => resolve(result));
-	}
-}
 
 
 function getStateDiagramInfo_controller(resolve = function(state) { }){
@@ -1550,6 +1500,27 @@ function getCurrentState_controller(resolve = function(state) { }){
 }
 
 
+function getTranslocationCanvasData_controller(resolve = function(result){}){
+
+	if (WEB_WORKER == null) {
+		var toCall = () => new Promise((resolve) => getTranslocationCanvasData_WW(resolve));
+		toCall().then((result) => resolve(result));
+	}
+
+	else{
+		var res = stringifyFunction("getTranslocationCanvasData_WW", [null], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
+	}
+
+
+}
+
+
+
 function getNTPCanvasData_controller(resolve = function(result){}){
 
 	if (WEB_WORKER == null) {
@@ -1580,6 +1551,25 @@ function getDeactivationCanvasData_controller(resolve = function(result){}){
 
 	else{
 		var res = stringifyFunction("getDeactivationCanvasData_WW", [null], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
+	}
+
+}
+
+
+function getSlippageCanvasData_controller(S = 0, resolve = function(result){}){
+
+	if (WEB_WORKER == null) {
+		var toCall = () => new Promise((resolve) => getSlippageCanvasData_WW(S, resolve));
+		toCall().then((result) => resolve(result));
+	}
+
+	else{
+		var res = stringifyFunction("getSlippageCanvasData_WW", [S, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -2054,8 +2044,6 @@ function userInputModel_controller(){
 
 		update_sliding_curve(0);
 		update_slipping_curve(0);
-		update_binding_curve(0);
-		update_activation_curve(0);
 
 		updateModelDOM(mod);
 	};

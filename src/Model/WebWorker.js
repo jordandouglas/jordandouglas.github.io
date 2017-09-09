@@ -1060,9 +1060,9 @@ function changeSpeed_WW(speed, resolve = function() { }, msgID = null){
 
 
 	if (msgID != null){
-		postMessage(msgID + "~X~done");
+		postMessage(msgID + "~X~" + ANIMATION_TIME_TEMP);
 	}else{
-		resolve();
+		resolve(ANIMATION_TIME_TEMP);
 	}
 
 

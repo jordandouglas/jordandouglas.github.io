@@ -112,7 +112,6 @@ function init(){
 		NTPtoAdd = "A";
 		mersenneTwister = new MersenneTwister();
 
-		hideSlide = true;
 		hideSlip = [true];
 		hideTSlip = true;
 		hideBind = true;
@@ -129,6 +128,7 @@ function init(){
 
 		initPlots();
 		$("#PreExp").val("medium");
+		SPEED_controller = $("#PreExp").val();
 		displayTP = true;
 		ALLOW_ANIMATIONS = true;
 		simulatedInsertDistribution = [];
@@ -527,9 +527,6 @@ function refresh(resolve = function(){}){
 			//return;
 
 
-			if (!hideSlide) update_sliding_curve(0);
-			if (!hideBind) update_binding_curve(0)
-			if (!hidePause) update_activation_curve(0)
 
 
 
@@ -548,8 +545,6 @@ function refresh(resolve = function(){}){
 			var afterRender = function(){
 				
 				update_sliding_curve(0)
-				update_binding_curve(0);
-				update_activation_curve(0);
 				resolve();
 
 			}
@@ -649,7 +644,7 @@ window.onkeyup = function(e) {
 		$("#nbasesToSimulate").select();
 	}else if (key == 27) { // Escape
 		stop_controller();
-		getSlidingHeights_controller(function(result){ console.log(result)});
+		//getSlidingHeights_controller(function(result){ console.log(result)});
 		
 	}
 	
@@ -658,25 +653,6 @@ window.onkeyup = function(e) {
 }
 
 
-
-
-function toggleSlide(){
-	
-	if(document.getElementById("hideSlide").value == "-"){
-		document.getElementById("hideSlide").value = "+";
-		hideSlide = true;
-		$("#slideCanvas").attr("height", 0);
-		draw_sliding_plot(0);
-		
-	}
-	else{
-		document.getElementById("hideSlide").value = "-";
-		hideSlide = false;
-		$("#slideCanvas").attr("height", 100);
-		update_sliding_curve(0);
-	}
-	
-}
 
 
 
@@ -718,74 +694,8 @@ function toggleSlipT(){
 
 
 
-function toggleBind(){
-	
-	if(document.getElementById("hideBind").value == "-"){
-		document.getElementById("hideBind").value = "+";
-		hideBind = true;
-		$("#bindCanvas").attr("height", 0);
-		draw_binding_plot(0);
-	}
-	else{
-		document.getElementById("hideBind").value = "-";
-		hideBind = false;
-		$("#bindCanvas").attr("height", 100);
-		update_binding_curve(0);
-	}
-
-	
-}
-
-function togglePause(){
-	
-	if(document.getElementById("hidePause").value == "-"){
-		document.getElementById("hidePause").value = "+";
-		hidePause = true;
-		$("#pauseCanvas").attr("height", 0);
-		draw_activation_plot(0);
-	}
-	else{
-		document.getElementById("hidePause").value = "-";
-		hidePause = false;
-		$("#pauseCanvas").attr("height", 100);
-		update_activation_curve(0);
-	}
-	
-}
 
 
-
-
-// TODO: get ymin and ymax sensible
-function draw_sliding_plot(dx){
-
-	if(hideSlide) {
-		var canvas = $('#slideCanvas')[0];
-		var ctx = canvas.getContext('2d');
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		return;
-	}
-	//console.log("slidingPeakHeights", slidingPeakHeights);
-	
-	var ymax = -maxHeight;
-	for (i = 0; PHYSICAL_PARAMETERS["FAssist"]["val"] != 0 && i < displaySlidingPeakHeights.length; i ++){
-		if (displaySlidingPeakHeights[i] != maxHeight) ymax = Math.max(ymax, displaySlidingPeakHeights[i]);
-	}
-	
-	var ymin = maxHeight;
-	for (i = 0;  PHYSICAL_PARAMETERS["FAssist"]["val"] != 0 && i < displaySlidingTroughHeights.length; i ++){
-		if (displaySlidingTroughHeights[i] != maxHeight) ymin = Math.min(ymin, displaySlidingTroughHeights[i]);
-	}
-	
-	if (ymin ==  maxHeight) ymin = -24;;// hybridLength * -3 - 5;
-	if (ymax == -maxHeight) ymax = 12;// PHYSICAL_PARAMETERS["GDaggerSlide"]["val"];
-
-
-	ymin = -10;
-	ymax = 30;
-	
-	draw_a_landacape_plot(dx, displaySlidingPeakHeights, displaySlidingTroughHeights, "#008CBA", "slideCanvas", ymin, ymax);
-}
 
 function draw_slipping_plot(dx, S = 0){
 
@@ -795,7 +705,7 @@ function draw_slipping_plot(dx, S = 0){
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		return;
 	}
-	draw_a_landacape_plot(dx, slippingPeakHeights[S], slippingTroughHeights[S], "#008CBA", "slipCanvas" + S, -26, 25 + PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"]);
+	draw_a_landscape_plot(dx, slippingPeakHeights[S], slippingTroughHeights[S], "#008CBA", "slipCanvas" + S, -26, 25 + PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"]);
 }
 
 
@@ -806,50 +716,13 @@ function draw_Tslipping_plot(dx){
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		return;
 	}
-	draw_a_landacape_plot(dx, slippingPeakHeights[0], slippingTroughHeights[0], "#008CBA", "TslipCanvas", -23, 25 + PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"]);
+	draw_a_landscape_plot(dx, slippingPeakHeights[0], slippingTroughHeights[0], "#008CBA", "TslipCanvas", -23, 25 + PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"]);
 }
-	
-function draw_binding_plot(dx){
-
-
-	if(hideBind) {
-		var canvas = $('#bindCanvas')[0];
-		var ctx = canvas.getContext('2d');
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		return;
-	}
-
-	var ymin = Math.min(Math.min.apply(Math,displayBindingTroughHeights));
-	var ymax = -maxHeight;
-	for (i = 0; i < displayBindingPeakHeights.length; i ++){
-		if (displayBindingPeakHeights[i] != maxHeight) ymax = Math.max(ymax, displayBindingPeakHeights[i]);
-	}
-	if (ymax == -maxHeight) ymax = ymin + 3;
-
-
-	draw_a_landacape_plot(dx, displayBindingPeakHeights, displayBindingTroughHeights, "#008CBA", "bindCanvas", -10, 10);// ymin, ymax + 5);
-}
-
-
-function draw_activation_plot(dx){
-
-	if(hidePause) {
-		var canvas = $('#pauseCanvas')[0];
-		var ctx = canvas.getContext('2d');
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		return;
-	}
-	
-	var minVal = Math.min.apply(Math,displayActivationTroughHeights);
-	
-	draw_a_landacape_plot(dx, displayActivationPeakHeights, displayActivationTroughHeights, "#008CBA", "pauseCanvas", minVal, 10);
-}
-
 	
 
 function enable_buttons(){
 
-
+	return;
 	if (!ALLOW_ANIMATIONS) return;
 	if (disabledButtons) return;
 		
@@ -1076,7 +949,7 @@ function moveScrollBar(moveTo = "#pol"){
 
 	var dx = -$("#mySidenav").width();
 	
-	var x = ($(moveTo).offset().left + $("#bases").scrollLeft() - 500) + dx;
+	var x = ($(moveTo).offset().left + $("#bases").scrollLeft() - 800) + dx;
 
 	if (x - $("#bases").scrollLeft() < 0 && x - $("#bases").scrollLeft() >= -75) return; 
 
@@ -1087,7 +960,7 @@ function moveScrollBar(moveTo = "#pol"){
 
 	// Move scrollbar of bases panel
 	$("#bases").finish();
-	$("#bases").animate( {scrollLeft: x + "px"}, ANIMATION_TIME_controller );
+	$("#bases").animate( {scrollLeft: x + "px"}, ANIMATION_TIME_controller);
 
 
 	// Lock it again
@@ -1097,7 +970,7 @@ function moveScrollBar(moveTo = "#pol"){
 
 	// Move the scrollbar of the sitewise plot
 	$("#plotDIV4").finish();
-	$("#plotDIV4").animate( {scrollLeft: x + "px"}, ANIMATION_TIME_controller );
+	$("#plotDIV4").animate( {scrollLeft: x + "px"}, ANIMATION_TIME_controller);
 
 }
 
@@ -1324,7 +1197,6 @@ function form_bulge_T(form_left){
 		update_Tslipping_curve(-1);
 		update_slipping_curve(0);
 		update_sliding_curve(0);
-		update_binding_curve(0);
 
 	}
 	
@@ -1354,7 +1226,6 @@ function form_bulge_T(form_left){
 		update_Tslipping_curve(-1);
 		update_slipping_curve(0);
 		update_sliding_curve(0);
-		update_binding_curve(0);
 
 	}
 	
@@ -1399,7 +1270,6 @@ function diffuse_left_T(){
 		
 		update_Tslipping_curve(-1);
 		update_slipping_curve(0);
-		update_binding_curve(0);
 		update_sliding_curve(0);
 	}
 	
@@ -1448,7 +1318,6 @@ function diffuse_right_T(){
 		set_state_desc();
 		update_Tslipping_curve(1);
 		update_slipping_curve(0);
-		update_binding_curve(0);
 		update_sliding_curve(0);
 
 
@@ -1491,7 +1360,6 @@ function absorb_T(absorb_right = false){
 		update_Tslipping_curve(-1);
 		update_slipping_curve(0);
 		update_sliding_curve(0);
-		update_binding_curve(0);
 		
 	}
 
@@ -1534,7 +1402,6 @@ function absorb_T(absorb_right = false){
 		update_Tslipping_curve(-1);
 		update_slipping_curve(0);
 		update_sliding_curve(0);
-		update_binding_curve(0)
 		
 	}
 
@@ -1547,144 +1414,6 @@ function update_Tslipping_curve(n){
 }
 
 
-
-
-
-function prepareForNextAction(actions){
-
-
-	
-
-	window.cancelAnimationFrame(slideAnimationFrameID);
-	window.cancelAnimationFrame(slipAnimationFrameID);
-	window.cancelAnimationFrame(bindAnimationFrameID);
-	window.cancelAnimationFrame(activationAnimationFrameID);
-
-	/*
-	slidingPeakHeights = update_slidingPeakHeights_controller();
-	slidingTroughHeights = update_slidingTroughHeights_controller();
-
-	slippingPeakHeights[0] = update_slippingPeakHeights();
-	slippingTroughHeights[0] = update_slippingTroughHeights();
-
-	bindingPeakHeights = update_bindingPeakHeights();
-	bindingTroughHeights = update_bindingTroughHeights();
-	*/
-
-
-	// Wait a duration before continuing (but only wait a duration on every nth step)
-	if (ANIMATION_TIME_controller == 1) {
-		$("#bases").children().promise().done(function() {
-			actionsUntilNextUpdate--;
-
-			if (actionsUntilNextUpdate == 0){
-				actionsUntilNextUpdate = renderGraphicsEveryNsteps;
-				wait(10).then(() => applyActions(actions));
-			}else applyActions(actions);
-		});
-
-	}
-	else applyActions(actions);
-	
-	//applyActions(actions);
-
-}
-
-
-
-
-
-
-
-function rexp(rate){
-	
-	var unif01 = mersenneTwister.random();
-	var exp = -Math.log(unif01) / rate;
-	return exp;
-	
-}
-
-
-
-
-
-
-function mutate(){
-
-	
-	if (rightGBase >= nbases) return;
-	
-	$("#mutateBtn").attr("disabled", true);
-	
-	var baseToMutate = Math.ceil(mersenneTwister.random() * (nbases - rightGBase - 1)) + rightGBase;
-	var nattempts = 0;
-	while(true){
-		if (templateSequence[baseToMutate]["mut"] == null) break;
-		baseToMutate = Math.ceil(mersenneTwister.random() * (nbases - rightGBase - 1)) + rightGBase;
-		nattempts ++;
-		if (nattempts > 1000) {
-			$("#mutateBtn").attr("disabled", false);
-			return;
-		}
-	}
-
-
-	var x = templateSequence[baseToMutate]["x"] - 70;
-	var y = templateSequence[baseToMutate]["y"] - 80;
-	var ANIMATION_TIME_controller = 200;
-	create_HTMLobject_controller('lightning' + baseToMutate, x, y, 50, 50, 'lightning', 2);
-
-	var renderObjects_resolve = () => new Promise((resolve) => renderObjects(false, resolve));
-
-	var afterObjectCreation = function(){
-
-		move_obj_from_id_controller('lightning' + baseToMutate, 30, 40, ANIMATION_TIME_controller);
-		
-		var currentBase = getBaseInSequenceAtPosition("g" + baseToMutate);
-		var transitTo = currentBase == "A" ? "G" : currentBase == "G" ? "A" : currentBase == "C" ? "T" : currentBase == "T" ? "C" : "X";
-
-		$(":animated").promise().done(function() {
-			
-
-			//$("#g" + baseToMutate).attr("mut", transitTo);
-			//document.getElementById("g" + baseToMutate).style.width = "25px";
-			//document.getElementById("g" + baseToMutate).style.height = "25px";
-
-			//document.getElementById("g" + baseToMutate).style.left = x + 67 + "px";
-			//document.getElementById("g" + baseToMutate).style.top = y + 77 + "px"; 
-			
-			
-			if ($("#SelectTemplateType").val().substring(0,2) == "ds" && baseToMutate >= rightGBase + hillLengthRight) {
-				move_obj_from_id_controller("o" + baseToMutate, 0, -15);
-				move_obj_from_id_controller("g" + baseToMutate, 0, 15);
-			}
-
-			renderObjects();
-
-
-			var exitFunction = function(){
-				flip_base_controller(baseToMutate, "g", "gp");
-				templateSequence[baseToMutate]["mut"] = transitTo;
-				templateSequence[baseToMutate]["width"] = 25;
-				templateSequence[baseToMutate]["height"] = 25;
-				$("#" + templateSequence[baseToMutate]["id"]).css("width", 25);
-				$("#" + templateSequence[baseToMutate]["id"]).css("height", 25);
-
-				delete_HTMLobj_controller("lightning" + baseToMutate);
-				$("#mutateBtn").attr("disabled", false);
-				renderObjects();
-			};
-
-			wait(ANIMATION_TIME_controller).then(() => exitFunction());
-
-			
-		});
-	};
-
-	renderObjects_resolve().then(() => afterObjectCreation());
-	
-
-}
 
 
 function hideButtonAndShowStopButton(toHide){
@@ -1959,7 +1688,7 @@ function closeNav() {
 			<div class="parameter-bg">
 				<div class="parameter-title">NTP Binding Parameters 
 
-				<input type=image id='viewNTPModelBtn' title="View the NTP binding rates" onClick="viewMisincorporationModel()" src="src/Images/bindingIcon.png" style="position: absolute; left: 310px; padding: 3 3; width:30px; height:30px; float:right; vertical-align: middle; ">   <br></div>
+				<input type=image id='viewNTPModelBtn' title="View the NTP binding rates" onClick="viewMisincorporationModel()" src="src/Images/bindingIcon.png" style="position: absolute; left: 310px; padding: 3 3; width:25px; height:25px; float:right; vertical-align: middle; ">   <br></div>
 
 				<br>
 
@@ -2070,9 +1799,12 @@ function closeNav() {
 			
 			<div  class="parameter-bg"> 
 				<div class="parameter-title">Advanced Model Options  <br></div>
-			 		<br> Elongation model: <select class="dropdown" style="width: 350px;" name="SelectElongationModel" id = "SelectElongationModel" title="Select an elongation model" OnChange="stop_controller(); userInputModel_controller()">
+
+
+					<div style="display:none">
+				 		<br> Elongation model: <select class="dropdown" style="width: 350px;" name="SelectElongationModel" id = "SelectElongationModel" title="Select an elongation model" OnChange="stop_controller(); userInputModel_controller()">
 											</select>
-												
+					</div>
 					
 						<div id="allowHypertranslocation_container">
 								<label style="cursor:pointer;"> <input class="variable"  type="checkbox" style="cursor:pointer;" id="allowHypertranslocation" OnChange="userInputModel_controller()">Allow hypertranslocation</input> </label>
@@ -2218,7 +1950,7 @@ function closeNav() {
 				We recommend you view this page in landscape mode! </div>
 
 
-			<div id="theToolbar" style="position:fixed; top:170px; left:14px; z-index:5;">
+			<div id="theToolbar" class="noselect" style="position:fixed; top:200px; left:14px; z-index:5;">
 				<table class="toolbar" cellpadding=3>
 						
 
@@ -2336,7 +2068,7 @@ function closeNav() {
 
 				<span style="font-size:18px; font-family:Bookman;">
 					<input type=button id='showNavigationPanel' class='minimise' value='-' onClick=showNavigationPanel()> 
-					<b>Navigation panel</b> 
+					<b class="noselect">Navigation panel</b> 
 						<!--<span style="font-size:14px; font-family:Arial; vertical-align:middle"> - Press any of the arrows below to apply a reaction-->
 						</span>
  
@@ -2346,7 +2078,7 @@ function closeNav() {
 				</span>
 
 					
-						<div id="navigationPanelTable" class="scrollbar" style="overflow-x:scroll; width:100%">
+						<div class="noselect" id="navigationPanelTable" class="scrollbar" style="overflow-x:scroll; width:100%; position:relative">
 						<table  cellspacing="0" style="width:100%;">
 
 
@@ -2360,12 +2092,9 @@ function closeNav() {
 									</div>
 
 									<div id="translocationCanvasDIV" style="position:relative; margin:auto; width: 350px">
-										<canvas id="translocationCanvas" height=70 width=350 ></canvas>
-									</div><br>
-
-									<input type=button id='bck' onClick=backwards_controller() value='Backwards' title="Translocate the polymerase backwards (&larr; key)" class="operation" style="z-index: 100">
-									<input type=button id='fwd' onClick=forward_controller() title="Translocate the polymerase forward (&rarr; key)" value='Forward' class="operation">
-								
+										<canvas id="translocationLandscapeCanvas" height=100 width=350 ></canvas>
+										<canvas id="translocationCanvas" height=60 width=350 ></canvas>
+									</div>
 
 
 								</td>
@@ -2376,7 +2105,7 @@ function closeNav() {
 									
 										<div style="font-size:18px; font-family:Arial; vertical-align:top">
 											NTP reactions
-										</div> <br><br>
+										</div> <br>
 
 										<div id="ntpCanvasDIV" style="position:relative; margin:auto; width: 350px">
 											<canvas id="ntpCanvas"  height=70 width=350></canvas>
@@ -2397,7 +2126,7 @@ function closeNav() {
 
 									<div style="font-size:18px; font-family:Arial; vertical-align:top">
 										Activation reactions
-									</div> <br><br>
+									</div> <br>
 									<div id="deactivationCanvasDIV">
 										<canvas id="deactivationCanvas"  height=70 width=350></canvas>
 									</div><br>
@@ -2409,19 +2138,14 @@ function closeNav() {
 
 								<td style="width:25%; vertical-align:top">
 
-									<div style="font-size:18px; font-family:Arial;">
+
+									<div style="font-size:18px; font-family:Arial; vertical-align:top">
 										Slippage reactions
-									</div>
-
-
-									<div id="slippageCanvasDIV" style="position:relative; margin:auto; width: 350px">
-										<canvas id="slippageCanvas" height=70 width=350 ></canvas>
+									</div> <br><br>
+									<div id="slippageCanvasDIV">
+										<canvas id="slippageCanvas"  height=50 width=450></canvas>
 									</div><br>
 
-									<input type=button id='dbl0' onClick=slip_left_controller() value='Form bulge' title="Move a bulge to the left" class="operation">
-									<input type=button id='dbr0' onClick=slip_right_controller() value='Absorb bulge' title="Move a bulge to the right" class="operation">
-									
-
 
 								</td>
 
@@ -2430,34 +2154,12 @@ function closeNav() {
 
 							</tr>
 
-
-							<tr style="text-align:center; display:none">
-								
-
-								<td class="landscape">
-									<canvas id="slideCanvas" width="410px" height="0px"></canvas>
-								</td>
-								
-								<td class="spacer"></td>
-
-								<td class="landscape">
-									<canvas id="bindCanvas" width="410px" height="0px"></canvas>
-								</td>
-								
-								<td class="spacer"></td>
-								
-								<td class="landscape">
-									<canvas id="pauseCanvas" width="410px" height="0px"></canvas>
-								</td>
-
-
-							</tr>
 
 						
 							<tr style="text-align:center; display:none">
 								
 								<td class="landscape">
-									<input type=button id='hideSlide' class='minimise' value='+' onClick=toggleSlide()>
+									
 									
 								</td>
 								
@@ -2471,7 +2173,6 @@ function closeNav() {
 											
 
 											
-											<input type=button id='hideBind' class='minimise'  value='+' onClick=toggleBind()>  
 
 								</td>
 								
@@ -2481,7 +2182,6 @@ function closeNav() {
 									<input type=button id='unpauseBtn' onClick=activate_controller() value='Activate' title="Activate the polymerase" class="operation">
 									Deactivation
 									<input type=button id='pauseBtn' onClick=deactivate_controller() value='Deactivate' title="Put the polymerase into a catalytically inactive state" class="operation">
-									<input type=button id='hidePause' class='minimise' value='+' onClick=togglePause()>
 								</td>
 								
 								
@@ -2715,7 +2415,7 @@ function closeNav() {
 
 			<div style="margin-left:130px;">
 
-				<div id="sequences" class="scrollbar parameter-bg" style="position:relative; display:none; height:0px; width:99%; overflow-x:scroll; transition: 0s;"></div><br>
+				<div id="sequences" class="parameter-bg" style="position:relative; display:none; height:0px; width:99%; transition: 0s;"></div><br>
 
 			</div>
 			

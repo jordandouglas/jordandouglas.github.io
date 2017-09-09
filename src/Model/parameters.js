@@ -55,7 +55,7 @@ PHYSICAL_PARAMETERS["nbasesToFold"] = {distribution:"Fixed", fixedDistnVal: 150,
 
 
 PHYSICAL_PARAMETERS["GDaggerDiffuse"] = {distribution:"Fixed", fixedDistnVal: 15, name: "\u0394G\u2020slip", title: "Free energy barrier height of bulge formation and diffusion in the primer sequence", zeroTruncated: false, integer: false};
-PHYSICAL_PARAMETERS["allowMultipleBulges"] = { distribution: "Fixed", fixedDistnVal:true, binary: true, title: "Allow more than 1 bulge in the primer at a time?", name: "allowMultipleBulges"};
+PHYSICAL_PARAMETERS["allowMultipleBulges"] = { distribution: "Fixed", fixedDistnVal:false, binary: true, title: "Allow more than 1 bulge in the primer at a time?", name: "allowMultipleBulges"};
 
 
 

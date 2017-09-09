@@ -282,9 +282,16 @@ function selectPlot(plotNum, deleteData = null){
 
 
 // Plot the free energy peaks and troughs
-function draw_a_landacape_plot(dx, peaks, troughs, col, id, ymin = -2, ymax = 3){
+function draw_a_landscape_plot(dx, peaks, troughs, col, id, ymin = -2, ymax = 3){
 	
 	if (!ALLOW_ANIMATIONS) return;
+
+	if (peaks[0] == maxHeight && peaks[1] == maxHeight && peaks[2] == maxHeight && peaks[3] == maxHeight && peaks[4] == maxHeight && peaks[5] == maxHeight) {
+		var canvas = $('#' + id)[0];
+		ctx = canvas.getContext('2d');
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		return;
+	}
 
 	//console.log("Plotting", id, peaks, troughs);
 	
@@ -350,22 +357,59 @@ function draw_a_landacape_plot(dx, peaks, troughs, col, id, ymin = -2, ymax = 3)
 
 			
 	}, [1/2 * Math.PI, 17/2 * Math.PI, Math.floor(ymin - (ymax - ymin) * 0.2), Math.ceil(ymax + (ymax - ymin) * 0.2)], id, col);
-	
+
+
+
+	// Add a Delta G yaxis on the left hand side
+	if ($("#" + id + "_deltaG").length == 0){
+		var x = $("#" + id).offset().left - $("#navigationPanelTable").offset().left;
+		var y = $("#" + id).offset().top + $("#" + id).height() - $("#navigationPanelTable").offset().top;
+		var deltaG = `<div id="` + id + `_deltaG" style="position:absolute; left:` + x + `; top:` + y + `; font-family:Arial">&Delta;G</div>`;
+		$("#navigationPanelTable").append(deltaG);
+	}
 	
 }
 
 
 // Plot the free energy peaks and troughs
 function landscape_plot(fn, range, id, col) {
-	
+
+
 	
 	var canvas = $('#' + id)[0];
 	if (canvas == null) return;
 	ctx = canvas.getContext('2d');
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	var widthScale = (canvas.width / (range[1] - range[0])),
-		heightScale = (canvas.height / (range[3] - range[2])),
-		first = true;
+	var widthScale = (canvas.width / (range[1] - range[0]));
+	//var heightScale = (canvas.height / (range[3] - range[2])),
+	var first = true;
+
+
+
+
+	// Add dashed lines corresponding to every few yvals. Only plot at nice numbers
+	var result = getNiceAxesNumbers(range[2], range[3], canvas.height, 0, [1])
+	range[2] = result["min"];
+	range[3] = result["max"];
+	var heightScale = result["widthOrHeightScale"];
+	var yDashedLinePos = result["vals"];
+
+
+	ctx.strokeStyle = "#696969";
+	ctx.setLineDash([5, 3]);
+	ctx.lineWidth = 1;
+
+	for (var lineNum = 0; lineNum < yDashedLinePos.length; lineNum++){
+		var y0 = heightScale * (yDashedLinePos[lineNum] - range[2]);
+		ctx.beginPath();
+		ctx.moveTo(0, y0);
+		ctx.lineTo(canvas.width, y0);
+		ctx.stroke();
+	}
+
+	ctx.setLineDash([]);
+	ctx.strokeStyle = "black";
+
 	
 	ctx.beginPath();
 	
@@ -403,25 +447,27 @@ function landscape_plot(fn, range, id, col) {
 	
 	
 	// Y-axis
+	/*
+	ctx.beginPath();
+	ctx.moveTo(1,0);
+	ctx.lineTo(1, canvas.height);
+	ctx.stroke();
 
-		ctx.beginPath();
-		ctx.moveTo(1,0);
-		ctx.lineTo(1, canvas.height);
-		ctx.stroke();
-	
-		ctx.beginPath();
-		ctx.moveTo(1,1);
-		ctx.lineTo(8,1);
-		ctx.stroke();
+	ctx.beginPath();
+	ctx.moveTo(1,1);
+	ctx.lineTo(8,1);
+	ctx.stroke();
 
-		ctx.beginPath();
-		ctx.moveTo(1,canvas.height - 1);
-		ctx.lineTo(8,canvas.height - 1);
-		ctx.stroke();
-	
-		ctx.font="12px Arial";
-		ctx.fillText(range[3],10, 10);
-		ctx.fillText(range[2],10, canvas.height);
+	ctx.beginPath();
+	ctx.moveTo(1,canvas.height - 1);
+	ctx.lineTo(8,canvas.height - 1);
+	ctx.stroke();
+	*/
+
+	ctx.font="12px Arial";
+	ctx.textBaseline="bottom"; 
+	ctx.fillText(-roundToSF(yDashedLinePos[0]),5, heightScale * (yDashedLinePos[0] - range[2]));
+	ctx.fillText(-roundToSF(yDashedLinePos[yDashedLinePos.length-1]),5, heightScale * (yDashedLinePos[yDashedLinePos.length-1] - range[2]));
 
 
 	
@@ -2506,39 +2552,37 @@ function plot_custom(plotNumCustom = null){
 
 
 
-function getNiceAxesNumbers(min, max, plotWidthOrHeight, axisGap = 45){
+function getNiceAxesNumbers(min, max, plotWidthOrHeight, axisGap = 45, niceBinSizes = [1, 2, 5]){
 
+	if (min > max) max = min+1;
 
 	var maxNumLabels = 8;
 	var nLabels = maxNumLabels;
 
-	var niceBinSizes = [1, 2, 5];
 	var niceBinSizeID = niceBinSizes.length - 1;
 	var basePower = Math.floor(log(max, base = 10));
 	
 	var binSize = niceBinSizes[niceBinSizeID] * Math.pow(10, basePower);
 
 
-
-	//console.log("BinSize1", binSize, "maxVal", maxVal, "basePower", basePower);
-	
+	var numLoops = 0;	
 	if (min != max) {
 		while(true){
 
 
-			if ((max - min) / binSize - nLabels > 0) break;
+			if (numLoops > 50 || (max - min) / binSize - nLabels > 0) break;
 			niceBinSizeID --;
 			if (niceBinSizeID < 0) {
 				niceBinSizeID = niceBinSizes.length - 1;
 				basePower --;
 			}
 			binSize = niceBinSizes[niceBinSizeID] * Math.pow(10, basePower);
+			numLoops++;
 
 		}
 
 
 
-		console.log("min", min, "max", max, "binSize", binSize);
 		
 
 		if (min > 0) min = min - min % binSize;

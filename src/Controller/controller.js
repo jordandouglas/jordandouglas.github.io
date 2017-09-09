@@ -74,7 +74,11 @@ function renderTermination(result){
 		firstLine += '<input type="image" style="vertical-align: middle; height:20px;  padding: 5 0" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="src/Images/download.png"> </input>'; 
 
 		// Add a table with site numbers
-		var tableHTML = "<table id='sequencesTable' style='position:absolute; font-family:\"Courier New\"; font-size:18px; border-spacing: 0; border-collapse: collapse;'></table>";
+		var tableHTML = `
+			<div id='sequencesTableDIV' class='scrollbar' style='overflow-x; position:relative'>
+				<table id='sequencesTable' style='position:absolute; font-family:\"Courier New\"; font-size:18px; border-spacing: 0; border-collapse: collapse;'></table>
+			</div>`;
+
 		$("#sequences").html(firstLine + "</div>" + tableHTML)
 		
 		var firstRow = "<tr id='terminationTableNumbers' style='height:40px'>";
@@ -259,12 +263,12 @@ function toggleSequences(){
 
 	if($("#hideSequences").val() == "-"){
 		$("#hideSequences").val("+");
-		$("#sequencesTable").hide(300);
+		$("#sequencesTableDIV").slideUp(300);
 		$("#sequences").height(30 + "px");
 	}
 	else{
 		$("#hideSequences").val("-");
-		$("#sequencesTable").show(300);
+		$("#sequencesTableDIV").slideDown(300);
 		$("#sequences").height(20 * 21 + 100 + "px");
 	}
 	
@@ -348,9 +352,6 @@ function renderHTML(){
 	drawPlots();
 	setNextBaseToAdd_controller();
 	update_sliding_curve(0);
-	update_binding_curve(0);
-	update_activation_curve(0);
-
 	resumeSimulation_controller();
 
 }
@@ -385,8 +386,6 @@ function renderObjectsUntilReceiveMessage(msgID){
 		renderParameters();
 		setNextBaseToAdd_controller();
 		update_sliding_curve(0);
-		update_binding_curve(0);
-		update_activation_curve(0);
 
 	});
 
@@ -481,6 +480,7 @@ function generatePol(obj){
 function renderObjects(override = false, resolve = function(){}){
 
 	if (!ALLOW_ANIMATIONS) return;
+
 	if (simulating && ANIMATION_TIME_controller == 1 && !override) return; // Do not do this if simulating in fast mode, unless permission is granted
 
 
@@ -984,9 +984,12 @@ function clearKineticDataCache(){
 		popupHTML = popupHTML.replace("PARAMSIZE", result["parameterPlotSize"]);
 		popupHTML = popupHTML.replace("NUMSEQ", terminatedSequences.length);
 		$(popupHTML).appendTo('body');
-		
+
+
 
 		window.setTimeout(function(){
+
+
 			
 			$("#main").click(function(){
 				closeKineticCachePopup();

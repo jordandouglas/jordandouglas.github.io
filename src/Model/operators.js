@@ -361,7 +361,7 @@ function forward_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdates)
 
 	successfulOp = true;
 
-
+	DOMupdates["successfulOp"] = successfulOp;
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(DOMupdates) );
 	}else{
@@ -384,8 +384,8 @@ function backwards_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdate
 
 	var successfulOp = false;
 	var DOMupdates = {where_to_create_new_slipping_landscape: [], landscapes_to_reset: [], landscapes_to_delete: []};
-	
-	if (state["leftGBase"] > 1){
+
+	if (state["leftGBase"] > 1 && state["leftGBase"] - PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"] -1 > 2){
 
 
 		// If bulge will move too far to the left then absorb it
@@ -522,7 +522,7 @@ function backwards_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdate
 
 	}
 
-	
+	DOMupdates["successfulOp"] = successfulOp;
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(DOMupdates) );
 	}else{

@@ -22,8 +22,10 @@
 
 
 function refreshNavigationCanvases(){
+	drawTranslocationCanvas();
 	drawNTPcanvas();
 	drawDeactivationCanvas();
+	drawSlippageCanvas();
 
 }
 
@@ -101,12 +103,13 @@ function plotArrow_navigationPanel(ctx, fromx, fromy, direction, label = "", rat
 
 
 	// Rate under label
-	ctx.textAlign = direction == "left" ? "right" : "left";
-	ctx.textBaseline="middle";
-	ctx.fillStyle = "black";
-	ctx.font = "16px Arial";
-
-	ctx.fillText(roundToSF(rate, 1) + "s\u207B\u00B9", xLabPos, yLabPos - 1.25*arrowSize);
+	if(rate != null){
+		ctx.textAlign = direction == "left" ? "right" : "left";
+		ctx.textBaseline="middle";
+		ctx.fillStyle = "black";
+		ctx.font = "16px Arial";
+		ctx.fillText(roundToSF(rate, 1) + "s\u207B\u00B9", xLabPos, yLabPos - 1.25*arrowSize);
+	}
 
 
 	return {tox: tox, toy: toy, headlen: headlen};
@@ -127,7 +130,7 @@ function plotArrowButton_navigationPanel(ctx, fromx, fromy, direction, label = "
 	navigationHoverEvents.push(function(e, rect) {
 
 
-		if (label == "") return;
+		if (label == "" || e == null) return;
 
 		var mouseInArrow = true;
 
@@ -162,6 +165,125 @@ function plotArrowButton_navigationPanel(ctx, fromx, fromy, direction, label = "
 
 
 
+function draw_sliding_plot(dx){
+
+
+	var ymax = -maxHeight;
+	for (i = 0; i < displaySlidingPeakHeights.length; i ++){
+		if (displaySlidingPeakHeights[i] != maxHeight) ymax = Math.max(ymax, displaySlidingPeakHeights[i]);
+	}
+	
+	var ymin = maxHeight;
+	for (i = 0; i < displaySlidingTroughHeights.length; i ++){
+		if (displaySlidingTroughHeights[i] != maxHeight) ymin = Math.min(ymin, displaySlidingTroughHeights[i]);
+	}
+	
+	ymax = roundToSF(ymax);
+	ymin = roundToSF(ymin);
+
+	
+	draw_a_landscape_plot(dx, displaySlidingPeakHeights, displaySlidingTroughHeights, "#008CBA", "translocationLandscapeCanvas", ymin, ymax);
+
+}
+
+
+
+
+
+
+function drawTranslocationCanvas(){
+
+
+	// Delete the canvas and add it back
+	//$("#deactivationCanvas").remove();
+	//$("#deactivationCanvasDIV").html('<canvas id="deactivationCanvas" height=70 width=350></canvas>');
+
+	// Draw two arrow buttons - one to slide left and one to slide right
+	// The free energy landscape is in a different canvas
+
+	var canvas = $("#translocationCanvas")[0];
+	if (canvas == null) return;
+
+
+	var ctx = canvas.getContext('2d');
+	ctx.globalAlpha = 1;
+
+	
+	var plotWidth = canvas.width;
+	var plotHeight = canvas.height;
+
+
+	getTranslocationCanvasData_controller(function(result){
+
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		var navigationHoverEvents = [];
+		var currentStateMargin = 2;
+		var spacingBetweenStates = plotWidth * 0.25 - 2*currentStateMargin;
+
+
+		// Backwards arrow
+		var fromX = canvas.width / 2 - 25;
+		var kBck = result["kBck"];
+		var onClickBackwards = function(){
+			canvas.removeEventListener('click', onClickBackwards);
+			backwards_controller();
+		};
+
+		plotArrowButton_navigationPanel(ctx, fromX, canvas.height/2+8, "left", "Backwards", kBck, onClickBackwards, navigationHoverEvents, spacingBetweenStates, canvas, result["bckBtnActive"]);
+
+
+
+		// Forwards arrow
+		var fromX = canvas.width / 2 + 25;
+		var kFwd = result["kFwd"];
+		var onClickForwards = function(){
+			canvas.removeEventListener('click', onClickForwards);
+			forward_controller();
+		};
+
+		plotArrowButton_navigationPanel(ctx, fromX, canvas.height/2+8, "right", result["fwdBtnLabel"], kFwd, onClickForwards, navigationHoverEvents, spacingBetweenStates, canvas, result["fwdBtnActive"]);
+
+
+
+		var mouseMoveFunction = function(e, rect){
+			var mouseHover = false;
+			for (var i = 0; i < navigationHoverEvents.length; i++){
+				if (navigationHoverEvents[i](e, rect)){
+					mouseHover = true;
+				 	break;
+				}
+			}
+
+			if (mouseHover){
+				$("#translocationCanvas").css('cursor','pointer');
+			}
+			else{
+				//$("#kineticStateSescription").hide(1);
+				$("#translocationCanvas").css('cursor','auto');
+			}
+
+		}
+
+		// If the mouse is already here then enable the mosuemove event now
+		mouseMoveFunction(window.event, document.getElementById("translocationCanvas").getBoundingClientRect());
+
+
+		canvas.onmousemove = function(e) { 
+			var rect = this.getBoundingClientRect();
+			mouseMoveFunction(e, rect);
+		};
+
+
+
+
+	});
+
+
+
+}
+
+
 
 
 
@@ -189,8 +311,10 @@ function drawNTPcanvas(){
 
 	getNTPCanvasData_controller(function(result){
 
-
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		$("#ntpCanvasDIV img").remove();
+
+		if (result == null || result["templateBaseBeingCopied"] == null) return;
 		
 		var stateMargin = 2;
 		var stateWidth = 0.2 * (plotWidth - stateMargin);
@@ -206,7 +330,7 @@ function drawNTPcanvas(){
 		var rightStateX = 280;
 
 		// Left hand state (unbound)
-		var leftStateHTML = `
+		var leftStateHTML =  `
 			<img src="src/Images/` + result["previousTemplateBase"] 	+ `g.png" style="left:` + leftStateX + 		`px; top:` + topBaseY + 		`px; width: 20px; height: 20px; position: absolute; z-index: 3;">
 			<img src="src/Images/` + result["templateBaseBeingCopied"]	+ `g.png" style="left:` + (leftStateX + 25) + `px; top:` + topBaseY + 		`px; width: 20px; height: 20px; position: absolute; z-index: 3;">
 			<img src="src/Images/` + result["previousNascentBase"] 		+ `m.png" style="left:` + leftStateX + 		`px; top:` + bottomBaseY + 	`px; width: 20px; height: 20px; position: absolute; z-index: 3;">
@@ -214,7 +338,7 @@ function drawNTPcanvas(){
 
 
 		// Middle state (bound)
-		var middleStateHTML = `
+		var middleStateHTML =  `
 			<img src="src/Images/` + result["previousTemplateBase"] 	+ `g.png" style="left:` + middleStateX + 		`px; top:` + topBaseY + 		`px; width: 20px; height: 20px; position: absolute; z-index: 3;">
 			<img src="src/Images/` + result["templateBaseBeingCopied"]	+ `g.png" style="left:` + (middleStateX + 25) + `px; top:` + topBaseY + 		`px; width: 20px; height: 20px; position: absolute; z-index: 3;">
 			<img src="src/Images/` + result["previousNascentBase"] 		+ `m.png" style="left:` + middleStateX + 		`px; top:` + bottomBaseY + 		`px; width: 20px; height: 20px; position: absolute; z-index: 3;">
@@ -230,7 +354,7 @@ function drawNTPcanvas(){
 			<img src="src/Images/` + result["baseToAdd"] 				+ `m.png" style="left:` + (rightStateX + 25) +	`px; top:` + bottomBaseY +  `px; width: 20px; height: 20px; position: absolute; z-index: 3;">
 		`;
 
-		$("#ntpCanvasDIV img").remove();
+
 		$("#ntpCanvasDIV").append(leftStateHTML);
 		$("#ntpCanvasDIV").append(middleStateHTML);
 		$("#ntpCanvasDIV").append(rightStateHTML);
@@ -311,24 +435,11 @@ function drawNTPcanvas(){
 
 
 		}
-		//plotArrowButton_navigationPanel(ctx, middleStateX + 52, plotHeight / 2, result["NTPbound"] ? "left" : "right", result["NTPbound"] ? "Release NTP" : "Bind NTP", bindOrReleaseRate, onClick, navigationHoverEvents, spacingBetweenStates, canvas);
 
 
 
 
-		// Draw a rectangle around the current state
-		/*
-		var stateX = !result["NTPbound"] && result["mRNAPosInActiveSite"] ? 4 : result["NTPbound"] ? middleStateX : rightStateX;
-		stateX -= stateMargin;
-		ctx.beginPath();
-		ctx.lineWidth="4";
-		ctx.strokeStyle="#008cba";
-		ctx.rect(stateX, stateMargin, 52, plotHeight-2*stateMargin);
-		ctx.stroke();
-		*/
-		canvas.onmousemove = function(e) { 
-
-			var rect = this.getBoundingClientRect();
+		var mouseMoveFunction = function(e, rect){
 			var mouseHover = false;
 			for (var i = 0; i < navigationHoverEvents.length; i++){
 				
@@ -336,10 +447,7 @@ function drawNTPcanvas(){
 					mouseHover = true;
 				 	break;
 				}
-
 			}
-
-
 			if (mouseHover){
 				$("#ntpCanvas").css('cursor','pointer');
 			}
@@ -348,8 +456,16 @@ function drawNTPcanvas(){
 				//$("#kineticStateSescription").hide(1);
 				$("#ntpCanvas").css('cursor','auto');
 			}
+		}
 
 
+		// If the mouse is already here then enable the mosuemove event now
+		mouseMoveFunction(window.event, document.getElementById("ntpCanvas").getBoundingClientRect());
+
+
+		canvas.onmousemove = function(e) { 
+			var rect = this.getBoundingClientRect();
+			mouseMoveFunction(e, rect);
 		};
 
 
@@ -357,6 +473,9 @@ function drawNTPcanvas(){
 
 
 }
+
+
+
 
 
 
@@ -478,20 +597,15 @@ function drawDeactivationCanvas(){
 
 
 
-		canvas.onmousemove = function(e) { 
 
-			var rect = this.getBoundingClientRect();
+		var mouseMoveFunction = function(e, rect){
 			var mouseHover = false;
 			for (var i = 0; i < navigationHoverEvents.length; i++){
-				
 				if (navigationHoverEvents[i](e, rect)){
 					mouseHover = true;
 				 	break;
 				}
-
 			}
-
-
 			if (mouseHover){
 				$("#deactivationCanvas").css('cursor','pointer');
 			}
@@ -500,8 +614,15 @@ function drawDeactivationCanvas(){
 				//$("#kineticStateSescription").hide(1);
 				$("#deactivationCanvas").css('cursor','auto');
 			}
+		}
+
+		// If the mouse is already here then enable the mosuemove event now
+		mouseMoveFunction(window.event, document.getElementById("deactivationCanvas").getBoundingClientRect());
 
 
+		canvas.onmousemove = function(e) { 
+			var rect = this.getBoundingClientRect();
+			mouseMoveFunction(e, rect);
 		};
 
 
@@ -511,3 +632,187 @@ function drawDeactivationCanvas(){
 
 }
 
+
+
+
+
+
+
+
+function drawSlippageCanvas(S = 0){
+
+
+	// Delete the canvas and add it back
+	//$("#deactivationCanvas").remove();
+	//$("#deactivationCanvasDIV").html('<canvas id="deactivationCanvas" height=70 width=350></canvas>');
+
+
+	var canvas = $("#slippageCanvas")[0];
+	if (canvas == null) return;
+
+
+	var ctx = canvas.getContext('2d');
+	ctx.globalAlpha = 1;
+
+	
+	var plotWidth = canvas.width;
+	var plotHeight = canvas.height;
+
+
+	getSlippageCanvasData_controller(S, function(result){
+
+
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		var navigationHoverEvents = [];
+		
+		var stateWidth = 0.2 * plotWidth;
+		var spacingBetweenStates = (plotWidth - 3*stateWidth) / 2 - 20;
+
+
+		var leftStateX = 0;
+		var middleStateX = (canvas.width - stateWidth) / 2;
+		var rightStateX = canvas.width - stateWidth;
+
+
+		// Each state is a horizontal line with kinks to represent bulge positions. The current kink is in red.
+		var pixelsPerBasepair = stateWidth / (result["hybridLength"]-1);
+		var templateHeight = canvas.height * 0.2;
+		var nascentHeight = canvas.height * 0.35;
+		var bulgeHeight = canvas.height * 0.6;
+
+
+		ctx.strokeStyle = "#696969";
+		ctx.lineWidth = 3;
+
+		// Middle state
+		var stateMiddle = result["stateMiddle"];
+
+		ctx.beginPath();
+		var rightBaseX = middleStateX + stateWidth;
+
+
+		ctx.moveTo(rightBaseX, templateHeight);
+		ctx.lineTo(middleStateX, templateHeight); 
+		ctx.stroke();
+
+		ctx.moveTo(rightBaseX - Math.max(stateMiddle["mRNAPosInActiveSite"], 0) * pixelsPerBasepair, nascentHeight); // Start on right side of hybrid
+		for (var s = 0; s < stateMiddle["bulgePos"].length; s ++){
+			var bulgePos = stateMiddle["bulgePos"][s];
+			if (bulgePos == 0) continue;
+			ctx.lineTo(rightBaseX - (bulgePos*pixelsPerBasepair - pixelsPerBasepair), nascentHeight); 
+			ctx.lineTo(rightBaseX - (bulgePos*pixelsPerBasepair - 0.5*pixelsPerBasepair), bulgeHeight); // Top of kink
+			ctx.lineTo(rightBaseX - (bulgePos*pixelsPerBasepair), nascentHeight); // Top of kink
+		}
+		ctx.lineTo(middleStateX, nascentHeight); 
+		ctx.stroke();
+
+
+		// Left state
+		var stateLeft = result["stateLeft"];
+		ctx.beginPath();
+		rightBaseX = leftStateX + stateWidth;
+
+		// Template
+		ctx.moveTo(rightBaseX, templateHeight);
+		ctx.lineTo(leftStateX, templateHeight); 
+		ctx.stroke();
+
+
+		ctx.moveTo(rightBaseX - Math.max(stateLeft["mRNAPosInActiveSite"], 0) * pixelsPerBasepair, nascentHeight);
+		for (var s = 0; s < stateLeft["bulgePos"].length; s ++){
+			var bulgePos = stateLeft["bulgePos"][s];
+			if (bulgePos == 0) continue;
+			ctx.lineTo(rightBaseX - (bulgePos*pixelsPerBasepair - pixelsPerBasepair), nascentHeight); 
+			ctx.lineTo(rightBaseX - (bulgePos*pixelsPerBasepair - 0.5*pixelsPerBasepair), bulgeHeight); // Top of kink
+			ctx.lineTo(rightBaseX - (bulgePos*pixelsPerBasepair), nascentHeight); // Top of kink
+		}
+		ctx.lineTo(leftStateX, nascentHeight);
+		ctx.stroke();
+
+
+
+
+		// Right state
+		var stateRight = result["stateRight"];
+		ctx.beginPath();
+		rightBaseX = rightStateX + stateWidth;
+
+		// Template
+		ctx.moveTo(rightBaseX, templateHeight);
+		ctx.lineTo(rightStateX, templateHeight); 
+		ctx.stroke();
+
+
+		ctx.moveTo(rightBaseX - Math.max(stateRight["mRNAPosInActiveSite"], 0) * pixelsPerBasepair, nascentHeight);
+		for (var s = 0; s < stateRight["bulgePos"].length; s ++){
+			var bulgePos = stateRight["bulgePos"][s];
+			if (bulgePos == 0) continue;
+			ctx.lineTo(rightBaseX - (bulgePos*pixelsPerBasepair - pixelsPerBasepair), nascentHeight); 
+			ctx.lineTo(rightBaseX - (bulgePos*pixelsPerBasepair - 0.5*pixelsPerBasepair), bulgeHeight); // Top of kink
+			ctx.lineTo(rightBaseX - (bulgePos*pixelsPerBasepair), nascentHeight); // Top of kink
+		}
+		ctx.lineTo(rightStateX, nascentHeight);
+		ctx.stroke();
+
+
+
+		// Slip left 
+		var decayRate = 0;
+		var onClickLeft = function(){
+			canvas.removeEventListener('click', onClickLeft);
+			slip_left_controller();
+		};
+		var arrowX = middleStateX - 5;
+		//var decayApplicable = result["mRNAPosInActiveSite"] == 0 && result["activated"];
+		plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "left", result["leftLabel"], null, onClickLeft, navigationHoverEvents, spacingBetweenStates, canvas, result["leftLabel"] != "");
+
+
+
+		// Slip right 
+		var decayRate = 0;
+		var onClickRight = function(){
+			canvas.removeEventListener('click', onClickRight);
+			slip_right_controller();
+		};
+		var arrowX = middleStateX + stateWidth + 5;
+		//var decayApplicable = result["mRNAPosInActiveSite"] == 0 && result["activated"];
+		plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "right", result["rightLabel"], null, onClickRight, navigationHoverEvents, spacingBetweenStates, canvas, result["rightLabel"] != "");
+
+
+
+
+
+
+		var mouseMoveFunction = function(e, rect){
+			var mouseHover = false;
+			for (var i = 0; i < navigationHoverEvents.length; i++){
+				if (navigationHoverEvents[i](e, rect)){
+					mouseHover = true;
+				 	break;
+				}
+			}
+			if (mouseHover){
+				$("#slippageCanvas").css('cursor','pointer');
+			}
+
+			else{
+				//$("#kineticStateSescription").hide(1);
+				$("#slippageCanvas").css('cursor','auto');
+			}
+		}
+
+		// If the mouse is already here then enable the mosuemove event now
+		mouseMoveFunction(window.event, document.getElementById("slippageCanvas").getBoundingClientRect());
+
+
+		canvas.onmousemove = function(e) { 
+			var rect = this.getBoundingClientRect();
+			mouseMoveFunction(e, rect);
+		};
+
+
+	});
+
+
+
+}

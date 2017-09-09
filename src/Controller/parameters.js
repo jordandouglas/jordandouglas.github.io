@@ -184,7 +184,6 @@ function refreshNTP(){
 	}
 	
 	//update_parameters();
-	update_binding_curve(0);
 	
 	
 	var updateTextbox = function(PHYSICAL_PARAMETERS_LOCAL){

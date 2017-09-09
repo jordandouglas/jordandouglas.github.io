@@ -22,7 +22,7 @@
 
 ELONGATION_MODELS = {};
 ELONGATION_MODELS["simpleBrownian"] = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: false, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
-ELONGATION_MODELS["twoSiteBrownian"] = {id: "twoSiteBrownian",name: "Brownian ratchet model with 2 NTP binding sites", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation:false, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
+//ELONGATION_MODELS["twoSiteBrownian"] = {id: "twoSiteBrownian",name: "Brownian ratchet model with 2 NTP binding sites", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation:false, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
 currentElongationModel = "simpleBrownian";
 
 
@@ -41,10 +41,6 @@ function initFreeEnergy_WW(){
 
 	slidingPeakHeights = [];
 	slidingTroughHeightsTemp = [];
-	bindingPeakHeights = [];
-	bindingTroughHeightsTemp = [];
-	activationPeakHeights = [];
-	activationTroughHeightsTemp = [];
 
 	RT = 0.63;
 	BasePairParams = init_BP_parameters_WW();
@@ -124,24 +120,21 @@ function userInputModel_WW(elongationModelID, translocationModelID, allowBacktra
 function calculateAllBarrierHeights_WW(sampleAll = true){
 
 	getSlidingHeights_WW(sampleAll);
-	getBindingHeights_WW()
-	getActivationHeights_WW()
 
 }
 
 
 
 
-function getSlidingHeights_WW(sampleAll = true, resolve = function(heights) {}, msgID = null){
+function getSlidingHeights_WW(sampleAll = true, ignoreModelOptions = false, resolve = function(heights) {}, msgID = null){
 
 
 	// TODO: only calculate when the values are not up to date
 
 	// Otherwise we calculate from sr
 	slidingTroughHeights = update_slidingTroughHeights_WW(currentState, sampleAll);
+	slidingPeakHeights = update_slidingPeakHeights_WW(currentState, sampleAll, ignoreModelOptions);
 
-
-	slidingPeakHeights = update_slidingPeakHeights_WW(currentState, sampleAll);
 	var toReturn = {slidingPeakHeights: slidingPeakHeights, slidingTroughHeights: slidingTroughHeights};
 
 
@@ -160,17 +153,16 @@ function getSlidingHeights_WW(sampleAll = true, resolve = function(heights) {}, 
 
 
 
-function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = true){
+function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = true, ignoreModelOptions = false){
 
 	if (stateToCalculateFor == null) stateToCalculateFor = currentState;
 
 	var slidingPeakHeightsTemp = [PHYSICAL_PARAMETERS["GDaggerSlide"]["val"], PHYSICAL_PARAMETERS["GDaggerSlide"]["val"],PHYSICAL_PARAMETERS["GDaggerSlide"]["val"],PHYSICAL_PARAMETERS["GDaggerSlide"]["val"],PHYSICAL_PARAMETERS["GDaggerSlide"]["val"],PHYSICAL_PARAMETERS["GDaggerSlide"]["val"]];
 	
-	if (stateToCalculateFor["terminated"]) return slidingPeakHeightsTemp;
+	if (stateToCalculateFor["terminated"]) return [maxHeight,maxHeight,maxHeight,maxHeight,maxHeight,maxHeight];
 
 	// If the single NTP binding site model is selected then sliding is not allowed if NTP is bound 
-	if (currentElongationModel == "simpleBrownian" && stateToCalculateFor["NTPbound"]) {
-		console.log("Brownian heights");
+	if (!ignoreModelOptions && currentElongationModel == "simpleBrownian" && stateToCalculateFor["NTPbound"]) {
 		return [maxHeight, maxHeight, maxHeight, maxHeight, maxHeight, maxHeight];
 	}
 
@@ -203,13 +195,13 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 
 
 			// Check if backtracking is permitted
-			if (!ELONGATION_MODELS[currentElongationModel]["allowBacktracking"] && state["mRNAPosInActiveSite"] < 0){
+			if (!ignoreModelOptions && !ELONGATION_MODELS[currentElongationModel]["allowBacktracking"] && state["mRNAPosInActiveSite"] < 0){
 				slidingPeakHeightsTemp[pos] = maxHeight;
 				break;
 			}
 
 			// Check if backtracking is permitted while activated
-			if (!ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"] && state["activated"] && state["mRNAPosInActiveSite"] == -1){
+			if (!ignoreModelOptions && !ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"] && state["activated"] && state["mRNAPosInActiveSite"] == -1){
 				slidingPeakHeightsTemp[pos] = maxHeight;
 				break;
 			}
@@ -279,7 +271,7 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 
 
 			// Check if hypertranslocation is permitted
-			if (!ELONGATION_MODELS[currentElongationModel]["allowHypertranslocation"] && state["mRNAPosInActiveSite"] > 1){
+			if (!ignoreModelOptions && !ELONGATION_MODELS[currentElongationModel]["allowHypertranslocation"] && state["mRNAPosInActiveSite"] > 1){
 				slidingPeakHeightsTemp[pos-1] = maxHeight;
 				break;
 			}
@@ -296,7 +288,6 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 			if (currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 1 && stateToCalculateFor["NTPbound"]){
 				slidingPeakHeightsTemp[pos-1] += PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
 			}
-
 
 
 
@@ -418,162 +409,6 @@ function update_slidingTroughHeights_WW(stateToCalculateFor = currentState, samp
 	return slidingTroughHeightsTemp;
 }
 
-
-
-
-
-function getBindingHeights_WW(resolve = function(heights) {}, msgID = null){
-
-
-	var bindingPeakHeightsTemp = update_bindingPeakHeights_WW();
-	var bindingTroughHeightsTemp = update_bindingTroughHeights_WW();
-	var toReturn = {bindingPeakHeights: bindingPeakHeightsTemp, bindingTroughHeights: bindingTroughHeightsTemp};
-
-
-	bindingPeakHeights = bindingPeakHeightsTemp;
-	bindingTroughHeights = bindingTroughHeightsTemp;
-
-
-	if (msgID != null){
-		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
-		return;
-	}
-	resolve(toReturn);
-
-
-}
-
-
-
-
-function update_bindingPeakHeights_WW(stateToCalculateFor = currentState){
-	
-
-	
-
-	if (stateToCalculateFor["terminated"] || templateSequence[stateToCalculateFor["rightGBase"]] == null) return [maxHeight,maxHeight, maxHeight,maxHeight,maxHeight,maxHeight];
-
-
-	var NTPconcID = stateToCalculateFor["NTPtoAdd"] == "A" ? "ATPconc" : stateToCalculateFor["NTPtoAdd"] == "T" ? "UTPconc" : stateToCalculateFor["NTPtoAdd"] == "U" ? "UTPconc" : stateToCalculateFor["NTPtoAdd"] == "C" ? "CTPconc" : "GTPconc";
-	var NTPconc = PHYSICAL_PARAMETERS[NTPconcID]["val"]
-	
-
-	var bindHeight = -Math.log(stateToCalculateFor["rateOfBindingNextBase"] * 1e-6);
-	var releaseHeight = -Math.log(PHYSICAL_PARAMETERS["RateUnbind"]["val"] * 1e-6);
-	var catalysisHeight = bindHeight - releaseHeight + -Math.log(PHYSICAL_PARAMETERS["RatePolymerise"]["val"] * 1e-6);
-	
-	if (!stateToCalculateFor["activated"] || bindHeight == Infinity) bindHeight = maxHeight;
-	if (!stateToCalculateFor["activated"] || catalysisHeight == Infinity) catalysisHeight = maxHeight;
-	
-	var bindingPeakHeightsTemp = [maxHeight,maxHeight,maxHeight,maxHeight,maxHeight,maxHeight];
-	
-	if (stateToCalculateFor["mRNAPosInActiveSite"] == 1 && !stateToCalculateFor["NTPbound"]) bindingPeakHeightsTemp = [maxHeight,maxHeight,maxHeight,bindHeight,catalysisHeight,maxHeight];
-	if (stateToCalculateFor["mRNAPosInActiveSite"] == 1 && stateToCalculateFor["NTPbound"]) bindingPeakHeightsTemp = [maxHeight,maxHeight,bindHeight,catalysisHeight,maxHeight,maxHeight];
-	//if (stateToCalculateFor["mRNAPosInActiveSite"] == 0 && !stateToCalculateFor["NTPbound"]) bindingPeakHeightsTemp= [maxHeight,bindHeight,catalysisHeight,maxHeight,maxHeight,maxHeight];
-
-
-	if (currentElongationModel == "twoSiteBrownian" && stateToCalculateFor["mRNAPosInActiveSite"] == 0 && templateSequence[stateToCalculateFor["rightGBase"]+1] != null){
-
-		
-		bindHeight += PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
-		if (!stateToCalculateFor["NTPbound"]) bindingPeakHeightsTemp = [maxHeight,maxHeight,maxHeight,bindHeight,maxHeight,maxHeight];
-		if (stateToCalculateFor["NTPbound"])  bindingPeakHeightsTemp = [maxHeight,maxHeight,bindHeight,maxHeight,maxHeight,maxHeight];
-
-	}
-
-
-	
-	
-	return bindingPeakHeightsTemp;
-	
-}
-
-
-function update_bindingTroughHeights_WW(stateToCalculateFor = currentState){
-	
-	var bindingTroughHeightsTemp = [0,0,0,0,0,0,0];
-	if (stateToCalculateFor["terminated"]  || templateSequence[stateToCalculateFor["rightGBase"]] == null) return bindingTroughHeightsTemp;
-	
-	var NTPconcID = stateToCalculateFor["NTPtoAdd"] == "A" ? "ATPconc" : stateToCalculateFor["NTPtoAdd"] == "T" ? "UTPconc" : stateToCalculateFor["NTPtoAdd"] == "U" ? "UTPconc" : stateToCalculateFor["NTPtoAdd"] == "C" ? "CTPconc" : "GTPconc";
-	var NTPconc = PHYSICAL_PARAMETERS[NTPconcID]["val"]
-	var bindHeight = -Math.log(stateToCalculateFor["rateOfBindingNextBase"] * 1e-6);
-	
-	
-	var releaseHeight = -Math.log(PHYSICAL_PARAMETERS["RateUnbind"]["val"] * 1e-6);
-	
-
-	
-	var unboundHeight = bindHeight - releaseHeight;
-	
-	if (stateToCalculateFor["mRNAPosInActiveSite"] == 1 && !stateToCalculateFor["NTPbound"]) bindingTroughHeightsTemp = [0,0,0,0,unboundHeight,ddGpol,0];
-	if (stateToCalculateFor["mRNAPosInActiveSite"] == 1 && stateToCalculateFor["NTPbound"]) bindingTroughHeightsTemp =  [0,0,0,unboundHeight,ddGpol,0,0];
-	//if (stateToCalculateFor["mRNAPosInActiveSite"] == 0 && !stateToCalculateFor["NTPbound"]) bindingTroughHeightsTemp = [0,0,unboundHeight,ddGpol,0,0,0];
-
-
-
-	if (currentElongationModel == "twoSiteBrownian" && stateToCalculateFor["mRNAPosInActiveSite"] == 0){
-		unboundHeight += PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
-		ddGpol += PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
-		if (!stateToCalculateFor["NTPbound"]) bindingTroughHeightsTemp = [0,0,0,0,unboundHeight,ddGpol,0];
-		if (stateToCalculateFor["NTPbound"]) bindingTroughHeightsTemp =  [0,0,0,unboundHeight,ddGpol,0,0];
-	}
-
-	
-	
-	return bindingTroughHeightsTemp;
-	
-}
-
-
-
-function getActivationHeights_WW(resolve = function(heights) {}, msgID = null){
-
-
-	var activationPeakHeightsTemp = update_activationPeakHeights_WW();
-	var activationTroughHeightsTemp = update_activationTroughHeights_WW();
-	var toReturn = {activationPeakHeights: activationPeakHeightsTemp, activationTroughHeights: activationTroughHeightsTemp};
-
-
-	activationPeakHeights = activationPeakHeightsTemp;
-	activationTroughHeights = activationTroughHeightsTemp;
-
-	if (msgID != null){
-		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
-		return;
-	}
-	resolve(toReturn);
-
-
-}
-
-
-
-
-function update_activationPeakHeights_WW(stateToCalculateFor = currentState){
-	
-	var DGDagger = !stateToCalculateFor["NTPbound"] && ELONGATION_MODELS[currentElongationModel]["allowInactivation"] ? 10 : maxHeight;
-	if (stateToCalculateFor["activated"]) return [maxHeight, maxHeight, maxHeight, DGDagger, maxHeight, maxHeight];
-	return [maxHeight, maxHeight, 10, maxHeight, maxHeight, maxHeight];
-	
-	
-}
-
-
-function update_activationTroughHeights_WW(stateToCalculateFor = currentState){
-	
-	
-	var ku = PHYSICAL_PARAMETERS["kU"]["val"];
-	//if (stateToCalculateFor["rightGBase"] == specialSite) ku *= PHYSICAL_PARAMETERS["kUspecial"]["val"];
-
-	var ka = PHYSICAL_PARAMETERS["kA"]["val"];
-	//if (stateToCalculateFor["rightGBase"] == specialSite) ka *= PHYSICAL_PARAMETERS["kAspecial"]["val"];
-
-
-	
-	if (stateToCalculateFor["activated"]) return [0,0,0, 10 + Math.log(ku * 1e-6) , 10 + Math.log(ka * 1e-6) ,0,0];
-	return [0,0, 10 + Math.log(ku * 1e-6) , 10 + Math.log(ka * 1e-6) ,0,0,0];
-	
-}
 
 
 
@@ -1156,20 +991,21 @@ function getStateDiagramInfo_WW(resolve = function() {}, msgID = null){
 	stateToCalculateFor["activated"] = true; 
 	toReturn["kbind"] = stateToCalculateFor["rateOfBindingNextBase"]; 
 
-	if (currentElongationModel == "twoSiteBrownian"){
+
+	// TODO: get this working without using update_bindingPeakHeights_WW
+	if (false && currentElongationModel == "twoSiteBrownian"){
 
 		// Calculate bind and release rate into secondary site
 		var bindPeaks = update_bindingPeakHeights_WW(stateToCalculateFor);
 		var bindTroughs = update_bindingTroughHeights_WW(stateToCalculateFor);
 
-		toReturn["k bind0"]    = 1e6 * Math.exp(-(bindPeaks[3] - bindTroughs[3])); // Bind from 0
+		//toReturn["k bind0"]    =  // Bind from 0
 		toReturn["k release0"] = 1e6 * Math.exp(-(bindPeaks[3] - bindTroughs[4])); // Release from 0
 
 		// Calculate translocation rates when NTP is bound in secondary site
-		bindNTP_WW(stateToCalculateFor, false);
+
 		slidePeaks = update_slidingPeakHeights_WW(stateToCalculateFor);
 		slideTroughs = update_slidingTroughHeights_WW(stateToCalculateFor);
-
 		toReturn["kN 0,+1"] = 1e6 * Math.exp(-(slidePeaks[3] - slideTroughs[3])); // Forward when bound (0 -> +1)
 		toReturn["kN +1,0"] = 1e6 * Math.exp(-(slidePeaks[3] - slideTroughs[4])); // Backwards when bound (+1 -> 0)
 
@@ -1186,24 +1022,63 @@ function getStateDiagramInfo_WW(resolve = function() {}, msgID = null){
 
 }
 
+function getTranslocationCanvasData_WW(resolve = function(result) { }, msgID = null){
+
+
+
+	// If NTP is not bound retrieve translocation rates from cache
+	var kBck = 0;
+	var kFwd = 0
+	var stateC = convertFullStateToCompactState(currentState);
+	if (!currentState["terminated"] && !stateC[2]){
+		var rateFwdAndBack = getTranslocationRates(stateC);
+		kFwd = rateFwdAndBack[1];
+		kBck = rateFwdAndBack[0];
+		if (stateC[3] && stateC[1] == 0 && !ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"]) kBck = 0; // If state is active but we don't allow backtracking while active then set rate to zero
+	}
+
+
+
+	var totalBulgeSize = 0;
+	for (var s = 0; s < currentState["bulgeSize"].length; s++) totalBulgeSize += currentState["bulgeSize"][s];
+	if (currentState["leftMBase"] >= currentState["mRNALength"] - totalBulgeSize) terminate_WW();
+	var fwdBtnLabel = !currentState["terminated"] && currentState["leftMBase"] >= currentState["mRNALength"] - totalBulgeSize - 1 ? "Terminate" : "Forward";
+
+	var bckBtnActive = currentState["leftGBase"] - PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"] -1 > 2; // Do not allow backtracking if it will break the 3' bubble
+	var fwdBtnActive = currentState["leftGBase"] < currentState["nbases"]; // Do not going forward if beyond the end of the sequence
+
+	var toReturn = {kBck: kBck, kFwd: kFwd, bckBtnActive: bckBtnActive, fwdBtnActive: fwdBtnActive, fwdBtnLabel: fwdBtnLabel};
+
+	if (msgID != null){
+		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+	}else{
+		resolve(toReturn);
+	}
+
+
+}
+
 
 function getNTPCanvasData_WW(resolve = function(result) { }, msgID = null){
 
 	// If the polymerase is post-translocated or hypertranslocated, then return the base to be transcribed next and the pair before it
 	// Otherwise return the most recently transcribed base
-	var deltaBase = currentState["mRNAPosInActiveSite"] <= 0 ? -1 : 0;
-	var toReturn = {state: convertFullStateToCompactState(currentState), 
-					NTPbound: currentState["NTPbound"],
-					mRNAPosInActiveSite: currentState["mRNAPosInActiveSite"],
-					baseToAdd: deltaBase == 0 ? currentState["NTPtoAdd"] : primerSequence[currentState["mRNALength"]-1]["base"],
-					kBind: currentState["rateOfBindingNextBase"],
-					kRelease: PHYSICAL_PARAMETERS["RateUnbind"]["val"], 
-					kCat: PHYSICAL_PARAMETERS["RatePolymerise"]["val"],
-					templateBaseBeingCopied: templateSequence[currentState["nextBaseToCopy"]+deltaBase]["base"],
-					previousTemplateBase: templateSequence[currentState["nextBaseToCopy"]-1+deltaBase]["base"],
-					previousNascentBase: primerSequence[currentState["mRNALength"]-1+deltaBase]["base"],
-					activated: currentState["activated"]
-	};
+	var toReturn = null;
+	if (!currentState["terminated"]){
+		var deltaBase = currentState["mRNAPosInActiveSite"] <= 0 ? -1 : 0;
+		toReturn = {state: convertFullStateToCompactState(currentState), 
+						NTPbound: currentState["NTPbound"],
+						mRNAPosInActiveSite: currentState["mRNAPosInActiveSite"],
+						baseToAdd: deltaBase == 0 ? currentState["NTPtoAdd"] : primerSequence[currentState["mRNALength"]-1]["base"],
+						kBind: currentState["rateOfBindingNextBase"],
+						kRelease: PHYSICAL_PARAMETERS["RateUnbind"]["val"], 
+						kCat: PHYSICAL_PARAMETERS["RatePolymerise"]["val"],
+						templateBaseBeingCopied: templateSequence[currentState["nextBaseToCopy"]+deltaBase] != null ? templateSequence[currentState["nextBaseToCopy"]+deltaBase]["base"] : null,
+						previousTemplateBase: templateSequence[currentState["nextBaseToCopy"]-1+deltaBase]["base"] != null ? templateSequence[currentState["nextBaseToCopy"]-1+deltaBase]["base"] : null,
+						previousNascentBase: primerSequence[currentState["mRNALength"]-1+deltaBase]["base"],
+						activated: currentState["activated"]
+		};
+	}
 
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
@@ -1225,8 +1100,91 @@ function getDeactivationCanvasData_WW(resolve = function(result) { }, msgID = nu
 		resolve(toReturn);
 	}
 
+}
+
+
+// Gets the button label associated with slipping right
+function getSlipRightLabel_WW(state, S = 0){
+
+
+	var label = "";
+	var allowMultipleBulges = PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"];
+	var h = PHYSICAL_PARAMETERS["hybridLength"]["val"];
+
+	var fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 1, 1));
+	if (fuseWith == -1)	fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 2, 2));
+
+
+
+	if (state["terminated"]) label = "";
+	else if (allowMultipleBulges && state["partOfBulgeID"][S] != i && state["bulgePos"][ state["partOfBulgeID"][S] ] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) label = "";
+	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S) label = "Fissure";
+	else if (!state["NTPbound"] && state["partOfBulgeID"][S] == S && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) label = "Absorb";	
+	else if (allowMultipleBulges && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] - 1) != -1) label = "Fuse";	
+	else if (state["leftMBase"] > 1 && allowMultipleBulges &&  state["bulgePos"][S] == 0 && ((state["bulgePos"].indexOf(h - 1) != -1) || state["bulgePos"].indexOf(h - 2) != -1)) label = "Form";	
+	else if (state["bulgePos"][S] < h && state["bulgePos"][S] > 1 && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1) label = "Diffuse";
+	else if (state["bulgePos"][S] == 0) label = "Form";
+	
+
+	return label;
+
+
 
 }
+
+
+// Gets the button label associated with slipping left
+function getSlipLeftLabel_WW(state, S = 0){
+
+	var label = "";
+	var allowMultipleBulges = PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"];
+	var h = PHYSICAL_PARAMETERS["hybridLength"]["val"];
+
+	var fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 1, 1));
+	if (fuseWith == -1)	fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 2, 2));
+
+
+	if (state["terminated"]) label = "";
+	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] == h - 1) label = "";
+	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S) label = "Fissure";
+	else if (allowMultipleBulges && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] + 1) != -1) label = "Fuse";
+	else if (allowMultipleBulges && state["bulgePos"][S] == 0 && allowMultipleBulges && state["bulgePos"][S] == 0 && fuseWith != -1) {
+		if (state["mRNAPosInActiveSite"] >= 0 && state["bulgePos"].indexOf( state["bulgePos"][fuseWith] +1 ) != -1) label = "";
+		else label = "Form";
+	}
+	else if (state["bulgePos"][S] > 0 && state["bulgePos"][S] < h - 1) label = "Diffuse";
+
+	else if (!state["NTPbound"] && state["bulgePos"][S] == 0 && state["mRNAPosInActiveSite"] != h - 1) label = "Form";
+	else if (state["bulgePos"][S] == h - 1) label = "Absorb";
+			
+	return label;
+
+
+}
+
+
+
+function getSlippageCanvasData_WW(S = 0, resolve = function(result) { }, msgID = null){
+
+
+	var stateMiddle = getCurrentStateCopy_WW();
+	var stateLeft = getCurrentStateCopy_WW();
+	slip_left_WW(stateLeft, false, S);
+	var stateRight = getCurrentStateCopy_WW();
+	slip_right_WW(stateRight, false, S);
+
+	// Return the 3 states, the 2 button names and the hybrid length
+	var toReturn = {stateMiddle: stateMiddle, stateLeft: stateLeft, stateRight:stateRight, 
+					hybridLength: PHYSICAL_PARAMETERS["hybridLength"]["val"], 
+					leftLabel: getSlipLeftLabel_WW(stateMiddle, S), rightLabel: getSlipRightLabel_WW(stateMiddle, S)};
+	if (msgID != null){
+		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+	}else{
+		resolve(toReturn);
+	}
+
+}
+
 
 
 

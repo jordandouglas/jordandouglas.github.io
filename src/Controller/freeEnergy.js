@@ -33,18 +33,6 @@ function refreshFreeEnergy(){
 	displaySlidingTroughHeights = trueSlidingTroughHeights.slice(); // The values which are displayed on the plot to enable animated transitions
 
 
-	trueBindingPeakHeights = [-1,-1,-1,-1,-1,-1]; 
-	trueBindingTroughHeights = [0,0,0,0,0,0,0];
-	displayBindingPeakHeights = trueBindingPeakHeights.slice();
-	displayBindingTroughHeights = trueBindingTroughHeights.slice();
-
-
-	trueActivationPeakHeights = [-1,-1,-1,-1,-1,-1]; 
-	trueActivationTroughHeights = [0,0,0,0,0,0,0]; 
-	displayActivationPeakHeights = trueActivationPeakHeights.slice();
-	displayActivationTroughHeights = trueActivationTroughHeights.slice();
-
-
 	slippingPeakHeights = [ [-1,-1,-1,-1,-1,-1,-1] ];
 	slippingTroughHeights = [ [0,0,0,0,0,0,0] ];
 	TslippingPeakHeights = [-1,-1,-1,-1,-1,-1,-1]; 
@@ -67,7 +55,6 @@ function refreshFreeEnergy(){
 function update_sliding_curve(dir){
 
 
-	if(document.getElementById("hideSlide").value == "+") return;
 
 	var updateHeights = function(dict){
 
@@ -80,25 +67,26 @@ function update_sliding_curve(dir){
 		// dir = -1: move waves right. dir = +1: move waves left. dir = 0: vertical syncing (ie change in landscape)
 		var time = new Date();
 
-		if (dir == 0) update_sliding_curve_vertical_sync(time.getMilliseconds());
-		else update_sliding_curve_horizontal_sync(time.getMilliseconds(), dir);
+		var animationTimeLandscape = 200;
+		if (dir == 0) update_sliding_curve_vertical_sync(time.getMilliseconds(), animationTimeLandscape);
+		else update_sliding_curve_horizontal_sync(time.getMilliseconds(), dir, animationTimeLandscape);
 
 
 	};
 
-	getSlidingHeights_controller(updateHeights);
+	getSlidingHeights_controller(true, updateHeights);
 
 
 }
 
 
 // Moves the sliding curve a fraction closer to its true value, over the timecourse of ANIMATION_TIME
-function update_sliding_curve_vertical_sync(startTime){
+function update_sliding_curve_vertical_sync(startTime, animationTimeLandscape){
 
 	// Calculate the fraction to move by
 	var currentTime = new Date().getMilliseconds();
 	if (currentTime < startTime) currentTime += 1000;
-	var fractionToMoveBy = Math.min((currentTime - startTime) / (ANIMATION_TIME_controller * 0.9), 1);
+	var fractionToMoveBy = Math.min((currentTime - startTime) / (animationTimeLandscape * 0.9), 1);
 
 
 	// Increment the display plot by this fraction
@@ -117,7 +105,7 @@ function update_sliding_curve_vertical_sync(startTime){
 	// If there is still time remaining then recurse
 	if (fractionToMoveBy < 1){
 		window.requestAnimationFrame(function(){
-			 update_sliding_curve_vertical_sync(startTime)
+			 update_sliding_curve_vertical_sync(startTime, animationTimeLandscape)
 		});
 	}
 
@@ -128,13 +116,13 @@ function update_sliding_curve_vertical_sync(startTime){
 }
 
 
-function update_sliding_curve_horizontal_sync(startTime, dir){
+function update_sliding_curve_horizontal_sync(startTime, dir, animationTimeLandscape){
 
 
 	// Calculate the fraction to move by
 	var currentTime = new Date().getMilliseconds();
 	if (currentTime < startTime) currentTime += 1000;
-	var fractionToMoveBy = Math.min((currentTime - startTime) / (ANIMATION_TIME_controller * 0.9), 1);
+	var fractionToMoveBy = Math.min((currentTime - startTime) / (animationTimeLandscape * 0.9), 1);
 
 
 
@@ -147,7 +135,7 @@ function update_sliding_curve_horizontal_sync(startTime, dir){
 		draw_sliding_plot(dir * 4/2 * Math.PI * fractionToMoveBy);
 
 		window.requestAnimationFrame(function(){
-			 update_sliding_curve_horizontal_sync(startTime, dir)
+			 update_sliding_curve_horizontal_sync(startTime, dir, animationTimeLandscape)
 		});
 	}
 
@@ -170,236 +158,6 @@ function update_sliding_curve_horizontal_sync(startTime, dir){
 
 
 
-
-/*  
-	*****************
-	  Binding curve
-	*****************
-*/
-function update_binding_curve(dir){
-
-
-	if(document.getElementById("hideBind").value == "+") return;
-	var updateHeights = function(dict){
-
-
-		
-		// Update the true heights
-		//console.log("Height object", dict);
-		trueBindingPeakHeights = dict["bindingPeakHeights"];
-		trueBindingTroughHeights = dict["bindingTroughHeights"];
-
-
-
-		// dir = -1: move waves right. dir = +1: move waves left. dir = 0: vertical syncing (ie change in landscape)
-		var time = new Date();
-
-		if (dir == 0) update_binding_curve_vertical_sync(time.getMilliseconds());
-		else {
-
-			//if (dir == -1 && trueBindingPeakHeights[2] == maxHeight) return;
-			//if (dir == +1 && trueBindingPeakHeights[3] == maxHeight) return;
-
-			update_binding_curve_horizontal_sync(time.getMilliseconds(), dir);
-		}
-
-
-	};
-
-	getBindingHeights_controller(updateHeights);
-
-
-}
-
-
-// Moves the binding curve a fraction closer to its true value, over the timecourse of ANIMATION_TIME
-function update_binding_curve_vertical_sync(startTime){
-
-	// Calculate the fraction to move by
-	var currentTime = new Date().getMilliseconds();
-	if (currentTime < startTime) currentTime += 1000;
-	var fractionToMoveBy = Math.min((currentTime - startTime) / (ANIMATION_TIME_controller * 0.9), 1);
-
-
-	// Increment the display plot by this fraction
-	for (p = 0; p < displayBindingPeakHeights.length; p++){
-		displayBindingPeakHeights[p] += (trueBindingPeakHeights[p] - displayBindingPeakHeights[p]) * fractionToMoveBy;	
-	}
-	
-	for (p = 0; p < displayBindingTroughHeights.length; p++){
-		displayBindingTroughHeights[p] += (trueBindingTroughHeights[p] - displayBindingTroughHeights[p]) * fractionToMoveBy;	
-	}
-
-	// Draw the plot
-	draw_binding_plot(0);
-
-
-	// If there is still time remaining then recurse
-	if (fractionToMoveBy < 1){
-		window.requestAnimationFrame(function(){
-			 update_binding_curve_vertical_sync(startTime)
-		});
-	}
-
-
-	// If not the display heights will now be equal to the true heights and we stop recursing
-
-
-}
-
-
-function update_binding_curve_horizontal_sync(startTime, dir){
-
-
-	// Calculate the fraction to move by
-	var currentTime = new Date().getMilliseconds();
-	if (currentTime < startTime) currentTime += 1000;
-	var fractionToMoveBy = Math.min((currentTime - startTime) / (ANIMATION_TIME_controller * 0.9), 1);
-
-
-
-
-
-	// If there is still time remaining then recurse
-	if (fractionToMoveBy < 1){
-
-
-		// Move the plot curve a fraction to the left or right
-		draw_binding_plot(dir * 4/2 * Math.PI * fractionToMoveBy);
-
-		window.requestAnimationFrame(function(){
-			 update_binding_curve_horizontal_sync(startTime, dir)
-		});
-	}
-
-
-	// If not then we set the display heights to the true heights and we stop recursing
-	else{
-
-		displayBindingPeakHeights = trueBindingPeakHeights.slice();
-		displayBindingTroughHeights = trueBindingTroughHeights.slice();
-
-		// Move the plot curve a fraction to the left or right
-		draw_binding_plot(0);
-
-	}
-
-}
-
-
-
-/*  
-	********************
-	  Activation curve
-	********************
-*/
-function update_activation_curve(dir){
-
-	if(document.getElementById("hidePause").value == "+") return;
-	var updateHeights = function(dict){
-
-
-		
-		// Update the true heights
-		//console.log("Height object", dict);
-		trueActivationPeakHeights = dict["activationPeakHeights"];
-		trueActivationTroughHeights = dict["activationTroughHeights"];
-
-
-
-		// dir = -1: move waves right. dir = +1: move waves left. dir = 0: vertical syncing (ie change in landscape)
-		var time = new Date();
-
-		if (dir == 0) update_activation_curve_vertical_sync(time.getMilliseconds());
-		else {
-
-
-
-			update_activation_curve_horizontal_sync(time.getMilliseconds(), dir);
-		}
-
-
-	};
-
-	getActivationHeights_controller(updateHeights);
-
-
-}
-
-
-// Moves the activation curve a fraction closer to its true value, over the timecourse of ANIMATION_TIME
-function update_activation_curve_vertical_sync(startTime){
-
-	// Calculate the fraction to move by
-	var currentTime = new Date().getMilliseconds();
-	if (currentTime < startTime) currentTime += 1000;
-	var fractionToMoveBy = Math.min((currentTime - startTime) / (ANIMATION_TIME_controller * 0.9), 1);
-
-
-	// Increment the display plot by this fraction
-	for (p = 0; p < displayActivationPeakHeights.length; p++){
-		displayActivationPeakHeights[p] += (trueActivationPeakHeights[p] - displayActivationPeakHeights[p]) * fractionToMoveBy;	
-	}
-	
-	for (p = 0; p < displayActivationTroughHeights.length; p++){
-		displayActivationTroughHeights[p] += (trueActivationTroughHeights[p] - displayActivationTroughHeights[p]) * fractionToMoveBy;	
-	}
-
-	// Draw the plot
-	draw_activation_plot(0);
-
-
-	// If there is still time remaining then recurse
-	if (fractionToMoveBy < 1){
-		window.requestAnimationFrame(function(){
-			 update_activation_curve_vertical_sync(startTime)
-		});
-	}
-
-
-	// If not the display heights will now be equal to the true heights and we stop recursing
-
-
-}
-
-
-function update_activation_curve_horizontal_sync(startTime, dir){
-
-
-	// Calculate the fraction to move by
-	var currentTime = new Date().getMilliseconds();
-	if (currentTime < startTime) currentTime += 1000;
-	var fractionToMoveBy = Math.min((currentTime - startTime) / (ANIMATION_TIME * 0.9), 1);
-
-
-
-
-
-	// If there is still time remaining then recurse
-	if (fractionToMoveBy < 1){
-
-
-		// Move the plot curve a fraction to the left or right
-		draw_activation_plot(dir * 4/2 * Math.PI * fractionToMoveBy);
-
-		window.requestAnimationFrame(function(){
-			 update_activation_curve_horizontal_sync(startTime, dir)
-		});
-	}
-
-
-	// If not then we set the display heights to the true heights and we stop recursing
-	else{
-
-		displayActivationPeakHeights = trueActivationPeakHeights.slice();
-		displayActivationTroughHeights = trueActivationTroughHeights.slice();
-
-		// Move the plot curve a fraction to the left or right
-		draw_activation_plot(0);
-
-	}
-
-}
 
 
 
@@ -782,7 +540,6 @@ function drawModelDiagramCanvas(){
 
 		var currentState = result["currentState"];
 
-		console.log("result", result);
 		
 		var canvas = $("#modelDiagramCanvas")[0];
 		if (canvas == null) return;
