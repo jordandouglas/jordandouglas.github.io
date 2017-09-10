@@ -91,7 +91,7 @@ function refreshPlotDataSequenceChangeOnly_WW(){
 	}
 	PARAMETERS_PLOT_DATA["probability"] = {name: "Probability density", vals: null};
 	PARAMETERS_PLOT_DATA["meanVelocity"] = {name: "Mean velocity (bp/s)", vals: []};
-	PARAMETERS_PLOT_DATA["meanCatalysis"] = {name: "Mean dwell time (s)", vals: []};
+	PARAMETERS_PLOT_DATA["meanCatalysis"] = {name: "Mean catalysis time (s)", vals: []};
 	PARAMETERS_PLOT_DATA["meanTranscription"] = {name: "Total transcription time (s)", vals: []};
 
 
