@@ -55,7 +55,7 @@ function register_WebWorker(){
 					WEB_WORKER = null;
 					removeWebworkerRegistrationHTML();
 					console.log('WebWorker registration failed', err);
-					//$("#browserWWdisabled").show(true);
+					$("#browserWWdisabled").show(true);
 
 					// Tell the WebWorker to initialise
    					init_WW(false);
@@ -65,7 +65,7 @@ function register_WebWorker(){
     } else {
        	console.log('WebWorker registration failed');
        	removeWebworkerRegistrationHTML();
-		//$("#browserWWdisabled").show(true);
+		$("#browserWWdisabled").show(true);
     }
 
 
