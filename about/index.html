@@ -470,18 +470,117 @@ function addCitations(){
 				<br><br><br><br>
 				<div class="main-block" >
 					<div class="main-block-inner">
-						<div class="block-title"> <span id='displayingPlotsBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span> Displaying Plots </div> 
+						<div class="block-title"> <span id='displayingPlotsBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span> Plots </div> 
 						<div id="displayingPlots"  style="display:none">
 
-							
+						
+						
 								<div class="about-block">
 									<div class="about-block-inner">
 										
-
+										
+										The output of your simulation can be visualised using various graphs, which are updated in real-time during the simulation.
+										These plots are displayed in the Plots panel and in the Sitewise panel. The display of each plot can be configured with its respective settings 
+									<img src="../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>
+									button. The raw data (.tsv) or a high resolution image (.png) can be downloaded <img src="../src/Images/download.png"  style="vertical-align:middle; height:20px;">. The different	
+									plots available are detailed below.
+							
 
 
 									</div>
 								</div>
+							
+							
+							
+								<div class="about-block">
+									<div class="about-block-inner"  style="vertical-align:middle;">
+										<div class="block-subtitle"> Distance vs time </div> <br>
+
+										
+											<img src="../src/TutorialImages/distanceVsTime.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
+											
+											<br><br><br><br>
+											This graph shows the progress made by the polymerase over time and is often used in single-molecule publications. The blue line represents the current simulation
+											and the grey lines represent previous simulations. The x- and y-axis ranges can be set manually in the settings <img src="../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
+											<br><br><br><br>
+
+									</div>
+								</div>
+								
+								
+								
+								<br><br>
+								<div class="about-block">
+									<div class="about-block-inner">
+										<div class="block-subtitle"> Time histogram </div> <br>
+
+										
+										
+											<img src="../src/TutorialImages/pauseHistogram.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
+											<img src="../src/TutorialImages/pauseHistogram2.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
+											
+											<br><br><br>
+											Depending on the settings <img src="../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>, this will either show the total time taken to copy the template (one value per trial) or the time in
+											between successive catalysis events. The x-axis of the latter plot can be restricted so that it only shows pause times (greater than 1s). 
+											<br><br><br><br><br>
+
+
+									</div>
+								</div>
+								
+								<br><br>
+								<div class="about-block">
+									<div class="about-block-inner">
+										<div class="block-subtitle"> Velocity histogram </div> <br>
+
+										
+											<img src="../src/TutorialImages/velocityHistogram1s.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
+											<img src="../src/TutorialImages/velocityHistogram5s.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
+											
+											
+											
+											This is a histogram of the <i>instantaneous</i> velocities during elongation, not the <i> mean </i> velocities. The instantaneous velocity at time $t$ is defined as the derivative of distance over time
+											$v(t) = \frac{dx}{dt}$. However since the distance versus time function is discontinuous, there is no derivative. Instead, we calculate the instantaneous velocities as the mean
+											velocities within non-overlapping fixed-sized windows. The window size parameter, $w$, can be changed in the settings  <img src="../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
+											The plots on the left illustrate how important this parameter can be. Larger window sizes tend to underrepresent negative velocities, which correspond to net backwards translocation within the time window.
+											
+											
+											
+
+
+									</div>
+								</div>
+								
+								<br><br><br><br><br><br>
+								<div class="about-block">
+									<div class="about-block-inner">
+										<div class="block-subtitle"> Parameter plot </div> <br>
+
+										
+										<img src="../src/TutorialImages/customPlot2.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
+										<img src="../src/TutorialImages/customPlot1.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
+										
+										<br>
+										
+										Any parameter in the &#9776; Parameters menu can be plotted onto the x-axis of this graph through the settings menu <img src="../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
+										Note that this parameter will remain constant unless you decide to change it yourself, which you may either do (1) manually, or (2) by adding a prior distribution
+										<img src="../src/Images/distn.png" style="vertical-align:middle; width:38px; height:12px;"></img>. By setting the y-axis, you can explore the effect of changing this parameter. Parameters are sampled
+										from their prior distribution once per trial. There will be one value added to this plot at the end of each trial. 
+										
+										<br><br><br>
+
+									</div>
+								</div>								
+								
+								<br><br>
+								<div class="about-block">
+									<div class="about-block-inner">
+										<div class="block-subtitle"> Dwell time per site </div> <br>
+
+
+
+									</div>
+								</div>								
 
 						</div>
 					</div>		
@@ -865,7 +964,7 @@ function addCitations(){
 	
 				
 				<br><br><br><br>
-				<div class="main-block" >
+				<div class="main-block">
 					<div class="main-block-inner">
 						<div class="block-title"> 
 						
@@ -891,7 +990,7 @@ function addCitations(){
 										and mRNA folding were disabled. Parameters were set to their default values. The simulation was performed on the 4029nt E.coli ropB gene (accession number KP670789) in <b>hidden</b> mode.<br><br>
 										
 										<table cellpadding=5 style="margin:auto; text-align:center;">
-											<tr style="background-color:#b3b3b3; font-size:30px">
+											<tr style="background-color:#b3b3b3; font-size:22px">
 												<td>
 													Browser
 												</td>
@@ -906,7 +1005,7 @@ function addCitations(){
 												</td>
 											</tr>
 											
-											<tr style="background-color:#ebe9e7; font-size:30px">
+											<tr style="background-color:#ebe9e7; font-size:22px">
 												<td>
 													<b>Chrome 60</b>
 												</td>
@@ -926,7 +1025,7 @@ function addCitations(){
 											</tr>
 											
 											
-											<tr style="background-color:#ebe9e7; font-size:30px">
+											<tr style="background-color:#ebe9e7; font-size:22px">
 												<td>
 													<b>Firefox 55</b>
 												</td>
@@ -947,7 +1046,7 @@ function addCitations(){
 
 										
 										
-											<tr style="background-color:#ebe9e7; font-size:30px">
+											<tr style="background-color:#ebe9e7; font-size:22px">
 												<td>
 													<b>Microsoft Edge 40</b>
 												</td>
@@ -965,9 +1064,9 @@ function addCitations(){
 												</td>
 												
 											</tr>
-
-										</table>
-
+											
+										
+								</table>
 
 
 
