@@ -22,6 +22,7 @@
 
 
 function refreshNavigationCanvases(){
+	
 	drawTranslocationCanvas();
 	drawNTPcanvas();
 	drawDeactivationCanvas();

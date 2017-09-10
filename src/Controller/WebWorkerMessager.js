@@ -881,6 +881,7 @@ function transcribe_controller(nbasesToTranscribe = null, fastMode = false, reso
 		refreshNavigationCanvases();
 		if (clickMisincorporation) $("#deactivateUponMisincorporation").click();
 		hideStopButtonAndShow("transcribe");
+		update_sliding_curve(0);
 		resolve();
 
 	};
@@ -922,6 +923,7 @@ function stutter_controller(nbasesToStutter = null, fastMode = false, resolve = 
 		reactivate_buttons();
 		refreshNavigationCanvases();
 		hideStopButtonAndShow("stutter");
+		update_sliding_curve(0);
 		resolve();
 	};
 
@@ -1630,6 +1632,7 @@ function startTrials_controller(){
 			console.log("Updating dom");
 			simulating = false;
 			hideStopButtonAndShow("simulate");
+			update_sliding_curve(0);
 
 			$("#numSimSpan").show(true);
 			$("#progressSimSpan").html("");

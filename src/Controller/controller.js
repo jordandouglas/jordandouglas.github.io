@@ -75,7 +75,7 @@ function renderTermination(result){
 
 		// Add a table with site numbers
 		var tableHTML = `
-			<div id='sequencesTableDIV' class='scrollbar' style='overflow-x; position:relative'>
+			<div  id='sequencesTableDIV' class='scrollbar' style='overflow-x: scroll; position:relative; width:100%;'>
 				<table id='sequencesTable' style='position:absolute; font-family:\"Courier New\"; font-size:18px; border-spacing: 0; border-collapse: collapse;'></table>
 			</div>`;
 
@@ -89,7 +89,7 @@ function renderTermination(result){
 		firstRow += "</tr>";
 		$("#sequencesTable").append(firstRow + "<tr></tr>");
 
-		$("#sequences").height(20 * 21 + 100 + "px");
+		$("#sequencesTableDIV").height(20 * 21 + 100 + "px");
 
 		
 		if ($("#PreExp").val() == "hidden") toggleSequences();
@@ -264,12 +264,12 @@ function toggleSequences(){
 	if($("#hideSequences").val() == "-"){
 		$("#hideSequences").val("+");
 		$("#sequencesTableDIV").slideUp(300);
-		$("#sequences").height(30 + "px");
+		$("#sequencesTableDIV").height(30 + "px");
 	}
 	else{
 		$("#hideSequences").val("-");
 		$("#sequencesTableDIV").slideDown(300);
-		$("#sequences").height(20 * 21 + 100 + "px");
+		$("#sequencesTableDIV").height(20 * 21 + 100 + "px");
 	}
 	
 }
@@ -281,7 +281,6 @@ function clearSequences(){
 	$("#sequences").hide(300);
 	wait(300).then(() => {
 		$("#sequences").html("");
-		$("#sequences").height(0);
 	});
 	terminatedSequences = [];
 }
@@ -351,7 +350,6 @@ function renderHTML(){
 	renderObjects();
 	drawPlots();
 	setNextBaseToAdd_controller();
-	update_sliding_curve(0);
 	resumeSimulation_controller();
 
 }
@@ -385,7 +383,6 @@ function renderObjectsUntilReceiveMessage(msgID){
 		renderObjects(false, function() { renderObjectsUntilReceiveMessage(msgID) });
 		renderParameters();
 		setNextBaseToAdd_controller();
-		update_sliding_curve(0);
 
 	});
 

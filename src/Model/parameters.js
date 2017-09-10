@@ -35,12 +35,12 @@ PHYSICAL_PARAMETERS["bubbleSizeRight"] = {distribution:"Fixed", refreshOnChange:
 PHYSICAL_PARAMETERS["GDaggerSlide"] = {distribution:"Fixed", fixedDistnVal: 8.7, name: "\u0394G\u2020slide", title: "Free energy barrier height of translocation", zeroTruncated: false, integer: false};
 PHYSICAL_PARAMETERS["GsecondarySitePenalty"] = {distribution:"Fixed", fixedDistnVal: 1.336, name: "\u0394G\u2020NTP2", title: "Free energy penalty of binding NTP in the secondary binding site", zeroTruncated: false, integer: false};
 PHYSICAL_PARAMETERS["FAssist"] = {distribution:"Fixed", fixedDistnVal: 0, name: "Fassist (pN)", title: "Assisting force", zeroTruncated: false, integer: false};
-PHYSICAL_PARAMETERS["arrestTimeout"] = {distribution:"Fixed", fixedDistnVal: 600, name: "Arrest timeout (s)", title: "Maximum pause duration before the simulation is arrested. Set to zero to prevent arrests.", zeroTruncated: true, integer: false};
+PHYSICAL_PARAMETERS["arrestTimeout"] = {distribution:"Fixed", fixedDistnVal: 25, name: "Arrest timeout (s)", title: "Maximum pause duration before the simulation is arrested. Set to zero to prevent arrests.", zeroTruncated: true, integer: false};
 
 
 PHYSICAL_PARAMETERS["RateBind"] = {distribution:"Fixed", fixedDistnVal: 250, name: "Rate bind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of binding the correct NTP", zeroTruncated: true, integer: false};
 PHYSICAL_PARAMETERS["RateUnbind"] = {distribution:"Fixed", fixedDistnVal: 1000, name: "Rate unbind (s\u207B\u00B9)", title: "Rate constant of releasing bound NTP", zeroTruncated: true, integer: false};
-PHYSICAL_PARAMETERS["RatePolymerise"] = {distribution:"Fixed", fixedDistnVal: 20, normalSdVal: 5, name: "Rate polymerise (s\u207B\u00B9)", title: "Rate constant of catalysing bound NTP", zeroTruncated: true, integer: false};
+PHYSICAL_PARAMETERS["RatePolymerise"] = {distribution:"Fixed", fixedDistnVal: 30, normalSdVal: 5, name: "Rate of catalysis (s\u207B\u00B9)", title: "Rate constant of catalysing bound NTP", zeroTruncated: true, integer: false};
 PHYSICAL_PARAMETERS["RateMisbind"] = {distribution:"Fixed", fixedDistnVal: 0.25, name: "Rate misbind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of NTP mis-binding which can lead to transition/transversion mutations", zeroTruncated: true, integer: false, hidden:true};
 PHYSICAL_PARAMETERS["TransitionTransversionRatio"] = {distribution:"Fixed", fixedDistnVal: 2, name: "Transition:transversion", title: "How much more likely is a transition mis-binding event than a transversion mis-binding event", zeroTruncated: true, integer: false, hidden:true};
 
