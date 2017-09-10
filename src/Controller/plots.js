@@ -2766,7 +2766,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	ctx.textAlign="center"; 
 	ctx.textBaseline="top";
 	var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
-	var xlabYPos = canvas.height - axisGap / 3 - 5*canvasSizeMultiplier;
+	var xlabYPos = canvas.height - axisGap / 3 - 7*canvasSizeMultiplier;
 	ctx.fillStyle = "black";
 	ctx.fillText(xlab, xlabXPos, xlabYPos);
 
