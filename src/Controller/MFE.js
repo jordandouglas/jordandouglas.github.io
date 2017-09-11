@@ -28,9 +28,9 @@ function renderSecondaryStructure(data){
 		//return;
 		if (data == null) return;
 
-		$("#bases").children().show(true);
+		$("#bases").children().show(0);
 		for (var i = 0; i < data["toHide"].length; i ++){
-			$(data["toHide"][i]).hide(true);
+			$(data["toHide"][i]).hide(0);
 		}
 	
 		var yShift = 100;

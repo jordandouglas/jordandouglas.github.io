@@ -1029,6 +1029,8 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 			update_sliding_curve(-1);
 			update_slipping_curve(0);
 			renderObjects();
+			$("#mRNAsvg").remove();
+			$("#bases").children().show(0);
 		}
 		
 
