@@ -22,7 +22,7 @@
 
 
 
-
+// Toggles the navigation panel between hidden and shown
 function showNavigationPanel(){
 
 	if($("#showNavigationPanel").val() == "-"){
@@ -37,6 +37,9 @@ function showNavigationPanel(){
 }
 
 
+
+
+
 function renderTermination(result){
 
 	var primerSeq = result["primerSeq"];
@@ -44,7 +47,7 @@ function renderTermination(result){
 
 	//console.log("insertPositions", insertPositions);
 
-	var colours = {"A" : "#ed1c24", "U" : "#00aeef", "T" : "#1c75bc", "G" : "#00a14b", "C" : "#f7941e", "X" : "#ec008c"}
+
 	
 	$("#bases").scrollLeft("0px");
 	$("#clearSeqs").show()
@@ -52,123 +55,18 @@ function renderTermination(result){
 	$("#mRNAsvg").remove();
 
 
+	// Initialise the buttons at the top of the sequence panel and the first row of the sequences table (if they have not already been created)
+	if (largestTerminatedSequence == null) largestTerminatedSequence = primerSeq.length;
+	initSequencesPanel();
+	initSequenceTable();
+	terminatedSequences.push(primerSeq);
 
-	
-	if ($("#sequences").html() == "") {
-
-		$("#sequences").show();
-		nTimes20SequencesToDisplay = 1;
-
-		var firstLine = "<div  style='font-family:\"Arial\"; font-size:18px;'>";
-		numSeqsDisplayed = 0;
-
-		firstLine += `<input type=button class='minimise' id='hideSequences'  value='-' title='Hide/show the sequence window' onClick=toggleSequences()>`; 
-		firstLine += " <span style='font-size:18px; font-family:Bookman;'><b>Copied sequences</b> &nbsp;&nbsp;&nbsp;</span>"
-
-
-		firstLine += " <input type=button id='minus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='&larr;20' onClick=minusSequences() title='See previous 20 sequences'>"
-		firstLine += "&nbsp;Displaying <span id='numSeqsDisplayed'>0</span> out of <span id='numSeqsSimulated'>0</span>&nbsp;"
-		firstLine += " <input type=button id='plus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='20&rarr;' onClick=plusSequences() title='See next 20 sequences'>"
-
-		firstLine += "&nbsp;&nbsp;&nbsp;";
-		firstLine += '<input type="image" style="vertical-align: middle; height:20px;  padding: 5 0" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="src/Images/download.png"> </input>'; 
-
-		// Add a table with site numbers
-		var tableHTML = `
-			<div  id='sequencesTableDIV' class='scrollbar' style='overflow-x: scroll; position:relative; width:100%;'>
-				<table id='sequencesTable' style='position:absolute; font-family:\"Courier New\"; font-size:18px; border-spacing: 0; border-collapse: collapse;'></table>
-			</div>`;
-
-		$("#sequences").html(firstLine + "</div>" + tableHTML)
-		
-		var firstRow = "<tr id='terminationTableNumbers' style='height:40px'>";
-		for (var i = 1; i < primerSeq.length; i ++){
-			if (i % 10 == 0) firstRow += "<td style='padding:0; margin:0;'><span style='padding:0 5; display:inline; position:absolute; vertical-align:top'>" + i + "</span></td>";
-			else firstRow += "<td style='padding:0; margin:0;'><span style='padding:0 5; display:inline; position:absolute; text-align:center; vertical-align:top'></span></td>";
-		}
-		firstRow += "</tr>";
-		$("#sequencesTable").append(firstRow + "<tr></tr>");
-
-		$("#sequencesTableDIV").height(20 * 21 + 100 + "px");
-
-		
-		if ($("#PreExp").val() == "hidden") toggleSequences();
-
-		largestTerminatedSequence = primerSeq.length;
-		terminationInsertPositions = [];
-		
-	}
+	// Add this sequence to the table
+	addTerminatedSequenceToTable(terminatedSequences.length, insertPositions);
 
 
 
 
-	// Check if any more numbers need to be added to the top
-	if(primerSeq.length > largestTerminatedSequence){
-
-		var newNumberCells = ""
-		for (var i = largestTerminatedSequence; i < primerSeq.length; i ++){
-			if (i % 10 == 0) newNumberCells += "<td style='padding:0; margin:0;'><span style='padding:0 5; display:inline; position:absolute; vertical-align:top'>" + i + "</span></td>";
-			else newNumberCells += "<td style='padding:0; margin:0;'><span style='padding:0 5; display:inline; position:absolute; text-align:center; vertical-align:top'></span></td>";
-		}
-		$("#terminationTableNumbers").append(newNumberCells);
-
-		largestTerminatedSequence = primerSeq.length;
-
-	}
-
-
-	// Add insertions to above sequences if necessary (assumes the list of insertion positions is sorted)
-	for(var insertionIndex = 0; insertionIndex < insertPositions.length; insertionIndex++){
-
-		var insertionCell = "<td style='padding:0; margin:0;'><span style='padding:1 5; display:inline; text-align:center'>&minus;</span></td>";
-		$("#sequencesTable").find("tr").not(':first').each(function(){
-			console.log("Adding", insertionCell, "to", insertPositions[insertionIndex]);
-        	//$(this).find("td").eq(insertPositions[insertionIndex]-1).after(insertionCell);
-
-        	$(this).find("td:nth-child(" + (insertPositions[insertionIndex]-1) + ")").after(insertionCell);
-
-    	});
-
-	}
-
-
-	// Add insertions to this sequence if necessary
-	
-	
-	var newSeq = "";
-	var newRow = "<tr class='simSequence' id='seq" + (terminatedSequences.length+1) + "' style='display:none;'>";
-	$("#m0").remove();
-	for (var i = 0; i < primerSeq.length; i ++){
-
-		var baseToAdd = primerSeq[i];
-		newRow += "<td style='padding:0; margin:0; background-color:" + colours[baseToAdd] + ";'><span style='padding:1 5;  display:inline; text-align:center'>" + baseToAdd + "</span></td>";
-		newSeq += baseToAdd;
-
-		$("#m" + (i+1)).remove();
-		//delete_nt_controller(i, "m");
-		
-	}
-	$("#sequencesTable").append(newRow  + "</tr>");
-
-
-	// Display the sequence
-	terminatedSequences.push(newSeq);
-	if (terminatedSequences.length <= 20 * nTimes20SequencesToDisplay) {
-		$("#seq" + terminatedSequences.length).show(200);
-
-		numSeqsDisplayed++;
-	}
-
-
-	// Do not display the sequence for now
-	else if (terminatedSequences.length == 20 * nTimes20SequencesToDisplay + 1){
-		$("#plus20Sequences").removeClass("dropdown-disabled");
-		$("#plus20Sequences").prop("disabled", false);
-	}
-
-	var numSeqsDisplayedString = (20 * (nTimes20SequencesToDisplay-1) + 1) + "-" + Math.min(terminatedSequences.length, (20 * (nTimes20SequencesToDisplay-1) + 20));
-	$("#numSeqsDisplayed").html(numSeqsDisplayedString);
-	$("#numSeqsSimulated").html(terminatedSequences.length);
 
 
 	// Update progress bar
@@ -177,8 +75,175 @@ function renderTermination(result){
 
 
 
+}
 
-	
+
+
+
+
+function initSequencesPanel(){
+
+
+
+	if ($("#sequences").html() == "") {
+
+		$("#sequences").show();
+		nTimes20SequencesToDisplay = 1;
+
+		numSeqsDisplayed = 0;
+		
+
+		var firstLine = `
+			<div  style='font-family:\"Arial\"; font-size:18px;'>
+				<input type=button class='minimise' id='hideSequences'  value='-' title='Hide/show the sequence window' onClick=toggleSequences()>
+				<span style='font-size:18px; font-family:Bookman;'><b>Copied sequences</b> &nbsp;&nbsp;&nbsp;</span>
+				<input type=button id='minus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='&larr;20' onClick=minusSequences() title='See previous 20 sequences'>
+				&nbsp;Displaying <span id='numSeqsDisplayed'>0</span> out of <span id='numSeqsSimulated'>0</span>&nbsp;
+				<input type=button id='plus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='20&rarr;' onClick=plusSequences() title='See next 20 sequences'>
+					&nbsp;&nbsp;&nbsp;
+				<input type="image" style="vertical-align: middle; height:20px;  padding: 5 0" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="src/Images/download.png"> </input>
+			</div>
+
+			<div id='sequencesTableDIV' class='scrollbar' style='overflow-x: scroll; position:relative; width:100%;'></div>
+		`;
+
+		$("#sequences").html(firstLine)
+		$("#sequencesTableDIV").height(20 * 21 + 100 + "px");
+
+
+		if($("#PreExp").val() == "hidden") toggleSequences();
+
+
+	}
+
+
+
+}
+
+
+// Generate the sequences table inside the sequences panel. Do not do this if the speed is hidden because the table will slow down
+// the whole program even if it is invisible
+function initSequenceTable(){
+
+	if((simulating && $("#PreExp").val() == "hidden") || ($("#sequencesTableDIV").length != 0 && $("#sequencesTableDIV").html() != "")) return;
+
+
+	// Add a table with site numbers
+	var tableHTML = `
+			<table id='sequencesTable' style='position:absolute; font-family:\"Courier New\"; font-size:18px; border-spacing: 0; border-collapse: collapse;'></table>
+	`;
+
+	$("#sequencesTableDIV").html(tableHTML);
+
+
+	var firstRow = "<tr id='terminationTableNumbers' style='height:40px'>";
+	for (var i = 1; i < largestTerminatedSequence; i ++){
+		if (i % 10 == 0) firstRow += "<td style='padding:0; margin:0;'><span style='padding:0 5; display:inline; position:absolute; vertical-align:top'>" + i + "</span></td>";
+		else firstRow += "<td style='padding:0; margin:0;'><span style='padding:0 5; display:inline; position:absolute; text-align:center; vertical-align:top'></span></td>";
+	}
+	firstRow += "</tr>";
+	$("#sequencesTable").append(firstRow + "<tr></tr>");
+
+
+	terminationInsertPositions = [];
+
+
+
+}
+
+
+
+function addTerminatedSequenceToTable(seqNum, insertPositions){
+
+	if (seqNum > terminatedSequences.length) return;
+
+	var displaySeq = !(simulating && $("#PreExp").val() == "hidden") && $("#sequencesTableDIV").length != 0;
+	// Only add the row if it is in the correct range
+	if (seqNum >= (20 * (nTimes20SequencesToDisplay-1) + 1) && seqNum <= 20 * nTimes20SequencesToDisplay){
+		numSeqsDisplayed++;
+
+		if(displaySeq){
+
+			var colours = {"A" : "#ed1c24", "U" : "#00aeef", "T" : "#1c75bc", "G" : "#00a14b", "C" : "#f7941e", "X" : "#ec008c"}
+			var primerSeq = terminatedSequences[seqNum-1];
+
+			// Check if any more numbers need to be added to the top
+			if(primerSeq.length > largestTerminatedSequence){
+
+				var newNumberCells = ""
+				for (var i = largestTerminatedSequence; i < primerSeq.length; i ++){
+					if (i % 10 == 0) newNumberCells += "<td style='padding:0; margin:0;'><span style='padding:0 5; display:inline; position:absolute; vertical-align:top'>" + i + "</span></td>";
+					else newNumberCells += "<td style='padding:0; margin:0;'><span style='padding:0 5; display:inline; position:absolute; text-align:center; vertical-align:top'></span></td>";
+				}
+				$("#terminationTableNumbers").append(newNumberCells);
+
+				largestTerminatedSequence = primerSeq.length;
+
+			}
+
+
+			/*
+			// Add insertions to above sequences if necessary (assumes the list of insertion positions is sorted)
+			for(var insertionIndex = 0; insertionIndex < insertPositions.length; insertionIndex++){
+
+				var insertionCell = "<td style='padding:0; margin:0;'><span style='padding:1 5; display:inline; text-align:center'>&minus;</span></td>";
+				$("#sequencesTable").find("tr").not(':first').each(function(){
+					console.log("Adding", insertionCell, "to", insertPositions[insertionIndex]);
+		        	//$(this).find("td").eq(insertPositions[insertionIndex]-1).after(insertionCell);
+
+		        	$(this).find("td:nth-child(" + (insertPositions[insertionIndex]-1) + ")").after(insertionCell);
+
+		    	});
+
+			}*/
+
+
+			// Add insertions to this sequence if necessary
+			var newRow = "<tr class='simSequence' id='seq" + seqNum + "'>";
+			$("#m0").remove();
+			for (var i = 0; i < primerSeq.length; i ++){
+
+				var baseToAdd = primerSeq[i];
+				newRow += "<td style='padding:0; margin:0; background-color:" + colours[baseToAdd] + ";'><span style='padding:1 5;  display:inline; text-align:center'>" + baseToAdd + "</span></td>";
+
+				$("#m" + (i+1)).remove();
+				//delete_nt_controller(i, "m");
+				
+			}
+
+
+			$("#sequencesTable").append(newRow  + "</tr>");
+		}
+
+	}
+
+
+	// Do not display the sequence for now
+	else if (seqNum == 20 * nTimes20SequencesToDisplay + 1){
+		$("#plus20Sequences").removeClass("dropdown-disabled");
+		$("#plus20Sequences").prop("disabled", false);
+	}
+
+	var numSeqsDisplayedString = (20 * (nTimes20SequencesToDisplay-1) + 1) + "-" + Math.min(seqNum, (20 * (nTimes20SequencesToDisplay-1) + 20));
+	$("#numSeqsDisplayed").html(numSeqsDisplayedString);
+	$("#numSeqsSimulated").html(terminatedSequences.length);
+
+
+
+
+}
+
+
+// Adds all the terminated sequences into the table
+function renderTerminatedSequences(){
+
+
+	initSequencesPanel();
+	initSequenceTable();
+
+	for(var i = 0; i < terminatedSequences.length; i ++){
+		addTerminatedSequenceToTable(i+1);
+	}
 
 
 }
@@ -191,25 +256,22 @@ function plusSequences(){
 
 	if (nTimes20SequencesToDisplay * 20 >= terminatedSequences.length) return;
 
-	// Hide the previous 20 sequences
+	// Delete the current 20 sequences
 	var startAt = 1 + 20 * (nTimes20SequencesToDisplay-1);
 	for (var i = startAt; i <= startAt + 19; i ++){
-		$("#seq" + i).hide();
+		$("#seq" + i).remove();
 	}
 
 	nTimes20SequencesToDisplay++;
+	numSeqsDisplayed = 0;
 	var numSeqsDisplayedString = (20 * (nTimes20SequencesToDisplay-1) + 1) + "-" + Math.min(terminatedSequences.length, (20 * (nTimes20SequencesToDisplay-1) + 20));
 	$("#numSeqsDisplayed").html(numSeqsDisplayedString);
 
-	// Show the next 20 sequences
+	// Create the next 20 sequences
 	var startAt = 1 + 20 * (nTimes20SequencesToDisplay-1);
 	var stopAt = -1;
 	for (var i = startAt; i <= startAt + 19; i ++){
-		if ($("#seq" + i).length == 0){
-			stopAt = i-startAt;
-			break;
-		}
-		$("#seq" + i).show();
+		addTerminatedSequenceToTable(i);
 	}
 
 	if (nTimes20SequencesToDisplay * 20 >= terminatedSequences.length) $("#plus20Sequences").addClass("dropdown-disabled");
@@ -227,25 +289,22 @@ function minusSequences(){
 	if (nTimes20SequencesToDisplay == 1) return;
 
 
-	// Hide the previous 20 sequences
+	// Delete the current 20 sequences
 	var startAt = 1 + 20 * (nTimes20SequencesToDisplay-1);
 	for (var i = startAt; i <= startAt + 19; i ++){
-		$("#seq" + i).hide();
+		$("#seq" + i).remove();
 	}
 
 	nTimes20SequencesToDisplay--;
+	numSeqsDisplayed = 0;
 	var numSeqsDisplayedString = (20 * (nTimes20SequencesToDisplay-1) + 1) + "-" + Math.min(terminatedSequences.length, (20 * (nTimes20SequencesToDisplay-1) + 20));
 	$("#numSeqsDisplayed").html(numSeqsDisplayedString);
 
-	// Show the next 20 sequences
+	// Create the previous 20 sequences
 	var startAt = 1 + 20 * (nTimes20SequencesToDisplay-1);
 	var stopAt = -1;
 	for (var i = startAt; i <= startAt + 19; i ++){
-		if ($("#seq" + i).length == 0){
-			stopAt = i-startAt;
-			break;
-		}
-		$("#seq" + i).show();
+		addTerminatedSequenceToTable(i);
 	}
 
 	if (nTimes20SequencesToDisplay == 1) $("#minus20Sequences").addClass("dropdown-disabled");
@@ -261,14 +320,17 @@ function minusSequences(){
 
 function toggleSequences(){
 
+	// Minimising the table deletes everything
 	if($("#hideSequences").val() == "-"){
 		$("#hideSequences").val("+");
-		$("#sequencesTableDIV").slideUp(300);
-		$("#sequencesTableDIV").height(30 + "px");
+		$("#sequencesTableDIV").html("");
+		$("#sequencesTableDIV").height("0px");
 	}
+
+	// Maximising the table adds it all back
 	else{
 		$("#hideSequences").val("-");
-		$("#sequencesTableDIV").slideDown(300);
+		renderTerminatedSequences();
 		$("#sequencesTableDIV").height(20 * 21 + 100 + "px");
 	}
 	
@@ -283,6 +345,7 @@ function clearSequences(){
 		$("#sequences").html("");
 	});
 	terminatedSequences = [];
+	largestTerminatedSequence = null;
 }
 
 
