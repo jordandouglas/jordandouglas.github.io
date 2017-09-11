@@ -149,7 +149,7 @@ function init(){
 		
 		userChangeSequence();
 		terminatedSequences = [];
-		largestTerminatedSequence = 0;
+		largestTerminatedSequence = null;
 		terminationInsertPositions = [];
 		numSeqsDisplayed = 0;
 		//refreshNTP();
@@ -1430,8 +1430,8 @@ function hideButtonAndShowStopButton(toHide){
 	// toHide \in {"simulate", "transcribe", "stutter"}
 
 	// Makes toHide hidden and displays the stop button associated with it
-	$("#" + toHide + "Btn").hide(true);
-	$("#stopBtn_" + toHide).show(true);
+	$("#" + toHide + "Btn").hide(50);
+	$("#stopBtn_" + toHide).show(50);
 
 	// Makes the other possible values entries turn grey 
 	var btns = ["simulate", "transcribe", "stutter"]
@@ -1448,8 +1448,8 @@ function hideStopButtonAndShow(toShow){
 
 
 	// Makes toShow no longer hidden and hides the stop button associated with it
-	if(toShow == "transcribe" || $("#SelectPrimerType").val().substring(0,2) == "ss") $("#" + toShow + "Btn").show(true);
-	$("#stopBtn_" + toShow).hide(true);
+	if(toShow == "transcribe" || $("#SelectPrimerType").val().substring(0,2) == "ss") $("#" + toShow + "Btn").show(50);
+	$("#stopBtn_" + toShow).hide(50);
 
 
 	// Makes the other possible values entries turn back from grey 
