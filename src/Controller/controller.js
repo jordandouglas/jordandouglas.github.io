@@ -94,11 +94,11 @@ function initSequencesPanel(){
 		
 
 		var firstLine = `
-			<div  style='font-family:\"Arial\"; font-size:18px;'>
+			<div class="noselect" style='font-size:16px; font-family:Bookman;'>
 				<input type=button class='minimise' id='hideSequences'  value='-' title='Hide/show the sequence window' onClick=toggleSequences()>
-				<span style='font-size:18px; font-family:Bookman;'><b>Copied sequences</b> &nbsp;&nbsp;&nbsp;</span>
+				<span style='font-size:18px; '><b>Copied sequences</b> &nbsp;&nbsp;&nbsp;</span>
 				<input type=button id='minus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='&larr;20' onClick=minusSequences() title='See previous 20 sequences'>
-				&nbsp;Displaying <span id='numSeqsDisplayed'>0</span> out of <span id='numSeqsSimulated'>0</span>&nbsp;
+				&nbsp;Showing seqs <span id='numSeqsDisplayed'>0</span> out of <span id='numSeqsSimulated'>0</span>&nbsp;
 				<input type=button id='plus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='20&rarr;' onClick=plusSequences() title='See next 20 sequences'>
 					&nbsp;&nbsp;&nbsp;
 				<input type="image" style="vertical-align: middle; height:20px;  padding: 5 0" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="src/Images/download.png"> </input>
