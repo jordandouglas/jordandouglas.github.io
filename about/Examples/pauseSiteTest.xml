@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<session datetime="2017_9_13-11.19.51">
+	<sequence seqID="$user" TemplateType="dsDNA" PrimerType="ssRNA" seq="AGCGAGCGTAGCATTATAGCCGAGCGCACCGCCAAAAAAAAAAAAAAGCGCGGGCTCGAGGCTGAACATATGATAGTCG" />
+	<elongation-model id="simpleBrownian">
+		<allowBacktracking val="true" />
+		<allowHypertranslocation val="false" />
+		<allowInactivation val="true" />
+		<allowBacktrackWithoutInactivation val="false" />
+		<deactivateUponMisincorporation val="false" />
+		<allowGeometricCatalysis val="true" />
+		<allowmRNAfolding val="false" />
+		<allowMisincorporation val="false" />
+	</elongation-model>
+	<parameters>
+		<ATPconc val="1000" distribution="Fixed" fixedDistnVal="1000" normalSdVal="1698">[ATP] (μM)</ATPconc>
+		<CTPconc val="1000" distribution="Fixed" fixedDistnVal="1000" normalSdVal="242">[CTP] (μM)</CTPconc>
+		<GTPconc val="1000" distribution="Fixed" fixedDistnVal="1000" normalSdVal="224">[GTP] (μM)</GTPconc>
+		<UTPconc val="1000" distribution="Fixed" fixedDistnVal="1000" normalSdVal="460">[UTP] (μM)</UTPconc>
+		<hybridLength val="9" distribution="Fixed" fixedDistnVal="9">Hybrid length (bp)</hybridLength>
+		<bubbleSizeLeft val="1" distribution="Fixed" fixedDistnVal="1">Bubble length left (bp)</bubbleSizeLeft>
+		<bubbleSizeRight val="2" distribution="Fixed" fixedDistnVal="2">Bubble length right (bp)</bubbleSizeRight>
+		<GDaggerSlide val="8" distribution="Fixed" fixedDistnVal="8">ΔG†slide</GDaggerSlide>
+		<FAssist val="0" distribution="Fixed" fixedDistnVal="0">Fassist (pN)</FAssist>
+		<arrestTimeout val="30" distribution="Fixed" fixedDistnVal="30">Arrest timeout (s)</arrestTimeout>
+		<RateBind val="250" distribution="Fixed" fixedDistnVal="250">Rate bind (μM⁻¹ s⁻¹)</RateBind>
+		<RateUnbind val="1000" distribution="Fixed" fixedDistnVal="1000">Rate unbind (s⁻¹)</RateUnbind>
+		<RatePolymerise val="30" distribution="Fixed" fixedDistnVal="30" normalSdVal="5">Rate of catalysis (s⁻¹)</RatePolymerise>
+		<kU val="0.23" distribution="Fixed" fixedDistnVal="0.23">kU (s⁻¹)</kU>
+		<kA val="3" distribution="Fixed" fixedDistnVal="3">kA (s⁻¹)</kA>
+		<GDaggerDiffuse val="15" distribution="Fixed" fixedDistnVal="15">ΔG†slip</GDaggerDiffuse>
+		<allowMultipleBulges val="false">allowMultipleBulges</allowMultipleBulges>
+	</parameters>
+</session>
