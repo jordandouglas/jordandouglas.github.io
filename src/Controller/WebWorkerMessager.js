@@ -1957,19 +1957,24 @@ function getMFESequenceBonds_controller(){
 
 function loadSession_controller(XMLData){
 	
-	
+
 	var updateDom = function(result){
+
+
 
 		var seqObject = result["seq"];
 		var model = result["model"];
 		var compactState = result["compactState"];
-
 		
 		$("#SelectSequence").val(seqObject["seqID"]);
 		$("#SelectTemplateType").val(seqObject["template"]);
 		$("#SelectPrimerType").val(seqObject["primer"]);
 		userChangeSequence();
-		if (seqObject["seqID"] == "$user") submitCustomSequence();
+
+		if (seqObject["seqID"] == "$user") {
+			$("#UserSequence").val(seqObject["seq"]);
+			submitCustomSequence();
+		}
 
 		updateModelDOM(model);
 

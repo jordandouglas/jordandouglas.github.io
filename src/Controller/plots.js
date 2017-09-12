@@ -737,7 +737,7 @@ function plotTimeChart(){
 			for (var trial = 0; trial < DISTANCE_VS_TIME_CONTROLLER.length; trial++){
 				numPoints += DISTANCE_VS_TIME_CONTROLLER[trial]["distances"].length;
 			}
-			if (numPoints > 5000){
+			if (numPoints > 100000){
 				haveShownDVTerrorMessage = true;
 				addNotificationMessage("That is a lot of data! If Simpol starts to slow down you should minimise this plot.", 
 									$("#plotCanvas" + pltNum).offset().left + 100,
