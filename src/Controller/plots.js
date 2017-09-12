@@ -193,13 +193,19 @@ function resetAllPlots(){
 
 
 	if (PLOT_DATA["whichPlotInWhichCanvas"] == null) return;
+	basesToDisplayTimes100 = 1;
+	console.log(PLOT_DATA["nbases"]);
 	
 	for (var i = 0; i < PLOT_DATA["whichPlotInWhichCanvas"].length; i ++){
 		//$("#selectPlot" + (i+1)).val("none");
 		//$("#showPlot" + (i+1)).hide(true);
 		//showPlot((i+1), false);
-		$("#downloadPlot" + (i+1)).hide(true);
-		$("#plotOptions" + (i+1)).hide(true);
+
+		if (i+1 == 4) $("#plot4Buttons").hide(true);
+		else{
+			$("#downloadPlot" + (i+1)).hide(true);
+			$("#plotOptions" + (i+1)).hide(true);
+		}
 	}
 
 
@@ -251,8 +257,12 @@ function selectPlot(plotNum, deleteData = null){
 			$("#showPlot" + plotNum).show(true);
 			showPlot(plotNum, true);
 
-			$("#plotOptions" + plotNum).show(true)
-			$("#downloadPlot" + plotNum).show(true)
+
+			if (plotNum == 4) $("#plot4Buttons").show(true);
+			else{
+				$("#plotOptions" + plotNum).show(true);
+				$("#downloadPlot" + plotNum).show(true);
+			}
 
 
 		}else{
@@ -1840,11 +1850,11 @@ function plot_time_vs_site(){
 
 
 		var pauseSum = PLOT_DATA["pauseTimePerSite"].reduce(function(a, b) { return a + b; }, 0);
-
-
+		//basesToDisplayTimes100 = 1;
 
 
 		// Create label function. Depends on what y-axis the user wants to see
+		var ymin = 1000000;
 		var labelFn = function(site, val){
 
 
@@ -1856,7 +1866,7 @@ function plot_time_vs_site(){
 					if (val <= 0) return "";
 					return "Mean time at " + site + ": " + roundToSF(val / PLOT_DATA["npauseSimulations"]) + "s";
 				case "logTimeSeconds":
-					if (Math.exp(val) <= 0) return "";
+					if (val <= ymin) return "";
 					//console.log("Log time", pauseSum, "normal time", 
 					return "Mean time at " + site + ": " + roundToSF(Math.exp(val) / PLOT_DATA["npauseSimulations"]) + "s";
 			}
@@ -1866,9 +1876,17 @@ function plot_time_vs_site(){
 
 		var valuesToPlot = [];
 		if (PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["yAxis"] == "logTimeSeconds"){
+
+			// Find the minimum value
+			ymin = 1000000;
 			for (var i = 0; i < PLOT_DATA["pauseTimePerSite"].length; i ++){
-				if (PLOT_DATA["pauseTimePerSite"][i] > 0) Math.max(valuesToPlot.push(Math.log(PLOT_DATA["pauseTimePerSite"][i])), -10);
-				else valuesToPlot.push(-10);
+				if (PLOT_DATA["pauseTimePerSite"][i] > 0) ymin = Math.min(Math.log(PLOT_DATA["pauseTimePerSite"][i]), ymin);
+			}
+
+			// Set all values to either their log value or ymin if the time is zero
+			for (var i = 0; i < PLOT_DATA["pauseTimePerSite"].length; i ++){
+				if (PLOT_DATA["pauseTimePerSite"][i] > 0) valuesToPlot.push(Math.log(PLOT_DATA["pauseTimePerSite"][i]));
+				else valuesToPlot.push(ymin);
 			}
 		}else valuesToPlot = PLOT_DATA["pauseTimePerSite"];
 
@@ -1922,7 +1940,7 @@ function plot_abortion_vs_site(){
 		console.log("CanvasNum", canvasesToPrintTo[canvasNum]);
 
 		if (PLOT_DATA["abortionCounts"] == null) continue;
-	
+		//basesToDisplayTimes100 = 1;
 	
 
 
@@ -1966,6 +1984,11 @@ function download_abortionSiteTSV(){
 
 
 // Assumes that the first and last element of yvals is zero
+// In firefox, safari and chrome, the maximum canvas width is around 32k pixels. In IE 8k (will ignore IE)
+// If we have the canvas size multiplier (for downloading high res png) at 10 and each base is 25 pixels wide then we should never display more
+// than 32000 / 25 / 10 = 128nt at a time
+// So the plot will display 120nt at a time maximum with overlapping windows of 20bp
+// eg. display 1-120 or 100-220, or 200-320 etc. The slot we see is indicated by basesToDisplayTimes100
 function sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab = "", hoverOverTextBoxFn = function(){}, canvasSizeMultiplier = 1, xlab = "", hoverOver = -1, mouseX = null, mouseY = null, scrollPos = null){
 
 
@@ -1973,6 +1996,10 @@ function sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab = "
 	if (canvasSizeMultiplier == null) canvasSizeMultiplier = 1;
 	
 	var axisGap = 30 * canvasSizeMultiplier;
+	var startSite = (basesToDisplayTimes100-1) * 100 + 1;
+	var endSite = Math.min(startSite + 119, yvals.length-2);
+
+	$("#plots4").off("mouseleave"); // Remove the mouseleave event
 	
 	// Delete the canvas and add it back later so it doesn't bug
 	if (canvasDivID != null) { 
@@ -1980,13 +2007,45 @@ function sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab = "
 		if (scrollPos == null) scrollPos = $("#" + canvasDivID).scrollLeft();
 
 		$("#" + canvasID).remove();
-		var canvasWidth = axisGap + canvasSizeMultiplier * (PLOT_DATA["xCoordOfRightMostBase"] - $("#" + canvasDivID).offset().left + $("#bases").scrollLeft());  // Width should cover all nucleotides
-		if (canvasSizeMultiplier > 1) canvasWidth = axisGap + canvasSizeMultiplier * (25 * (yvals.length-1)); // If saving to file
+		var canvasWidth = axisGap + canvasSizeMultiplier * (Math.min((PLOT_DATA["nbases"]-1), 120-1)*25);  // Width should cover all nucleotides
 		
 		var canvasHeight = canvasSizeMultiplier * 150;
 		$("#" + canvasContainerID).html('<canvas id="' + canvasID + '" height=' + canvasHeight + ' width=' + canvasWidth + '></canvas>');
+
+
+
+		// Enable/disable the buttons to turn this plot into the next plot with different site range
+
+		// Disable the minus button if we cannot decrease from here
+		if (basesToDisplayTimes100 == 1){
+			$("#minus100Sites").addClass("dropdown-disabled");
+			$("#minus100Sites").prop("disabled", true);
+		}else{
+			$("#minus100Sites").removeClass("dropdown-disabled");
+			$("#minus100Sites").prop("disabled", false);
+		}
+
+
+		// Disable the plus button if we cannot increase from here
+		var max = Math.ceil(PLOT_DATA["nbases"] / 100);
+		if (PLOT_DATA["nbases"] % 100 <= 20) max--;
+		if (basesToDisplayTimes100 == max){
+			$("#plus100Sites").addClass("dropdown-disabled");
+			$("#plus100Sites").prop("disabled", true);
+		}else{
+			$("#plus100Sites").removeClass("dropdown-disabled");
+			$("#plus100Sites").prop("disabled", false);
+		}
+
+
+		// Set the label of the "Displaying XXX-YYY sites of ZZZ" label
+		$("#numSitesDisplayed").html(startSite + "-" + endSite);
+		$("#numSitesTotal").html(PLOT_DATA["nbases"]-1);
+
+
 	}
 	
+
 
 	var canvas = $('#' + canvasID)[0];
 	if (canvas == null) return;
@@ -2014,11 +2073,6 @@ function sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab = "
 
 
 
-	var basesOffset =  -$("#" + canvasDivID).offset().left + parseFloat($("#bases").scrollLeft());
-	if (canvasSizeMultiplier > 1) basesOffset -= PLOT_DATA["xCoordOfLeftMostBase"] * canvasSizeMultiplier - axisGap; // If saving to file
-	
-
-
 
 	var baseHeight = 25 * canvasSizeMultiplier;
 
@@ -2027,16 +2081,18 @@ function sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab = "
 	var colours = {"A" : "#ed1c24", "U" : "#00aeef", "T" : "#1c75bc", "G" : "#00a14b", "C" : "#f7941e", "X" : "#ec008c"}
 	var textbox = ""; // To display above a bar
 
+
+
 	if (yvals.length > 0){
 
 		// Draw the first point
 		//var prevX = $("#g1").offset().left - basesOffset;
 		//ctx.moveTo(prevX, canvas.height - axisGap);
 
-		
-		for (var site = 2; site < yvals.length-1; site++){
-			
-	
+
+		for (var site = startSite; site <= endSite; site++){
+
+
 			if (site == hoverOver) ctx.globalAlpha = 1;
 			else ctx.globalAlpha = 0.7;
 			//ctx.globalAlpha = 0.7;
@@ -2044,8 +2100,7 @@ function sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab = "
 			ctx.beginPath();
 
 
-			if ($("#g" + site).offset() == null) break;
-			var xVal = $("#g" + site).offset().left * canvasSizeMultiplier + basesOffset;
+			var xVal = ((site-startSite)*25) * canvasSizeMultiplier + axisGap;
 			
 			
 			
@@ -2103,24 +2158,25 @@ function sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab = "
 		}
 		
 		
-	
+
+
+		
 		
 		// Add mouse hover event
 		canvas.onmousemove = function (e) {
 
-			if (simulating) return;
+			if (simulating && $("#PreExp").val() != "hidden") return;
 
 			var rect = this.getBoundingClientRect(),
 		        mouseX = e.clientX - rect.left,
 				mouseY = e.clientY - rect.top;
 
-			for (var site = 1; site < yvals.length-1; site++){
+			for (var site = startSite; site <= endSite; site++){
 				
-				var xVal = $("#g" + site).offset().left + basesOffset;
+				var xVal = ((site-startSite)*25) * canvasSizeMultiplier + axisGap;
 				
 				// Mouse is hovering over this bar
 				if (xVal <= mouseX && mouseX < xVal + baseHeight){
-					
 
 					// Redraw the graph but with this bar having a different opacity and with a label showing
 					sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab, hoverOverTextBoxFn, canvasSizeMultiplier, xlab, site, mouseX, mouseY, $("#" + canvasDivID).scrollLeft());
@@ -2133,11 +2189,15 @@ function sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab = "
 			
 			
 		};
-		
-		canvas.onmouseleave = function(e){
+
+
+		// Remove highlighting when mouse leaves sitewise panel
+		$("#plots4").mouseleave(function() {
+			$("#plots4").off("mouseleave");
 			sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab, hoverOverTextBoxFn, canvasSizeMultiplier, xlab, -1, null, null, $("#" + canvasDivID).scrollLeft());
-		};
+		});
 		
+
 
 
 		
@@ -3052,7 +3112,8 @@ function downloadPlotInFormat(){
 		// Save the temporary canvas to a file
 		var tempCanvas = document.getElementById("plotCanvas5"); 
 		//var image = tempCanvas.toDataURL("image/png");
-		
+
+
 		tempCanvas.toBlob(function(blob) {
 			saveAs(blob, PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] + ".png");
 		}, "image/png");
@@ -3687,6 +3748,30 @@ function customPlotSelectPropertyTemplate(){
 
 	`;
 	
+}
+
+// Decrease the indices of the sites displayed in the long sitewise plot by 100
+function minus100Sites(){
+
+	if (basesToDisplayTimes100 == 1) return;
+	basesToDisplayTimes100--;
+	eval(PLOT_DATA["whichPlotInWhichCanvas"][4]["plotFunction"])(); // Draw the plot again
+
+
+
+}
+
+
+// Increase the indices of the sites displayed in the long sitewise plot by 100
+function plus100Sites(){
+
+
+	var max = Math.ceil(PLOT_DATA["nbases"] / 100);
+	if (PLOT_DATA["nbases"] % 100 <= 20) max--;
+	if (basesToDisplayTimes100 == max) return;
+	basesToDisplayTimes100++;
+	eval(PLOT_DATA["whichPlotInWhichCanvas"][4]["plotFunction"])(); // Draw the plot again
+
 }
 
 
