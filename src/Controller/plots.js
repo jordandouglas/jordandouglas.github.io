@@ -731,13 +731,13 @@ function plotTimeChart(){
 
 
 		// Show a warning message that the data is getting big
-		if(!$("#plotCanvasContainer" + pltNum).is( ":hidden" ) && !haveShownDVTerrorMessage){
+		if(!$("#plotCanvasContainer" + pltNum).is( ":hidden" ) && !haveShownDVTerrorMessage && $("#PreExp").val() != "hidden"){
 
 			var numPoints = 0;
 			for (var trial = 0; trial < DISTANCE_VS_TIME_CONTROLLER.length; trial++){
 				numPoints += DISTANCE_VS_TIME_CONTROLLER[trial]["distances"].length;
 			}
-			if (numPoints > 100000){
+			if (numPoints > 500000){
 				haveShownDVTerrorMessage = true;
 				addNotificationMessage("That is a lot of data! If Simpol starts to slow down you should minimise this plot.", 
 									$("#plotCanvas" + pltNum).offset().left + 100,
