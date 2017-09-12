@@ -44,7 +44,7 @@ function startTrials_WW(n, resolve = function() { }, msgID = null){
 		toCall().then(() => {
 			
 
-			pauseEveryNActions = 500;
+			pauseEveryNActions = 300;
 			actionsSinceLastPause = pauseEveryNActions;
 			renderPlotsEveryMS = 5000; // If in hidden mode, render the plots every few seconds
 
@@ -297,11 +297,13 @@ function trial_WW(stateC, resolve = function() { }, msgID = null){
 		}
 
 		simulationOnPause = true;
-		currentState = convertCompactStateToFullState(stateC);
-		updateCoordsOfCurrentState();
+
 
 		// Ultrafast mode -> render html then continue when its done
 		if (ANIMATION_TIME == 1) {
+
+			currentState = convertCompactStateToFullState(stateC);
+			updateCoordsOfCurrentState();
 			postMessage("_renderHTML()");
 		
 
