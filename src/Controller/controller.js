@@ -410,7 +410,7 @@ function renderHTML(){
 	}
 	
 	renderParameters();
-	renderObjects();
+	renderObjects(true);
 	drawPlots();
 	setNextBaseToAdd_controller();
 	resumeSimulation_controller();
@@ -1091,7 +1091,7 @@ function clearCache(){
 	if (distanceVsTime_cleardata){
 		DISTANCE_VS_TIME_CONTROLLER = [];
 		VELOCITIES = [];
-
+		haveShownDVTerrorMessage = false;
 	} 
 
 	if (timeHistogram_cleardata){

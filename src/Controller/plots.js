@@ -27,6 +27,8 @@ function initPlots(){
 	DISTANCE_VS_TIME_CONTROLLER = [];
 
 	variableSelectionMode = false;
+	haveShownDVTerrorMessage = false; // If the distance versus time plot contains too much data it slows down the program.
+									  // Show an error message once if the number of points becomes too great
 
 	$("#plotDIV4").hide();
 
@@ -35,14 +37,6 @@ function initPlots(){
 	$("#selectPlot3").val("none");
 	$("#selectPlot4").val("none");
 
-	/*
-	selectPlot(1);
-	selectPlot(2);
-	selectPlot(3);
-	selectPlot(4);
-	*/
-	
-	//drawPlots();
 
 
 
@@ -194,7 +188,7 @@ function resetAllPlots(){
 
 	if (PLOT_DATA["whichPlotInWhichCanvas"] == null) return;
 	basesToDisplayTimes100 = 1;
-	console.log(PLOT_DATA["nbases"]);
+	haveShownDVTerrorMessage = false;
 	
 	for (var i = 0; i < PLOT_DATA["whichPlotInWhichCanvas"].length; i ++){
 		//$("#selectPlot" + (i+1)).val("none");
@@ -735,6 +729,26 @@ function plotTimeChart(){
 		}
 
 
+
+		// Show a warning message that the data is getting big
+		if(!$("#plotCanvasContainer" + pltNum).is( ":hidden" ) && !haveShownDVTerrorMessage){
+
+			var numPoints = 0;
+			for (var trial = 0; trial < DISTANCE_VS_TIME_CONTROLLER.length; trial++){
+				numPoints += DISTANCE_VS_TIME_CONTROLLER[trial]["distances"].length;
+			}
+			if (numPoints > 5000){
+				haveShownDVTerrorMessage = true;
+				addNotificationMessage("That is a lot of data! If Simpol starts to slow down you should minimise this plot.", 
+									$("#plotCanvas" + pltNum).offset().left + 100,
+									$("#plotCanvas" + pltNum).offset().top + 20,
+									300);
+			}
+
+		}
+
+
+
 		step_plot(DISTANCE_VS_TIME_CONTROLLER, [xmin, xmax, ymin, ymax], "plotCanvas" + pltNum, "plotCanvasContainer" + pltNum, "#008CBA", addDashedLines, "Time (s)", "Distance (nt)", PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["canvasSizeMultiplier"]);
 	}
 	
@@ -893,8 +907,13 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 		var yPrime; 
 		
 
-		
+		var pixelsPerSecond = (canvas.width - axisGap) / (range[1] - range[0]);
+		var pixelsPerNucleotide = (canvas.height - axisGap) / (range[3] - range[2]);
+		var finalXValue = 0;
+		var finalYValue = 0; // Save the coordinates of the final plotted value so we can add the circle
+
 		var acumTime = 0;
+		var prevAcumTime = 0;
 		for (var simNum = 0; simNum < vals.length; simNum++){
 
 			if (vals[simNum] == null) continue;
@@ -912,10 +931,19 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 			var xvalsSim = vals[simNum]["times"];
 			var yvalsSim = vals[simNum]["distances"];
 			//var plotEvery = Math.floor(Math.max(xvalsSim / 1000, 1));
+
+			var currentTimePixel = 0; 		// We do not want to plot every single value because it is wasteful (and crashes the program). 
+			var currentDistancePixel = 0; 	// So only plot values which will occupy a new pixel
 			for (var valIndex = 0; valIndex < xvalsSim.length; valIndex ++){
 
 
 				acumTime += xvalsSim[valIndex];
+
+				if (acumTime * pixelsPerSecond < currentTimePixel && yvalsSim[valIndex] * pixelsPerNucleotide < currentDistancePixel) break; // Do not plot if it will not generate a new pixel
+				currentTimePixel = Math.ceil(acumTime * pixelsPerSecond);
+				currentDistancePixel = Math.ceil(acumTime * pixelsPerNucleotide);
+				finalXValue = acumTime;
+				finalYValue = yvalsSim[valIndex];
 				
 				//if (valIndex != 0 && valIndex != xvalsSim.length-1 && valIndex % plotEvery != 1) continue;
 
@@ -968,11 +996,11 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 		if (lastIndex >= 0){
 			var lastYvals = vals[lastIndex]["distances"];
 
-			if (acumTime - range[0] >= 0 && lastYvals[lastYvals.length-1] - range[2] >= 0) {
+			if (finalXValue - range[0] >= 0 && finalYValue - range[2] >= 0) {
 				ctx.beginPath();
 				ctx.fillStyle = "#008CBA";
-				xPrime = widthScale * (acumTime - range[0]) + axisGap;
-				yPrime = canvas.height - heightScale * (lastYvals[lastYvals.length-1] - range[2]) - axisGap;
+				xPrime = widthScale * (finalXValue - range[0]) + axisGap;
+				yPrime = canvas.height - heightScale * (finalYValue - range[2]) - axisGap;
 				ctx_ellipse(ctx, xPrime, yPrime, 5 * canvasSizeMultiplier, 5 * canvasSizeMultiplier, 0, 0, 2 * Math.PI);
 				ctx.fill();
 			}
