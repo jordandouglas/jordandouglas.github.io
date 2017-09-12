@@ -115,27 +115,7 @@ function setStructuralParameters_WW(){
 	}
 	
 	
-	
-	if (all_sequences[sequenceID]["bubbleSizeLeft"] != null) {
-		PHYSICAL_PARAMETERS["bubbleSizeLeft"]["fixedDistnVal"] = all_sequences[sequenceID]["bubbleSizeLeft"];
-		PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"] = all_sequences[sequenceID]["bubbleSizeLeft"];
-	}else{
-		PHYSICAL_PARAMETERS["bubbleSizeLeft"]["fixedDistnVal"] = 4;
-		PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"] = 4;
-	}
-	
-	if (all_sequences[sequenceID]["bubbleSizeRight"] != null) {
-		PHYSICAL_PARAMETERS["bubbleSizeRight"]["fixedDistnVal"] = all_sequences[sequenceID]["bubbleSizeRight"];
-		PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"] = all_sequences[sequenceID]["bubbleSizeRight"];
-	}else{
-		PHYSICAL_PARAMETERS["bubbleSizeRight"]["fixedDistnVal"] = 4;
-		PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"] = 4;
-	}
-	
 
-
-	
-	
 	
 }
 
