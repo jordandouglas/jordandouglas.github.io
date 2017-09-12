@@ -35,7 +35,7 @@ PHYSICAL_PARAMETERS["bubbleSizeRight"] = {distribution:"Fixed", refreshOnChange:
 PHYSICAL_PARAMETERS["GDaggerSlide"] = {distribution:"Fixed", fixedDistnVal: 8.7, name: "\u0394G\u2020slide", title: "Free energy barrier height of translocation", zeroTruncated: false, integer: false};
 PHYSICAL_PARAMETERS["GsecondarySitePenalty"] = {distribution:"Fixed", fixedDistnVal: 1.336, name: "\u0394G\u2020NTP2", title: "Free energy penalty of binding NTP in the secondary binding site", zeroTruncated: false, integer: false};
 PHYSICAL_PARAMETERS["FAssist"] = {distribution:"Fixed", fixedDistnVal: 0, name: "Fassist (pN)", title: "Assisting force", zeroTruncated: false, integer: false};
-PHYSICAL_PARAMETERS["arrestTimeout"] = {distribution:"Fixed", fixedDistnVal: 25, name: "Arrest timeout (s)", title: "Maximum pause duration before the simulation is arrested. Set to zero to prevent arrests.", zeroTruncated: true, integer: false};
+PHYSICAL_PARAMETERS["arrestTimeout"] = {distribution:"Fixed", fixedDistnVal: 600, name: "Arrest timeout (s)", title: "Maximum pause duration before the simulation is arrested. Set to zero to prevent arrests.", zeroTruncated: true, integer: false};
 
 
 PHYSICAL_PARAMETERS["RateBind"] = {distribution:"Fixed", fixedDistnVal: 250, name: "Rate bind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of binding the correct NTP", zeroTruncated: true, integer: false};

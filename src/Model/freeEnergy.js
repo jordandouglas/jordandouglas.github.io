@@ -225,6 +225,15 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 			if (currentTranslocationModel == "midpointBarriers"){
 
 				slidingPeakHeightsTemp[pos] += (getFreeEnergyOfState_WW(statePreOperation) - getFreeEnergyOfTranscriptionBubble_WW(statePreOperation) + getFreeEnergyOfState_WW(state) - getFreeEnergyOfTranscriptionBubble_WW(state)) / 2;
+				
+				// Don't backtrack if it will break the structure
+				if (all_sequences[sequenceID]["primer"].substring(2) == "RNA" && ELONGATION_MODELS[currentElongationModel]["allowmRNAfolding"]){
+					var structure = calculateMFESequence_WW(statePreOperation)["structure"];
+					if (structure[structure.length-1] == ")") slidingPeakHeightsTemp[pos] = maxHeight;
+					//mRNAFreeEnergy = calculateMFESequence_WW(state)["energy"];
+				}
+				
+
 
 			}
 
@@ -295,7 +304,8 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 			if (currentTranslocationModel == "midpointBarriers"){
 
 				slidingPeakHeightsTemp[pos-1] += (getFreeEnergyOfState_WW(statePreOperation) - getFreeEnergyOfTranscriptionBubble_WW(statePreOperation) + getFreeEnergyOfState_WW(state) - getFreeEnergyOfTranscriptionBubble_WW(state)) / 2;
-
+				
+				
 			}
 
 			// Calculate the free energy of the intermediate state
@@ -378,6 +388,7 @@ function update_slidingTroughHeights_WW(stateToCalculateFor = currentState, samp
 		for (var pos = 4; pos <= 6; pos ++){
 				forward_WW(state, false);
 				slidingTroughHeightsTemp[pos] = getFreeEnergyOfState_WW(state, [TbulgePos]);
+				if (slidingTroughHeightsTemp[pos] == null)  slidingTroughHeightsTemp[pos] = maxHeight;
 				slidingTroughHeightsTemp[pos] -= getFreeEnergyOfTranscriptionBubble_WW(state); 
 
 				// Add a penalty for having NTP in the secondary binding site
@@ -421,13 +432,16 @@ function update_slidingTroughHeights_WW(stateToCalculateFor = currentState, samp
 function getFreeEnergyOfState_WW(state, bPosG = [TbulgePos]){
 	
 	var hybridStrings = getHybridString_WW(state, bPosG);
-	var hybridFreeEnergy = getHybridFreeEnergy_WW(hybridStrings[0], hybridStrings[1], all_sequences[sequenceID]["template"].substring(2,5), all_sequences[sequenceID]["primer"]);
+	var hybridFreeEnergy = getHybridFreeEnergy_WW(hybridStrings[0], hybridStrings[1], all_sequences[sequenceID]["template"].substring(2,5), all_sequences[sequenceID]["primer"].substring(2));
 
 
 	// Include the free energy of the mRNA?
 	var mRNAFreeEnergy = 0;
-	if (all_sequences[sequenceID]["primer"] == "RNA" && ELONGATION_MODELS[currentElongationModel]["allowmRNAfolding"]){
-		mRNAFreeEnergy = calculateMFESequence_WW(state)["energy"];
+	if (false && all_sequences[sequenceID]["primer"].substring(2) == "RNA" && ELONGATION_MODELS[currentElongationModel]["allowmRNAfolding"]){
+		var structure = calculateMFESequence_WW(state)["structure"];
+		console.log("XXX", structure, structure[structure.length-1], structure[structure.length-1] == ")");
+		if (structure[structure.length-1] == ")") return null;
+		//mRNAFreeEnergy = calculateMFESequence_WW(state)["energy"];
 	}
 
 
@@ -449,7 +463,7 @@ function getFreeEnergyOfIntermediateState_WW(state1, state2, bPosG1 = [TbulgePos
 	//console.log("Free energy of\n", state1["leftGBase"], "-", hybridStrings1[0], "\n", state1["leftMBase"], "-",  hybridStrings1[1], "\n + \n", state2["leftGBase"], "-", hybridStrings2[0], "\n", state2["leftMBase"], "-", hybridStrings2[1], "\n = \n", intermediateString[0], "\n", intermediateString[1], "\n\n");
 	
 	
-	return getHybridFreeEnergy_WW(intermediateString[0], intermediateString[1], all_sequences[sequenceID]["template"].substring(2,5), all_sequences[sequenceID]["primer"]);
+	return getHybridFreeEnergy_WW(intermediateString[0], intermediateString[1], all_sequences[sequenceID]["template"].substring(2,5), all_sequences[sequenceID]["primer"].substring(2));
 	
 }
 
