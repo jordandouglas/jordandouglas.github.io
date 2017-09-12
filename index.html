@@ -877,7 +877,7 @@ function disable_all_buttons(){
 	$("#ntpC").attr("disabled", false);
 	$("#ntpG").attr("disabled", false);
 	$("#ntpT").attr("disabled", false);
-	$("#deleteNotification").attr("disabled", false);
+	$(".errorBtn").attr("disabled", false);
 
 
 }
@@ -932,7 +932,7 @@ function addNotificationMessage(msg, x, y, w = 220){
 			<div class="errorMsg" style='position:relative; padding:3 3'>
 				
 				` + msg + `
-				<input type="button" style="background-color: #008CBA; color: white; cursor:pointer; vertical-align: middle; width:40px;" onclick='removeNotification(this)' value="OK">
+				<input type="button" class="errorBtn" style="background-color: #008CBA; color: white; cursor:pointer; vertical-align: middle; width:40px;" onclick='removeNotification(this)' value="OK">
 				
 			</div>
 		</div>
