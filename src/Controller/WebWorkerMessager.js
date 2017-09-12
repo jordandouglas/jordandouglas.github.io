@@ -1973,6 +1973,7 @@ function loadSession_controller(XMLData){
 
 		if (seqObject["seqID"] == "$user") {
 			$("#UserSequence").val(seqObject["seq"]);
+			$('input[name="inputSeqType"][value="inputTemplateSeq"]').click()
 			submitCustomSequence();
 		}
 
