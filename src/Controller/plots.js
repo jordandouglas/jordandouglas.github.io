@@ -951,7 +951,7 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 
 				// If this point is in the future then all the remaining points in this list will be too. Break
 				if (acumTime > range[1]){
-					continue;
+					break;
 				}
 
 				// If this point is too early in time then do not plot it
