@@ -21,7 +21,7 @@
 -*/
 
 ELONGATION_MODELS = {};
-ELONGATION_MODELS["simpleBrownian"] = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: false, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
+ELONGATION_MODELS["simpleBrownian"] = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: false, allowGeometricCatalysis: false, allowmRNAfolding:false, allowMisincorporation:false};
 //ELONGATION_MODELS["twoSiteBrownian"] = {id: "twoSiteBrownian",name: "Brownian ratchet model with 2 NTP binding sites", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation:false, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
 currentElongationModel = "simpleBrownian";
 
