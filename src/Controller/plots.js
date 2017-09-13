@@ -938,10 +938,12 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 
 
 				acumTime += xvalsSim[valIndex];
+				//console.log("acumTime", acumTime, pixelsPerSecond, currentTimePixel, acumTime * pixelsPerSecond < currentTimePixel);
+				if (acumTime * pixelsPerSecond < currentTimePixel && Math.ceil(yvalsSim[valIndex] * pixelsPerNucleotide) == currentDistancePixel) continue; // Do not plot if it will not generate a new pixel
 
-				if (acumTime * pixelsPerSecond < currentTimePixel && yvalsSim[valIndex] * pixelsPerNucleotide < currentDistancePixel) break; // Do not plot if it will not generate a new pixel
+				//console.log("Plotting", acumTime, yvalsSim[valIndex]);
 				currentTimePixel = Math.ceil(acumTime * pixelsPerSecond);
-				currentDistancePixel = Math.ceil(acumTime * pixelsPerNucleotide);
+				currentDistancePixel = Math.ceil(yvalsSim[valIndex] * pixelsPerNucleotide);
 				finalXValue = acumTime;
 				finalYValue = yvalsSim[valIndex];
 				
@@ -949,7 +951,7 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 
 				// If this point is in the future then all the remaining points in this list will be too. Break
 				if (acumTime > range[1]){
-					break;
+					continue;
 				}
 
 				// If this point is too early in time then do not plot it
