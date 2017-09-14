@@ -160,8 +160,7 @@ function init(){
 
 
 		var ua = window.navigator.userAgent;
-   	 	var msie = ua.indexOf("MSIE ");
-	    IS_INTERNET_EXPLORER = msie > 0;
+	    IS_INTERNET_EXPLORER = ua.indexOf("MSIE") > -1 || ua.indexOf("Edge") > -1;
 
 	    // If internet explorer then display IE warning message
 	    if (IS_INTERNET_EXPLORER) $("#IEwarningMsg").show(true);
@@ -662,7 +661,7 @@ window.onkeyup = function(e) {
 	}else if (key == 27) { // Escape
 		stop_controller();
 		//getSlidingHeights_controller(function(result){ console.log(result)});
-		addNotificationMessage("Hello there", 100, 100);
+		//addNotificationMessage("Hello there", 100, 100);
 		
 	}
 	
