@@ -876,6 +876,7 @@ function disable_all_buttons(){
 	$("#ntpC").attr("disabled", false);
 	$("#ntpG").attr("disabled", false);
 	$("#ntpT").attr("disabled", false);
+	$("#viewModelBtn").attr("disabled", false);
 	$(".errorBtn").attr("disabled", false);
 
 
@@ -1600,10 +1601,13 @@ function closeNav() {
 			<br> 
 				<div id="userChangeSequence" style="display:none"> <br>
 					<textarea id="UserSequence" title="Please submit a sequence" style="max-width: 350px; width: 350px; height: 100px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input template sequence 3' to 5'..."></textarea> 
-						<div style="width:100%; margin:auto; text-align:center;">
+						&nbsp;&nbsp;
+						<div style="width:100%; margin:auto; text-align:center; line-height:25px; font-family:Arial;  vertical-align:bottom">
+						
+							
 							<label style="font-size:16px;"><input type="radio" onclick="changeInputSequenceType()" name="inputSeqType" value="inputTemplateSeq"  checked=true> </input> Template </label>
 							<label style="font-size:16px;"><input type="radio" onclick="changeInputSequenceType()" name="inputSeqType" value="inputNascentSeq">  </input> Nascent  </label>
-							<input type=image onClick="submitCustomSequence()" src="src/Images/go.png" style="float:right; vertical-align: bottom; width:20px; height:20px;" title="Submit sequence">  </input>
+							<span class="noselect" style="padding:2 5; background-color:#008CBA; color:white; cursor:pointer; font-size:16px; float:right;" onClick="submitCustomSequence()" title="Submit sequence">Submit</span> 
 						</div>
 				</div>
 				<br>
@@ -1623,22 +1627,22 @@ function closeNav() {
 				<div class="parameter-title" ><span  id="NTPtitle"> </span>  </div> <br>
 				
 				<div id="ATPconc_container">
-					<span id="ATPname"></span> = <input class="variable"   type="number" onChange="update_this_parameter_controller(this)" id="ATPconc" style="vertical-align: middle; text-align:right; width: 70px">&mu;M 
+					<span id="ATPname"></span> = <input class="variable"   type="number" onChange="update_this_parameter_controller(this)" id="ATPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
 					<input type=image id='ATPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>	
 					
 				<div id="CTPconc_container">
-					<span id="CTPname"></span> = <input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="CTPconc" style="vertical-align: middle; text-align:right; width: 70px">&mu;M
+					<span id="CTPname"></span> = <input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="CTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
 					<input type=image id='CTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>	
 				
 				<div id="GTPconc_container">
-					<span id="GTPname"></span> = <input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="GTPconc" style="vertical-align: middle; text-align:right; width: 70px">&mu;M
+					<span id="GTPname"></span> = <input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="GTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
 					<input type=image id='GTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 					
 				<div id="UTPconc_container">
-					<span id="UTPname"></span> = <input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="UTPconc" style="vertical-align: middle; text-align:right; width: 70px">&mu;M	
+					<span id="UTPname"></span> = <input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="UTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
 					<input type=image id='UTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 				
@@ -1648,17 +1652,17 @@ function closeNav() {
 			<div class="parameter-bg">
 				<div class="parameter-title">Structural Parameters </div>  <br> 
 				<div id="hybridLength_container">
-			    	Hybrid length = <input class="variable"  type="number"  id="hybridLength" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
+			    	Hybrid length = <input class="variable"  type="number"  id="hybridLength" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
 					<input type=image id='hybridLength_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 				
 				<div id="bubbleSizeLeft_container">
-					Bubble size 3' = <input class="variable"  type="number"  id="bubbleSizeLeft" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
+					Bubble size 3' = <input class="variable"  type="number"  id="bubbleSizeLeft" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
 					<input type=image id='bubbleSizeLeft_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
 				</div>
 				
 				<div id="bubbleSizeRight_container">
-					Bubble size 5' = <input class="variable"  type="number"  id="bubbleSizeRight" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
+					Bubble size 5' = <input class="variable"  type="number"  id="bubbleSizeRight" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
 					<input type=image id='bubbleSizeRight_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
 				</div>
 
@@ -1674,26 +1678,26 @@ function closeNav() {
 				
 				
 				<div id="GDaggerSlide_container">
-					&Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>slide</sub> = <input class="variable"  type="number" id="GDaggerSlide" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
+					&Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>slide</sub> = <input class="variable"  type="number" id="GDaggerSlide" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
 					<input type=image id='GDaggerSlide_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
 				</div>
 
 
 
 				<div id="GsecondarySitePenalty_container">
-					&Delta;G<sub>NTP2</sub> = <input class="variable"  type="number" id="GsecondarySitePenalty" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">
+					&Delta;G<sub>NTP2</sub> = <input class="variable"  type="number" id="GsecondarySitePenalty" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">
 					<input type=image id='GsecondarySitePenalty_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
 				</div>
 
 
 				
 				<div id="FAssist_container">
-					F<sub>assist</sub> = <input type="number" class="variable"  id="FAssist" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">pN
+					F<sub>assist</sub> = <input type="number" class="variable"  id="FAssist" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">pN
 					<input type=image id='FAssist_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
 				</div>
 
 				<div id="arrestTimeout_container">
-					Arrest time: <input type="number" class="variable" id="arrestTimeout" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">s
+					Arrest time: <input type="number" class="variable" id="arrestTimeout" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">s
 					<input type=image id='arrestTimeout_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
 				</div>
 
@@ -1716,18 +1720,18 @@ function closeNav() {
 				<br>
 
 				<div id="RateBind_container">	
-			 		k<sub>bind</sub> =  <input class="variable"  type="number" id="RateBind" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M<sup>-1</sup>.s<sup>-1</sup> 
+			 		k<sub>bind</sub> =  <input class="variable"  type="number" id="RateBind" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M<sup>-1</sup>.s<sup>-1</sup> 
 			 		<input type=image id='RateBind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 			 
 
 				<div id="RateUnbind_container">
-					k<sub>release</sub> =  <input class="variable"  type="number" id="RateUnbind" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> s<sup>-1</sup> 
+					k<sub>release</sub> =  <input class="variable"  type="number" id="RateUnbind" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> s<sup>-1</sup> 
 					<input type=image id='RateUnbind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 				
 				<div id="RatePolymerise_container">
-		    		k<sub>cat</sub> = <input class="variable"  type="number"id="RatePolymerise" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> s<sup>-1</sup> 
+		    		k<sub>cat</sub> = <input class="variable"  type="number"id="RatePolymerise" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> s<sup>-1</sup> 
 					<input type=image id='RatePolymerise_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 					
@@ -1741,12 +1745,12 @@ function closeNav() {
 				</div> 
 				
 				<div id="RateMisbind_container">
-				 	k<sub>misbind</sub> =  <input class="variable"  type="number" id="RateMisbind" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M<sup>-1</sup>.s<sup>-1</sup> 
+				 	k<sub>misbind</sub> =  <input class="variable"  type="number" id="RateMisbind" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M<sup>-1</sup>.s<sup>-1</sup> 
 				 	<input type=image id='RateMisbind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				 </div>
 				 
 				<div id="TransitionTransversionRatio_container">
-					k<sub>transition</sub> / k<sub>transversion</sub> = <input class="variable"  type="number" id="TransitionTransversionRatio" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> 
+					k<sub>transition</sub> / k<sub>transversion</sub> = <input class="variable"  type="number" id="TransitionTransversionRatio" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
 					<input type=image id='TransitionTransversionRatio_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 
@@ -1765,12 +1769,12 @@ function closeNav() {
 				
 				
 				<div id="kU_container">
-					k<sub>U</sub> = <input class="variable"  type="number" id="kU"  style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+					k<sub>U</sub> = <input class="variable"  type="number" id="kU"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
 					<input type=image id='kU_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				</div>
 				
 				<div id="kA_container">
-					k<sub>A</sub> = <input class="variable"  type="number" id="kA" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+					k<sub>A</sub> = <input class="variable"  type="number" id="kA" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
 					<input type=image id='kA_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
 				</div>
 				
@@ -1778,16 +1782,16 @@ function closeNav() {
 				
 				
 				<div id="kUspecial_container">
-				 	<span style="">k<sup>`</sup><sub style='position: relative; left: -.20em;'>U</sub> = <input class="variable"  type="number"  id="kUspecial"  style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> </span> 
+				 	<span style="">k<sup>`</sup><sub style='position: relative; left: -.20em;'>U</sub> = <input class="variable"  type="number"  id="kUspecial"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> </span> 
 					<input type=image id='kUspecial_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  		
 				</div>
 				
 				<div id="kAspecial_container">
-					<span style="">k<sup>`</sup><sub style='position: relative; left: -.20em;'>A</sub> = <input class="variable"  type="number" id="kAspecial" style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> </span>  
+					<span style="">k<sup>`</sup><sub style='position: relative; left: -.20em;'>A</sub> = <input class="variable"  type="number" id="kAspecial" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> </span>  
 					<input type=image id='kAspecial_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">   
 				</div>
 				
-				<span style="display:none">Special site = <input class="variable"  type="number" name="specialSite" id="specialSite" value=33 style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"></span>
+				<span style="display:none">Special site = <input class="variable"  type="number" name="specialSite" id="specialSite" value=33 style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"></span>
 				
 				
 				
@@ -1808,7 +1812,7 @@ function closeNav() {
 
 					<div id="nbasesToFold_container">
 						
-						Number of bases to fold = <input class="variable"  type="number" id="nbasesToFold"  style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)">  nt</sup> 
+						Number of bases to fold = <input class="variable"  type="number" id="nbasesToFold"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  nt</sup> 
 						<input type=image id='nbasesToFold_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 						<br><br>The first simulation may take longer as we calculate the MFE structure of the nascent strand. 
 
@@ -1930,14 +1934,14 @@ function closeNav() {
 					<tr>
 						<td style="height:30px; width: 30%; vertical-align:bottom; ">
 							<div id="mfeOutput" style="font-family:'Courier New'; "> </div>
-							<span id="openNavBtn" style="text-align:right;  font-size:20px;cursor:pointer; font-color: #858280; font-family:Palatino;" onclick="openNav(); ">&#9776; Parameters</span>
+							<span id="openNavBtn" style="text-align:right;  font-size:20px;cursor:pointer; font-color: #858280;" onclick="openNav(); ">&#9776; Parameters</span>
 							
 						</td>
 
 						<td  style="text-align:center; font-size: 20px; vertical-align:top; font-family: 'Palatino'; width: 40%;"> 
 							<div style="width:100%; text-align:center; ">
-								<a href="" style="text-decoration: none; width:300px; vertical-align:middle"" >
-									<div style="font-family: 'Palatino'; font-size:70px; text-decoration: none; color:black; vertical-align:middle"">
+								<a href="" target="_blank" style="text-decoration: none; width:300px; vertical-align:middle">
+									<div style="font-family: 'Palatino'; font-size:70px; text-decoration: none; color:black; vertical-align:middle">
 										Simpol 
 										<img style="height:60px; width:100px; vertical-align:middle" src="src/Images/logo.png">
 									</div>
@@ -1958,9 +1962,10 @@ function closeNav() {
 
 						<td style="height:30px; width: 30%; vertical-align:bottom; text-align:right;"> 
 						
-							<span class="noselect" style="padding:5 5; background-color:#008CBA; padding: 5 5;"><a href="about" style="text-decoration:none; color:white; ">About</a></span> &nbsp;
-							<span class="noselect" style="padding:5 5; background-color:#008CBA; padding: 5 5;"><a href="download" style="text-decoration:none; color:white; ">Download</a></span> &nbsp;
-							<span class="noselect" style="padding:5 5; background-color:#008CBA; padding: 5 5;"><a href="contact" style="text-decoration:none; color:white; ">Contact us</a></span> &nbsp;
+							<span class="noselect" style="padding:5 5; background-color:#b20000; padding: 5 5; color:white;">Home</span> &nbsp;
+							<span class="noselect" style="padding:5 5; background-color:#008CBA; padding: 5 5;"><a  target="_blank" href="about" style="text-decoration:none; color:white; ">About</a></span> &nbsp;
+							<span class="noselect" style="padding:5 5; background-color:#008CBA; padding: 5 5;"><a  target="_blank" href="download" style="text-decoration:none; color:white; ">Download</a></span> &nbsp;
+							<span class="noselect" style="padding:5 5; background-color:#008CBA; padding: 5 5;"><a  target="_blank" href="contact" style="text-decoration:none; color:white; ">Contact us</a></span> &nbsp;
 
 						</td>
 					</tr>
@@ -1994,7 +1999,7 @@ function closeNav() {
 						
 					<tr>
 						<td>
-							<div class="toolbarIcon" style="cursor:pointer;" onClick="resetBtn();" title="Reinitiate the polymerase"> <img id='refresh'   src="src/Images/reset.png" style="padding:5 0; width:35px; height:25px;"> </div>
+							<div class="toolbarIcon" style="cursor:pointer;" onClick="resetBtn();" title="Reinitiate the polymerase"> <img id='refresh'   src="src/Images/reset.png" style="padding:0 0; width:35px; height:35px"> </div>
 						</td>
 
 
@@ -2040,7 +2045,7 @@ function closeNav() {
 						<td colspan=2>
 							<div class="toolbarIcon" style="width:90px; height:22px; vertical-align:middle"> 
 								<span id="progressSimSpan" style="font-size: 16px; display:none; cursor: auto;"></span> 
-								<span id="numSimSpan"> <b>N=</b><input type="number" name="nbasesToSimulate" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:right; width: 60px; background-color: #008CBA; color:white"> </span> </div>
+								<span id="numSimSpan"> <b>N=</b><input type="number" name="nbasesToSimulate" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:left; width: 60px; background-color: #008CBA; color:white"> </span> </div>
 						</td>
 
 					</tr>
@@ -2106,7 +2111,7 @@ function closeNav() {
 						</span>
  
 
-					<input type=button id='viewModelBtn' onClick=viewModel() value='View model' title="View the kinetic diagram of this model" class="operation" style="z-index: 100; float:right">
+					<input type=button id='viewModelBtn' onClick=viewModel() value='View model diagram' title="View the kinetic diagram of this model" class="operation" style="z-index: 100; float:right; width:160px">
 					<!--<input type=image id='viewModelBtn' title="View the kinetic diagram of this model" onClick="viewModel()" src="src/Images/diagram.png" style="padding: 3 3; width:50px; height:25px; vertical-align: middle; ">-->
 				</span>
 
