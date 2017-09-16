@@ -148,7 +148,7 @@ function plotArrowButton_navigationPanel(ctx, fromx, fromy, direction, label = "
 
 
 
-		if (reactionApplicable && mouseInArrow){
+		if (!simulating && reactionApplicable && mouseInArrow){
 			canvas.addEventListener('click', onClick, false);
 			return true
 		}else{

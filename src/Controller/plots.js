@@ -262,10 +262,14 @@ function selectPlot(plotNum, deleteData = null){
 		}else{
 
 			// If no plot then hide the buttons
-			$("#showPlot" + plotNum).hide(true);
+			
 			showPlot(plotNum, false);
-			$("#downloadPlot" + plotNum).hide(true);
-			$("#plotOptions" + plotNum).hide(true);
+			if (plotNum == 4) $("#plot4Buttons").hide(true);
+			else{
+				$("#showPlot" + plotNum).hide(true);
+				$("#downloadPlot" + plotNum).hide(true);
+				$("#plotOptions" + plotNum).hide(true);
+			}
 
 		}
 	
@@ -3856,7 +3860,7 @@ function plotOptions(plotNum){
 
 			$("#settingCell3").html(distanceVsTimeOptionsTemplate1().replace("XUNITS", "s").replace("XUNITS", "s"));
 			$("#settingCell1").html(pauseHistogramOptionsTemplate());
-			$("#settingCell2").html(logSpaceTemplateX());
+			//$("#settingCell2").html(logSpaceTemplateX());
 			//$("#settingCell4").html(logSpaceTemplateY());
 
 			// Per site or per template
@@ -3888,7 +3892,7 @@ function plotOptions(plotNum){
 
 			$("#settingCell1").html(distanceVsTimeOptionsTemplate1().replace("Time range", "Velocity range").replace("XUNITS", "s").replace("XUNITS", "s"));
 			$("#settingCell2").html(windowSizeOptionsTemplate());
-			$("#settingCell3").html(logSpaceTemplateX());
+			//$("#settingCell3").html(logSpaceTemplateX());
 			//$("#settingCell4").html(logSpaceTemplateY());
 			
 			$("#pauseXRow").remove();

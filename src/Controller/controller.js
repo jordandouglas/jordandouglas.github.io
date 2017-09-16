@@ -1006,7 +1006,7 @@ function getCacheClearTemplate(){
 					<tr >
 
 						<td style="vertical-align:top; text-align:center; width:100%"> 
-							<input type=button class="operation" onClick=clearCache() value='Delete' title="Removes all data which may be displayed in the plots" style="width:100px"></input>
+							<input type=button class="operation" onClick=clearCache() value='Delete' title="Deletes the selected data" style="width:100px"></input>
 						</td>
 					</tr>
 					
@@ -1081,6 +1081,8 @@ function clearCache(){
 	var customPlot_cleardata = $("#customPlot_cleardata").prop('checked');
 	var sequences_cleardata = $("#sequences_cleardata").prop('checked');
 	if (sequences_cleardata) clearSequences();
+	
+	refresh();
 
 	if (!distanceVsTime_cleardata && !timeHistogram_cleardata && !timePerSite_cleardata && !customPlot_cleardata) {
 		closeKineticCachePopup();

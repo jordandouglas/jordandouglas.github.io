@@ -1041,8 +1041,8 @@ function changeSpeed_WW(speed, resolve = function() { }, msgID = null){
 
 
 	if (speed == "slow") ANIMATION_TIME_TEMP = 200;
-	else if (speed == "medium") ANIMATION_TIME_TEMP = 100;
-	else if (speed == "fast") ANIMATION_TIME_TEMP = 5;
+	else if (speed == "medium") ANIMATION_TIME_TEMP = 60;
+	else if (speed == "fast") ANIMATION_TIME_TEMP = 15;
 	else if (speed == "ultrafast") ANIMATION_TIME_TEMP = 1;
 	else if (speed == "hidden") ANIMATION_TIME_TEMP = 0;
 
@@ -1056,7 +1056,7 @@ function changeSpeed_WW(speed, resolve = function() { }, msgID = null){
 
 
 	// Use the geometric sampling speed up only if the speed is set to hidden, ultrafast or fast.
-	ELONGATION_MODELS[currentElongationModel]["allowGeometricCatalysis"] = ANIMATION_TIME_TEMP == 0 || ANIMATION_TIME_TEMP == 1 || ANIMATION_TIME_TEMP == 5; 
+	ELONGATION_MODELS[currentElongationModel]["allowGeometricCatalysis"] = speed != "slow";
 
 
 	if (msgID != null){

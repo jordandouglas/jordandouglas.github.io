@@ -20,6 +20,11 @@
 -*/
 
 
+
+body { 
+	font-family: Arial; 
+}
+
 canvas {
 	Vertical-align: middle;
 }
@@ -364,6 +369,8 @@ div.vertical{
 }
 
 
+
+
 @media screen and (max-height: 450px) {
   .sidenav {padding-top: 15px;}
   .sidenav a {font-size: 18px;}
@@ -395,7 +402,7 @@ div.vertical{
 	min-width:99%;
 	padding: 5px 5px;
 	text-align: center;
-	font-family: "Palatino";
+	font-family: "Arial";
 	
 	
 }
