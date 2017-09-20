@@ -84,8 +84,7 @@ BIBLIOGRAPHY["makarova1995transcribing"] = `Makarova, Olga V., et al. "Transcrib
 BIBLIOGRAPHY["gubbay2001sendai"] = `Gubbay, Oliver, Joseph Curran, and Daniel Kolakofsky. "Sendai virus genome synthesis and assembly are coupled: a possible mechanism to promote viral RNA polymerase processivity." Journal of General Virology 82.12 (2001): 2895-2903.`;
 BIBLIOGRAPHY["plumet2005dynamics"] = `Plumet, Sébastien, W. Paul Duprex, and Denis Gerlier. "Dynamics of viral RNA synthesis during measles virus infection." Journal of virology 79.11 (2005): 6900-6908.`;
 BIBLIOGRAPHY["iverson1981localized"] = `Iverson, Linda E., and John K. Rose. "Localized attenuation and discontinuous synthesis during vesicular stomatitis virus transcription." Cell 23.2 (1981): 477-484.`;
-
-BIBLIOGRAPHY["XXX"] = ``;
+BIBLIOGRAPHY["hodges2009nucleosomal"] = `Hodges, Courtney, et al. "Nucleosomal fluctuations govern the transcription dynamics of RNA polymerase II." Science 325.5940 (2009): 626-628.`;
 
 BIBLIOGRAPHY["XXX"] = ``;
 
