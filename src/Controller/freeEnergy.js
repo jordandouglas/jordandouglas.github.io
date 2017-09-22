@@ -197,20 +197,27 @@ function updateModelDOM(elongation_model_temp){
 	else $("#GsecondarySitePenalty_container").hide(100);
 
 
-	if (elongation_model_temp["allowmRNAfolding"]) $("#nbasesToFold_container").show(100);
-	else $("#nbasesToFold_container").hide(100);
+	if (elongation_model_temp["allowmRNAfolding"]) {
+		$("#nbasesToFold_container").show(100);
+		$("#nbasesToFold_desc").show(100);
+
+	}
+	else {
+		$("#nbasesToFold_container").hide(100);
+		$("#nbasesToFold_desc").hide(100);
+	}
 	
 	
 
 	if (elongation_model_temp["allowMisincorporation"]) {
 		$("#RateMisbind_container").show(100);
-		$("#TransitionTransversionRatio_container").show(100);
+		//$("#TransitionTransversionRatio_container").show(100);
 		$("#deactivateUponMisincorporation_container").show(100);
 
 	}
 	else {
 		$("#RateMisbind_container").hide(100);
-		$("#TransitionTransversionRatio_container").hide(100);
+		//$("#TransitionTransversionRatio_container").hide(100);
 		$("#deactivateUponMisincorporation_container").hide(100);
 	}
 

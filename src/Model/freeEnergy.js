@@ -97,7 +97,7 @@ function userInputModel_WW(elongationModelID, translocationModelID, allowBacktra
 	PHYSICAL_PARAMETERS["nbasesToFold"]["hidden"] = !allowmRNAfolding
 	
 	PHYSICAL_PARAMETERS["RateMisbind"]["hidden"] = !allowMisincorporation;
-	PHYSICAL_PARAMETERS["TransitionTransversionRatio"]["hidden"] = !allowMisincorporation;
+	PHYSICAL_PARAMETERS["TransitionTransversionRatio"]["hidden"] = true;// !allowMisincorporation;
 
 
 
