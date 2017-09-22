@@ -3517,6 +3517,8 @@ function getPlotOptionsTemplate(){
 		<div id='settingsPopup' style='background-color:adadad; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:50vh; z-index:5' plotNum="XX_plotNum_XX">
 			<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> XX_plotName_XX settings </span>
+
+
 				<span style='font-size: 30px; cursor:pointer; position:fixed; left:64.5vw; top:50.5vh' onclick='closePlotSettingsPopup()'>&times;</span>
 				<div style='padding:2; font-size:18px;'> Choose the display settings for this plot </div>
 				<table cellpadding=10 style='width:90%; margin:auto;'>
