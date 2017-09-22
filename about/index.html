@@ -52,16 +52,10 @@ function init(){
 		console.log(window.location.hash);
 
 		var hashBits = window.location.hash.split("_");
-		if (hashBits[1] == "ParamHelp"){
+		if (hashBits[1] == "ParamHelp") minimiseSection("#parametersBtn", true);
+		else if (hashBits[1] == "PlotHelp") minimiseSection("#displayingPlotsBtn", true); 
 
-			minimiseSection("#parametersBtn", true);
-			$(window.location.hash).addClass("helpSelected");
-
-
-
-			//location.reload();
-
-		}
+		$(window.location.hash).addClass("helpSelected");
 
 
 	}
@@ -115,9 +109,14 @@ function minimiseSection(element, setTo = null){
 
 function openReferences(){
 
-	minimiseSection("#referencesSecctionBtn", true);
+	
+	minimiseSection("#referencesSectionBtn", true);
 
 }
+
+$(window).on('hashchange', function() {
+  	$(window.location.hash).addClass("helpSelected");
+});
 
 
 function addCitations(){
@@ -142,7 +141,7 @@ function addCitations(){
 		
 		
 		// Create the link to the reference
-		$(citationTags[i]).append(`<sup><a style="text-decoration: none; color:#008CBA"  onclick="openReferences();"  href="#` + val + `">(` + referenceNumbers[val] + `) </a></sup>`);
+		$(citationTags[i]).append(`<sup><a style="text-decoration: none; color:#008CBA;"  onclick="openReferences();"  href="#` + val + `">(` + referenceNumbers[val] + `) </a></sup>`);
 		
 
 	
@@ -299,8 +298,8 @@ function addCitations(){
 
 							<br><br>
 							<div class="about-block">
-								<div class="about-block-inner">
-									<div class="block-subtitle" > Applying chemical reactions </div> <br>
+								<div  class="about-block-inner">
+									<div id="navigationPanelHelp" class="block-subtitle" > Applying chemical reactions </div> <br>
 								
 
 									
@@ -352,7 +351,7 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div class="block-subtitle"> The toolbar </div> <br>
+									<div id="toolbarHelp" class="block-subtitle"> The toolbar </div> <br>
 
 
 									<table class="toolbar" cellpadding=3 style="position:absolute; vertical-align:middle">
@@ -529,9 +528,9 @@ function addCitations(){
 							
 							
 							
-								<div class="about-block">
+								<div  class="about-block">
 									<div class="about-block-inner"  style="vertical-align:middle;">
-										<div class="block-subtitle"> Distance vs time </div> <br>
+										<div  id="distanceVsTime_PlotHelp" class="block-subtitle"> Distance vs time </div> <br>
 
 										
 											<img src="../src/TutorialImages/distanceVsTime.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
@@ -549,7 +548,7 @@ function addCitations(){
 								<br><br><br>
 								<div class="about-block">
 									<div class="about-block-inner">
-										<div class="block-subtitle"> Time histogram </div> <br><br>
+										<div  id="pauseHistogram_PlotHelp"  class="block-subtitle"> Time histogram </div> <br><br>
 
 										
 										
@@ -568,7 +567,7 @@ function addCitations(){
 								<br><br><br>
 								<div class="about-block">
 									<div class="about-block-inner" >
-										<div class="block-subtitle"> Velocity histogram </div> <br>
+										<div  id="velocityHistogram_PlotHelp" class="block-subtitle"> Velocity histogram </div> <br>
 											<br>
 										
 											<img src="../src/TutorialImages/velocityHistogram1s.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
@@ -591,7 +590,7 @@ function addCitations(){
 								<br><br><br>
 								<div class="about-block">
 									<div class="about-block-inner">
-										<div class="block-subtitle"> Parameter plot </div> <br>
+										<div id="custom_PlotHelp"  class="block-subtitle"> Parameter plot </div> <br>
 
 										
 										<img src="../src/TutorialImages/customPlot2.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
@@ -752,7 +751,7 @@ function addCitations(){
 														</div><br>
 
 
-														<div class="paramHelp" id="RatePolymerise_ParamHelp">
+														<div class="paramHelp" id="RatePolymerise_ParamHelp"> 
 															<b style="font-size:20px">$k_{cat}$</b> - rate constant of catalysing bound NTP, thus extending the nascent chain by one base. When translocation is fast,
 																	catalysis is the rate limiting step in transcription. Default: 20s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> 
 
@@ -767,7 +766,7 @@ function addCitations(){
 
 
 
-														<div class="paramHelp" id="RatePolymerise_ParamHelp" stule="display:none">
+														<div class="paramHelp" stule="display:none">
 															<b style="font-size:20px">$k_{transition} / k_{transversion}$</b> - the ratio between transition and transversion rates. This parameter is only applicable when "Allow inactivation" is enabled. Default: 2 
 														</div><br>
 
@@ -1651,10 +1650,10 @@ function addCitations(){
 			<div class="block-title"> 
 			
 			
-				<span id='referencesSecctionBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="false" onClick="minimiseSection(this)">&minus;</span>
+				<span id='referencesSectionBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="false" onClick="minimiseSection(this)">&minus;</span>
 				References 
 				</div> 
-					<div id="referencesSecction">
+					<div id="referencesSection">
 
 						<br><br>
 						<div class="about-block" style="width:90%; margin:auto">

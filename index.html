@@ -2586,7 +2586,9 @@ function closeNav() {
 					
 					
 					<tr style="height:20px">
-						<td></td>
+						<td>
+							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#toolbarHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+						</td>
 						<td></td>
 					</tr>
 
@@ -2605,10 +2607,11 @@ function closeNav() {
 				<span style="font-size:18px; font-family:Bookman;">
 					<input type=button id='showNavigationPanel' class='minimise' value='-' onClick=showNavigationPanel()> 
 					<b class="noselect">Navigation panel</b> 
-						<!--<span style="font-size:14px; font-family:Arial; vertical-align:middle"> - Press any of the arrows below to apply a reaction-->
-						</span>
+						<span style="font-size:12px; font-family:Arial; vertical-align:middle"> - Press any of the arrows below to apply a reaction </span>
+ 						<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#navigationPanelHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+						
+				</span>
  
-
 					<input type=button id='viewModelBtn' onClick=viewModel() value='View model diagram' title="View the kinetic diagram of this model" class="operation" style="z-index: 100; float:right; width:160px">
 					<!--<input type=image id='viewModelBtn' title="View the kinetic diagram of this model" onClick="viewModel()" src="src/Images/diagram.png" style="padding: 3 3; width:50px; height:25px; vertical-align: middle; ">-->
 				</span>
@@ -2872,7 +2875,8 @@ function closeNav() {
 										<input type=button id='showPlot1' class='minimise' value='+' onClick=showPlot(1) style="display:none">
 										<input type=image id='plotOptions1' title="Change the settings of this plot" onClick=plotOptions(1) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
 										<input type=image id='downloadPlot1' title="Download the data displayed in this plot" onClick=downloadPlot(1) src="src/Images/download.png" style="vertical-align: middle; height:20px; display:none">  
-										
+										<a id="helpPlot1" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="src/Images/help.png"></a>
+						
 
 
 
@@ -2903,7 +2907,8 @@ function closeNav() {
 									<input type=button id='showPlot2' class='minimise' value='+' onClick=showPlot(2) style="display:none">
 									<input type=image id='plotOptions2' title="Change the settings of this plot" onClick=plotOptions(2) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
 									<input type=image id='downloadPlot2' title="Download the data displayed in this plot" onClick=downloadPlot(2) src="src/Images/download.png" style="vertical-align: middle;  height:20px; display:none ">  
-									
+									<a id="helpPlot2" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="src/Images/help.png"></a>
+						
 									
 									
 									
@@ -2938,7 +2943,8 @@ function closeNav() {
 								<input type=button id='showPlot3' class='minimise' value='+' onClick=showPlot(3) style="display:none">
 								<input type=image id='plotOptions3' title="Change the settings of this plot" onClick=plotOptions(3) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
 								<input type=image id='downloadPlot3' title="Download the data displayed in this plot" onClick=downloadPlot(3) src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px; ">  
-							
+								<a id="helpPlot3" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="src/Images/help.png"></a>
+						
 								
 								
 								
