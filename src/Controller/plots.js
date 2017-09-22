@@ -199,6 +199,7 @@ function resetAllPlots(){
 		else{
 			$("#downloadPlot" + (i+1)).hide(true);
 			$("#plotOptions" + (i+1)).hide(true);
+			$("#helpPlot" + (i+1)).hide(true);
 		}
 	}
 
@@ -256,6 +257,8 @@ function selectPlot(plotNum, deleteData = null){
 			else{
 				$("#plotOptions" + plotNum).show(true);
 				$("#downloadPlot" + plotNum).show(true);
+				$("#helpPlot" + plotNum).show(true);
+				$("#helpPlot" + plotNum).attr("href", "about/#" + value + "_PlotHelp");
 			}
 
 
@@ -269,6 +272,9 @@ function selectPlot(plotNum, deleteData = null){
 				$("#showPlot" + plotNum).hide(true);
 				$("#downloadPlot" + plotNum).hide(true);
 				$("#plotOptions" + plotNum).hide(true);
+				$("#helpPlot" + plotNum).hide(true);
+
+
 			}
 
 		}
