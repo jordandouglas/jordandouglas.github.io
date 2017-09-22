@@ -141,7 +141,7 @@ function addCitations(){
 		
 		
 		// Create the link to the reference
-		$(citationTags[i]).append(`<sup><a style="text-decoration: none; color:#008CBA;"  onclick="openReferences();"  href="#` + val + `">(` + referenceNumbers[val] + `) </a></sup>`);
+		$(citationTags[i]).append(`<sup><a  class="refLink"  onclick="openReferences();"  href="#` + val + `">(` + referenceNumbers[val] + `) </a></sup>`);
 		
 
 	
@@ -841,7 +841,7 @@ function addCitations(){
 								<br><br>
 								<div class="about-block">
 									<div class="about-block-inner">
-										<div class="block-subtitle" > Adding a background distribution to a parameter</div> <br>
+										<div id="priorDistribution_ParamHelp" class="block-subtitle" > Adding a background distribution to a parameter</div> <br>
 											
 											
 											
