@@ -2,20 +2,20 @@
 /* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
-	This file is part of Simpol.
+	This file is part of SimPol.
 
-    Simpol is free software: you can redistribute it and/or modify
+    SimPol is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Simpol is distributed in the hope that it will be useful,
+    SimPol is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Simpol.  If not, see <http://www.gnu.org/licenses/>. 
+    along with SimPol.  If not, see <http://www.gnu.org/licenses/>. 
     --------------------------------------------------------------------
     --------------------------------------------------------------------
 -*/
@@ -216,6 +216,10 @@ function getDistributionChangeTemplate(){
 		<div id='popup_distn' style='background-color:adadad; padding: 10 10; position:fixed; width: 600px; left:380; top:30vh; z-index:5' paramName="XX_NAME_XX" paramID="XX_ID_XX">
 			<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> Background distribution of XX_ID_XX </span>
+
+				<span style='font-size: 30px; cursor:pointer; position:absolute; left:565px; top:10px' onclick='closePriorDistributionPopup()'>
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:right" href="about/#priorDistribution_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				</span>
 				<span style='font-size: 30px; cursor:pointer; position:absolute; left:590px; top:5px' onclick='closePriorDistributionPopup()'>&times;</span>
 				<div style='padding:2; font-size:18px;'> XX_NAME_XX: XX_TITLE_XX </div>
 				<table cellpadding=10 style='width:90%; margin:auto;'>
