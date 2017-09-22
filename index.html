@@ -85,8 +85,6 @@
 </script>
 
 <script language='JavaScript' type='text/JavaScript'>
-<!--
-
 
 
 
@@ -1579,7 +1577,12 @@ function closeNav() {
 			
 			<div  class="parameter-bg">
 				
-				<div class="parameter-title">Sequence Options</div>
+				<div class="parameter-title">
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#sequenceSelection"><img class="helpIcon" src="src/Images/help.png"></a>
+					Sequence Options
+				</div>
+
+
 			 <br> Select sequence <select class="dropdown" style="width: 350px;" name="SelectSequence" id = "SelectSequence" title="Select a sequence" OnChange="stop_controller(); userChangeSequence()">
 			</select>
 				
@@ -1625,46 +1628,186 @@ function closeNav() {
 			<div class="parameter-bg">
 				
 				<div class="parameter-title" ><span  id="NTPtitle"> </span>  </div> <br>
-				
-				<div id="ATPconc_container">
-					<span id="ATPname"></span> = <input class="variable"   type="number" onChange="update_this_parameter_controller(this)" id="ATPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
-					<input type=image id='ATPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
-				</div>	
-					
-				<div id="CTPconc_container">
-					<span id="CTPname"></span> = <input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="CTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
-					<input type=image id='CTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
-				</div>	
-				
-				<div id="GTPconc_container">
-					<span id="GTPname"></span> = <input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="GTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
-					<input type=image id='GTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
-				</div>
-					
-				<div id="UTPconc_container">
-					<span id="UTPname"></span> = <input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="UTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
-					<input type=image id='UTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
-				</div>
+
+
+				<table style="width:100%">
+
+					<tr id="ATPconc_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#ATPconc_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			<span id="ATPname"></span> = 
+				 		</td>
+
+				 		<td>
+				 			<input class="variable"   type="number" onChange="update_this_parameter_controller(this)" id="ATPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
+						</td>
+
+
+				 		<td>
+				 			<input type=image id='ATPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+						</td>
+
+				 	</tr>
+
+
+				 	<tr id="CTPconc_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#CTPconc_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right;  width:110px">
+				 			<span id="CTPname"></span> = 
+				 		</td>
+
+				 		<td>
+				 			<input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="CTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+						</td>
+
+
+				 		<td>
+							<input type=image id='CTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+						</td>
+
+				 	</tr>
+
+
+
+
+				 	<tr id="GTPconc_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#GTPconc_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right;  width:110px">
+				 			<span id="GTPname"></span> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="GTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+						</td>
+
+
+				 		<td>
+							<input type=image id='GTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+				 			
+						</td>
+
+				 	</tr>
+
+
+
+				 	<tr id="UTPconc_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#UTPconc_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right;  width:110px">
+				 			<span id="UTPname"></span> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="UTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
+						</td>
+
+
+				 		<td>
+							<input type=image id='UTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+						</td>
+
+				 	</tr>
+
+
+				 </table>
+
+
 				
 			</div>
 			<br>
 			
 			<div class="parameter-bg">
 				<div class="parameter-title">Structural Parameters </div>  <br> 
-				<div id="hybridLength_container">
-			    	Hybrid length = <input class="variable"  type="number"  id="hybridLength" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
-					<input type=image id='hybridLength_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
-				</div>
-				
-				<div id="bubbleSizeLeft_container">
-					Bubble size 3&prime; = <input class="variable"  type="number"  id="bubbleSizeLeft" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
-					<input type=image id='bubbleSizeLeft_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
-				</div>
-				
-				<div id="bubbleSizeRight_container">
-					Bubble size 5&prime;  = <input class="variable"  type="number"  id="bubbleSizeRight" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
-					<input type=image id='bubbleSizeRight_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
-				</div>
+
+
+				<table style="width:100%">
+
+					<tr id="hybridLength_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#hybridLength_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			Hybrid length:
+				 		</td>
+
+				 		<td>
+			    			<input class="variable"  type="number"  id="hybridLength" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
+						</td>
+
+
+				 		<td>
+							<input type=image id='hybridLength_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+						</td>
+
+				 	</tr>
+
+
+
+					<tr id="bubbleSizeLeft_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#bubbleSizeLeft_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			Bubble size 3&prime;:
+				 		</td>
+
+				 		<td>
+				 			<input class="variable"  type="number"  id="bubbleSizeLeft" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
+		    			</td>
+
+
+				 		<td>
+							<input type=image id='bubbleSizeLeft_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
+						</td>
+
+				 	</tr>
+
+
+
+					<tr id="bubbleSizeRight_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#bubbleSizeRight_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			Bubble size 5&prime;:
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number"  id="bubbleSizeRight" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
+		    			</td>
+
+
+				 		<td>
+							<input type=image id='bubbleSizeRight_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
+						</td>
+
+				 	</tr>
+
+
+				 </table>
+
+
 
 			</div>
 			<br>
@@ -1675,31 +1818,112 @@ function closeNav() {
 
 			<div class="parameter-bg">
 				<div class="parameter-title">Translocation Parameters </div>  <br> 
-				
-				
-				<div id="GDaggerSlide_container">
-					&Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>slide</sub> = <input class="variable"  type="number" id="GDaggerSlide" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
-					<input type=image id='GDaggerSlide_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
-				</div>
 
 
 
-				<div id="GsecondarySitePenalty_container">
-					&Delta;G<sub>NTP2</sub> = <input class="variable"  type="number" id="GsecondarySitePenalty" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">
-					<input type=image id='GsecondarySitePenalty_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
-				</div>
+
+				<table style="width:100%">
+
+					<tr id="GDaggerSlide_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#GDaggerSlide_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			&Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>slide</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="GDaggerSlide" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
+			 			</td>
 
 
-				
-				<div id="FAssist_container">
-					F<sub>assist</sub> = <input type="number" class="variable"  id="FAssist" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">pN
-					<input type=image id='FAssist_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
-				</div>
+				 		<td>
+							<input type=image id='GDaggerSlide_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
+				 		</td>
 
-				<div id="arrestTimeout_container">
-					Arrest time: <input type="number" class="variable" id="arrestTimeout" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">s
-					<input type=image id='arrestTimeout_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
-				</div>
+				 	</tr>
+
+
+			 		<tr id="GsecondarySitePenalty_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			&Delta;G<sub>NTP2</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="GsecondarySitePenalty" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">
+			 			</td>
+
+
+				 		<td>
+							<input type=image id='GsecondarySitePenalty_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
+				 		</td>
+
+				 	</tr>
+
+
+
+			 		<tr id="FAssist_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#FAssist_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			F<sub>assist</sub> = 
+				 		</td>
+
+				 		<td>
+							<input type="number" class="variable"  id="FAssist" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">pN
+			 			</td>
+
+
+				 		<td>
+							<input type=image id='FAssist_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
+				 		</td>
+
+				 	</tr>
+
+
+
+
+				 	<tr id="arrestTimeout_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#arrestTimeout_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			Arrest time: 
+				 		</td>
+
+				 		<td>
+							<input type="number" class="variable" id="arrestTimeout" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">s
+			 			</td>
+
+
+				 		<td>
+							<input type=image id='arrestTimeout_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
+				 		</td>
+
+				 	</tr>
+
+
+
+
+
+				 </table>
+
+
+
+
+
 
 				<div style="display:none">
 				<br> Translocation barrier height model: <select class="dropdown" style="width: 350px;" name="SelectTranslocationModel" id = "SelectTranslocationModel" title="Select a translocation model" OnChange="userInputModel_controller()">
@@ -1719,36 +1943,145 @@ function closeNav() {
 
 				<br>
 
-				<div id="RateBind_container">	
-			 		k<sub>bind</sub> =  <input class="variable"  type="number" id="RateBind" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M<sup>-1</sup>.s<sup>-1</sup> 
-			 		<input type=image id='RateBind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
-				</div>
-			 
 
-				<div id="RateUnbind_container">
-					k<sub>release</sub> =  <input class="variable"  type="number" id="RateUnbind" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> s<sup>-1</sup> 
-					<input type=image id='RateUnbind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
-				</div>
-				
-				<div id="RatePolymerise_container">
-		    		k<sub>cat</sub> = <input class="variable"  type="number"id="RatePolymerise" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> s<sup>-1</sup> 
-					<input type=image id='RatePolymerise_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
-				</div>
+				<table style="width:100%">
+
+					<tr id="RateBind_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateBind_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			k<sub>bind</sub> =   
+				 		</td>
+
+				 		<td>
+				 			<input class="variable"  type="number" id="RateBind" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M<sup>-1</sup>.s<sup>-1</sup>
+				 		</td>
+
+
+				 		<td>
+				 			<input type=image id='RateBind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
+
+					<tr id="RateUnbind_container">
+
+						<td style="text-align:left; font-size:10px; float:left;">
+							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateUnbind_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right">
+							k<sub>release</sub> =  
+						</td>
+
+				 		<td>
+				 			 <input class="variable"  type="number" id="RateUnbind" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> s<sup>-1</sup>
+				 		</td>
+
+
+				 		<td>
+				 			<input type=image id='RateUnbind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+				 		</td>
+					</tr>
 					
-				<br>
-				<div id="allowMisincorporation_container">
-					<label style="cursor:pointer;"> <input class="variable"  type="checkbox" style="cursor:pointer;" id="allowMisincorporation" OnChange="userInputModel_controller()">Allow misincorporations</input> </label>
-				</div> 
+					<tr id="RatePolymerise_container">
 
-				<div id="deactivateUponMisincorporation_container">
-						<label style="cursor:pointer;"> <input class="variable"  type="checkbox" style="cursor:pointer;" id="deactivateUponMisincorporation" OnChange="userInputModel_controller()">Deactivate upon misincorporation</input> </label>
-				</div> 
+						<td style="text-align:left; font-size:10px; float:left;">
+							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RatePolymerise_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right">
+			    			k<sub>cat</sub> =
+							
+						</td>
+
+				 		<td>
+				 			 <input class="variable"  type="number"id="RatePolymerise" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> s<sup>-1</sup> 
+				 		</td>
+
+
+				 		<td>
+				 			<input type=image id='RatePolymerise_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+				 		</td>
+
+					</tr>
+
+
+					<tr id="allowMisincorporation_container" title="Can the wrong nucleotide bind (during the simulation)?">
+
+
+						<td style="text-align:left; font-size:10px; float:left;">
+							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						 
+				 		<td colspan=3>
+					 		<label class="switch">
+						 		 <input type="checkbox" id="allowMisincorporation" OnChange="userInputModel_controller()"> </input>
+						 		 <span class="slider round"></span>
+							</label> 
+							<span style="font-size:15px; vertical-align:middle" >Enable misincorporations</span>
+				 		</td>
+
+
+
+					</tr>
+
+
+
+					<tr id="deactivateUponMisincorporation_container" title="Does the polymerase enter the inactivated state upon a nucleotide misincorporation (during the simulation)?">
+
+						<td style="text-align:left; float:left; width:20px">
+							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateMisbind_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+				 		<td colspan=3>
+					 		<label class="switch">
+						 		 <input type="checkbox" id="deactivateUponMisincorporation" OnChange="userInputModel_controller()"> </input>
+						 		 <span class="slider round"></span>
+							</label> 
+							<span style="font-size:15px; vertical-align:middle" >Inactivate after misincorporations</span>
+				 		</td>
+
+
+					</tr>
+
+
+					<tr id="RateMisbind_container">
+
+
+						<td style="text-align:left; font-size:10px; float:left;">
+							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateMisbind_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right">
+			    			k<sub>misbind</sub> =  
+							
+						</td>
+
+				 		<td>
+				 			 <input class="variable"  type="number" id="RateMisbind" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M<sup>-1</sup>.s<sup>-1</sup>  
+				 		</td>
+
+
+				 		<td>
+				 			<input type=image id='RateMisbind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+				 		</td>
+
+					</tr>
+
+
+
+
+
+				</table>
+					
+
+
 				
-				<div id="RateMisbind_container">
-				 	k<sub>misbind</sub> =  <input class="variable"  type="number" id="RateMisbind" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M<sup>-1</sup>.s<sup>-1</sup> 
-				 	<input type=image id='RateMisbind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
-				 </div>
-				 
 				<div id="TransitionTransversionRatio_container">
 					k<sub>transition</sub> / k<sub>transversion</sub> = <input class="variable"  type="number" id="TransitionTransversionRatio" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
 					<input type=image id='TransitionTransversionRatio_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
@@ -1760,23 +2093,94 @@ function closeNav() {
 			<br>
 			<div class="parameter-bg">
 				<div class="parameter-title">Unactivated State Parameters </div>  <br> 
-				
-				
-				
-				<div id="allowInactivation_container">
-					<label style="cursor:pointer;"> <input class="variable"  type="checkbox" style="cursor:pointer;" id="allowInactivation" OnChange="userInputModel_controller()">Allow inactivation</input> </label>
-				</div> 
-				
-				
-				<div id="kU_container">
-					k<sub>U</sub> = <input class="variable"  type="number" id="kU"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
-					<input type=image id='kU_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
-				</div>
-				
-				<div id="kA_container">
-					k<sub>A</sub> = <input class="variable"  type="number" id="kA" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
-					<input type=image id='kA_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
-				</div>
+
+
+
+				<table style="width:100%">
+
+
+
+					<tr id="allowInactivation_container"  title="Can the polymerase enter a catalytically inactive state (during the simulation)?">
+
+
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+
+				 		<td colspan=3>
+		 					<label class="switch">
+					 	 		<input type="checkbox" id="allowInactivation" OnChange="userInputModel_controller()"> </input>
+					 	 		<span class="slider round"></span>
+
+							</label> 
+							<span style="font-size:15px; vertical-align:middle" >Enable inactivation</span>
+
+				 		</td>
+
+
+
+
+				 	</tr>
+
+
+
+					<tr id="kU_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kU_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							k<sub>U</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="kU"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='kU_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
+
+
+
+				 	<tr id="kA_container">
+
+
+				 		<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kA_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							k<sub>A</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="kA" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='kA_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
+				 		</td>
+
+				 	</tr>
+
+
+
+
+
+
+		 		</table>
+
+
 				
 				<span style="display:none"> <br> &Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>special</sub> = <input class="variable"  type="number" title="Free energy barrier height of sliding in or out of the edit site" name="GDaggerSpecial" id="GDaggerSpecial" value=0 style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T <br> </span>  
 				
@@ -1803,19 +2207,63 @@ function closeNav() {
 				<br>
 				<div  class="parameter-bg">
 					
-					<div class="parameter-title">RNA Folding Parameters </div>  <br> 
+					<div class="parameter-title">RNA Folding Settings </div>  <br> 
 
 
-					<div id="allowmRNAfolding_container">
-							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" style="cursor:pointer;" id="allowmRNAfolding" OnChange="userInputModel_controller()">Allow mRNA folding</input> </label>
-					</div> 
 
-					<div id="nbasesToFold_container">
-						
-						Number of bases to fold = <input class="variable"  type="number" id="nbasesToFold"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  nt</sup> 
-						<input type=image id='nbasesToFold_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+					<table style="width:100%">
+
+						<tr id="allowmRNAfolding_container"  title="Do you want the mRNA to fold automatically during the simulation? This will place constraints upon backwards translocation.">
+
+
+
+							<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
+					 		</td>
+
+
+					 		<td colspan=3>
+			 					<label class="switch">
+							 	 <input type="checkbox" id="allowmRNAfolding" OnChange="userInputModel_controller()"> </input>
+							 	 <span class="slider round"></span>
+
+								</label> 
+								<span style="font-size:15px; vertical-align:middle">Enable mRNA folding</span>
+
+					 		</td>
+
+					 	</tr>
+
+					 	<tr id="nbasesToFold_container">
+
+
+					 		<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#nbasesToFold_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+					 		</td>
+
+
+							<td style="text-align:right; font-size:14px">
+								Number of bases to fold = 
+					 		</td>
+
+					 		<td>
+								<input class="variable"  type="number" id="nbasesToFold"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  nt</sup> 
+					 		</td>
+
+
+					 		<td>
+								<input type=image id='nbasesToFold_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+					 			
+					 		</td>
+
+					 	</tr>
+
+
+				 	</table>
+
+
+					<div id="nbasesToFold_desc" style="display:none">
 						<br><br>The first simulation may take longer as we calculate the MFE structure of the nascent strand. 
-
 					</div>
 					
 				</div>
@@ -1825,31 +2273,88 @@ function closeNav() {
 			
 			
 			<div  class="parameter-bg"> 
-				<div class="parameter-title">Advanced Model Options  <br></div>
+				<div class="parameter-title">Advanced Model Settings <br> <br></div>
 
 
 					<div style="display:none">
 				 		<br> Elongation model: <select class="dropdown" style="width: 350px;" name="SelectElongationModel" id = "SelectElongationModel" title="Select an elongation model" OnChange="stop_controller(); userInputModel_controller()">
 											</select>
 					</div>
-					
-						<div id="allowHypertranslocation_container">
-								<label style="cursor:pointer;"> <input class="variable"  type="checkbox" style="cursor:pointer;" id="allowHypertranslocation" OnChange="userInputModel_controller()">Allow hypertranslocation</input> </label>
-						</div> 
-
-																
-						<div id="allowBacktracking_container">
-								<label style="cursor:pointer;"> <input class="variable"  type="checkbox" style="cursor:pointer;" id="allowBacktracking" OnChange="userInputModel_controller()">Allow backtracking</input> </label>
-						</div> 
-						
-
-						
 
 
-						<div id="allowBacktrackWithoutInactivation_container">
-								<label style="cursor:pointer;"> <input class="variable"  type="checkbox" style="cursor:pointer;" id="allowBacktrackWithoutInactivation" OnChange="userInputModel_controller()">Allow backtracking without inactivation</input> </label>
-						</div> 
-												
+
+					<table style="width:100%">
+
+						<tr id="allowHypertranslocation_container"  title="Can the polymerase translocate far forwards (hypertranslocation) during the simulation?">
+
+
+
+							<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
+					 		</td>
+
+
+					 		<td>
+			 					<label class="switch">
+							 	 <input type="checkbox" id="allowHypertranslocation" OnChange="userInputModel_controller()"> </input>
+							 	 <span class="slider round"></span>
+
+								</label> 
+								<span style="font-size:15px; vertical-align:middle"> Enable hypertranslocation</span>
+
+					 		</td>
+
+					 	</tr>
+
+					 	<tr id="allowBacktracking_container" title="Can the polymerase translocate far backwards (backtracking) during the simulation?">
+
+
+
+							<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
+					 		</td>
+
+
+					 		<td>
+			 					<label class="switch">
+							 	 <input type="checkbox" id="allowBacktracking" OnChange="userInputModel_controller()"> </input>
+							 	 <span class="slider round"></span>
+
+								</label> 
+								<span style="font-size:15px; vertical-align:middle" > Enable backtracking</span>
+
+					 		</td>
+
+					 	</tr>
+
+
+					 	<tr id="allowBacktrackWithoutInactivation_container" title="Can the polymerase backtrack without entering the inactive state first (during the simulation)?">
+
+
+
+							<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
+					 		</td>
+
+
+					 		<td>
+			 					<label class="switch">
+						 		 <input type="checkbox" id="allowBacktrackWithoutInactivation" OnChange="userInputModel_controller()"> </input>
+						 	 	<span class="slider round"></span>
+
+								</label> 
+								<span style="font-size:15px; vertical-align:middle" > Enable backtracking without inactivation</span>
+								<br> <br style="line-height:5px">
+
+					 		</td>
+
+					 	</tr>
+
+
+
+					 </table>
+
+		
 				<br>
 			</div>
 			<br>

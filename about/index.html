@@ -32,7 +32,7 @@
 
 
 <script language='JavaScript' type='text/JavaScript'>
-<!--
+
 
 function init(){
 
@@ -44,6 +44,27 @@ function init(){
 	numReferences = 0;
 	referenceNumbers = {};
 	addCitations();
+
+
+	// If the url is linked to a section then make sure the section is not collapsed
+	// Sections given id in this format: RateBind_ParamHelp. This means the linkable section is in the Parameters section
+	if(window.location.hash) {
+		console.log(window.location.hash);
+
+		var hashBits = window.location.hash.split("_");
+		if (hashBits[1] == "ParamHelp"){
+
+			minimiseSection("#parametersBtn", true);
+			$(window.location.hash).addClass("helpSelected");
+
+
+
+			//location.reload();
+
+		}
+
+
+	}
 	
 }
 
@@ -72,25 +93,32 @@ function setImageSizes(){
 }
 
 
-function minimiseSection(element){
+function minimiseSection(element, setTo = null){
 
 	var toHide = $(element).attr("id");
 	toHide = toHide.substring(0, toHide.length-3); // Remove 'Btn' from the end
 	console.log(toHide);
 
 	
-	if($(element).attr("disp") == "false"){
+	if(setTo == false || (setTo == null && $(element).attr("disp") == "false")){
 		$(element).html("&plus;")
-		$("#" + toHide).hide(300);
+		$("#" + toHide).hide(setTo == null ? 300 : 0);
 		$(element).attr("disp", true);
 	}
 	else{
 		$(element).html("&minus;")
-		$("#" + toHide).show(300);
+		$("#" + toHide).show(setTo == null ? 300 : 0);
 		$(element).attr("disp", false);
 	}
 
 }
+
+function openReferences(){
+
+	minimiseSection("#referencesSecctionBtn", true);
+
+}
+
 
 function addCitations(){
 
@@ -114,11 +142,9 @@ function addCitations(){
 		
 		
 		// Create the link to the reference
-		$(citationTags[i]).append(`<sup><a style="text-decoration: none; color:#008CBA" href="#` + val + `">(` + referenceNumbers[val] + `) </a></sup>`);
+		$(citationTags[i]).append(`<sup><a style="text-decoration: none; color:#008CBA"  onclick="openReferences();"  href="#` + val + `">(` + referenceNumbers[val] + `) </a></sup>`);
 		
-		
-		
-		
+
 	
 	}
 
@@ -224,7 +250,7 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div class="block-subtitle"> Sequence selection </div> <br>
+									<div id="sequenceSelection" class="block-subtitle"> Sequence selection </div> <br>
 									
 									
 									<img src="../src/TutorialImages/sequenceParams.png" style="width:300px; padding: 10 30;" align=left></img>
@@ -621,14 +647,23 @@ function addCitations(){
 													<div class="parameter-title" style="font-size:30px">NTP Concentrations </div>  
 													<div class="parameter-title" style="font-size:18px">The concentrations of NTP (or dNTP if the nascent strand is DNA). The default values are estimated averages across multiple species and
 																have been borrowed from Traut 1994.<cite val="traut1994physiological"></cite> It is recommended that you change these values if you know what they are for your system.</div>  <br> 
-													
-														<b>[ATP]</b> - concentration of ATP (or dATP). Default: 3152&mu;M (or 24&mu;M) <br><br>
 
-														<b>[CTP]</b> - concentration of CTP (or dCTP). Default: 278&mu;M (or 29&mu;M) <br><br>
 
-														<b>[GTP]</b> - concentration of GTP (or dGTP). Default: 468&mu;M (or 5.2&mu;M) <br><br>
-					
-														<b>[UTP]</b> - concentration of UTP (or dTTP). Default: 567&mu;M (or 37&mu;M) <br><br>
+														<div class="paramHelp" id="ATPconc_ParamHelp">
+															<b>[ATP]</b> - concentration of ATP (or dATP). Default: 3152&mu;M (or 24&mu;M) 
+														</div><br>
+
+														<div class="paramHelp" id="CTPconc_ParamHelp">
+															<b>[CTP]</b> - concentration of CTP (or dCTP). Default: 278&mu;M (or 29&mu;M) 
+														</div><br>
+
+														<div class="paramHelp" id="GTPconc_ParamHelp">
+															<b>[GTP]</b> - concentration of GTP (or dGTP). Default: 468&mu;M (or 5.2&mu;M) 
+														</div><br>
+
+														<div class="paramHelp" id="UTPconc_ParamHelp">
+															<b>[UTP]</b> - concentration of UTP (or dTTP). Default: 567&mu;M (or 37&mu;M) 
+														</div><br>
 																			   
 														
 									
@@ -642,15 +677,21 @@ function addCitations(){
 													<div class="parameter-title" style="font-size:30px">Structural Parameters </div>  
 													<div class="parameter-title" style="font-size:18px">Basepairing configuration within the transcription bubble and polymerase.</div>  <br> 
 													
-														<b>Hybrid length</b> - number of basepairs in the template/primer hybrid within the polymerase. As translocation rates are determined from sequence composition, this value may affect
-																			   the predicted location of pause sites. In eukaryotes and prokaryotes, RNA polymerase contains a hybrid of 8 or 9bp<cite val="komissarova1997transcriptional"></cite>
-																			<cite val="gnatt2001structural"></cite> <cite val="nudler1997rna"></cite>. Default: 9bp <br><br>
-																			   
-																			   
-														<b>Bubble size 3&prime;</b> - number of unpaired template bases 3&prime; (left hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 2bp<cite val="maoileidigh2011unified"></cite> <br><br>
-														
-														<b>Bubble size 5&prime;</b> - number of unpaired template bases 5&prime; (right hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 1bp<cite val="maoileidigh2011unified"></cite> <br><br>
 
+
+														<div class="paramHelp" id="hybridLength_ParamHelp">
+															<b>Hybrid length</b> - number of basepairs in the template/primer hybrid within the polymerase. As translocation rates are determined from sequence composition, this value may affect
+																			   the predicted location of pause sites. In eukaryotes and prokaryotes, RNA polymerase contains a hybrid of 8 or 9bp<cite val="komissarova1997transcriptional"></cite>
+																			<cite val="gnatt2001structural"></cite> <cite val="nudler1997rna"></cite>. Default: 9bp 
+														</div><br>				   
+
+														<div class="paramHelp" id="bubbleSizeLeft_ParamHelp">			   
+															<b>Bubble size 3&prime;</b> - number of unpaired template bases 3&prime; (left hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 2bp<cite val="maoileidigh2011unified"></cite>
+														</div><br>	
+
+														<div class="paramHelp" id="bubbleSizeRight_ParamHelp">
+															<b>Bubble size 5&prime;</b> - number of unpaired template bases 5&prime; (right hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 1bp<cite val="maoileidigh2011unified"></cite>
+														</div><br>	
 									
 												</div>
 
@@ -661,24 +702,27 @@ function addCitations(){
 													
 													<div class="parameter-title" style="font-size:30px">Translocation Parameters </div>  
 													<div class="parameter-title" style="font-size:18px">Energetics of translocation reactions and forces.</div>  <br> 
-													
-														<b style="font-size:20px">$\Delta G^\dagger_{slide}$</b> - free energy barrier height of translocation. To translocate forwards or backwards, several
-																	basepairs may need to be broken. The energy barrier which must be overcome in order to translocate is estimated as the energy needed to break these basepairs
-																	plus the value of this parameter. Increasing this value will make translocation slower. Default: 8.7RT <br><br>
 
+
+														<div class="paramHelp" id="GDaggerSlide_ParamHelp">
+															<b style="font-size:20px">$\Delta G^\dagger_{slide}$</b> - free energy barrier height of translocation. To translocate forwards or backwards, several
+																	basepairs may need to be broken. The energy barrier which must be overcome in order to translocate is estimated as the energy needed to break these basepairs
+																	plus the value of this parameter. Increasing this value will make translocation slower. Default: 8.7RT 
+														</div><br>	
 
 														
 
-
-														<b style="font-size:20px">$F_{assist}$</b> - the size of the force being applied to the polymerase during a single-molecule experiment. Positive forces are assisting loads and increase
+														<div class="paramHelp" id="FAssist_ParamHelp">
+															<b style="font-size:20px">$F_{assist}$</b> - the size of the force being applied to the polymerase during a single-molecule experiment. Positive forces are assisting loads and increase
 																	the rate of transcription. Negative forces are hindering loads and decrease the rate of transcription. When this force reaches a critical value, $k_{cat}$ becomes
-																	the rate limiting step. Default: 0pN <br><br>
+																	the rate limiting step. Default: 0pN
+														</div><br>	
 
 
-
-														<b>Arrest time </b> - the amount of time the polymerase may take to copy a base before the simulation trial is aborted. When the timeout is
-																	reached, copying will prematurely terminate and the next trial will begin. Default: 600s <br><br>
-																	
+														<div class="paramHelp" id="arrestTimeout_ParamHelp">
+															<b>Arrest time </b> - the amount of time the polymerase may take to copy a base before the simulation trial is aborted. When the timeout is
+																	reached, copying will prematurely terminate and the next trial will begin. Default: 600s 
+														</div><br>		
 																	
 
 																			   
@@ -693,33 +737,39 @@ function addCitations(){
 													
 													<div class="parameter-title" style="font-size:30px">NTP Binding Parameters </div>  
 													<div class="parameter-title" style="font-size:18px">Kinetics of binding/releasing NTP, and catalysing polymerisation.</div>  <br> 
-													
-														<b style="font-size:20px">$k_{bind}$</b> - used to calculate rate constant of binding the complementary NTP, which is calculated as [NTP] k<sub>bind</sub>. 
-																	See k<sub>misbind</sub> for the rate of binding a non-complementary NTP. Default: 250s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> <br><br>
 
 
+														<div class="paramHelp" id="RateBind_ParamHelp">
+															<b style="font-size:20px">$k_{bind}$</b> - used to calculate rate constant of binding the complementary NTP, which is calculated as [NTP] k<sub>bind</sub>. 
+																	See k<sub>misbind</sub> for the rate of binding a non-complementary NTP. Default: 250s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> 
+														</div><br>
 
 
-
-														<b style="font-size:20px">$k_{release}$</b> - rate constant of releasing bound NTP. Since this value is around 50&times; the value of $k_{cat}$, the polymerase
+														<div class="paramHelp" id="RateUnbind_ParamHelp">
+															<b style="font-size:20px">$k_{release}$</b> - rate constant of releasing bound NTP. Since this value is around 50&times; the value of $k_{cat}$, the polymerase
 																	will bind and release the NTP on average 50 times before catalysis occurs. Fast, ultrafast and hidden simulations in Simpol are optimised to  
-																	perform the binding step without rendering any visual changes. Default: 1000s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> <br><br>
+																	perform the binding step without rendering any visual changes. Default: 1000s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> 
+														</div><br>
+
+
+														<div class="paramHelp" id="RatePolymerise_ParamHelp">
+															<b style="font-size:20px">$k_{cat}$</b> - rate constant of catalysing bound NTP, thus extending the nascent chain by one base. When translocation is fast,
+																	catalysis is the rate limiting step in transcription. Default: 20s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> 
+
+														</div><br>
+
+
+														<div class="paramHelp" id="RateMisbind_ParamHelp">
+															<b style="font-size:20px">$k_{misbind}$</b> - used to calculate rate constant of binding a non-complementary NTP, which is calculated as [NTP] k<sub>misbind</sub>. 
+																		If the bound NTP is added onto the end of the chain without correction then there is a misincorporation event. This parameter is only applicable when "Allow inactivation" is enabled. The overall rate of uncorrected misincorpations during transcription is
+																		around 1 in 10<sup>4</sup> - 10<sup>5</sup> bases<cite val="imashimizu2013direct"></cite><cite val="rosenberger1981estimate"></cite><cite val="shaw2002use"></cite>. Default: 0.25s<sup>-1</sup> 
+														</div><br>
 
 
 
-														<b style="font-size:20px">$k_{cat}$</b> - rate constant of catalysing bound NTP, thus extending the nascent chain by one base. When translocation is fast,
-																	catalysis is the rate limiting step in transcription. Default: 20s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> <br><br>
-																	
-																	
-														<b style="font-size:20px">$k_{misbind}$</b> - used to calculate rate constant of binding a non-complementary NTP, which is calculated as [NTP] k<sub>misbind</sub>. 
-																	If the bound NTP is added onto the end of the chain without correction then there is a misincorporation event. This parameter is only applicable when "Allow inactivation" is enabled. The overall rate of uncorrected misincorpations during transcription is
-																	around 1 in 10<sup>4</sup> - 10<sup>5</sup> bases<cite val="imashimizu2013direct"></cite><cite val="rosenberger1981estimate"></cite><cite val="shaw2002use"></cite>. Default: 0.25s<sup>-1</sup> <br><br>
-
-
-
-
-														<b style="font-size:20px">$k_{transition} / k_{transversion}$</b> - the ratio between transition and transversion rates. This parameter is only applicable when "Allow inactivation" is enabled. Default: 2 <br><br>
-
+														<div class="paramHelp" id="RatePolymerise_ParamHelp" stule="display:none">
+															<b style="font-size:20px">$k_{transition} / k_{transversion}$</b> - the ratio between transition and transversion rates. This parameter is only applicable when "Allow inactivation" is enabled. Default: 2 
+														</div><br>
 
 														
 																			   
@@ -733,14 +783,16 @@ function addCitations(){
 													
 													<div class="parameter-title" style="font-size:30px">Unactivated State Parameters </div>  
 													<div class="parameter-title" style="font-size:18px">Kinetics of entering/exiting a catalytically inactive state.</div>  <br> 
-													
-														<b style="font-size:20px">$k_{U}$</b> - rate constant of polymerase entering the unactive state. When in the unactive state, the polymerase may
-																translocate but it may not bind NTP or catalyse. Elongation may only continue when the polymerase reactivates. Default: 0.23s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> <br><br>
 
 
+														<div class="paramHelp" id="kU_ParamHelp">
+															<b style="font-size:20px">$k_{U}$</b> - rate constant of polymerase entering the unactive state. When in the unactive state, the polymerase may
+																	translocate but it may not bind NTP or catalyse. Elongation may only continue when the polymerase reactivates. Default: 0.23s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite>
+														</div><br>
 
-														<b style="font-size:20px">$k_{A}$</b> - rate constant of polymerase entering the active state. Default: 3s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> <br><br>
-
+														<div class="paramHelp" id="kA_ParamHelp">
+															<b style="font-size:20px">$k_{A}$</b> - rate constant of polymerase entering the active state. Default: 3s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite>
+														</div><br>
 												</div>
 
 
@@ -759,11 +811,11 @@ function addCitations(){
 																<img src="../src/Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"></img> button. Default: TRUE <br><br>
 
 
-
-														<b>Number of bases to fold </b> - the number of most recently added bases in the nascent strand to fold (if "Allow mRNA folding" is enabled). The timescale
+														<div class="paramHelp" id="nbasesToFold_ParamHelp">
+															<b>Number of bases to fold </b> - the number of most recently added bases in the nascent strand to fold (if "Allow mRNA folding" is enabled). The timescale
 																of transcription is probably not long enough to allow the whole mRNA chain to fold<cite val="maoileidigh2011unified"></cite>, especially in vivo, and folding the entire chain is
 																computationally expensive. For these two reasons we do not fold the entire mRNA but only the most recently added bases. Default: 150nt<cite val="maoileidigh2011unified"></cite> <br><br>
-
+														</div><br>
 												</div>
 
 
