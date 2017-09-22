@@ -474,12 +474,23 @@ div.vertical{
 }
 
 
-.helpSelected {
-	background-color:#FFFFB2;
-	border-style: solid; 
-	border-width: 1px; 
-	border-color:#f0c36d;  
+.refLink{
+	text-decoration: none; 
+	color:#008CBA;
 }
+
+
+.helpSelected  {
+	background-color:#708090;
+	color:white;
+}
+
+
+.helpSelected * {
+	color:white;
+}
+
+
 
 .parameter-disabled {
 	
