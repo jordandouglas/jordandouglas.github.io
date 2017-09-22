@@ -102,6 +102,13 @@ input[type=number] {
 
 }
 
+.ref{
+
+	padding:5;
+	width:100%;
+
+}
+
 div.vertical{
   margin-right: -40px;
   transform: rotate(-90deg);
@@ -341,11 +348,12 @@ div.vertical{
 	text-align:left;
 }
 
+.help{
+	vertical-align:middle;
+}
 
 .helpIcon {
-
 	width:15px;
-
 }
 
 .sidenav a {
@@ -468,6 +476,9 @@ div.vertical{
 
 .helpSelected {
 	background-color:#FFFFB2;
+	border-style: solid; 
+	border-width: 1px; 
+	border-color:#f0c36d;  
 }
 
 .parameter-disabled {
