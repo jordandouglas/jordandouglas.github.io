@@ -2,20 +2,20 @@
 <!-- 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
-	This file is part of Simpol.
+	This file is part of SimPol.
 
-    Simpol is free software: you can redistribute it and/or modify
+    SimPol is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Simpol is distributed in the hope that it will be useful,
+    SimPol is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Simpol.  If not, see <http://www.gnu.org/licenses/>. 
+    along with SimPol.  If not, see <http://www.gnu.org/licenses/>. 
     --------------------------------------------------------------------
     --------------------------------------------------------------------
 -->
@@ -26,7 +26,7 @@
 
 <html>
 <head>
-<title>Simpol</title>
+<title>SimPol</title>
 
 <link rel="icon" href="src/Images/transcribe.png">
 <meta name="viewport" content="width=device-width, initial-scale=0.41, maximum-scale=1" />
@@ -2475,7 +2475,7 @@ function closeNav() {
 
 
 
-			<div class="errorMsg" id="IEwarningMsg" style="display:none"> We notice that you are using Internet Explorer. To get the most out of Simpol we recommend you
+			<div class="errorMsg" id="IEwarningMsg" style="display:none"> We notice that you are using Internet Explorer. To get the most out of SimPol we recommend you
 						change to another web browser (Chrome, Safari or Firefox). </div>
 			
 			<div class="errorMsg" id="badBrowser" style="display:none"> There was a javascript error which will prevent this page from operating. Please update your web browser. If this problem persists then send us information about the bug to support@polymerase.nz </div>
@@ -2643,7 +2643,7 @@ function closeNav() {
 									<div style="width:100%;">
 									
 										<div style="font-size:18px; font-family:Arial; vertical-align:top">
-											NTP reactions
+											Catalysis reactions
 										</div> <br>
 
 										<div id="ntpCanvasDIV" style="position:relative; margin:auto; width: 350px">
@@ -2664,7 +2664,7 @@ function closeNav() {
 								<td style="width:25%; vertical-align:top">
 
 									<div style="font-size:18px; font-family:Arial; vertical-align:top">
-										Activation reactions
+										Deactivation reactions
 									</div> <br>
 									<div id="deactivationCanvasDIV">
 										<canvas id="deactivationCanvas"  height=70 width=350></canvas>
@@ -2870,6 +2870,7 @@ function closeNav() {
 														  <option value="pauseHistogram">Time histogram</option>
 														  <option value="velocityHistogram">Velocity histogram</option>
 														  <option value="custom">Parameter plot</option>
+														  <option value="parameterHeatmap">Parameter heatmap</option>
 											</select>
 										
 										<input type=button id='showPlot1' class='minimise' value='+' onClick=showPlot(1) style="display:none">
@@ -2901,7 +2902,8 @@ function closeNav() {
 														  <option value="distanceVsTime">Distance vs time</option>
 														  <option value="pauseHistogram">Time histogram</option>
 														  <option value="velocityHistogram">Velocity histogram</option>
-															<option value="custom">Parameter plot</option>
+														  <option value="custom">Parameter plot</option>
+														  <option value="parameterHeatmap">Parameter heatmap</option>
 										</select>
 									
 									<input type=button id='showPlot2' class='minimise' value='+' onClick=showPlot(2) style="display:none">
@@ -2937,6 +2939,7 @@ function closeNav() {
 														  <option value="pauseHistogram">Time histogram</option>
 														  <option value="velocityHistogram">Velocity histogram</option>
 														  <option value="custom">Parameter plot</option>
+														  <option value="parameterHeatmap">Parameter heatmap</option>
 												
 									</select>
 								
@@ -2983,7 +2986,7 @@ function closeNav() {
 
 
 				<div class="header">
-					Simpol, Lab of Structural Biology & Centre for Computational Evolution, University of Auckland
+					SimPol, Lab of Structural Biology & Centre for Computational Evolution, University of Auckland
 				</div>
 
 

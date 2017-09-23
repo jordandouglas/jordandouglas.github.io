@@ -1,12 +1,14 @@
 <html>
 <head>
-<title>About Simpol</title>
+<title>About SimPol</title>
 <link rel="icon" href="../src/Images/transcribe.png">
 <meta name="viewport" content="width=device-width, initial-scale=0.41, maximum-scale=1" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="../src/Resources/gifplayer-master/dist/gifplayer.css">
 <link rel="stylesheet" type="text/css" href="../src/Resources/styles.css">
 <script language='JavaScript' type='text/JavaScript' src="../src/Resources/jquery-3.1.1.min.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="../src/Resources/bibliography.js"></script>
+<script type="text/javascript" src="../src/Resources/gifplayer-master/dist/jquery.gifplayer.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -44,6 +46,8 @@ function init(){
 	numReferences = 0;
 	referenceNumbers = {};
 	addCitations();
+	
+	$('.gif').gifplayer();
 
 
 	// If the url is linked to a section then make sure the section is not collapsed
@@ -126,22 +130,33 @@ function addCitations(){
 	for (var i = 0; i < citationTags.length; i ++){
 	
 		
-		var val = $(citationTags[i]).attr("val");
+		var vals = $(citationTags[i]).attr("val").split(",");
+		if (vals.length == 0) continue;
 		
-		// Add the reference to the bottom of the page if it does not already exist
-		if ($("#" + val).length == 0){
+		var citationHTML = "<sup class='refLink'>(";
 		
-			numReferences++;
-			referenceNumbers[val] = numReferences;
-			var referenceString = BIBLIOGRAPHY[val];
-			$("#references").append('<div class="ref" id="' + val + '">' + numReferences + ') ' +  referenceString + '</div><br>');
+		for (var j = 0; j < vals.length; j ++){
 		
-		
+			// Add the reference to the bottom of the page if it does not already exist
+			var val = vals[j].trim();
+			if ($("#" + val).length == 0){
+			
+				numReferences++;
+				referenceNumbers[val] = numReferences;
+				var referenceString = BIBLIOGRAPHY[val];
+				$("#references").append('<div class="ref" id="' + val + '">' + numReferences + ') ' +  referenceString + '</div><br>');
+
+			}
+			
+			citationHTML +=  `<a onclick="openReferences();" class='refLink'  href="#` + val + `">` + referenceNumbers[val] + `</a>`;
+			if (j < vals.length-1) citationHTML += ",";
+			
 		}
 		
 		
 		// Create the link to the reference
-		$(citationTags[i]).append(`<sup><a  class="refLink"  onclick="openReferences();"  href="#` + val + `">(` + referenceNumbers[val] + `) </a></sup>`);
+		citationHTML += ")</sup>";
+		$(citationTags[i]).append(citationHTML);
 		
 
 	
@@ -214,9 +229,9 @@ function addCitations(){
 					<div class="about-block-inner">
 						<div class="block-subtitle" style="font-size:45px"> An interactive graphical simulation of nucleic acid polymerases </div> <br>
 					
-						<b>Disclaimer:</b> Simpol is currently in prerelease. It has not been peer-reviewed or published. <br><br>
+						<b>Disclaimer:</b> SimPol is currently in prerelease. It has not been peer-reviewed or published. <br><br>
 					
-						Simpol is a free open-source web-based program aimed to help researchers, teachers and students visualise transcription at the level of a single molecule. Transcription is the copying of a template (typically DNA) 
+						SimPol is a free open-source web-based program aimed to help researchers, teachers and students visualise transcription at the level of a single molecule. Transcription is the copying of a template (typically DNA) 
 						into messenger RNA (mRNA) and is one of the most central processes in all of biology. The copying process is carried out by a protein called RNA polymerase. RNA polymerase runs along the template 
 						as it extends the mRNA. While this main pathway of transcription is fairly straightfoward, some of the less-common and off-pathway events can be	cause complications. For example, sometimes	
 						RNA polymerase moves very far in the wrong direction (backtracking), sometimes a nucleotide is copied incorrectly (a misincorporation), and sometimes the template and mRNA slip along each other (which can cause an insertion or deletion).
@@ -225,11 +240,12 @@ function addCitations(){
 
 						
 						This program has two main functions: (1) <b>Visualisation</b> of transcription elongation, misincorporations and transcriptional slippage, and for more advanced users (2) <b>Simulation</b> of transcription elongation  
-						with kinetic models. This webpage contains tutorials on how to use Simpol.   <br><br>
+						with kinetic models. This webpage contains tutorials on how to use SimPol.   <br><br>
 						
 						
 						
-						<img src="../src/TutorialImages/overview.gif" style="display:none; width:100%; display:inline-block; margin:auto"  border="1"></img>
+						<!--<img class="gif"  src="../src/TutorialImages/overview.png" style="width:100%; display:inline-block; margin:auto; padding: 10 10">-->
+
 						
 
 						
@@ -257,7 +273,7 @@ function addCitations(){
 									<br><br><br>
 									
 									The first thing you will want to do is choose your sequence.
-									There are several example sequences preloaded into the system, or you may upload your own nucleic acid sequence from the &#9776; Parameters side-navigation menu. The models in Simpol are designed for and have only been tested on
+									There are several example sequences preloaded into the system, or you may upload your own nucleic acid sequence from the &#9776; Parameters side-navigation menu. The models in SimPol are designed for and have only been tested on
 									DNA-dependent RNA-polymerases. However, you do have the option to play around with other polymerase classes (eg. DNA polymerases or RNA-dependent RNA-polymerases) but be warned that the science behind them is not yet clear.
 									Your choice of sequence type will determine the NTP or dNTP concentrations, and which of the three sets of thermodynamic parameters are used 
 									- Turner's RNA/RNA parameters<cite val="xia1998thermodynamic"></cite>, Sugimoto's DNA/RNA parameters<cite val="wu2002temperature"></cite>, or SantaLucia's DNA/DNA parameters<cite val="santalucia1998unified"></cite>. <br><br>
@@ -317,7 +333,7 @@ function addCitations(){
 									<span class="block-subsubtitle" > Catalysis. </span> 
 									
 										If the active site is free and next to the 3&prime; end of the nascent strand, then the polymerase may bind NTP.
-										Once bound, the polymerase may catalyse the reaction, or it may release the NTP back into the cell. Reverse-catalysis is also possible in Simpol using 
+										Once bound, the polymerase may catalyse the reaction, or it may release the NTP back into the cell. Reverse-catalysis is also possible in SimPol using 
 										the Decay reaction, although it is very improbable in nature. The canonical pathway of transcription 
 										elongation is a three step cycle: 1) forward translocation, 2) NTP binding, 3) catalysis. This may also be achieved with the Copy 
 										<img src="../src/Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function. 
@@ -328,18 +344,18 @@ function addCitations(){
 									<span class="block-subsubtitle" > Deactivation. </span>  RNA polymerases are believed to occassionally deactivate whereby they undergo 
 									conformational changes and enter a catalytically inactive state, sometimes known as the intermediate state. In this state the protein cannot polymerise but it may still translocate. Factors known to increase the 
 									rate of entering the inactive state are 1) weak basepairing in the hybrid, 2) interactions between the polymerase and upstream or downstream elements of the template, and 3) interactions between the polymerase and
-									a secondary structure in the nascent strand <cite val="artsimovitch2000pausing"></cite> <cite val="depken2009origin"></cite> <cite val="imashimizu2013intrinsic"></cite>. Inactivation causes the polymerase to pause indefinitely, 
+									a secondary structure in the nascent strand <cite val="artsimovitch2000pausing,depken2009origin,imashimizu2013intrinsic"></cite>. Inactivation causes the polymerase to pause indefinitely, 
 									and elongation can only resume following an activation event.
 									
 									
 									<br><br><br>
 									<span class="block-subsubtitle" > Slippage. </span> Sometimes the nascent and template strand temporarily melt and a bulge forms in one of the strands. This can be performed by the
 									Form Bulge reaction.
-									When this happens, a kink (bulge) forms within the duplex. This can occur within either the template or nascent strand (although in Simpol it can currently only occur within the nascent strand). When a bulge forms,
+									When this happens, a bulge (kink) forms within the duplex. This can occur within either the template or nascent strand (although in SimPol it can currently only occur within the nascent strand). When a bulge forms,
 									the active site may be opened up, allowing one of the template bases to be copied twice. This would lead to an insertion. The bulge may 
 									diffuse left or right along the
 									 hybrid. This process is favoured if the hybrid sequence is repetitive (eg. AAAAAAAAA/UUUUUUUUU). When positioned at either end of the hybrid, the bulge may be absorbed. This three step process (bulge formation, diffusion and absorption)
-									 was inspired by Neher et al.<cite val="neher2004dynamics"></cite><cite val="kuhner2007force"></cite> and is believed to be the mechanism behind transcriptional slippage. Iterative slippage and elongation can lead to large insertions. This is sometimes called stuttering and
+									 was inspired by Neher et al.<cite val="neher2004dynamics,kuhner2007force"></cite> and is believed to be the mechanism behind transcriptional slippage. Iterative slippage and elongation can lead to large insertions. This is sometimes called stuttering and
 									can also be achieved with the Stutter <img src="../src/Images/stutter.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function.
 							
 								</div>
@@ -609,6 +625,22 @@ function addCitations(){
 								</div>								
 								
 								<br><br><br>
+
+
+
+								<div class="about-block">
+									<div class="about-block-inner">
+										<div id="parameterHeatmap_PlotHelp"  class="block-subtitle"> Parameter heatmap </div> <br>
+
+										
+									
+										
+
+									</div>
+								</div>								
+
+
+								<br><br><br>
 								<div class="about-block">
 									<div class="about-block-inner">
 										<div class="block-subtitle"> Dwell time per site </div> <br>
@@ -680,8 +712,8 @@ function addCitations(){
 
 														<div class="paramHelp" id="hybridLength_ParamHelp">
 															<b>Hybrid length</b> - number of basepairs in the template/primer hybrid within the polymerase. As translocation rates are determined from sequence composition, this value may affect
-																			   the predicted location of pause sites. In eukaryotes and prokaryotes, RNA polymerase contains a hybrid of 8 or 9bp<cite val="komissarova1997transcriptional"></cite>
-																			<cite val="gnatt2001structural"></cite> <cite val="nudler1997rna"></cite>. Default: 9bp 
+																			   the predicted location of pause sites. In eukaryotes and prokaryotes, RNA polymerase contains a hybrid of 8 or 9bp
+																			   <cite val="komissarova1997transcriptional,gnatt2001structural,nudler1997rna"></cite>. Default: 9bp 
 														</div><br>				   
 
 														<div class="paramHelp" id="bubbleSizeLeft_ParamHelp">			   
@@ -746,7 +778,7 @@ function addCitations(){
 
 														<div class="paramHelp" id="RateUnbind_ParamHelp">
 															<b style="font-size:20px">$k_{release}$</b> - rate constant of releasing bound NTP. Since this value is around 50&times; the value of $k_{cat}$, the polymerase
-																	will bind and release the NTP on average 50 times before catalysis occurs. Fast, ultrafast and hidden simulations in Simpol are optimised to  
+																	will bind and release the NTP on average 50 times before catalysis occurs. Fast, ultrafast and hidden simulations in SimPol are optimised to  
 																	perform the binding step without rendering any visual changes. Default: 1000s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> 
 														</div><br>
 
@@ -761,7 +793,7 @@ function addCitations(){
 														<div class="paramHelp" id="RateMisbind_ParamHelp">
 															<b style="font-size:20px">$k_{misbind}$</b> - used to calculate rate constant of binding a non-complementary NTP, which is calculated as [NTP] k<sub>misbind</sub>. 
 																		If the bound NTP is added onto the end of the chain without correction then there is a misincorporation event. This parameter is only applicable when "Allow inactivation" is enabled. The overall rate of uncorrected misincorpations during transcription is
-																		around 1 in 10<sup>4</sup> - 10<sup>5</sup> bases<cite val="imashimizu2013direct"></cite><cite val="rosenberger1981estimate"></cite><cite val="shaw2002use"></cite>. Default: 0.25s<sup>-1</sup> 
+																		around 1 in 10<sup>4</sup> - 10<sup>5</sup> bases<cite val="imashimizu2013direct,rosenberger1981estimate,shaw2002use"></cite>. Default: 0.25s<sup>-1</sup> 
 														</div><br>
 
 
@@ -844,31 +876,38 @@ function addCitations(){
 										<div id="priorDistribution_ParamHelp" class="block-subtitle" > Adding a background distribution to a parameter</div> <br>
 											
 											
+
 											
-											<img src="../src/TutorialImages/prior.gif" style="display:none; width:600px; display:inline-block" align=left  border="1"></img>
+											
 											<br>
 											If you are uncertain about the value of a parameter you can give it a background distribution <img src="../src/Images/distn.png" style="vertical-align:middle; width:38px; height:12px;"></img> 
 											to capture your uncertainty. The probability distributions supported are uniform, normal, lognormal, exponential, and gamma. The parameter is resampled at the beginning of each simulation. 
 											All parameters are sampled independently of each other.
 											<br><br>
 											
+											
 											<b>Example 1:</b> [ATP] is defaulted to Traut 1994’s<cite val="traut1994physiological"></cite> estimate of the mean ATP concentration (3152&mu;M) but one may wish to refine this value to reflect their own 
 											experimental settings. Or one may recognise that cellular NTP concentrations are not constant, and they fluctuate throughout the cell cycle. In this case, it may be more accurate to 
 											add a prior distribution behind [ATP]. Yaginuma et al. 2014 <cite val="yaginuma2014diversity"></cite> describe heterogeneity in [ATP] across E.coli cells with [ATP] following a positive-skewed modal distribution 
-											(mean: 1540&mu;M, SD: 1220&mu;M). Using Simpol and some algebra, one could model [ATP] approximately with a lognormal distribution (where &mu; = 7.10, &sigma; = 0.698). Then the ATP 
+											(mean: 1540&mu;M, SD: 1220&mu;M). Using SimPol and some algebra, one could model [ATP] approximately with a lognormal distribution (where &mu; = 7.10, &sigma; = 0.698). Then the ATP 
 											concentration would be resampled from this distribution at the beginning of each trial. <br><br>
 											
-											
+											<!--
 											<b>Example 2:</b> There can be a great deal of heterogeneity between different RNA polymerase units. The standard deviation of transcription velocity 
-											across different RNA polymerase units in E.coli is quite high: around 4-6bp/s<cite val="adelman2002single"></cite><cite val="tolic2004diversity"></cite>. Compare this to the mean velocity of 
+											across different RNA polymerase units in E.coli is quite high: around 4-6bp/s<cite val="adelman2002single,tolic2004diversity"></cite>. Compare this to the mean velocity of 
 											14-20bp/s. One of many methods to account for polymerase heterogeneity is to add a normal prior distribution behind $k_{cat}$ with a standard deviation of, for example, 5.<cite val="maoileidigh2011unified"></cite>
-
+											-->
 											
+
+
 											
 
 									</div>
 								</div>
+								
+								
 
+											
 
 								<br><br><br>
 
@@ -975,7 +1014,7 @@ function addCitations(){
 										$$
 										
 				
-										This model of translocation has been borrowed from Tadigotla et al.<cite val="maoileidigh2011unified"></cite><cite val="tadigotla2006thermodynamic"></cite>
+										This model of translocation has been borrowed from Tadigotla et al.<cite val="maoileidigh2011unified,tadigotla2006thermodynamic"></cite>
 
 
 								
@@ -1048,7 +1087,7 @@ function addCitations(){
 										does not occur. If the program starts to slow down, you should hide components of the interface with its respective minimise <span class='minimise' value='-' style="cursor:auto; padding: 1 1">&minus;</span>
 										button. If a component is minimised then rendering will not occur. The polymerase animation can be minimised by setting the speed to <b>hidden</b>. This will happen automatically when simulating large sequences. <br><br>
 										
-										In 2017 we ran 200 simulations in Simpol on different operating systems using the latest versions of different web browsers. The results are displayed below. Backtracking, hypertranslocation, inactivation, misincorporations	
+										In 2017 we ran 200 simulations in SimPol on different operating systems using the latest versions of different web browsers. The results are displayed below. Backtracking, hypertranslocation, inactivation, misincorporations	
 										and mRNA folding were disabled. Parameters were set to their default values. The simulation was performed on the 4029nt E.coli ropB gene (accession number KP670789) in <b>hidden</b> mode. On all three computers we tested this on Chrome was the fastest.<br><br>
 										
 										<table cellpadding=5 style="margin:auto; text-align:center;">
@@ -1229,7 +1268,7 @@ function addCitations(){
 										
 										A Web Worker is like a socket, or an invisible tab your browser opens which runs on its own thread and can communicate
 										with the main window. <a href="https://www.w3schools.com/html/html5_webworkers.asp">Most modern browsers support Web Workers</a> but if 
-										your browser is not up to date or if you have an overzealous third-party plugin then the Web Worker may not register (Simpol will notify you with an error message). 
+										your browser is not up to date or if you have an overzealous third-party plugin then the Web Worker may not register (SimPol will notify you with an error message). 
 										We recommend that you allow the Web Worker to register, to ensure the whole program runs smoothly and you can run simulations in <b>ultrafast</b> or <b>hidden</b> mode.
 
 								</div>
@@ -1685,7 +1724,7 @@ function addCitations(){
 	
 	
 		<div class="header">
-			Simpol, Lab of Structural Biology & Centre for Computational Evolution, University of Auckland
+			SimPol, Lab of Structural Biology & Centre for Computational Evolution, University of Auckland
 		</div>
 	
 
