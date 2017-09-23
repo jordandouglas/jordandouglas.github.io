@@ -1,20 +1,20 @@
 /* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
-	This file is part of Simpol.
+	This file is part of SimPol.
 
-    Simpol is free software: you can redistribute it and/or modify
+    SimPol is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Simpol is distributed in the hope that it will be useful,
+    SimPol is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Simpol.  If not, see <http://www.gnu.org/licenses/>. 
+    along with SimPol.  If not, see <http://www.gnu.org/licenses/>. 
     --------------------------------------------------------------------
     --------------------------------------------------------------------
 -*/
@@ -222,13 +222,16 @@ function getPlotData_WW(resolve = function(plotData) { }, msgID = null){
 	}
 
 	
-	var thereExistsACustomPlot = (whichPlotInWhichCanvas[1] != null && !whichPlotInWhichCanvas[1]["hidden"] && whichPlotInWhichCanvas[1]["name"] == "custom") || 
+	var thereExistsAParameterPlot = (whichPlotInWhichCanvas[1] != null && !whichPlotInWhichCanvas[1]["hidden"] && whichPlotInWhichCanvas[1]["name"] == "custom") || 
 			 					 (whichPlotInWhichCanvas[2] != null && !whichPlotInWhichCanvas[2]["hidden"] && whichPlotInWhichCanvas[2]["name"] == "custom") || 
-			 				     (whichPlotInWhichCanvas[3] != null && !whichPlotInWhichCanvas[3]["hidden"] && whichPlotInWhichCanvas[3]["name"] == "custom");
+			 				     (whichPlotInWhichCanvas[3] != null && !whichPlotInWhichCanvas[3]["hidden"] && whichPlotInWhichCanvas[3]["name"] == "custom") ||
+			 				     (whichPlotInWhichCanvas[1] != null && !whichPlotInWhichCanvas[1]["hidden"] && whichPlotInWhichCanvas[1]["name"] == "parameterHeatmap") || 
+			 					 (whichPlotInWhichCanvas[2] != null && !whichPlotInWhichCanvas[2]["hidden"] && whichPlotInWhichCanvas[2]["name"] == "parameterHeatmap") || 
+			 				     (whichPlotInWhichCanvas[3] != null && !whichPlotInWhichCanvas[3]["hidden"] && whichPlotInWhichCanvas[3]["name"] == "parameterHeatmap");
 
 
 	
-	if (JSON.stringify(plotData) != "{}" || thereExistsACustomPlot){
+	if (JSON.stringify(plotData) != "{}" || thereExistsAParameterPlot){
 	
 		plotData["nbases"] = currentState["nbases"];
 		plotData["templateSeq"] = getSequenceOfObject_WW(templateSequence);
@@ -439,6 +442,21 @@ function selectPlot_WW(plotNum, value, deleteData, resolve = function(plotData) 
 
 	}
 
+
+	else if (whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
+		whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_parameter_heatmap";
+		whichPlotInWhichCanvas[plotNum]["sitesToRecord"] = [];
+		whichPlotInWhichCanvas[plotNum]["customParamX"] = "none";
+		whichPlotInWhichCanvas[plotNum]["customParamY"] = "none";
+		whichPlotInWhichCanvas[plotNum]["metricZ"] = "probability";
+		whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+		whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+		whichPlotInWhichCanvas[plotNum]["zRange"] = "automaticZ";
+
+	}
+
+
+
 	else if (whichPlotInWhichCanvas[plotNum]["name"]  =="foldingBarrierPlot"){
 		whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plotFoldingBarrier";
 	}
@@ -539,7 +557,7 @@ function saveSettings_WW(plotNum, plotType, values, resolve = function() { }, ms
 			break;
 
 
-		case "custom": // Save the site(s) which are interested in
+		case "custom":
 
 			whichPlotInWhichCanvas[plotNum]["customParam"] = values[0];
 			whichPlotInWhichCanvas[plotNum]["customMetric"] = values[1];
@@ -565,6 +583,47 @@ function saveSettings_WW(plotNum, plotType, values, resolve = function() { }, ms
 				var yMax = Math.max(parseFloat(values[3][1]), yMin+1);
 				if (isNaN(yMin) || isNaN(yMax)) whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
 				else whichPlotInWhichCanvas[plotNum]["yRange"] = [yMin, yMax];
+			}
+
+
+
+		case "parameterHeatmap":
+
+			whichPlotInWhichCanvas[plotNum]["customParamX"] = values[0];
+			whichPlotInWhichCanvas[plotNum]["customParamY"] = values[1];
+			whichPlotInWhichCanvas[plotNum]["metricZ"] = values[2];
+			whichPlotInWhichCanvas[plotNum]["xData"] = PARAMETERS_PLOT_DATA[values[0]];
+			whichPlotInWhichCanvas[plotNum]["yData"] = PARAMETERS_PLOT_DATA[values[1]];
+			whichPlotInWhichCanvas[plotNum]["zData"] = PARAMETERS_PLOT_DATA[values[2]];
+
+
+			if (values[3] == "automaticX") whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+			else{
+				var xMin = parseFloat(values[3][0]);
+				var xMax = parseFloat(values[3][1]);
+				if (xMax <= xMin) xMax = xMin + 0.00001;
+				if (isNaN(xMin) || isNaN(xMax)) whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+				else whichPlotInWhichCanvas[plotNum]["xRange"] = [xMin, xMax];
+			}
+
+
+			if (values[4] == "automaticY" || values[4] == null) whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+			else{
+				var yMin = parseFloat(values[4][0]);
+				var yMax = parseFloat(values[4][1]);
+				if (yMax <= yMin) yMax = yMin + 0.00001;
+				if (isNaN(yMin) || isNaN(yMax)) whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+				else whichPlotInWhichCanvas[plotNum]["yRange"] = [yMin, yMax];
+			}
+
+
+			if (values[5] == "automaticZ" || values[5] == null) whichPlotInWhichCanvas[plotNum]["zRange"] = "automaticZ";
+			else{
+				var zMin = parseFloat(values[5][0]);
+				var zMax = parseFloat(values[5][1]);
+				if (zMax <= zMin) zMax = zMin + 0.00001;
+				if (isNaN(zMin) || isNaN(zMax)) whichPlotInWhichCanvas[plotNum]["zRange"] = "automaticZ";
+				else whichPlotInWhichCanvas[plotNum]["zRange"] = [zMin, zMax];
 			}
 
 	}
@@ -636,14 +695,7 @@ function delete_plot_data_WW(plotName){
 
 function update_custom_plot_data_WW(){
 
-	/*
-	var thereExistsACustomPlot = (whichPlotInWhichCanvas[1] != null && whichPlotInWhichCanvas[1]["name"] == "custom") || 
-			 					 (whichPlotInWhichCanvas[2] != null && whichPlotInWhichCanvas[2]["name"] == "custom") || 
-			 				     (whichPlotInWhichCanvas[3] != null && whichPlotInWhichCanvas[3]["name"] == "custom");*/
 
-
-
-	
 
 	if (DWELL_TIMES.length == 0) return; 
 
@@ -662,7 +714,6 @@ function update_custom_plot_data_WW(){
 
 
 
-	//if (!thereExistsACustomPlot) return;
 
 	var increaseInPrimerLength = currentState["mRNALength"] - (PHYSICAL_PARAMETERS["hybridLength"]["val"] + PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"] + 1);
 	var meanVelocity_thisTrial = increaseInPrimerLength / totalTime_thisTrial;
@@ -818,7 +869,13 @@ function deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timeP
 			}
 		}
 
-
+		for (var plotNum = 1; plotNum <= 3; plotNum++){
+			if (whichPlotInWhichCanvas[plotNum] != null && whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
+				whichPlotInWhichCanvas[plotNum]["xData"]["vals"] = [];
+				whichPlotInWhichCanvas[plotNum]["yData"]["vals"] = [];
+				whichPlotInWhichCanvas[plotNum]["zData"]["vals"] = [];
+			}
+		}
 
 
 	}

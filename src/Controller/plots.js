@@ -1,20 +1,20 @@
 /* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
-	This file is part of Simpol.
+	This file is part of SimPol.
 
-    Simpol is free software: you can redistribute it and/or modify
+    SimPol is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Simpol is distributed in the hope that it will be useful,
+    SimPol is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Simpol.  If not, see <http://www.gnu.org/licenses/>. 
+    along with SimPol.  If not, see <http://www.gnu.org/licenses/>. 
     --------------------------------------------------------------------
     --------------------------------------------------------------------
 -*/
@@ -139,8 +139,8 @@ function drawPlots(){
 	
 			window.requestAnimationFrame(function(){
 				for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
-					if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "none" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
-					else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
+					if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "none" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
+					else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
 				}
 			});
 	
@@ -240,6 +240,11 @@ function selectPlot(plotNum, deleteData = null){
 		}
 	
 		else if (value == "custom") {
+			$("#plotLabel" + plotNum).html("<br>");
+		}
+
+
+		else if (value == "parameterHeatmap") {
 			$("#plotLabel" + plotNum).html("<br>");
 		}
 
@@ -749,7 +754,7 @@ function plotTimeChart(){
 			}
 			if (numPoints > 500000){
 				haveShownDVTerrorMessage = true;
-				addNotificationMessage("That is a lot of data! If Simpol starts to slow down you should minimise this plot.", 
+				addNotificationMessage("That is a lot of data! If SimPol starts to slow down you should minimise this plot.", 
 									$("#plotCanvas" + pltNum).offset().left + 100,
 									$("#plotCanvas" + pltNum).offset().top + 20,
 									300);
@@ -2579,6 +2584,87 @@ function download_customDataTSV(plotNum){
 
 }
 
+function plot_parameter_heatmap(plotNumCustom = null){
+
+
+	if (plotNumCustom == null) plotNumCustom = 5;
+
+	if (plotNumCustom != 5 && $("#plotDIV" + plotNumCustom).is( ":hidden" )) return;
+
+	
+	// Empty plot
+	if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParamX"] == "none" || PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParamY"] == "none"){
+		scatter_plot([], [], [0, 10, 0, 1], "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"]);
+	}
+	
+	// X and Y variables
+	else{
+		
+
+
+		var xLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xData"]["name"];
+		var yLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["name"];
+		var zLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["name"];
+		var xvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xData"]["vals"];
+		var yvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["vals"];
+		var zvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["vals"];
+
+
+	
+		// Make a scatter plot
+		var xmin, xmax, ymin, ymax, zmin, zmax;
+		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"] == "automaticX"){
+			xmin = Math.min.apply(Math, xvals);
+			xmax = Math.max.apply(Math, xvals);
+		}else{
+			xmin = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"][0];
+			xmax = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"][1];
+		}
+
+		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yRange"] == "automaticY"){
+			ymin = Math.min.apply(Math, yvals);
+			ymax = Math.max.apply(Math, yvals);
+		}else{
+			ymin = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yRange"][0];
+			ymax = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yRange"][1];
+		}
+
+		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"] == "automaticZ"){
+			zmin = Math.min.apply(Math, zvals);
+			zmax = Math.max.apply(Math, zvals);
+		}else{
+			zmin = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"][0];
+			zmax = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"][1];
+		}
+
+
+		xmin = roundToSF(xmin, 2, "floor");
+		xmax = roundToSF(xmax, 2, "ceil");
+		ymin = roundToSF(ymin, 2, "floor");
+		ymax = roundToSF(ymax, 2, "ceil");
+		zmin = roundToSF(zmin, 2, "floor");
+		zmax = roundToSF(zmax, 2, "ceil");
+
+
+		//console.log("ymax", ymax, "ymin", ymin, "yvals", yvals);
+		//console.log("xmax", xmax, "xmin", xmin, "xvals", xvals, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]);
+		
+		//console.log("actual boundaries", Math.max.apply(Math, xvals), Math.min.apply(Math, xvals), Math.max.apply(Math, yvals), Math.min.apply(Math, yvals));
+		//console.log("Magnitudes", orderOfMagnitudeXMin, orderOfMagnitudeXMax, orderOfMagnitudeYMin, orderOfMagnitudeYMax);
+		
+
+		scatter_plot(xvals, yvals, [xmin, xmax, ymin, ymax], "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], xLab, yLab);
+
+
+	}
+	
+	
+	
+
+
+
+}
+
 
 function plot_custom(plotNumCustom = null){
 
@@ -2643,7 +2729,7 @@ function plot_custom(plotNumCustom = null){
 		
 
 		scatter_plot(xvals, yvals, [xmin, xmax, ymin, ymax], "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], xLab, yLab);
-		
+
 	}
 	
 	
@@ -2774,7 +2860,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 		widthScale = xResult["widthOrHeightScale"]
 		xlabPos = xResult["vals"]
 
-		console.log("xResult", xResult);
+		//console.log("xResult", xResult);
 		
 	}
 
@@ -2962,7 +3048,7 @@ function showPlot(plotNum, setTo = null){
 		document.getElementById("showPlot" + plotNum).value = "-";
 		$("#plotDIV" + plotNum).show(300);
 
-		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] == "custom") eval(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFunction"])(plotNum);
+		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFunction"])(plotNum);
 		else if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] != "none") eval(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFunction"])();
 
 		showPlot_controller(plotNum, false);
@@ -3514,12 +3600,12 @@ function getPlotOptionsTemplate(){
 
 
 	return `
-		<div id='settingsPopup' style='background-color:adadad; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:50vh; z-index:5' plotNum="XX_plotNum_XX">
+		<div id='settingsPopup' style='background-color:adadad; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:20vh; z-index:5' plotNum="XX_plotNum_XX">
 			<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> XX_plotName_XX settings </span>
 
 
-				<span style='font-size: 30px; cursor:pointer; position:fixed; left:64.5vw; top:50.5vh' onclick='closePlotSettingsPopup()'>&times;</span>
+				<span style='font-size: 30px; cursor:pointer; position:fixed; left:64.5vw; top:20.5vh' onclick='closePlotSettingsPopup()'>&times;</span>
 				<div style='padding:2; font-size:18px;'> Choose the display settings for this plot </div>
 				<table cellpadding=10 style='width:90%; margin:auto;'>
 				
@@ -3541,6 +3627,19 @@ function getPlotOptionsTemplate(){
 						
 						
 						<td id="settingCell4" style="vertical-align:top"> 
+							
+						</td>
+					</tr>
+
+
+
+					<tr>
+						<td id="settingCell5" style="vertical-align:top"> 
+							
+						</td>
+						
+						
+						<td id="settingCell6" style="vertical-align:top"> 
 							
 						</td>
 					</tr>
@@ -3678,6 +3777,56 @@ function distanceVsTimeOptionsTemplate2(){
 	
 }
 
+
+
+
+
+function distanceVsTimeOptionsTemplate3(){
+	
+	return `
+		<legend><b>Z-axis range</b></legend>
+		<table>
+
+				<tr style="cursor:pointer" onclick= " $('input[name=zRange][value=automaticZ]').prop('checked', true); disableTextbox('#zMin_textbox'); disableTextbox('#zMax_textbox') ">
+					<td>
+						 <input type="radio" name="zRange" value="automaticZ"> 
+					</td>
+					<td>Auto</td>
+					<td></td>
+
+
+				</tr>
+
+			<tr style="cursor:pointer" onclick= " $('input[name=zRange][value=specifyZ]').prop('checked', true); enableTextbox('#zMin_textbox'); enableTextbox('#zMax_textbox') ">
+				<td>
+					<input type="radio" name="zRange" onclick="enableTextbox('#zMin_textbox'); enableTextbox('#zMax_textbox')"  value="specifyZ">
+				</td>
+
+				<td>
+					Min = 
+				</td>
+
+				<td>
+					<input class="textboxBlue" type="number" style="width:50px; text-align:right" id="zMin_textbox" value=ZMINDEFAULT> 
+				</td>
+			</tr>
+			<tr style="cursor:pointer" onclick= " $('input[name=zRange][value=specifyZ]').prop('checked', true); enableTextbox('#zMin_textbox'); enableTextbox('#zMax_textbox') ">
+				<td></td>
+
+
+				<td>
+					Max = 
+				</td>
+
+				<td>
+					<input class="textboxBlue" type="number" style="width:50px; text-align:right" id="zMax_textbox" value=ZMAXDEFAULT> 
+				</td>
+			</tr>
+		</table>
+	`;
+	
+}
+
 /*
 function pauseHistogramOptionsTemplate(){
 	
@@ -3792,14 +3941,32 @@ function customPlotSelectPropertyTemplate(){
 	
 }
 
+
+function parameterHeatmapZAxisTemplate(){
+
+	return `
+
+		<legend><b>Metric (y-axis)</b></legend>
+		<select class="dropdown" onChange="customYVariableChange()" title="Which metric do you want to show on the y-axis?" id = "customMetric" style="vertical-align: middle; text-align:right;">
+			<option value="probability">Probability</option>
+			<option value="meanVelocity">Mean velocity (bp/s)</option>
+			<option value="meanCatalysis">Mean catalysis time (s)</option>
+			<option value="meanTranscription">Mean transcription time (s)</option>
+		</select><br>
+		Calculated per trial.
+
+	`;
+
+
+}
+
+
 // Decrease the indices of the sites displayed in the long sitewise plot by 100
 function minus100Sites(){
 
 	if (basesToDisplayTimes100 == 1) return;
 	basesToDisplayTimes100--;
 	eval(PLOT_DATA["whichPlotInWhichCanvas"][4]["plotFunction"])(); // Draw the plot again
-
-
 
 }
 
@@ -3957,12 +4124,13 @@ function plotOptions(plotNum){
 
 
 			// Y-axis attribute
-			$("#settingCell2").html(customPlotSelectPropertyTemplate());
+			$("#settingCell3").html(customPlotSelectPropertyTemplate());
 			$("#customMetric").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customMetric"]);
 			customYVariableChange();
+			$("#settingCell6").html(distanceVsTimeOptionsTemplate2().replace("Distance range", "Z-axis range").replace("YUNITS", "").replace("YUNITS", "").replace("YMINDEFAULT", 0).replace("YMAXDEFAULT", 1));
 
 
-			$("#settingCell3").html(distanceVsTimeOptionsTemplate1().replace("Time range", "X-axis range").replace("XUNITS", "").replace("XUNITS", ""));
+			$("#settingCell2").html(distanceVsTimeOptionsTemplate1().replace("Time range", "X-axis range").replace("XUNITS", "").replace("XUNITS", ""));
 			$("#settingCell4").html(distanceVsTimeOptionsTemplate2().replace("Distance range", "Y-axis range").replace("YUNITS", "").replace("YUNITS", "").replace("YMINDEFAULT", 0).replace("YMAXDEFAULT", 1));
 
 			$("#pauseXRow").remove();
@@ -4004,6 +4172,75 @@ function plotOptions(plotNum){
 			*/
 			//$('input[name="Yaxis"][value="' + whichPlotInWhichCanvas[plotNum]["yAxis"] + '"]').prop('checked', true)
 			break;
+
+
+
+		case "parameterHeatmap": 
+
+
+			// X-axis parameter
+			$("#settingCell1").html(customPlotSelectParameterTemplate().replace("customParam", "customParamX"));
+			$("#settingCell3").html(customPlotSelectParameterTemplate().replace("x-axis", "y-axis").replace("x-axis", "y-axis").replace("customParam", "customParamY"));
+
+			get_PHYSICAL_PARAMETERS_controller(function(params){
+				console.log("params",params, params.length);
+				for (var paramID in params){
+					if (!params[paramID]["hidden"] && !params[paramID]["binary"]) $("#customParamX").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
+					if (!params[paramID]["hidden"] && !params[paramID]["binary"]) $("#customParamY").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
+				}
+
+				$("#customParamX").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamX"]);
+				$("#customParamY").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamY"]);
+
+			});
+
+
+			// Z-axis
+			$("#settingCell5").html(customPlotSelectPropertyTemplate().replace("y-axis", "z-axis").replace("y-axis", "z-axis"));
+			$("#settingCell6").html(distanceVsTimeOptionsTemplate3().replace("ZMINDEFAULT", 0).replace("ZMAXDEFAULT", 1));
+			$("#customMetric").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["metricZ"]);
+
+
+			// Y-axis attribute
+			$("#settingCell2").html(distanceVsTimeOptionsTemplate1().replace("Time range", "X-axis range").replace("XUNITS", "").replace("XUNITS", ""));
+			$("#settingCell4").html(distanceVsTimeOptionsTemplate2().replace("Distance range", "Y-axis range").replace("YUNITS", "").replace("YUNITS", "").replace("YMINDEFAULT", 0).replace("YMAXDEFAULT", 1));
+			$("#pauseXRow").remove();
+			$("#shortPauseXRow").remove();
+
+
+			// Set xmax and xmin
+			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"] == "automaticX") $('input[name="xRange"][value="automaticX"]').click()
+			else {
+				$('input[name="xRange"][value="specifyX"]').click()
+				$("#xMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][0]);
+				$("#xMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][1]);
+			}
+
+
+			// Set ymax and ymin
+			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"] == "automaticY") $('input[name="yRange"][value="automaticY"]').click()
+			else {
+				$('input[name="yRange"][value="specifyY"]').click()
+				$("#yMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][0]);
+				$("#yMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][1]);
+			}
+
+
+
+			// Set zmax and zmin
+			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"] == "automaticZ") $('input[name="zRange"][value="automaticZ"]').click()
+			else {
+				$('input[name="zRange"][value="specifyZ"]').click()
+				$("#zMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][0]);
+				$("#zMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][1]);
+			}
+
+
+
+
+
+			break;
+
 
 
 	}

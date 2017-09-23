@@ -2,20 +2,20 @@
 /* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
-	This file is part of Simpol.
+	This file is part of SimPol.
 
-    Simpol is free software: you can redistribute it and/or modify
+    SimPol is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Simpol is distributed in the hope that it will be useful,
+    SimPol is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Simpol.  If not, see <http://www.gnu.org/licenses/>. 
+    along with SimPol.  If not, see <http://www.gnu.org/licenses/>. 
     --------------------------------------------------------------------
     --------------------------------------------------------------------
 -*/
@@ -1799,7 +1799,34 @@ function saveSettings_controller(){
 			*/
 
 			functionToCallAfterSaving  = function() { plot_custom(plotNum); };
+			break;
 
+
+		case "parameterHeatmap": // Save the site(s) which are interested in
+
+			values.push($("#customParamX").val());
+			values.push($("#customParamY").val());
+			values.push($("#customMetric").val());
+
+
+			if ($('input[name="xRange"][value="automaticX"]').prop("checked")) values.push("automaticX");
+			else {
+				values.push([$("#xMin_textbox").val(), $("#xMax_textbox").val()]);
+			}
+
+			if ($('input[name="yRange"][value="automaticY"]').prop("checked")) values.push("automaticY");
+			else {
+				values.push([$("#yMin_textbox").val(), $("#yMax_textbox").val()]);
+			}
+
+			if ($('input[name="zRange"][value="automaticZ"]').prop("checked")) values.push("automaticZ");
+			else {
+				values.push([$("#zMin_textbox").val(), $("#zMax_textbox").val()]);
+			}
+
+
+			functionToCallAfterSaving  = function() { plot_parameter_heatmap(plotNum); };
+			break;
 	}
 	
 	var updateDom = function(whichPlotInWhichCanvas){
