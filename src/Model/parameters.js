@@ -32,7 +32,7 @@ PHYSICAL_PARAMETERS["hybridLength"] = {distribution:"Fixed", refreshOnChange:tru
 PHYSICAL_PARAMETERS["bubbleSizeLeft"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 2, name: "Bubble length left (bp)",  title: "Number of unpaired template bases 3' of the hybrid", zeroTruncated: true, integer: true, hidden:true};
 PHYSICAL_PARAMETERS["bubbleSizeRight"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 1, name: "Bubble length right (bp)", title: "Number of unpaired template bases 5' of the hybrid", zeroTruncated: true, integer: true, hidden:true};
 
-PHYSICAL_PARAMETERS["GDaggerSlide"] = {distribution:"Fixed", fixedDistnVal: 8.7, name: "\u0394G\u2020slide", title: "Free energy barrier height of translocation", zeroTruncated: false, integer: false};
+PHYSICAL_PARAMETERS["GDaggerSlide"] = {distribution:"Fixed", fixedDistnVal: 8.2, name: "\u0394G\u2020slide", title: "Free energy barrier height of translocation", zeroTruncated: false, integer: false};
 PHYSICAL_PARAMETERS["GsecondarySitePenalty"] = {distribution:"Fixed", fixedDistnVal: 1.336, name: "\u0394G\u2020NTP2", title: "Free energy penalty of binding NTP in the secondary binding site", zeroTruncated: false, integer: false};
 PHYSICAL_PARAMETERS["FAssist"] = {distribution:"Fixed", fixedDistnVal: 0, name: "Fassist (pN)", title: "Assisting force", zeroTruncated: false, integer: false};
 PHYSICAL_PARAMETERS["arrestTimeout"] = {distribution:"Fixed", fixedDistnVal: 60, name: "Arrest timeout (s)", title: "Maximum pause duration before the simulation is arrested. Set to zero to prevent arrests.", zeroTruncated: true, integer: false};
@@ -45,7 +45,7 @@ PHYSICAL_PARAMETERS["RateMisbind"] = {distribution:"Fixed", fixedDistnVal: 0.25,
 PHYSICAL_PARAMETERS["TransitionTransversionRatio"] = {distribution:"Fixed", fixedDistnVal: 2, name: "Transition:transversion", title: "How much more likely is a transition mis-binding event than a transversion mis-binding event", zeroTruncated: true, integer: false, hidden:true};
 
 
-PHYSICAL_PARAMETERS["kU"] = {distribution:"Fixed", fixedDistnVal: 0.23, name: "kU (s\u207B\u00B9)", title: "Rate constant of polymerase entering the unactive state", zeroTruncated: true, integer: false};
+PHYSICAL_PARAMETERS["kU"] = {distribution:"Fixed", fixedDistnVal: 0.05, name: "kU (s\u207B\u00B9)", title: "Rate constant of polymerase entering the unactive state", zeroTruncated: true, integer: false};
 PHYSICAL_PARAMETERS["kA"] = {distribution:"Fixed", fixedDistnVal: 3, name: "kA (s\u207B\u00B9)", title: "Rate constant of polymerase leaving the unactive state", zeroTruncated: true, integer: false};
 PHYSICAL_PARAMETERS["kUspecial"] = {distribution:"Fixed", fixedDistnVal: 1, name: "kU' (s\u207B\u00B9)", title: "Rate of entry into unactivated state multiplier at edit site", zeroTruncated: true, integer: false, hidden:true};
 PHYSICAL_PARAMETERS["kAspecial"] = {distribution:"Fixed", fixedDistnVal: 1, name: "kA' (s\u207B\u00B9)", title: "Rate of entry into activated state multiplier at edit site", zeroTruncated: true, integer: false, hidden:true};

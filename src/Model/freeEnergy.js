@@ -98,6 +98,10 @@ function userInputModel_WW(elongationModelID, translocationModelID, allowBacktra
 	
 	PHYSICAL_PARAMETERS["RateMisbind"]["hidden"] = !allowMisincorporation;
 	PHYSICAL_PARAMETERS["TransitionTransversionRatio"]["hidden"] = true;// !allowMisincorporation;
+	
+	PHYSICAL_PARAMETERS["kA"]["hidden"] = !allowInactivation;
+	PHYSICAL_PARAMETERS["kU"]["hidden"] = !allowInactivation;
+	
 
 
 
