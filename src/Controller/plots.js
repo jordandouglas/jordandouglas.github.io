@@ -4127,7 +4127,6 @@ function plotOptions(plotNum){
 			$("#settingCell3").html(customPlotSelectPropertyTemplate());
 			$("#customMetric").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customMetric"]);
 			customYVariableChange();
-			$("#settingCell6").html(distanceVsTimeOptionsTemplate2().replace("Distance range", "Z-axis range").replace("YUNITS", "").replace("YUNITS", "").replace("YMINDEFAULT", 0).replace("YMAXDEFAULT", 1));
 
 
 			$("#settingCell2").html(distanceVsTimeOptionsTemplate1().replace("Time range", "X-axis range").replace("XUNITS", "").replace("XUNITS", ""));
