@@ -297,7 +297,7 @@ function setSequenceOptions(){
 function submitCustomSequence(resolveAfterRefresh = function() { }){
 
 
-	var newSeq = $("#UserSequence").val();
+	var newSeq = $("#UserSequence").val().replace(/\n/g,'');
 	if (newSeq == "") return;
 
 
@@ -310,7 +310,9 @@ function submitCustomSequence(resolveAfterRefresh = function() { }){
 
 
 	var toCall = (newSequenceID, newTemplateType, newPrimerType) => new Promise((resolve) => userInputSequence_controller(newSequenceID, newTemplateType, primerType, inputSequenceIsNascent, resolve));
-	toCall(newSeq, templateType, primerType, inputSequenceIsNascent).then((uselessVar) => {
+	toCall(newSeq, templateType, primerType, inputSequenceIsNascent).then((goodLength) => {
+	
+		if (!goodLength) return;
 
 		var refr = () => new Promise((resolve) => refresh(resolve));
 		var sequenceChangeRefreshTemp = function(){
@@ -417,10 +419,6 @@ function resetBtn(){
 
 
 function refresh(resolve = function(){}){
-
-
-	// Do not refresh until all animations have stopped
-	$("#bases").children().promise().done(function(){
 
 
 
@@ -581,9 +579,7 @@ function refresh(resolve = function(){}){
 
 
 	
-	
 
-	});
 	
 	
 
@@ -2533,7 +2529,7 @@ function closeNav() {
 						</td>
 
 						<td>
-							<div id="stutterBtn" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick=stutter_controller() title="Stutter N times" > <img id='stutter'  src="src/Images/stutter.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
+							<div id="stutterBtn" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick=stutter_controller() title="Stutter N times (iteratively copy the current base N times)" > <img id='stutter'  src="src/Images/stutter.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
 							<div id="stopBtn_stutter" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="src/Images/stop.png" style="width:35px; height:35px;"> </div>
 						
 						</td>
@@ -2543,7 +2539,7 @@ function closeNav() {
 						<td colspan=2>
 							<div class="toolbarIcon" style="width:90px; height:22px; vertical-align:middle"> 
 								<span id="progressSimSpan" style="font-size: 16px; display:none; cursor: auto;"></span> 
-								<span id="numSimSpan"> <b>N=</b><input type="number" name="nbasesToSimulate" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:left; width: 60px; background-color: #008CBA; color:white"> </span> </div>
+								<span id="numSimSpan"> <b>N=</b><input type="number" name="nbasesToSimulate" min="1" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:left; width: 60px; background-color: #008CBA; color:white"> </span> </div>
 						</td>
 
 					</tr>
