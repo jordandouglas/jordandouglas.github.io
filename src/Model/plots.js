@@ -900,6 +900,7 @@ function deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timeP
 
 
 	}
+	
 
 	getPlotData_WW(resolve, msgID);
 

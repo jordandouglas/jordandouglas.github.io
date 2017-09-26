@@ -279,7 +279,7 @@ function add_pairs_WW(msgID = null){
 
 
 
-function stop_WW(msgID = null){
+function stop_WW(resolve = function() { }, msgID = null){
 
 	simulating = false;
 	stopRunning_WW = true;
@@ -288,6 +288,7 @@ function stop_WW(msgID = null){
 	if (msgID != null){
 		postMessage(msgID + "~X~" + "done");
 	}
+	else resolve();
 
 
 
@@ -785,10 +786,12 @@ function userInputSequence_WW(newSeq, newTemplateType, newPrimerType, inputSeque
 
 	// Store the template sequence not the nascent sequence 
 	newSeq = newSeq.trim();
+	var goodLength = newSeq.length > PHYSICAL_PARAMETERS["hybridLength"]["val"];
+
 	if (inputSequenceIsNascent) newSeq = getComplementSequence_WW(newSeq, newPrimerType.substring(2) == "RNA");
 
 	// Only apply changes if there is one
-	if (sequenceID != newSeq.substring(0, 15) || newSeq != all_sequences[sequenceID]["seq"] || newTemplateType != all_sequences[sequenceID]["template"] || newPrimerType != all_sequences[sequenceID]["primer"]){
+	if (goodLength && sequenceID != newSeq.substring(0, 15) || newSeq != all_sequences[sequenceID]["seq"] || newTemplateType != all_sequences[sequenceID]["template"] || newPrimerType != all_sequences[sequenceID]["primer"]){
 
 	
 		if (newPrimerType.substring(2) != all_sequences[sequenceID]["primer"].substring(2)) needToRefreshNTPParameters = true;  // Refresh the NTP concentrations if nascent strand changed from DNA to RNA or vice versa
@@ -812,9 +815,9 @@ function userInputSequence_WW(newSeq, newTemplateType, newPrimerType, inputSeque
 		
 
 	if (msgID != null){
-		postMessage(msgID + "~X~" + "done");
+		postMessage(msgID + "~X~" + goodLength);
 	}else{
-		return null;
+		return goodLength;
 	}
 
 }
