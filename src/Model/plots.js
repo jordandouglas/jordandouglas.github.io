@@ -584,7 +584,7 @@ function saveSettings_WW(plotNum, plotType, values, resolve = function() { }, ms
 				if (isNaN(yMin) || isNaN(yMax)) whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
 				else whichPlotInWhichCanvas[plotNum]["yRange"] = [yMin, yMax];
 			}
-
+			break;
 
 
 		case "parameterHeatmap":
@@ -625,6 +625,7 @@ function saveSettings_WW(plotNum, plotType, values, resolve = function() { }, ms
 				if (isNaN(zMin) || isNaN(zMax)) whichPlotInWhichCanvas[plotNum]["zRange"] = "automaticZ";
 				else whichPlotInWhichCanvas[plotNum]["zRange"] = [zMin, zMax];
 			}
+			break;
 
 	}
 	
