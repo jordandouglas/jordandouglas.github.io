@@ -1082,43 +1082,54 @@ function clearCache(){
 	var sequences_cleardata = $("#sequences_cleardata").prop('checked');
 	if (sequences_cleardata) clearSequences();
 	
-	refresh();
 
 	if (!distanceVsTime_cleardata && !timeHistogram_cleardata && !timePerSite_cleardata && !customPlot_cleardata) {
 		closeKineticCachePopup();
 		return;
 	}
 
-
-	if (distanceVsTime_cleardata){
-		DISTANCE_VS_TIME_CONTROLLER = [];
-		VELOCITIES = [];
-		haveShownDVTerrorMessage = false;
-	} 
-
-	if (timeHistogram_cleardata){
-		DWELL_TIMES_CONTROLLER = [];
-	}
-
-
-
-	deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, function(plotData){
-
+	stop_controller(function(){
 		
-		update_PLOT_DATA(plotData)
-
-
-		window.requestAnimationFrame(function(){
-			for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
-				if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "none" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom"  && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
-				else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
-			}
-		});
-
 		closeKineticCachePopup();
+		refresh(function(){
+			
+
+			if (distanceVsTime_cleardata){
+				DISTANCE_VS_TIME_CONTROLLER = [];
+				VELOCITIES = [];
+				haveShownDVTerrorMessage = false;
+			} 
+
+			if (timeHistogram_cleardata){
+				DWELL_TIMES_CONTROLLER = [];
+			}
+
+
+
+			deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, function(plotData){
+
+				
+				update_PLOT_DATA(plotData)
+
+
+				window.requestAnimationFrame(function(){
+					for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
+						if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "none" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom"  && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
+						else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
+					}
+					
+					
+				});
+				
+				
+			
+
+				
+			});
+
+		});
+		
 	});
-
-
 
 }
 

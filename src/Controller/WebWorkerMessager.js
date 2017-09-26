@@ -259,16 +259,21 @@ function refresh_controller(resolve_fn = function(x) {}){
 }
 
 
-function stop_controller(){
+function stop_controller(resolve = function() { }){
 
 
 
 	if (WEB_WORKER == null) {
-		stop_WW();
+		resolve(stop_WW());
 	}else{
-		var fnStr = stringifyFunction("stop_WW", []);
+
+		var res = stringifyFunction("stop_WW", [null], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+		
 		console.log("Sending function: " + fnStr);
-		callWebWorkerFunction(fnStr);
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall(fnStr).then(() => resolve());
 	}
 
 
@@ -475,7 +480,7 @@ function add_pairs_controller(resolve){
 function userInputSequence_controller(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent, resolve){
 
 
-
+	
 
 	if (WEB_WORKER == null) {
 		resolve(userInputSequence_WW(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent));
@@ -502,8 +507,9 @@ function userSelectSequence_controller(newSequenceID, newTemplateType, newPrimer
 		var res = stringifyFunction("userSelectSequence_WW", [newSequenceID, newTemplateType, newPrimerType], true);
 		var fnStr = res[0];
 		var msgID = res[1];
-		console.log("Sending function: " + fnStr);
-		callWebWorkerFunction(fnStr, resolve, msgID);
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall(fnStr).then((goodLength) => resolve(goodLength));
+		
 	}
 
 
@@ -861,7 +867,7 @@ function transcribe_controller(nbasesToTranscribe = null, fastMode = false, reso
 	disable_all_buttons();
 
 	if (nbasesToTranscribe == null) nbasesToTranscribe = parseFloat($('#nbasesToSimulate').val());
-	console.log("Transcribing", nbasesToTranscribe);
+	if(nbasesToTranscribe <= 0) return;
 
 	var clickMisincorporation = false;
 	if ($("#deactivateUponMisincorporation").is(":checked")){
@@ -915,7 +921,7 @@ function stutter_controller(nbasesToStutter = null, fastMode = false, resolve = 
 	disable_all_buttons();
 
 	if (nbasesToStutter == null) nbasesToStutter = parseFloat($('#nbasesToSimulate').val());
-	console.log("Stuttering", nbasesToStutter);
+	if(nbasesToStutter <= 0) return;
 
 	var updateDOM = function(){
 		setNextBaseToAdd_controller();
@@ -1592,6 +1598,8 @@ function startTrials_controller(){
 
 	if ($("#simulateBtn").hasClass("toolbarIconDisabled")) return;
 	if ($("#SelectPrimerType").val().substring(0,2) == "ds") return;
+	var ntrials = $("#nbasesToSimulate").val();
+	if(ntrials <= 0) return;
 	
 	if(simulating) return;
 	simulating = true;
@@ -1610,7 +1618,7 @@ function startTrials_controller(){
 		if ($("#PreExp").val() != "hidden" && WEB_WORKER != null && currentState["nbases"] > 500) changeToHiddenModeAndShowNotification();
 		
 		
-		var ntrials = $("#nbasesToSimulate").val();
+		
 		disable_all_buttons();
 
 		// If this is not a webworker and the current speed is ultrafast then set it back to fast otherwise the browser will crash
