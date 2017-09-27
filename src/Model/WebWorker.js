@@ -991,7 +991,9 @@ function initMisbindingMatrix(){
 		}
 	}
 
-	//console.log("initMisbindingMatrix", misbindMatrix);
+
+
+
 
 
 }
@@ -1003,7 +1005,7 @@ function getRateOfBindingXtoY_WW(baseX, baseY){
 
 	var NTPconcID = baseY == "A" ? "ATPconc" : baseY == "T" ? "UTPconc" : baseY == "U" ? "UTPconc" : baseY == "C" ? "CTPconc" : "GTPconc";
 	
-	var NTPconc = PHYSICAL_PARAMETERS[NTPconcID]["val"]
+	var NTPconc = ELONGATION_MODELS[currentElongationModel]["useFourNTPconcentrations"] ? PHYSICAL_PARAMETERS[NTPconcID]["val"] : PHYSICAL_PARAMETERS["NTPconc"]["val"];
 	var rateOfBindingNextBaseTemp = 0;
 
 

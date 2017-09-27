@@ -796,6 +796,7 @@ function update_this_parameter_controller(element){
 			$(element).val(result["val"]);
 			update_sliding_curve(0);
 			update_slipping_curve(0);
+			refreshNavigationCanvases();
 		};
 
 
@@ -2068,6 +2069,28 @@ function resumeSimulation_controller(){
 }
 
 
+function getNTPparametersAndSettings_controller(resolve = function(){}){
+
+
+	
+	if (WEB_WORKER == null) {
+		var toCall = () => new Promise((resolve) => getNTPparametersAndSettings_WW(resolve));
+		toCall().then((mod) => resolve(mod));
+	}
+
+	else{
+		var res = stringifyFunction("getNTPparametersAndSettings_WW", [null], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((mod) => resolve(mod));
+
+	}
+
+
+
+}
+
 
 
 function userInputModel_controller(){
@@ -2078,11 +2101,13 @@ function userInputModel_controller(){
 	var allowHypertranslocation = $("#allowHypertranslocation").is(":checked");
 	var allowInactivation = $("#allowInactivation").is(":checked");
 	var allowBacktrackWithoutInactivation = $("#allowBacktrackWithoutInactivation").is(":checked");
-	var deactivateUponMisincorporation = $("#deactivateUponMisincorporation").is(":checked");
+	var deactivateUponMisincorporation = $("#deactivateUponMisincorporation").length == 0 ? null :  $("#deactivateUponMisincorporation").is(":checked");
 	var allowGeometricCatalysis = $("#allowGeometricCatalysis").is(":checked");
 	var allowmRNAfolding = $("#allowmRNAfolding").is(":checked");
-	var allowMisincorporation = $("#allowMisincorporation").is(":checked");
-	
+	var allowMisincorporation = $("#allowMisincorporation").length == 0 ? null : $("#allowMisincorporation").is(":checked");
+	var useFourNTPconcentrations = $("#useFourNTPconcentrations").is(":checked");
+	var NTPbindingNParams = $("#NTPbindingNParams").length == 0 ? null : $("#NTPbindingNParams").is(":checked") ? 8 : 2;
+
 
 
 
@@ -2091,17 +2116,20 @@ function userInputModel_controller(){
 		update_sliding_curve(0);
 		update_slipping_curve(0);
 
+
+		refreshNavigationCanvases();
+
 		updateModelDOM(mod);
 	};
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => userInputModel_WW(elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, resolve));
+		var toCall = () => new Promise((resolve) => userInputModel_WW(elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, resolve));
 		toCall().then((mod) => updateDOM(mod));
 	}
 
 	else{
-		var res = stringifyFunction("userInputModel_WW", [elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, null], true);
+		var res = stringifyFunction("userInputModel_WW", [elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));

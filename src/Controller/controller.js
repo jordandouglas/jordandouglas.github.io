@@ -778,6 +778,7 @@ function closeAllDialogs(){
 	closePlotDownloadPopup();
 	closePlotSettingsPopup();
 	closeKineticCachePopup();
+	closeNTPModelPopup();
 
 
 }

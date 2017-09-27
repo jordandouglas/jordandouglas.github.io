@@ -23,10 +23,11 @@
 
 PHYSICAL_PARAMETERS = {}; // The complete list of parameters which can be tuned using the side navigation menu
 
-PHYSICAL_PARAMETERS["ATPconc"] = {distribution:"Fixed", zeroTruncated: true, integer: false};
-PHYSICAL_PARAMETERS["CTPconc"] = {distribution:"Fixed", zeroTruncated: true, integer: false};
-PHYSICAL_PARAMETERS["GTPconc"] = {distribution:"Fixed", zeroTruncated: true, integer: false};
-PHYSICAL_PARAMETERS["UTPconc"] = {distribution:"Fixed", zeroTruncated: true, integer: false};
+PHYSICAL_PARAMETERS["NTPconc"] = {distribution:"Fixed", zeroTruncated: true, integer: false, hidden:false};
+PHYSICAL_PARAMETERS["ATPconc"] = {distribution:"Fixed", zeroTruncated: true, integer: false, hidden:true};
+PHYSICAL_PARAMETERS["CTPconc"] = {distribution:"Fixed", zeroTruncated: true, integer: false, hidden:true};
+PHYSICAL_PARAMETERS["GTPconc"] = {distribution:"Fixed", zeroTruncated: true, integer: false, hidden:true};
+PHYSICAL_PARAMETERS["UTPconc"] = {distribution:"Fixed", zeroTruncated: true, integer: false, hidden:true};
 
 PHYSICAL_PARAMETERS["hybridLength"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 7, minVal: 5, name: "Hybrid length (bp)", title: "Number of base pairs inside the polymerase", zeroTruncated: true, integer: true};
 PHYSICAL_PARAMETERS["bubbleSizeLeft"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 2, name: "Bubble length left (bp)",  title: "Number of unpaired template bases 3' of the hybrid", zeroTruncated: true, integer: true, hidden:true};
@@ -38,11 +39,22 @@ PHYSICAL_PARAMETERS["FAssist"] = {distribution:"Fixed", fixedDistnVal: 0, name: 
 PHYSICAL_PARAMETERS["arrestTimeout"] = {distribution:"Fixed", fixedDistnVal: 60, name: "Arrest timeout (s)", title: "Maximum pause duration before the simulation is arrested. Set to zero to prevent arrests.", zeroTruncated: true, integer: false};
 
 
+PHYSICAL_PARAMETERS["RateCatalyse"] = {distribution:"Fixed", fixedDistnVal: 30, normalSdVal: 5, name: "Rate of catalysis (s\u207B\u00B9)", title: "Rate constant of catalysing bound NTP", zeroTruncated: true, integer: false, hidden:false};
+PHYSICAL_PARAMETERS["RateCatalyse_ATP"] = {distribution:"Fixed", fixedDistnVal: 38, name: "Rate of catalysis for ATP (s\u207B\u00B9)", title: "Rate constant of catalysing bound ATP", zeroTruncated: true, integer: false, hidden:true};
+PHYSICAL_PARAMETERS["RateCatalyse_CTP"] = {distribution:"Fixed", fixedDistnVal: 7, name: "Rate of catalysis for CTP (s\u207B\u00B9)", title: "Rate constant of catalysing bound CTP", zeroTruncated: true, integer: false, hidden:true};
+PHYSICAL_PARAMETERS["RateCatalyse_GTP"] = {distribution:"Fixed", fixedDistnVal: 62, name: "Rate of catalysis for GTP (s\u207B\u00B9)", title: "Rate constant of catalysing bound GTP", zeroTruncated: true, integer: false, hidden:true};
+PHYSICAL_PARAMETERS["RateCatalyse_UTP"] = {distribution:"Fixed", fixedDistnVal: 24, name: "Rate of catalysis for UTP (s\u207B\u00B9)", title: "Rate constant of catalysing bound UTP", zeroTruncated: true, integer: false, hidden:true};
+
+PHYSICAL_PARAMETERS["Kdissociation"] = {distribution:"Fixed", fixedDistnVal: 4, name: "Dissociation constant of NTP (\u03bcM)", title: "Equilibrium constant of NTP dissociation", zeroTruncated: true, integer: false, hidden:false};
+PHYSICAL_PARAMETERS["Kdissociation_ATP"] = {distribution:"Fixed", fixedDistnVal: 50, name: "Dissociation constant of ATP (\u03bcM)", title: "Equilibrium constant of ATP dissociation", zeroTruncated: true, integer: false, hidden:true};
+PHYSICAL_PARAMETERS["Kdissociation_CTP"] = {distribution:"Fixed", fixedDistnVal: 33, name: "Dissociation constant of CTP (\u03bcM)", title: "Equilibrium constant of CTP dissociation", zeroTruncated: true, integer: false, hidden:true};
+PHYSICAL_PARAMETERS["Kdissociation_GTP"] = {distribution:"Fixed", fixedDistnVal: 36, name: "Dissociation constant of GTP (\u03bcM)", title: "Equilibrium constant of GTP dissociation", zeroTruncated: true, integer: false, hidden:true};
+PHYSICAL_PARAMETERS["Kdissociation_UTP"] = {distribution:"Fixed", fixedDistnVal: 18, name: "Dissociation constant of UTP (\u03bcM)", title: "Equilibrium constant of UTP dissociation", zeroTruncated: true, integer: false, hidden:true};
+
+
 PHYSICAL_PARAMETERS["RateBind"] = {distribution:"Fixed", fixedDistnVal: 250, name: "Rate bind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of binding the correct NTP", zeroTruncated: true, integer: false};
-PHYSICAL_PARAMETERS["RateUnbind"] = {distribution:"Fixed", fixedDistnVal: 1000, name: "Rate unbind (s\u207B\u00B9)", title: "Rate constant of releasing bound NTP", zeroTruncated: true, integer: false};
-PHYSICAL_PARAMETERS["RatePolymerise"] = {distribution:"Fixed", fixedDistnVal: 30, normalSdVal: 5, name: "Rate of catalysis (s\u207B\u00B9)", title: "Rate constant of catalysing bound NTP", zeroTruncated: true, integer: false};
-PHYSICAL_PARAMETERS["RateMisbind"] = {distribution:"Fixed", fixedDistnVal: 0.25, name: "Rate misbind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of NTP mis-binding which can lead to transition/transversion mutations", zeroTruncated: true, integer: false, hidden:true};
-PHYSICAL_PARAMETERS["TransitionTransversionRatio"] = {distribution:"Fixed", fixedDistnVal: 2, name: "Transition:transversion", title: "How much more likely is a transition mis-binding event than a transversion mis-binding event", zeroTruncated: true, integer: false, hidden:true};
+PHYSICAL_PARAMETERS["RateMisbind"] = {distribution:"Fixed", fixedDistnVal: 1, name: "Rate misbind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of NTP mis-binding which can lead to transition/transversion mutations", zeroTruncated: true, integer: false, hidden:true};
+PHYSICAL_PARAMETERS["TransitionTransversionRatio"] = {distribution:"Fixed", fixedDistnVal: 4, name: "Transition:transversion", title: "How much more likely is a transition mis-binding event than a transversion mis-binding event", zeroTruncated: true, integer: false, hidden:true};
 
 
 PHYSICAL_PARAMETERS["kU"] = {distribution:"Fixed", fixedDistnVal: 0.05, name: "kU (s\u207B\u00B9)", title: "Rate constant of polymerase entering the unactive state", zeroTruncated: true, integer: false};
@@ -122,10 +134,16 @@ function setStructuralParameters_WW(){
 
 function refreshNTP_WW(){
 
-	console.log("needToRefreshNTPParameters", needToRefreshNTPParameters);
 	if(!needToRefreshNTPParameters) return;
 	if (all_sequences[sequenceID]["primer"].substring(2) == "RNA"){
-		
+
+
+
+		PHYSICAL_PARAMETERS["NTPconc"]["distribution"] = "Fixed";
+		PHYSICAL_PARAMETERS["NTPconc"]["fixedDistnVal"] = 1000;
+		PHYSICAL_PARAMETERS["NTPconc"]["name"] = "[NTP] (\u03bcM)";
+		PHYSICAL_PARAMETERS["NTPconc"]["title"] = "Cellular concentration of all NTPs";
+		PHYSICAL_PARAMETERS["NTPconc"]["val"] = PHYSICAL_PARAMETERS["NTPconc"]["fixedDistnVal"];
 		
 		PHYSICAL_PARAMETERS["ATPconc"]["distribution"] = "Fixed";
 		PHYSICAL_PARAMETERS["ATPconc"]["fixedDistnVal"] = 3152;
@@ -158,7 +176,16 @@ function refreshNTP_WW(){
 
 		
 	}else{
-		
+
+
+
+		PHYSICAL_PARAMETERS["NTPconc"]["distribution"] = "Fixed";
+		PHYSICAL_PARAMETERS["NTPconc"]["fixedDistnVal"] = 20;
+		PHYSICAL_PARAMETERS["NTPconc"]["name"] = "[dNTP] (\u03bcM)";
+		PHYSICAL_PARAMETERS["NTPconc"]["title"] = "Cellular concentration of all dNTPs";
+		PHYSICAL_PARAMETERS["NTPconc"]["val"] = PHYSICAL_PARAMETERS["NTPconc"]["fixedDistnVal"];
+
+
 		PHYSICAL_PARAMETERS["ATPconc"]["distribution"] = "Fixed";
 		PHYSICAL_PARAMETERS["ATPconc"]["fixedDistnVal"] = 24;
 		PHYSICAL_PARAMETERS["ATPconc"]["normalSdVal"] = 22;
@@ -231,12 +258,14 @@ function update_this_parameter_WW(paramID, fixedVal, resolve = function(toReturn
 	// Recalculate misincorporation transition matrix 
 	if (paramID.substring(3) == "conc" || paramID == "RateBind" || paramID == "RateMisbind" || paramID == "TransitionTransversionRatio"){
 		initMisbindingMatrix();
+		setNextBaseToAdd_WW();
 	}
 	
 	
 	// If the parameter has been changed and it will affect translocation rates then we calculate everything again
 	if (initialVal != PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "GDaggerSlide" || paramID == "FAssist" || paramID == "hybridLength" || paramID == "bubbleSizeLeft" || paramID == "bubbleSizeRight" || paramID == "nbasesToFold")){
 		translocationCacheNeedsUpdating = true; // Recalculate the translocation rate cache
+		initTranslocationRateCache();
 	}
 
 

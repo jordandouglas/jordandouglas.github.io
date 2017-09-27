@@ -172,7 +172,10 @@ function updateModelDOM(elongation_model_temp){
 	$("#allowGeometricCatalysis").prop('checked', elongation_model_temp["allowGeometricCatalysis"]);
 	$("#allowmRNAfolding").prop('checked', elongation_model_temp["allowmRNAfolding"]);
 	$("#allowMisincorporation").prop('checked', elongation_model_temp["allowMisincorporation"]);
-	
+	$("#useFourNTPconcentrations").prop('checked', elongation_model_temp["useFourNTPconcentrations"]);
+	$("#NTPbindingNParams").prop('checked', elongation_model_temp["NTPbindingNParams"] == 8);
+
+
 
 
 	if (elongation_model_temp["allowBacktracking"] && elongation_model_temp["allowInactivation"]) $("#allowBacktrackWithoutInactivation_container").show(100);
@@ -220,6 +223,59 @@ function updateModelDOM(elongation_model_temp){
 		//$("#TransitionTransversionRatio_container").hide(100);
 		$("#deactivateUponMisincorporation_container").hide(100);
 	}
+
+
+	// 1 NTP concentration or 4
+	if (elongation_model_temp["useFourNTPconcentrations"]) {
+		$("#NTPconc_container").hide(0);
+		$("#ATPconc_container").show(100);
+		$("#CTPconc_container").show(100);
+		$("#GTPconc_container").show(100);
+		$("#UTPconc_container").show(100);
+
+	}
+	else {
+		$("#NTPconc_container").show(100);
+		$("#ATPconc_container").hide(0);
+		$("#CTPconc_container").hide(0);
+		$("#GTPconc_container").hide(0);
+		$("#UTPconc_container").hide(0);
+	}
+
+
+	// 2 NTP parameters or 8
+	if (elongation_model_temp["NTPbindingNParams"] == 8) {
+		$(".NTPparams2").hide(0);
+		$("#Kdissociation_container").hide(0);
+		$("#RateCatalyse_container").hide(0);
+		$(".NTPparams8").show(100);
+		$("#Kdissociation_ATP_container").show(100);
+		$("#Kdissociation_CTP_container").show(100);
+		$("#Kdissociation_GTP_container").show(100);
+		$("#Kdissociation_UTP_container").show(100);
+		$("#RateCatalyse_ATP_container").show(100);
+		$("#RateCatalyse_CTP_container").show(100);
+		$("#RateCatalyse_GTP_container").show(100);
+		$("#RateCatalyse_UTP_container").show(100);
+
+
+	}
+
+	else {
+		$(".NTPparams2").show(100);
+		$("#Kdissociation_container").show(100);
+		$("#RateCatalyse_container").show(100);
+		$(".NTPparams8").hide(0);
+		$("#Kdissociation_ATP_container").hide(0);
+		$("#Kdissociation_CTP_container").hide(0);
+		$("#Kdissociation_GTP_container").hide(0);
+		$("#Kdissociation_UTP_container").hide(0);
+		$("#RateCatalyse_ATP_container").hide(0);
+		$("#RateCatalyse_CTP_container").hide(0);
+		$("#RateCatalyse_GTP_container").hide(0);
+		$("#RateCatalyse_UTP_container").hide(0);
+	}
+
 
 
 	//if (elongation_model_temp["id"] == "twoSiteBrownian") $("#allowGeometricCatalysis_container").hide(100);
@@ -453,6 +509,19 @@ function closeModelDiagramPopup(){
 }
 
 
+function closeNTPModelPopup(){
+	
+	if ($("#popup_NTPmodel").length == 0) return;
+	$("#mySidenav").unbind('click');
+	$("#main").unbind('click');
+	$("#popup_NTPmodel").remove();
+	$("#main").css("opacity", 1);
+	$("#mySidenav").css("opacity", 1);
+	
+	
+}
+
+
 function getModelDiagramTemplate(){
 	
 	
@@ -540,6 +609,329 @@ function getNTPModelDiagramTemplate(){
 
 
 
+
+
+function getNTPModelSettingsTemplate(){
+	
+	
+	
+	return `
+		<div id='popup_NTPmodel' style='background-color:adadad; padding: 10 10; position:fixed; width: 800px; left:380; top:30vh; z-index:5;'>
+			<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+				<span style='font-size: 30px'> NTP parameters</span>
+
+				<span style='font-size: 30px; cursor:pointer; position:absolute; left:770px; top:10px'>
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:right" href="about/#polymerisation_ModelHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				</span>
+				<span style='font-size: 30px; cursor:pointer; position:absolute; vertical-align:top; left:793px; top:2px' onclick='closeNTPModelPopup()'>&times;</span>
+				<div style='padding:2; font-size:22px;'> Select the parameters for binding, catalysing and misincorporating NTP</div>
+
+				<div id="ntpmodelDiagramDiv" style="width:90%; margin:auto; vertical-align:middle; display:block">
+					
+					<br>
+					<table style="width:100%; margin:auto; text-align:center">
+
+						<tr id="NTPbindingNParams_container" title="Do you want two parameters for each NTP or two parameters shared by all four NTPs?">
+
+
+							<td style="text-align:left; font-size:10px; float:left;">
+								<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
+					 		</td>
+
+							 
+							<td style="text-align:right;  width:110px">
+					 			2 params  
+					 		</td>
+							 
+					 		<td colspan=3 style="text-align:left;">
+						 		<label class="switch">
+							 		 <input type="checkbox" id="NTPbindingNParams" OnChange="userInputModel_controller()"> </input>
+							 		 <span class="slider round notboolean"></span>
+								</label> 
+								<span style="font-size:15px; vertical-align:middle" >8 params</span>
+					 		</td>
+
+
+						</tr>
+
+						<tr>
+							<td style="width:100%" colspan=4>
+
+
+								<table cellspacing="2" cellpadding="2" style="width:100%; margin:auto; text-align:center;">
+
+
+									<tr style="font-size:18px; "> 
+
+										<td></td>
+
+										<td style="background-color:#b3b3b3; width:44%">
+											<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Kdissociate_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a> K<sub>D</sub>  (&mu;M)
+										</td>
+
+
+										<td style="background-color:#b3b3b3;  width:44%">
+											<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateCatalyse_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a> k<sub>cat</sub> (s<sup>-1</sup>)
+										</td>
+
+									</tr>
+
+
+
+									<tr class="NTPparams2" style="font-size:18px;"> 
+
+										<td style="background-color:#b3b3b3; width:50px">
+											[NTP]:
+										</td>
+
+										<td id="Kdissociation_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number" id="Kdissociation" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  
+										 	<input type=image id='Kdissociation_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										</td>
+
+
+										<td id="RateCatalyse_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number"id="RateCatalyse" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
+					 						<input type=image id='RateCatalyse_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										</td>
+
+									</tr>
+
+
+									<tr class="NTPparams8" style="font-size:18px;"> 
+
+										<td style="background-color:#b3b3b3; width:50px">
+											[ATP]:
+										</td>
+
+
+										<td id="Kdissociation_ATP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number"id="Kdissociation_ATP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
+					 						<input type=image id='Kdissociation_ATP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										</td>
+
+										<td id="RateCatalyse_ATP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number" id="RateCatalyse_ATP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
+										 	<input type=image id='RateCatalyse_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										</td>
+
+
+
+
+									</tr>
+
+
+									<tr class="NTPparams8" style="font-size:18px;"> 
+
+										<td style="background-color:#b3b3b3; width:50px">
+											[CTP]:
+										</td>
+
+
+										<td id="Kdissociation_CTP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number"id="Kdissociation_CTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
+					 						<input type=image id='Kdissociation_CTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										</td>
+
+										<td id="RateCatalyse_CTP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number" id="RateCatalyse_CTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  
+										 	<input type=image id='RateCatalyse_CTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										</td>
+
+
+
+
+									</tr>
+
+
+								<tr class="NTPparams8" style="font-size:18px;"> 
+
+										<td style="background-color:#b3b3b3; width:50px">
+											[GTP]:
+										</td>
+
+
+
+										<td id="Kdissociation_GTP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number"id="Kdissociation_GTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">
+					 						<input type=image id='Kdissociation_GTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										</td>
+
+										<td id="RateCatalyse_GTP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number" id="RateCatalyse_GTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  
+										 	<input type=image id='RateCatalyse_GTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										</td>
+
+
+
+									</tr>
+
+
+
+								<tr class="NTPparams8" style="font-size:18px;"> 
+
+										<td style="background-color:#b3b3b3; width:50px">
+											[UTP]:
+										</td>
+
+
+
+										<td id="Kdissociation_UTP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number"id="Kdissociation_UTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
+					 						<input type=image id='Kdissociation_UTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										</td>
+
+										<td id="RateCatalyse_UTP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number" id="RateCatalyse_UTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
+										 	<input type=image id='RateCatalyse_UTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										</td>
+
+									</tr>						
+
+
+								</table> 
+							</td>
+
+
+
+						<tr>
+							<td colspan=4>
+
+								<table style="width:50%; margin:auto">
+
+
+									<tr id="RateBind_container">
+
+										<td style="text-align:left; font-size:10px; float:left; width:20px">
+								 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateBind_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+								 		</td>
+
+										<td style="text-align:right; width:110px">
+								 			k<sub>bind</sub> =  
+
+								 		</td>
+
+								 		<td>
+								 			<input class="variable"  type="number" id="RateBind" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M<sup>-1</sup>.s<sup>-1</sup>  
+								 		</td>
+
+
+								 		<td>
+								 			<input type=image id='RateBind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+								 		</td>
+
+								 	</tr>
+
+
+
+									<tr id="allowMisincorporation_container" title="Can the wrong nucleotide bind (during the simulation)?">
+
+
+										<td style="text-align:left; font-size:10px; float:left;">
+											<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
+								 		</td>
+
+										 
+								 		<td colspan=3>
+									 		<label class="switch">
+										 		 <input type="checkbox" id="allowMisincorporation" OnChange="userInputModel_controller()"> </input>
+										 		 <span class="slider round"></span>
+											</label> 
+											<span style="font-size:15px; vertical-align:middle" >Enable misincorporations</span>
+								 		</td>
+
+
+									</tr>
+
+
+									<tr id="deactivateUponMisincorporation_container" title="Does the polymerase enter the inactivated state upon a nucleotide misincorporation (during the simulation)?">
+
+										<td style="text-align:left; float:left; width:20px">
+											<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateMisbind_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+								 		</td>
+
+								 		<td colspan=3>
+									 		<label class="switch">
+										 		 <input type="checkbox" id="deactivateUponMisincorporation" OnChange="userInputModel_controller()"> </input>
+										 		 <span class="slider round"></span>
+											</label> 
+											<span style="font-size:15px; vertical-align:middle" >Inactivate after misincorporations</span>
+								 		</td>
+
+
+									</tr>
+
+
+
+
+									<tr id="RateMisbind_container">
+
+
+										<td style="text-align:left; font-size:10px; float:left;">
+											<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateMisbind_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+								 		</td>
+
+										<td style="text-align:right">
+							    			k<sub>misbind</sub> =  
+											
+										</td>
+
+								 		<td>
+								 			 <input class="variable"  type="number" id="RateMisbind" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M<sup>-1</sup>.s<sup>-1</sup>  
+								 		</td>
+
+
+								 		<td>
+								 			<input type=image id='RateMisbind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+								 		</td>
+
+									</tr>
+
+						
+
+
+								</table>
+
+							</td>
+
+						</tr>
+
+
+							
+
+						</tr>
+
+
+
+
+
+					</table>
+						
+
+					
+				
+					<div id="TransitionTransversionRatio_container" style="display:none">
+						k<sub>transition</sub> / k<sub>transversion</sub> = <input class="variable"  type="number" id="TransitionTransversionRatio" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
+						<input type=image id='TransitionTransversionRatio_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+					</div>
+				
+					
+				</div>
+				
+				<br><br>
+
+
+			</div>
+		</div>
+	`;
+	
+	
+	
+}
+
+
+
+
 function drawModelDiagramCanvas(){
 
 	if ($("#modelDiagramDiv").length == 0) return;
@@ -586,7 +978,7 @@ function drawModelDiagramCanvas(){
 		var kU = parseFloat($("#kU").val());
 		var kA = parseFloat($("#kA").val());
 		var krelease = parseFloat($("#RateUnbind").val());
-		var kcat = parseFloat($("#RatePolymerise").val());
+		var kcat = parseFloat($("#RateCatalyse").val());
 		
 		
 
@@ -805,6 +1197,7 @@ function drawModelDiagramCanvas(){
 
 }
 
+
 function plotArrow_stateDiagram(ctx, fromx, fromy, direction, label = "", rate = 0, rateSum = 0){
 
 	ctx.globalAlpha = 1;
@@ -1008,6 +1401,65 @@ function plotState(ctx, label, xCoord, yCoord, desc = "", isCurrentState = false
 		});
 
 
+}
+
+
+
+
+
+
+
+
+function viewNTPModel(){
+	
+	
+	
+	closeAllDialogs();
+	$("#main").css("opacity", 0.5);
+	$("#mySidenav").css("opacity", 0.5);
+	
+	var popupHTML = getNTPModelSettingsTemplate();
+
+
+
+	getNTPparametersAndSettings_controller(function(result){
+
+
+		var params = result["params"];
+		var model = result["model"]
+
+		$(popupHTML).appendTo('body');
+
+
+
+		// 2 NTP parameters or 8
+		$("#NTPbindingNParams").prop('checked', model["NTPbindingNParams"] == 8);
+
+
+
+
+		updateModelDOM(model);
+		renderParameters_givenParameters(params);
+
+
+	});
+	
+	window.setTimeout(function(){
+
+		$("#main").click(function(){
+			closeNTPModelPopup();
+		});
+		
+		$("#mySidenav").click(function(){
+			closeNTPModelPopup();
+		});
+		
+	}, 50);
+	
+
+	
+	
+	
 }
 
 

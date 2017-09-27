@@ -716,7 +716,8 @@ function update_custom_plot_data_WW(){
 
 
 
-	var increaseInPrimerLength = currentState["mRNALength"] - (PHYSICAL_PARAMETERS["hybridLength"]["val"] + PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"] + 1);
+	var increaseInPrimerLength = currentState["mRNALength"] - (PHYSICAL_PARAMETERS["hybridLength"]["val"] + PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"] + 2);
+	//if(increaseInPrimerLength < 100) return; // Disqualify early terminations because they will skew everything
 	var meanVelocity_thisTrial = increaseInPrimerLength / totalTime_thisTrial;
 	var meanDwellTime_thisTrial = totalTime_thisTrial / DWELL_TIMES[DWELL_TIMES.length-1].length;
 	

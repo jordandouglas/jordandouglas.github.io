@@ -555,6 +555,15 @@ input {
 }
 
 
+.distn_inline{
+	padding: 3 3;
+	vertical-align: bottom; 
+	width:38px; 
+	height:12px;
+	text-align:right;
+}
+
+
 
 
 /* Slider toggle CSS. Modified from https://www.w3schools.com/howto/howto_css_switch.asp */
@@ -595,6 +604,10 @@ input {
 	background-color: white;
 	-webkit-transition: .3s;
 	transition: .3s;
+}
+
+.notboolean{
+	background-color: #008CBA;	
 }
 
 input:checked + .slider {

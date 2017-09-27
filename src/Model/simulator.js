@@ -72,7 +72,6 @@ function startTrials_WW(n, resolve = function() { }, msgID = null){
 			// Use the geometric sampling speed up only if the speed is not set to slow
 			ELONGATION_MODELS[currentElongationModel]["allowGeometricCatalysis"] = ANIMATION_TIME < 200; 
 
-
 			n_simulations_WW(n, stateC, resolve, msgID);
 			
 
@@ -368,7 +367,7 @@ function sampleAction_WW(stateC){
 		if (stateC[3] && stateC[1] == 0 && !ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"]) kBck = 0; // If state is active but we don't allow backtracking while active then set rate to zero
 		
 	}
-	var kRelease = stateC[2] ? PHYSICAL_PARAMETERS["RateUnbind"]["val"] : 0; // Can only release NTP if it is bound
+	var kRelease = stateC[2] ? getReleaseRate(getBaseInSequenceAtPosition_WW("m" + (stateC[1] + stateC[0]))) : 0; // Can only release NTP if it is bound
 	var kAct = stateC[3] ? 0 : PHYSICAL_PARAMETERS["kA"]["val"]; // Can only activate if it is deactivated
 	var kDeact = stateC[3] && !stateC[2] && ELONGATION_MODELS[currentElongationModel]["allowInactivation"] ? PHYSICAL_PARAMETERS["kU"]["val"] : 0; // Can only deactivate if it is activated, NTP is not bound, and model permits it
 	
@@ -392,17 +391,20 @@ function sampleAction_WW(stateC){
 
 		//console.log("allowGeometricCatalysis");
 
-		var kcat = PHYSICAL_PARAMETERS["RatePolymerise"]["val"];
-		var rateRelCat = kRelease + kcat;
+
 
 		var baseToTranscribe = getBaseInSequenceAtPosition_WW("g" + (stateC[1] + stateC[0]));
+
+
+
 		var result = sampleBaseToAdd(baseToTranscribe);
 		var kBind = result["rate"];
-		SIMULATION_VARIABLES["baseToAdd"] = result["base"];  // SIMPLIFICATION: the base added is sampled only once. We do not resample the base to add every time 
-															 // it is released from the activt site at this position. 
+		SIMULATION_VARIABLES["baseToAdd"] = result["base"];  
+		kRelease = getReleaseRate(result["base"]); 
+		kcat = getCatalysisRate(result["base"])
+		var rateRelCat = kRelease + kcat;
 
 		var rateBindRelease = kBind * kRelease / rateRelCat;
-		var rateBindCat =     kBind * kcat / rateRelCat;
 		var rate = kBck + kFwd + kRelease + kBind + kAct + kDeact;
 
 
@@ -410,14 +412,33 @@ function sampleAction_WW(stateC){
 		var runif = mersenneTwister.random() * rate;
 		minReactionTime = 0;
 		while(runif < rateBindRelease){
+
+			
+			// This block must be resampled every time if we are using 4 different catalysis rates and 4 different dissociation constants
+			if (ELONGATION_MODELS[currentElongationModel]["NTPbindingNParams"] == 8){
+				result = sampleBaseToAdd(baseToTranscribe);
+				kBind = result["rate"];
+				SIMULATION_VARIABLES["baseToAdd"] = result["base"];  
+
+
+				kRelease = getReleaseRate(result["base"]); 
+				kcat = getCatalysisRate(result["base"])
+				rateRelCat = kRelease + kcat;
+
+				rateBindRelease = kBind * kRelease / rateRelCat;
+				rate = kBck + kFwd + kRelease + kBind + kAct + kDeact;
+			}
+
 			minReactionTime += rexp(rate); // Time taken to bind
 			minReactionTime += rexp(rateRelCat); // Time taken to release
+
 			runif = mersenneTwister.random() * rate;
 		}
 		minReactionTime += rexp(rate);
 
 
 		// Choose next action uniformly
+		var rateBindCat =     kBind * kcat / rateRelCat;
 		var rates = [kBck, kFwd, kRelease, rateBindCat, kAct, kDeact];
 		var sum = kBck + kFwd + kRelease + rateBindCat + kAct + kDeact;
 		runif = mersenneTwister.random() * sum;
@@ -549,16 +570,17 @@ function sampleAction_WW(stateC){
 		*/
 	} else {
 
-
+		
 
 		var kBindOrCat = 0; // Sample binding or catalysis rate
 		if (stateC[1] == 1 && stateC[3]){
-			if (stateC[2]) kBindOrCat = PHYSICAL_PARAMETERS["RatePolymerise"]["val"]; // If NTP bound then use rate of catalysis
 
-			// Otherwise sample which NTP to bind and then use its rate
-			else{
-				var baseToTranscribe = getBaseInSequenceAtPosition_WW("g" + (stateC[1] + stateC[0]));
-				var result = sampleBaseToAdd(baseToTranscribe);
+			// Sample which base to add
+			var baseToTranscribe = getBaseInSequenceAtPosition_WW("g" + (stateC[1] + stateC[0]));
+			var result = sampleBaseToAdd(baseToTranscribe);
+
+			if (stateC[2]) kBindOrCat = getCatalysisRate(result["base"]); // If NTP bound then use rate of catalysis
+			else{ // Otherwise use binding rate
 				kBindOrCat = result["rate"];
 				SIMULATION_VARIABLES["baseToAdd"] = result["base"];
 			}

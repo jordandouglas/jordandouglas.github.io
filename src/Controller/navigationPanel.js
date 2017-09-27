@@ -22,7 +22,7 @@
 
 
 function refreshNavigationCanvases(){
-	
+
 	drawTranslocationCanvas();
 	drawNTPcanvas();
 	drawDeactivationCanvas();
@@ -109,7 +109,7 @@ function plotArrow_navigationPanel(ctx, fromx, fromy, direction, label = "", rat
 		ctx.textBaseline="middle";
 		ctx.fillStyle = "black";
 		ctx.font = "16px Arial";
-		ctx.fillText(roundToSF(rate, 1) + "s\u207B\u00B9", xLabPos, yLabPos - 1.25*arrowSize);
+		ctx.fillText(roundToSF(rate, 3) + "s\u207B\u00B9", xLabPos, yLabPos - 1.25*arrowSize);
 	}
 
 
@@ -316,6 +316,7 @@ function drawNTPcanvas(){
 		$("#ntpCanvasDIV img").remove();
 
 		if (result == null || result["templateBaseBeingCopied"] == null) return;
+
 		
 		var stateMargin = 2;
 		var stateWidth = 0.2 * (plotWidth - stateMargin);

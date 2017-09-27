@@ -4055,8 +4055,8 @@ function plotOptions(plotNum){
 
 
 			// Log space or linear space
-			$('input[name="timeSpaceX"][value="' + PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["timeSpaceX"] + '"]').prop('checked', true)
-			$('input[name="timeSpaceY"][value="' + PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["timeSpaceY"] + '"]').prop('checked', true)
+			$('input[name="timeSpaceX"][value="' + PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["timeSpaceX"] + '"]').prop('checked', true);
+			$('input[name="timeSpaceY"][value="' + PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["timeSpaceY"] + '"]').prop('checked', true);
 
 
 			break;

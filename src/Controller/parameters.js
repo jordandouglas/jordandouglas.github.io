@@ -24,11 +24,23 @@ PHYSICAL_PARAMETERS_TEMP = [];
 
 
 
+
+
 function renderParameters(){
 
 
 	var toCall = () => new Promise((resolve) => get_PHYSICAL_PARAMETERS_controller(resolve));
 	toCall().then((PHYSICAL_PARAMETERS_LOCAL) => {
+		renderParameters_givenParameters(PHYSICAL_PARAMETERS_LOCAL);
+	});
+
+	
+}
+
+
+
+function renderParameters_givenParameters(PHYSICAL_PARAMETERS_LOCAL){
+
 
 		for (var paramID in PHYSICAL_PARAMETERS_LOCAL){
 			
@@ -67,11 +79,8 @@ function renderParameters(){
 			
 		}
 
-	});
 
-	
 }
-
 
 
 
@@ -141,7 +150,7 @@ function update_parameters() {
 
 	
 	
-	//renderGraphicsEveryNsteps = Math.max(Math.ceil(15 * PHYSICAL_PARAMETERS["RateUnbind"]["val"] / PHYSICAL_PARAMETERS["RatePolymerise"]["val"]), 100);
+	//renderGraphicsEveryNsteps = Math.max(Math.ceil(15 * PHYSICAL_PARAMETERS["RateUnbind"]["val"] / PHYSICAL_PARAMETERS["RateCatalyse"]["val"]), 100);
 	
 	
 	//formBulgeH = parseFloat(document.getElementById("GDaggerBulge").value);
@@ -165,7 +174,8 @@ function refreshNTP(){
 	refreshNTP_controller();
 
 	if (document.getElementById("SelectPrimerType").value.substring(2) == "RNA"){
-		
+
+		document.getElementById("NTPname").innerHTML = "[NTP]";
 		document.getElementById("ATPname").innerHTML = "[ATP]";
 		document.getElementById("CTPname").innerHTML = "[CTP]";
 		document.getElementById("GTPname").innerHTML = "[GTP]";
@@ -174,7 +184,8 @@ function refreshNTP(){
 		$("#refreshNTP").attr("title", "Reset NTP concentrations to standard cellular levels");
 		
 	}else{
-		
+
+		document.getElementById("NTPname").innerHTML = "[dNTP]";
 		document.getElementById("ATPname").innerHTML = "[dATP]";
 		document.getElementById("CTPname").innerHTML = "[dCTP]";
 		document.getElementById("GTPname").innerHTML = "[dGTP]";
@@ -187,8 +198,8 @@ function refreshNTP(){
 	
 	
 	var updateTextbox = function(PHYSICAL_PARAMETERS_LOCAL){
-	
-		var ids = ["ATPconc", "GTPconc", "CTPconc", "UTPconc"];
+
+		var ids = ELONGATION_MODELS[currentElongationModel]["useFourNTPconcentrations"] ? ["ATPconc", "GTPconc", "CTPconc", "UTPconc"] : ["NTPconc", "NTPconc", "NTPconc", "NTPconc"];
 		for (var i = 0; i < 4; i ++){
 			var paramID = ids[i];
 			$("#" + paramID).val(roundToSF(PHYSICAL_PARAMETERS_LOCAL[paramID]["val"], 3));
@@ -217,7 +228,7 @@ function getDistributionChangeTemplate(){
 			<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> Background distribution of XX_ID_XX </span>
 
-				<span style='font-size: 30px; cursor:pointer; position:absolute; left:565px; top:10px' onclick='closePriorDistributionPopup()'>
+				<span style='font-size: 30px; cursor:pointer; position:absolute; left:565px; top:10px'>
 					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:right" href="about/#priorDistribution_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
 				</span>
 				<span style='font-size: 30px; cursor:pointer; position:absolute; left:590px; top:5px' onclick='closePriorDistributionPopup()'>&times;</span>
@@ -700,7 +711,7 @@ function changeDistribution(element){
 	console.log("Changing the distribution of", element);
 	
 
-	closeAllDialogs();
+
 
 
 	var correspondingTextfield = $("#" + $(element).attr('id').replace("_distn", ""));
@@ -715,8 +726,9 @@ function changeDistribution(element){
 	popupHTML = popupHTML.replace("XX_NAME_XX", correspondingTextfield.attr('name'));
 	popupHTML = popupHTML.replace("XX_NAME_XX", correspondingTextfield.attr('name'));
 	
-	
+	var paramID = correspondingTextfield.attr("id");
 
+	closeAllDialogs();
 	
 	
 	var loadParams = function(PHYSICAL_PARAMETERS_LOCAL){
@@ -724,20 +736,20 @@ function changeDistribution(element){
 		PHYSICAL_PARAMETERS_TEMP = PHYSICAL_PARAMETERS_LOCAL;
 		
 		var discreteDescriptionStr = "";
-		if (PHYSICAL_PARAMETERS_TEMP[correspondingTextfield.attr("id")]["integer"] == null || !PHYSICAL_PARAMETERS_TEMP[correspondingTextfield.attr("id")]["integer"]){
+		if (PHYSICAL_PARAMETERS_TEMP[paramID]["integer"] == null || !PHYSICAL_PARAMETERS_TEMP[paramID]["integer"]){
 			popupHTML = popupHTML.replace("XX_DISTRIBUTION_XX", getContinuousVariableDistributionsTemplate());
 		}else{
 			popupHTML = popupHTML.replace("XX_DISTRIBUTION_XX", getDiscreteVariableDistributionsTemplate());
 			
 			var minVal = null;
-			if (PHYSICAL_PARAMETERS_TEMP[correspondingTextfield.attr("id")]["minVal"] != null) minVal = PHYSICAL_PARAMETERS_TEMP[correspondingTextfield.attr("id")]["minVal"];
-			else if (PHYSICAL_PARAMETERS_TEMP[correspondingTextfield.attr("id")]["zeroTruncated"] != null && PHYSICAL_PARAMETERS_TEMP[correspondingTextfield.attr("id")]["zeroTruncated"]) minVal = 1;
+			if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null) minVal = PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"];
+			else if (PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"] != null && PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"]) minVal = 1;
 			if (minVal != null) {
 				popupHTML = popupHTML.replace("Poisson Distribution", "Shifted Poisson Distribution");
 				discreteDescriptionStr += "The smallest value allowed is " + minVal;
 			}
 
-			var maxVal = PHYSICAL_PARAMETERS_TEMP[correspondingTextfield.attr("id")]["maxVal"];
+			var maxVal = PHYSICAL_PARAMETERS_TEMP[paramID]["maxVal"];
 			if (maxVal != null) {
 				popupHTML = popupHTML.replace("Poisson Distribution", "Shifted Poisson Distribution");
 				discreteDescriptionStr += "<br>The largest value allowed is " + maxVal;
@@ -746,14 +758,14 @@ function changeDistribution(element){
 			
 		}
 		
-		if (PHYSICAL_PARAMETERS_TEMP[correspondingTextfield.attr("id")]["zeroTruncated"]){
+		if (PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"]){
 			popupHTML = popupHTML.replace("Normal Distribution", "Zero-truncated Normal Distribution");
 		}
 		
 		$(popupHTML).appendTo('body');
 		if (discreteDescriptionStr != "") $("#discreteDescription").html(discreteDescriptionStr);
 	
-		$("#SelectDistribution").val(PHYSICAL_PARAMETERS_TEMP[correspondingTextfield.attr("id")]["distribution"])
+		$("#SelectDistribution").val(PHYSICAL_PARAMETERS_TEMP[paramID]["distribution"])
 		selectPriorDistribution();
 	};
 

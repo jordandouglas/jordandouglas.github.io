@@ -268,6 +268,7 @@ function buildBacktrackRateTable(){
 	
 	
 	var h = PHYSICAL_PARAMETERS["hybridLength"]["val"];
+	if (currentState["nbases"] - h - 1 < 0) return null;
 	var backtrackRates = Array(currentState["nbases"] - h - 1);
 	
 	
@@ -301,6 +302,8 @@ function buildTranslocationRateTable(){
 	var nLengths = currentState["nbases"] - h;
 	var nPositions = h + 1; 
 	
+	
+	if (nLengths < 0) return null;
 	
 	var translocationRates = Array(nLengths);
 	for(var nascentLength = h-1; nascentLength <= currentState["nbases"]; nascentLength ++){
@@ -336,7 +339,7 @@ function buildTranslocationRateTable(){
 
 function forward_cWW(state, resolve = function() { }){
 	if (!state[2]) state[1]++;
-	else if (state[1] >= PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1) SIMULATION_VARIABLES["terminated"] = true; // Terminate if too hypertranslocated
+	if (state[1] > PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1) SIMULATION_VARIABLES["terminated"] = true; // Terminate if too hypertranslocated
 	resolve();
 }
 

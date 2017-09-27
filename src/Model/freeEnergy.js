@@ -21,7 +21,10 @@
 -*/
 
 ELONGATION_MODELS = {};
-ELONGATION_MODELS["simpleBrownian"] = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: false, allowGeometricCatalysis: false, allowmRNAfolding:false, allowMisincorporation:false};
+ELONGATION_MODELS["simpleBrownian"] = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: true, allowHypertranslocation: false, 
+										allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: false, 
+										allowGeometricCatalysis: false, allowmRNAfolding:false, allowMisincorporation:false, useFourNTPconcentrations:false,
+										NTPbindingNParams: 2};
 //ELONGATION_MODELS["twoSiteBrownian"] = {id: "twoSiteBrownian",name: "Brownian ratchet model with 2 NTP binding sites", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation:false, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
 currentElongationModel = "simpleBrownian";
 
@@ -29,7 +32,7 @@ currentElongationModel = "simpleBrownian";
 TRANSLOCATION_MODELS = {};
 TRANSLOCATION_MODELS["midpointBarriers"] = {id: "midpointBarriers", name: "Midpoint free energy barriers"};
 TRANSLOCATION_MODELS["meltingBarriers"] = {id: "meltingBarriers", name: "Melting union free energy barriers"};
-currentTranslocationModel = "midpointBarriers";
+currentTranslocationModel = "meltingBarriers";
 
 
 
@@ -75,7 +78,13 @@ function getElongationModels_WW(resolve = function(x) { }, msgID = null){
 }
 
 
-function userInputModel_WW(elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, resolve = function() { }, msgID = null){
+// When use changes the model settings (typically by changing one of the checkboxes) some of the parameters need updating
+function userInputModel_WW(elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, resolve = function() { }, msgID = null){
+
+
+	var needToInitBindingMatrix = (allowMisincorporation != null && ELONGATION_MODELS[currentElongationModel]["allowMisincorporation"] != allowMisincorporation) ||
+								  ELONGATION_MODELS[currentElongationModel]["useFourNTPconcentrations"] != useFourNTPconcentrations || 
+								  (NTPbindingNParams != null && ELONGATION_MODELS[currentElongationModel]["NTPbindingNParams"] != NTPbindingNParams);
 
 	currentElongationModel = elongationModelID;
 	currentTranslocationModel = translocationModelID;
@@ -83,29 +92,58 @@ function userInputModel_WW(elongationModelID, translocationModelID, allowBacktra
 	ELONGATION_MODELS[currentElongationModel]["allowHypertranslocation"] = allowHypertranslocation;
 	ELONGATION_MODELS[currentElongationModel]["allowInactivation"] = allowInactivation;
 	ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"] = allowBacktrackWithoutInactivation;
-	ELONGATION_MODELS[currentElongationModel]["deactivateUponMisincorporation"] = deactivateUponMisincorporation;
+	if(deactivateUponMisincorporation != null) ELONGATION_MODELS[currentElongationModel]["deactivateUponMisincorporation"] = deactivateUponMisincorporation;
 	ELONGATION_MODELS[currentElongationModel]["allowGeometricCatalysis"] = allowGeometricCatalysis;
 	ELONGATION_MODELS[currentElongationModel]["allowmRNAfolding"] = allowmRNAfolding;
-
-	var needToInitBindingMatrix = ELONGATION_MODELS[currentElongationModel]["allowMisincorporation"] != allowMisincorporation
-	ELONGATION_MODELS[currentElongationModel]["allowMisincorporation"] = allowMisincorporation;
-	if(needToInitBindingMatrix) initMisbindingMatrix();
+	ELONGATION_MODELS[currentElongationModel]["useFourNTPconcentrations"] = useFourNTPconcentrations;
+	if(allowMisincorporation != null) ELONGATION_MODELS[currentElongationModel]["allowMisincorporation"] = allowMisincorporation;
+	if(NTPbindingNParams != null) ELONGATION_MODELS[currentElongationModel]["NTPbindingNParams"] = NTPbindingNParams;
 
 
 
 	PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["hidden"] = currentElongationModel != "twoSiteBrownian";
 	PHYSICAL_PARAMETERS["nbasesToFold"]["hidden"] = !allowmRNAfolding
 	
-	PHYSICAL_PARAMETERS["RateMisbind"]["hidden"] = !allowMisincorporation;
+	if(allowMisincorporation != null) PHYSICAL_PARAMETERS["RateMisbind"]["hidden"] = !allowMisincorporation;
 	PHYSICAL_PARAMETERS["TransitionTransversionRatio"]["hidden"] = true;// !allowMisincorporation;
 	
 	PHYSICAL_PARAMETERS["kA"]["hidden"] = !allowInactivation;
 	PHYSICAL_PARAMETERS["kU"]["hidden"] = !allowInactivation;
+
+
+	PHYSICAL_PARAMETERS["NTPconc"]["hidden"] = useFourNTPconcentrations;
+	PHYSICAL_PARAMETERS["ATPconc"]["hidden"] = !useFourNTPconcentrations;
+	PHYSICAL_PARAMETERS["CTPconc"]["hidden"] = !useFourNTPconcentrations;
+	PHYSICAL_PARAMETERS["GTPconc"]["hidden"] = !useFourNTPconcentrations;
+	PHYSICAL_PARAMETERS["UTPconc"]["hidden"] = !useFourNTPconcentrations;
+
+
+
+	if(NTPbindingNParams != null){
+		PHYSICAL_PARAMETERS["RateCatalyse"]["hidden"] = NTPbindingNParams == 8;
+		PHYSICAL_PARAMETERS["RateCatalyse_ATP"]["hidden"] = NTPbindingNParams != 8;
+		PHYSICAL_PARAMETERS["RateCatalyse_CTP"]["hidden"] = NTPbindingNParams != 8;
+		PHYSICAL_PARAMETERS["RateCatalyse_GTP"]["hidden"] = NTPbindingNParams != 8;
+		PHYSICAL_PARAMETERS["RateCatalyse_UTP"]["hidden"] = NTPbindingNParams != 8;
+
+		PHYSICAL_PARAMETERS["Kdissociation"]["hidden"] = NTPbindingNParams == 8;
+		PHYSICAL_PARAMETERS["Kdissociation_ATP"]["hidden"] = NTPbindingNParams != 8;
+		PHYSICAL_PARAMETERS["Kdissociation_CTP"]["hidden"] = NTPbindingNParams != 8;
+		PHYSICAL_PARAMETERS["Kdissociation_GTP"]["hidden"] = NTPbindingNParams != 8;
+		PHYSICAL_PARAMETERS["Kdissociation_UTP"]["hidden"] = NTPbindingNParams != 8;
+	}
+
+
+	if(needToInitBindingMatrix) {
+		initMisbindingMatrix();
+		setNextBaseToAdd_WW();
+	}
 	
 
 
 
 	translocationCacheNeedsUpdating = true;
+	initTranslocationRateCache();
 
 
 	if (msgID != null){
@@ -119,6 +157,22 @@ function userInputModel_WW(elongationModelID, translocationModelID, allowBacktra
 }
 
 
+// Returns everything necessary to populate the NTP parameters popup
+function getNTPparametersAndSettings_WW(resolve = function(){}, msgID = null){
+
+
+	var toReturn = {params: PHYSICAL_PARAMETERS, model: ELONGATION_MODELS[currentElongationModel]}
+
+	if (msgID != null){
+		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+	}
+	else{
+		resolve(toReturn);
+	}
+
+
+
+}
 
 
 function calculateAllBarrierHeights_WW(sampleAll = true){
@@ -1077,6 +1131,21 @@ function getTranslocationCanvasData_WW(resolve = function(result) { }, msgID = n
 }
 
 
+// Get the rate of releasing bound NTP. This term may be NTP dependent, and is calculated by rearranging KD = krel / kbind
+function getReleaseRate(currentlyBoundBase){
+	var KdissociationID = ELONGATION_MODELS[currentElongationModel]["NTPbindingNParams"] == 2 ? "Kdissociation" : "Kdissociation_" + currentlyBoundBase + "TP";
+	var kRelease = PHYSICAL_PARAMETERS["RateBind"]["val"] * PHYSICAL_PARAMETERS[KdissociationID]["val"];
+	return kRelease;
+}
+
+
+// Get the rate of catalysing bound NTP. This term may be NTP dependent
+function getCatalysisRate(currentlyBoundBase){
+	var kcatID = ELONGATION_MODELS[currentElongationModel]["NTPbindingNParams"] == 2 ? "RateCatalyse" : "RateCatalyse_" + currentlyBoundBase + "TP";
+	return PHYSICAL_PARAMETERS[kcatID]["val"];
+}
+
+
 function getNTPCanvasData_WW(resolve = function(result) { }, msgID = null){
 
 	// If the polymerase is post-translocated or hypertranslocated, then return the base to be transcribed next and the pair before it
@@ -1084,13 +1153,14 @@ function getNTPCanvasData_WW(resolve = function(result) { }, msgID = null){
 	var toReturn = null;
 	if (!currentState["terminated"]){
 		var deltaBase = currentState["mRNAPosInActiveSite"] <= 0 ? -1 : 0;
+		var baseToAdd = deltaBase == 0 ? currentState["NTPtoAdd"] : primerSequence[currentState["mRNALength"]-1]["base"];
 		toReturn = {state: convertFullStateToCompactState(currentState), 
 						NTPbound: currentState["NTPbound"],
 						mRNAPosInActiveSite: currentState["mRNAPosInActiveSite"],
-						baseToAdd: deltaBase == 0 ? currentState["NTPtoAdd"] : primerSequence[currentState["mRNALength"]-1]["base"],
+						baseToAdd: baseToAdd,
 						kBind: currentState["rateOfBindingNextBase"],
-						kRelease: PHYSICAL_PARAMETERS["RateUnbind"]["val"], 
-						kCat: PHYSICAL_PARAMETERS["RatePolymerise"]["val"],
+						kRelease: getReleaseRate(baseToAdd),
+						kCat: getCatalysisRate(baseToAdd),
 						templateBaseBeingCopied: templateSequence[currentState["nextBaseToCopy"]+deltaBase] != null ? templateSequence[currentState["nextBaseToCopy"]+deltaBase]["base"] : null,
 						previousTemplateBase: templateSequence[currentState["nextBaseToCopy"]-1+deltaBase]["base"] != null ? templateSequence[currentState["nextBaseToCopy"]-1+deltaBase]["base"] : null,
 						previousNascentBase: primerSequence[currentState["mRNALength"]-1+deltaBase]["base"],
