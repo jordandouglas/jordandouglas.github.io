@@ -873,6 +873,8 @@ function disable_all_buttons(){
 	$("#ntpT").attr("disabled", false);
 	$("#viewModelBtn").attr("disabled", false);
 	$(".errorBtn").attr("disabled", false);
+	$("#viewNTPmodelBtn").attr("disabled", false);
+
 
 
 }
@@ -1629,6 +1631,62 @@ function closeNav() {
 
 				<table style="width:100%">
 
+
+
+
+
+
+					<tr id="useFourNTPconcentrations_container" title="Do you want one concentration for all 4 NTPs or one concentration for each one?">
+
+
+						<td style="text-align:left; font-size:10px; float:left;">
+							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; " href="about/#useFourNTPconcentrations_paramHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						 
+						 
+						<td style="text-align:right;">
+				 			1 concentration  
+				 		</td>
+						 
+				 		<td colspan=3>
+					 		<label class="switch">
+						 		 <input type="checkbox" id="useFourNTPconcentrations" OnChange="userInputModel_controller()"> </input>
+						 		 <span class="slider round notboolean"></span>
+							</label> 
+							<span style="font-size:15px; vertical-align:middle" >4 concentrations</span>
+				 		</td>
+						
+
+
+					</tr>
+				
+
+
+
+					<tr id="NTPconc_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#NTPconc_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			<span id="NTPname"></span> = 
+				 		</td>
+
+				 		<td>
+				 			<input class="variable"   type="number" onChange="update_this_parameter_controller(this)" id="NTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
+						</td>
+
+
+				 		<td>
+				 			<input type=image id='NTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+						</td>
+
+				 	</tr>
+
+
+
 					<tr id="ATPconc_container">
 
 						<td style="text-align:left; font-size:10px; float:left; width:20px">
@@ -1814,7 +1872,12 @@ function closeNav() {
 
 
 			<div class="parameter-bg">
-				<div class="parameter-title">Translocation Parameters </div>  <br> 
+
+
+				<div class="parameter-title">
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#translocation_ModelHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+					Translocation Parameters 
+				</div>
 
 
 
@@ -1934,155 +1997,17 @@ function closeNav() {
 			
 			<br>
 			<div class="parameter-bg">
-				<div class="parameter-title">NTP Binding Parameters 
+				<div class="parameter-title">NTP Parameters 
 
-				<input type=image id='viewNTPModelBtn' title="View the NTP binding rates" onClick="viewMisincorporationModel()" src="src/Images/bindingIcon.png" style="position: absolute; left: 310px; padding: 3 3; width:25px; height:25px; float:right; vertical-align: middle; ">   <br></div>
+				<input type=image id='viewNTPModelBtn' title="View the NTP binding rates" onClick="viewMisincorporationModel()" src="src/Images/bindingIcon.png" style="display:none; position: absolute; left: 310px; padding: 3 3; width:25px; height:25px; float:right; vertical-align: middle; ">   <br></div>
 
 				<br>
 
 
-				<table style="width:100%">
-
-					<tr id="RateBind_container">
-
-						<td style="text-align:left; font-size:10px; float:left; width:20px">
-				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateBind_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
-				 		</td>
-
-						<td style="text-align:right; width:110px">
-				 			k<sub>bind</sub> =   
-				 		</td>
-
-				 		<td>
-				 			<input class="variable"  type="number" id="RateBind" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M<sup>-1</sup>.s<sup>-1</sup>
-				 		</td>
-
-
-				 		<td>
-				 			<input type=image id='RateBind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
-				 		</td>
-
-				 	</tr>
-
-					<tr id="RateUnbind_container">
-
-						<td style="text-align:left; font-size:10px; float:left;">
-							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateUnbind_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
-				 		</td>
-
-						<td style="text-align:right">
-							k<sub>release</sub> =  
-						</td>
-
-				 		<td>
-				 			 <input class="variable"  type="number" id="RateUnbind" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> s<sup>-1</sup>
-				 		</td>
-
-
-				 		<td>
-				 			<input type=image id='RateUnbind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
-				 		</td>
-					</tr>
-					
-					<tr id="RatePolymerise_container">
-
-						<td style="text-align:left; font-size:10px; float:left;">
-							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RatePolymerise_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
-				 		</td>
-
-						<td style="text-align:right">
-			    			k<sub>cat</sub> =
-							
-						</td>
-
-				 		<td>
-				 			 <input class="variable"  type="number"id="RatePolymerise" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> s<sup>-1</sup> 
-				 		</td>
-
-
-				 		<td>
-				 			<input type=image id='RatePolymerise_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
-				 		</td>
-
-					</tr>
-
-
-					<tr id="allowMisincorporation_container" title="Can the wrong nucleotide bind (during the simulation)?">
-
-
-						<td style="text-align:left; font-size:10px; float:left;">
-							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
-				 		</td>
-
-						 
-				 		<td colspan=3>
-					 		<label class="switch">
-						 		 <input type="checkbox" id="allowMisincorporation" OnChange="userInputModel_controller()"> </input>
-						 		 <span class="slider round"></span>
-							</label> 
-							<span style="font-size:15px; vertical-align:middle" >Enable misincorporations</span>
-				 		</td>
-
-
-
-					</tr>
-
-
-
-					<tr id="deactivateUponMisincorporation_container" title="Does the polymerase enter the inactivated state upon a nucleotide misincorporation (during the simulation)?">
-
-						<td style="text-align:left; float:left; width:20px">
-							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateMisbind_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
-				 		</td>
-
-				 		<td colspan=3>
-					 		<label class="switch">
-						 		 <input type="checkbox" id="deactivateUponMisincorporation" OnChange="userInputModel_controller()"> </input>
-						 		 <span class="slider round"></span>
-							</label> 
-							<span style="font-size:15px; vertical-align:middle" >Inactivate after misincorporations</span>
-				 		</td>
-
-
-					</tr>
-
-
-					<tr id="RateMisbind_container">
-
-
-						<td style="text-align:left; font-size:10px; float:left;">
-							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateMisbind_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
-				 		</td>
-
-						<td style="text-align:right">
-			    			k<sub>misbind</sub> =  
-							
-						</td>
-
-				 		<td>
-				 			 <input class="variable"  type="number" id="RateMisbind" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M<sup>-1</sup>.s<sup>-1</sup>  
-				 		</td>
-
-
-				 		<td>
-				 			<input type=image id='RateMisbind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
-				 		</td>
-
-					</tr>
-
-
-
-
-
-				</table>
-					
-
-
-				
-				<div id="TransitionTransversionRatio_container">
-					k<sub>transition</sub> / k<sub>transversion</sub> = <input class="variable"  type="number" id="TransitionTransversionRatio" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
-					<input type=image id='TransitionTransversionRatio_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+				<div style="width:100%; text-align:center">
+					<input type=button id='viewNTPmodelBtn' onClick=viewNTPModel() value='Polymerisation Settings' title="Change the NTP binding/catalysis parameters for this model" class="operation" style="z-index: 100; margin:auto; width:190px">
 				</div>
+				
 
 			</div>
 			

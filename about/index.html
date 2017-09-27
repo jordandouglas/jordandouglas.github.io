@@ -58,6 +58,9 @@ function init(){
 		var hashBits = window.location.hash.split("_");
 		if (hashBits[1] == "ParamHelp") minimiseSection("#parametersBtn", true);
 		else if (hashBits[1] == "PlotHelp") minimiseSection("#displayingPlotsBtn", true); 
+		else if (hashBits[1] == "ModelHelp") minimiseSection("#kineticsBtn", true); 
+
+
 
 		$(window.location.hash).addClass("helpSelected");
 
@@ -680,6 +683,41 @@ function addCitations(){
 																have been borrowed from Traut 1994.<cite val="traut1994physiological"></cite> It is recommended that you change these values if you know what they are for your system.</div>  <br> 
 
 
+														<div class="paramHelp" id="useFourNTPconcentrations_paramHelp">
+															<table style="">
+															<tr title="Do you want one concentration for all 4 NTPs or one concentration for each one?">
+
+																<td style="text-align:right; width:150px">
+														 			1 concentration  
+														 		</td>
+														 		<td style="" >
+															 		<label class="switch">
+																 		 <input type="checkbox"> </input>
+																 		 <span class="slider round notboolean"></span>
+																	</label> 
+																	<span style="font-size:15px; vertical-align:middle" >4 concentrations</span>
+														 		</td>
+
+													 			<td style="width:75%">
+																If this is set to <b>1 concentration</b> then all four NTPs will have the same concentration ([NTP]). If this is set to <b>4 concentrations</b>
+																then you can set the concentration of all four NTPs independently ([ATP], [CTP] [GTP], and [UTP]). Default: 1 concentration 
+
+																</td>
+
+															</tr>
+
+														
+
+															</table>
+														</div><br>
+
+
+
+
+														<div class="paramHelp" id="NTPconc_ParamHelp">
+															<b>[NTP]</b> - concentration of all four NTPs (or dNTPs). Default: 1000&mu;M (or 20&mu;M) 
+														</div><br>
+
 														<div class="paramHelp" id="ATPconc_ParamHelp">
 															<b>[ATP]</b> - concentration of ATP (or dATP). Default: 3152&mu;M (or 24&mu;M) 
 														</div><br>
@@ -772,20 +810,21 @@ function addCitations(){
 
 														<div class="paramHelp" id="RateBind_ParamHelp">
 															<b style="font-size:20px">$k_{bind}$</b> - used to calculate rate constant of binding the complementary NTP, which is calculated as [NTP] k<sub>bind</sub>. 
-																	See k<sub>misbind</sub> for the rate of binding a non-complementary NTP. Default: 250s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> 
+																	See k<sub>misbind</sub> for the rate of binding a non-complementary NTP. This parameter is constant across all NTPs. Default: 30&mu;M<sup>-1</sup>.s<sup>-1</sup>  
 														</div><br>
 
 
-														<div class="paramHelp" id="RateUnbind_ParamHelp">
-															<b style="font-size:20px">$k_{release}$</b> - rate constant of releasing bound NTP. Since this value is around 50&times; the value of $k_{cat}$, the polymerase
-																	will bind and release the NTP on average 50 times before catalysis occurs. Fast, ultrafast and hidden simulations in SimPol are optimised to  
-																	perform the binding step without rendering any visual changes. Default: 1000s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> 
+														<div class="paramHelp" id="Kdissociate_ParamHelp">
+															<b style="font-size:20px">$K_D$</b> - equilibrium constant of NTP dissociation. $K_D$ is used in conjunction with $k_{bind}$ to calculate the rate of releasing
+															bound NTP: $k_\text{release} = K_D \; k_\text{bind}$. $K_D$ is by default shared by all 4 NTPs but you can make it NTP specific instead (ie. 1 term for each of ATP, CTP, GTP, UTP).
+															Defaults: $K_D = 35, K_D^{ATP} = 50, K_D^{CTP} = 33, K_D^{GTP} = 36, K_D^{UTP} = 18\;$ <cite val="bai2007mechanochemical"></cite>
 														</div><br>
 
 
-														<div class="paramHelp" id="RatePolymerise_ParamHelp"> 
+														<div class="paramHelp" id="RateCatalyse_ParamHelp"> 
 															<b style="font-size:20px">$k_{cat}$</b> - rate constant of catalysing bound NTP, thus extending the nascent chain by one base. When translocation is fast,
-																	catalysis is the rate limiting step in transcription. Default: 20s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite> 
+																	catalysis is the rate limiting step in transcription. $k_{cat}$ is by default shared by all 4 NTPs but you can make it NTP specific instead (ie. 1 term for each of ATP, CTP, GTP, UTP).
+																	Defaults: $k_{cat} = 30, k_{cat}^{ATP} = 38, k_{cat}^{CTP} = 7, k_{cat}^{GTP} = 62, k_{cat}^{UTP} = 24\;$ <cite val="bai2007mechanochemical"></cite>
 
 														</div><br>
 
@@ -930,7 +969,7 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div class="block-subtitle" > Calculating translocation rates</div> <br>
+									<div id="translocation_ModelHelp" class="block-subtitle" > Calculating translocation rates</div> <br>
 								
 										Basepairs may need to be broken in order for the polymerase to translocate forwards (right) or backwards (left) from its current position. For example, consider the image below. 
 
@@ -1016,6 +1055,19 @@ function addCitations(){
 				
 										This model of translocation has been borrowed from Tadigotla et al.<cite val="maoileidigh2011unified,tadigotla2006thermodynamic"></cite>
 
+
+								
+							
+								</div>
+							</div>
+
+
+
+
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+									<div id="polymerisation_ModelHelp" class="block-subtitle" > Calculating polymerisation and misincorporation rates</div> <br>
 
 								
 							
