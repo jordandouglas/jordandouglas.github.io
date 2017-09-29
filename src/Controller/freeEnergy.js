@@ -183,6 +183,10 @@ function updateModelDOM(elongation_model_temp){
 
 	//if (elongation_model_temp["allowInactivation"]) $("#deactivateUponMisincorporation_container").show(100);
 	//else $("#deactivateUponMisincorporation_container").hide(100);
+
+
+	if(elongation_model_temp["allowHypertranslocation"]) $("#GHypertranslocate_container").show(300);
+	else  $("#GHypertranslocate_container").hide(0);
 	
 	
 	if (elongation_model_temp["allowInactivation"]) {
@@ -190,14 +194,14 @@ function updateModelDOM(elongation_model_temp){
 		$("#kA_container").show(100);
 	}
 	else {
-		$("#kU_container").hide(100);
-		$("#kA_container").hide(100);
+		$("#kU_container").hide(0);
+		$("#kA_container").hide(0);
 	}
 
 
 
 	if (elongation_model_temp["id"] == "twoSiteBrownian") $("#GsecondarySitePenalty_container").show(100);
-	else $("#GsecondarySitePenalty_container").hide(100);
+	else $("#GsecondarySitePenalty_container").hide(0);
 
 
 	if (elongation_model_temp["allowmRNAfolding"]) {
@@ -206,8 +210,8 @@ function updateModelDOM(elongation_model_temp){
 
 	}
 	else {
-		$("#nbasesToFold_container").hide(100);
-		$("#nbasesToFold_desc").hide(100);
+		$("#nbasesToFold_container").hide(0);
+		$("#nbasesToFold_desc").hide(0);
 	}
 	
 	
@@ -219,9 +223,9 @@ function updateModelDOM(elongation_model_temp){
 
 	}
 	else {
-		$("#RateMisbind_container").hide(100);
+		$("#RateMisbind_container").hide(0);
 		//$("#TransitionTransversionRatio_container").hide(100);
-		$("#deactivateUponMisincorporation_container").hide(100);
+		$("#deactivateUponMisincorporation_container").hide(0);
 	}
 
 

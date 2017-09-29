@@ -832,6 +832,7 @@ function updateForce_controller(){
 	var updateDOM = function(){
 		update_sliding_curve(0);
 		renderObjects();
+		refreshNavigationCanvases();
 	};
 
 	// If this is in animation mode, then this process is synchronous with rendering so we return in between operators
@@ -1832,6 +1833,8 @@ function saveSettings_controller(){
 			else {
 				values.push([$("#zMin_textbox").val(), $("#zMax_textbox").val()]);
 			}
+
+			values.push($("#zColouring").val());
 
 
 			functionToCallAfterSaving  = function() { plot_parameter_heatmap(plotNum); };

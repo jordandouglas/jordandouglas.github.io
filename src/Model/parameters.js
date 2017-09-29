@@ -33,7 +33,8 @@ PHYSICAL_PARAMETERS["hybridLength"] = {distribution:"Fixed", refreshOnChange:tru
 PHYSICAL_PARAMETERS["bubbleSizeLeft"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 2, name: "Bubble length left (bp)",  title: "Number of unpaired template bases 3' of the hybrid", zeroTruncated: true, integer: true, hidden:true};
 PHYSICAL_PARAMETERS["bubbleSizeRight"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 1, name: "Bubble length right (bp)", title: "Number of unpaired template bases 5' of the hybrid", zeroTruncated: true, integer: true, hidden:true};
 
-PHYSICAL_PARAMETERS["GDaggerSlide"] = {distribution:"Fixed", fixedDistnVal: 8.2, name: "\u0394G\u2020slide", title: "Free energy barrier height of translocation", zeroTruncated: false, integer: false};
+PHYSICAL_PARAMETERS["GDaggerSlide"] = {distribution:"Fixed", fixedDistnVal: 4.5, name: "\u0394G\u2020slide", title: "Free energy barrier height of translocation", zeroTruncated: false, integer: false};
+PHYSICAL_PARAMETERS["GHypertranslocate"] = {distribution:"Fixed", fixedDistnVal: 2, name: "\u0394Ghyper", title: "Free energy penalty height of hypertranslocation", zeroTruncated: false, integer: false, hidden: true};
 PHYSICAL_PARAMETERS["GsecondarySitePenalty"] = {distribution:"Fixed", fixedDistnVal: 1.336, name: "\u0394G\u2020NTP2", title: "Free energy penalty of binding NTP in the secondary binding site", zeroTruncated: false, integer: false};
 PHYSICAL_PARAMETERS["FAssist"] = {distribution:"Fixed", fixedDistnVal: 0, name: "Fassist (pN)", title: "Assisting force", zeroTruncated: false, integer: false};
 PHYSICAL_PARAMETERS["arrestTimeout"] = {distribution:"Fixed", fixedDistnVal: 60, name: "Arrest timeout (s)", title: "Maximum pause duration before the simulation is arrested. Set to zero to prevent arrests.", zeroTruncated: true, integer: false};
@@ -66,7 +67,7 @@ PHYSICAL_PARAMETERS["nbasesToFold"] = {distribution:"Fixed", fixedDistnVal: 150,
 
 
 
-PHYSICAL_PARAMETERS["GDaggerDiffuse"] = {distribution:"Fixed", fixedDistnVal: 15, name: "\u0394G\u2020slip", title: "Free energy barrier height of bulge formation and diffusion in the primer sequence", zeroTruncated: false, integer: false};
+PHYSICAL_PARAMETERS["GDaggerDiffuse"] = {distribution:"Fixed", fixedDistnVal: 15, name: "\u0394G\u2020slip", title: "Free energy barrier height of bulge formation and diffusion in the primer sequence", zeroTruncated: false, integer: false, hidden:true};
 PHYSICAL_PARAMETERS["allowMultipleBulges"] = { distribution: "Fixed", fixedDistnVal:false, binary: true, title: "Allow more than 1 bulge in the primer at a time?", name: "allowMultipleBulges"};
 
 
@@ -263,7 +264,7 @@ function update_this_parameter_WW(paramID, fixedVal, resolve = function(toReturn
 	
 	
 	// If the parameter has been changed and it will affect translocation rates then we calculate everything again
-	if (initialVal != PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "GDaggerSlide" || paramID == "FAssist" || paramID == "hybridLength" || paramID == "bubbleSizeLeft" || paramID == "bubbleSizeRight" || paramID == "nbasesToFold")){
+	if (initialVal != PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "GDaggerSlide" || paramID == "GHypertranslocate" || paramID == "FAssist" || paramID == "hybridLength" || paramID == "bubbleSizeLeft" || paramID == "bubbleSizeRight" || paramID == "nbasesToFold")){
 		translocationCacheNeedsUpdating = true; // Recalculate the translocation rate cache
 		initTranslocationRateCache();
 	}
@@ -365,7 +366,7 @@ function sample_parameter_WW(paramID, resolve = function() { }, msgID = null){
 	}
 	
 	// If a parameter has been changed and it will affect translocation rates then we calculate everything again
-	if (initialVal != PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "GDaggerSlide" || paramID == "FAssist" || paramID == "hybridLength" || paramID == "bubbleSizeLeft" || paramID == "bubbleSizeRight" || paramID == "nbasesToFold")){
+	if (initialVal != PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "GDaggerSlide" || paramID == "GHypertranslocate" || paramID == "FAssist" || paramID == "hybridLength" || paramID == "bubbleSizeLeft" || paramID == "bubbleSizeRight" || paramID == "nbasesToFold")){
 		translocationCacheNeedsUpdating = true;
 	}
 	
@@ -524,6 +525,7 @@ function updateForce_WW(newFAssist = null, resolve = function() { }, msgID = nul
 	if (newFAssist != null){
 		PHYSICAL_PARAMETERS["FAssist"]["val"] = newFAssist;
 		PHYSICAL_PARAMETERS["FAssist"]["fixedDistnVal"] = newFAssist;
+		translocationCacheNeedsUpdating = true;
 		initTranslocationRateCache(); // Recalculate the translocation rate cache when the force changes
 	}
 

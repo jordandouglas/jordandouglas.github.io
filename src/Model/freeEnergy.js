@@ -21,8 +21,8 @@
 -*/
 
 ELONGATION_MODELS = {};
-ELONGATION_MODELS["simpleBrownian"] = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: true, allowHypertranslocation: false, 
-										allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: false, 
+ELONGATION_MODELS["simpleBrownian"] = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: false, allowHypertranslocation: false, 
+										allowInactivation:false, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: false, 
 										allowGeometricCatalysis: false, allowmRNAfolding:false, allowMisincorporation:false, useFourNTPconcentrations:false,
 										NTPbindingNParams: 2};
 //ELONGATION_MODELS["twoSiteBrownian"] = {id: "twoSiteBrownian",name: "Brownian ratchet model with 2 NTP binding sites", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation:false, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
@@ -30,8 +30,8 @@ currentElongationModel = "simpleBrownian";
 
 
 TRANSLOCATION_MODELS = {};
-TRANSLOCATION_MODELS["midpointBarriers"] = {id: "midpointBarriers", name: "Midpoint free energy barriers"};
-TRANSLOCATION_MODELS["meltingBarriers"] = {id: "meltingBarriers", name: "Melting union free energy barriers"};
+TRANSLOCATION_MODELS["midpointBarriers"] = {id: "midpointBarriers", name: "Midpoint"};
+TRANSLOCATION_MODELS["meltingBarriers"] = {id: "meltingBarriers", name: "Melting"};
 currentTranslocationModel = "meltingBarriers";
 
 
@@ -101,6 +101,7 @@ function userInputModel_WW(elongationModelID, translocationModelID, allowBacktra
 
 
 
+
 	PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["hidden"] = currentElongationModel != "twoSiteBrownian";
 	PHYSICAL_PARAMETERS["nbasesToFold"]["hidden"] = !allowmRNAfolding
 	
@@ -110,6 +111,8 @@ function userInputModel_WW(elongationModelID, translocationModelID, allowBacktra
 	PHYSICAL_PARAMETERS["kA"]["hidden"] = !allowInactivation;
 	PHYSICAL_PARAMETERS["kU"]["hidden"] = !allowInactivation;
 
+
+	PHYSICAL_PARAMETERS["GHypertranslocate"]["hidden"] = !allowHypertranslocation;
 
 	PHYSICAL_PARAMETERS["NTPconc"]["hidden"] = useFourNTPconcentrations;
 	PHYSICAL_PARAMETERS["ATPconc"]["hidden"] = !useFourNTPconcentrations;
@@ -277,6 +280,11 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 			}
 
 
+			// Hypertranslocation penalty
+			if(ELONGATION_MODELS[currentElongationModel]["allowHypertranslocation"]){
+				var hypertranslocationPenalty = Math.max(0, state["mRNAPosInActiveSite"] - 1.5) * PHYSICAL_PARAMETERS["GHypertranslocate"]["val"];
+				slidingPeakHeightsTemp[pos] += hypertranslocationPenalty;
+			}
 
 
 			// Midpoint model: free energy barrier is halfway between the two on either side
@@ -357,6 +365,13 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 			}
 
 
+			// Hypertranslocation penalty
+			if(ELONGATION_MODELS[currentElongationModel]["allowHypertranslocation"]){
+				var hypertranslocationPenalty = Math.max(0, statePreOperation["mRNAPosInActiveSite"] - 0.5) * PHYSICAL_PARAMETERS["GHypertranslocate"]["val"];
+				slidingPeakHeightsTemp[pos-1] += hypertranslocationPenalty;
+			}
+
+
 
 			// Midpoint model: free energy barrier is halfway between the two on either side
 			if (currentTranslocationModel == "midpointBarriers"){
@@ -414,11 +429,19 @@ function update_slidingTroughHeights_WW(stateToCalculateFor = currentState, samp
 	slidingTroughHeightsTemp[3] = getFreeEnergyOfState_WW(stateToCalculateFor, [TbulgePos]);
 	//console.log("Hybrid string of transcription bubble:")
 	slidingTroughHeightsTemp[3] -= getFreeEnergyOfTranscriptionBubble_WW(stateToCalculateFor); // Subtract the energy which we would gain if the transcription bubble was sealed
-	
+
+
+
 
 	// Add a penalty for having NTP in the secondary binding site
 	if (currentElongationModel == "twoSiteBrownian" && stateToCalculateFor["mRNAPosInActiveSite"] == 0 && stateToCalculateFor["NTPbound"]){
 		slidingTroughHeightsTemp[3] += PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
+	}
+
+
+	if(ELONGATION_MODELS[currentElongationModel]["allowHypertranslocation"]){
+		var hypertranslocationPenalty = Math.max(0, stateToCalculateFor["mRNAPosInActiveSite"] - 1) * PHYSICAL_PARAMETERS["GHypertranslocate"]["val"];
+		slidingTroughHeightsTemp[3] += hypertranslocationPenalty;
 	}
 	
 	// Slide backwards
@@ -435,6 +458,17 @@ function update_slidingTroughHeights_WW(stateToCalculateFor = currentState, samp
 				if (currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 0 && stateToCalculateFor["NTPbound"]){
 					slidingTroughHeightsTemp[pos] += PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
 				}
+
+
+				// Hypertranslocation penalty
+				if(ELONGATION_MODELS[currentElongationModel]["allowHypertranslocation"]){
+					var hypertranslocationPenalty = Math.max(0, state["mRNAPosInActiveSite"] - 1) * PHYSICAL_PARAMETERS["GHypertranslocate"]["val"];
+					//console.log("1Current state", state["mRNAPosInActiveSite"], "penalty", hypertranslocationPenalty);
+					slidingTroughHeightsTemp[pos] += hypertranslocationPenalty;
+				}
+
+
+
 
 		}
 	}
@@ -453,6 +487,15 @@ function update_slidingTroughHeights_WW(stateToCalculateFor = currentState, samp
 				if (currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 0 && stateToCalculateFor["NTPbound"]){	
 					slidingTroughHeightsTemp[pos] += PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
 				}
+
+
+				// Hypertranslocation penalty
+				if(ELONGATION_MODELS[currentElongationModel]["allowHypertranslocation"]){
+					var hypertranslocationPenalty = Math.max(0, state["mRNAPosInActiveSite"] - 1) * PHYSICAL_PARAMETERS["GHypertranslocate"]["val"];
+					//console.log("2Current state", state["mRNAPosInActiveSite"], "penalty", hypertranslocationPenalty);
+					slidingTroughHeightsTemp[pos] += hypertranslocationPenalty;
+				}
+
 		}
 	}
 	

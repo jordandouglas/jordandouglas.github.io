@@ -93,6 +93,8 @@ function refreshPlotDataSequenceChangeOnly_WW(){
 	PARAMETERS_PLOT_DATA["meanVelocity"] = {name: "Mean velocity (bp/s)", vals: []};
 	PARAMETERS_PLOT_DATA["meanCatalysis"] = {name: "Mean catalysis time (s)", vals: []};
 	PARAMETERS_PLOT_DATA["meanTranscription"] = {name: "Total transcription time (s)", vals: []};
+	PARAMETERS_PLOT_DATA["nascentLength"] = {name: "Final nascent length (nt)", vals: []};
+
 
 
 	timesSpentOnEachTemplate = [0];
@@ -244,7 +246,7 @@ function getPlotData_WW(resolve = function(plotData) { }, msgID = null){
 	
 	}
 
-	
+
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(plotData));
 	}
@@ -452,6 +454,7 @@ function selectPlot_WW(plotNum, value, deleteData, resolve = function(plotData) 
 		whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
 		whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
 		whichPlotInWhichCanvas[plotNum]["zRange"] = "automaticZ";
+		whichPlotInWhichCanvas[plotNum]["zColouring"] = "blue";
 
 	}
 
@@ -595,6 +598,7 @@ function saveSettings_WW(plotNum, plotType, values, resolve = function() { }, ms
 			whichPlotInWhichCanvas[plotNum]["xData"] = PARAMETERS_PLOT_DATA[values[0]];
 			whichPlotInWhichCanvas[plotNum]["yData"] = PARAMETERS_PLOT_DATA[values[1]];
 			whichPlotInWhichCanvas[plotNum]["zData"] = PARAMETERS_PLOT_DATA[values[2]];
+			whichPlotInWhichCanvas[plotNum]["zColouring"] = values[6]; // Colour of the points
 
 
 			if (values[3] == "automaticX") whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
@@ -625,6 +629,9 @@ function saveSettings_WW(plotNum, plotType, values, resolve = function() { }, ms
 				if (isNaN(zMin) || isNaN(zMax)) whichPlotInWhichCanvas[plotNum]["zRange"] = "automaticZ";
 				else whichPlotInWhichCanvas[plotNum]["zRange"] = [zMin, zMax];
 			}
+
+
+
 			break;
 
 	}
@@ -733,9 +740,12 @@ function update_custom_plot_data_WW(){
 	PARAMETERS_PLOT_DATA["meanVelocity"]["vals"].push(meanVelocity_thisTrial);
 	PARAMETERS_PLOT_DATA["meanTranscription"]["vals"].push(totalTime_thisTrial);
 	PARAMETERS_PLOT_DATA["meanCatalysis"]["vals"].push(meanDwellTime_thisTrial);
+	PARAMETERS_PLOT_DATA["nascentLength"]["vals"].push(currentState["mRNALength"]-1);
+
 
 
 	// Update the parameters on the list
+
 	for (var canvasNum = 1; canvasNum <=3; canvasNum++){
 		if (whichPlotInWhichCanvas[canvasNum] != null && whichPlotInWhichCanvas[canvasNum]["name"] == "custom"){
 
@@ -746,8 +756,20 @@ function update_custom_plot_data_WW(){
 			whichPlotInWhichCanvas[canvasNum]["yData"] = PARAMETERS_PLOT_DATA[metricID];
 
 
+		}
+
+		else if (whichPlotInWhichCanvas[canvasNum] != null && whichPlotInWhichCanvas[canvasNum]["name"] == "parameterHeatmap") {
+
+			var paramIDx = whichPlotInWhichCanvas[canvasNum]["customParamX"];
+			var paramIDy = whichPlotInWhichCanvas[canvasNum]["customParamY"];
+			var metricID = whichPlotInWhichCanvas[canvasNum]["metricZ"];
+
+			whichPlotInWhichCanvas[canvasNum]["xData"] = PARAMETERS_PLOT_DATA[paramIDx];
+			whichPlotInWhichCanvas[canvasNum]["yData"] = PARAMETERS_PLOT_DATA[paramIDy];
+			whichPlotInWhichCanvas[canvasNum]["zData"] = PARAMETERS_PLOT_DATA[metricID];
 
 		}
+
 
 	}
 
@@ -861,21 +883,24 @@ function deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timeP
 		PARAMETERS_PLOT_DATA["meanVelocity"] = {name: "Mean velocity (bp/s)", vals: []};
 		PARAMETERS_PLOT_DATA["meanCatalysis"] = {name: "Mean dwell time (s)", vals: []};
 		PARAMETERS_PLOT_DATA["meanTranscription"] = {name: "Total transcription time (s)", vals: []};
+		PARAMETERS_PLOT_DATA["nascentLength"] = {name: "Final nascent length (nt)", vals: []};
+
+
 
 
 
 		for (var plotNum = 1; plotNum <= 3; plotNum++){
 			if (whichPlotInWhichCanvas[plotNum] != null && whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
-				whichPlotInWhichCanvas[plotNum]["xData"]["vals"] = [];
-				whichPlotInWhichCanvas[plotNum]["yData"]["vals"] = [];
+				if(whichPlotInWhichCanvas[plotNum]["xData"] != null) whichPlotInWhichCanvas[plotNum]["xData"]["vals"] = [];
+				if(whichPlotInWhichCanvas[plotNum]["yData"] != null) whichPlotInWhichCanvas[plotNum]["yData"]["vals"] = [];
 			}
 		}
 
 		for (var plotNum = 1; plotNum <= 3; plotNum++){
 			if (whichPlotInWhichCanvas[plotNum] != null && whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
-				whichPlotInWhichCanvas[plotNum]["xData"]["vals"] = [];
-				whichPlotInWhichCanvas[plotNum]["yData"]["vals"] = [];
-				whichPlotInWhichCanvas[plotNum]["zData"]["vals"] = [];
+				if(whichPlotInWhichCanvas[plotNum]["xData"] != null) whichPlotInWhichCanvas[plotNum]["xData"]["vals"] = [];
+				if(whichPlotInWhichCanvas[plotNum]["yData"] != null) whichPlotInWhichCanvas[plotNum]["yData"]["vals"] = [];
+				if(whichPlotInWhichCanvas[plotNum]["zData"] != null) whichPlotInWhichCanvas[plotNum]["zData"]["vals"] = [];
 			}
 		}
 

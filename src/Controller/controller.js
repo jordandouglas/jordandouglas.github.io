@@ -399,7 +399,7 @@ function download(filename, text) {
 
 
 // This function is called by the WebWorker during ultrafast simulations
-function renderHTML(){
+function renderHTML_ultrafast(){
 
 	
 
@@ -414,6 +414,17 @@ function renderHTML(){
 	drawPlots();
 	setNextBaseToAdd_controller();
 	resumeSimulation_controller();
+
+}
+
+
+
+
+// This function is called by the WebWorker during hidden simulations
+function renderHTML_hidden(){
+	
+	renderParameters();
+	drawPlots();
 
 }
 

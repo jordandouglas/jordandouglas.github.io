@@ -90,7 +90,7 @@ function renderPlotsHidden(){
 
 
 	setTimeout(function(){
-		postMessage("_drawPlots()");
+		postMessage("_renderHTML_hidden()");
 		renderPlotsHidden();
 	}, renderPlotsEveryMS); // Give it an extra few ms to ensure that action has completed
 
@@ -303,7 +303,7 @@ function trial_WW(stateC, resolve = function() { }, msgID = null){
 
 			currentState = convertCompactStateToFullState(stateC);
 			updateCoordsOfCurrentState();
-			postMessage("_renderHTML()");
+			postMessage("_renderHTML_ultrafast()");
 		
 
 			resumeSimulation_WW = function(){

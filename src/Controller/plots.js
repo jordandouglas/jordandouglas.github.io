@@ -2584,8 +2584,96 @@ function download_customDataTSV(plotNum){
 
 }
 
+
+
+
+
+function download_heatmapDataTSV(plotNum){
+
+
+	if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamX"] == "none" || PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamY"] == "none") return;
+
+	var xLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamX"];
+	var yLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamY"];
+	var zLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["metricZ"];
+	var xvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xData"]["vals"];
+	var yvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yData"]["vals"];
+	var zvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zData"]["vals"];
+
+
+	var tsv = xLab + " vs " + yLab + " per trial, DateTime "  + getFormattedDateAndTime() + "\n";
+	tsv += xLab + "\t";
+	for (var i = 0; i < xvals.length; i ++){
+		tsv += xvals[i] + "\t";
+	}
+	tsv += "\n";
+
+
+	tsv += yLab + "\t";
+	for (var i = 0; i < yvals.length; i ++){
+		tsv += yvals[i] + "\t";
+	}
+	tsv += "\n";
+
+	if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["metricZ"] != "probability"){
+		tsv += zLab + "\t";
+		for (var i = 0; i < zvals.length; i ++){
+			tsv += zvals[i] + "\t";
+		}
+		tsv += "\n";
+	}
+
+	download(xLab + ".tsv", tsv);
+
+
+}
+
+
+
+
+
+function getColourPalette(paletteName){
+
+	switch(paletteName){
+
+		case "blue":
+			return Array(10).fill("#008CBA");
+		case "rainbow":
+			return ["#FF80CCFF", "#E680FFFF", "#9980FFFF", "#80B2FFFF", "#80FFFFFF", "#80FFB3FF", "#99FF80FF", "#E5FF80FF", "#FFCC80FF", "#FF8080FF"];
+		case "yellowRed":
+			return ["#FFFFBFFF", "#FFFF40FF", "#FFFF00FF", "#FFDB00FF", "#FFB600FF", "#FF9200FF", "#FF6D00FF", "#FF4900FF", "#FF2400FF", "#FF0000FF"];
+		case "greyBlack":
+			return ["#999999", "#919191", "#898989", "#7F7F7F", "#757575", "#6A6A6A", "#5D5D5D", "#4E4E4E", "#393939", "#0D0D0D"];
+	}
+
+	return null;
+
+
+}
+
+
+
+
+// Returns the colour of the current value
+function getColourFromPalette(val, min, max, paletteName){
+
+	var scaledVal = Math.floor(10 * (val - min) / (max - min)); // Normalise between 0 and 9
+	if(scaledVal > 9) scaledVal = 9;
+	if(scaledVal < 0) scaledVal = 0;
+	var cols = getColourPalette(paletteName);
+	return cols[scaledVal];
+	
+}
+
+
+
+
+
+
 function plot_parameter_heatmap(plotNumCustom = null){
 
+
+	console.log("Drawing heatmap", plotNumCustom);
 
 	if (plotNumCustom == null) plotNumCustom = 5;
 
@@ -2594,7 +2682,7 @@ function plot_parameter_heatmap(plotNumCustom = null){
 	
 	// Empty plot
 	if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParamX"] == "none" || PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParamY"] == "none"){
-		scatter_plot([], [], [0, 10, 0, 1], "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"]);
+		scatter_plot([], [], [0, 10, 0, 1], "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], "Variable 1", "Variable 2", "Variable 3", "#008CBA", PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zColouring"]);
 	}
 	
 	// X and Y variables
@@ -2610,31 +2698,66 @@ function plot_parameter_heatmap(plotNumCustom = null){
 		var zvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["vals"];
 
 
+
+		var xValsGood = [];
+		var yValsGood = [];
+		var zValsGood = [];
+		var zmin, zmax;
+
+
+		// Get the z-axis range and filter out points which are not within this range. 
+		// If a colour gradient is being used then assign colours to the points
+		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"] == "automaticZ"){
+			zmin = Math.min.apply(Math, zvals);
+			zmax = Math.max.apply(Math, zvals);
+			xValsGood = xvals;
+			yValsGood = yvals;
+			zValsGood = zvals;
+		}else{
+			zmin = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"][0];
+			zmax = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"][1];
+
+
+			if(PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["metricZ"] == "probability"){
+				xValsGood = xvals;
+				yValsGood = yvals;
+			}
+
+			else{
+
+				for (var trialID = 0; trialID < zvals.length; trialID++){
+
+					if (zvals[trialID] <= zmax && zvals[trialID] >= zmin) {
+						xValsGood.push(xvals[trialID]);
+						yValsGood.push(yvals[trialID]);
+						zValsGood.push(zvals[trialID]);
+					}
+
+				}
+			}
+
+		}
+
+
+
+
 	
-		// Make a scatter plot
-		var xmin, xmax, ymin, ymax, zmin, zmax;
+		// Get the x and y ranged
+		var xmin, xmax, ymin, ymax;
 		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"] == "automaticX"){
-			xmin = Math.min.apply(Math, xvals);
-			xmax = Math.max.apply(Math, xvals);
+			xmin = Math.min.apply(Math, xValsGood);
+			xmax = Math.max.apply(Math, xValsGood);
 		}else{
 			xmin = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"][0];
 			xmax = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"][1];
 		}
 
 		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yRange"] == "automaticY"){
-			ymin = Math.min.apply(Math, yvals);
-			ymax = Math.max.apply(Math, yvals);
+			ymin = Math.min.apply(Math, yValsGood);
+			ymax = Math.max.apply(Math, yValsGood);
 		}else{
 			ymin = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yRange"][0];
 			ymax = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yRange"][1];
-		}
-
-		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"] == "automaticZ"){
-			zmin = Math.min.apply(Math, zvals);
-			zmax = Math.max.apply(Math, zvals);
-		}else{
-			zmin = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"][0];
-			zmax = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"][1];
 		}
 
 
@@ -2651,16 +2774,27 @@ function plot_parameter_heatmap(plotNumCustom = null){
 		
 		//console.log("actual boundaries", Math.max.apply(Math, xvals), Math.min.apply(Math, xvals), Math.max.apply(Math, yvals), Math.min.apply(Math, yvals));
 		//console.log("Magnitudes", orderOfMagnitudeXMin, orderOfMagnitudeXMax, orderOfMagnitudeYMin, orderOfMagnitudeYMax);
-		
 
-		scatter_plot(xvals, yvals, [xmin, xmax, ymin, ymax], "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], xLab, yLab);
+
+		// Set the point colouring
+		var cols = "#008CBA"; // Either a single colour or a gradient
+		var colouringFn = null;
+		if(PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["metricZ"] != "probability"){
+			
+			cols = [];
+			colouringFn = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zColouring"];
+			for (var trialID = 0; trialID < zValsGood.length; trialID++){
+				cols.push(getColourFromPalette(zValsGood[trialID], zmin, zmax, colouringFn));
+			}
+
+		}
+
+
+
+		scatter_plot(xValsGood, yValsGood, [xmin, xmax, ymin, ymax, zmin, zmax], "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], xLab, yLab, zLab, cols, colouringFn);
 
 
 	}
-	
-	
-	
-
 
 
 }
@@ -2722,7 +2856,7 @@ function plot_custom(plotNumCustom = null){
 
 
 		//console.log("ymax", ymax, "ymin", ymin, "yvals", yvals);
-		console.log("xmax", xmax, "xmin", xmin, "xvals", xvals, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]);
+		//console.log("xmax", xmax, "xmin", xmin, "xvals", xvals, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]);
 		
 		//console.log("actual boundaries", Math.max.apply(Math, xvals), Math.min.apply(Math, xvals), Math.max.apply(Math, yvals), Math.min.apply(Math, yvals));
 		//console.log("Magnitudes", orderOfMagnitudeXMin, orderOfMagnitudeXMax, orderOfMagnitudeYMin, orderOfMagnitudeYMax);
@@ -2814,11 +2948,10 @@ function getNiceAxesNumbers(min, max, plotWidthOrHeight, axisGap = 45, niceBinSi
 
 
 // Plot the values of x and y
-function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier, xlab = "Variable 1", ylab = "Variable 2", col = "#008CBA") {
+function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier, xlab = "Variable 1", ylab = "Variable 2", zlab = null, col = "#008CBA", colGradient = null) {
 	
 
 	if ($("#" + canvasDivID).is( ":hidden" )) return;
-
 
 
 	if (canvasSizeMultiplier == null) canvasSizeMultiplier = 1;
@@ -2833,8 +2966,8 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	
 	
 
-
 	var axisGap = 45 * canvasSizeMultiplier;
+	var legendGap = zlab == null ? 0 : 45 * canvasSizeMultiplier; // If there are multiple colours then need a legend
 	
 	var canvas = $('#' + id)[0];
 	if (canvas == null) return;
@@ -2847,7 +2980,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	
-	var plotWidth = canvas.width - axisGap;
+	var plotWidth = canvas.width - axisGap - legendGap;
 	var plotHeight = canvas.height - axisGap;
 
 
@@ -2918,9 +3051,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 
 		ctx.beginPath();
 		ctx.setLineDash([])
-		ctx.strokeStyle = col;
 		ctx.lineWidth = 3 * canvasSizeMultiplier;
-		
 
 		for (var valIndex = 0; valIndex < Math.min(xvals.length, yvals.length); valIndex ++){
 			
@@ -2929,11 +3060,11 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 			xPrime = widthScale * (xvals[valIndex] - range[0]) + axisGap;
 			yPrime = plotHeight - heightScale * (yvals[valIndex] - range[2]);
 			
-			if (xPrime < axisGap || yPrime > plotHeight - axisGap) continue; // Don't plot if out of range
+			if (xPrime < axisGap || xPrime > axisGap + plotWidth || yPrime > plotHeight - axisGap || yPrime < 0) continue; // Don't plot if out of range
 			
 			// Add circle
 			ctx.beginPath();
-			ctx.fillStyle = col;
+			ctx.fillStyle = !$.isArray(col) ? col : col[valIndex]; // The colour may be a single value or a list corresponding to each point
 			ctx.globalAlpha = 0.7;
 			ctx_ellipse(ctx, xPrime, yPrime, 4 * canvasSizeMultiplier, 4 * canvasSizeMultiplier, 0, 0, 2 * Math.PI);
 			ctx.fill();
@@ -2967,57 +3098,91 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	ctx.fillStyle = "black";
 	ctx.fillText(ylab, 0 ,0);
 	ctx.restore();
-	
 
 
-	// Add a hover events over the axis labels
+	// Z label colour legend
+	if (zlab != null){
 
-	/*
-	// Add mouse hover event
-	canvas.onmousemove = function (e) {
+		// Add the z-axis label name
+		ctx.font = 14 * canvasSizeMultiplier + "px Arial";
+		ctx.textBaseline="bottom"; 
+		ctx.textAlign="center"; 
+		var zlabXPos = axisGap + plotWidth + legendGap;
+		var zlabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
+		ctx.save()
+		ctx.translate(zlabXPos, zlabYPos);
+		ctx.rotate(-Math.PI/2);
+		ctx.fillStyle = "black";
+		ctx.fillText(zlab, 0 ,0);
+		ctx.restore();
 
-		if (simulating) return;
-		
-		var rect = this.getBoundingClientRect();
-    	var mouseX = e.clientX - rect.left;
-		var mouseY = e.clientY - rect.top;
+
+		// Draw the colour gradient (a ladder of filled rectangles on top of each other)
+		if(colGradient != null){
+
+			ctx.globalAlpha = 1;
+			colGradient = getColourPalette(colGradient);
+			var colourStepSize = 3 * canvasSizeMultiplier;
+			var rectX = axisGap + plotWidth + 5*canvasSizeMultiplier;
+			var rectHeight = 12*canvasSizeMultiplier;
+			var rectY0 = zlabYPos + rectHeight*(colGradient.length)/2 - rectHeight;
+			var rectWidth = 23*canvasSizeMultiplier;
+			ctx.strokeStyle = "black";
 
 
 
-		// Hover over variables
-		var mouseInXLab = x0 < mouseX && x0 + w > mouseX && y0 <= mouseY && y0 + h >= mouseY;
-		if (mouseInXLab){
-			//$('#' + id).addClass("variable-cursor")
-			$('#' + id).css('cursor','pointer');
-		}else{
-			//$('#' + id).removeClass("variable-cursor")
-			$('#' + id).css('cursor','auto');
+			// The ladder
+			for (var colID = 0; colID < colGradient.length; colID++){
+
+				var rectY = rectY0 - colID*rectHeight;
+				ctx.fillStyle = colGradient[colID]; // Rectangle filling
+				ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+
+			}
+
+
+			if(range.length > 4){
+
+				ctx.textBaseline="middle"; 
+			
+
+				// Z min and max above and below the ladder
+				if (!isNaN(range[4])){
+					ctx.font = 10 * canvasSizeMultiplier + "px Arial";
+					var zminYPos = rectY0 + rectHeight + 2*canvasSizeMultiplier;
+					ctx.textAlign="right";
+					ctx.save()
+					ctx.translate(rectX + rectWidth/2, zminYPos);
+					ctx.rotate(-Math.PI/2);
+					ctx.fillStyle = "black";
+					ctx.fillText(range[4], 0 ,0);
+					ctx.restore();
+				}
+
+
+				if (!isNaN(range[5])){
+					var zmaxYPos = rectY0 - (colGradient.length-1)*rectHeight - 2*canvasSizeMultiplier ;
+					ctx.textAlign="left";
+					ctx.save()
+					ctx.translate(rectX + rectWidth/2, zmaxYPos);
+					ctx.rotate(-Math.PI/2);
+					ctx.fillStyle = "black";
+					ctx.fillText(range[5], 0 ,0);
+					ctx.restore();
+				}
+
+			}
+
+
+
 		}
-		
-		
-		
 
 
-	};
+
+
+	}
 	
-	canvas.addEventListener('click', function(e) { 
-		
-		if (simulating) return;
-		
-		var rect = this.getBoundingClientRect();
-		var mouseX = e.clientX - rect.left;
-		var mouseY = e.clientY - rect.top;
-		var mouseInXLab = x0 < mouseX && x0 + w > mouseX && y0 <= mouseY && y0 + h >= mouseY;
-		if (mouseInXLab){
-			highlightVariables(id, "x");
-		}
 
-		
-		
-	}, false);
-		
-	*/
-	
 	
 	ctx.lineWidth = 3*canvasSizeMultiplier;
 	
@@ -3026,7 +3191,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	ctx.beginPath();
 	ctx.moveTo(axisGap, 0);
 	ctx.lineTo(axisGap, canvas.height - axisGap);
-	ctx.lineTo(canvas.width, canvas.height - axisGap);
+	ctx.lineTo(canvas.width - legendGap, canvas.height - axisGap);
 	ctx.stroke();
 	
 	
@@ -3187,6 +3352,9 @@ function downloadPlotInFormat(){
 		}
 		else if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] == "custom") {	
 			download_customDataTSV(plotNum);
+		}
+		else if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] == "parameterHeatmap") {	
+			download_heatmapDataTSV(plotNum);
 		}
 		else if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] == "pauseSite") {	
 			download_pauseSiteTSV();
@@ -3643,6 +3811,19 @@ function getPlotOptionsTemplate(){
 							
 						</td>
 					</tr>
+
+
+
+					<tr>
+						<td id="settingCell7" style="vertical-align:top"> 
+							
+						</td>
+						
+						
+						<td id="settingCell8" style="vertical-align:top"> 
+							
+						</td>
+					</tr>
 					
 
 				</table>
@@ -3827,6 +4008,27 @@ function distanceVsTimeOptionsTemplate3(){
 	
 }
 
+
+
+
+function heatmapZAxisLegend(){
+	
+	return `
+		<legend><b>Point Colour</b></legend> 
+
+
+		<select class="dropdown" title="Select the colour of the points in this plot" id = "zColouring" style="width:200px; vertical-align: middle; text-align:left;">
+			<option value="blue">Blue</option>
+			<option value="rainbow">Rainbow</option>
+			<option value="greyBlack">Grey-black</option>
+			<option value="yellowRed">Yellow-red</option>
+		</select>
+
+	`;
+	
+}
+
+
 /*
 function pauseHistogramOptionsTemplate(){
 	
@@ -3933,7 +4135,8 @@ function customPlotSelectPropertyTemplate(){
 			<option value="probability">Probability</option>
 			<option value="meanVelocity">Mean velocity (bp/s)</option>
 			<option value="meanCatalysis">Mean catalysis time (s)</option>
-			<option value="meanTranscription">Mean transcription time (s)</option>
+			<option value="meanTranscription">Total transcription time (s)</option>
+			<option value="nascentLength">Nascent strand length (nt)</option>
 		</select><br>
 		Calculated per trial.
 
@@ -3946,12 +4149,13 @@ function parameterHeatmapZAxisTemplate(){
 
 	return `
 
-		<legend><b>Metric (y-axis)</b></legend>
-		<select class="dropdown" onChange="customYVariableChange()" title="Which metric do you want to show on the y-axis?" id = "customMetric" style="vertical-align: middle; text-align:right;">
+		<legend><b>Metric (z-axis)</b></legend>
+		<select class="dropdown" onChange="heatmapZVariableChange()" title="Which metric do you want to show on the z-axis?" id = "customMetric" style="vertical-align: middle; text-align:right;">
 			<option value="probability">Probability</option>
 			<option value="meanVelocity">Mean velocity (bp/s)</option>
 			<option value="meanCatalysis">Mean catalysis time (s)</option>
 			<option value="meanTranscription">Mean transcription time (s)</option>
+			<option value="nascentLength">Nascent strand length (nt)</option>
 		</select><br>
 		Calculated per trial.
 
@@ -4195,9 +4399,15 @@ function plotOptions(plotNum){
 
 
 			// Z-axis
-			$("#settingCell5").html(customPlotSelectPropertyTemplate().replace("y-axis", "z-axis").replace("y-axis", "z-axis"));
+			$("#settingCell5").html(parameterHeatmapZAxisTemplate());
 			$("#settingCell6").html(distanceVsTimeOptionsTemplate3().replace("ZMINDEFAULT", 0).replace("ZMAXDEFAULT", 1));
 			$("#customMetric").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["metricZ"]);
+			heatmapZVariableChange();
+
+
+			// Z axis colouring
+			$("#settingCell7").html(heatmapZAxisLegend());
+			$("#zColouring").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zColouring"]);
 
 
 			// Y-axis attribute
@@ -4267,22 +4477,34 @@ function plotOptions(plotNum){
 
 // If the perTemplate option is selected from the time histogram settings menu, then we hide the pause/short pause options
 function perTemplateSelected(){
-	$("#pauseXRow").hide(true);
-	$("#shortPauseXRow").hide(true);
+	$("#pauseXRow").hide(0);
+	$("#shortPauseXRow").hide(0);
 	if ($('input[name="xRange"][value="pauseX"]').prop("checked") || $('input[name="xRange"][value="shortPauseX"]').prop("checked")) $('input[name="xRange"][value="automaticX"]').click();
 }
 
 
 // If the perTemplate option is selected from the time histogram settings menu, then we hide the pause/short pause options
 function perTemplateDeselected(){
-	$("#pauseXRow").show(true);
-	$("#shortPauseXRow").show(true);
+	$("#pauseXRow").show(0);
+	$("#shortPauseXRow").show(0);
 }
 
 
 function customYVariableChange(){
-	if ($("#customMetric").length != 0 && $("#customMetric").val() == "probability") $("#settingCell4").hide(true);
-	else $("#settingCell4").show(true);
+	if ($("#customMetric").length != 0 && $("#customMetric").val() == "probability") $("#settingCell4").hide(0);
+	else $("#settingCell4").show(0);
+}
+
+
+function heatmapZVariableChange(){
+	if ($("#customMetric").length != 0 && $("#customMetric").val() == "probability") {
+		$("#settingCell6").hide(0);
+		$("#settingCell7").hide(0);
+	}
+	else {
+		$("#settingCell6").show(0);
+		$("#settingCell7").show(0);
+	}
 }
 
 
