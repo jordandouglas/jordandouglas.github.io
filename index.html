@@ -1906,6 +1906,30 @@ function closeNav() {
 				 	</tr>
 
 
+
+
+				 	<tr id="GHypertranslocate_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#GDaggerSlide_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			&Delta;G<sub>hyper</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="GHypertranslocate" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
+			 			</td>
+
+
+				 		<td>
+							<input type=image id='GHypertranslocate_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
+				 		</td>
+
+				 	</tr>
+
+
 			 		<tr id="GsecondarySitePenalty_container">
 
 						<td style="text-align:left; font-size:10px; float:left; width:20px">
@@ -1976,20 +2000,32 @@ function closeNav() {
 
 
 
+				 	<tr id="SelectTranslocationModel_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#translocation_ModelHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td colspan = 3 style="text-align:center">
+				 			Barrier height model:
+				 			<select class="dropdown" style="width:150px;" name="SelectTranslocationModel" id = "SelectTranslocationModel" title="Select which model to use for estimating translocation free energy barrier heights" OnChange="userInputModel_controller()">
+						 </select>
+				 		</td>
+
+
+				 	</tr>
+
+
+
+
+
+
 
 
 				 </table>
 
 
 
-
-
-
-				<div style="display:none">
-				<br> Translocation barrier height model: <select class="dropdown" style="width: 350px;" name="SelectTranslocationModel" id = "SelectTranslocationModel" title="Select a translocation model" OnChange="userInputModel_controller()">
-														 </select>
-
-				</div>
 
 				 
 			</div>
