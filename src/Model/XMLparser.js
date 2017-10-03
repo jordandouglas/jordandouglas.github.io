@@ -46,8 +46,12 @@ function loadSession_WW(XMLstring, resolve = function() { }, msgID = null){
 	xmlAttrArray=handler.getAttr_Array()
 
 
-	
+	var speedVal = "medium";
 	arr=handler.getPath_Array();
+	var N = xmlAttrArray[arr[0]]["N"];
+	var speedVal = xmlAttrArray[arr[0]]["speed"];
+
+	
 	for (var i=0;i<arr.length;i++){
 		
 		var splitArr = arr[i].split("/");
@@ -56,12 +60,13 @@ function loadSession_WW(XMLstring, resolve = function() { }, msgID = null){
 		else if (splitArr[2] == "elongation-model" && splitArr.length == 3) currentElongationModel = xmlAttrArray[arr[i]]["id"]; // Model id
 		else if (splitArr[2] == "elongation-model" && splitArr.length == 4) parseXML_model_WW(splitArr[3], xmlAttrArray[arr[i]]["val"]); // Model property
 		//else if (splitArr[2] == "state") compactState = parseXML_state_WW(xmlAttrArray[arr[i]]); // Current state
-
+		else if (splitArr[2] == "plots" && splitArr.length == 4) parseXML_plots_WW(splitArr[3], xmlAttrArray[arr[i]]); 
+		
+		
 		}
 
 
-
-	var toReturn = {seq: all_sequences[sequenceID], model: ELONGATION_MODELS[currentElongationModel]};
+	var toReturn = {seq: all_sequences[sequenceID], model: ELONGATION_MODELS[currentElongationModel], N: N, speed: speedVal, whichPlotInWhichCanvas: whichPlotInWhichCanvas};
 	toReturn["seq"]["seqID"] = sequenceID;
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
@@ -73,6 +78,20 @@ function loadSession_WW(XMLstring, resolve = function() { }, msgID = null){
 
 }
 
+
+function parseXML_plots_WW(attr, values){
+	
+
+	var plotNum = parseFloat(attr.substring(4)); // Convert plotx into x where x is a number from 1 to 4
+	
+	selectPlot_WW(plotNum, values["name"]); // Initialise the plot
+	for (var prop in values){
+		if (prop != "name") whichPlotInWhichCanvas[plotNum][prop] = values[prop]; // Copy all the settings over
+		
+	}
+
+	
+}
 
 function parseXML_model_WW(attr, val){
 	var val = val == "true" ? true : val == "false" ? false : val;

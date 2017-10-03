@@ -516,27 +516,33 @@ function userSelectSequence_controller(newSequenceID, newTemplateType, newPrimer
 }
 
 
-function refreshPlotDataSequenceChangeOnly_controller(){
+function refreshPlotDataSequenceChangeOnly_controller(resolve = function() { }){
 	
-	if (WEB_WORKER == null) {
-		refreshPlotDataSequenceChangeOnly_WW();
-	}
 
-	else{
-		var fnStr = stringifyFunction("refreshPlotDataSequenceChangeOnly_WW", []);
-		callWebWorkerFunction(fnStr);
+	if (WEB_WORKER == null) {
+		var toCall = () => new Promise((resolve) => refreshPlotDataSequenceChangeOnly_WW(resolve));
+		toCall().then(() => resolve());
+
+	}else{
+		var res = stringifyFunction("refreshPlotDataSequenceChangeOnly_WW", [null], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall(fnStr).then(() => resolve());
 	}
+	
 	
 }
 
-function getPlotData_controller(resolve){
+function getPlotData_controller(forceUpdate = false, resolve){
 	
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getPlotData_WW(resolve, null));
+		var toCall = () => new Promise((resolve) => getPlotData_WW(forceUpdate, resolve, null));
 		toCall().then((dict) => resolve(dict));
 
 	}else{
-		var res = stringifyFunction("getPlotData_WW", [null], true);
+		var res = stringifyFunction("getPlotData_WW", [forceUpdate, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 
@@ -2005,19 +2011,56 @@ function loadSession_controller(XMLData){
 		var model = result["model"];
 		var compactState = result["compactState"];
 		
+		
+			
+		var openPlots = function(){
+			// Open up the appropriate plots
+			//PLOT_DATA = {};
+			//PLOT_DATA["whichPlotInWhichCanvas"] = result["whichPlotInWhichCanvas"];
+			
+			for (var plt in result["whichPlotInWhichCanvas"]){
+				
+				var pltName = result["whichPlotInWhichCanvas"][plt]["name"];
+				$("#selectPlot" + plt).val(pltName);
+				$("#showPlot" + plt).show(0);
+				$("#showPlot" + plt).val("-");
+				$("#plotDIV" + plt).show(0);
+				$("#plotOptions" + plt).show(0);
+				$("#downloadPlot" + plt).show(0);
+				$("#helpPlot" + plt).show(0);
+				$("#helpPlot" + plt).attr("href", "about/#" + pltName + "_PlotHelp");
+				
+				
+				
+				//if (result["whichPlotInWhichCanvas"][plt]["name"] != "none" && result["whichPlotInWhichCanvas"][plt]["name"] != "custom" && result["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(result["whichPlotInWhichCanvas"][plt]["plotFunction"])();
+				//else if (result["whichPlotInWhichCanvas"][plt]["name"] == "custom" || result["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(result["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
+				
+			}
+			
+			//drawPlots();
+			
+		}
+		
+		
+		
+		// Update the sequence settings
+		if (result["N"] != null) $("#nbasesToSimulate").val(result["N"]);
+		if (result["speed"] != null) $("#PreExp").val(result["speed"]);
 		$("#SelectSequence").val(seqObject["seqID"]);
 		$("#SelectTemplateType").val(seqObject["template"]);
 		$("#SelectPrimerType").val(seqObject["primer"]);
-		userChangeSequence();
+		userChangeSequence(openPlots);
 
 		if (seqObject["seqID"] == "$user") {
 			$("#UserSequence").val(seqObject["seq"]);
 			$('input[name="inputSeqType"][value="inputTemplateSeq"]').click()
-			submitCustomSequence();
+			submitCustomSequence(openPlots);
 		}
 
+		// Update the model DOM eg. enable hypertranslocation
 		updateModelDOM(model);
-
+		
+	
 		
 	};
 	

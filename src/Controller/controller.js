@@ -841,6 +841,8 @@ function saveSession(){
 		
 		saveXML.writeStartElement('session');
 		saveXML.writeAttributeString('datetime', datetime);
+		saveXML.writeAttributeString("N", $("#nbasesToSimulate").val());
+		saveXML.writeAttributeString('speed', $("#PreExp").val());
 		
 			// Sequence
 			saveXML.writeStartElement('sequence');
@@ -851,7 +853,26 @@ function saveSession(){
 				saveXML.writeAttributeString('seq', result["TEMPLATE_SEQUENCE"]);
 			
 			saveXML.writeEndElement();
-
+			
+			
+			
+			// Plots
+			if (PLOT_DATA["whichPlotInWhichCanvas"] != null) {
+				saveXML.writeStartElement('plots');
+					for (var i = 1; i <=4; i ++){
+						if (PLOT_DATA["whichPlotInWhichCanvas"][i] == null) continue;
+						
+						saveXML.writeStartElement("plot" + i);
+						for (pltData in PLOT_DATA["whichPlotInWhichCanvas"][i]){
+							if (pltData == "xData" || pltData == "yData" || pltData == "zData") continue; // Don't save the data just the settings
+							saveXML.writeAttributeString(pltData, PLOT_DATA["whichPlotInWhichCanvas"][i][pltData]);
+						}
+						saveXML.writeEndElement();
+					}
+					
+				
+				saveXML.writeEndElement();
+			}
 
 			// Current state
 			/*

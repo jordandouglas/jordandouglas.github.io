@@ -69,7 +69,7 @@ function refreshPlotData(){
 }
 
 
-function refreshPlotDataSequenceChangeOnly_WW(){
+function refreshPlotDataSequenceChangeOnly_WW(resolve = function() { }, msgID = null){
 
 	// There are two lists of distance/time data in the model
 	// We have the master copy (DISTANCE_VS_TIME) which contains all the information (having the master copy in the model might not be necessary)
@@ -96,7 +96,6 @@ function refreshPlotDataSequenceChangeOnly_WW(){
 	PARAMETERS_PLOT_DATA["nascentLength"] = {name: "Final nascent length (nt)", vals: []};
 
 
-
 	timesSpentOnEachTemplate = [0];
 	distancesTravelledOnEachTemplate = [0];
 	elongationDurations = [];
@@ -117,18 +116,27 @@ function refreshPlotDataSequenceChangeOnly_WW(){
 		misincorporationCounts[i] = {"A": 0, "C": 0, "G": 0, "T": 0, "U": 0};
 	}
 
-
+	
 	for (var plotNum = 1; plotNum <= 3; plotNum++){
 		if (whichPlotInWhichCanvas[plotNum] != null && whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
-			whichPlotInWhichCanvas[plotNum]["xData"]["vals"] = [];
-			whichPlotInWhichCanvas[plotNum]["yData"]["vals"] = [];
+			whichPlotInWhichCanvas[plotNum]["xData"] = PARAMETERS_PLOT_DATA[whichPlotInWhichCanvas[plotNum]["customParam"]];
+			whichPlotInWhichCanvas[plotNum]["yData"] = PARAMETERS_PLOT_DATA[whichPlotInWhichCanvas[plotNum]["customMetric"]];
+		}
+		
+		if (whichPlotInWhichCanvas[plotNum] != null && whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
+			whichPlotInWhichCanvas[plotNum]["xData"] = PARAMETERS_PLOT_DATA[whichPlotInWhichCanvas[plotNum]["customParamX"]];
+			whichPlotInWhichCanvas[plotNum]["yData"] = PARAMETERS_PLOT_DATA[whichPlotInWhichCanvas[plotNum]["customParamY"]];
+			whichPlotInWhichCanvas[plotNum]["zData"] = PARAMETERS_PLOT_DATA[whichPlotInWhichCanvas[plotNum]["metricZ"]];
 		}
 	}
 
 	
 	//console.log("Setting data", abortionCounts, currentState["nbases"]);
 	
-	return;
+	if (msgID != null){
+		postMessage(msgID + "~X~done");
+	}
+	else resolve();
 	
 
 
@@ -151,7 +159,7 @@ function getSequenceOfObject_WW(nt_obj){
 
 
 
-function getPlotData_WW(resolve = function(plotData) { }, msgID = null){
+function getPlotData_WW(forceUpdate = false, resolve = function(plotData) { }, msgID = null){
 	
 	
 	var plotData = {};
@@ -233,7 +241,7 @@ function getPlotData_WW(resolve = function(plotData) { }, msgID = null){
 
 
 	
-	if (JSON.stringify(plotData) != "{}" || thereExistsAParameterPlot){
+	if (forceUpdate || JSON.stringify(plotData) != "{}" || thereExistsAParameterPlot){
 	
 		plotData["nbases"] = currentState["nbases"];
 		plotData["templateSeq"] = getSequenceOfObject_WW(templateSequence);
@@ -391,6 +399,7 @@ function selectPlot_WW(plotNum, value, deleteData, resolve = function(plotData) 
 	whichPlotInWhichCanvas[plotNum] = {};
 	whichPlotInWhichCanvas[plotNum]["name"] = value;
 	whichPlotInWhichCanvas[plotNum]["hidden"] = false;
+
 
 	
 	// Initialise the appropriate plot

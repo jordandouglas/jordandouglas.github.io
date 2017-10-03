@@ -122,20 +122,19 @@ function update_DISTANCE_VS_TIME(DISTANCE_VS_TIME_UNSENT){
 
 
 
-function drawPlots(){
+function drawPlots(forceUpdate = false){
 	
 	
 	// Only make a request if there exists a visible plot
 	//console.log("visibilities", $("#plotDIV1").is(":visible"), $("#plotDIV2").is(":visible"), $("#plotDIV3").is(":visible"), $("#plotDIV4").is(":visible"));
 	if (!$("#plotDIV1").is(":visible") && !$("#plotDIV2").is(":visible") && !$("#plotDIV3").is(":visible") && !$("#plotDIV4").is(":visible")) return;
 	
-	var toCall = () => new Promise((resolve) => getPlotData_controller(resolve));
+	var toCall = () => new Promise((resolve) => getPlotData_controller(forceUpdate, resolve));
 	toCall().then((plotData) => {
 
 
 			//console.log("Received data", plotData);
 			update_PLOT_DATA(plotData)
-
 	
 			window.requestAnimationFrame(function(){
 				for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
@@ -2807,6 +2806,7 @@ function plot_custom(plotNumCustom = null){
 
 	if (plotNumCustom != 5 && $("#plotDIV" + plotNumCustom).is( ":hidden" )) return;
 
+	console.log("plotNumCustom", plotNumCustom, PLOT_DATA);
 	
 	// Empty plot
 	if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParam"] == "none"){
@@ -4315,7 +4315,7 @@ function plotOptions(plotNum){
 			$("#settingCell1").html(customPlotSelectParameterTemplate());
 
 			get_PHYSICAL_PARAMETERS_controller(function(params){
-				console.log("params",params, params.length);
+				//console.log("params",params, params.length);
 				for (var paramID in params){
 					if (!params[paramID]["hidden"] && !params[paramID]["binary"]) $("#customParam").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
 				}
