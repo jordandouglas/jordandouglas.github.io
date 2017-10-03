@@ -197,6 +197,16 @@ function init(){
 
 		barchart(true);
 
+		
+		// Load a session specified in the url
+		var urlContent = location.href.substring(location.href.indexOf("?")+1);
+		if (urlContent != ""){
+			
+			var sessionFileLocation = "http://www.polymerase.nz/about/Examples/" + urlContent;
+			loadSessionFromURL(sessionFileLocation);
+			
+		}
+		
 
 
 		
