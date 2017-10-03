@@ -199,9 +199,8 @@ function init(){
 
 		
 		// Load a session specified in the url
-		var urlContent = location.href.substring(location.href.indexOf("?")+1);
-		if (urlContent != ""){
-			
+		if (location.href.indexOf("?") != -1){
+			var urlContent = location.href.substring(location.href.indexOf("?")+1);
 			var sessionFileLocation = "http://www.polymerase.nz/about/Examples/" + urlContent;
 			loadSessionFromURL(sessionFileLocation);
 			
@@ -328,10 +327,15 @@ function submitCustomSequence(resolveAfterRefresh = function() { }){
 		var refr = () => new Promise((resolve) => refresh(resolve));
 		var sequenceChangeRefreshTemp = function(){
 			
-			refreshPlotDataSequenceChangeOnly_controller();
 			sequenceChangeRefresh();
-			drawPlots();
-			resolveAfterRefresh();
+			refreshPlotDataSequenceChangeOnly_controller(function(){
+			
+				resolveAfterRefresh();
+				drawPlots(true);
+
+				
+			});
+
 
 		};
 		refr().then(() => sequenceChangeRefreshTemp());
@@ -386,10 +390,11 @@ function userChangeSequence(resolveAfterRefresh = function() { }){
 			
 			var refr = () => new Promise((resolve) => refresh(resolve));
 			var sequenceChangeRefreshTemp = function(){
-				refreshPlotDataSequenceChangeOnly_controller();
 				sequenceChangeRefresh();
-				drawPlots();
-				resolveAfterRefresh();
+				refreshPlotDataSequenceChangeOnly_controller(function(){
+					resolveAfterRefresh();
+					drawPlots(true);
+				});
 			};
 			refr().then(() => sequenceChangeRefreshTemp());
 

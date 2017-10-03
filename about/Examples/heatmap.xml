@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<session datetime="2017_10_3-19.4.28" N="200" speed="hidden">
+	<sequence seqID="E.coli lacZ gene GU063697" TemplateType="dsDNA" PrimerType="ssRNA" seq="TACTTTCGACCGATGTCCTTCCGGTCTGCGCTTAATAAAAACTACCGCAATTGAGCCGCAAAGTAGACACCACGTTGCCCGCGACCCAGCCAATGCCGGTCCTGTCAGCAAACGGCAGACTTAAACTGGACTCGCGTAAAAATGCGCGGCCTCTTTTGGCGGAGCGCCACTACCACGACGCGACCTCACTGCCGTCAATAGACCTTCTAGTCCTATACACCGCCTACTCGCCGTAAAAGGCACTGCAGAGCAACGACGTATTTGGCTGATGTGTTTAGTCGCTAAAGGTACAACGGTGAGCGAAATTACTACTAAAGTCGGCGCGACATGACCTCCGACTTCAAGTCTACACGCCGCTCAACGCACTGATGGATGCCCATTGTCAAAGAAATACCGTCCCACTTTGCGTCCAGCGGTCGCCGTGGCGCGGAAAGCCGCCACTTTAATAGCTACTCGCACCACCAATACGGCTAGCGCAGTGTGATGCAGACTTGCAGCTTTTGGGCTTTGACACCTC" />
+	<plots>
+		<plot1 name="distanceVsTime" hidden="false" plotFunction="plotTimeChart" xRange="automaticX" yRange="automaticY" />
+		<plot2 name="velocityHistogram" hidden="false" plotFunction="plot_velocity_distribution" displayBottomProportionOf="1" windowSize="1" xRange="automaticX" timeSpaceX="linearSpace" timeSpaceY="linearSpace" />
+		<plot3 name="parameterHeatmap" hidden="false" plotFunction="plot_parameter_heatmap" sitesToRecord="" customParamX="RateCatalyse" customParamY="GDaggerSlide" metricZ="meanVelocity" xRange="automaticX" yRange="automaticY" zRange="automaticZ" zColouring="rainbow" />
+	</plots>
+	<elongation-model id="simpleBrownian">
+		<allowBacktracking val="false" />
+		<allowHypertranslocation val="true" />
+		<allowInactivation val="false" />
+		<allowBacktrackWithoutInactivation val="false" />
+		<deactivateUponMisincorporation val="false" />
+		<allowGeometricCatalysis val="true" />
+		<allowmRNAfolding val="false" />
+		<allowMisincorporation val="false" />
+		<useFourNTPconcentrations val="false" />
+		<NTPbindingNParams val="2" />
+	</elongation-model>
+	<parameters>
+		<NTPconc val="1000" distribution="Fixed" fixedDistnVal="1000">[NTP] (μM)</NTPconc>
+		<hybridLength val="9" distribution="Fixed" fixedDistnVal="9">Hybrid length (bp)</hybridLength>
+		<bubbleSizeLeft val="1" distribution="Fixed" fixedDistnVal="1">Bubble length left (bp)</bubbleSizeLeft>
+		<bubbleSizeRight val="2" distribution="Fixed" fixedDistnVal="2">Bubble length right (bp)</bubbleSizeRight>
+		<GDaggerSlide val="6.389499263605103" distribution="Uniform" fixedDistnVal="5" uniformDistnLowerVal="2.5" uniformDistnUpperVal="7.5">ΔG†slide</GDaggerSlide>
+		<GHypertranslocate val="0" distribution="Fixed" fixedDistnVal="0">ΔGhyper</GHypertranslocate>
+		<FAssist val="0" distribution="Fixed" fixedDistnVal="0">Fassist (pN)</FAssist>
+		<arrestTimeout val="30" distribution="Fixed" fixedDistnVal="30">Arrest timeout (s)</arrestTimeout>
+		<RateCatalyse val="113.78190983086824" distribution="Uniform" fixedDistnVal="30" uniformDistnLowerVal="0" uniformDistnUpperVal="200" normalSdVal="5">Rate of catalysis (s⁻¹)</RateCatalyse>
+		<Kdissociation val="4" distribution="Fixed" fixedDistnVal="4">Dissociation constant of NTP (μM)</Kdissociation>
+		<RateBind val="250" distribution="Fixed" fixedDistnVal="250">Rate bind (μM⁻¹ s⁻¹)</RateBind>
+		<allowMultipleBulges val="false">allowMultipleBulges</allowMultipleBulges>
+	</parameters>
+</session>
