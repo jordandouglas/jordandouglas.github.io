@@ -938,46 +938,75 @@ function saveSession(){
 
 
 
+// Loads a session from the XML file stored at url
+function loadSessionFromURL(url){
+	
+	console.log("Trying to open", url);
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+		  
+		   if (xhttp == null || xhttp.responseXML == "") return;
+		   
+		   //console.log("xhttp.responseText", xhttp.responseText);
+		   var XMLstring = xhttp.responseText.replace(/(\r\n|\n|\r)/gm,"");
+		   loadSession_controller(XMLstring);
+		   
+		}
+	};
+	xhttp.open("GET", url, true);
+	xhttp.send();
+	
+	
+}
+
+
 // Load the session from an xml file
-function loadSession(){
+function loadSession(fileLocation = null){
 	
 	document.getElementById('uploadSessionFile').addEventListener('change', loadSessionFile, false);
-	$("#uploadSessionFile").click();
-	
+	if(fileLocation == null) $("#uploadSessionFile").click();
+	 
 	 function loadSessionFile(evt) {
-		 
-		 
+
 		var files = evt.target.files; // FileList object
-		
 			
 		// Loop through the FileList
 		for (var i = 0, f; f = files[i]; i++) {
 		
-			var reader = new FileReader();
-
-				// Closure to capture the file information.
-				reader.onload = (function(theFile) {
-				return function(e) {
-
-					var XMLstring = e.target.result.replace(/(\r\n|\n|\r)/gm,"");
-
-					//console.log("Sending XMLstring", XMLstring);
-
-					loadSession_controller(XMLstring);
-
-				};
-			})(f);
-
-			reader.readAsText(f);
-
-
+			loadSessionFromFileName(f);
 
 		}
-
 
 		$("#uploadSessionFile").val("");
 
 	 }
+
+
+}
+
+
+
+function loadSessionFromFileName(fileName){
+	
+	var reader = new FileReader();
+	
+
+	// Closure to capture the file information.
+	reader.onload = (function(theFile) {
+		return function(e) {
+
+			if (e == null || e.target.result == "") return;
+			var XMLstring = e.target.result.replace(/(\r\n|\n|\r)/gm,"");
+
+			//console.log("Sending XMLstring", XMLstring);
+
+			loadSession_controller(XMLstring);
+
+		};
+	})(fileName);
+
+	reader.readAsText(fileName);
 
 	
 }
