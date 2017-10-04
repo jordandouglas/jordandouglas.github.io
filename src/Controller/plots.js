@@ -2637,12 +2637,16 @@ function getColourPalette(paletteName){
 
 		case "blue":
 			return Array(10).fill("#008CBA");
+			break;
 		case "rainbow":
-			return ["#FF80CCFF", "#E680FFFF", "#9980FFFF", "#80B2FFFF", "#80FFFFFF", "#80FFB3FF", "#99FF80FF", "#E5FF80FF", "#FFCC80FF", "#FF8080FF"];
+			return ["#FF80CC", "#E680FF", "#9980FF", "#80B2FF", "#80FFFF", "#80FFB3", "#99FF80", "#E5FF80", "#FFCC80", "#FF8080"];
+			break;
 		case "yellowRed":
-			return ["#FFFFBFFF", "#FFFF40FF", "#FFFF00FF", "#FFDB00FF", "#FFB600FF", "#FF9200FF", "#FF6D00FF", "#FF4900FF", "#FF2400FF", "#FF0000FF"];
+			return ["#FFFFBF", "#FFFF40", "#FFFF00", "#FFDB00", "#FFB600", "#FF9200", "#FF6D00", "#FF4900", "#FF2400", "#FF0000"];
+			break;
 		case "greyBlack":
 			return ["#999999", "#919191", "#898989", "#7F7F7F", "#757575", "#6A6A6A", "#5D5D5D", "#4E4E4E", "#393939", "#0D0D0D"];
+			break;
 	}
 
 	return null;
@@ -2660,6 +2664,7 @@ function getColourFromPalette(val, min, max, paletteName){
 	if(scaledVal > 9) scaledVal = 9;
 	if(scaledVal < 0) scaledVal = 0;
 	var cols = getColourPalette(paletteName);
+
 	return cols[scaledVal];
 	
 }
@@ -3121,21 +3126,21 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 		if(colGradient != null){
 
 			ctx.globalAlpha = 1;
-			colGradient = getColourPalette(colGradient);
+			var colGradientList = getColourPalette(colGradient);
 			var colourStepSize = 3 * canvasSizeMultiplier;
 			var rectX = axisGap + plotWidth + 5*canvasSizeMultiplier;
 			var rectHeight = 12*canvasSizeMultiplier;
-			var rectY0 = zlabYPos + rectHeight*(colGradient.length)/2 - rectHeight;
+			var rectY0 = zlabYPos + rectHeight*(colGradientList.length)/2 - rectHeight;
 			var rectWidth = 23*canvasSizeMultiplier;
 			ctx.strokeStyle = "black";
 
 
 
 			// The ladder
-			for (var colID = 0; colID < colGradient.length; colID++){
+			for (var colID = 0; colID < colGradientList.length; colID++){
 
 				var rectY = rectY0 - colID*rectHeight;
-				ctx.fillStyle = colGradient[colID]; // Rectangle filling
+				ctx.fillStyle = colGradientList[colID]; // Rectangle filling
 				ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
 
 			}
@@ -3161,7 +3166,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 
 
 				if (!isNaN(range[5])){
-					var zmaxYPos = rectY0 - (colGradient.length-1)*rectHeight - 2*canvasSizeMultiplier ;
+					var zmaxYPos = rectY0 - (colGradientList.length-1)*rectHeight - 2*canvasSizeMultiplier ;
 					ctx.textAlign="left";
 					ctx.save()
 					ctx.translate(rectX + rectWidth/2, zmaxYPos);
