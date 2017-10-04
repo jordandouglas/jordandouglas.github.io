@@ -2164,7 +2164,8 @@ function userInputModel_controller(){
 
 
 		refreshNavigationCanvases();
-
+		updateABCpanel();
+		
 		updateModelDOM(mod);
 	};
 
@@ -2228,6 +2229,37 @@ function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardat
 		toCall().then((result) => resolve(result));
 
 	}
+
+
+
+
+}
+
+
+
+function beginABC_controller(rules){
+
+
+	var updateDOM = function(mod){
+
+		
+	};
+
+
+	if (WEB_WORKER == null) {
+		var toCall = () => new Promise((resolve) => beginABC_WW(rules, resolve));
+		toCall().then(() => updateDOM());
+	}
+
+	else{
+		var res = stringifyFunction("beginABC_WW", [rules, null], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then(() => updateDOM());
+
+	}
+
 
 
 

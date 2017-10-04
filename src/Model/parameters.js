@@ -317,47 +317,57 @@ function sample_parameter_WW(paramID, resolve = function() { }, msgID = null){
 
 	// The Random() function sometimes generates the same number multiple times in a row if you do not use a seed 
 	// (which will often give different parameters the same value if they have the same distribution)
-	
+
 
 	var initialVal = PHYSICAL_PARAMETERS[paramID]["val"];
-	switch(PHYSICAL_PARAMETERS[paramID]["distribution"]) {
-	    case "Fixed":
-	        PHYSICAL_PARAMETERS[paramID]["val"] = PHYSICAL_PARAMETERS[paramID]["fixedDistnVal"];
-	        break;
 	
-	    case "Uniform":
-	        PHYSICAL_PARAMETERS[paramID]["val"] = new Random(Math.ceil(mersenneTwister.random() * 1e6)).uniform(PHYSICAL_PARAMETERS[paramID]["uniformDistnLowerVal"], PHYSICAL_PARAMETERS[paramID]["uniformDistnUpperVal"]);
-	        break;
-	
-		case "Exponential":
-		    PHYSICAL_PARAMETERS[paramID]["val"] = new Random(Math.ceil(mersenneTwister.random() * 1e6)).exponential(PHYSICAL_PARAMETERS[paramID]["ExponentialDistnVal"]);
-		    break;
+
+	// Do not sample if it is being used by the ABC analysis
+	if (PHYSICAL_PARAMETERS[paramID]["ABCval"] != null) PHYSICAL_PARAMETERS[paramID]["val"] = PHYSICAL_PARAMETERS[paramID]["ABCval"];
+
+	// Otherwise sample it
+	else{
+
+		switch(PHYSICAL_PARAMETERS[paramID]["distribution"]) {
+		    case "Fixed":
+		        PHYSICAL_PARAMETERS[paramID]["val"] = PHYSICAL_PARAMETERS[paramID]["fixedDistnVal"];
+		        break;
 		
-		case "Normal": // May have to repeatedly resample if this parameter is zero-truncated
-			var value = new Random(Math.ceil(mersenneTwister.random() * 1e6)).normal(PHYSICAL_PARAMETERS[paramID]["normalMeanVal"], PHYSICAL_PARAMETERS[paramID]["normalSdVal"]);
-			while (value <= 0 && PHYSICAL_PARAMETERS[paramID]["zeroTruncated"]) value = new Random(Math.ceil(mersenneTwister.random() * 1e6)).normal(PHYSICAL_PARAMETERS[paramID]["normalMeanVal"], PHYSICAL_PARAMETERS[paramID]["normalSdVal"]);
-			PHYSICAL_PARAMETERS[paramID]["val"] = value;
-			break;
+		    case "Uniform":
+		        PHYSICAL_PARAMETERS[paramID]["val"] = new Random(Math.ceil(mersenneTwister.random() * 1e6)).uniform(PHYSICAL_PARAMETERS[paramID]["uniformDistnLowerVal"], PHYSICAL_PARAMETERS[paramID]["uniformDistnUpperVal"]);
+		        break;
+		
+			case "Exponential":
+			    PHYSICAL_PARAMETERS[paramID]["val"] = new Random(Math.ceil(mersenneTwister.random() * 1e6)).exponential(PHYSICAL_PARAMETERS[paramID]["ExponentialDistnVal"]);
+			    break;
 			
-		case "Lognormal": // Generate a normal(mean, sd) and then take the exp of it
-			PHYSICAL_PARAMETERS[paramID]["val"] = Math.exp(new Random(Math.ceil(mersenneTwister.random() * 1e6)).normal(PHYSICAL_PARAMETERS[paramID]["lognormalMeanVal"], PHYSICAL_PARAMETERS[paramID]["lognormalSdVal"]));
-			break;
-			
-		case "Gamma": 
-			PHYSICAL_PARAMETERS[paramID]["val"] = new Random(Math.ceil(mersenneTwister.random() * 1e6)).gamma(PHYSICAL_PARAMETERS[paramID]["gammaShapeVal"], 1/PHYSICAL_PARAMETERS[paramID]["gammaRateVal"]);
-			break;
-			
-		case "DiscreteUniform": 
-			PHYSICAL_PARAMETERS[paramID]["val"] = Math.max(1, PHYSICAL_PARAMETERS[paramID]["uniformDistnLowerVal"] + Math.floor(mersenneTwister.random() * (1 + PHYSICAL_PARAMETERS[paramID]["uniformDistnUpperVal"] - PHYSICAL_PARAMETERS[paramID]["uniformDistnLowerVal"])));
-			break;	
-			
-		case "Poisson": 
-			PHYSICAL_PARAMETERS[paramID]["val"] = rpoiss(PHYSICAL_PARAMETERS[paramID]["poissonRateVal"], PHYSICAL_PARAMETERS[paramID]["zeroTruncated"], PHYSICAL_PARAMETERS[paramID]["minVal"], PHYSICAL_PARAMETERS[paramID]["maxVal"]);
-			break;
-			
-			
-	    default:
-	        PHYSICAL_PARAMETERS[paramID]["val"] = PHYSICAL_PARAMETERS[paramID]["fixedDistnVal"];
+			case "Normal": // May have to repeatedly resample if this parameter is zero-truncated
+				var value = new Random(Math.ceil(mersenneTwister.random() * 1e6)).normal(PHYSICAL_PARAMETERS[paramID]["normalMeanVal"], PHYSICAL_PARAMETERS[paramID]["normalSdVal"]);
+				while (value <= 0 && PHYSICAL_PARAMETERS[paramID]["zeroTruncated"]) value = new Random(Math.ceil(mersenneTwister.random() * 1e6)).normal(PHYSICAL_PARAMETERS[paramID]["normalMeanVal"], PHYSICAL_PARAMETERS[paramID]["normalSdVal"]);
+				PHYSICAL_PARAMETERS[paramID]["val"] = value;
+				break;
+				
+			case "Lognormal": // Generate a normal(mean, sd) and then take the exp of it
+				PHYSICAL_PARAMETERS[paramID]["val"] = Math.exp(new Random(Math.ceil(mersenneTwister.random() * 1e6)).normal(PHYSICAL_PARAMETERS[paramID]["lognormalMeanVal"], PHYSICAL_PARAMETERS[paramID]["lognormalSdVal"]));
+				break;
+				
+			case "Gamma": 
+				PHYSICAL_PARAMETERS[paramID]["val"] = new Random(Math.ceil(mersenneTwister.random() * 1e6)).gamma(PHYSICAL_PARAMETERS[paramID]["gammaShapeVal"], 1/PHYSICAL_PARAMETERS[paramID]["gammaRateVal"]);
+				break;
+				
+			case "DiscreteUniform": 
+				PHYSICAL_PARAMETERS[paramID]["val"] = Math.max(1, PHYSICAL_PARAMETERS[paramID]["uniformDistnLowerVal"] + Math.floor(mersenneTwister.random() * (1 + PHYSICAL_PARAMETERS[paramID]["uniformDistnUpperVal"] - PHYSICAL_PARAMETERS[paramID]["uniformDistnLowerVal"])));
+				break;	
+				
+			case "Poisson": 
+				PHYSICAL_PARAMETERS[paramID]["val"] = rpoiss(PHYSICAL_PARAMETERS[paramID]["poissonRateVal"], PHYSICAL_PARAMETERS[paramID]["zeroTruncated"], PHYSICAL_PARAMETERS[paramID]["minVal"], PHYSICAL_PARAMETERS[paramID]["maxVal"]);
+				break;
+				
+				
+		    default:
+		        PHYSICAL_PARAMETERS[paramID]["val"] = PHYSICAL_PARAMETERS[paramID]["fixedDistnVal"];
+		}
+
 	}
 
 

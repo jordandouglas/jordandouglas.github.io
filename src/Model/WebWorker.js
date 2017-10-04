@@ -34,6 +34,7 @@ function init_WW(isWW){
 		self.importScripts('operators.js');
 		self.importScripts('plots.js');
 		self.importScripts('freeEnergy.js');
+		self.importScripts('ABC.js');
 		self.importScripts('MFE.js');
 		self.importScripts('stateEncoding.js');
 		self.importScripts('XMLparser.js');

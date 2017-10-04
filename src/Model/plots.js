@@ -240,7 +240,6 @@ function getPlotData_WW(forceUpdate = false, resolve = function(plotData) { }, m
 			 				     (whichPlotInWhichCanvas[3] != null && !whichPlotInWhichCanvas[3]["hidden"] && whichPlotInWhichCanvas[3]["name"] == "parameterHeatmap");
 
 
-	
 	if (forceUpdate || JSON.stringify(plotData) != "{}" || thereExistsAParameterPlot){
 	
 		plotData["nbases"] = currentState["nbases"];

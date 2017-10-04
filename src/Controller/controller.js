@@ -23,6 +23,20 @@
 
 
 // Toggles the navigation panel between hidden and shown
+function showABCPanelFn(){
+
+	if($("#showABCPanel").val() == "-"){
+		$("#showABCPanel").val("+");
+		$("#ABCPanelTableDIV").slideUp(100);
+	}
+	else{
+		$("#showABCPanel").val("-");
+		$("#ABCPanelTableDIV").slideDown(100);
+	}
+
+}
+
+
 function showNavigationPanel(){
 
 	if($("#showNavigationPanel").val() == "-"){
