@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<session datetime="2017_10_3-19.4.28" N="200" speed="hidden">
-	<sequence seqID="$user" TemplateType="dsDNA" PrimerType="ssRNA" seq="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" />
+<session datetime="2017_10_5-13.49.50" N="200" speed="hidden">
+	<sequence seqID="E.coli lacZ gene GU063697" TemplateType="dsDNA" PrimerType="ssRNA" seq="TACTTTCGACCGATGTCCTTCCGGTCTGCGCTTAATAAAAACTACCGCAATTGAGCCGCAAAGTAGACACCACGTTGCCCGCGACCCAGCCAATGCCGGTCCTGTCAGCAAACGGCAGACTTAAACTGGACTCGCGTAAAAATGCGCGGCCTCTTTTGGCGGAGCGCCACTACCACGACGCGACCTCACTGCCGTCAATAGACCTTCTAGTCCTATACACCGCCTACTCGCCGTAAAAGGCACTGCAGAGCAACGACGTATTTGGCTGATGTGTTTAGTCGCTAAAGGTACAACGGTGAGCGAAATTACTACTAAAGTCGGCGCGACATGACCTCCGACTTCAAGTCTACACGCCGCTCAACGCACTGATGGATGCCCATTGTCAAAGAAATACCGTCCCACTTTGCGTCCAGCGGTCGCCGTGGCGCGGAAAGCCGCCACTTTAATAGCTACTCGCACCACCAATACGGCTAGCGCAGTGTGATGCAGACTTGCAGCTTTTGGGCTTTGACACCTC" />
 	<plots>
 		<plot1 name="distanceVsTime" hidden="false" plotFunction="plotTimeChart" xRange="automaticX" yRange="automaticY" />
 		<plot2 name="velocityHistogram" hidden="false" plotFunction="plot_velocity_distribution" displayBottomProportionOf="1" windowSize="1" xRange="automaticX" timeSpaceX="linearSpace" timeSpaceY="linearSpace" />
@@ -23,11 +23,10 @@
 		<hybridLength val="9" distribution="Fixed" fixedDistnVal="9">Hybrid length (bp)</hybridLength>
 		<bubbleSizeLeft val="1" distribution="Fixed" fixedDistnVal="1">Bubble length left (bp)</bubbleSizeLeft>
 		<bubbleSizeRight val="2" distribution="Fixed" fixedDistnVal="2">Bubble length right (bp)</bubbleSizeRight>
-		<GDaggerSlide val="6.389499263605103" distribution="Uniform" fixedDistnVal="5" uniformDistnLowerVal="2.5" uniformDistnUpperVal="7.5">ΔG†slide</GDaggerSlide>
-		<GHypertranslocate val="0" distribution="Fixed" fixedDistnVal="0">ΔGhyper</GHypertranslocate>
-		<FAssist val="0" distribution="Fixed" fixedDistnVal="0">Fassist (pN)</FAssist>
+		<GDaggerSlide val="3.4968896443024278" distribution="Uniform" fixedDistnVal="5" uniformDistnLowerVal="2.5" uniformDistnUpperVal="7.5">ΔG†slide</GDaggerSlide>
+		<FAssist val="0" distribution="Fixed" fixedDistnVal="0">Force (pN)</FAssist>
 		<arrestTimeout val="30" distribution="Fixed" fixedDistnVal="30">Arrest timeout (s)</arrestTimeout>
-		<RateCatalyse val="113.78190983086824" distribution="Uniform" fixedDistnVal="30" uniformDistnLowerVal="0" uniformDistnUpperVal="200" normalSdVal="5">Rate of catalysis (s⁻¹)</RateCatalyse>
+		<RateCatalyse val="132.73733453825116" distribution="Uniform" fixedDistnVal="30" uniformDistnLowerVal="0" uniformDistnUpperVal="200" normalSdVal="5">Rate of catalysis (s⁻¹)</RateCatalyse>
 		<Kdissociation val="4" distribution="Fixed" fixedDistnVal="4">Dissociation constant of NTP (μM)</Kdissociation>
 		<RateBind val="250" distribution="Fixed" fixedDistnVal="250">Rate bind (μM⁻¹ s⁻¹)</RateBind>
 		<allowMultipleBulges val="false">allowMultipleBulges</allowMultipleBulges>
