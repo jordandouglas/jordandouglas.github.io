@@ -2954,7 +2954,7 @@ function closeNav() {
 
 
 				<span style="font-size:18px; font-family:Bookman;">
-					<input type=button id='showABCPanel' class='minimise' value='-' onClick=showABCPanelFn()> 
+					<input type=button id='showABCPanel' class='minimise' value='+' onClick=showABCPanelFn()> 
 					<b class="noselect">Approximate Bayesian Computation</b> 
 						<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
 							- Fit your parameters to experimental data using a Bayesian analysis. 
@@ -2966,7 +2966,7 @@ function closeNav() {
 				</span>
 
 					
-					<div id="ABCPanelTableDIV" class="noselect"  class="scrollbar" style="overflow-x:scroll; width:100%; position:relative">
+					<div id="ABCPanelTableDIV" class="noselect"  class="scrollbar" style="display:none; overflow-x:scroll; width:100%; position:relative">
 
 						<br>
 
@@ -2995,9 +2995,7 @@ function closeNav() {
 
 							<input type=button id="beginABC_btn" onClick=beginABC() value='Begin ABC' title="Begin the approximate Bayesian computation with the current settings" class="operation" style="background-color:#663399"> 
 
-							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#navigationPanelHelp">
-								<img class="helpIcon" src="src/Images/help.png">
-							</a>
+
 
 							<br><br>
 							<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
