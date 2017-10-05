@@ -36,7 +36,7 @@ PHYSICAL_PARAMETERS["bubbleSizeRight"] = {distribution:"Fixed", refreshOnChange:
 PHYSICAL_PARAMETERS["GDaggerSlide"] = {distribution:"Fixed", fixedDistnVal: 4.5, name: "\u0394G\u2020slide", title: "Free energy barrier height of translocation", zeroTruncated: false, integer: false};
 PHYSICAL_PARAMETERS["GHypertranslocate"] = {distribution:"Fixed", fixedDistnVal: 2, name: "\u0394Ghyper", title: "Free energy penalty height of hypertranslocation", zeroTruncated: false, integer: false, hidden: true};
 PHYSICAL_PARAMETERS["GsecondarySitePenalty"] = {distribution:"Fixed", fixedDistnVal: 1.336, name: "\u0394G\u2020NTP2", title: "Free energy penalty of binding NTP in the secondary binding site", zeroTruncated: false, integer: false};
-PHYSICAL_PARAMETERS["FAssist"] = {distribution:"Fixed", fixedDistnVal: 0, name: "Fassist (pN)", title: "Assisting force", zeroTruncated: false, integer: false};
+PHYSICAL_PARAMETERS["FAssist"] = {distribution:"Fixed", fixedDistnVal: 0, name: "Force (pN)", title: "Assisting force applied to the polymerase during single-molecule experiments.", zeroTruncated: false, integer: false};
 PHYSICAL_PARAMETERS["arrestTimeout"] = {distribution:"Fixed", fixedDistnVal: 60, name: "Arrest timeout (s)", title: "Maximum pause duration before the simulation is arrested. Set to zero to prevent arrests.", zeroTruncated: true, integer: false};
 
 
@@ -58,8 +58,8 @@ PHYSICAL_PARAMETERS["RateMisbind"] = {distribution:"Fixed", fixedDistnVal: 1, na
 PHYSICAL_PARAMETERS["TransitionTransversionRatio"] = {distribution:"Fixed", fixedDistnVal: 4, name: "Transition:transversion", title: "How much more likely is a transition mis-binding event than a transversion mis-binding event", zeroTruncated: true, integer: false, hidden:true};
 
 
-PHYSICAL_PARAMETERS["kU"] = {distribution:"Fixed", fixedDistnVal: 0.05, name: "kU (s\u207B\u00B9)", title: "Rate constant of polymerase entering the unactive state", zeroTruncated: true, integer: false};
-PHYSICAL_PARAMETERS["kA"] = {distribution:"Fixed", fixedDistnVal: 3, name: "kA (s\u207B\u00B9)", title: "Rate constant of polymerase leaving the unactive state", zeroTruncated: true, integer: false};
+PHYSICAL_PARAMETERS["kU"] = {distribution:"Fixed", fixedDistnVal: 0.05, name: "kU (s\u207B\u00B9)", title: "Rate constant of polymerase entering the unactive state", zeroTruncated: true, integer: false, hidden:true};
+PHYSICAL_PARAMETERS["kA"] = {distribution:"Fixed", fixedDistnVal: 3, name: "kA (s\u207B\u00B9)", title: "Rate constant of polymerase leaving the unactive state", zeroTruncated: true, integer: false, hidden:true};
 PHYSICAL_PARAMETERS["kUspecial"] = {distribution:"Fixed", fixedDistnVal: 1, name: "kU' (s\u207B\u00B9)", title: "Rate of entry into unactivated state multiplier at edit site", zeroTruncated: true, integer: false, hidden:true};
 PHYSICAL_PARAMETERS["kAspecial"] = {distribution:"Fixed", fixedDistnVal: 1, name: "kA' (s\u207B\u00B9)", title: "Rate of entry into activated state multiplier at edit site", zeroTruncated: true, integer: false, hidden:true};
 
@@ -320,55 +320,48 @@ function sample_parameter_WW(paramID, resolve = function() { }, msgID = null){
 
 
 	var initialVal = PHYSICAL_PARAMETERS[paramID]["val"];
+
+
+	switch(PHYSICAL_PARAMETERS[paramID]["distribution"]) {
+	    case "Fixed":
+	        PHYSICAL_PARAMETERS[paramID]["val"] = PHYSICAL_PARAMETERS[paramID]["fixedDistnVal"];
+	        break;
 	
-
-	// Do not sample if it is being used by the ABC analysis
-	if (PHYSICAL_PARAMETERS[paramID]["ABCval"] != null) PHYSICAL_PARAMETERS[paramID]["val"] = PHYSICAL_PARAMETERS[paramID]["ABCval"];
-
-	// Otherwise sample it
-	else{
-
-		switch(PHYSICAL_PARAMETERS[paramID]["distribution"]) {
-		    case "Fixed":
-		        PHYSICAL_PARAMETERS[paramID]["val"] = PHYSICAL_PARAMETERS[paramID]["fixedDistnVal"];
-		        break;
+	    case "Uniform":
+	        PHYSICAL_PARAMETERS[paramID]["val"] = new Random(Math.ceil(mersenneTwister.random() * 1e6)).uniform(PHYSICAL_PARAMETERS[paramID]["uniformDistnLowerVal"], PHYSICAL_PARAMETERS[paramID]["uniformDistnUpperVal"]);
+	        break;
+	
+		case "Exponential":
+		    PHYSICAL_PARAMETERS[paramID]["val"] = new Random(Math.ceil(mersenneTwister.random() * 1e6)).exponential(PHYSICAL_PARAMETERS[paramID]["ExponentialDistnVal"]);
+		    break;
 		
-		    case "Uniform":
-		        PHYSICAL_PARAMETERS[paramID]["val"] = new Random(Math.ceil(mersenneTwister.random() * 1e6)).uniform(PHYSICAL_PARAMETERS[paramID]["uniformDistnLowerVal"], PHYSICAL_PARAMETERS[paramID]["uniformDistnUpperVal"]);
-		        break;
-		
-			case "Exponential":
-			    PHYSICAL_PARAMETERS[paramID]["val"] = new Random(Math.ceil(mersenneTwister.random() * 1e6)).exponential(PHYSICAL_PARAMETERS[paramID]["ExponentialDistnVal"]);
-			    break;
+		case "Normal": // May have to repeatedly resample if this parameter is zero-truncated
+			var value = new Random(Math.ceil(mersenneTwister.random() * 1e6)).normal(PHYSICAL_PARAMETERS[paramID]["normalMeanVal"], PHYSICAL_PARAMETERS[paramID]["normalSdVal"]);
+			while (value <= 0 && PHYSICAL_PARAMETERS[paramID]["zeroTruncated"]) value = new Random(Math.ceil(mersenneTwister.random() * 1e6)).normal(PHYSICAL_PARAMETERS[paramID]["normalMeanVal"], PHYSICAL_PARAMETERS[paramID]["normalSdVal"]);
+			PHYSICAL_PARAMETERS[paramID]["val"] = value;
+			break;
 			
-			case "Normal": // May have to repeatedly resample if this parameter is zero-truncated
-				var value = new Random(Math.ceil(mersenneTwister.random() * 1e6)).normal(PHYSICAL_PARAMETERS[paramID]["normalMeanVal"], PHYSICAL_PARAMETERS[paramID]["normalSdVal"]);
-				while (value <= 0 && PHYSICAL_PARAMETERS[paramID]["zeroTruncated"]) value = new Random(Math.ceil(mersenneTwister.random() * 1e6)).normal(PHYSICAL_PARAMETERS[paramID]["normalMeanVal"], PHYSICAL_PARAMETERS[paramID]["normalSdVal"]);
-				PHYSICAL_PARAMETERS[paramID]["val"] = value;
-				break;
-				
-			case "Lognormal": // Generate a normal(mean, sd) and then take the exp of it
-				PHYSICAL_PARAMETERS[paramID]["val"] = Math.exp(new Random(Math.ceil(mersenneTwister.random() * 1e6)).normal(PHYSICAL_PARAMETERS[paramID]["lognormalMeanVal"], PHYSICAL_PARAMETERS[paramID]["lognormalSdVal"]));
-				break;
-				
-			case "Gamma": 
-				PHYSICAL_PARAMETERS[paramID]["val"] = new Random(Math.ceil(mersenneTwister.random() * 1e6)).gamma(PHYSICAL_PARAMETERS[paramID]["gammaShapeVal"], 1/PHYSICAL_PARAMETERS[paramID]["gammaRateVal"]);
-				break;
-				
-			case "DiscreteUniform": 
-				PHYSICAL_PARAMETERS[paramID]["val"] = Math.max(1, PHYSICAL_PARAMETERS[paramID]["uniformDistnLowerVal"] + Math.floor(mersenneTwister.random() * (1 + PHYSICAL_PARAMETERS[paramID]["uniformDistnUpperVal"] - PHYSICAL_PARAMETERS[paramID]["uniformDistnLowerVal"])));
-				break;	
-				
-			case "Poisson": 
-				PHYSICAL_PARAMETERS[paramID]["val"] = rpoiss(PHYSICAL_PARAMETERS[paramID]["poissonRateVal"], PHYSICAL_PARAMETERS[paramID]["zeroTruncated"], PHYSICAL_PARAMETERS[paramID]["minVal"], PHYSICAL_PARAMETERS[paramID]["maxVal"]);
-				break;
-				
-				
-		    default:
-		        PHYSICAL_PARAMETERS[paramID]["val"] = PHYSICAL_PARAMETERS[paramID]["fixedDistnVal"];
-		}
-
+		case "Lognormal": // Generate a normal(mean, sd) and then take the exp of it
+			PHYSICAL_PARAMETERS[paramID]["val"] = Math.exp(new Random(Math.ceil(mersenneTwister.random() * 1e6)).normal(PHYSICAL_PARAMETERS[paramID]["lognormalMeanVal"], PHYSICAL_PARAMETERS[paramID]["lognormalSdVal"]));
+			break;
+			
+		case "Gamma": 
+			PHYSICAL_PARAMETERS[paramID]["val"] = new Random(Math.ceil(mersenneTwister.random() * 1e6)).gamma(PHYSICAL_PARAMETERS[paramID]["gammaShapeVal"], 1/PHYSICAL_PARAMETERS[paramID]["gammaRateVal"]);
+			break;
+			
+		case "DiscreteUniform": 
+			PHYSICAL_PARAMETERS[paramID]["val"] = Math.max(1, PHYSICAL_PARAMETERS[paramID]["uniformDistnLowerVal"] + Math.floor(mersenneTwister.random() * (1 + PHYSICAL_PARAMETERS[paramID]["uniformDistnUpperVal"] - PHYSICAL_PARAMETERS[paramID]["uniformDistnLowerVal"])));
+			break;	
+			
+		case "Poisson": 
+			PHYSICAL_PARAMETERS[paramID]["val"] = rpoiss(PHYSICAL_PARAMETERS[paramID]["poissonRateVal"], PHYSICAL_PARAMETERS[paramID]["zeroTruncated"], PHYSICAL_PARAMETERS[paramID]["minVal"], PHYSICAL_PARAMETERS[paramID]["maxVal"]);
+			break;
+			
+			
+	    default:
+	        PHYSICAL_PARAMETERS[paramID]["val"] = PHYSICAL_PARAMETERS[paramID]["fixedDistnVal"];
 	}
+
 
 
 	if (paramID.substring(3) == "conc" || paramID == "RateBind" || paramID == "RateMisbind" || paramID == "TransitionTransversionRatio"){

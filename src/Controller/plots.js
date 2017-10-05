@@ -2677,7 +2677,7 @@ function getColourFromPalette(val, min, max, paletteName){
 function plot_parameter_heatmap(plotNumCustom = null){
 
 
-	console.log("Drawing heatmap", plotNumCustom);
+	//console.log("Drawing heatmap", plotNumCustom);
 
 	if (plotNumCustom == null) plotNumCustom = 5;
 
@@ -2811,7 +2811,7 @@ function plot_custom(plotNumCustom = null){
 
 	if (plotNumCustom != 5 && $("#plotDIV" + plotNumCustom).is( ":hidden" )) return;
 
-	console.log("plotNumCustom", plotNumCustom, PLOT_DATA);
+	//console.log("plotNumCustom", plotNumCustom, PLOT_DATA);
 	
 	// Empty plot
 	if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParam"] == "none"){

@@ -2240,8 +2240,11 @@ function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardat
 function beginABC_controller(rules){
 
 
-	var updateDOM = function(mod){
+	var updateDOM = function(){
 
+		hideStopButtonAndShow("simulate");
+		$("#beginABC_btn").val("Begin ABC");
+		$("#beginABC_btn").attr("onclick", "beginABC()");
 		
 	};
 

@@ -26,9 +26,13 @@ SIMULATION_ACTIONS = [];
 
 function startTrials_WW(n, resolve = function() { }, msgID = null){
 
-
-	if (!stopRunning_WW) {
-		resolve();
+	
+	if (!stopRunning_WW && !ABC_simulating) { // If ABC is running then allow this to proceed 
+		if (msgID != null){
+			postMessage(msgID + "~X~" + "done");
+		}else{
+			resolve();
+		}
 		return;
 	}
 
@@ -63,7 +67,7 @@ function startTrials_WW(n, resolve = function() { }, msgID = null){
 
 
 
-			stopRunning_WW = false;
+			if (!ABC_simulating) stopRunning_WW = false; // Do not modify this variable if the simulation was called by ABC
 			simulating = true;
 			ANIMATION_TIME = ANIMATION_TIME_TEMP;
 
@@ -111,7 +115,7 @@ function n_simulations_WW(n, stateC, resolve = function() { }, msgID = null){
 
 		ANIMATION_TIME = 200;
 		simulating = false;
-		stopRunning_WW = true;
+		if(!ABC_simulating) stopRunning_WW = true; // Do not modify this variable if the simulation was called by ABC
 
 		currentState = convertCompactStateToFullState(stateC);
 		updateCoordsOfCurrentState();

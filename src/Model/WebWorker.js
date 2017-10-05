@@ -92,7 +92,7 @@ function refresh_WW(resolve = function() {}, msgID = null){
 
 
 	// Which sequence are we using
-	sample_parameters_WW();
+	if(!ABC_simulating) sample_parameters_WW(); // Do not sample parameters if in the middle of an ABC experiment
 	templateEntryChannelLength = 6;
 	templateExitChannelLength = 5;
 	specialSite = -1;

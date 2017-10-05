@@ -716,6 +716,7 @@ function update_custom_plot_data_WW(){
 	if (DWELL_TIMES.length == 0) return; 
 
 
+
 	var totalTime_thisTrial = 0;
 	for (var timeNum = 0; timeNum < DWELL_TIMES[DWELL_TIMES.length-1].length; timeNum ++){
 		totalTime_thisTrial += DWELL_TIMES[DWELL_TIMES.length-1][timeNum];
@@ -751,9 +752,17 @@ function update_custom_plot_data_WW(){
 	PARAMETERS_PLOT_DATA["nascentLength"]["vals"].push(currentState["mRNALength"]-1);
 
 
+	// If ABC is being run then add the appropriate metrics to this list
+	if (ABC_simulating){
+		if (ABC_metric_values_this_simulation["meanVelocity"] != null) ABC_metric_values_this_simulation["meanVelocity"].push(meanVelocity_thisTrial);
+		if (ABC_metric_values_this_simulation["meanTranscription"] != null) ABC_metric_values_this_simulation["meanTranscription"].push(totalTime_thisTrial);
+		if (ABC_metric_values_this_simulation["meanCatalysis"] != null) ABC_metric_values_this_simulation["meanCatalysis"].push(meanDwellTime_thisTrial);
+		if (ABC_metric_values_this_simulation["nascentLength"] != null) ABC_metric_values_this_simulation["nascentLength"].push(currentState["mRNALength"]-1);
+	}
+
+
 
 	// Update the parameters on the list
-
 	for (var canvasNum = 1; canvasNum <=3; canvasNum++){
 		if (whichPlotInWhichCanvas[canvasNum] != null && whichPlotInWhichCanvas[canvasNum]["name"] == "custom"){
 
@@ -936,7 +945,7 @@ function deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timeP
 	}
 	
 
-	getPlotData_WW(resolve, msgID);
+	getPlotData_WW(false, resolve, msgID);
 
 
 }

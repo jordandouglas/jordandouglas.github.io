@@ -30,7 +30,7 @@ function beginABC(){
 		var ruleNumber = ruleDOM.attr("id").substring(7);
 		if (ruleNumber >= numberABCrules) break;
 		var paramNames = ruleDOM.find(".ifParameterName" + ruleNumber);
-		var paramOperators = ruleDOM.find(".ifOperator" + ruleNumber);
+		//var paramOperators = ruleDOM.find(".ifOperator" + ruleNumber);
 		var paramValues = ruleDOM.find(".ifParameterVal" + ruleNumber);
 		var thisRule = {num: ruleNumber, LHS: [], RHS: []};
 		
@@ -42,7 +42,7 @@ function beginABC(){
 			if (param == "none" || value == null || isNaN(value)) continue;
 
 			condition["param"] = param;
-			condition["operator"] = $(paramOperators[conditionNum]).val();
+			//condition["operator"] = $(paramOperators[conditionNum]).val();
 			condition["value"] = value;
 			thisRule["LHS"].push(condition);
 
@@ -77,9 +77,11 @@ function beginABC(){
 
 	beginABC_controller(rules);
 
+	
 
 	// Update the DOM so that we can see that ABC is running
 	$("#beginABC_btn").val("Stop ABC");
+	$("#beginABC_btn").attr("onclick", "stop_controller()");
 	hideButtonAndShowStopButton("simulate");
 
 
@@ -107,7 +109,7 @@ function updateABCpanel(){
 
 					// If an option in the dropdown is no longer an applicable param then remove it
 					if (params[paramID]["hidden"] && optionValues.indexOf(paramID) != -1) {
-						if (dropdown.val() == paramID) dropdown.val("none") // Set the current parameter to none if this one is selected
+						if (dropdown.val() == paramID) dropdown.val("FAssist") // Set the current parameter to FAssist if this one is selected
 						dropdown.find("option[value='" + paramID + "']").remove(); // Remove the option from the list
 					}
 
@@ -231,14 +233,14 @@ function addIfStatementABC(ruleNumber, params, first = true){
 
 	var ifHTML = `
 
-		<td style="vertical-align:middle; font-size:25px text-align:center; min-width:400px">
+		<td style="vertical-align:middle; font-size:25px text-align:center; min-width:380px">
 
 			<b style="font-family:Bookman;">` + ifOrAnd + `</b> &nbsp;&nbsp;	
 				<select class="plot-dropdown ifParameterName` + ruleNumber + `" title="Select which parameter to tweak" style="vertical-align: middle; text-align:right; background-color:#663399; max-width:180px; font-size:15px">
-				  <option value="none">Select parameter...</option>
 				</select>
 				&nbsp;&nbsp; 
 
+				<!--
 				<select class="plot-dropdown ifOperator` + ruleNumber + `" title="Select whether this parameter must be greater than or less than a number" style="vertical-align: middle; text-align:right; background-color:#663399">
 				  	<option value="greaterThan">&gt;</option>
 				  	<option value="greaterThanEqual">&ge;</option>
@@ -248,8 +250,11 @@ function addIfStatementABC(ruleNumber, params, first = true){
 				</select>
 
 
-				&nbsp;&nbsp; 
-				<input type="number" class="variable ifParameterVal` + ruleNumber + `" style="vertical-align: middle; text-align:center; width: 70px;  padding: 5px; font-size:14px; background-color:#663399">
+				-->
+
+				<b style="font-family:Bookman; font-size:22px; vertical-align:middle">=</b> &nbsp;&nbsp;	
+
+				<input type="number" value="0" class="variable ifParameterVal` + ruleNumber + `" style="vertical-align: middle; text-align:left; width: 70px;  padding: 5px; font-size:14px; background-color:#663399">
 
 
 		</td>
@@ -281,9 +286,11 @@ function addIfStatementABC(ruleNumber, params, first = true){
 	var dropDown = $($(".ifParameterName" + ruleNumber)[$(".ifParameterName" + ruleNumber).length-1]);
 	addParametersToIfDropdownList(dropDown, params);
 
+	dropDown.val("FAssist");
+
 
 	// Set the >, >= etc operator to default as =
-	$($(".ifOperator" + ruleNumber)[$(".ifOperator" + ruleNumber).length-1]).val("equalTo");
+	//$($(".ifOperator" + ruleNumber)[$(".ifOperator" + ruleNumber).length-1]).val("equalTo");
 
 
 
@@ -340,7 +347,7 @@ function addThenStatementABC(ruleNumber, first = true){
 				</select>
 				 &nbsp;&nbsp;	
 
-				 <input type="number" value="10" class="variable thenParameterVal` + ruleNumber + `" style="vertical-align: middle; text-align:center; width: 70px;  padding: 5px; font-size:14px; background-color:#663399">
+				 <input type="number" value="10" class="variable thenParameterVal` + ruleNumber + `" style="vertical-align: middle; text-align:left; width: 70px;  padding: 5px; font-size:14px; background-color:#663399">
 
 
 			</td>
