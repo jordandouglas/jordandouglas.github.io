@@ -391,7 +391,7 @@ function showPlot_WW(plotNum, isHidden){
 }
 
 
-function selectPlot_WW(plotNum, value, deleteData, resolve = function(plotData) { }, msgID = null){
+function selectPlot_WW(plotNum, value, deleteData, addData = true, resolve = function(plotData) { }, msgID = null){
 
 
 
@@ -477,9 +477,11 @@ function selectPlot_WW(plotNum, value, deleteData, resolve = function(plotData) 
 	if (deleteData != null) delete_plot_data_WW(deleteData);
 
 
-	var plotData = getPlotData_WW();
-	if (plotData["whichPlotInWhichCanvas"] == null) plotData["whichPlotInWhichCanvas"] = whichPlotInWhichCanvas;
-
+	var plotData = {};
+	if (addData){
+		var plotData = getPlotData_WW();
+		if (plotData["whichPlotInWhichCanvas"] == null) plotData["whichPlotInWhichCanvas"] = whichPlotInWhichCanvas;
+	}
 	
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(plotData));

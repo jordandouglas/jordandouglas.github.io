@@ -35,7 +35,7 @@
 
 MESSAGE_LISTENER = {};
 
-function register_WebWorker(){
+function register_WebWorker(resolve = function() { }){
 
 	
 	WEB_WORKER = null;
@@ -134,6 +134,9 @@ function register_WebWorker(){
 
 
     }
+
+
+    resolve();
 
 
 
@@ -536,7 +539,7 @@ function refreshPlotDataSequenceChangeOnly_controller(resolve = function() { }){
 }
 
 function getPlotData_controller(forceUpdate = false, resolve){
-	
+
 	if (WEB_WORKER == null) {
 		var toCall = () => new Promise((resolve) => getPlotData_WW(forceUpdate, resolve, null));
 		toCall().then((dict) => resolve(dict));
@@ -1706,12 +1709,12 @@ function selectPlot_controller(plotNum, value, deleteData, updateDOM = function(
 	
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => selectPlot_WW(plotNum, value, deleteData, resolve));
+		var toCall = () => new Promise((resolve) => selectPlot_WW(plotNum, value, deleteData, true, resolve));
 		toCall().then((plotData) => updateDOM(plotData));
 	}
 
 	else{
-		var res = stringifyFunction("selectPlot_WW", [plotNum, value, deleteData, null], true);
+		var res = stringifyFunction("selectPlot_WW", [plotNum, value, deleteData, true, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));

@@ -84,7 +84,7 @@ function parseXML_plots_WW(attr, values){
 
 	var plotNum = parseFloat(attr.substring(4)); // Convert plotx into x where x is a number from 1 to 4
 	
-	selectPlot_WW(plotNum, values["name"]); // Initialise the plot
+	selectPlot_WW(plotNum, values["name"], null, false); // Initialise the plot
 	for (var prop in values){
 		if (prop != "name") whichPlotInWhichCanvas[plotNum][prop] = values[prop]; // Copy all the settings over
 		
