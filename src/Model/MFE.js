@@ -60,10 +60,10 @@ function getMFESequenceBonds_WW(resolve = function() { }, msgID = null){
 function calculateMFESequence_WW(state){
 	
 
-	// Calculate secondary structure for previous nbasesToFold only
+	// Calculate secondary structure for previous nbpToFold only
 	var primerSeq = "";
-	var startAt = Math.max(1, state["leftMBase"] - PHYSICAL_PARAMETERS["nbasesToFold"]["val"]);
-	//for (var i = startAt; i < state["leftMBase"] - PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]; i ++){
+	var startAt = Math.max(1, state["leftMBase"] - PHYSICAL_PARAMETERS["nbpToFold"]["val"]);
+	//for (var i = startAt; i < state["leftMBase"] - PHYSICAL_PARAMETERS["bubbleLeft"]["val"]; i ++){
 	for (var i = startAt; i < state["leftMBase"]; i ++){
 			if (primerSequence[i] == null) break;
 			primerSeq += primerSequence[i]["base"];
@@ -120,7 +120,7 @@ function getSecondaryStructureBonds_WW(state, primerSeq, structureString){
 
 	var toHide = ["#m0"];
 	
-	//for (var i = 1; i < state["leftMBase"] - PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]; i ++){
+	//for (var i = 1; i < state["leftMBase"] - PHYSICAL_PARAMETERS["bubbleLeft"]["val"]; i ++){
 	for (var i = 1; i < state["leftMBase"]; i ++){
 		bonds.push({ source: i, target: i+1 });
 		vertices.push({src: primerSequence[i]["src"], startX: startX, startY: startY});
@@ -128,7 +128,7 @@ function getSecondaryStructureBonds_WW(state, primerSeq, structureString){
 		
 	}
 	
-	//var anchoredNode = primerSequence[state["leftMBase"] - PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]];
+	//var anchoredNode = primerSequence[state["leftMBase"] - PHYSICAL_PARAMETERS["bubbleLeft"]["val"]];
 	var anchoredNode = primerSequence[state["leftMBase"]];
 
 	vertices.push({src: anchoredNode["src"], fx: anchoredNode["x"] - startX, fy: anchoredNode["y"] - 100 - startY, fixed: true, startX: startX, startY: startY });

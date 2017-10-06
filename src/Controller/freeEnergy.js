@@ -185,8 +185,8 @@ function updateModelDOM(elongation_model_temp){
 	//else $("#deactivateUponMisincorporation_container").hide(100);
 
 
-	if(elongation_model_temp["allowHypertranslocation"]) $("#GHypertranslocate_container").show(300);
-	else  $("#GHypertranslocate_container").hide(0);
+	if(elongation_model_temp["allowHypertranslocation"]) $("#GHyper_container").show(300);
+	else  $("#GHyper_container").hide(0);
 	
 	
 	if (elongation_model_temp["allowInactivation"]) {
@@ -205,13 +205,13 @@ function updateModelDOM(elongation_model_temp){
 
 
 	if (elongation_model_temp["allowmRNAfolding"]) {
-		$("#nbasesToFold_container").show(100);
-		$("#nbasesToFold_desc").show(100);
+		$("#nbpToFold_container").show(100);
+		$("#nbpToFold_desc").show(100);
 
 	}
 	else {
-		$("#nbasesToFold_container").hide(0);
-		$("#nbasesToFold_desc").hide(0);
+		$("#nbpToFold_container").hide(0);
+		$("#nbpToFold_desc").hide(0);
 	}
 	
 	
@@ -250,34 +250,34 @@ function updateModelDOM(elongation_model_temp){
 	// 2 NTP parameters or 8
 	if (elongation_model_temp["NTPbindingNParams"] == 8) {
 		$(".NTPparams2").hide(0);
-		$("#Kdissociation_container").hide(0);
-		$("#RateCatalyse_container").hide(0);
+		$("#Kdiss_container").hide(0);
+		$("#kCat_container").hide(0);
 		$(".NTPparams8").show(100);
-		$("#Kdissociation_ATP_container").show(100);
-		$("#Kdissociation_CTP_container").show(100);
-		$("#Kdissociation_GTP_container").show(100);
-		$("#Kdissociation_UTP_container").show(100);
-		$("#RateCatalyse_ATP_container").show(100);
-		$("#RateCatalyse_CTP_container").show(100);
-		$("#RateCatalyse_GTP_container").show(100);
-		$("#RateCatalyse_UTP_container").show(100);
+		$("#Kdiss_ATP_container").show(100);
+		$("#Kdiss_CTP_container").show(100);
+		$("#Kdiss_GTP_container").show(100);
+		$("#Kdiss_UTP_container").show(100);
+		$("#kCat_ATP_container").show(100);
+		$("#kCat_CTP_container").show(100);
+		$("#kCat_GTP_container").show(100);
+		$("#kCat_UTP_container").show(100);
 
 
 	}
 
 	else {
 		$(".NTPparams2").show(100);
-		$("#Kdissociation_container").show(100);
-		$("#RateCatalyse_container").show(100);
+		$("#Kdiss_container").show(100);
+		$("#kCat_container").show(100);
 		$(".NTPparams8").hide(0);
-		$("#Kdissociation_ATP_container").hide(0);
-		$("#Kdissociation_CTP_container").hide(0);
-		$("#Kdissociation_GTP_container").hide(0);
-		$("#Kdissociation_UTP_container").hide(0);
-		$("#RateCatalyse_ATP_container").hide(0);
-		$("#RateCatalyse_CTP_container").hide(0);
-		$("#RateCatalyse_GTP_container").hide(0);
-		$("#RateCatalyse_UTP_container").hide(0);
+		$("#Kdiss_ATP_container").hide(0);
+		$("#Kdiss_CTP_container").hide(0);
+		$("#Kdiss_GTP_container").hide(0);
+		$("#Kdiss_UTP_container").hide(0);
+		$("#kCat_ATP_container").hide(0);
+		$("#kCat_CTP_container").hide(0);
+		$("#kCat_GTP_container").hide(0);
+		$("#kCat_UTP_container").hide(0);
 	}
 
 
@@ -675,7 +675,7 @@ function getNTPModelSettingsTemplate(){
 
 
 										<td style="background-color:#b3b3b3;  width:44%">
-											<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateCatalyse_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a> k<sub>cat</sub> (s<sup>-1</sup>)
+											<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kCat_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a> k<sub>cat</sub> (s<sup>-1</sup>)
 										</td>
 
 									</tr>
@@ -688,15 +688,15 @@ function getNTPModelSettingsTemplate(){
 											[NTP]:
 										</td>
 
-										<td id="Kdissociation_container" style="vertical-align:bottom; background-color:white;">
-											<input class="variable"  type="number" id="Kdissociation" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  
-										 	<input type=image id='Kdissociation_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										<td id="Kdiss_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number" id="Kdiss" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  
+										 	<input type=image id='Kdiss_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
 
 
-										<td id="RateCatalyse_container" style="vertical-align:bottom; background-color:white;">
-											<input class="variable"  type="number"id="RateCatalyse" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
-					 						<input type=image id='RateCatalyse_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										<td id="kCat_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number"id="kCat" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
+					 						<input type=image id='kCat_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
 
 									</tr>
@@ -709,14 +709,14 @@ function getNTPModelSettingsTemplate(){
 										</td>
 
 
-										<td id="Kdissociation_ATP_container" style="vertical-align:bottom; background-color:white;">
-											<input class="variable"  type="number"id="Kdissociation_ATP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
-					 						<input type=image id='Kdissociation_ATP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										<td id="Kdiss_ATP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number"id="Kdiss_ATP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
+					 						<input type=image id='Kdiss_ATP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
 
-										<td id="RateCatalyse_ATP_container" style="vertical-align:bottom; background-color:white;">
-											<input class="variable"  type="number" id="RateCatalyse_ATP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
-										 	<input type=image id='RateCatalyse_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										<td id="kCat_ATP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number" id="kCat_ATP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
+										 	<input type=image id='kCat_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
 
 
@@ -732,14 +732,14 @@ function getNTPModelSettingsTemplate(){
 										</td>
 
 
-										<td id="Kdissociation_CTP_container" style="vertical-align:bottom; background-color:white;">
-											<input class="variable"  type="number"id="Kdissociation_CTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
-					 						<input type=image id='Kdissociation_CTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										<td id="Kdiss_CTP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number"id="Kdiss_CTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
+					 						<input type=image id='Kdiss_CTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
 
-										<td id="RateCatalyse_CTP_container" style="vertical-align:bottom; background-color:white;">
-											<input class="variable"  type="number" id="RateCatalyse_CTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  
-										 	<input type=image id='RateCatalyse_CTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										<td id="kCat_CTP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number" id="kCat_CTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  
+										 	<input type=image id='kCat_CTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
 
 
@@ -756,14 +756,14 @@ function getNTPModelSettingsTemplate(){
 
 
 
-										<td id="Kdissociation_GTP_container" style="vertical-align:bottom; background-color:white;">
-											<input class="variable"  type="number"id="Kdissociation_GTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">
-					 						<input type=image id='Kdissociation_GTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										<td id="Kdiss_GTP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number"id="Kdiss_GTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">
+					 						<input type=image id='Kdiss_GTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
 
-										<td id="RateCatalyse_GTP_container" style="vertical-align:bottom; background-color:white;">
-											<input class="variable"  type="number" id="RateCatalyse_GTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  
-										 	<input type=image id='RateCatalyse_GTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										<td id="kCat_GTP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number" id="kCat_GTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  
+										 	<input type=image id='kCat_GTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
 
 
@@ -780,14 +780,14 @@ function getNTPModelSettingsTemplate(){
 
 
 
-										<td id="Kdissociation_UTP_container" style="vertical-align:bottom; background-color:white;">
-											<input class="variable"  type="number"id="Kdissociation_UTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
-					 						<input type=image id='Kdissociation_UTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										<td id="Kdiss_UTP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number"id="Kdiss_UTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
+					 						<input type=image id='Kdiss_UTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
 
-										<td id="RateCatalyse_UTP_container" style="vertical-align:bottom; background-color:white;">
-											<input class="variable"  type="number" id="RateCatalyse_UTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
-										 	<input type=image id='RateCatalyse_UTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
+										<td id="kCat_UTP_container" style="vertical-align:bottom; background-color:white;">
+											<input class="variable"  type="number" id="kCat_UTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
+										 	<input type=image id='kCat_UTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
 
 									</tr>						
@@ -982,7 +982,7 @@ function drawModelDiagramCanvas(){
 		var kU = parseFloat($("#kU").val());
 		var kA = parseFloat($("#kA").val());
 		var krelease = parseFloat($("#RateUnbind").val());
-		var kcat = parseFloat($("#RateCatalyse").val());
+		var kcat = parseFloat($("#kCat").val());
 		
 		
 

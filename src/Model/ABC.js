@@ -5,7 +5,9 @@ ABC_POSTERIOR_DISTRIBUTION = [];
 ABC_simulating = false;
 ABC_metric_values_this_simulation = {};
 ABC_parameters_and_metrics_this_simulation = {};
-
+ABC_outputString = [];
+ABC_outputString_unrendered = [];
+n_ABC_trials_left = null;
 
 
 // Start running ABC with the rules parsed by the controller
@@ -33,7 +35,7 @@ function beginABC_WW(rules, resolve = function() { }, msgID = null){
 	var ruleNums = []; // Build a list of rule numbers
 	var LHS_params = []; // Build a list of parameters used on the LHS
 	var RHS_params = []; // Build a list of metrics used on the RHS
-	for (var ruleNum in  ABC_RULES["rules"]) {
+	for (var ruleNum in ABC_RULES["rules"]) {
 		ruleNums.push(ruleNum); 
 
 		var LHS = ABC_RULES["rules"][ruleNum]["LHS"];
@@ -51,45 +53,13 @@ function beginABC_WW(rules, resolve = function() { }, msgID = null){
 
 
 
-
-
-	// Start the first trial
-	ABC_trials_WW(ABC_RULES["ntrials"], ruleNums, LHS_params, RHS_params, resolve, msgID);
-
-
-
-
-
-
-}
-
-
-// Perform N ABC-trials
-function ABC_trials_WW(N, ruleNums, LHS_params, RHS_params, resolve = function() { }, msgID = null){
-
-
-	// When there are no more trials, stop
-	if (N == 0 || stopRunning_WW) {
-
-		console.log("Finished ABC, posterior is", ABC_POSTERIOR_DISTRIBUTION, N, stopRunning_WW);
-		ABC_simulating = false;
-		stopRunning_WW = true;
-
-		if (msgID != null){
-			postMessage(msgID + "~X~" + "done");
-		}else{
-			resolve();
-		}
-
-		return;
-	}
-
-	//console.log("N = ", N, "LHS_params", LHS_params, "RHS_params", RHS_params);
-
-
 	// Initialise the list of parameters/metrics which will be added to the posterior distribution if accepted
 	// Each element in a list is from one rule
 	ABC_parameters_and_metrics_this_simulation = {};
+	for (var ruleNum in ABC_RULES["rules"]) {
+		ABC_parameters_and_metrics_this_simulation["Rule" + ruleNum + "Passed"] = null;
+	}
+	ABC_parameters_and_metrics_this_simulation["accepted"] = null;
 	for (var paramID in PHYSICAL_PARAMETERS){
 		if (!PHYSICAL_PARAMETERS[paramID]["binary"] && !PHYSICAL_PARAMETERS[paramID]["hidden"]) {
 
@@ -110,6 +80,55 @@ function ABC_trials_WW(N, ruleNums, LHS_params, RHS_params, resolve = function()
 	if(RHS_params.indexOf("nascentLength") != -1) ABC_parameters_and_metrics_this_simulation["nascentLength"] = {name: "Final nascent length (nt)", vals: []};
 
 
+	n_ABC_trials_left = ABC_RULES["ntrials"];
+
+	initialise_ABCoutput_WW(ruleNums);
+
+
+	// Start the first trial
+	ABC_trials_WW(ruleNums, resolve, msgID);
+
+
+
+
+
+
+}
+
+
+// Perform N ABC-trials
+function ABC_trials_WW(ruleNums, resolve = function() { }, msgID = null){
+
+
+	// When there are no more trials, stop
+	if (n_ABC_trials_left == 0 || stopRunning_WW) {
+
+		console.log("Finished ABC, posterior is", ABC_POSTERIOR_DISTRIBUTION, n_ABC_trials_left, stopRunning_WW);
+		ABC_simulating = false;
+		stopRunning_WW = true;
+
+		if (msgID != null){
+			postMessage(msgID + "~X~" + "done");
+		}else{
+			resolve();
+		}
+
+		return;
+	}
+
+	//console.log("N = ", n_ABC_trials_left);
+
+	// Reset the values in the object which will be added to the posterior if accepted
+	for (var paramID in ABC_parameters_and_metrics_this_simulation) {
+		if (ABC_parameters_and_metrics_this_simulation[paramID] != null && ABC_parameters_and_metrics_this_simulation[paramID]["vals"] != null) ABC_parameters_and_metrics_this_simulation[paramID]["vals"] = [];
+	}
+
+	// Reset whether or not each rule passed
+	for (var ruleNum in ABC_RULES["rules"]) {
+		ABC_parameters_and_metrics_this_simulation["Rule" + ruleNum + "Passed"] = null;
+	}
+	ABC_parameters_and_metrics_this_simulation["accepted"] = null;
+
 
 	// Sample all the parameters now. There will be no more random sampling between simulation trials, only in between ABC trials
 	sample_parameters_WW();
@@ -121,12 +140,19 @@ function ABC_trials_WW(N, ruleNums, LHS_params, RHS_params, resolve = function()
 	// After completing this trial, call this function again but with N decremented. If the trial was a success then add to the posterior
 	var toDoAfterTrial = function(accepted){
 
+
+
+		ABC_parameters_and_metrics_this_simulation["accepted"] = accepted;
 		if (accepted) {
-			console.log("Accepted parameters", ABC_parameters_and_metrics_this_simulation);
-			ABC_POSTERIOR_DISTRIBUTION.push(ABC_parameters_and_metrics_this_simulation);
+			//console.log("Accepted parameters", ABC_parameters_and_metrics_this_simulation);
+			ABC_POSTERIOR_DISTRIBUTION.push(JSON.parse(JSON.stringify(ABC_parameters_and_metrics_this_simulation)));
 		}
 
-		ABC_trials_WW(N - 1, ruleNums, LHS_params, RHS_params, resolve, msgID);
+		if (!stopRunning_WW) update_ABCoutput_WW(ruleNums);
+		n_ABC_trials_left--;
+
+
+		ABC_trials_WW(ruleNums, resolve, msgID);
 	}
 
 
@@ -174,7 +200,6 @@ function ABC_trial_fire_rules_WW(currentRuleIndex, accepted, ruleNums, resolve =
 function ABC_trial_fire_rule_WW(ruleNum, K, resolve = function(acc) { }){
 
 
-	//console.log("Executing rule", ruleNum, K, "times");
 
 	// Set the parameters in the LHS to their required ABC value. This value will override its current value / prior distribution
 	var LHS = ABC_RULES["rules"][ruleNum]["LHS"];
@@ -194,7 +219,11 @@ function ABC_trial_fire_rule_WW(ruleNum, K, resolve = function(acc) { }){
 	}
 
 
+
+
+
 	var toDoAfterTrials = function(){
+
 
 
 		// Cache the parameters used by this rule 
@@ -211,7 +240,11 @@ function ABC_trial_fire_rule_WW(ruleNum, K, resolve = function(acc) { }){
 		}
 
 		// Check if this satisfies the RHS
-		resolve(acceptOrRejectParameters(ruleNum));
+		var accepted = acceptOrRejectParameters(ruleNum);
+		ABC_parameters_and_metrics_this_simulation["Rule" + ruleNum + "Passed"] = accepted;
+		resolve(accepted);
+
+
 		return;
 
 	}
@@ -292,6 +325,100 @@ function acceptOrRejectParameters(ruleNum){
 
 
 
+function initialise_ABCoutput_WW(ruleNums){
 
 
+
+	// Initialise the ABC output string
+	// The first 2 lines are in the following format:	
+	//															|						Rule1							  |	    |				Rule 2									  |
+	// Number		Rule1Param1		Rule1Param2		Rule1Metric1	Rule1Passed		Rule2Param1		Rule2Param2		Rule2Metric1	Rule2Passed		Accepted	 
+	// Each column will have total width of a fixed number of spaces
+
+
+	var paddingString = "&&&&&&&&&&&&&&&&&&&&"; 
+	//for (var i = 0; i < 20; i ++) paddingString += 
+	var secondLine = (paddingString + "Trial").slice(-9);
+
+	// Add all the variable names to the row. These variables will occur one time for each rule
+	var variablesSection = "";
+	for (var objID in ABC_parameters_and_metrics_this_simulation){
+		if (ABC_parameters_and_metrics_this_simulation[objID] != null && ABC_parameters_and_metrics_this_simulation[objID]["vals"] != null) variablesSection +=  (paddingString + objID).slice(-paddingString.length);
+	}
+
+	for (var ruleNum in ruleNums){
+		secondLine += variablesSection;
+		secondLine += (paddingString + "Rule" + ruleNums[ruleNum] + "Passed").slice(-paddingString.length);
+	}
+
+	secondLine += (paddingString + "Accepted").slice(-10);
+
+
+	ABC_outputString = [secondLine];
+	ABC_outputString_unrendered = [secondLine];
+
+
+}
+
+
+// Add the current ABC state to the output to be displayed on the DOM
+function update_ABCoutput_WW(ruleNums){
+
+
+
+	var paddingString = "&&&&&&&&&&&&&&&&&&&&"; 
+	var trialNum = 	ABC_RULES["ntrials"] - n_ABC_trials_left + 1;
+	var line = (paddingString + trialNum).slice(-9);
+
+	// Get the value of each parameter for this trial
+	for (var ruleIndex = 0; ruleIndex < ruleNums.length; ruleIndex++){
+
+
+
+		var printVals = true; // When this is false, the rule has not been executed, so leave some space but don't print any numbers
+		if (ABC_parameters_and_metrics_this_simulation["Rule" + ruleNums[ruleIndex] + "Passed"] == null) printVals = false;
+
+		for (var objID in ABC_parameters_and_metrics_this_simulation){
+
+
+
+			if (ABC_parameters_and_metrics_this_simulation[objID] != null && ABC_parameters_and_metrics_this_simulation[objID]["vals"] != null) {
+				var valueThisRule = printVals ? roundToSF_WW(parseFloat(ABC_parameters_and_metrics_this_simulation[objID]["vals"][ruleIndex]), 5) : "";
+				line += (paddingString + valueThisRule).slice(-paddingString.length);
+			}
+
+		} 
+
+
+		line += (paddingString + ABC_parameters_and_metrics_this_simulation["Rule" + ruleNums[ruleIndex] + "Passed"]).slice(-paddingString.length);
+
+	}
+
+	line += (paddingString + ABC_parameters_and_metrics_this_simulation["accepted"]).slice(-10).toUpperCase();
+
+	ABC_outputString.push(line);
+	ABC_outputString_unrendered.push(line);
+
+
+}
+
+
+
+// Returns any new lines of the ABC output
+function get_ABCoutput_WW(resolve = function() { }, msgID = null){
+
+
+	var toReturn = {newLines: ABC_outputString_unrendered, nTrialsToGo: n_ABC_trials_left};
+	
+	if (msgID != null){
+		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+	}else{
+		resolve(toReturn);
+	}
+
+
+	ABC_outputString_unrendered = [];
+
+
+}
 

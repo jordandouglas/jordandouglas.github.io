@@ -57,8 +57,8 @@ whichPlotInWhichCanvas = {};
 function refreshPlotData(){
 
 
-	DISTANCE_VS_TIME.push({sim: DISTANCE_VS_TIME.length+1, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLength"]["val"]] });
-	DISTANCE_VS_TIME_UNSENT[DISTANCE_VS_TIME.length] = {sim: DISTANCE_VS_TIME.length, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLength"]["val"]] };
+	DISTANCE_VS_TIME.push({sim: DISTANCE_VS_TIME.length+1, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] });
+	DISTANCE_VS_TIME_UNSENT[DISTANCE_VS_TIME.length] = {sim: DISTANCE_VS_TIME.length, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] };
 	DWELL_TIMES.push([]); // List i contains all the dwell times from the ith trial
 	DWELL_TIMES_UNSENT[DWELL_TIMES.length] = [];	// List[i] contains all the dwell times from the ith trial
 
@@ -78,8 +78,8 @@ function refreshPlotDataSequenceChangeOnly_WW(resolve = function() { }, msgID = 
 	// 		This is to avoid sending the complete list of data back every time 
 	DISTANCE_VS_TIME = [];
 	DISTANCE_VS_TIME_UNSENT = {};
-	DISTANCE_VS_TIME.push({sim: 1, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLength"]["val"]] });
-	DISTANCE_VS_TIME_UNSENT[DISTANCE_VS_TIME.length] = {sim: DISTANCE_VS_TIME.length, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLength"]["val"]] };
+	DISTANCE_VS_TIME.push({sim: 1, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] });
+	DISTANCE_VS_TIME_UNSENT[DISTANCE_VS_TIME.length] = {sim: DISTANCE_VS_TIME.length, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] };
 	DWELL_TIMES = [];
 	DWELL_TIMES_UNSENT = {};
 
@@ -302,7 +302,7 @@ function updatePlotData_WW(stateC, actionNumber, reactionTime){
 	
 
 	// If we have been pausing too long, then abort
-	if (PHYSICAL_PARAMETERS["arrestTimeout"]["val"] > 0 && PHYSICAL_PARAMETERS["arrestTimeout"]["val"] < timeWaitedUntilNextCatalysis){
+	if (PHYSICAL_PARAMETERS["arrestTime"]["val"] > 0 && PHYSICAL_PARAMETERS["arrestTime"]["val"] < timeWaitedUntilNextCatalysis){
 		var abortionSite = stateC[0] + 1;
 		abortionCounts[abortionSite] ++;
 	}
@@ -734,7 +734,7 @@ function update_custom_plot_data_WW(){
 
 
 
-	var increaseInPrimerLength = currentState["mRNALength"] - (PHYSICAL_PARAMETERS["hybridLength"]["val"] + PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"] + 2);
+	var increaseInPrimerLength = currentState["mRNALength"] - (PHYSICAL_PARAMETERS["hybridLen"]["val"] + PHYSICAL_PARAMETERS["bubbleLeft"]["val"] + 2);
 	//if(increaseInPrimerLength < 100) return; // Disqualify early terminations because they will skew everything
 	var meanVelocity_thisTrial = increaseInPrimerLength / totalTime_thisTrial;
 	var meanDwellTime_thisTrial = totalTime_thisTrial / DWELL_TIMES[DWELL_TIMES.length-1].length;
@@ -875,8 +875,8 @@ function deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timeP
 	if (distanceVsTime_cleardata) {
 		DISTANCE_VS_TIME = [];
 		DISTANCE_VS_TIME_UNSENT = {};
-		DISTANCE_VS_TIME.push({sim: 1, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLength"]["val"]] });
-		DISTANCE_VS_TIME_UNSENT[DISTANCE_VS_TIME.length] = {sim: DISTANCE_VS_TIME.length, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLength"]["val"]] };
+		DISTANCE_VS_TIME.push({sim: 1, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] });
+		DISTANCE_VS_TIME_UNSENT[DISTANCE_VS_TIME.length] = {sim: DISTANCE_VS_TIME.length, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] };
 		totalDisplacement = 0;
 		totalTimeElapsed = 0;
 		meanVelocity = 0;
@@ -993,7 +993,4 @@ function binaryFind_WW(sortedArray, searchElement) {
   return currentElement < searchElement ? currentIndex + 1 : currentIndex;
 
 }
-
-
-
 

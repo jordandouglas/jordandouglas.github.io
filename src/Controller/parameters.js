@@ -135,9 +135,9 @@ function update_parameters() {
 	
 	
 	
-	//var hybridLengthTemp = Math.max(Math.floor($("#hybridLength").val()), 5);
-	//$("#hybridLength").val(hybridLengthTemp);
-	//if (hybridLengthTemp != hybridLength) refresh();
+	//var hybridLenTemp = Math.max(Math.floor($("#hybridLen").val()), 5);
+	//$("#hybridLen").val(hybridLenTemp);
+	//if (hybridLenTemp != hybridLen) refresh();
 
 
 
@@ -150,7 +150,7 @@ function update_parameters() {
 
 	
 	
-	//renderGraphicsEveryNsteps = Math.max(Math.ceil(15 * PHYSICAL_PARAMETERS["RateUnbind"]["val"] / PHYSICAL_PARAMETERS["RateCatalyse"]["val"]), 100);
+	//renderGraphicsEveryNsteps = Math.max(Math.ceil(15 * PHYSICAL_PARAMETERS["RateUnbind"]["val"] / PHYSICAL_PARAMETERS["kCat"]["val"]), 100);
 	
 	
 	//formBulgeH = parseFloat(document.getElementById("GDaggerBulge").value);

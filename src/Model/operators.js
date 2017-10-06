@@ -91,7 +91,7 @@ function stutter_WW(nbasesToStutter, fastMode = false, resolve = function() {}, 
 	if (!currentState["activated"]) actions.push(function() {  activate_WW(null, true) });
 	if (currentState["NTPbound"]) actions.push(function() { releaseNTP_WW(null, true) });
 	
-	for (var i = currentState["bulgePos"]; i < PHYSICAL_PARAMETERS["hybridLength"]["val"] && i > 0; i ++){
+	for (var i = currentState["bulgePos"]; i < PHYSICAL_PARAMETERS["hybridLen"]["val"] && i > 0; i ++){
 		actions.push(function() { slip_left_WW(null, true) });
 	}
 	
@@ -112,7 +112,7 @@ function stutter_WW(nbasesToStutter, fastMode = false, resolve = function() {}, 
 		actions.push(function() { bindNTP_WW(null, true) });
 		actions.push(function() { bindNTP_WW(null, true) });
 
-		for (var j = 0; j < PHYSICAL_PARAMETERS["hybridLength"]["val"] - 3; j ++) actions.push(function() { slip_left_WW(null, true) });
+		for (var j = 0; j < PHYSICAL_PARAMETERS["hybridLen"]["val"] - 3; j ++) actions.push(function() { slip_left_WW(null, true) });
 	}
 
 
@@ -229,27 +229,27 @@ function forward_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdates)
 
 	// If bulge will move too far to the left then absorb it
 	for (var s = 0; state["partOfBulgeID"][s] == s && s < state["bulgePos"].length; s++){
-		if (state["bulgePos"][s] > 0 && state["bulgePos"][s] == PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1) absorb_WW(state, UPDATE_COORDS, s, false, true, DOMupdates);
+		if (state["bulgePos"][s] > 0 && state["bulgePos"][s] == PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) absorb_WW(state, UPDATE_COORDS, s, false, true, DOMupdates);
 		if (state["bulgePos"][s] > 0) state["bulgePos"][s]++;
 	}
 	
-	//if (TbulgePos == PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1) absorb_T(false);
+	//if (TbulgePos == PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) absorb_T(false);
 	//if (TbulgePos > 0) TbulgePos++;
 
 
 	// Move genome bases
 	if (UPDATE_COORDS){
-		var shiftMutBaseBy = -52/(PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1);
-		//if (templateSequence[state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1) + 1] != null && templateSequence[state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1) + 1]["mut"] != null) shiftMutBaseBy += 15; 
-		for (i = state["leftGBase"]; i > state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1) && i >= 0; i--) {
+		var shiftMutBaseBy = -52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1);
+		//if (templateSequence[state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) + 1] != null && templateSequence[state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) + 1]["mut"] != null) shiftMutBaseBy += 15; 
+		for (i = state["leftGBase"]; i > state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0; i--) {
 			if (templateSequence[i] == null) break;
-			if (i == state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1) + 1){
+			if (i == state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) + 1){
 				if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "g", 0, shiftMutBaseBy);
 				if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "o", 0, -shiftMutBaseBy/2);
 			}
 			else {
-				if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "g", 0, -52/(PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1));
-				if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "o", 0, +26/(PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1));
+				if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "g", 0, -52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
+				if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "o", 0, +26/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
 			}
 		
 			if (i > 0 && all_sequences[sequenceID]["template"].substring(0,2) == "ds") {
@@ -259,19 +259,19 @@ function forward_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdates)
 		}
 	
 
-		shiftMutBaseBy = 52/(PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1);
+		shiftMutBaseBy = 52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1);
 
-		//if (templateSequence[state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1)] != null && templateSequence[state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1)]["mut"] != null) shiftMutBaseBy -= 15; 
-		for (i = state["rightGBase"] + 1; i < state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1) + 1; i++) {
+		//if (templateSequence[state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)] != null && templateSequence[state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)]["mut"] != null) shiftMutBaseBy -= 15; 
+		for (i = state["rightGBase"] + 1; i < state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1; i++) {
 			if (templateSequence[i] == null) break;
 
-			if (i == state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1)) {
+			if (i == state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)) {
 				move_nt_WW(i, "g", 0, shiftMutBaseBy);
 				move_nt_WW(i, "o", 0, -shiftMutBaseBy/2);
 			}
 			else {
-				move_nt_WW(i, "g", 0, +52/(PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1));
-				move_nt_WW(i, "o", 0, -26/(PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1));
+				move_nt_WW(i, "g", 0, +52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
+				move_nt_WW(i, "o", 0, -26/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
 			}
 		
 			if (i > 0 && all_sequences[sequenceID]["template"].substring(0,2) == "ds") {
@@ -288,8 +288,8 @@ function forward_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdates)
 
 
 	// Move mRNA bases
-	if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") for (i = state["leftMBase"]; UPDATE_COORDS && i > state["leftMBase"] - (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1) && i >= 0; i--) move_nt_WW(i, "m", 0, +52/(PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1));
-	for (i = state["rightMBase"] + 1; UPDATE_COORDS && i < state["rightMBase"] + (PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1) + 1; i++) move_nt_WW(i, "m", 0, -52/(PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1));
+	if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") for (i = state["leftMBase"]; UPDATE_COORDS && i > state["leftMBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0; i--) move_nt_WW(i, "m", 0, +52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
+	for (i = state["rightMBase"] + 1; UPDATE_COORDS && i < state["rightMBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1; i++) move_nt_WW(i, "m", 0, -52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
 	
 	state["leftMBase"] ++;
 	state["rightMBase"] ++;
@@ -302,7 +302,7 @@ function forward_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdates)
 			state["NTPbound"] = false;
 		}else{
 			if (UPDATE_COORDS){
-				move_nt_WW(state["mRNALength"], "m", 0, 52/(PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1))
+				move_nt_WW(state["mRNALength"], "m", 0, 52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1))
 			}
 		}
 	}
@@ -385,7 +385,7 @@ function backwards_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdate
 	var successfulOp = false;
 	var DOMupdates = {where_to_create_new_slipping_landscape: [], landscapes_to_reset: [], landscapes_to_delete: []};
 
-	if (state["leftGBase"] > 1 && state["leftGBase"] - PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"] -1 > 2){
+	if (state["leftGBase"] > 1 && state["leftGBase"] - PHYSICAL_PARAMETERS["bubbleLeft"]["val"] -1 > 2){
 
 
 		// If bulge will move too far to the left then absorb it
@@ -406,19 +406,19 @@ function backwards_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdate
 		// Move genome bases
 		if (UPDATE_COORDS){
 			
-			var shiftMutBaseBy = 52/(PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1);
+			var shiftMutBaseBy = 52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1);
 
-			//if (templateSequence[state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1)] != null && templateSequence[state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1)]["mut"] != null) shiftMutBaseBy -= 15; 
-			for (i = state["leftGBase"] - 1; i > state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1) - 1 && i >= 0; i--) {
+			//if (templateSequence[state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)] != null && templateSequence[state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)]["mut"] != null) shiftMutBaseBy -= 15; 
+			for (i = state["leftGBase"] - 1; i > state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) - 1 && i >= 0; i--) {
 				if (templateSequence[i] == null) break;
 
-				if (i == state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1)) {
+				if (i == state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)) {
 					if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "g", 0, shiftMutBaseBy);
 					if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "o", 0, -shiftMutBaseBy/2);
 				}
 				else {
-					if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "g", 0, +52/(PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1));
-					if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "o", 0, -26/(PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1));
+					if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "g", 0, +52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
+					if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "o", 0, -26/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
 				}
 					
 		
@@ -429,18 +429,18 @@ function backwards_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdate
 		
 		
 			
-			shiftMutBaseBy = -52/(PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1);
-			//if (templateSequence[state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1) - 1] != null && templateSequence[state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1) - 1]["mut"] != null) shiftMutBaseBy += 15; 
-			for (i = state["rightGBase"]; i < state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1); i++) {
+			shiftMutBaseBy = -52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1);
+			//if (templateSequence[state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) - 1] != null && templateSequence[state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) - 1]["mut"] != null) shiftMutBaseBy += 15; 
+			for (i = state["rightGBase"]; i < state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1); i++) {
 				if (templateSequence[i] == null) break;
 
-				if (i == state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1) - 1) {
+				if (i == state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) - 1) {
 					move_nt_WW(i, "g", 0, shiftMutBaseBy);
 					move_nt_WW(i, "o", 0, -shiftMutBaseBy/2);
 				}
 				else {
-					move_nt_WW(i, "g", 0, -52/(PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1));
-					move_nt_WW(i, "o", 0, +26/(PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1));
+					move_nt_WW(i, "g", 0, -52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
+					move_nt_WW(i, "o", 0, +26/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
 				}
 		
 				if (i > 0 && all_sequences[sequenceID]["template"].substring(0,2) == "ds") {
@@ -455,8 +455,8 @@ function backwards_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdate
 		state["rightGBase"] --;
 
 		// Move mRNA bases
-		if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") for (i = state["leftMBase"] - 1; UPDATE_COORDS &&  i > state["leftMBase"] - (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1) - 1 && i >= 0; i--) move_nt_WW(i, "m", 0, -52/(PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1));
-		for (i = state["rightMBase"]; UPDATE_COORDS && i < state["rightMBase"] + (PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1); i++) move_nt_WW(i, "m", 0, +52/(PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1));
+		if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") for (i = state["leftMBase"] - 1; UPDATE_COORDS &&  i > state["leftMBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) - 1 && i >= 0; i--) move_nt_WW(i, "m", 0, -52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
+		for (i = state["rightMBase"]; UPDATE_COORDS && i < state["rightMBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1); i++) move_nt_WW(i, "m", 0, +52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
 		state["leftMBase"] --;
 		state["rightMBase"] --;
 
@@ -469,7 +469,7 @@ function backwards_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdate
 				state["NTPbound"] = false;
 			}else{
 				if (UPDATE_COORDS){
-					move_nt_WW(state["mRNALength"], "m", 0, -52/(PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1))
+					move_nt_WW(state["mRNALength"], "m", 0, -52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1))
 				}
 			}
 		}
@@ -681,7 +681,7 @@ function elongate_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgI
 		state["NTPbound"] = false;
 		state["nextBaseToCopy"]++;
 
-		if (all_sequences[sequenceID]["primer"].substring(0,2) == "ds") PHYSICAL_PARAMETERS["hybridLength"]["val"]++;
+		if (all_sequences[sequenceID]["primer"].substring(0,2) == "ds") PHYSICAL_PARAMETERS["hybridLen"]["val"]++;
 
 
 		// Deactivate upon misincorporation if the model demands it
@@ -716,7 +716,7 @@ function decay_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgID =
 	var successfulOp = false;
 
 
-	if (state["activated"] && !state["NTPbound"] && state["mRNALength"] > PHYSICAL_PARAMETERS["hybridLength"]["val"] && state["mRNAPosInActiveSite"] == 0 && !state["terminated"]){
+	if (state["activated"] && !state["NTPbound"] && state["mRNALength"] > PHYSICAL_PARAMETERS["hybridLen"]["val"] && state["mRNAPosInActiveSite"] == 0 && !state["terminated"]){
 
 
 		// Add the triphosphate
@@ -731,7 +731,7 @@ function decay_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgID =
 		state["NTPbound"] = true;
 		state["nextBaseToCopy"] --;
 
-		if (all_sequences[sequenceID]["primer"].substring(0,2) == "ds") PHYSICAL_PARAMETERS["hybridLength"]["val"]--;
+		if (all_sequences[sequenceID]["primer"].substring(0,2) == "ds") PHYSICAL_PARAMETERS["hybridLen"]["val"]--;
 		
 		setNextBaseToAdd_WW();
 
@@ -834,12 +834,12 @@ function slip_left_WW(state = null, UPDATE_COORDS, S = 0, resolve = function(x) 
 	var DOMupdates = {where_to_create_new_slipping_landscape: [], landscapes_to_reset: [], landscapes_to_delete: []};
 
 
-	if (!state["terminated"] && !(PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] &&  state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] == PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1)) {
+	if (!state["terminated"] && !(PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] &&  state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] == PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1)) {
 		
 
 
 		// If this is part of a larger bulge, then split one base off to the left and leave the rest as it is (fissure). Do Not Return. It will be followed up by a 2nd operation.
-		if (PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] != PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1 && state["partOfBulgeID"][S] != S) {
+		if (PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] != PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1 && state["partOfBulgeID"][S] != S) {
 			fissureBulgeLeft_WW(state, UPDATE_COORDS, S, DOMupdates);
 		}
 		
@@ -851,9 +851,9 @@ function slip_left_WW(state = null, UPDATE_COORDS, S = 0, resolve = function(x) 
 		// If there is another bulge 1 to the left then we fuse the two together
 		if (PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] + 1) != -1) fuseBulgeLeft_WW(state, UPDATE_COORDS, S, DOMupdates);
 		else if (PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] == 0 && fuseWith != -1) fuseBulgeLeft_WW(state, UPDATE_COORDS, S, DOMupdates);
-		else if (state["bulgePos"][S] > 0 && state["bulgePos"][S] < PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1) diffuse_left_WW(state, UPDATE_COORDS, S, DOMupdates);
-		else if (!state["NTPbound"] && state["bulgePos"][S] == 0 && state["mRNAPosInActiveSite"] < PHYSICAL_PARAMETERS["hybridLength"]["val"] - 2) form_bulge_WW(state, UPDATE_COORDS, S, true, DOMupdates)
-		else if (state["bulgePos"][S] != 0 && state["bulgePos"][S] == PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1) absorb_WW(state, UPDATE_COORDS, S, false, false, DOMupdates);
+		else if (state["bulgePos"][S] > 0 && state["bulgePos"][S] < PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) diffuse_left_WW(state, UPDATE_COORDS, S, DOMupdates);
+		else if (!state["NTPbound"] && state["bulgePos"][S] == 0 && state["mRNAPosInActiveSite"] < PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2) form_bulge_WW(state, UPDATE_COORDS, S, true, DOMupdates)
+		else if (state["bulgePos"][S] != 0 && state["bulgePos"][S] == PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) absorb_WW(state, UPDATE_COORDS, S, false, false, DOMupdates);
 
 
 
@@ -900,14 +900,14 @@ function slip_right_WW(state = null, UPDATE_COORDS, S = 0, resolve = function(x)
 			}
 			
 			
-			var canFuseWith = state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1);
-			if (canFuseWith == -1)	canFuseWith = state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLength"]["val"] - 2);
+			var canFuseWith = state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1);
+			if (canFuseWith == -1)	canFuseWith = state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2);
 			
 
 			// If there is another bulge 1 to the right then we fuse the two together
 			if (PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] &&  state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] - 1) != -1) fuseBulgeRight_WW(state, UPDATE_COORDS, S, DOMupdates);
 			else if (allowBulgeToFormRight && state["leftMBase"] > 1 && PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] == 0 && canFuseWith != -1 && state["bulgePos"].indexOf( state["bulgePos"][canFuseWith] - 1) != -1)fuseBulgeRight_WW(state, UPDATE_COORDS, S, DOMupdates);
-			else if (state["bulgePos"][S] < PHYSICAL_PARAMETERS["hybridLength"]["val"] && state["bulgePos"][S] > 1 && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1) diffuse_right_WW(state, UPDATE_COORDS, S, DOMupdates);
+			else if (state["bulgePos"][S] < PHYSICAL_PARAMETERS["hybridLen"]["val"] && state["bulgePos"][S] > 1 && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1) diffuse_right_WW(state, UPDATE_COORDS, S, DOMupdates);
 			else if (allowBulgeToFormRight && state["bulgePos"][S] == 0 && state["leftMBase"] > 1) form_bulge_WW(state, UPDATE_COORDS, S, false, DOMupdates);
 		}
 
@@ -932,7 +932,7 @@ function form_bulge_WW(state = null, UPDATE_COORDS, S = 0, form_left = true, DOM
 	if (state == null) state = currentState;
 
 	//console.log("forming", state, S);
-	if (form_left && !state["NTPbound"] &&  state["bulgePos"][S] == 0 && state["mRNAPosInActiveSite"] < PHYSICAL_PARAMETERS["hybridLength"]["val"] - 2){
+	if (form_left && !state["NTPbound"] &&  state["bulgePos"][S] == 0 && state["mRNAPosInActiveSite"] < PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2){
 		
 
 		// Move 2nd last base to between the 2nd and 3rd to last positions, and last base into 2nd last position
@@ -960,7 +960,7 @@ function form_bulge_WW(state = null, UPDATE_COORDS, S = 0, form_left = true, DOM
 		if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], 1);
 		
 		for (i = state["bulgedBase"][S] + 2; UPDATE_COORDS && i < state["mRNALength"]; i ++){
-			if (i > state["rightMBase"] && i-state["rightMBase"] <= (PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1)) move_nt_WW(i, "m", -25, -52/(1+PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]));
+			if (i > state["rightMBase"] && i-state["rightMBase"] <= (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)) move_nt_WW(i, "m", -25, -52/(1+PHYSICAL_PARAMETERS["bubbleRight"]["val"]));
 			else move_nt_WW(i, "m", -25, 0);
 		}
 		
@@ -996,15 +996,15 @@ function form_bulge_WW(state = null, UPDATE_COORDS, S = 0, form_left = true, DOM
 		if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[state["bulgedBase"][S]]["x"], 1);
 		if (all_sequences[sequenceID]["primer"].substring(0,2) == "ss"){
 			for (i = state["bulgedBase"][S] - 2; UPDATE_COORDS && i >= 0; i --){
-				if (state["bulgedBase"][S]-i <= PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1) move_nt_WW(i, "m", 25, -52/(1+PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]));
+				if (state["bulgedBase"][S]-i <= PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) move_nt_WW(i, "m", 25, -52/(1+PHYSICAL_PARAMETERS["bubbleLeft"]["val"]));
 				else move_nt_WW(i, "m", 25, 0);
 			}
 		}else{
 			move_nt_WW(0, "m", 25, 0);
-			PHYSICAL_PARAMETERS["hybridLength"]["val"]--;
+			PHYSICAL_PARAMETERS["hybridLen"]["val"]--;
 		}
 
-		state["bulgePos"][S] = PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1;
+		state["bulgePos"][S] = PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1;
 		state["leftMBase"] --;
 
 		if (PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) {
@@ -1032,7 +1032,7 @@ function diffuse_left_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 
 	//console.log("diff left", state, S);
-	if (state["bulgePos"][S] > 0 && state["bulgePos"][S] < PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1){
+	if (state["bulgePos"][S] > 0 && state["bulgePos"][S] < PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1){
 		
 	    var leftBoundary = state["bulgedBase"][S] - state["bulgeSize"][S] - 1;
 		if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], state["bulgeSize"][S]);
@@ -1056,7 +1056,7 @@ function diffuse_right_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 	if (state == null) state = currentState;
 
-	if (state["bulgePos"][S] < PHYSICAL_PARAMETERS["hybridLength"]["val"] && state["bulgePos"][S] > 1 && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1){
+	if (state["bulgePos"][S] < PHYSICAL_PARAMETERS["hybridLen"]["val"] && state["bulgePos"][S] > 1 && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1){
 
 
 
@@ -1090,7 +1090,7 @@ function absorb_WW(state = null, UPDATE_COORDS, S = 0, absorb_right = false, des
 
 	//console.log("absorbing", state, S);
 
-	if (!absorb_right && state["bulgeSize"][S] > 0 && state["bulgePos"][S] == PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1){
+	if (!absorb_right && state["bulgeSize"][S] > 0 && state["bulgePos"][S] == PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1){
 		
 		
 
@@ -1101,13 +1101,13 @@ function absorb_WW(state = null, UPDATE_COORDS, S = 0, absorb_right = false, des
 
 		if (all_sequences[sequenceID]["primer"].substring(0,2) == "ss"){
 			for (i = state["leftMBase"] - 1; UPDATE_COORDS && i >= 0; i --){
-				if (state["leftMBase"] - i <= (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1)) move_nt_WW(i, "m", -25, 52/(PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1));
+				if (state["leftMBase"] - i <= (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)) move_nt_WW(i, "m", -25, 52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
 				else move_nt_WW(i, "m", -25, 0);
 			}		
 		}else{
 			move_nt_WW(1, "m", -25, 0);
 			move_nt_WW(0, "m", -25, 0);
-			PHYSICAL_PARAMETERS["hybridLength"]["val"]++;
+			PHYSICAL_PARAMETERS["hybridLen"]["val"]++;
 		}
 
 		state["bulgeSize"][S] --;
@@ -1150,7 +1150,7 @@ function absorb_WW(state = null, UPDATE_COORDS, S = 0, absorb_right = false, des
 		
 		// Shift every rightward base 1 to the right
 		for (i = leftBoundary + state["bulgeSize"][S] + 1; UPDATE_COORDS && i < state["mRNALength"]; i ++){
-			if (i >= state["rightMBase"] && i-(leftBoundary + state["bulgeSize"][S]) <= (PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1)) move_nt_WW(i, "m", 25, 52/(1+PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]));
+			if (i >= state["rightMBase"] && i-(leftBoundary + state["bulgeSize"][S]) <= (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)) move_nt_WW(i, "m", 25, 52/(1+PHYSICAL_PARAMETERS["bubbleRight"]["val"]));
 			else move_nt_WW(i, "m", 25, 0);
 		}	
 		
@@ -1338,12 +1338,12 @@ function fuseBulgeRight_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 	
 	//console.log("fuse right", state, S);
-	if (state["leftMBase"] > 1 && state["bulgePos"][S] == 0 && ((state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1) != -1) || state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLength"]["val"] - 2) != -1)) { // Form bulge first and then fuse them
+	if (state["leftMBase"] > 1 && state["bulgePos"][S] == 0 && ((state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) != -1) || state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2) != -1)) { // Form bulge first and then fuse them
 		
 		
 		
-		var fuseWith = state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1);
-		if (fuseWith == -1)	fuseWith = state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLength"]["val"] - 2);
+		var fuseWith = state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1);
+		if (fuseWith == -1)	fuseWith = state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2);
 		
 		if (state["bulgeSize"].indexOf( state["bulgePos"][fuseWith] ) >= 6 ) return function(){};
 		
@@ -1448,7 +1448,7 @@ function fissureBulgeLeft_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 	if (state == null) state = currentState;
 	
 	//console.log("fiss left", state, S);
-	if (state["bulgePos"][S] != PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1 && state["partOfBulgeID"][S] != S){
+	if (state["bulgePos"][S] != PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1 && state["partOfBulgeID"][S] != S){
 	
 		
 		var fissureFrom = state["partOfBulgeID"][S];

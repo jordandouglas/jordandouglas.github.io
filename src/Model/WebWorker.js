@@ -98,9 +98,9 @@ function refresh_WW(resolve = function() {}, msgID = null){
 	specialSite = -1;
 
 	// Initial state
-	currentState = { leftGBase: 0, rightGBase: PHYSICAL_PARAMETERS["hybridLength"]["val"]-1, leftMBase: 0, rightMBase: PHYSICAL_PARAMETERS["hybridLength"]["val"]-1, NTPtoAdd: "X",
-					 mRNAPosInActiveSite: 0, NTPbound: false, nbases: 0, mRNALength: PHYSICAL_PARAMETERS["hybridLength"]["val"], activated:true, rateOfBindingNextBase:0,
-					 bulgePos: [0], bulgedBase: [-1], bulgeSize: [0], partOfBulgeID: [0], nextBaseToCopy: PHYSICAL_PARAMETERS["hybridLength"]["val"], terminated: false };
+	currentState = { leftGBase: 0, rightGBase: PHYSICAL_PARAMETERS["hybridLen"]["val"]-1, leftMBase: 0, rightMBase: PHYSICAL_PARAMETERS["hybridLen"]["val"]-1, NTPtoAdd: "X",
+					 mRNAPosInActiveSite: 0, NTPbound: false, nbases: 0, mRNALength: PHYSICAL_PARAMETERS["hybridLen"]["val"], activated:true, rateOfBindingNextBase:0,
+					 bulgePos: [0], bulgedBase: [-1], bulgeSize: [0], partOfBulgeID: [0], nextBaseToCopy: PHYSICAL_PARAMETERS["hybridLen"]["val"], terminated: false };
 	
 
 
@@ -117,7 +117,7 @@ function refresh_WW(resolve = function() {}, msgID = null){
 	updateForce_WW();
 
 	setNextBaseToAdd_WW();
-	transcribe_WW(2 + Math.max(2, PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+2), true); // Keep moving right until transcription bubble is sealed
+	transcribe_WW(2 + Math.max(2, PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+2), true); // Keep moving right until transcription bubble is sealed
 
 
 	initTranslocationRateCache();
@@ -167,10 +167,10 @@ function add_pairs_WW(msgID = null){
 			if (i == 0) {
 				create_nucleoprotein_WW("NP" + (i+1), xPos, yPos -50);
 			}
-			else if (PHYSICAL_PARAMETERS["hybridLength"]["val"] + nucleoproteinPhase > i * 6 ) {
+			else if (PHYSICAL_PARAMETERS["hybridLen"]["val"] + nucleoproteinPhase > i * 6 ) {
 				create_nucleoprotein_WW("NP" + (i+1), xPos, yPos -50);
 			}
-			else if (templateEntryChannelLength + PHYSICAL_PARAMETERS["hybridLength"]["val"] - 2 + nucleoproteinPhase > i * 6) {
+			else if (templateEntryChannelLength + PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2 + nucleoproteinPhase > i * 6) {
 				create_nucleoprotein_WW("NP" + (i+1), xPos, yPos -50);
 			}
 			else{
@@ -208,7 +208,7 @@ function add_pairs_WW(msgID = null){
 
 		
 		
-		if (index < PHYSICAL_PARAMETERS["hybridLength"]["val"]){
+		if (index < PHYSICAL_PARAMETERS["hybridLen"]["val"]){
 			
 			create_nucleotide_WW("g" + index, "g", index, startX, startY + 52, baseToAdd, baseToAdd + "g");
 			oppositeCol = baseToAdd == "G" ? "C" : baseToAdd == "C" ? "G" : baseToAdd == "A" ? "U" : baseToAdd == "U" ? "A" : baseToAdd == "T" ? "A" : "X";
@@ -235,7 +235,7 @@ function add_pairs_WW(msgID = null){
 
 
 		}else{
-			dy = 52 - Math.min(52, (index - (PHYSICAL_PARAMETERS["hybridLength"]["val"]-1)) * 52/(PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1));
+			dy = 52 - Math.min(52, (index - (PHYSICAL_PARAMETERS["hybridLen"]["val"]-1)) * 52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
 			if (all_sequences[sequenceID]["template"].substring(0,2) == "ds") {
 				create_nucleotide_WW("g" + index, "g", index, startX, startY + dy, baseToAdd, baseToAdd + "m");
 			}
@@ -418,7 +418,7 @@ function create_pol_WW(x, y, src = "pol"){
 		height = 160;
 	}
 	else {
-		width = (PHYSICAL_PARAMETERS["hybridLength"]["val"] * 25 + 75);
+		width = (PHYSICAL_PARAMETERS["hybridLen"]["val"] * 25 + 75);
 		height = 140;
 	}
 
@@ -787,7 +787,7 @@ function userInputSequence_WW(newSeq, newTemplateType, newPrimerType, inputSeque
 
 	// Store the template sequence not the nascent sequence 
 	newSeq = newSeq.trim();
-	var goodLength = newSeq.length > PHYSICAL_PARAMETERS["hybridLength"]["val"];
+	var goodLength = newSeq.length > PHYSICAL_PARAMETERS["hybridLen"]["val"];
 
 	if (inputSequenceIsNascent) newSeq = getComplementSequence_WW(newSeq, newPrimerType.substring(2) == "RNA");
 
@@ -1033,6 +1033,48 @@ function getRateOfBindingXtoY_WW(baseX, baseY){
 }
 
 
+
+function roundToSF_WW(val, sf=2, ceilOrFloor = "none"){
+
+
+	
+	var magnitude = Math.floor(log_WW(val, 10));
+	
+
+	var num = val * Math.pow(10, sf-magnitude);
+	if (ceilOrFloor == "ceil") num = Math.ceil(num)
+	else if (ceilOrFloor == "floor") num = Math.floor(num)
+	else num = Math.round(num);
+
+
+	num = num * Math.pow(10, magnitude-sf);
+	
+	// Sometimes this picks up a trailing .00000000001 which we want to remove
+
+	var expectedStringLength = 0;
+	if (magnitude >= 0) expectedStringLength = magnitude >= sf ? magnitude+1 : sf+2; // Add 1 for the decimal point
+	else expectedStringLength = 2 -magnitude + sf;
+	if (num < 0) expectedStringLength++; // Also need the negative symbol
+
+
+	num = parseFloat(num.toString().substring(0, expectedStringLength+1));
+
+	
+	return num;
+		
+}
+
+
+function log_WW(num, base = null){
+	
+	if (num == 0) return 0;
+	if (base == null) return Math.log(Math.abs(num));
+	return Math.log(Math.abs(num)) / Math.log(base);
+	
+}
+
+
+
 function changeSpeed_WW(speed, resolve = function() { }, msgID = null){
 
 
@@ -1077,7 +1119,7 @@ function changeSpeed_WW(speed, resolve = function() { }, msgID = null){
 
 function getCurrentState_WW(resolve = function() {}, msgID = null){
 
-	var toReturn = {state: currentState, hybridLength: PHYSICAL_PARAMETERS["hybridLength"]["val"]};
+	var toReturn = {state: currentState, hybridLen: PHYSICAL_PARAMETERS["hybridLen"]["val"]};
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
 	}else{

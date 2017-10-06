@@ -467,7 +467,6 @@ function renderObjectsUntilReceiveMessage(msgID){
 	window.requestAnimationFrame(function(){
 
 
-
 		renderObjects(false, function() { renderObjectsUntilReceiveMessage(msgID) });
 		renderParameters();
 		setNextBaseToAdd_controller();
@@ -567,6 +566,9 @@ function renderObjects(override = false, resolve = function(){}){
 	if (!ALLOW_ANIMATIONS) return;
 
 	if (simulating && ANIMATION_TIME_controller == 1 && !override) return; // Do not do this if simulating in fast mode, unless permission is granted
+
+
+	if (running_ABC) get_ABCoutput_controller(); // Update the ABC output if ABC is running
 
 
 	window.requestAnimationFrame(function() {

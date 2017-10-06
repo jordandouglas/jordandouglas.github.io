@@ -130,7 +130,7 @@ function parseXML_sequence_WW(sequenceNode){
 
 function parseXML_param_WW(paramID, paramNode){
 
-	//console.log("Parsing", paramID, paramNode);
+	console.log("Parsing", paramID, paramNode);
 
 
 	var val = parseFloat(paramNode["val"]);

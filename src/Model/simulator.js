@@ -233,7 +233,7 @@ function trial_WW(stateC, resolve = function() { }, msgID = null){
 	
 	
 	// If we have been pausing too long, then abort
-	if (PHYSICAL_PARAMETERS["arrestTimeout"]["val"] > 0 && PHYSICAL_PARAMETERS["arrestTimeout"]["val"] < timeWaitedUntilNextCatalysis){
+	if (PHYSICAL_PARAMETERS["arrestTime"]["val"] > 0 && PHYSICAL_PARAMETERS["arrestTime"]["val"] < timeWaitedUntilNextCatalysis){
 		resolve(true);
 		return;
 	}

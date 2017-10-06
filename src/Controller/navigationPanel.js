@@ -677,7 +677,7 @@ function drawSlippageCanvas(S = 0){
 
 
 		// Each state is a horizontal line with kinks to represent bulge positions. The current kink is in red.
-		var pixelsPerBasepair = stateWidth / (result["hybridLength"]-1);
+		var pixelsPerBasepair = stateWidth / (result["hybridLen"]-1);
 		var templateHeight = canvas.height * 0.2;
 		var nascentHeight = canvas.height * 0.35;
 		var bulgeHeight = canvas.height * 0.6;

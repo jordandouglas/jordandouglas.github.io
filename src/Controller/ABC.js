@@ -75,6 +75,13 @@ function beginABC(){
 
 	}
 
+
+
+	// Set to hidden mode
+	$("#PreExp").val("hidden");
+	changeSpeed_controller();
+
+
 	beginABC_controller(rules);
 
 	
@@ -83,6 +90,17 @@ function beginABC(){
 	$("#beginABC_btn").val("Stop ABC");
 	$("#beginABC_btn").attr("onclick", "stop_controller()");
 	hideButtonAndShowStopButton("simulate");
+
+
+	// Disable the ntrials and nrulespertrial textboxes
+	$("#ABCntrials").css("cursor", "auto");
+	$("#ABCntrials").css("background-color", "#858280");
+	$("#ABCntrials").attr("disabled", "disabled");
+
+	$("#ABCnRulesPerTrial").css("cursor", "auto");
+	$("#ABCnRulesPerTrial").css("background-color", "#858280");
+	$("#ABCnRulesPerTrial").attr("disabled", "disabled");
+
 
 
 
@@ -181,7 +199,7 @@ function addNewRuleTemplate(ruleNumber) {
 
 		
 
-		<td style="vertical-align:middle; font-size:16px text-align:right;  min-width:70px">
+		<td style="vertical-align:middle; font-size:16px text-align:right;  min-width:90px">
 
 			<input id="deleteRule` + ruleNumber + `" type=button onClick=deleteABCrule(this) value='&times;' title="Delete this rule" class="operation" style="background-color:#663399; width:15px; font-size:12px; padding: 0 0">
 
@@ -387,10 +405,6 @@ function addNewRule() {
 
 
 }
-
-
-
-
 
 
 

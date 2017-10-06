@@ -48,7 +48,7 @@ function initTranslocationRateCache(){
 function updateCoordsOfCurrentState(){
 
 	// Coordinates of pol
-	var h = PHYSICAL_PARAMETERS["hybridLength"]["val"];
+	var h = PHYSICAL_PARAMETERS["hybridLen"]["val"];
 	var polX = 165 + 25 * (currentState["rightMBase"] - h + 1);
 	var polY = 81;
 	move_obj_absolute("pol", polX, polY, 1);
@@ -67,11 +67,11 @@ function updateCoordsOfCurrentState(){
 		// Y value determined by whether it is part of hybrid, bubble or on the bottom
 
 		var ntY = 207;
-		if (i <= currentState["leftMBase"] &&  i > currentState["leftMBase"]  - (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1) && i >= 0) dy += -52/(PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1)
-		if (i > currentState["rightMBase"] && i < currentState["rightMBase"] + (PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1) + 1) dy += 52/(PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1)
+		if (i <= currentState["leftMBase"] &&  i > currentState["leftMBase"]  - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0) dy += -52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)
+		if (i > currentState["rightMBase"] && i < currentState["rightMBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1) dy += 52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)
 
 		//if (all_sequences[sequenceID]["primer"] != "dsRNA") 
-		//for (i = state["leftMBase"] - 1; UPDATE_COORDS &&  i > state["leftMBase"] - (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1) - 1 && i >= 0; i--) move_nt_WW(i, "m", 0, -52/(PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1));
+		//for (i = state["leftMBase"] - 1; UPDATE_COORDS &&  i > state["leftMBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) - 1 && i >= 0; i--) move_nt_WW(i, "m", 0, -52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
 
 
 		// Is NTP bound?
@@ -95,17 +95,17 @@ function updateCoordsOfCurrentState(){
 		// Y value determined by whether it is part of hybrid, bubble or on the bottom
 
 		var ntY = 78;
-		if (i <= currentState["leftGBase"] &&  i > currentState["leftGBase"]  - (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1) && i >= 0) dy += 52/(PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1)
-		if (i > currentState["rightGBase"] && i < currentState["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1) + 1) dy += -52/(PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"]+1)
+		if (i <= currentState["leftGBase"] &&  i > currentState["leftGBase"]  - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0) dy += 52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)
+		if (i > currentState["rightGBase"] && i < currentState["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1) dy += -52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)
 
 		//if (all_sequences[sequenceID]["primer"] != "dsRNA") 
-		//for (i = state["leftMBase"] - 1; UPDATE_COORDS &&  i > state["leftMBase"] - (PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1) - 1 && i >= 0; i--) move_nt_WW(i, "m", 0, -52/(PHYSICAL_PARAMETERS["bubbleSizeLeft"]["val"]+1));
+		//for (i = state["leftMBase"] - 1; UPDATE_COORDS &&  i > state["leftMBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) - 1 && i >= 0; i--) move_nt_WW(i, "m", 0, -52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
 
 		 move_nt_absolute_WW(i, "g", ntX, ntY + dy, 1); 
 
 
 		 // Orientation
-		 if (i > 0 && i <= currentState["rightGBase"] + PHYSICAL_PARAMETERS["bubbleSizeRight"]["val"] && i >= currentState["leftGBase"]) flip_base_WW(i, "g", "g"); 
+		 if (i > 0 && i <= currentState["rightGBase"] + PHYSICAL_PARAMETERS["bubbleRight"]["val"] && i >= currentState["leftGBase"]) flip_base_WW(i, "g", "g"); 
 		 else if (i > 0) flip_base_WW(i, "g", "m"); 
 
 		 // Complementary strand
@@ -135,7 +135,7 @@ function convertCompactStateToFullState(compactState){
 	//console.log("Input compact", compactState);
 	
 	var rightHybridBase = compactState[1] + compactState[0];
-	var leftHybridBase = rightHybridBase + 1 - PHYSICAL_PARAMETERS["hybridLength"]["val"];
+	var leftHybridBase = rightHybridBase + 1 - PHYSICAL_PARAMETERS["hybridLen"]["val"];
 	
 	var fullState = { leftGBase: leftHybridBase, rightGBase: rightHybridBase, leftMBase: leftHybridBase, rightMBase: rightHybridBase, NTPtoAdd: "X",
 					 mRNAPosInActiveSite: compactState[1], NTPbound: compactState[2], nbases: currentState["nbases"], mRNALength: compactState[0]+1, activated:compactState[3], rateOfBindingNextBase:0,
@@ -171,7 +171,7 @@ function convertFullStateToCompactState(fullState){
 function getTranslocationRates(compactState){
 	
 	
-	var h = PHYSICAL_PARAMETERS["hybridLength"]["val"];
+	var h = PHYSICAL_PARAMETERS["hybridLen"]["val"];
 	
 	//console.log("State", compactState, "tables", TRANSLOCATION_RATES, BACKTRACKING_RATES);
 	
@@ -267,7 +267,7 @@ function buildBacktrackRateTable(){
 	// folding the 3' end of the nascent strand
 	
 	
-	var h = PHYSICAL_PARAMETERS["hybridLength"]["val"];
+	var h = PHYSICAL_PARAMETERS["hybridLen"]["val"];
 	if (currentState["nbases"] - h - 1 < 0) return null;
 	var backtrackRates = Array(currentState["nbases"] - h - 1);
 	
@@ -298,7 +298,7 @@ function buildTranslocationRateTable(){
 	// Each entry is a tuple (kbck, kfwd)
 	// There are n - h rows (n is total number of bases, h is hybrid length)
 	// There are l + 1 entries in each row, where l is the length of the nascent strand in the row
-	var h = PHYSICAL_PARAMETERS["hybridLength"]["val"];
+	var h = PHYSICAL_PARAMETERS["hybridLen"]["val"];
 	var nLengths = currentState["nbases"] - h;
 	var nPositions = h + 1; 
 	
@@ -339,7 +339,7 @@ function buildTranslocationRateTable(){
 
 function forward_cWW(state, resolve = function() { }){
 	if (!state[2]) state[1]++;
-	if (state[1] > PHYSICAL_PARAMETERS["hybridLength"]["val"] - 1) SIMULATION_VARIABLES["terminated"] = true; // Terminate if too hypertranslocated
+	if (state[1] > PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) SIMULATION_VARIABLES["terminated"] = true; // Terminate if too hypertranslocated
 	resolve();
 }
 

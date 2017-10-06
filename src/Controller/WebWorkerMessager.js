@@ -2243,11 +2243,19 @@ function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardat
 function beginABC_controller(rules){
 
 
+	running_ABC = true;
 	var updateDOM = function(){
 
 		hideStopButtonAndShow("simulate");
 		$("#beginABC_btn").val("Begin ABC");
 		$("#beginABC_btn").attr("onclick", "beginABC()");
+		$("#ABCntrials").css("cursor", "");
+		$("#ABCntrials").css("background-color", "#663399");
+		$("#ABCntrials").attr("disabled", false);
+		$("#ABCnRulesPerTrial").css("cursor", "");
+		$("#ABCnRulesPerTrial").css("background-color", "#663399");
+		$("#ABCnRulesPerTrial").attr("disabled", false);
+		running_ABC = false;
 		
 	};
 
@@ -2263,11 +2271,66 @@ function beginABC_controller(rules){
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then(() => updateDOM());
+		renderObjectsUntilReceiveMessage(msgID);
 
 	}
 
 
 
+}
+
+
+function get_ABCoutput_controller(){
+
+
+
+	// Update the ABC output 
+	var updateDOM = function(result){
+
+		
+		var nTrialsToGo = result["nTrialsToGo"];
+		if (nTrialsToGo != parseFloat($("#ABCntrials").val())) $("#ABCntrials").val(nTrialsToGo);
+
+		var newLines = result["newLines"];
+		if (newLines.length == 0) return;
+
+		for (var i = 0; i < newLines.length; i++){
+
+
+
+			// Replace all the & with a space
+			var paddedLine = "";
+			for (var j = 0; j < newLines[i].length; j ++){
+
+				if (newLines[i][j] == "&") paddedLine += "&nbsp";
+				else paddedLine += newLines[i][j];
+			}
+
+			var currentOutputHTML = $("#ABCoutput").html();
+			$("#ABCoutput").html(currentOutputHTML + paddedLine + "<br>");
+		}
+
+
+		// Scroll to the bottom of the textoutput
+		$('#ABCoutput').scrollTop($('#ABCoutput')[0].scrollHeight);
+
+
+	};
+
+
+	if (WEB_WORKER == null) {
+		var toCall = () => new Promise((resolve) => get_ABCoutput_WW(resolve));
+		toCall().then((lines) => updateDOM(lines));
+	}
+
+	else{
+		var res = stringifyFunction("get_ABCoutput_WW", [null], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((lines) => updateDOM(lines));
+
+	}
 
 
 }
