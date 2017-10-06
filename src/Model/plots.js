@@ -20,10 +20,16 @@
 -*/
 
 
+DISTANCE_VS_TIME_SIZE = 0;
+DISTANCE_VS_TIME_SIZE_MAX = 1e8;
 DISTANCE_VS_TIME = [];
 DISTANCE_VS_TIME_UNSENT = {};
+
+DWELL_TIMES_SIZE = 0;
+DWELL_TIMES_SIZE_MAX = 1e6;
 DWELL_TIMES = [];
 DWELL_TIMES_UNSENT = {};
+DWELL_TIMES_THIS_TRIAL = [];
 
 PARAMETERS_PLOT_DATA = {};
 
@@ -57,10 +63,19 @@ whichPlotInWhichCanvas = {};
 function refreshPlotData(){
 
 
-	DISTANCE_VS_TIME.push({sim: DISTANCE_VS_TIME.length+1, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] });
-	DISTANCE_VS_TIME_UNSENT[DISTANCE_VS_TIME.length] = {sim: DISTANCE_VS_TIME.length, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] };
-	DWELL_TIMES.push([]); // List i contains all the dwell times from the ith trial
-	DWELL_TIMES_UNSENT[DWELL_TIMES.length] = [];	// List[i] contains all the dwell times from the ith trial
+	
+	if (DISTANCE_VS_TIME_SIZE < DISTANCE_VS_TIME_SIZE_MAX){
+		DISTANCE_VS_TIME_SIZE += 2;
+		DISTANCE_VS_TIME.push({sim: DISTANCE_VS_TIME.length+1, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] });
+		DISTANCE_VS_TIME_UNSENT[DISTANCE_VS_TIME.length] = {sim: DISTANCE_VS_TIME.length, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] };
+	}
+
+
+	DWELL_TIMES_THIS_TRIAL = [];
+	if (DWELL_TIMES_SIZE < DWELL_TIMES_SIZE_MAX){
+		DWELL_TIMES.push([]); // List i contains all the dwell times from the ith trial
+		DWELL_TIMES_UNSENT[DWELL_TIMES.length] = [];	// List[i] contains all the dwell times from the ith trial
+	}
 
 	timeElapsed = 0;
 	timeWaitedUntilNextTranslocation = 0;
@@ -76,12 +91,15 @@ function refreshPlotDataSequenceChangeOnly_WW(resolve = function() { }, msgID = 
 	// We also have the temporary copy (DISTANCE_VS_TIME_UNSENT) which contains all the information which hasn't been sent back to the controller
 	// 		This second list is reset everytime we send data back, and the controller uses it to reconstruct the master copy on its end
 	// 		This is to avoid sending the complete list of data back every time 
+	DISTANCE_VS_TIME_SIZE = 2;
+	DWELL_TIMES_SIZE = 0;
 	DISTANCE_VS_TIME = [];
 	DISTANCE_VS_TIME_UNSENT = {};
 	DISTANCE_VS_TIME.push({sim: 1, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] });
 	DISTANCE_VS_TIME_UNSENT[DISTANCE_VS_TIME.length] = {sim: DISTANCE_VS_TIME.length, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] };
 	DWELL_TIMES = [];
 	DWELL_TIMES_UNSENT = {};
+	DWELL_TIMES_THIS_TRIAL = [];
 
 
 	// Create a series of lists corresponding to the value of each parameter and each metric
@@ -130,7 +148,11 @@ function refreshPlotDataSequenceChangeOnly_WW(resolve = function() { }, msgID = 
 		}
 	}
 
-	
+
+
+	// Clear the ABC data
+	clearABCdata_WW();
+
 	//console.log("Setting data", abortionCounts, currentState["nbases"]);
 	
 	if (msgID != null){
@@ -240,6 +262,56 @@ function getPlotData_WW(forceUpdate = false, resolve = function(plotData) { }, m
 			 				     (whichPlotInWhichCanvas[3] != null && !whichPlotInWhichCanvas[3]["hidden"] && whichPlotInWhichCanvas[3]["name"] == "parameterHeatmap");
 
 
+
+
+	// If a parameter plot/heatmap requires posterior data then send it
+	if (ABC_POSTERIOR_DISTRIBUTION.length > 0){
+
+		
+		
+		for (var plotNum = 1; plotNum <= 3; plotNum++){
+			if (whichPlotInWhichCanvas[plotNum] != null && !whichPlotInWhichCanvas[plotNum]["hidden"] && whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] && whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
+
+				var valuesX = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customParam"]);
+				var valuesY = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customMetric"]);
+
+
+				if(whichPlotInWhichCanvas[plotNum]["xData"] != null) whichPlotInWhichCanvas[plotNum]["xData"] = {name:whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
+				if(whichPlotInWhichCanvas[plotNum]["yData"] != null) whichPlotInWhichCanvas[plotNum]["yData"] = {name:whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY}; // WILL NOT WORK IF THIS METRIC WAS NOT SAMPLED
+
+			}
+		}
+
+
+
+		for (var plotNum = 1; plotNum <= 3; plotNum++){
+
+			// TODO: add back  && !whichPlotInWhichCanvas[plotNum]["hidden"]
+			if (whichPlotInWhichCanvas[plotNum] != null && whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] && whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
+
+
+				
+
+				var valuesX = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customParamX"]);
+				var valuesY = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customParamY"]);
+				var valuesZ = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["metricZ"]);
+
+				//console.log("posterior", valuesX, valuesY, valuesZ, "PP", ABC_POSTERIOR_DISTRIBUTION);
+
+
+				if(whichPlotInWhichCanvas[plotNum]["xData"] != null) whichPlotInWhichCanvas[plotNum]["xData"] = {name:whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
+				if(whichPlotInWhichCanvas[plotNum]["yData"] != null) whichPlotInWhichCanvas[plotNum]["yData"] = {name:whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY};
+				if(whichPlotInWhichCanvas[plotNum]["yData"] != null) whichPlotInWhichCanvas[plotNum]["zData"] = {name:whichPlotInWhichCanvas[plotNum]["zData"]["name"], vals:valuesZ};
+			}
+		}
+
+
+
+	}
+
+
+
+
 	if (forceUpdate || JSON.stringify(plotData) != "{}" || thereExistsAParameterPlot){
 	
 		plotData["nbases"] = currentState["nbases"];
@@ -249,7 +321,7 @@ function getPlotData_WW(forceUpdate = false, resolve = function(plotData) { }, m
 		plotData["xCoordOfLeftMostBase"] = templateSequence[1]["x"];
 		plotData["medianTimeSpentOnATemplate"] = timesSpentOnEachTemplate[Math.floor(timesSpentOnEachTemplate.length / 2)]; // List is already sorted
 		plotData["medianDistanceTravelledPerTemplate"] = distancesTravelledOnEachTemplate[Math.floor(distancesTravelledOnEachTemplate.length / 2)]; // List is already sorted
-
+		plotData["thereExistsPosteriorDistribution"] = ABC_POSTERIOR_DISTRIBUTION.length > 0;
 	
 	}
 
@@ -311,33 +383,22 @@ function updatePlotData_WW(stateC, actionNumber, reactionTime){
 	if (actionNumber < 2) {
 
 
-
-		var index = DISTANCE_VS_TIME.length-1;
-		DISTANCE_VS_TIME[index]["times"].push(timeWaitedUntilNextTranslocation);
-		DISTANCE_VS_TIME[index]["distances"].push(rightHybridBase);
-
-
-		timeElapsed += timeWaitedUntilNextTranslocation;
-		
+		if (DISTANCE_VS_TIME_SIZE < DISTANCE_VS_TIME_SIZE_MAX){ // Maximum size of the distance vs time object
+			var index = DISTANCE_VS_TIME.length-1;
+			DISTANCE_VS_TIME[index]["times"].push(timeWaitedUntilNextTranslocation);
+			DISTANCE_VS_TIME[index]["distances"].push(rightHybridBase);
+			DISTANCE_VS_TIME_SIZE += 2;
+			//console.log("Before", DISTANCE_VS_TIME);
+		    
+			if (DISTANCE_VS_TIME_UNSENT[index+1] == null) DISTANCE_VS_TIME_UNSENT[index+1] = {sim: index+1, times: [], distances: []};
+			DISTANCE_VS_TIME_UNSENT[index+1]["times"].push(timeWaitedUntilNextTranslocation);
+			DISTANCE_VS_TIME_UNSENT[index+1]["distances"].push(rightHybridBase);
+		}
 
 		// Update total displacement
-		//var distanceTravelledThisStep = currentState["rightGBase"] - DISTANCE_VS_TIME[index]["distances"][DISTANCE_VS_TIME[index]["distances"].length-2];;
+		timeElapsed += timeWaitedUntilNextTranslocation;
 		totalDisplacement += actionNumber == 0 ? -1 : 1;
 		velocity = totalDisplacement / totalTimeElapsed;
-
-
-
-
-
-		//console.log("Before", DISTANCE_VS_TIME);
-
-	    
-		if (DISTANCE_VS_TIME_UNSENT[index+1] == null) DISTANCE_VS_TIME_UNSENT[index+1] = {sim: index+1, times: [], distances: []};
-
-
-		DISTANCE_VS_TIME_UNSENT[index+1]["times"].push(timeWaitedUntilNextTranslocation);
-		DISTANCE_VS_TIME_UNSENT[index+1]["distances"].push(rightHybridBase);
-
 
 
 		pauseTimePerSite[rightHybridBase] += timeWaitedUntilNextTranslocation;
@@ -350,14 +411,18 @@ function updatePlotData_WW(stateC, actionNumber, reactionTime){
 
 
 		// Dwell time histogram
-		var index = DWELL_TIMES.length-1;
-		if (DWELL_TIMES[index] == null) {
-			DWELL_TIMES.push([]);
-			index++;
+		DWELL_TIMES_THIS_TRIAL.push(timeWaitedUntilNextCatalysis);
+		if (DWELL_TIMES_SIZE < DWELL_TIMES_SIZE_MAX){
+			var index = DWELL_TIMES.length-1;
+			if (DWELL_TIMES[index] == null) {
+				DWELL_TIMES.push([]);
+				index++;
+			}
+			DWELL_TIMES[index].push(timeWaitedUntilNextCatalysis);
+			if (DWELL_TIMES_UNSENT[index+1] == null) DWELL_TIMES_UNSENT[index+1] = [];
+			DWELL_TIMES_UNSENT[index+1].push(timeWaitedUntilNextCatalysis);
+			DWELL_TIMES_SIZE++;
 		}
-		DWELL_TIMES[index].push(timeWaitedUntilNextCatalysis);
-		if (DWELL_TIMES_UNSENT[index+1] == null) DWELL_TIMES_UNSENT[index+1] = [];
-		DWELL_TIMES_UNSENT[index+1].push(timeWaitedUntilNextCatalysis);
 
 
 		// Pause duration histogram
@@ -449,7 +514,7 @@ function selectPlot_WW(plotNum, value, deleteData, addData = true, resolve = fun
 		whichPlotInWhichCanvas[plotNum]["customMetric"] = "probability";
 		whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
 		whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
-
+		whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] = false;
 	}
 
 
@@ -463,6 +528,7 @@ function selectPlot_WW(plotNum, value, deleteData, addData = true, resolve = fun
 		whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
 		whichPlotInWhichCanvas[plotNum]["zRange"] = "automaticZ";
 		whichPlotInWhichCanvas[plotNum]["zColouring"] = "blue";
+		whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] = false;
 
 	}
 
@@ -577,7 +643,15 @@ function saveSettings_WW(plotNum, plotType, values, resolve = function() { }, ms
 			//whichPlotInWhichCanvas[plotNum]["sitesToRecord"] = values[2];
 			whichPlotInWhichCanvas[plotNum]["xData"] = PARAMETERS_PLOT_DATA[values[0]];
 			whichPlotInWhichCanvas[plotNum]["yData"] = PARAMETERS_PLOT_DATA[values[1]];
+			whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] = values[4];
 
+			// If sample from posterior use the correct points
+			if (whichPlotInWhichCanvas[plotNum]["plotFromPosterior"]){
+				var valuesX = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customParam"]);
+				var valuesY = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customMetric"]);
+				whichPlotInWhichCanvas[plotNum]["xData"] = {name:whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
+				whichPlotInWhichCanvas[plotNum]["yData"] = {name:whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY}; // WILL NOT WORK IF THIS METRIC WAS NOT SAMPLED
+			}
 
 
 			if (values[2] == "automaticX") whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
@@ -597,6 +671,9 @@ function saveSettings_WW(plotNum, plotType, values, resolve = function() { }, ms
 				if (isNaN(yMin) || isNaN(yMax)) whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
 				else whichPlotInWhichCanvas[plotNum]["yRange"] = [yMin, yMax];
 			}
+
+
+
 			break;
 
 
@@ -609,6 +686,22 @@ function saveSettings_WW(plotNum, plotType, values, resolve = function() { }, ms
 			whichPlotInWhichCanvas[plotNum]["yData"] = PARAMETERS_PLOT_DATA[values[1]];
 			whichPlotInWhichCanvas[plotNum]["zData"] = PARAMETERS_PLOT_DATA[values[2]];
 			whichPlotInWhichCanvas[plotNum]["zColouring"] = values[6]; // Colour of the points
+			whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] = values[7]; 
+
+
+
+			// If sample from posterior use the correct points
+			if (whichPlotInWhichCanvas[plotNum]["plotFromPosterior"]){
+				var valuesX = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customParamX"]);
+				var valuesY = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customParamY"]);
+				var valuesZ = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["metricZ"]);
+				whichPlotInWhichCanvas[plotNum]["xData"] = {name:whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
+				whichPlotInWhichCanvas[plotNum]["yData"] = {name:whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY};
+				whichPlotInWhichCanvas[plotNum]["zData"] = {name:whichPlotInWhichCanvas[plotNum]["zData"]["name"], vals:valuesZ};
+			}
+
+				
+
 
 
 			if (values[3] == "automaticX") whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
@@ -639,6 +732,7 @@ function saveSettings_WW(plotNum, plotType, values, resolve = function() { }, ms
 				if (isNaN(zMin) || isNaN(zMax)) whichPlotInWhichCanvas[plotNum]["zRange"] = "automaticZ";
 				else whichPlotInWhichCanvas[plotNum]["zRange"] = [zMin, zMax];
 			}
+
 
 
 
@@ -702,8 +796,6 @@ function delete_plot_data_WW(plotName){
 	}
 	
 
-	
-	
 }
 
 
@@ -720,8 +812,8 @@ function update_custom_plot_data_WW(){
 
 
 	var totalTime_thisTrial = 0;
-	for (var timeNum = 0; timeNum < DWELL_TIMES[DWELL_TIMES.length-1].length; timeNum ++){
-		totalTime_thisTrial += DWELL_TIMES[DWELL_TIMES.length-1][timeNum];
+	for (var timeNum = 0; timeNum < DWELL_TIMES_THIS_TRIAL.length; timeNum ++){
+		totalTime_thisTrial += DWELL_TIMES_THIS_TRIAL[timeNum];
 	}
 
 
@@ -737,7 +829,7 @@ function update_custom_plot_data_WW(){
 	var increaseInPrimerLength = currentState["mRNALength"] - (PHYSICAL_PARAMETERS["hybridLen"]["val"] + PHYSICAL_PARAMETERS["bubbleLeft"]["val"] + 2);
 	//if(increaseInPrimerLength < 100) return; // Disqualify early terminations because they will skew everything
 	var velocity_thisTrial = increaseInPrimerLength / totalTime_thisTrial;
-	var meanDwellTime_thisTrial = totalTime_thisTrial / DWELL_TIMES[DWELL_TIMES.length-1].length;
+	var meanDwellTime_thisTrial = totalTime_thisTrial / DWELL_TIMES_THIS_TRIAL.length;
 	
 
 
@@ -766,7 +858,7 @@ function update_custom_plot_data_WW(){
 
 	// Update the parameters on the list
 	for (var canvasNum = 1; canvasNum <=3; canvasNum++){
-		if (whichPlotInWhichCanvas[canvasNum] != null && whichPlotInWhichCanvas[canvasNum]["name"] == "custom"){
+		if (whichPlotInWhichCanvas[canvasNum] != null && !whichPlotInWhichCanvas[canvasNum]["plotFromPosterior"] && whichPlotInWhichCanvas[canvasNum]["name"] == "custom"){
 
 			var paramID = whichPlotInWhichCanvas[canvasNum]["customParam"];
 			var metricID = whichPlotInWhichCanvas[canvasNum]["customMetric"];
@@ -777,7 +869,7 @@ function update_custom_plot_data_WW(){
 
 		}
 
-		else if (whichPlotInWhichCanvas[canvasNum] != null && whichPlotInWhichCanvas[canvasNum]["name"] == "parameterHeatmap") {
+		else if (whichPlotInWhichCanvas[canvasNum] != null && !whichPlotInWhichCanvas[canvasNum]["plotFromPosterior"] && whichPlotInWhichCanvas[canvasNum]["name"] == "parameterHeatmap") {
 
 			var paramIDx = whichPlotInWhichCanvas[canvasNum]["customParamX"];
 			var paramIDy = whichPlotInWhichCanvas[canvasNum]["customParamY"];
@@ -791,9 +883,6 @@ function update_custom_plot_data_WW(){
 
 
 	}
-
-
-
 
 
 	
@@ -841,23 +930,13 @@ function setVariableToRecord_WW(plotCanvasID, varName, axis, resolve = function 
 function getCacheSizes_WW(resolve = function() { }, msgID = null){
 
 
-	var DVTsize = 0;
-	for (var i = 0; i < DISTANCE_VS_TIME.length; i ++){
-		DVTsize += DISTANCE_VS_TIME[i]["distances"].length * 2; // Number of distance AND time measurements stored
-	}
-
-	var timeSize = 0;
-	for (var i = 0; i < DWELL_TIMES.length; i ++){
-		timeSize += DWELL_TIMES[i].length; // Number of distance AND time measurements stored
-	}
-
 
 	var parameterPlotSize = -1;
 	for (var i in PARAMETERS_PLOT_DATA) parameterPlotSize++;
 	parameterPlotSize *= PARAMETERS_PLOT_DATA["velocity"]["vals"].length;
 
 
-	var result = {DVTsize: DVTsize, timeSize: timeSize, parameterPlotSize:parameterPlotSize};
+	var result = {DVTsize: DISTANCE_VS_TIME_SIZE, timeSize: DWELL_TIMES_SIZE, parameterPlotSize:parameterPlotSize};
 	
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(result));
@@ -869,10 +948,11 @@ function getCacheSizes_WW(resolve = function() { }, msgID = null){
 }
 
 
-function deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, resolve = function() { }, msgID = null){
+function deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, resolve = function() { }, msgID = null){
 
 
 	if (distanceVsTime_cleardata) {
+		DISTANCE_VS_TIME_SIZE = 2;
 		DISTANCE_VS_TIME = [];
 		DISTANCE_VS_TIME_UNSENT = {};
 		DISTANCE_VS_TIME.push({sim: 1, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] });
@@ -887,8 +967,10 @@ function deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timeP
 	}
 
 	if (timeHistogram_cleardata){
+		DWELL_TIMES_SIZE = 0;
 		DWELL_TIMES = [];
 		DWELL_TIMES_UNSENT = {};
+		DWELL_TIMES_THIS_TRIAL = [];
 	}
 
 	if (customPlot_cleardata){
@@ -944,6 +1026,12 @@ function deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timeP
 		*/
 
 
+	}
+
+
+	// Clear the data saved in the ABC output, and the posterior distribution
+	if (ABC_cleardata) {
+		clearABCdata_WW();
 	}
 	
 

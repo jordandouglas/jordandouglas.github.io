@@ -60,27 +60,27 @@ function renderTermination(result){
 	var insertPositions = result["insertPositions"]; // Has there been an insertion due to slippage?
 
 	//console.log("insertPositions", insertPositions);
+	if (terminatedSequences.length < maxNumberTerminatedSequences){
+
+		
+		$("#bases").scrollLeft("0px");
+		$("#clearSeqs").show()
+		$("#downloadSeqs").show();
+		$("#mRNAsvg").remove();
 
 
-	
-	$("#bases").scrollLeft("0px");
-	$("#clearSeqs").show()
-	$("#downloadSeqs").show();
-	$("#mRNAsvg").remove();
+		// Initialise the buttons at the top of the sequence panel and the first row of the sequences table (if they have not already been created)
+		if (largestTerminatedSequence == null) largestTerminatedSequence = primerSeq.length;
+		initSequencesPanel();
+		initSequenceTable();
+		terminatedSequences.push(primerSeq);
 
-
-	// Initialise the buttons at the top of the sequence panel and the first row of the sequences table (if they have not already been created)
-	if (largestTerminatedSequence == null) largestTerminatedSequence = primerSeq.length;
-	initSequencesPanel();
-	initSequenceTable();
-	terminatedSequences.push(primerSeq);
-
-	// Add this sequence to the table
-	addTerminatedSequenceToTable(terminatedSequences.length, insertPositions);
+		// Add this sequence to the table
+		addTerminatedSequenceToTable(terminatedSequences.length, insertPositions);
 
 
 
-
+	}
 
 
 	// Update progress bar
@@ -439,6 +439,7 @@ function renderHTML_hidden(){
 	
 	renderParameters();
 	drawPlots();
+	if (running_ABC) get_unrendered_ABCoutput_controller(); // Update the ABC output if ABC is running
 
 }
 
@@ -568,7 +569,7 @@ function renderObjects(override = false, resolve = function(){}){
 	if (simulating && ANIMATION_TIME_controller == 1 && !override) return; // Do not do this if simulating in fast mode, unless permission is granted
 
 
-	if (running_ABC) get_ABCoutput_controller(); // Update the ABC output if ABC is running
+	if (running_ABC) get_unrendered_ABCoutput_controller(); // Update the ABC output if ABC is running
 
 
 	window.requestAnimationFrame(function() {
@@ -1068,14 +1069,18 @@ function getCacheClearTemplate(){
 				
 					<tr>
 						<td style="vertical-align:top; text-align:left; width:100%; font-size:16px"> 
-							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="distanceVsTime_cleardata">Distance versus time and velocity data (DVTSIZE values)</input> </label> <br>
-							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="timeHistogram_cleardata">Catalysis time data (TIMESIZE values)</input> </label> <br>
-							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="customPlot_cleardata">Parameter plot data (PARAMSIZE values)</input> </label> <br>
-							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="timePerSite_cleardata">Dwell time per site data</input> </label> <br>
+							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="distanceVsTime_cleardata">Distance versus time and velocity data (DVTSIZE values).</input> </label> <br>
+							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="timeHistogram_cleardata">Catalysis time data (TIMESIZE values). </input></label> <br>
+							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="customPlot_cleardata">Parameter plot data (PARAMSIZE values).</input> </label> <br>
+							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="timePerSite_cleardata">Dwell time per site data.</input> </label> <br>
 
 							<br>
-							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="sequences_cleardata">Copied sequences (NUMSEQ seqs)</input> </label> <br>
+							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="sequences_cleardata">Copied sequences (NUMSEQ seqs).</input></label> <br>
+
+							<br>
+							<label style="cursor:pointer;"> <input class="variable"  type="checkbox" checked="true" style="cursor:pointer;" id="ABC_cleardata">ABC output data and posterior distribution.</input></label> <br>
 							
+
 						</td>
 
 					</tr>
@@ -1158,10 +1163,11 @@ function clearCache(){
 	var timePerSite_cleardata = $("#timePerSite_cleardata").prop('checked');
 	var customPlot_cleardata = $("#customPlot_cleardata").prop('checked');
 	var sequences_cleardata = $("#sequences_cleardata").prop('checked');
+	var ABC_cleardata = $("#ABC_cleardata").prop('checked');
 	if (sequences_cleardata) clearSequences();
 	
 
-	if (!distanceVsTime_cleardata && !timeHistogram_cleardata && !timePerSite_cleardata && !customPlot_cleardata) {
+	if (!distanceVsTime_cleardata && !timeHistogram_cleardata && !timePerSite_cleardata && !customPlot_cleardata && !ABC_cleardata) {
 		closeKineticCachePopup();
 		return;
 	}
@@ -1183,8 +1189,16 @@ function clearCache(){
 			}
 
 
+			if (ABC_cleardata) {
+				$("#ABCoutput").html("");
+				$("#downloadABC").hide(50);
+				$("#ABCacceptancePercentage_span").hide(50);
+				$("#ABCacceptance_span").hide(50);
+			}
 
-			deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, function(plotData){
+
+
+			deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, function(plotData){
 
 				
 				update_PLOT_DATA(plotData)

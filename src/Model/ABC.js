@@ -27,7 +27,7 @@ function beginABC_WW(rules, resolve = function() { }, msgID = null){
 	ABC_simulating = true;
 	stopRunning_WW = false;
 	ABC_RULES = rules;
-	ABC_POSTERIOR_DISTRIBUTION = [];
+	//ABC_POSTERIOR_DISTRIBUTION = [];
 
 	console.log("I have rules", ABC_RULES);
 
@@ -60,6 +60,7 @@ function beginABC_WW(rules, resolve = function() { }, msgID = null){
 		ABC_parameters_and_metrics_this_simulation["Rule" + ruleNum] = null;
 	}
 	ABC_parameters_and_metrics_this_simulation["accepted"] = null;
+	ABC_parameters_and_metrics_this_simulation["nrules"] = ruleNums.length;
 	for (var paramID in PHYSICAL_PARAMETERS){
 		if (!PHYSICAL_PARAMETERS[paramID]["binary"] && !PHYSICAL_PARAMETERS[paramID]["hidden"]) {
 
@@ -85,12 +86,31 @@ function beginABC_WW(rules, resolve = function() { }, msgID = null){
 	initialise_ABCoutput_WW(ruleNums);
 
 
+	if (ANIMATION_TIME_TEMP == 0) renderPlotsHidden(50); // Set up the DOM rendering loop, which will render plots, parameters, and ABC output every few seconds
+
+
 	// Start the first trial
 	ABC_trials_WW(ruleNums, resolve, msgID);
 
 
 
 
+
+
+}
+
+
+
+function clearABCdata_WW(){
+
+	ABC_RULES = null;
+	ABC_POSTERIOR_DISTRIBUTION = [];
+	ABC_simulating = false;
+	ABC_metric_values_this_simulation = {};
+	ABC_parameters_and_metrics_this_simulation = {};
+	ABC_outputString = [];
+	ABC_outputString_unrendered = [];
+	n_ABC_trials_left = null;
 
 
 }
@@ -351,11 +371,11 @@ function initialise_ABCoutput_WW(ruleNums){
 		secondLine += (paddingString + "Rule" + ruleNums[ruleNum]).slice(-paddingString.length);
 	}
 
-	secondLine += (paddingString + "Accepted").slice(-10);
+	secondLine += (paddingString + "|Accepted|").slice(-12) + "&&&"; // Add the | to denote that this should be in coloured font
 
 
-	ABC_outputString = [secondLine];
-	ABC_outputString_unrendered = [secondLine];
+	ABC_outputString.push("", "", secondLine);
+	ABC_outputString_unrendered.push("", "", secondLine);
 
 
 }
@@ -394,7 +414,7 @@ function update_ABCoutput_WW(ruleNums){
 
 	}
 
-	line += (paddingString + ABC_parameters_and_metrics_this_simulation["accepted"]).slice(-10).toUpperCase();
+	line += (paddingString + "|" + ABC_parameters_and_metrics_this_simulation["accepted"] + "|").slice(-12); // Add the | to denote that this should be in coloured font
 
 	ABC_outputString.push(line);
 	ABC_outputString_unrendered.push(line);
@@ -405,10 +425,11 @@ function update_ABCoutput_WW(ruleNums){
 
 
 // Returns any new lines of the ABC output
-function get_ABCoutput_WW(resolve = function() { }, msgID = null){
+function get_unrendered_ABCoutput_WW(resolve = function() { }, msgID = null){
 
-
-	var toReturn = {newLines: ABC_outputString_unrendered, nTrialsToGo: n_ABC_trials_left};
+	var acceptanceNumber = ABC_POSTERIOR_DISTRIBUTION.length;
+	var acceptancePercentage = 100 * ABC_POSTERIOR_DISTRIBUTION.length / (ABC_RULES["ntrials"] - n_ABC_trials_left);
+	var toReturn = {newLines: ABC_outputString_unrendered, nTrialsToGo: n_ABC_trials_left, acceptanceNumber: acceptanceNumber, acceptancePercentage: acceptancePercentage};
 	
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
@@ -422,3 +443,56 @@ function get_ABCoutput_WW(resolve = function() { }, msgID = null){
 
 }
 
+
+// Return the full ABC output. Each line is a string in the list
+function get_ABCoutput_WW(resolve = function() { }, msgID = null){
+
+	var toReturn = {lines: ABC_outputString};
+	if (msgID != null){
+		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+	}else{
+		resolve(toReturn);
+	}
+
+
+}
+
+
+
+// Returns the list of this type of value if it is in the posterior distribution
+function getListOfValuesFromPosterior_WW(paramOrMetricID){
+
+
+	if (paramOrMetricID == "probability") return null;
+
+	var posteriorValues = [];
+	for (var i = 0; i < ABC_POSTERIOR_DISTRIBUTION.length; i ++){
+		
+		// If no values sampled then move on to next value in posterior
+		//if (ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID] == null || ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["vals"] == null) continue;
+
+		// If there was only 1 number then use it (one time for each rule)
+
+
+		// Iterate through all rules
+		for (var j = 0; j < ABC_POSTERIOR_DISTRIBUTION[i]["nrules"]; j ++){
+
+			if (ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["vals"] == null){
+
+				posteriorValues.push(ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["val"]);
+				
+			}else{
+
+				posteriorValues.push(ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["vals"][j]);
+
+			}
+		}
+
+
+
+	}
+
+	return posteriorValues;
+
+
+}

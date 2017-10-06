@@ -1196,7 +1196,7 @@ function getNTPCanvasData_WW(resolve = function(result) { }, msgID = null){
 	var toReturn = null;
 	if (!currentState["terminated"]){
 		var deltaBase = currentState["mRNAPosInActiveSite"] <= 0 ? -1 : 0;
-		var baseToAdd = deltaBase == 0 ? currentState["NTPtoAdd"] : primerSequence[currentState["mRNALength"]-1]["base"];
+		var baseToAdd = deltaBase == 0 ? currentState["NTPtoAdd"] : (primerSequence == null || currentState["mRNALength"] == null) ? "X" : primerSequence[currentState["mRNALength"]-1]["base"];
 		toReturn = {state: convertFullStateToCompactState(currentState), 
 						NTPbound: currentState["NTPbound"],
 						mRNAPosInActiveSite: currentState["mRNAPosInActiveSite"],

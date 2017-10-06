@@ -448,7 +448,7 @@ function submitDistribution_WW(paramID, distributionName, distributionParams, re
 	        PHYSICAL_PARAMETERS[paramID]["val"] = 1;
 	}
 	
-	sample_parameter_WW(paramID);
+	if (!simulating) sample_parameter_WW(paramID);
 
 
 	if (msgID != null){

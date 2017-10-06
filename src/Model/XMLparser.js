@@ -87,7 +87,6 @@ function parseXML_plots_WW(attr, values){
 	selectPlot_WW(plotNum, values["name"], null, false); // Initialise the plot
 	for (var prop in values){
 		if (prop != "name") whichPlotInWhichCanvas[plotNum][prop] = values[prop]; // Copy all the settings over
-		
 	}
 
 	

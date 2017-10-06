@@ -77,9 +77,14 @@ function beginABC(){
 
 
 
-	// Set to hidden mode
+	// Set to hidden mode and prevent user from changing to regular mode
 	$("#PreExp").val("hidden");
+	$("#PreExp").attr("disabled", "disabled");
+	$("#PreExp").css("cursor", "auto");
+	$("#PreExp").css("background-color", "#858280");
 	changeSpeed_controller();
+
+
 
 
 	beginABC_controller(rules);
@@ -101,6 +106,14 @@ function beginABC(){
 	$("#ABCnRulesPerTrial").css("background-color", "#858280");
 	$("#ABCnRulesPerTrial").attr("disabled", "disabled");
 
+	$("#downloadABC").show(50);
+	$("#ABCacceptancePercentage_span").show(50);
+	$("#ABCacceptancePercentage_val").html("0");
+	$("#ABCacceptance_span").show(50);
+	$("#ABCacceptance_val").html("0");
+
+
+	
 
 
 
@@ -157,6 +170,12 @@ function updateABCpanel(){
 function addNewABCRuleButton() {
 
 	numberABCrules++;
+
+	if (numberABCrules == 2){
+		$("#beginABC_btn").css("cursor", "pointer");
+		$("#beginABC_btn").css("background-color", "#663399");
+		$("#beginABC_btn").attr("disabled", false);
+	}
 
 
 	var html = `
@@ -408,3 +427,45 @@ function addNewRule() {
 
 
 
+function downloadABC(){
+
+	get_ABCoutput_controller(function(result){
+
+
+		var lines = result["lines"];
+		if (lines.length == 0) return;
+		var stringToPrint = "";
+		for (var i = 0; i < lines.length; i++){
+
+			
+
+			// Replace all the &&&&& blocks with a single tab
+			var tabbedLine = "";
+			var addedTab = false;
+			for (var j = 0; j < lines[i].length; j ++){
+
+				if (lines[i][j] == "|") continue; // Ignore pipes. They denote coloured font
+
+				if (lines[i][j] == "&" && !addedTab) { // Replace & with a tab (unless you have already replaced a touching & with a tab)
+					tabbedLine += "\t";
+					addedTab = true;
+				}
+				else if(lines[i][j] != "&") {	// Add the normal character to the string
+					tabbedLine += lines[i][j];
+					addedTab = false;
+				}
+			}
+
+			stringToPrint += tabbedLine + "\n";
+
+		}
+
+
+		download("ABC_output.tsv", stringToPrint);
+		
+
+	});
+
+
+
+}

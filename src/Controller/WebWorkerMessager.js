@@ -1616,6 +1616,12 @@ function startTrials_controller(){
 	simulating = true;
 
 
+	// Unfocus from anything which has been focused so that the input box change event triggers
+	// Clicking this button will not defocus because this has the noselect class
+	var focusedObj = $(':focus');
+	if (focusedObj.length > 0) focusedObj.blur();
+
+
 	// Hide the simulate button and show the stop button
 	hideButtonAndShowStopButton("simulate");
 
@@ -1635,9 +1641,9 @@ function startTrials_controller(){
 		// If this is not a webworker and the current speed is ultrafast then set it back to fast otherwise the browser will crash
 		changeSpeed_controller();
 
-		$("#numSimSpan").hide(true);
+		$("#numSimSpan").hide(0);
 		$("#progressSimSpan").html("<span id='counterProgress'>0</span> / " + ntrials);
-		$("#progressSimSpan").show(true);
+		$("#progressSimSpan").show(0);
 		lockTheScrollbar("#bases");
 
 
@@ -1655,9 +1661,9 @@ function startTrials_controller(){
 			hideStopButtonAndShow("simulate");
 			update_sliding_curve(0);
 
-			$("#numSimSpan").show(true);
+			$("#numSimSpan").show(0);
 			$("#progressSimSpan").html("");
-			$("#progressSimSpan").hide(true);
+			$("#progressSimSpan").hide(0);
 			unlockTheScrollbar("#bases");
 
 
@@ -1817,6 +1823,8 @@ function saveSettings_controller(){
 			else values.push(convertCommaStringToList($("#sitesToRecord_textbox").val()));
 			*/
 
+			values.push($("#plotFromPosterior").prop("checked"));
+
 			functionToCallAfterSaving  = function() { plot_custom(plotNum); };
 			break;
 
@@ -1844,6 +1852,8 @@ function saveSettings_controller(){
 			}
 
 			values.push($("#zColouring").val());
+
+			values.push($("#plotFromPosterior").prop("checked"));
 
 
 			functionToCallAfterSaving  = function() { plot_parameter_heatmap(plotNum); };
@@ -2215,17 +2225,17 @@ function getCacheSizes_controller(resolve = function(){}){
 
 
 
-function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, resolve){
+function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, resolve){
 
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, resolve));
+		var toCall = () => new Promise((resolve) => deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, resolve));
 		toCall().then((result) => resolve(result));
 	}
 
 	else{
-		var res = stringifyFunction("deletePlots_WW", [distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, null], true);
+		var res = stringifyFunction("deletePlots_WW", [distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -2255,8 +2265,12 @@ function beginABC_controller(rules){
 		$("#ABCnRulesPerTrial").css("cursor", "");
 		$("#ABCnRulesPerTrial").css("background-color", "#663399");
 		$("#ABCnRulesPerTrial").attr("disabled", false);
+		$("#PreExp").attr("disabled", false);
+		$("#PreExp").css("cursor", "");
+		$("#PreExp").css("background-color", "#008CBA");
 		running_ABC = false;
-		
+		simulationRenderingController = false;
+
 	};
 
 
@@ -2271,7 +2285,18 @@ function beginABC_controller(rules){
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then(() => updateDOM());
-		renderObjectsUntilReceiveMessage(msgID);
+
+
+		if ($("#PreExp").val() != "ultrafast" && $("#PreExp").val() != "hidden") {
+			simulationRenderingController = true;
+			renderObjectsUntilReceiveMessage(msgID);
+		}
+
+		// If ultrafast mode then the model will tell us when to render
+		else{
+			simulationRenderingController = false;
+		}
+
 
 	}
 
@@ -2280,16 +2305,26 @@ function beginABC_controller(rules){
 }
 
 
-function get_ABCoutput_controller(){
+function get_unrendered_ABCoutput_controller(){
 
 
 
 	// Update the ABC output 
 	var updateDOM = function(result){
 
-		
+		// Update the counter
 		var nTrialsToGo = result["nTrialsToGo"];
 		if (nTrialsToGo != parseFloat($("#ABCntrials").val())) $("#ABCntrials").val(nTrialsToGo);
+
+
+		// Update the numbers of accepted values
+		var acceptanceNumber = result["acceptanceNumber"];
+		if (acceptanceNumber != null) $("#ABCacceptance_val").html(roundToSF(acceptanceNumber));
+
+
+		// Update the acceptance percentage
+		var acceptancePercentage = result["acceptancePercentage"];
+		if (acceptancePercentage != null) $("#ABCacceptancePercentage_val").html(roundToSF(acceptancePercentage));
 
 		var newLines = result["newLines"];
 		if (newLines.length == 0) return;
@@ -2300,9 +2335,14 @@ function get_ABCoutput_controller(){
 
 			// Replace all the & with a space
 			var paddedLine = "";
+			var openPipe = true; // | (pipes) denote coloured font
 			for (var j = 0; j < newLines[i].length; j ++){
 
-				if (newLines[i][j] == "&") paddedLine += "&nbsp";
+				if (newLines[i][j] == "|") {
+					paddedLine += openPipe ? "<span style='color:red'>" : "</span>"; 
+					openPipe = !openPipe;
+				}
+				else if (newLines[i][j] == "&") paddedLine += "&nbsp";
 				else paddedLine += newLines[i][j];
 			}
 
@@ -2319,8 +2359,36 @@ function get_ABCoutput_controller(){
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => get_ABCoutput_WW(resolve));
+		var toCall = () => new Promise((resolve) => get_unrendered_ABCoutput_WW(resolve));
 		toCall().then((lines) => updateDOM(lines));
+	}
+
+	else{
+		var res = stringifyFunction("get_unrendered_ABCoutput_WW", [null], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((lines) => updateDOM(lines));
+
+	}
+
+
+}
+
+
+
+
+
+
+
+
+
+function get_ABCoutput_controller(resolve = function(lines) { }){
+
+
+	if (WEB_WORKER == null) {
+		var toCall = () => new Promise((resolve) => get_ABCoutput_WW(resolve));
+		toCall().then((lines) => resolve(lines));
 	}
 
 	else{
@@ -2328,7 +2396,7 @@ function get_ABCoutput_controller(){
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((lines) => updateDOM(lines));
+		toCall().then((lines) => resolve(lines));
 
 	}
 

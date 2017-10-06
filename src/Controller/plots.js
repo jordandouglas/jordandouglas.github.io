@@ -1374,6 +1374,31 @@ function download_pauseHistogramTSV(){
 
 }
 
+// Using homebrew functions because the default ones have upperlimits of ~100,000
+function minimumFromList(list){
+
+	var min = 1e20;
+	for (var i = 0; i < list.length; i ++){
+		min = Math.min(min, list[i]);
+	}
+	if (min == 1e20) return null;
+	return min;
+
+}
+
+
+function maximumFromList(list){
+
+	var max = -1e20;
+	for (var i = 0; i < list.length; i ++){
+		max = Math.max(max, list[i]);
+	}
+	if (max == -1e20) return null;
+	return max;
+
+}
+
+
 
 
 // Assumes that values are sorted. Will not display the top 5% of values
@@ -1427,8 +1452,8 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 		// If xRange is set to pauseX set min to 1 and max to whatever the maximum is
 		// If xRange is set to shortPauseX set min to 1 and max to 25
 		ctx.lineWidth = 0;
-		var minVal = xRange == "automaticX" ? Math.min.apply(null, values) : xRange == "pauseX" || xRange == "shortPauseX" ? 1  : xRange[0]; 
-		var maxVal = xRange == "automaticX" || xRange == "pauseX" ? Math.max.apply(null, values) : xRange == "shortPauseX" ? 25 : xRange[1];
+		var minVal = xRange == "automaticX" ? minimumFromList(values) : xRange == "pauseX" || xRange == "shortPauseX" ? 1  : xRange[0]; 
+		var maxVal = xRange == "automaticX" || xRange == "pauseX" ? maximumFromList(values) : xRange == "shortPauseX" ? 25 : xRange[1];
 
 
 
@@ -1504,8 +1529,8 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 
 		}
 
-		var ymin = logSpace ? Math.min.apply(Math, barHeights) : 0;
-		var ymax =  roundToSF(Math.max.apply(Math, barHeights) * 1.2); // Math.min(Math.ceil(Math.max.apply(Math, barHeights) * 10.5) / 10, 1);
+		var ymin = logSpace ? minimumFromList(barHeights) : 0;
+		var ymax = roundToSF(maximumFromList(barHeights) * 1.2); // Math.min(Math.ceil(Math.max.apply(Math, barHeights) * 10.5) / 10, 1);
 		
 	
 		// Plot the bars and add the hover events
@@ -2712,8 +2737,8 @@ function plot_parameter_heatmap(plotNumCustom = null){
 		// Get the z-axis range and filter out points which are not within this range. 
 		// If a colour gradient is being used then assign colours to the points
 		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"] == "automaticZ"){
-			zmin = Math.min.apply(Math, zvals);
-			zmax = Math.max.apply(Math, zvals);
+			zmin = minimumFromList(zvals);
+			zmax = maximumFromList(zvals);
 			xValsGood = xvals;
 			yValsGood = yvals;
 			zValsGood = zvals;
@@ -2749,16 +2774,16 @@ function plot_parameter_heatmap(plotNumCustom = null){
 		// Get the x and y ranged
 		var xmin, xmax, ymin, ymax;
 		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"] == "automaticX"){
-			xmin = Math.min.apply(Math, xValsGood);
-			xmax = Math.max.apply(Math, xValsGood);
+			xmin = minimumFromList(xValsGood);
+			xmax = maximumFromList(xValsGood);
 		}else{
 			xmin = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"][0];
 			xmax = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"][1];
 		}
 
 		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yRange"] == "automaticY"){
-			ymin = Math.min.apply(Math, yValsGood);
-			ymax = Math.max.apply(Math, yValsGood);
+			ymin = minimumFromList(yValsGood);
+			ymax = maximumFromList(yValsGood);
 		}else{
 			ymin = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yRange"][0];
 			ymax = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yRange"][1];
@@ -2838,16 +2863,16 @@ function plot_custom(plotNumCustom = null){
 		// Otherwise make a scatter plot
 		var xmin, xmax, ymin, ymax;
 		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"] == "automaticX"){
-			xmin = Math.min.apply(Math, xvals);
-			xmax = Math.max.apply(Math, xvals);
+			xmin = minimumFromList(xvals); 
+			xmax = maximumFromList(xvals); 
 		}else{
 			xmin = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"][0];
 			xmax = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"][1];
 		}
 
 		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yRange"] == "automaticY"){
-			ymin = Math.min.apply(Math, yvals);
-			ymax = Math.max.apply(Math, yvals);
+			ymin = minimumFromList(yvals);  
+			ymax = maximumFromList(yvals);
 		}else{
 			ymin = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yRange"][0];
 			ymax = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yRange"][1];
@@ -3636,7 +3661,8 @@ function plot_probability_distribution(distn_fn, xmin, xmax, canvasID, xlab = ""
 		//console.log("Values", xVals, yVals, xmin, xmax);
 	
 
-		var ymax = Math.max.apply(Math, yVals);
+		
+		var ymax = maximumFromList(yVals);  
 		ymax = roundToSF(ymax * 1.1, 1);
 	
 	
@@ -4170,6 +4196,23 @@ function parameterHeatmapZAxisTemplate(){
 }
 
 
+function getPosteriorCheckboxTemplate(){
+
+	return `
+		<label class="switch" title="Only plot points which were accepted by the posterior distribution?">
+	 	 	<input type="checkbox" id="plotFromPosterior"> </input>
+	 	 	<span class="slider round"></span>
+	 	 </label> 
+		<span style="font-size:15px; vertical-align:middle">Posterior</span>
+		
+		
+
+	`;
+
+
+}
+
+
 // Decrease the indices of the sites displayed in the long sitewise plot by 100
 function minus100Sites(){
 
@@ -4341,6 +4384,7 @@ function plotOptions(plotNum){
 			$("#settingCell2").html(distanceVsTimeOptionsTemplate1().replace("Time range", "X-axis range").replace("XUNITS", "").replace("XUNITS", ""));
 			$("#settingCell4").html(distanceVsTimeOptionsTemplate2().replace("Distance range", "Y-axis range").replace("YUNITS", "").replace("YUNITS", "").replace("YMINDEFAULT", 0).replace("YMAXDEFAULT", 1));
 
+
 			$("#pauseXRow").remove();
 			$("#shortPauseXRow").remove();
 
@@ -4362,6 +4406,13 @@ function plotOptions(plotNum){
 				$("#yMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][1]);
 			}
 
+
+			$("#settingCell5").html(getPosteriorCheckboxTemplate());
+			if (!PLOT_DATA["thereExistsPosteriorDistribution"]) {
+				$("#plotFromPosterior").css("cursor", "auto");
+				$("#plotFromPosterior").attr("disabled", "disabled");
+			}
+			else $("#plotFromPosterior").prop("checked", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFromPosterior"]);
 
 
 			/*
@@ -4451,7 +4502,13 @@ function plotOptions(plotNum){
 
 
 
-
+			$("#settingCell8").html(getPosteriorCheckboxTemplate());
+			console.log("exists", PLOT_DATA["thereExistsPosteriorDistribution"]);
+			if (!PLOT_DATA["thereExistsPosteriorDistribution"]) {
+				$("#plotFromPosterior").css("cursor", "auto");
+				$("#plotFromPosterior").attr("disabled", "disabled");
+			}
+			else $("#plotFromPosterior").prop("checked", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFromPosterior"]);
 
 			break;
 

@@ -22,6 +22,7 @@
 
 SIMULATION_VARIABLES = {};
 SIMULATION_ACTIONS = [];
+renderPlotsEveryMS = 5000; // If in hidden mode, render the plots every few seconds
 
 
 function startTrials_WW(n, resolve = function() { }, msgID = null){
@@ -50,7 +51,7 @@ function startTrials_WW(n, resolve = function() { }, msgID = null){
 
 			pauseEveryNActions = 300;
 			actionsSinceLastPause = pauseEveryNActions;
-			renderPlotsEveryMS = 5000; // If in hidden mode, render the plots every few seconds
+
 
 			SIMULATION_VARIABLES = {baseToAdd: "X", terminated: false};
 			
@@ -71,7 +72,7 @@ function startTrials_WW(n, resolve = function() { }, msgID = null){
 			simulating = true;
 			ANIMATION_TIME = ANIMATION_TIME_TEMP;
 
-			if (ANIMATION_TIME == 0) renderPlotsHidden();
+			if (ANIMATION_TIME == 0 && !ABC_simulating) renderPlotsHidden(1000);
 
 			// Use the geometric sampling speed up only if the speed is not set to slow
 			ELONGATION_MODELS[currentElongationModel]["allowGeometricCatalysis"] = ANIMATION_TIME < 200; 
@@ -88,15 +89,15 @@ function startTrials_WW(n, resolve = function() { }, msgID = null){
 
 
 
-function renderPlotsHidden(){
+function renderPlotsHidden(timeToTake = renderPlotsEveryMS){
 
-	if (!isWebWorker || !simulating || ANIMATION_TIME_TEMP > 0) return;
+	if (!isWebWorker || (!simulating && !ABC_simulating) || ANIMATION_TIME_TEMP > 0) return;
 
 
 	setTimeout(function(){
 		postMessage("_renderHTML_hidden()");
-		renderPlotsHidden();
-	}, renderPlotsEveryMS); // Give it an extra few ms to ensure that action has completed
+		renderPlotsHidden(renderPlotsEveryMS);
+	}, timeToTake); // Give it an extra few ms to ensure that action has completed
 
 
 }
@@ -199,8 +200,6 @@ function trial_WW(stateC, resolve = function() { }, msgID = null){
 
 
 	ANIMATION_TIME = ANIMATION_TIME_TEMP;
-
-
 
 	
 	// Stop the simulations or refresh to begin the next trial
