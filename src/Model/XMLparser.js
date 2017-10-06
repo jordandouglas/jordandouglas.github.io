@@ -102,7 +102,7 @@ function parseXML_model_WW(attr, val){
 
 function parseXML_state_WW(stateAttr){
 
-	var compactState = [parseFloat(stateAttr["nascentLength"]), parseFloat(stateAttr["activeSitePosition"]), stateAttr["NTPbound"] == "true", stateAttr["activated"] == "true"];
+	var compactState = [parseFloat(stateAttr["nascentLen"]), parseFloat(stateAttr["activeSitePosition"]), stateAttr["NTPbound"] == "true", stateAttr["activated"] == "true"];
 	return compactState;
 
 }

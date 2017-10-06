@@ -1179,7 +1179,7 @@ function plot_velocity_distribution(){
 
 	
 		// Print the mean velocity to the html
-		$("#plotLabelVariable" + canvasesToPrintTo[i]).html(roundToSF(PLOT_DATA["meanVelocity"]));
+		$("#plotLabelVariable" + canvasesToPrintTo[i]).html(roundToSF(PLOT_DATA["velocity"]));
 
 
 				
@@ -4138,10 +4138,10 @@ function customPlotSelectPropertyTemplate(){
 		<legend><b>Metric (y-axis)</b></legend>
 		<select class="dropdown" onChange="customYVariableChange()" title="Which metric do you want to show on the y-axis?" id = "customMetric" style="vertical-align: middle; text-align:right;">
 			<option value="probability">Probability</option>
-			<option value="meanVelocity">Mean velocity (bp/s)</option>
-			<option value="meanCatalysis">Mean catalysis time (s)</option>
-			<option value="meanTranscription">Total transcription time (s)</option>
-			<option value="nascentLength">Nascent strand length (nt)</option>
+			<option value="velocity">Mean velocity (bp/s)</option>
+			<option value="catalyTime">Mean catalysis time (s)</option>
+			<option value="totalTime">Total transcription time (s)</option>
+			<option value="nascentLen">Nascent strand length (nt)</option>
 		</select><br>
 		Calculated per trial.
 
@@ -4157,10 +4157,10 @@ function parameterHeatmapZAxisTemplate(){
 		<legend><b>Metric (z-axis)</b></legend>
 		<select class="dropdown" onChange="heatmapZVariableChange()" title="Which metric do you want to show on the z-axis?" id = "customMetric" style="vertical-align: middle; text-align:right;">
 			<option value="probability">Probability</option>
-			<option value="meanVelocity">Mean velocity (bp/s)</option>
-			<option value="meanCatalysis">Mean catalysis time (s)</option>
-			<option value="meanTranscription">Mean transcription time (s)</option>
-			<option value="nascentLength">Nascent strand length (nt)</option>
+			<option value="velocity">Mean velocity (bp/s)</option>
+			<option value="catalyTime">Mean catalysis time (s)</option>
+			<option value="totalTime">Mean transcription time (s)</option>
+			<option value="nascentLen">Nascent strand length (nt)</option>
 		</select><br>
 		Calculated per trial.
 

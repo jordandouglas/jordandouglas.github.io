@@ -348,10 +348,10 @@ function addThenStatementABC(ruleNumber, first = true){
 
 				<b style="font-family:Bookman;">` + thenOrAnd + `</b> &nbsp;&nbsp;	
 				<select class="plot-dropdown thenParameterName` + ruleNumber + `" title="Select which metric to measure" style="vertical-align: middle; text-align:right; background-color:#663399; max-width:210px; font-size:15px">
-					<option value="meanVelocity">Mean velocity (bp/s)</option>
-					<option value="meanCatalysis">Mean catalysis time (s)</option>
-					<option value="meanTranscription">Total copy time (s)</option>
-					<option value="nascentLength">Nascent strand length (nt)</option>
+					<option value="velocity">Mean velocity (bp/s)</option>
+					<option value="catalyTime">Mean catalysis time (s)</option>
+					<option value="totalTime">Total copy time (s)</option>
+					<option value="nascentLen">Nascent strand length (nt)</option>
 				</select>
 
 				 &nbsp;&nbsp; 

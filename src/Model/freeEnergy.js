@@ -218,7 +218,7 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 
 	if (stateToCalculateFor == null) stateToCalculateFor = currentState;
 
-	var slidingPeakHeightsTemp = [PHYSICAL_PARAMETERS["GDaggerSlide"]["val"], PHYSICAL_PARAMETERS["GDaggerSlide"]["val"],PHYSICAL_PARAMETERS["GDaggerSlide"]["val"],PHYSICAL_PARAMETERS["GDaggerSlide"]["val"],PHYSICAL_PARAMETERS["GDaggerSlide"]["val"],PHYSICAL_PARAMETERS["GDaggerSlide"]["val"]];
+	var slidingPeakHeightsTemp = [PHYSICAL_PARAMETERS["GDagSlide"]["val"], PHYSICAL_PARAMETERS["GDagSlide"]["val"],PHYSICAL_PARAMETERS["GDagSlide"]["val"],PHYSICAL_PARAMETERS["GDagSlide"]["val"],PHYSICAL_PARAMETERS["GDagSlide"]["val"],PHYSICAL_PARAMETERS["GDagSlide"]["val"]];
 	
 	if (stateToCalculateFor["terminated"]) return [maxHeight,maxHeight,maxHeight,maxHeight,maxHeight,maxHeight];
 

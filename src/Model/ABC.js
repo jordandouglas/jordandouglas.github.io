@@ -57,7 +57,7 @@ function beginABC_WW(rules, resolve = function() { }, msgID = null){
 	// Each element in a list is from one rule
 	ABC_parameters_and_metrics_this_simulation = {};
 	for (var ruleNum in ABC_RULES["rules"]) {
-		ABC_parameters_and_metrics_this_simulation["Rule" + ruleNum + "Passed"] = null;
+		ABC_parameters_and_metrics_this_simulation["Rule" + ruleNum] = null;
 	}
 	ABC_parameters_and_metrics_this_simulation["accepted"] = null;
 	for (var paramID in PHYSICAL_PARAMETERS){
@@ -74,10 +74,10 @@ function beginABC_WW(rules, resolve = function() { }, msgID = null){
 	}
 
 
-	if(RHS_params.indexOf("meanVelocity") != -1) ABC_parameters_and_metrics_this_simulation["meanVelocity"] = {name: "Mean velocity (bp/s)", vals: []};
-	if(RHS_params.indexOf("meanCatalysis") != -1) ABC_parameters_and_metrics_this_simulation["meanCatalysis"] = {name: "Mean catalysis time (s)", vals: []};
-	if(RHS_params.indexOf("meanTranscription") != -1) ABC_parameters_and_metrics_this_simulation["meanTranscription"] = {name: "Total transcription time (s)", vals: []};
-	if(RHS_params.indexOf("nascentLength") != -1) ABC_parameters_and_metrics_this_simulation["nascentLength"] = {name: "Final nascent length (nt)", vals: []};
+	if(RHS_params.indexOf("velocity") != -1) ABC_parameters_and_metrics_this_simulation["velocity"] = {name: "Mean velocity (bp/s)", vals: []};
+	if(RHS_params.indexOf("catalyTime") != -1) ABC_parameters_and_metrics_this_simulation["catalyTime"] = {name: "Mean catalysis time (s)", vals: []};
+	if(RHS_params.indexOf("totalTime") != -1) ABC_parameters_and_metrics_this_simulation["totalTime"] = {name: "Total transcription time (s)", vals: []};
+	if(RHS_params.indexOf("nascentLen") != -1) ABC_parameters_and_metrics_this_simulation["nascentLen"] = {name: "Final nascent length (nt)", vals: []};
 
 
 	n_ABC_trials_left = ABC_RULES["ntrials"];
@@ -125,7 +125,7 @@ function ABC_trials_WW(ruleNums, resolve = function() { }, msgID = null){
 
 	// Reset whether or not each rule passed
 	for (var ruleNum in ABC_RULES["rules"]) {
-		ABC_parameters_and_metrics_this_simulation["Rule" + ruleNum + "Passed"] = null;
+		ABC_parameters_and_metrics_this_simulation["Rule" + ruleNum] = null;
 	}
 	ABC_parameters_and_metrics_this_simulation["accepted"] = null;
 
@@ -241,7 +241,7 @@ function ABC_trial_fire_rule_WW(ruleNum, K, resolve = function(acc) { }){
 
 		// Check if this satisfies the RHS
 		var accepted = acceptOrRejectParameters(ruleNum);
-		ABC_parameters_and_metrics_this_simulation["Rule" + ruleNum + "Passed"] = accepted;
+		ABC_parameters_and_metrics_this_simulation["Rule" + ruleNum] = accepted;
 		resolve(accepted);
 
 
@@ -336,7 +336,7 @@ function initialise_ABCoutput_WW(ruleNums){
 	// Each column will have total width of a fixed number of spaces
 
 
-	var paddingString = "&&&&&&&&&&&&&&&&&&&&"; 
+	var paddingString = "&&&&&&&&&&&"; 
 	//for (var i = 0; i < 20; i ++) paddingString += 
 	var secondLine = (paddingString + "Trial").slice(-9);
 
@@ -348,7 +348,7 @@ function initialise_ABCoutput_WW(ruleNums){
 
 	for (var ruleNum in ruleNums){
 		secondLine += variablesSection;
-		secondLine += (paddingString + "Rule" + ruleNums[ruleNum] + "Passed").slice(-paddingString.length);
+		secondLine += (paddingString + "Rule" + ruleNums[ruleNum]).slice(-paddingString.length);
 	}
 
 	secondLine += (paddingString + "Accepted").slice(-10);
@@ -366,7 +366,7 @@ function update_ABCoutput_WW(ruleNums){
 
 
 
-	var paddingString = "&&&&&&&&&&&&&&&&&&&&"; 
+	var paddingString = "&&&&&&&&&&&"; 
 	var trialNum = 	ABC_RULES["ntrials"] - n_ABC_trials_left + 1;
 	var line = (paddingString + trialNum).slice(-9);
 
@@ -376,7 +376,7 @@ function update_ABCoutput_WW(ruleNums){
 
 
 		var printVals = true; // When this is false, the rule has not been executed, so leave some space but don't print any numbers
-		if (ABC_parameters_and_metrics_this_simulation["Rule" + ruleNums[ruleIndex] + "Passed"] == null) printVals = false;
+		if (ABC_parameters_and_metrics_this_simulation["Rule" + ruleNums[ruleIndex]] == null) printVals = false;
 
 		for (var objID in ABC_parameters_and_metrics_this_simulation){
 
@@ -390,7 +390,7 @@ function update_ABCoutput_WW(ruleNums){
 		} 
 
 
-		line += (paddingString + ABC_parameters_and_metrics_this_simulation["Rule" + ruleNums[ruleIndex] + "Passed"]).slice(-paddingString.length);
+		line += (paddingString + (printVals ? ABC_parameters_and_metrics_this_simulation["Rule" + ruleNums[ruleIndex]] : "")).slice(-paddingString.length);
 
 	}
 

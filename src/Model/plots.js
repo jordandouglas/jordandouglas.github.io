@@ -40,7 +40,7 @@ misincorporationCounts = [];
 elongationDurations = [];
 
 timeElapsed = 0;
-meanVelocity = 0;
+velocity = 0;
 totalDisplacement = 0;
 totalTimeElapsed = 0;
 npauseSimulations = 0;
@@ -90,10 +90,10 @@ function refreshPlotDataSequenceChangeOnly_WW(resolve = function() { }, msgID = 
 		if (!PHYSICAL_PARAMETERS[paramID]["binary"]) PARAMETERS_PLOT_DATA[paramID] = {name: PHYSICAL_PARAMETERS[paramID]["name"], vals: []};
 	}
 	PARAMETERS_PLOT_DATA["probability"] = {name: "Probability density", vals: null};
-	PARAMETERS_PLOT_DATA["meanVelocity"] = {name: "Mean velocity (bp/s)", vals: []};
-	PARAMETERS_PLOT_DATA["meanCatalysis"] = {name: "Mean catalysis time (s)", vals: []};
-	PARAMETERS_PLOT_DATA["meanTranscription"] = {name: "Total transcription time (s)", vals: []};
-	PARAMETERS_PLOT_DATA["nascentLength"] = {name: "Final nascent length (nt)", vals: []};
+	PARAMETERS_PLOT_DATA["velocity"] = {name: "Mean velocity (bp/s)", vals: []};
+	PARAMETERS_PLOT_DATA["catalyTime"] = {name: "Mean catalysis time (s)", vals: []};
+	PARAMETERS_PLOT_DATA["totalTime"] = {name: "Total transcription time (s)", vals: []};
+	PARAMETERS_PLOT_DATA["nascentLen"] = {name: "Final nascent length (nt)", vals: []};
 
 
 	timesSpentOnEachTemplate = [0];
@@ -203,7 +203,7 @@ function getPlotData_WW(forceUpdate = false, resolve = function(plotData) { }, m
 
 
 		plotData["timeElapsed"] = timeElapsed;
-		plotData["meanVelocity"] = meanVelocity;
+		plotData["velocity"] = velocity;
 
 
 				
@@ -323,7 +323,7 @@ function updatePlotData_WW(stateC, actionNumber, reactionTime){
 		// Update total displacement
 		//var distanceTravelledThisStep = currentState["rightGBase"] - DISTANCE_VS_TIME[index]["distances"][DISTANCE_VS_TIME[index]["distances"].length-2];;
 		totalDisplacement += actionNumber == 0 ? -1 : 1;
-		meanVelocity = totalDisplacement / totalTimeElapsed;
+		velocity = totalDisplacement / totalTimeElapsed;
 
 
 
@@ -736,7 +736,7 @@ function update_custom_plot_data_WW(){
 
 	var increaseInPrimerLength = currentState["mRNALength"] - (PHYSICAL_PARAMETERS["hybridLen"]["val"] + PHYSICAL_PARAMETERS["bubbleLeft"]["val"] + 2);
 	//if(increaseInPrimerLength < 100) return; // Disqualify early terminations because they will skew everything
-	var meanVelocity_thisTrial = increaseInPrimerLength / totalTime_thisTrial;
+	var velocity_thisTrial = increaseInPrimerLength / totalTime_thisTrial;
 	var meanDwellTime_thisTrial = totalTime_thisTrial / DWELL_TIMES[DWELL_TIMES.length-1].length;
 	
 
@@ -748,18 +748,18 @@ function update_custom_plot_data_WW(){
 
 
 	// Y values
-	PARAMETERS_PLOT_DATA["meanVelocity"]["vals"].push(meanVelocity_thisTrial);
-	PARAMETERS_PLOT_DATA["meanTranscription"]["vals"].push(totalTime_thisTrial);
-	PARAMETERS_PLOT_DATA["meanCatalysis"]["vals"].push(meanDwellTime_thisTrial);
-	PARAMETERS_PLOT_DATA["nascentLength"]["vals"].push(currentState["mRNALength"]-1);
+	PARAMETERS_PLOT_DATA["velocity"]["vals"].push(velocity_thisTrial);
+	PARAMETERS_PLOT_DATA["totalTime"]["vals"].push(totalTime_thisTrial);
+	PARAMETERS_PLOT_DATA["catalyTime"]["vals"].push(meanDwellTime_thisTrial);
+	PARAMETERS_PLOT_DATA["nascentLen"]["vals"].push(currentState["mRNALength"]-1);
 
 
 	// If ABC is being run then add the appropriate metrics to this list
 	if (ABC_simulating){
-		if (ABC_metric_values_this_simulation["meanVelocity"] != null) ABC_metric_values_this_simulation["meanVelocity"].push(meanVelocity_thisTrial);
-		if (ABC_metric_values_this_simulation["meanTranscription"] != null) ABC_metric_values_this_simulation["meanTranscription"].push(totalTime_thisTrial);
-		if (ABC_metric_values_this_simulation["meanCatalysis"] != null) ABC_metric_values_this_simulation["meanCatalysis"].push(meanDwellTime_thisTrial);
-		if (ABC_metric_values_this_simulation["nascentLength"] != null) ABC_metric_values_this_simulation["nascentLength"].push(currentState["mRNALength"]-1);
+		if (ABC_metric_values_this_simulation["velocity"] != null) ABC_metric_values_this_simulation["velocity"].push(velocity_thisTrial);
+		if (ABC_metric_values_this_simulation["totalTime"] != null) ABC_metric_values_this_simulation["totalTime"].push(totalTime_thisTrial);
+		if (ABC_metric_values_this_simulation["catalyTime"] != null) ABC_metric_values_this_simulation["catalyTime"].push(meanDwellTime_thisTrial);
+		if (ABC_metric_values_this_simulation["nascentLen"] != null) ABC_metric_values_this_simulation["nascentLen"].push(currentState["mRNALength"]-1);
 	}
 
 
@@ -854,7 +854,7 @@ function getCacheSizes_WW(resolve = function() { }, msgID = null){
 
 	var parameterPlotSize = -1;
 	for (var i in PARAMETERS_PLOT_DATA) parameterPlotSize++;
-	parameterPlotSize *= PARAMETERS_PLOT_DATA["meanVelocity"]["vals"].length;
+	parameterPlotSize *= PARAMETERS_PLOT_DATA["velocity"]["vals"].length;
 
 
 	var result = {DVTsize: DVTsize, timeSize: timeSize, parameterPlotSize:parameterPlotSize};
@@ -879,7 +879,7 @@ function deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timeP
 		DISTANCE_VS_TIME_UNSENT[DISTANCE_VS_TIME.length] = {sim: DISTANCE_VS_TIME.length, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] };
 		totalDisplacement = 0;
 		totalTimeElapsed = 0;
-		meanVelocity = 0;
+		velocity = 0;
 		timeElapsed = 0;
 		timesSpentOnEachTemplate = [0];
 		distancesTravelledOnEachTemplate = [0];
@@ -899,10 +899,10 @@ function deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timeP
 			if (!PHYSICAL_PARAMETERS[paramID]["binary"]) PARAMETERS_PLOT_DATA[paramID] = {name: PHYSICAL_PARAMETERS[paramID]["name"], vals: []};
 		}
 		PARAMETERS_PLOT_DATA["probability"] = {name: "Probability density", vals: null};
-		PARAMETERS_PLOT_DATA["meanVelocity"] = {name: "Mean velocity (bp/s)", vals: []};
-		PARAMETERS_PLOT_DATA["meanCatalysis"] = {name: "Mean dwell time (s)", vals: []};
-		PARAMETERS_PLOT_DATA["meanTranscription"] = {name: "Total transcription time (s)", vals: []};
-		PARAMETERS_PLOT_DATA["nascentLength"] = {name: "Final nascent length (nt)", vals: []};
+		PARAMETERS_PLOT_DATA["velocity"] = {name: "Mean velocity (bp/s)", vals: []};
+		PARAMETERS_PLOT_DATA["catalyTime"] = {name: "Mean dwell time (s)", vals: []};
+		PARAMETERS_PLOT_DATA["totalTime"] = {name: "Total transcription time (s)", vals: []};
+		PARAMETERS_PLOT_DATA["nascentLen"] = {name: "Final nascent length (nt)", vals: []};
 
 
 

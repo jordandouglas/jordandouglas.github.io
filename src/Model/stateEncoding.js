@@ -306,9 +306,9 @@ function buildTranslocationRateTable(){
 	if (nLengths < 0) return null;
 	
 	var translocationRates = Array(nLengths);
-	for(var nascentLength = h-1; nascentLength <= currentState["nbases"]; nascentLength ++){
+	for(var nascentLen = h-1; nascentLen <= currentState["nbases"]; nascentLen ++){
 		
-		var rowNum = nascentLength - (h-1);
+		var rowNum = nascentLen - (h-1);
 		
 		translocationRates[rowNum] = Array(nPositions).fill(false);
 

@@ -893,7 +893,7 @@ function saveSession(){
 			// Current state
 			/*
 			saveXML.writeStartElement('state');
-				saveXML.writeAttributeString('nascentLength', STATE[0]);
+				saveXML.writeAttributeString('nascentLen', STATE[0]);
 				saveXML.writeAttributeString('activeSitePosition', STATE[1]);
 				saveXML.writeAttributeString('NTPbound', STATE[2]);
 				saveXML.writeAttributeString('activated', STATE[3]);

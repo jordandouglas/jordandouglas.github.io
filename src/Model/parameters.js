@@ -33,7 +33,7 @@ PHYSICAL_PARAMETERS["hybridLen"] = {distribution:"Fixed", refreshOnChange:true, 
 PHYSICAL_PARAMETERS["bubbleLeft"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 2, name: "Bubble length left (bp)",  title: "Number of unpaired template bases 3' of the hybrid", zeroTruncated: true, integer: true, hidden:true};
 PHYSICAL_PARAMETERS["bubbleRight"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 1, name: "Bubble length right (bp)", title: "Number of unpaired template bases 5' of the hybrid", zeroTruncated: true, integer: true, hidden:true};
 
-PHYSICAL_PARAMETERS["GDaggerSlide"] = {distribution:"Fixed", fixedDistnVal: 4.5, name: "\u0394G\u2020slide", title: "Free energy barrier height of translocation", zeroTruncated: false, integer: false};
+PHYSICAL_PARAMETERS["GDagSlide"] = {distribution:"Fixed", fixedDistnVal: 4.5, name: "\u0394G\u2020slide", title: "Free energy barrier height of translocation", zeroTruncated: false, integer: false};
 PHYSICAL_PARAMETERS["GHyper"] = {distribution:"Fixed", fixedDistnVal: 0, name: "\u0394Ghyper", title: "Free energy penalty height of hypertranslocation", zeroTruncated: false, integer: false, hidden: true};
 PHYSICAL_PARAMETERS["GsecondarySitePenalty"] = {distribution:"Fixed", fixedDistnVal: 1.336, name: "\u0394G\u2020NTP2", title: "Free energy penalty of binding NTP in the secondary binding site", zeroTruncated: false, integer: false};
 PHYSICAL_PARAMETERS["FAssist"] = {distribution:"Fixed", fixedDistnVal: 0, name: "Force (pN)", title: "Assisting force applied to the polymerase during single-molecule experiments.", zeroTruncated: false, integer: false};
@@ -264,7 +264,7 @@ function update_this_parameter_WW(paramID, fixedVal, resolve = function(toReturn
 	
 	
 	// If the parameter has been changed and it will affect translocation rates then we calculate everything again
-	if (initialVal != PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "GDaggerSlide" || paramID == "GHyper" || paramID == "FAssist" || paramID == "hybridLen" || paramID == "bubbleLeft" || paramID == "bubbleRight" || paramID == "nbpToFold")){
+	if (initialVal != PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "GDagSlide" || paramID == "GHyper" || paramID == "FAssist" || paramID == "hybridLen" || paramID == "bubbleLeft" || paramID == "bubbleRight" || paramID == "nbpToFold")){
 		translocationCacheNeedsUpdating = true; // Recalculate the translocation rate cache
 		initTranslocationRateCache();
 	}
@@ -369,7 +369,7 @@ function sample_parameter_WW(paramID, resolve = function() { }, msgID = null){
 	}
 	
 	// If a parameter has been changed and it will affect translocation rates then we calculate everything again
-	if (initialVal != PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "GDaggerSlide" || paramID == "GHyper" || paramID == "FAssist" || paramID == "hybridLen" || paramID == "bubbleLeft" || paramID == "bubbleRight" || paramID == "nbpToFold")){
+	if (initialVal != PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "GDagSlide" || paramID == "GHyper" || paramID == "FAssist" || paramID == "hybridLen" || paramID == "bubbleLeft" || paramID == "bubbleRight" || paramID == "nbpToFold")){
 		translocationCacheNeedsUpdating = true;
 	}
 	
