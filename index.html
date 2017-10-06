@@ -165,6 +165,7 @@ function init(){
 			}
 
 			terminatedSequences = [];
+			maxNumberTerminatedSequences = 5000;
 			largestTerminatedSequence = null;
 			terminationInsertPositions = [];
 			numSeqsDisplayed = 0;
@@ -342,7 +343,11 @@ function submitCustomSequence(resolveAfterRefresh = function() { }){
 		var sequenceChangeRefreshTemp = function(){
 			sequenceChangeRefresh();
 			refreshPlotDataSequenceChangeOnly_controller(function(){
-			
+
+				$("#ABCoutput").html("");
+				$("#downloadABC").hide(50);
+				$("#ABCacceptancePercentage_span").hide(50);
+				$("#ABCacceptance_span").hide(50);
 				resolveAfterRefresh();
 				drawPlots(true);
 
@@ -405,6 +410,10 @@ function userChangeSequence(resolveAfterRefresh = function() { }){
 			var sequenceChangeRefreshTemp = function(){
 				sequenceChangeRefresh();
 				refreshPlotDataSequenceChangeOnly_controller(function(){
+					$("#ABCoutput").html("");
+					$("#downloadABC").hide(50);
+					$("#ABCacceptancePercentage_span").hide(50);
+					$("#ABCacceptance_span").hide(50);
 					resolveAfterRefresh();
 					drawPlots(true);
 				});
@@ -2997,15 +3006,30 @@ function closeNav() {
 
 
 							Number of times to fire each rule per trial:
-							<input type="number" id="ABCnRulesPerTrial" value=3 title="Number of times to execute each rule per trial" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
+							<input type="number" id="ABCnRulesPerTrial" value=3 title="Number of times to execute each rule per trial. If your sequence is short then you should make this number higher" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
 
 
 							&nbsp;&nbsp;&nbsp;&nbsp;
 
 
 							<input type=button id="beginABC_btn" onClick=beginABC() value='Begin ABC' title="Begin the approximate Bayesian computation with the current settings" class="operation" style="background-color:#663399"> 
+							&nbsp;&nbsp;&nbsp;<input type=image id="downloadABC" title="Download the ABC output (displayed below) in .tsv format" onClick=downloadABC() src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px; ">  
 
 
+							<span id="ABCacceptance_span" title="Number of sampled parameters which have been added to the posterior distribution" style="display:none; vertical-align: middle; height:20px;"> 
+									&nbsp; Accepted:
+									<span id="ABCacceptance_val">
+										0
+									</span>.
+							</span>		
+
+							<span id="ABCacceptancePercentage_span" title="Percentage of sampled parameters which are accepted by the posterior distribution" style="display:none; vertical-align: middle; height:20px;"> 
+									&nbsp;&nbsp; Acceptance rate:
+									<span id="ABCacceptancePercentage_val">
+										0
+									</span>%
+							</span>				 
+								
 
 							<br><br>
 							<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
