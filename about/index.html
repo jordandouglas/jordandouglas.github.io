@@ -748,17 +748,17 @@ function addCitations(){
 													
 
 
-														<div class="paramHelp" id="hybridLength_ParamHelp">
+														<div class="paramHelp" id="hybridLen_ParamHelp">
 															<b>Hybrid length</b> - number of basepairs in the template/primer hybrid within the polymerase. As translocation rates are determined from sequence composition, this value may affect
 																			   the predicted location of pause sites. In eukaryotes and prokaryotes, RNA polymerase contains a hybrid of 8 or 9bp
 																			   <cite val="komissarova1997transcriptional,gnatt2001structural,nudler1997rna"></cite>. Default: 9bp 
 														</div><br>				   
 
-														<div class="paramHelp" id="bubbleSizeLeft_ParamHelp">			   
+														<div class="paramHelp" id="bubbleLeft_ParamHelp">			   
 															<b>Bubble size 3&prime;</b> - number of unpaired template bases 3&prime; (left hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 2bp<cite val="maoileidigh2011unified"></cite>
 														</div><br>	
 
-														<div class="paramHelp" id="bubbleSizeRight_ParamHelp">
+														<div class="paramHelp" id="bubbleRight_ParamHelp">
 															<b>Bubble size 5&prime;</b> - number of unpaired template bases 5&prime; (right hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 1bp<cite val="maoileidigh2011unified"></cite>
 														</div><br>	
 									
@@ -788,7 +788,7 @@ function addCitations(){
 														</div><br>	
 
 
-														<div class="paramHelp" id="arrestTimeout_ParamHelp">
+														<div class="paramHelp" id="arrestTime_ParamHelp">
 															<b>Arrest time </b> - the amount of time the polymerase may take to copy a base before the simulation trial is aborted. When the timeout is
 																	reached, copying will prematurely terminate and the next trial will begin. Default: 600s 
 														</div><br>		
@@ -821,7 +821,7 @@ function addCitations(){
 														</div><br>
 
 
-														<div class="paramHelp" id="RateCatalyse_ParamHelp"> 
+														<div class="paramHelp" id="kCat_ParamHelp"> 
 															<b style="font-size:20px">$k_{cat}$</b> - rate constant of catalysing bound NTP, thus extending the nascent chain by one base. When translocation is fast,
 																	catalysis is the rate limiting step in transcription. $k_{cat}$ is by default shared by all 4 NTPs but you can make it NTP specific instead (ie. 1 term for each of ATP, CTP, GTP, UTP).
 																	Defaults: $k_{cat} = 30, k_{cat}^{ATP} = 38, k_{cat}^{CTP} = 7, k_{cat}^{GTP} = 62, k_{cat}^{UTP} = 24\;$ <cite val="bai2007mechanochemical"></cite>
@@ -881,7 +881,7 @@ function addCitations(){
 																<img src="../src/Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"></img> button. Default: TRUE <br><br>
 
 
-														<div class="paramHelp" id="nbasesToFold_ParamHelp">
+														<div class="paramHelp" id="nbpToFold_ParamHelp">
 															<b>Number of bases to fold </b> - the number of most recently added bases in the nascent strand to fold (if "Allow mRNA folding" is enabled). The timescale
 																of transcription is probably not long enough to allow the whole mRNA chain to fold<cite val="maoileidigh2011unified"></cite>, especially in vivo, and folding the entire chain is
 																computationally expensive. For these two reasons we do not fold the entire mRNA but only the most recently added bases. Default: 150nt<cite val="maoileidigh2011unified"></cite> <br><br>
