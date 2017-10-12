@@ -29,6 +29,12 @@ canvas {
 	Vertical-align: middle;
 }
 
+.code {
+	font-family:'Courier New';
+	%font-weight:bold;
+}
+
+
 .errorMsg{
 	background-color:#FFFFB2; 
 	padding: 5 2 5 2; width:95%; 
