@@ -215,9 +215,8 @@ SIM_JS.renderPlotsEveryMS = 5000; // If in hidden mode, render the plots every f
 SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 
 	
-
 	ANIMATION_TIME = ANIMATION_TIME_TEMP;
-
+	
 	
 	// Stop the simulations or refresh to begin the next trial
 	if (WW_JS.stopRunning_WW || SIM_JS.SIMULATION_VARIABLES["terminated"] || (stateC[1] <= 1 && stateC[1] + stateC[0] + 1 > WW_JS.currentState["nbases"])) {
@@ -311,7 +310,7 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 	if (WW_JS.isWebWorker && (ANIMATION_TIME == 1 || ANIMATION_TIME == 0) && actionsSinceLastPause <= 0){
 		actionsSinceLastPause = pauseEveryNActions;
 
-		//postMessage("MSG: pausing");
+		//console.log("Pausing");
 		
 		if (WW_JS.isWebWorker){
 			//postMessage("MSG: yes pause");
@@ -343,7 +342,7 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 			setTimeout(function(){
 				var toCall = (state) => new Promise((resolve) => actionToDo(state, resolve));
 				toCall(stateC).then(() => prepareForNextTrial());
-			}, 100);
+			}, 20);
 
 
 		}
