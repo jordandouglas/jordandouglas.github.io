@@ -336,14 +336,11 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 			} 
 		}
 
-		// Hidden mode -> pause for a fixed period
+		// Hidden mode
 		else{
 			if (!RUNNING_FROM_COMMAND_LINE) WW_JS.currentState = STATE_JS.convertCompactStateToFullState(stateC);
-			setTimeout(function(){
-				var toCall = (state) => new Promise((resolve) => actionToDo(state, resolve));
-				toCall(stateC).then(() => prepareForNextTrial());
-			}, 20);
-
+			var toCall = (state) => new Promise((resolve) => actionToDo(state, resolve));
+			toCall(stateC).then(() => prepareForNextTrial());
 
 		}
 
