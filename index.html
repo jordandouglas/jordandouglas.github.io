@@ -54,12 +54,12 @@
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 
 
+<script language='JavaScript' type='text/JavaScript' src="src/Model/WebWorker.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Model/sequences.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Model/freeEnergy.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Model/parameters.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Model/operators.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Model/simulator.js"></script>
-<script language='JavaScript' type='text/JavaScript' src="src/Model/WebWorker.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Model/plots.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Model/MFE.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Model/ABC.js"></script>
@@ -100,9 +100,8 @@ function init(){
     	maxWidth: "100%"
   	});
 	*/
-	// Random.js from http://simjs.com/random.html
-	// jstat library for gamma   - http://wiki.q-researchsoftware.com/wiki/Accessing_Common_Distributions_When_Writing_JavaScript_in_Q#Density_7
-	//							 - https://github.com/jstat/jstat
+	// jstat library for gamma   - http://wiki.q-researchsoftware.com/wiki/Accessing_Common_Distributions_When_Writing_JavaScript_in_Q#Density_7				
+	//	 - https://github.com/jstat/jstat
 
 
 	nrefreshes = 1;
@@ -137,7 +136,7 @@ function init(){
 
 
 			ANIMATION_TIME_controller = 1;
-			RT = 0.63;
+
 			wait = (time) => new Promise((resolve) => setTimeout(resolve, time));
 			renderGraphicsEveryNsteps = 20;
 			actionsUntilNextUpdate = renderGraphicsEveryNsteps;
@@ -304,7 +303,7 @@ function setSequenceOptions(){
 	var dropdown = document.getElementById('SelectSequence');
 	$("#SelectSequence").empty();
 	
-	for (var seq in all_sequences){
+	for (var seq in SEQS_JS.all_sequences){
 		var opt = document.createElement('option');
 		opt.value = seq;
 		opt.innerHTML = seq;
@@ -347,6 +346,7 @@ function submitCustomSequence(resolveAfterRefresh = function() { }){
 				$("#ABCoutput").html("");
 				$("#downloadABC").hide(50);
 				$("#ABCacceptancePercentage_span").hide(50);
+				$("#ABC_showRejectedParameters_span").hide(50);
 				$("#ABCacceptance_span").hide(50);
 				resolveAfterRefresh();
 				drawPlots(true);
@@ -413,6 +413,7 @@ function userChangeSequence(resolveAfterRefresh = function() { }){
 					$("#ABCoutput").html("");
 					$("#downloadABC").hide(50);
 					$("#ABCacceptancePercentage_span").hide(50);
+					$("#ABC_showRejectedParameters_span").hide(50);
 					$("#ABCacceptance_span").hide(50);
 					resolveAfterRefresh();
 					drawPlots(true);
@@ -475,14 +476,14 @@ function refresh(resolve = function(){}){
 
 		//document.getElementById("randomOutput").value = "";
 		if (document.getElementById("SelectSequence").value != "$user"){
-			if (all_sequences[document.getElementById("SelectSequence").value]["template"] != "") {
-				document.getElementById("SelectTemplateType").value = all_sequences[document.getElementById("SelectSequence").value]["template"];
+			if (SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["template"] != "") {
+				document.getElementById("SelectTemplateType").value = SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["template"];
 				$("#SelectTemplateType").prop("disabled", true);
 				$("#SelectTemplateType").addClass("dropdown-disabled");
 			}else $("#SelectTemplateType").attr('disabled', false);
 		
-			if (all_sequences[document.getElementById("SelectSequence").value]["primer"] != "") {
-				document.getElementById("SelectPrimerType").value = all_sequences[document.getElementById("SelectSequence").value]["primer"];
+			if (SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["primer"] != "") {
+				document.getElementById("SelectPrimerType").value = SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["primer"];
 				$("#SelectPrimerType").prop("disabled", true);
 				$("#SelectPrimerType").addClass("dropdown-disabled");
 			} else 	$("#SelectPrimerType").attr('disabled', false);
@@ -558,7 +559,7 @@ function refresh(resolve = function(){}){
 
 
 			//renderObjects();
-			refreshPlotData();
+			//refreshPlotData();
 			
 			
 			//refreshNTP();
@@ -882,7 +883,7 @@ function enable_buttons(){
 		
 	};
 
-	getCurrentState_controller(enable_buttons_fn);
+	getWW_JS.currentState_controller(enable_buttons_fn);
 	
 	$(".parameter-disabled").prop("disabled", true);
 	$(".dropdown-disabled").prop("disabled", true);
@@ -2968,7 +2969,9 @@ function closeNav() {
 
 
 			<br>
-			
+
+
+
 			<div id="ABCpanel"  class="parameter-bg" style="background-color:#ebe9e7;  margin-left:130px">
 
 
@@ -2976,7 +2979,7 @@ function closeNav() {
 					<input type=button id='showABCPanel' class='minimise' value='-' onClick=showABCPanelFn()> 
 					<b class="noselect">Approximate Bayesian Computation</b> 
 						<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
-							- Fit your parameters to experimental data using a Bayesian analysis. 
+							- Fit your parameters to experimental data using a Bayesian analysis
 							</span>
  						<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#navigationPanelHelp"><img class="helpIcon" src="src/Images/help.png"></a>
 						
@@ -2990,6 +2993,25 @@ function closeNav() {
 						<br>
 
 						<table id="ABCPanelTable" style="position:relative; display:block;" cellspacing="0" cellpadding="10" >
+
+
+							<tr>
+								<td style="width:300px; text-align:center">
+
+									<div style="font-size:20px;">Force-velocity curve</div>
+
+
+										<textarea id="forceVelocityInputData" onChange="validateForceVelocityInput(this)" style="font-size:14px; padding: 5 10;  width: 300px; height: 300px; max-width:300px; max-height:500px; min-height:100px; min-width:300px"  
+										title="Input force-velocity data in the specified format" placeholder="Example.                                  5, 15.5                                 10, 17.4                                14, 18.5"></textarea>
+										<br>
+										<span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
+											Input your force (pN) and velocity (bp/s) observations. Separate force and velocity values with a comma and separate observations with a line break. 
+											Ensure there are no duplicate forces.
+										</span>
+
+								</td>
+
+							</tr>
 
 							
 						</table>
@@ -3005,8 +3027,9 @@ function closeNav() {
 							&nbsp;&nbsp;&nbsp;&nbsp;
 
 
-							Number of times to fire each rule per trial:
-							<input type="number" id="ABCnRulesPerTrial" value=3 title="Number of times to execute each rule per trial. If your sequence is short then you should make this number higher" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
+							Mean RSS threshold:
+							<input type="number" id="ABC_RSS" value=5 title="Accept parameters into the posterior distribution if and only if the mean residual sum of squares (RSS) is less than this threshold"
+												 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
 
 
 							&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3023,18 +3046,27 @@ function closeNav() {
 									</span>.
 							</span>		
 
+							&nbsp;&nbsp;&nbsp;&nbsp;
 							<span id="ABCacceptancePercentage_span" title="Percentage of sampled parameters which are accepted by the posterior distribution" style="display:none; vertical-align: middle; height:20px;"> 
 									&nbsp;&nbsp; Acceptance rate:
 									<span id="ABCacceptancePercentage_val">
 										0
 									</span>%
 							</span>				 
-								
+
+							&nbsp;&nbsp;&nbsp;&nbsp;
+							<span id="ABC_showRejectedParameters_span" style="font-size:15px; vertical-align:middle">
+							<label class="switch">
+						 		<input type="checkbox" id="ABC_showRejectedParameters" OnChange="get_unrendered_ABCoutput_controller()"> </input>
+						 	 	<span class="slider round"></span>
+
+							</label> 
+							Show rejected parameters</span>
+
 
 							<br><br>
 							<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
-								If you do not specify a parameter's value on the left hand side then it will be sampled from it's prior distribution. 
-								A set of parameters will be rejected by the posterior distribution if the right hand side of one of the rules above are not met. 
+								Parameters will be sampled from their prior distributions specified in the Parameters navigation menu
 							</span>
 
 
@@ -3051,6 +3083,25 @@ function closeNav() {
 					</div>
 
 			</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
