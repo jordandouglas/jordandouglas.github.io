@@ -20,140 +20,155 @@
 -*/
 
 
-DISTANCE_VS_TIME_SIZE = 0;
-DISTANCE_VS_TIME_SIZE_MAX = 1e8;
-DISTANCE_VS_TIME = [];
-DISTANCE_VS_TIME_UNSENT = {};
-
-DWELL_TIMES_SIZE = 0;
-DWELL_TIMES_SIZE_MAX = 1e6;
-DWELL_TIMES = [];
-DWELL_TIMES_UNSENT = {};
-DWELL_TIMES_THIS_TRIAL = [];
-
-PARAMETERS_PLOT_DATA = {};
-
-
-timesSpentOnEachTemplate = [0];
-distancesTravelledOnEachTemplate = [0];
-
-
-timeWaitedUntilNextTranslocation = 0;
-timeWaitedUntilNextCatalysis = 0;
-pauseTimePerSite = [];
-abortionCounts = [];
-misincorporationCounts = [];
-elongationDurations = [];
-
-timeElapsed = 0;
-velocity = 0;
-totalDisplacement = 0;
-totalTimeElapsed = 0;
-npauseSimulations = 0;
-nabortionSimulations = 0;
-nMisincorporationSimulations = 0;
+PLOTS_JS = {};
 
 
 
 
-whichPlotInWhichCanvas = {};
 
 
 
-function refreshPlotData(){
+
+PLOTS_JS.CURRENT_SIM_NUMBER = 1;
+
+PLOTS_JS.DISTANCE_VS_TIME_SIZE = 0;
+PLOTS_JS.DISTANCE_VS_TIME_SIZE_MAX = 1e8;
+PLOTS_JS.DISTANCE_VS_TIME = [];
+PLOTS_JS.DISTANCE_VS_TIME_UNSENT = {};
+
+PLOTS_JS.DWELL_TIMES_SIZE = 0;
+PLOTS_JS.DWELL_TIMES_SIZE_MAX = 1e6;
+PLOTS_JS.DWELL_TIMES = [];
+PLOTS_JS.DWELL_TIMES_UNSENT = {};
+PLOTS_JS.DWELL_TIMES_THIS_TRIAL = [];
+
+PLOTS_JS.PARAMETERS_PLOT_DATA = {};
 
 
+PLOTS_JS.timesSpentOnEachTemplate = [0];
+PLOTS_JS.distancesTravelledOnEachTemplate = [0];
+
+
+PLOTS_JS.timeWaitedUntilNextTranslocation = 0;
+PLOTS_JS.timeWaitedUntilNextCatalysis = 0;
+PLOTS_JS.pauseTimePerSite = [];
+PLOTS_JS.arrestCounts = [];
+PLOTS_JS.misincorporationCounts = [];
+
+PLOTS_JS.timeElapsed = 0;
+PLOTS_JS.velocity = 0;
+PLOTS_JS.totalDisplacement = 0;
+PLOTS_JS.totaltimeElapsed = 0;
+PLOTS_JS.npauseSimulations = 0;
+PLOTS_JS.nabortionSimulations = 0;
+PLOTS_JS.nMisincorporationSimulations = 0;
+
+
+
+
+PLOTS_JS.whichPlotInWhichCanvas = {};
+
+
+
+ PLOTS_JS.refreshPlotData = function(){
+
+
+ 	
 	
-	if (DISTANCE_VS_TIME_SIZE < DISTANCE_VS_TIME_SIZE_MAX){
-		DISTANCE_VS_TIME_SIZE += 2;
-		DISTANCE_VS_TIME.push({sim: DISTANCE_VS_TIME.length+1, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] });
-		DISTANCE_VS_TIME_UNSENT[DISTANCE_VS_TIME.length] = {sim: DISTANCE_VS_TIME.length, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] };
+	if (PLOTS_JS.DISTANCE_VS_TIME_SIZE < PLOTS_JS.DISTANCE_VS_TIME_SIZE_MAX){
+		PLOTS_JS.DISTANCE_VS_TIME_SIZE += 2;
+		var rightHybridBase = WW_JS.currentState["rightGBase"] - WW_JS.currentState["mRNAPosInActiveSite"];
+		PLOTS_JS.DISTANCE_VS_TIME.push({sim: PLOTS_JS.CURRENT_SIM_NUMBER, times: [0], distances: [rightHybridBase] });
+		PLOTS_JS.DISTANCE_VS_TIME_UNSENT[PLOTS_JS.DISTANCE_VS_TIME.length] = {sim: PLOTS_JS.CURRENT_SIM_NUMBER, times: [0], distances: [rightHybridBase] };
 	}
 
 
-	DWELL_TIMES_THIS_TRIAL = [];
-	if (DWELL_TIMES_SIZE < DWELL_TIMES_SIZE_MAX){
-		DWELL_TIMES.push([]); // List i contains all the dwell times from the ith trial
-		DWELL_TIMES_UNSENT[DWELL_TIMES.length] = [];	// List[i] contains all the dwell times from the ith trial
+	PLOTS_JS.DWELL_TIMES_THIS_TRIAL = [];
+	if (PLOTS_JS.DWELL_TIMES_SIZE < PLOTS_JS.DWELL_TIMES_SIZE_MAX){
+		PLOTS_JS.DWELL_TIMES.push([]); // List i contains all the dwell times from the ith trial
+		PLOTS_JS.DWELL_TIMES_UNSENT[PLOTS_JS.DWELL_TIMES.length] = [];	// List[i] contains all the dwell times from the ith trial
 	}
 
-	timeElapsed = 0;
-	timeWaitedUntilNextTranslocation = 0;
-	timeWaitedUntilNextCatalysis = 0;
+	PLOTS_JS.timeElapsed = 0;
+	PLOTS_JS.timeWaitedUntilNextTranslocation = 0;
+	PLOTS_JS.timeWaitedUntilNextCatalysis = 0;
 
 }
 
 
-function refreshPlotDataSequenceChangeOnly_WW(resolve = function() { }, msgID = null){
+PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { }, msgID = null){
+
+
 
 	// There are two lists of distance/time data in the model
-	// We have the master copy (DISTANCE_VS_TIME) which contains all the information (having the master copy in the model might not be necessary)
-	// We also have the temporary copy (DISTANCE_VS_TIME_UNSENT) which contains all the information which hasn't been sent back to the controller
+	// We have the master copy (PLOTS_JS.DISTANCE_VS_TIME) which contains all the information (having the master copy in the model might not be necessary)
+	// We also have the temporary copy (PLOTS_JS.DISTANCE_VS_TIME_UNSENT) which contains all the information which hasn't been sent back to the controller
 	// 		This second list is reset everytime we send data back, and the controller uses it to reconstruct the master copy on its end
 	// 		This is to avoid sending the complete list of data back every time 
-	DISTANCE_VS_TIME_SIZE = 2;
-	DWELL_TIMES_SIZE = 0;
-	DISTANCE_VS_TIME = [];
-	DISTANCE_VS_TIME_UNSENT = {};
-	DISTANCE_VS_TIME.push({sim: 1, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] });
-	DISTANCE_VS_TIME_UNSENT[DISTANCE_VS_TIME.length] = {sim: DISTANCE_VS_TIME.length, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] };
-	DWELL_TIMES = [];
-	DWELL_TIMES_UNSENT = {};
-	DWELL_TIMES_THIS_TRIAL = [];
+	PLOTS_JS.CURRENT_SIM_NUMBER = 1;
+	PLOTS_JS.DISTANCE_VS_TIME_SIZE = 2;
+	PLOTS_JS.DWELL_TIMES_SIZE = 0;
+	PLOTS_JS.DISTANCE_VS_TIME = [];
+	PLOTS_JS.DISTANCE_VS_TIME_UNSENT = {};
+	var rightHybridBase = WW_JS.currentState["rightGBase"] - WW_JS.currentState["mRNAPosInActiveSite"];
+	PLOTS_JS.DISTANCE_VS_TIME.push({sim: 1, times: [0], distances: [rightHybridBase] });
+	PLOTS_JS.DISTANCE_VS_TIME_UNSENT[PLOTS_JS.DISTANCE_VS_TIME.length] = {sim: PLOTS_JS.DISTANCE_VS_TIME.length, times: [0], distances: [rightHybridBase] };
+	PLOTS_JS.DWELL_TIMES = [];
+	PLOTS_JS.DWELL_TIMES_UNSENT = {};
+	PLOTS_JS.DWELL_TIMES_THIS_TRIAL = [];
 
 
 	// Create a series of lists corresponding to the value of each parameter and each metric
-	PARAMETERS_PLOT_DATA = {};
-	for (var paramID in PHYSICAL_PARAMETERS){
-		if (!PHYSICAL_PARAMETERS[paramID]["binary"]) PARAMETERS_PLOT_DATA[paramID] = {name: PHYSICAL_PARAMETERS[paramID]["name"], vals: []};
+	PLOTS_JS.PARAMETERS_PLOT_DATA = {};
+	for (var paramID in PARAMS_JS.PHYSICAL_PARAMETERS){
+		if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["binary"]) PLOTS_JS.PARAMETERS_PLOT_DATA[paramID] = {name: PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["name"], vals: []};
 	}
-	PARAMETERS_PLOT_DATA["probability"] = {name: "Probability density", vals: null};
-	PARAMETERS_PLOT_DATA["velocity"] = {name: "Mean velocity (bp/s)", vals: []};
-	PARAMETERS_PLOT_DATA["catalyTime"] = {name: "Mean catalysis time (s)", vals: []};
-	PARAMETERS_PLOT_DATA["totalTime"] = {name: "Total transcription time (s)", vals: []};
-	PARAMETERS_PLOT_DATA["nascentLen"] = {name: "Final nascent length (nt)", vals: []};
+	PLOTS_JS.PARAMETERS_PLOT_DATA["probability"] = {name: "Probability density", vals: null};
+	PLOTS_JS.PARAMETERS_PLOT_DATA["velocity"] = {name: "Mean velocity (bp/s)", vals: []};
+	PLOTS_JS.PARAMETERS_PLOT_DATA["catalyTime"] = {name: "Mean catalysis time (s)", vals: []};
+	PLOTS_JS.PARAMETERS_PLOT_DATA["totalTime"] = {name: "Total transcription time (s)", vals: []};
+	PLOTS_JS.PARAMETERS_PLOT_DATA["nascentLen"] = {name: "Final nascent length (nt)", vals: []};
 
 
-	timesSpentOnEachTemplate = [0];
-	distancesTravelledOnEachTemplate = [0];
-	elongationDurations = [];
-	npauseSimulations = 1;
-	nabortionSimulations = 1;
-	nMisincorporationSimulations = 1;
-	totalDisplacement = 0;
-	totalTimeElapsed = 0;
+	PLOTS_JS.timesSpentOnEachTemplate = [0];
+	PLOTS_JS.distancesTravelledOnEachTemplate = [0];
+	PLOTS_JS.npauseSimulations = 1;
+	PLOTS_JS.nabortionSimulations = 1;
+	PLOTS_JS.nMisincorporationSimulations = 1;
+	PLOTS_JS.totalDisplacement = 0;
+	PLOTS_JS.totaltimeElapsed = 0;
 	
-	pauseTimePerSite = new Array(currentState["nbases"]+1);
-	for (var i = 0; i < pauseTimePerSite.length; i ++) pauseTimePerSite[i] = 0;
+	PLOTS_JS.pauseTimePerSite = new Array(WW_JS.currentState["nbases"]+1);
+	for (var i = 0; i < PLOTS_JS.pauseTimePerSite.length; i ++) PLOTS_JS.pauseTimePerSite[i] = 0;
 	
-	abortionCounts = new Array(currentState["nbases"]+1);
-	for (var i = 0; i < abortionCounts.length; i ++) abortionCounts[i] = 0;
+	PLOTS_JS.arrestCounts = new Array(WW_JS.currentState["nbases"]+1);
+	for (var i = 0; i < PLOTS_JS.arrestCounts.length; i ++) PLOTS_JS.arrestCounts[i] = 0;
 	
-	misincorporationCounts = new Array(currentState["nbases"]+1);
-	for (var i = 0; i < misincorporationCounts.length; i ++) {
-		misincorporationCounts[i] = {"A": 0, "C": 0, "G": 0, "T": 0, "U": 0};
+	PLOTS_JS.misincorporationCounts = new Array(WW_JS.currentState["nbases"]+1);
+	for (var i = 0; i < PLOTS_JS.misincorporationCounts.length; i ++) {
+		PLOTS_JS.misincorporationCounts[i] = {"A": 0, "C": 0, "G": 0, "T": 0, "U": 0};
 	}
 
 	
 	for (var plotNum = 1; plotNum <= 3; plotNum++){
-		if (whichPlotInWhichCanvas[plotNum] != null && whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
-			whichPlotInWhichCanvas[plotNum]["xData"] = PARAMETERS_PLOT_DATA[whichPlotInWhichCanvas[plotNum]["customParam"]];
-			whichPlotInWhichCanvas[plotNum]["yData"] = PARAMETERS_PLOT_DATA[whichPlotInWhichCanvas[plotNum]["customMetric"]];
+		if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParam"]];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customMetric"]];
 		}
 		
-		if (whichPlotInWhichCanvas[plotNum] != null && whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
-			whichPlotInWhichCanvas[plotNum]["xData"] = PARAMETERS_PLOT_DATA[whichPlotInWhichCanvas[plotNum]["customParamX"]];
-			whichPlotInWhichCanvas[plotNum]["yData"] = PARAMETERS_PLOT_DATA[whichPlotInWhichCanvas[plotNum]["customParamY"]];
-			whichPlotInWhichCanvas[plotNum]["zData"] = PARAMETERS_PLOT_DATA[whichPlotInWhichCanvas[plotNum]["metricZ"]];
+		if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamX"]];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamY"]];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[PLOTS_JS.whichPlotInWhichCanvas[plotNum]["metricZ"]];
 		}
 	}
 
 
 
 	// Clear the ABC data
-	clearABCdata_WW();
+	ABC_JS.clearABCdata_WW();
 
-	//console.log("Setting data", abortionCounts, currentState["nbases"]);
+	//console.log("Setting data", PLOTS_JS.arrestCounts, WW_JS.currentState["nbases"]);
 	
 	if (msgID != null){
 		postMessage(msgID + "~X~done");
@@ -167,7 +182,7 @@ function refreshPlotDataSequenceChangeOnly_WW(resolve = function() { }, msgID = 
 
 
 // Returns a string of the sequence stored inside primerSequence / templateSequence / complementSequence
-function getSequenceOfObject_WW(nt_obj){
+ getSequenceOfObject_WW = function(nt_obj){
 	
 	var seq = "";
 	for (var i = 1; i < nt_obj.length; i ++){
@@ -181,7 +196,7 @@ function getSequenceOfObject_WW(nt_obj){
 
 
 
-function getPlotData_WW(forceUpdate = false, resolve = function(plotData) { }, msgID = null){
+ PLOTS_JS.getPlotData_WW = function(forceUpdate = false, resolve = function(plotData) { }, msgID = null){
 	
 	
 	var plotData = {};
@@ -189,43 +204,43 @@ function getPlotData_WW(forceUpdate = false, resolve = function(plotData) { }, m
 	
 	
 	// Only send plot data which is needed
-	if (whichPlotInWhichCanvas[4] != null && !whichPlotInWhichCanvas[4]["hidden"] && whichPlotInWhichCanvas[4]["name"] == "abortionSite"){
-		plotData["abortionCounts"] = abortionCounts;
-		plotData["nabortionSimulations"] = nabortionSimulations;
-	}else if (whichPlotInWhichCanvas[4] != null && !whichPlotInWhichCanvas[4]["hidden"] && whichPlotInWhichCanvas[4]["name"] == "pauseSite"){
-		plotData["pauseTimePerSite"] = pauseTimePerSite;
-		plotData["npauseSimulations"] = npauseSimulations
-	}else if (whichPlotInWhichCanvas[4] != null && !whichPlotInWhichCanvas[4]["hidden"] && whichPlotInWhichCanvas[4]["name"] == "misincorporationSite"){
-		plotData["misincorporationCounts"] = misincorporationCounts;
-		plotData["nMisincorporationSimulations"] = nMisincorporationSimulations;
+	if (PLOTS_JS.whichPlotInWhichCanvas[4] != null && !PLOTS_JS.whichPlotInWhichCanvas[4]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[4]["name"] == "abortionSite"){
+		plotData["arrestCounts"] = PLOTS_JS.arrestCounts;
+		plotData["nabortionSimulations"] = PLOTS_JS.nabortionSimulations;
+	}else if (PLOTS_JS.whichPlotInWhichCanvas[4] != null && !PLOTS_JS.whichPlotInWhichCanvas[4]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[4]["name"] == "pauseSite"){
+		plotData["pauseTimePerSite"] = PLOTS_JS.pauseTimePerSite;
+		plotData["npauseSimulations"] = PLOTS_JS.npauseSimulations
+	}else if (PLOTS_JS.whichPlotInWhichCanvas[4] != null && !PLOTS_JS.whichPlotInWhichCanvas[4]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[4]["name"] == "misincorporationSite"){
+		plotData["misincorporationCounts"] = PLOTS_JS.misincorporationCounts;
+		plotData["nMisincorporationSimulations"] = PLOTS_JS.nMisincorporationSimulations;
 	}
 
 
 
-	var distanceVsTime_needsData = 	(whichPlotInWhichCanvas[1] != null && !whichPlotInWhichCanvas[1]["hidden"] && whichPlotInWhichCanvas[1]["name"] == "distanceVsTime") || 
-			 						(whichPlotInWhichCanvas[2] != null && !whichPlotInWhichCanvas[2]["hidden"] && whichPlotInWhichCanvas[2]["name"] == "distanceVsTime") || 
-									(whichPlotInWhichCanvas[3] != null && !whichPlotInWhichCanvas[3]["hidden"] && whichPlotInWhichCanvas[3]["name"] == "distanceVsTime");
+	var distanceVsTime_needsData = 	(PLOTS_JS.whichPlotInWhichCanvas[1] != null && !PLOTS_JS.whichPlotInWhichCanvas[1]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "distanceVsTime") || 
+			 						(PLOTS_JS.whichPlotInWhichCanvas[2] != null && !PLOTS_JS.whichPlotInWhichCanvas[2]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "distanceVsTime") || 
+									(PLOTS_JS.whichPlotInWhichCanvas[3] != null && !PLOTS_JS.whichPlotInWhichCanvas[3]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "distanceVsTime");
 
-	var pauseHistogram_needsData = 	(whichPlotInWhichCanvas[1] != null && !whichPlotInWhichCanvas[1]["hidden"] && whichPlotInWhichCanvas[1]["name"] == "pauseHistogram") || 
-			 						(whichPlotInWhichCanvas[2] != null && !whichPlotInWhichCanvas[2]["hidden"] && whichPlotInWhichCanvas[2]["name"] == "pauseHistogram") || 
-									(whichPlotInWhichCanvas[3] != null && !whichPlotInWhichCanvas[3]["hidden"] && whichPlotInWhichCanvas[3]["name"] == "pauseHistogram");
+	var pauseHistogram_needsData = 	(PLOTS_JS.whichPlotInWhichCanvas[1] != null && !PLOTS_JS.whichPlotInWhichCanvas[1]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "pauseHistogram") || 
+			 						(PLOTS_JS.whichPlotInWhichCanvas[2] != null && !PLOTS_JS.whichPlotInWhichCanvas[2]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "pauseHistogram") || 
+									(PLOTS_JS.whichPlotInWhichCanvas[3] != null && !PLOTS_JS.whichPlotInWhichCanvas[3]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "pauseHistogram");
 
-	var velocityHistogram_needsData = 	(whichPlotInWhichCanvas[1] && !whichPlotInWhichCanvas[1]["hidden"] != null && whichPlotInWhichCanvas[1]["name"] == "velocityHistogram") || 
-			 							(whichPlotInWhichCanvas[2] && !whichPlotInWhichCanvas[2]["hidden"] != null && whichPlotInWhichCanvas[2]["name"] == "velocityHistogram") || 
-										(whichPlotInWhichCanvas[3] && !whichPlotInWhichCanvas[3]["hidden"] != null && whichPlotInWhichCanvas[3]["name"] == "velocityHistogram");
+	var velocityHistogram_needsData = 	(PLOTS_JS.whichPlotInWhichCanvas[1] && !PLOTS_JS.whichPlotInWhichCanvas[1]["hidden"] != null && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "velocityHistogram") || 
+			 							(PLOTS_JS.whichPlotInWhichCanvas[2] && !PLOTS_JS.whichPlotInWhichCanvas[2]["hidden"] != null && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "velocityHistogram") || 
+										(PLOTS_JS.whichPlotInWhichCanvas[3] && !PLOTS_JS.whichPlotInWhichCanvas[3]["hidden"] != null && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "velocityHistogram");
 	
 	
 	if (distanceVsTime_needsData || velocityHistogram_needsData){
 
 
-		//console.log("Sending", DISTANCE_VS_TIME_UNSENT);
-		plotData["DISTANCE_VS_TIME_UNSENT"] = DISTANCE_VS_TIME_UNSENT;
-		DISTANCE_VS_TIME_UNSENT = {}; // Reset the list of unsent data
-		DISTANCE_VS_TIME_UNSENT[DISTANCE_VS_TIME.length] = { sim: DISTANCE_VS_TIME.length, times: [], distances: [] };
+		//console.log("Sending", PLOTS_JS.DISTANCE_VS_TIME_UNSENT);
+		plotData["DVT_UNSENT"] = PLOTS_JS.DISTANCE_VS_TIME_UNSENT;
+		PLOTS_JS.DISTANCE_VS_TIME_UNSENT = {}; // Reset the list of unsent data
+		PLOTS_JS.DISTANCE_VS_TIME_UNSENT[PLOTS_JS.DISTANCE_VS_TIME.length] = { sim: PLOTS_JS.CURRENT_SIM_NUMBER, times: [], distances: [] };
 
 
-		plotData["timeElapsed"] = timeElapsed;
-		plotData["velocity"] = velocity;
+		plotData["PLOTS_JS.timeElapsed"] = PLOTS_JS.timeElapsed;
+		plotData["velocity"] = PLOTS_JS.velocity;
 
 
 				
@@ -234,12 +249,12 @@ function getPlotData_WW(forceUpdate = false, resolve = function(plotData) { }, m
 
 	if (pauseHistogram_needsData){
 
-		plotData["DWELL_TIMES_UNSENT"] = DWELL_TIMES_UNSENT;
-		DWELL_TIMES_UNSENT = {};
-		DWELL_TIMES_UNSENT[DWELL_TIMES.length] = [];
+		plotData["DWELL_TIMES_UNSENT"] = PLOTS_JS.DWELL_TIMES_UNSENT;
+		PLOTS_JS.DWELL_TIMES_UNSENT = {};
+		PLOTS_JS.DWELL_TIMES_UNSENT[PLOTS_JS.DWELL_TIMES.length] = [];
 
 
-		//console.log("Correct dwell times", DWELL_TIMES);
+		//console.log("Correct dwell times", PLOTS_JS.DWELL_TIMES);
 
 	}
 
@@ -254,30 +269,30 @@ function getPlotData_WW(forceUpdate = false, resolve = function(plotData) { }, m
 	}
 
 	
-	var thereExistsAParameterPlot = (whichPlotInWhichCanvas[1] != null && !whichPlotInWhichCanvas[1]["hidden"] && whichPlotInWhichCanvas[1]["name"] == "custom") || 
-			 					 (whichPlotInWhichCanvas[2] != null && !whichPlotInWhichCanvas[2]["hidden"] && whichPlotInWhichCanvas[2]["name"] == "custom") || 
-			 				     (whichPlotInWhichCanvas[3] != null && !whichPlotInWhichCanvas[3]["hidden"] && whichPlotInWhichCanvas[3]["name"] == "custom") ||
-			 				     (whichPlotInWhichCanvas[1] != null && !whichPlotInWhichCanvas[1]["hidden"] && whichPlotInWhichCanvas[1]["name"] == "parameterHeatmap") || 
-			 					 (whichPlotInWhichCanvas[2] != null && !whichPlotInWhichCanvas[2]["hidden"] && whichPlotInWhichCanvas[2]["name"] == "parameterHeatmap") || 
-			 				     (whichPlotInWhichCanvas[3] != null && !whichPlotInWhichCanvas[3]["hidden"] && whichPlotInWhichCanvas[3]["name"] == "parameterHeatmap");
+	var thereExistsAParameterPlot = (PLOTS_JS.whichPlotInWhichCanvas[1] != null && !PLOTS_JS.whichPlotInWhichCanvas[1]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "custom") || 
+			 					 (PLOTS_JS.whichPlotInWhichCanvas[2] != null && !PLOTS_JS.whichPlotInWhichCanvas[2]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "custom") || 
+			 				     (PLOTS_JS.whichPlotInWhichCanvas[3] != null && !PLOTS_JS.whichPlotInWhichCanvas[3]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "custom") ||
+			 				     (PLOTS_JS.whichPlotInWhichCanvas[1] != null && !PLOTS_JS.whichPlotInWhichCanvas[1]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "parameterHeatmap") || 
+			 					 (PLOTS_JS.whichPlotInWhichCanvas[2] != null && !PLOTS_JS.whichPlotInWhichCanvas[2]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "parameterHeatmap") || 
+			 				     (PLOTS_JS.whichPlotInWhichCanvas[3] != null && !PLOTS_JS.whichPlotInWhichCanvas[3]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "parameterHeatmap");
 
 
 
 
 	// If a parameter plot/heatmap requires posterior data then send it
-	if (ABC_POSTERIOR_DISTRIBUTION.length > 0){
+	if (ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length > 0){
 
 		
 		
 		for (var plotNum = 1; plotNum <= 3; plotNum++){
-			if (whichPlotInWhichCanvas[plotNum] != null && !whichPlotInWhichCanvas[plotNum]["hidden"] && whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] && whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
+			if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && !PLOTS_JS.whichPlotInWhichCanvas[plotNum]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
 
-				var valuesX = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customParam"]);
-				var valuesY = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customMetric"]);
+				var valuesX = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParam"]);
+				var valuesY = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customMetric"]);
 
 
-				if(whichPlotInWhichCanvas[plotNum]["xData"] != null) whichPlotInWhichCanvas[plotNum]["xData"] = {name:whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
-				if(whichPlotInWhichCanvas[plotNum]["yData"] != null) whichPlotInWhichCanvas[plotNum]["yData"] = {name:whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY}; // WILL NOT WORK IF THIS METRIC WAS NOT SAMPLED
+				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
+				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY}; // WILL NOT WORK IF THIS METRIC WAS NOT SAMPLED
 
 			}
 		}
@@ -286,22 +301,22 @@ function getPlotData_WW(forceUpdate = false, resolve = function(plotData) { }, m
 
 		for (var plotNum = 1; plotNum <= 3; plotNum++){
 
-			// TODO: add back  && !whichPlotInWhichCanvas[plotNum]["hidden"]
-			if (whichPlotInWhichCanvas[plotNum] != null && whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] && whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
+			// TODO: add back  && !PLOTS_JS.whichPlotInWhichCanvas[plotNum]["hidden"]
+			if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
 
 
 				
 
-				var valuesX = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customParamX"]);
-				var valuesY = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customParamY"]);
-				var valuesZ = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["metricZ"]);
+				var valuesX = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamX"]);
+				var valuesY = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamY"]);
+				var valuesZ = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["metricZ"]);
 
-				//console.log("posterior", valuesX, valuesY, valuesZ, "PP", ABC_POSTERIOR_DISTRIBUTION);
+				//console.log("posterior", valuesX, valuesY, valuesZ, "PP", ABC_JS.ABC_POSTERIOR_DISTRIBUTION);
 
 
-				if(whichPlotInWhichCanvas[plotNum]["xData"] != null) whichPlotInWhichCanvas[plotNum]["xData"] = {name:whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
-				if(whichPlotInWhichCanvas[plotNum]["yData"] != null) whichPlotInWhichCanvas[plotNum]["yData"] = {name:whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY};
-				if(whichPlotInWhichCanvas[plotNum]["yData"] != null) whichPlotInWhichCanvas[plotNum]["zData"] = {name:whichPlotInWhichCanvas[plotNum]["zData"]["name"], vals:valuesZ};
+				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
+				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY};
+				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"]["name"], vals:valuesZ};
 			}
 		}
 
@@ -314,14 +329,14 @@ function getPlotData_WW(forceUpdate = false, resolve = function(plotData) { }, m
 
 	if (forceUpdate || JSON.stringify(plotData) != "{}" || thereExistsAParameterPlot){
 	
-		plotData["nbases"] = currentState["nbases"];
+		plotData["nbases"] = WW_JS.currentState["nbases"];
 		plotData["templateSeq"] = getSequenceOfObject_WW(templateSequence);
-		plotData["whichPlotInWhichCanvas"] = whichPlotInWhichCanvas;
-		plotData["xCoordOfRightMostBase"] = templateSequence[currentState["nbases"]-1]["x"];
+		plotData["whichPlotInWhichCanvas"] = PLOTS_JS.whichPlotInWhichCanvas;
+		plotData["xCoordOfRightMostBase"] = templateSequence[WW_JS.currentState["nbases"]-1]["x"];
 		plotData["xCoordOfLeftMostBase"] = templateSequence[1]["x"];
-		plotData["medianTimeSpentOnATemplate"] = timesSpentOnEachTemplate[Math.floor(timesSpentOnEachTemplate.length / 2)]; // List is already sorted
-		plotData["medianDistanceTravelledPerTemplate"] = distancesTravelledOnEachTemplate[Math.floor(distancesTravelledOnEachTemplate.length / 2)]; // List is already sorted
-		plotData["thereExistsPosteriorDistribution"] = ABC_POSTERIOR_DISTRIBUTION.length > 0;
+		plotData["medianTimeSpentOnATemplate"] = PLOTS_JS.timesSpentOnEachTemplate[Math.floor(PLOTS_JS.timesSpentOnEachTemplate.length / 2)]; // List is already sorted
+		plotData["medianDistanceTravelledPerTemplate"] = PLOTS_JS.distancesTravelledOnEachTemplate[Math.floor(PLOTS_JS.distancesTravelledOnEachTemplate.length / 2)]; // List is already sorted
+		plotData["thereExistsPosteriorDistribution"] = ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length > 0;
 	
 	}
 
@@ -338,71 +353,66 @@ function getPlotData_WW(forceUpdate = false, resolve = function(plotData) { }, m
 }
 
 
-function plots_complete_simulation_WW(){
+ PLOTS_JS.plots_complete_simulation_WW = function(){
 
 
 	// Update any custom plots
-	update_custom_plot_data_WW();
+	PLOTS_JS.update_custom_plot_data_WW();
+	PLOTS_JS.savePlotsToFiles_CommandLine();
 
 
-	//refreshPlotData();
+	//PLOTS_JS.refreshPlotData();
 
-	nabortionSimulations ++;
-	npauseSimulations++;
-	nMisincorporationSimulations ++;
-
-
-
-
-
-
-
+	PLOTS_JS.CURRENT_SIM_NUMBER ++;
+	PLOTS_JS.nabortionSimulations ++;
+	PLOTS_JS.npauseSimulations++;
+	PLOTS_JS.nMisincorporationSimulations ++;
 
 
 	
 }
 
 
-function updatePlotData_WW(stateC, actionNumber, reactionTime){
+ PLOTS_JS.updatePlotData_WW = function(stateC, actionNumber, reactionTime){
 	
 
 	var rightHybridBase = stateC[1] + stateC[0];
 
-	totalTimeElapsed += reactionTime;
-	timeWaitedUntilNextTranslocation += reactionTime;
-	timeWaitedUntilNextCatalysis += reactionTime;
+	PLOTS_JS.totaltimeElapsed += reactionTime;
+	PLOTS_JS.timeWaitedUntilNextTranslocation += reactionTime;
+	PLOTS_JS.timeWaitedUntilNextCatalysis += reactionTime;
 	
 
 	// If we have been pausing too long, then abort
-	if (PHYSICAL_PARAMETERS["arrestTime"]["val"] > 0 && PHYSICAL_PARAMETERS["arrestTime"]["val"] < timeWaitedUntilNextCatalysis){
+	if (PARAMS_JS.PHYSICAL_PARAMETERS["arrestTime"]["val"] > 0 && PARAMS_JS.PHYSICAL_PARAMETERS["arrestTime"]["val"] < PLOTS_JS.timeWaitedUntilNextCatalysis){
 		var abortionSite = stateC[0] + 1;
-		abortionCounts[abortionSite] ++;
+		PLOTS_JS.arrestCounts[abortionSite] ++;
 	}
 	
 	// If this is a translocation event, add it to the distance~time chart, and update the time spent at this site
 	if (actionNumber < 2) {
 
 
-		if (DISTANCE_VS_TIME_SIZE < DISTANCE_VS_TIME_SIZE_MAX){ // Maximum size of the distance vs time object
-			var index = DISTANCE_VS_TIME.length-1;
-			DISTANCE_VS_TIME[index]["times"].push(timeWaitedUntilNextTranslocation);
-			DISTANCE_VS_TIME[index]["distances"].push(rightHybridBase);
-			DISTANCE_VS_TIME_SIZE += 2;
-			//console.log("Before", DISTANCE_VS_TIME);
+		if (PLOTS_JS.DISTANCE_VS_TIME_SIZE < PLOTS_JS.DISTANCE_VS_TIME_SIZE_MAX){ // Maximum size of the distance vs time object
+			var index = PLOTS_JS.DISTANCE_VS_TIME.length-1;
+			PLOTS_JS.DISTANCE_VS_TIME[index]["times"].push(PLOTS_JS.timeWaitedUntilNextTranslocation);
+			PLOTS_JS.DISTANCE_VS_TIME[index]["distances"].push(rightHybridBase);
+			PLOTS_JS.DISTANCE_VS_TIME_SIZE += 2;
+			//console.log("Before", PLOTS_JS.DISTANCE_VS_TIME);
 		    
-			if (DISTANCE_VS_TIME_UNSENT[index+1] == null) DISTANCE_VS_TIME_UNSENT[index+1] = {sim: index+1, times: [], distances: []};
-			DISTANCE_VS_TIME_UNSENT[index+1]["times"].push(timeWaitedUntilNextTranslocation);
-			DISTANCE_VS_TIME_UNSENT[index+1]["distances"].push(rightHybridBase);
+			if (PLOTS_JS.DISTANCE_VS_TIME_UNSENT[index+1] == null) PLOTS_JS.DISTANCE_VS_TIME_UNSENT[index+1] = {sim: PLOTS_JS.CURRENT_SIM_NUMBER, times: [], distances: []};
+			PLOTS_JS.DISTANCE_VS_TIME_UNSENT[index+1]["times"].push(PLOTS_JS.timeWaitedUntilNextTranslocation);
+			PLOTS_JS.DISTANCE_VS_TIME_UNSENT[index+1]["distances"].push(rightHybridBase);
 		}
 
 		// Update total displacement
-		timeElapsed += timeWaitedUntilNextTranslocation;
-		totalDisplacement += actionNumber == 0 ? -1 : 1;
-		velocity = totalDisplacement / totalTimeElapsed;
+		PLOTS_JS.timeElapsed += PLOTS_JS.timeWaitedUntilNextTranslocation;
+		PLOTS_JS.totalDisplacement += actionNumber == 0 ? -1 : 1;
+		PLOTS_JS.velocity = PLOTS_JS.totalDisplacement / PLOTS_JS.totaltimeElapsed;
 
 
-		pauseTimePerSite[rightHybridBase] += timeWaitedUntilNextTranslocation;
-		timeWaitedUntilNextTranslocation = 0;
+		PLOTS_JS.pauseTimePerSite[rightHybridBase] += PLOTS_JS.timeWaitedUntilNextTranslocation;
+		PLOTS_JS.timeWaitedUntilNextTranslocation = 0;
 	}
 	
 	
@@ -411,31 +421,31 @@ function updatePlotData_WW(stateC, actionNumber, reactionTime){
 
 
 		// Dwell time histogram
-		DWELL_TIMES_THIS_TRIAL.push(timeWaitedUntilNextCatalysis);
-		if (DWELL_TIMES_SIZE < DWELL_TIMES_SIZE_MAX){
-			var index = DWELL_TIMES.length-1;
-			if (DWELL_TIMES[index] == null) {
-				DWELL_TIMES.push([]);
+		PLOTS_JS.DWELL_TIMES_THIS_TRIAL.push(PLOTS_JS.timeWaitedUntilNextCatalysis);
+		if (PLOTS_JS.DWELL_TIMES_SIZE < PLOTS_JS.DWELL_TIMES_SIZE_MAX){
+			var index = PLOTS_JS.DWELL_TIMES.length-1;
+			if (PLOTS_JS.DWELL_TIMES[index] == null) {
+				PLOTS_JS.DWELL_TIMES.push([]);
 				index++;
 			}
-			DWELL_TIMES[index].push(timeWaitedUntilNextCatalysis);
-			if (DWELL_TIMES_UNSENT[index+1] == null) DWELL_TIMES_UNSENT[index+1] = [];
-			DWELL_TIMES_UNSENT[index+1].push(timeWaitedUntilNextCatalysis);
-			DWELL_TIMES_SIZE++;
+			PLOTS_JS.DWELL_TIMES[index].push(PLOTS_JS.timeWaitedUntilNextCatalysis);
+			if (PLOTS_JS.DWELL_TIMES_UNSENT[index+1] == null) PLOTS_JS.DWELL_TIMES_UNSENT[index+1] = [];
+			PLOTS_JS.DWELL_TIMES_UNSENT[index+1].push(PLOTS_JS.timeWaitedUntilNextCatalysis);
+			PLOTS_JS.DWELL_TIMES_SIZE++;
 		}
 
 
 		// Pause duration histogram
-		//sortedPush(elongationDurations, timeWaitedUntilNextCatalysis)
+		//sortedPush(elongationDurations, PLOTS_JS.timeWaitedUntilNextCatalysis)
 		
 		// Mutation?
 
 		var siteNum = rightHybridBase;
 		var baseCopyFrom = templateSequence[siteNum]["base"];
-		var baseCopyTo = SIMULATION_VARIABLES["baseToAdd"];
-		if (correctPairs["" + baseCopyFrom + baseCopyTo] == null) misincorporationCounts[siteNum][baseCopyTo] ++;
+		var baseCopyTo = SIM_JS.SIMULATION_VARIABLES["baseToAdd"];
+		if (correctPairs["" + baseCopyFrom + baseCopyTo] == null) PLOTS_JS.misincorporationCounts[siteNum][baseCopyTo] ++;
 		
-		timeWaitedUntilNextCatalysis = 0;
+		PLOTS_JS.timeWaitedUntilNextCatalysis = 0;
 	}
 	
 	
@@ -447,106 +457,106 @@ function updatePlotData_WW(stateC, actionNumber, reactionTime){
 
 
 
-function showPlot_WW(plotNum, isHidden){
+ PLOTS_JS.showPlot_WW = function(plotNum, isHidden){
 
-	if (whichPlotInWhichCanvas[plotNum] != null){
-		whichPlotInWhichCanvas[plotNum]["hidden"] = isHidden;
+	if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null){
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["hidden"] = isHidden;
 	}
 
 }
 
 
-function selectPlot_WW(plotNum, value, deleteData, addData = true, resolve = function(plotData) { }, msgID = null){
+ PLOTS_JS.selectPlot_WW = function(plotNum, value, deleteData, addData = true, resolve = function(plotData) { }, msgID = null){
 
 
 
-	whichPlotInWhichCanvas[plotNum] = {};
-	whichPlotInWhichCanvas[plotNum]["name"] = value;
-	whichPlotInWhichCanvas[plotNum]["hidden"] = false;
+	PLOTS_JS.whichPlotInWhichCanvas[plotNum] = {};
+	PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] = value;
+	PLOTS_JS.whichPlotInWhichCanvas[plotNum]["hidden"] = false;
 
 
 	
 	// Initialise the appropriate plot
-	if (whichPlotInWhichCanvas[plotNum]["name"] == "distanceVsTime") {
-		whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plotTimeChart";
-		whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
-		whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+	if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "distanceVsTime") {
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plotTimeChart";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
 	}
 
-	else if (whichPlotInWhichCanvas[plotNum]["name"] == "pauseHistogram") {
-		whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_pause_distribution";
-		whichPlotInWhichCanvas[plotNum]["displayBottomProportionOf"] = 1;
-		whichPlotInWhichCanvas[plotNum]["perTime"] = "perCatalysis";
-		whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
-		whichPlotInWhichCanvas[plotNum]["timeSpaceX"] = "linearSpace";
-		whichPlotInWhichCanvas[plotNum]["timeSpaceY"] = "linearSpace";
+	else if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "pauseHistogram") {
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_pause_distribution";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["displayBottomProportionOf"] = 1;
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["perTime"] = "perCatalysis";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["timeSpaceX"] = "linearSpace";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["timeSpaceY"] = "linearSpace";
 		
 	}
 
-	else if (whichPlotInWhichCanvas[plotNum]["name"] == "velocityHistogram") {
-		whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_velocity_distribution";
-		whichPlotInWhichCanvas[plotNum]["displayBottomProportionOf"] = 1;
-		whichPlotInWhichCanvas[plotNum]["windowSize"] = 1;
-		whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
-		whichPlotInWhichCanvas[plotNum]["timeSpaceX"] = "linearSpace";
-		whichPlotInWhichCanvas[plotNum]["timeSpaceY"] = "linearSpace";
+	else if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "velocityHistogram") {
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_velocity_distribution";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["displayBottomProportionOf"] = 1;
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["windowSize"] = 1;
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["timeSpaceX"] = "linearSpace";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["timeSpaceY"] = "linearSpace";
 
 	}
 	
-	else if (whichPlotInWhichCanvas[plotNum]["name"] == "pauseSite") {
-		whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_time_vs_site";
-		whichPlotInWhichCanvas[plotNum]["yAxis"] = "timePercentage";
+	else if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "pauseSite") {
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_time_vs_site";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yAxis"] = "timePercentage";
 	}
 	
-	else if (whichPlotInWhichCanvas[plotNum]["name"] == "abortionSite") {
-		whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_abortion_vs_site";
+	else if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "abortionSite") {
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_abortion_vs_site";
 	}
 	
-	else if (whichPlotInWhichCanvas[plotNum]["name"] == "misincorporationSite") {
-		whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_misincorporation_vs_site";
+	else if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "misincorporationSite") {
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_misincorporation_vs_site";
 	}
 	
 	
-	else if (whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
-		whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_custom";
-		whichPlotInWhichCanvas[plotNum]["sitesToRecord"] = [];
-		whichPlotInWhichCanvas[plotNum]["customParam"] = "none";
-		whichPlotInWhichCanvas[plotNum]["customMetric"] = "probability";
-		whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
-		whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
-		whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] = false;
+	else if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_custom";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["sitesToRecord"] = [];
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParam"] = "none";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customMetric"] = "probability";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] = false;
 	}
 
 
-	else if (whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
-		whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_parameter_heatmap";
-		whichPlotInWhichCanvas[plotNum]["sitesToRecord"] = [];
-		whichPlotInWhichCanvas[plotNum]["customParamX"] = "none";
-		whichPlotInWhichCanvas[plotNum]["customParamY"] = "none";
-		whichPlotInWhichCanvas[plotNum]["metricZ"] = "probability";
-		whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
-		whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
-		whichPlotInWhichCanvas[plotNum]["zRange"] = "automaticZ";
-		whichPlotInWhichCanvas[plotNum]["zColouring"] = "blue";
-		whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] = false;
+	else if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_parameter_heatmap";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["sitesToRecord"] = [];
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamX"] = "none";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamY"] = "none";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["metricZ"] = "probability";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zRange"] = "automaticZ";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zColouring"] = "blue";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] = false;
 
-	}
-
-
-
-	else if (whichPlotInWhichCanvas[plotNum]["name"]  =="foldingBarrierPlot"){
-		whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plotFoldingBarrier";
 	}
 
 
 
-	if (deleteData != null) delete_plot_data_WW(deleteData);
+	else if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"]  =="foldingBarrierPlot"){
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plotFoldingBarrier";
+	}
+
+
+
+	if (deleteData != null) PLOTS_JS.delete_plot_data_WW(deleteData);
 
 
 	var plotData = {};
 	if (addData){
-		var plotData = getPlotData_WW();
-		if (plotData["whichPlotInWhichCanvas"] == null) plotData["whichPlotInWhichCanvas"] = whichPlotInWhichCanvas;
+		var plotData = PLOTS_JS.getPlotData_WW();
+		if (plotData["whichPlotInWhichCanvas"] == null) plotData["whichPlotInWhichCanvas"] = PLOTS_JS.whichPlotInWhichCanvas;
 	}
 	
 	if (msgID != null){
@@ -556,7 +566,7 @@ function selectPlot_WW(plotNum, value, deleteData, addData = true, resolve = fun
 }
 
 
-function saveSettings_WW(plotNum, plotType, values, resolve = function() { }, msgID = null ){
+ PLOTS_JS.saveSettings_WW = function(plotNum, plotType, values, resolve = function() { }, msgID = null ){
 
 
 	console.log("Saving values", values);
@@ -566,43 +576,43 @@ function saveSettings_WW(plotNum, plotType, values, resolve = function() { }, ms
 
 
 		case "distanceVsTime":
-			if (values[0] == "automaticX") whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+			if (values[0] == "automaticX") PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
 			else{
 				var xMin = Math.max(parseFloat(values[0][0]), 0);
 				var xMax = parseFloat(values[0][1]);
 				if (xMax <= xMin) xMax = xMin + 0.1;
-				if (isNaN(xMin) || isNaN(xMax)) whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
-				else whichPlotInWhichCanvas[plotNum]["xRange"] = [xMin, xMax];
+				if (isNaN(xMin) || isNaN(xMax)) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+				else PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = [xMin, xMax];
 			}
 
 
-			if (values[0] == "automaticY") whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+			if (values[0] == "automaticY") PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
 			else{
 				var yMin = Math.max(parseFloat(values[1][0]), 1);
 				var yMax = Math.max(parseFloat(values[1][1]), yMin+1);
-				if (isNaN(yMin) || isNaN(yMax)) whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
-				else whichPlotInWhichCanvas[plotNum]["yRange"] = [yMin, yMax];
+				if (isNaN(yMin) || isNaN(yMax)) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+				else PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = [yMin, yMax];
 			}
 
 			break;
 
 		case "pauseHistogram": // Save the proportion of values to display
-			whichPlotInWhichCanvas[plotNum]["perTime"] = values[0];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["perTime"] = values[0];
 
 
-			if (values[1] == "automaticX") whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
-			else if (values[1] == "pauseX") whichPlotInWhichCanvas[plotNum]["xRange"] = "pauseX";
-			else if (values[1] == "shortPauseX") whichPlotInWhichCanvas[plotNum]["xRange"] = "shortPauseX";
+			if (values[1] == "automaticX") PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+			else if (values[1] == "pauseX") PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "pauseX";
+			else if (values[1] == "shortPauseX") PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "shortPauseX";
 			else{
 				var xMin = Math.max(parseFloat(values[1][0]), 0);
 				var xMax = parseFloat(values[1][1]);
 				if (xMax <= xMin) xMax = xMin + 0.1;
-				if (isNaN(xMin) || isNaN(xMax)) whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
-				else whichPlotInWhichCanvas[plotNum]["xRange"] = [xMin, xMax];
+				if (isNaN(xMin) || isNaN(xMax)) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+				else PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = [xMin, xMax];
 			}
 
-			whichPlotInWhichCanvas[plotNum]["timeSpaceX"] = values[2];
-			whichPlotInWhichCanvas[plotNum]["timeSpaceY"] = values[3];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["timeSpaceX"] = values[2];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["timeSpaceY"] = values[3];
 
 
 			break;
@@ -611,65 +621,65 @@ function saveSettings_WW(plotNum, plotType, values, resolve = function() { }, ms
 		case "velocityHistogram": // Save the proportion of values to display and the window size
 
 			val = parseFloat(values[0]);
-			if (!(val == null || isNaN(val) || val < 0.001)) whichPlotInWhichCanvas[plotNum]["windowSize"] = val;
+			if (!(val == null || isNaN(val) || val < 0.001)) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["windowSize"] = val;
 
 
-			if (values[1] == "automaticX") whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+			if (values[1] == "automaticX") PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
 			else{
 				var xMin = parseFloat(values[1][0]);
 				var xMax = parseFloat(values[1][1]);
 				if (xMax <= xMin) xMax = xMin + 0.1;
-				if (isNaN(xMin) || isNaN(xMax)) whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
-				else whichPlotInWhichCanvas[plotNum]["xRange"] = [xMin, xMax];
+				if (isNaN(xMin) || isNaN(xMax)) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+				else PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = [xMin, xMax];
 			}
 
 
-			whichPlotInWhichCanvas[plotNum]["timeSpaceX"] = values[2];
-			whichPlotInWhichCanvas[plotNum]["timeSpaceY"] = values[3];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["timeSpaceX"] = values[2];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["timeSpaceY"] = values[3];
 
 
 			break;
 
 
 		case "pauseSite": // Save the y-axis variable
-			whichPlotInWhichCanvas[plotNum]["yAxis"] = values[0];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yAxis"] = values[0];
 			break;
 
 
 		case "custom":
 
-			whichPlotInWhichCanvas[plotNum]["customParam"] = values[0];
-			whichPlotInWhichCanvas[plotNum]["customMetric"] = values[1];
-			//whichPlotInWhichCanvas[plotNum]["sitesToRecord"] = values[2];
-			whichPlotInWhichCanvas[plotNum]["xData"] = PARAMETERS_PLOT_DATA[values[0]];
-			whichPlotInWhichCanvas[plotNum]["yData"] = PARAMETERS_PLOT_DATA[values[1]];
-			whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] = values[4];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParam"] = values[0];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customMetric"] = values[1];
+			//PLOTS_JS.whichPlotInWhichCanvas[plotNum]["sitesToRecord"] = values[2];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[values[0]];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[values[1]];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] = values[4];
 
 			// If sample from posterior use the correct points
-			if (whichPlotInWhichCanvas[plotNum]["plotFromPosterior"]){
-				var valuesX = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customParam"]);
-				var valuesY = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customMetric"]);
-				whichPlotInWhichCanvas[plotNum]["xData"] = {name:whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
-				whichPlotInWhichCanvas[plotNum]["yData"] = {name:whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY}; // WILL NOT WORK IF THIS METRIC WAS NOT SAMPLED
+			if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"]){
+				var valuesX = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParam"]);
+				var valuesY = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customMetric"]);
+				PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
+				PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY}; // WILL NOT WORK IF THIS METRIC WAS NOT SAMPLED
 			}
 
 
-			if (values[2] == "automaticX") whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+			if (values[2] == "automaticX") PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
 			else{
 				var xMin = parseFloat(values[2][0]);
 				var xMax = parseFloat(values[2][1]);
 				if (xMax <= xMin) xMax = xMin + 0.1;
-				if (isNaN(xMin) || isNaN(xMax)) whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
-				else whichPlotInWhichCanvas[plotNum]["xRange"] = [xMin, xMax];
+				if (isNaN(xMin) || isNaN(xMax)) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+				else PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = [xMin, xMax];
 			}
 
 
-			if (values[3] == "automaticY") whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+			if (values[3] == "automaticY") PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
 			else{
 				var yMin = parseFloat(values[3][0]);
 				var yMax = Math.max(parseFloat(values[3][1]), yMin+1);
-				if (isNaN(yMin) || isNaN(yMax)) whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
-				else whichPlotInWhichCanvas[plotNum]["yRange"] = [yMin, yMax];
+				if (isNaN(yMin) || isNaN(yMax)) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+				else PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = [yMin, yMax];
 			}
 
 
@@ -679,58 +689,58 @@ function saveSettings_WW(plotNum, plotType, values, resolve = function() { }, ms
 
 		case "parameterHeatmap":
 
-			whichPlotInWhichCanvas[plotNum]["customParamX"] = values[0];
-			whichPlotInWhichCanvas[plotNum]["customParamY"] = values[1];
-			whichPlotInWhichCanvas[plotNum]["metricZ"] = values[2];
-			whichPlotInWhichCanvas[plotNum]["xData"] = PARAMETERS_PLOT_DATA[values[0]];
-			whichPlotInWhichCanvas[plotNum]["yData"] = PARAMETERS_PLOT_DATA[values[1]];
-			whichPlotInWhichCanvas[plotNum]["zData"] = PARAMETERS_PLOT_DATA[values[2]];
-			whichPlotInWhichCanvas[plotNum]["zColouring"] = values[6]; // Colour of the points
-			whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] = values[7]; 
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamX"] = values[0];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamY"] = values[1];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["metricZ"] = values[2];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[values[0]];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[values[1]];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[values[2]];
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zColouring"] = values[6]; // Colour of the points
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] = values[7]; 
 
 
 
 			// If sample from posterior use the correct points
-			if (whichPlotInWhichCanvas[plotNum]["plotFromPosterior"]){
-				var valuesX = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customParamX"]);
-				var valuesY = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["customParamY"]);
-				var valuesZ = getListOfValuesFromPosterior_WW(whichPlotInWhichCanvas[plotNum]["metricZ"]);
-				whichPlotInWhichCanvas[plotNum]["xData"] = {name:whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
-				whichPlotInWhichCanvas[plotNum]["yData"] = {name:whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY};
-				whichPlotInWhichCanvas[plotNum]["zData"] = {name:whichPlotInWhichCanvas[plotNum]["zData"]["name"], vals:valuesZ};
+			if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"]){
+				var valuesX = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamX"]);
+				var valuesY = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamY"]);
+				var valuesZ = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["metricZ"]);
+				PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
+				PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY};
+				PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"]["name"], vals:valuesZ};
 			}
 
 				
 
 
 
-			if (values[3] == "automaticX") whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+			if (values[3] == "automaticX") PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
 			else{
 				var xMin = parseFloat(values[3][0]);
 				var xMax = parseFloat(values[3][1]);
 				if (xMax <= xMin) xMax = xMin + 0.00001;
-				if (isNaN(xMin) || isNaN(xMax)) whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
-				else whichPlotInWhichCanvas[plotNum]["xRange"] = [xMin, xMax];
+				if (isNaN(xMin) || isNaN(xMax)) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+				else PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = [xMin, xMax];
 			}
 
 
-			if (values[4] == "automaticY" || values[4] == null) whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+			if (values[4] == "automaticY" || values[4] == null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
 			else{
 				var yMin = parseFloat(values[4][0]);
 				var yMax = parseFloat(values[4][1]);
 				if (yMax <= yMin) yMax = yMin + 0.00001;
-				if (isNaN(yMin) || isNaN(yMax)) whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
-				else whichPlotInWhichCanvas[plotNum]["yRange"] = [yMin, yMax];
+				if (isNaN(yMin) || isNaN(yMax)) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+				else PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = [yMin, yMax];
 			}
 
 
-			if (values[5] == "automaticZ" || values[5] == null) whichPlotInWhichCanvas[plotNum]["zRange"] = "automaticZ";
+			if (values[5] == "automaticZ" || values[5] == null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zRange"] = "automaticZ";
 			else{
 				var zMin = parseFloat(values[5][0]);
 				var zMax = parseFloat(values[5][1]);
 				if (zMax <= zMin) zMax = zMin + 0.00001;
-				if (isNaN(zMin) || isNaN(zMax)) whichPlotInWhichCanvas[plotNum]["zRange"] = "automaticZ";
-				else whichPlotInWhichCanvas[plotNum]["zRange"] = [zMin, zMax];
+				if (isNaN(zMin) || isNaN(zMax)) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zRange"] = "automaticZ";
+				else PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zRange"] = [zMin, zMax];
 			}
 
 
@@ -742,51 +752,50 @@ function saveSettings_WW(plotNum, plotType, values, resolve = function() { }, ms
 	
 	
 	if (msgID != null){
-		postMessage(msgID + "~X~" + JSON.stringify(whichPlotInWhichCanvas));
-	}else resolve(whichPlotInWhichCanvas);
+		postMessage(msgID + "~X~" + JSON.stringify(PLOTS_JS.whichPlotInWhichCanvas));
+	}else resolve(PLOTS_JS.whichPlotInWhichCanvas);
 	
 	
 }
 
 
 
-function delete_plot_data_WW(plotName){
+ PLOTS_JS.delete_plot_data_WW = function(plotName){
 	
 
 	
 	// Only delete the data if noone else is using it
-	for (var x in whichPlotInWhichCanvas){
-		if (whichPlotInWhichCanvas[x]["name"] == plotName) return;
+	for (var x in PLOTS_JS.whichPlotInWhichCanvas){
+		if (PLOTS_JS.whichPlotInWhichCanvas[x]["name"] == plotName) return;
 	}
 
 	
 	switch(plotName){
 		
 		case "distanceVsTime":
-			timeElapsed = 0;
+			PLOTS_JS.timeElapsed = 0;
 			break;
 			
 		case "pauseHistogram":
-			elongationDurations = [];
 			break
 			
 		case "pauseSite":
-			npauseSimulations = 1;
-			pauseTimePerSite = new Array(currentState["nbases"]+1);
-			for (var i = 0; i < pauseTimePerSite.length; i ++) pauseTimePerSite[i] = 0;
+			PLOTS_JS.npauseSimulations = 1;
+			PLOTS_JS.pauseTimePerSite = new Array(WW_JS.currentState["nbases"]+1);
+			for (var i = 0; i < PLOTS_JS.pauseTimePerSite.length; i ++) PLOTS_JS.pauseTimePerSite[i] = 0;
 			break;
 			
 		case "abortionSite":
-			nabortionSimulations = 1;
-			abortionCounts = new Array(currentState["nbases"]+1);
-			for (var i = 0; i < abortionCounts.length; i ++) abortionCounts[i] = 0;
+			PLOTS_JS.nabortionSimulations = 1;
+			PLOTS_JS.arrestCounts = new Array(WW_JS.currentState["nbases"]+1);
+			for (var i = 0; i < PLOTS_JS.arrestCounts.length; i ++) PLOTS_JS.arrestCounts[i] = 0;
 			break;
 			
 		case "misincorporationSite":
-			nMisincorporationSimulations = 1;
-			misincorporationCounts = new Array(currentState["nbases"]+1);
-			for (var i = 0; i < misincorporationCounts.length; i ++) {
-				misincorporationCounts[i] = {"A": 0, "C": 0, "G": 0, "T": 0, "U": 0};
+			PLOTS_JS.nMisincorporationSimulations = 1;
+			PLOTS_JS.misincorporationCounts = new Array(WW_JS.currentState["nbases"]+1);
+			for (var i = 0; i < PLOTS_JS.misincorporationCounts.length; i ++) {
+				PLOTS_JS.misincorporationCounts[i] = {"A": 0, "C": 0, "G": 0, "T": 0, "U": 0};
 			}
 			break;
 			
@@ -803,81 +812,79 @@ function delete_plot_data_WW(plotName){
 
 
 
-function update_custom_plot_data_WW(){
+ PLOTS_JS.update_custom_plot_data_WW = function(){
 
 
 
-	if (DWELL_TIMES.length == 0) return; 
+	if (PLOTS_JS.DWELL_TIMES.length == 0) return; 
 
 
 
 	var totalTime_thisTrial = 0;
-	for (var timeNum = 0; timeNum < DWELL_TIMES_THIS_TRIAL.length; timeNum ++){
-		totalTime_thisTrial += DWELL_TIMES_THIS_TRIAL[timeNum];
+	for (var timeNum = 0; timeNum < PLOTS_JS.DWELL_TIMES_THIS_TRIAL.length; timeNum ++){
+		totalTime_thisTrial += PLOTS_JS.DWELL_TIMES_THIS_TRIAL[timeNum];
 	}
 
 
 	if (totalTime_thisTrial == 0) return;
 
 
-	sortedPush_WW(timesSpentOnEachTemplate, totalTime_thisTrial);
-	sortedPush_WW(distancesTravelledOnEachTemplate, currentState["rightGBase"]);
+	sortedPush_WW(PLOTS_JS.timesSpentOnEachTemplate, totalTime_thisTrial);
+	var rightHybridBase = WW_JS.currentState["rightGBase"] - WW_JS.currentState["mRNAPosInActiveSite"];
+	sortedPush_WW(PLOTS_JS.distancesTravelledOnEachTemplate, rightHybridBase);
 
 
 
 
-	var increaseInPrimerLength = currentState["mRNALength"] - (PHYSICAL_PARAMETERS["hybridLen"]["val"] + PHYSICAL_PARAMETERS["bubbleLeft"]["val"] + 2);
+	var increaseInPrimerLength = WW_JS.currentState["mRNALength"] - (PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] + PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"] + 2);
 	//if(increaseInPrimerLength < 100) return; // Disqualify early terminations because they will skew everything
 	var velocity_thisTrial = increaseInPrimerLength / totalTime_thisTrial;
-	var meanDwellTime_thisTrial = totalTime_thisTrial / DWELL_TIMES_THIS_TRIAL.length;
+	var meanDwellTime_thisTrial = totalTime_thisTrial / PLOTS_JS.DWELL_TIMES_THIS_TRIAL.length;
 	
 
 
 	// X value
-	for (var paramID in PHYSICAL_PARAMETERS){
-		if (!PHYSICAL_PARAMETERS[paramID]["binary"]) PARAMETERS_PLOT_DATA[paramID]["vals"].push(PHYSICAL_PARAMETERS[paramID]["val"]) ;
+	for (var paramID in PARAMS_JS.PHYSICAL_PARAMETERS){
+		if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["binary"]) PLOTS_JS.PARAMETERS_PLOT_DATA[paramID]["vals"].push(PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"]) ;
 	}
 
 
 	// Y values
-	PARAMETERS_PLOT_DATA["velocity"]["vals"].push(velocity_thisTrial);
-	PARAMETERS_PLOT_DATA["totalTime"]["vals"].push(totalTime_thisTrial);
-	PARAMETERS_PLOT_DATA["catalyTime"]["vals"].push(meanDwellTime_thisTrial);
-	PARAMETERS_PLOT_DATA["nascentLen"]["vals"].push(currentState["mRNALength"]-1);
+	PLOTS_JS.PARAMETERS_PLOT_DATA["velocity"]["vals"].push(velocity_thisTrial);
+	PLOTS_JS.PARAMETERS_PLOT_DATA["totalTime"]["vals"].push(totalTime_thisTrial);
+	PLOTS_JS.PARAMETERS_PLOT_DATA["catalyTime"]["vals"].push(meanDwellTime_thisTrial);
+	PLOTS_JS.PARAMETERS_PLOT_DATA["nascentLen"]["vals"].push(WW_JS.currentState["mRNALength"]-1);
 
 
 	// If ABC is being run then add the appropriate metrics to this list
-	if (ABC_simulating){
-		if (ABC_metric_values_this_simulation["velocity"] != null) ABC_metric_values_this_simulation["velocity"].push(velocity_thisTrial);
-		if (ABC_metric_values_this_simulation["totalTime"] != null) ABC_metric_values_this_simulation["totalTime"].push(totalTime_thisTrial);
-		if (ABC_metric_values_this_simulation["catalyTime"] != null) ABC_metric_values_this_simulation["catalyTime"].push(meanDwellTime_thisTrial);
-		if (ABC_metric_values_this_simulation["nascentLen"] != null) ABC_metric_values_this_simulation["nascentLen"].push(currentState["mRNALength"]-1);
+	if (ABC_JS.ABC_simulating){
+		if (ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"] != null) ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"].push(velocity_thisTrial);
 	}
 
 
 
 	// Update the parameters on the list
 	for (var canvasNum = 1; canvasNum <=3; canvasNum++){
-		if (whichPlotInWhichCanvas[canvasNum] != null && !whichPlotInWhichCanvas[canvasNum]["plotFromPosterior"] && whichPlotInWhichCanvas[canvasNum]["name"] == "custom"){
+		if (PLOTS_JS.whichPlotInWhichCanvas[canvasNum] != null && !PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["plotFromPosterior"] && PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["name"] == "custom"){
 
-			var paramID = whichPlotInWhichCanvas[canvasNum]["customParam"];
-			var metricID = whichPlotInWhichCanvas[canvasNum]["customMetric"];
+			var paramID = PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["customParam"];
+			var metricID = PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["customMetric"];
 
-			whichPlotInWhichCanvas[canvasNum]["xData"] = PARAMETERS_PLOT_DATA[paramID];
-			whichPlotInWhichCanvas[canvasNum]["yData"] = PARAMETERS_PLOT_DATA[metricID];
+			PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["xData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[paramID];
+			PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["yData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[metricID];
 
 
 		}
 
-		else if (whichPlotInWhichCanvas[canvasNum] != null && !whichPlotInWhichCanvas[canvasNum]["plotFromPosterior"] && whichPlotInWhichCanvas[canvasNum]["name"] == "parameterHeatmap") {
+		else if (PLOTS_JS.whichPlotInWhichCanvas[canvasNum] != null && !PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["plotFromPosterior"] && PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["name"] == "parameterHeatmap") {
 
-			var paramIDx = whichPlotInWhichCanvas[canvasNum]["customParamX"];
-			var paramIDy = whichPlotInWhichCanvas[canvasNum]["customParamY"];
-			var metricID = whichPlotInWhichCanvas[canvasNum]["metricZ"];
+			var paramIDx = PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["customParamX"];
+			var paramIDy = PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["customParamY"];
+			var metricID = PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["metricZ"];
 
-			whichPlotInWhichCanvas[canvasNum]["xData"] = PARAMETERS_PLOT_DATA[paramIDx];
-			whichPlotInWhichCanvas[canvasNum]["yData"] = PARAMETERS_PLOT_DATA[paramIDy];
-			whichPlotInWhichCanvas[canvasNum]["zData"] = PARAMETERS_PLOT_DATA[metricID];
+			PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["xData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[paramIDx];
+			PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["yData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[paramIDy];
+			PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["zData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[metricID];
 
 		}
 
@@ -895,31 +902,31 @@ function setVariableToRecord_WW(plotCanvasID, varName, axis, resolve = function 
 	
 	
 	// Set the x variable data for this element
-	if (axis == "x" && whichPlotInWhichCanvas[plotCanvasID]["customDataIDX"] != varName) {
+	if (axis == "x" && PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataIDX"] != varName) {
 		
-		whichPlotInWhichCanvas[plotCanvasID]["customDataIDX"] = varName;
-		whichPlotInWhichCanvas[plotCanvasID]["customDataY"] = [];
-		whichPlotInWhichCanvas[plotCanvasID]["customDataX"] = [];
+		PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataIDX"] = varName;
+		PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataY"] = [];
+		PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataX"] = [];
 		
 	}
 
 
 	// Set the y variable data
-	else if (axis == "y" && whichPlotInWhichCanvas[plotCanvasID]["customDataIDY"] != varName) {
+	else if (axis == "y" && PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataIDY"] != varName) {
 		
-		whichPlotInWhichCanvas[plotCanvasID]["customDataIDY"] = varName;
-		whichPlotInWhichCanvas[plotCanvasID]["customDataY"] = [];
-		whichPlotInWhichCanvas[plotCanvasID]["customDataX"] = [];
+		PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataIDY"] = varName;
+		PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataY"] = [];
+		PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataX"] = [];
 		
 	}
 
 	
 
 	if (msgID != null){
-		postMessage(msgID + "~X~" + JSON.stringify(whichPlotInWhichCanvas));
+		postMessage(msgID + "~X~" + JSON.stringify(PLOTS_JS.whichPlotInWhichCanvas));
 	}
 	
-	else resolve(whichPlotInWhichCanvas);
+	else resolve(PLOTS_JS.whichPlotInWhichCanvas);
 
 	
 }
@@ -927,16 +934,16 @@ function setVariableToRecord_WW(plotCanvasID, varName, axis, resolve = function 
 
 
 
-function getCacheSizes_WW(resolve = function() { }, msgID = null){
+ PLOTS_JS.getCacheSizes_WW = function(resolve = function() { }, msgID = null){
 
 
 
 	var parameterPlotSize = -1;
-	for (var i in PARAMETERS_PLOT_DATA) parameterPlotSize++;
-	parameterPlotSize *= PARAMETERS_PLOT_DATA["velocity"]["vals"].length;
+	for (var i in PLOTS_JS.PARAMETERS_PLOT_DATA) parameterPlotSize++;
+	parameterPlotSize *= PLOTS_JS.PARAMETERS_PLOT_DATA["velocity"]["vals"].length;
 
 
-	var result = {DVTsize: DISTANCE_VS_TIME_SIZE, timeSize: DWELL_TIMES_SIZE, parameterPlotSize:parameterPlotSize};
+	var result = {DVTsize: PLOTS_JS.DISTANCE_VS_TIME_SIZE, timeSize: PLOTS_JS.DWELL_TIMES_SIZE, parameterPlotSize:parameterPlotSize};
 	
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(result));
@@ -948,60 +955,61 @@ function getCacheSizes_WW(resolve = function() { }, msgID = null){
 }
 
 
-function deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, resolve = function() { }, msgID = null){
+ PLOTS_JS.deletePlots_WW = function(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, resolve = function() { }, msgID = null){
 
 
 	if (distanceVsTime_cleardata) {
-		DISTANCE_VS_TIME_SIZE = 2;
-		DISTANCE_VS_TIME = [];
-		DISTANCE_VS_TIME_UNSENT = {};
-		DISTANCE_VS_TIME.push({sim: 1, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] });
-		DISTANCE_VS_TIME_UNSENT[DISTANCE_VS_TIME.length] = {sim: DISTANCE_VS_TIME.length, times: [0], distances: [PHYSICAL_PARAMETERS["hybridLen"]["val"]] };
-		totalDisplacement = 0;
-		totalTimeElapsed = 0;
-		velocity = 0;
-		timeElapsed = 0;
-		timesSpentOnEachTemplate = [0];
-		distancesTravelledOnEachTemplate = [0];
+		PLOTS_JS.DISTANCE_VS_TIME_SIZE = 2;
+		PLOTS_JS.DISTANCE_VS_TIME = [];
+		PLOTS_JS.DISTANCE_VS_TIME_UNSENT = {};
+		var rightHybridBase = WW_JS.currentState["rightGBase"] - WW_JS.currentState["mRNAPosInActiveSite"];
+		PLOTS_JS.DISTANCE_VS_TIME.push({sim: 1, times: [0], distances: [rightHybridBase] });
+		PLOTS_JS.DISTANCE_VS_TIME_UNSENT[PLOTS_JS.DISTANCE_VS_TIME.length] = {sim: PLOTS_JS.DISTANCE_VS_TIME.length, times: [0], distances: [rightHybridBase] };
+		PLOTS_JS.totalDisplacement = 0;
+		PLOTS_JS.totaltimeElapsed = 0;
+		PLOTS_JS.velocity = 0;
+		PLOTS_JS.timeElapsed = 0;
+		PLOTS_JS.timesSpentOnEachTemplate = [0];
+		PLOTS_JS.distancesTravelledOnEachTemplate = [0];
 	
 	}
 
 	if (timeHistogram_cleardata){
-		DWELL_TIMES_SIZE = 0;
-		DWELL_TIMES = [];
-		DWELL_TIMES_UNSENT = {};
-		DWELL_TIMES_THIS_TRIAL = [];
+		PLOTS_JS.DWELL_TIMES_SIZE = 0;
+		PLOTS_JS.DWELL_TIMES = [];
+		PLOTS_JS.DWELL_TIMES_UNSENT = {};
+		PLOTS_JS.DWELL_TIMES_THIS_TRIAL = [];
 	}
 
 	if (customPlot_cleardata){
 
 		// Create a series of lists corresponding to the value of each parameter and each metric
-		PARAMETERS_PLOT_DATA = {};
-		for (var paramID in PHYSICAL_PARAMETERS){
-			if (!PHYSICAL_PARAMETERS[paramID]["binary"]) PARAMETERS_PLOT_DATA[paramID] = {name: PHYSICAL_PARAMETERS[paramID]["name"], vals: []};
+		PLOTS_JS.PARAMETERS_PLOT_DATA = {};
+		for (var paramID in PARAMS_JS.PHYSICAL_PARAMETERS){
+			if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["binary"]) PLOTS_JS.PARAMETERS_PLOT_DATA[paramID] = {name: PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["name"], vals: []};
 		}
-		PARAMETERS_PLOT_DATA["probability"] = {name: "Probability density", vals: null};
-		PARAMETERS_PLOT_DATA["velocity"] = {name: "Mean velocity (bp/s)", vals: []};
-		PARAMETERS_PLOT_DATA["catalyTime"] = {name: "Mean dwell time (s)", vals: []};
-		PARAMETERS_PLOT_DATA["totalTime"] = {name: "Total transcription time (s)", vals: []};
-		PARAMETERS_PLOT_DATA["nascentLen"] = {name: "Final nascent length (nt)", vals: []};
+		PLOTS_JS.PARAMETERS_PLOT_DATA["probability"] = {name: "Probability density", vals: null};
+		PLOTS_JS.PARAMETERS_PLOT_DATA["velocity"] = {name: "Mean velocity (bp/s)", vals: []};
+		PLOTS_JS.PARAMETERS_PLOT_DATA["catalyTime"] = {name: "Mean dwell time (s)", vals: []};
+		PLOTS_JS.PARAMETERS_PLOT_DATA["totalTime"] = {name: "Total transcription time (s)", vals: []};
+		PLOTS_JS.PARAMETERS_PLOT_DATA["nascentLen"] = {name: "Final nascent length (nt)", vals: []};
 
 
 
 
 
 		for (var plotNum = 1; plotNum <= 3; plotNum++){
-			if (whichPlotInWhichCanvas[plotNum] != null && whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
-				if(whichPlotInWhichCanvas[plotNum]["xData"] != null) whichPlotInWhichCanvas[plotNum]["xData"]["vals"] = [];
-				if(whichPlotInWhichCanvas[plotNum]["yData"] != null) whichPlotInWhichCanvas[plotNum]["yData"]["vals"] = [];
+			if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
+				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["vals"] = [];
+				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["vals"] = [];
 			}
 		}
 
 		for (var plotNum = 1; plotNum <= 3; plotNum++){
-			if (whichPlotInWhichCanvas[plotNum] != null && whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
-				if(whichPlotInWhichCanvas[plotNum]["xData"] != null) whichPlotInWhichCanvas[plotNum]["xData"]["vals"] = [];
-				if(whichPlotInWhichCanvas[plotNum]["yData"] != null) whichPlotInWhichCanvas[plotNum]["yData"]["vals"] = [];
-				if(whichPlotInWhichCanvas[plotNum]["zData"] != null) whichPlotInWhichCanvas[plotNum]["zData"]["vals"] = [];
+			if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
+				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["vals"] = [];
+				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["vals"] = [];
+				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"]["vals"] = [];
 			}
 		}
 
@@ -1012,16 +1020,16 @@ function deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timeP
 
 	if (timePerSite_cleardata){
 
-		pauseTimePerSite = new Array(currentState["nbases"]+1);
-		for (var i = 0; i < pauseTimePerSite.length; i ++) pauseTimePerSite[i] = 0;
-		npauseSimulations = 1;
+		PLOTS_JS.pauseTimePerSite = new Array(WW_JS.currentState["nbases"]+1);
+		for (var i = 0; i < PLOTS_JS.pauseTimePerSite.length; i ++) PLOTS_JS.pauseTimePerSite[i] = 0;
+		PLOTS_JS.npauseSimulations = 1;
 		/*
-		abortionCounts = new Array(currentState["nbases"]+1);
-		for (var i = 0; i < abortionCounts.length; i ++) abortionCounts[i] = 0;
+		PLOTS_JS.arrestCounts = new Array(WW_JS.currentState["nbases"]+1);
+		for (var i = 0; i < PLOTS_JS.arrestCounts.length; i ++) PLOTS_JS.arrestCounts[i] = 0;
 		
-		misincorporationCounts = new Array(currentState["nbases"]+1);
-		for (var i = 0; i < misincorporationCounts.length; i ++) {
-			misincorporationCounts[i] = {"A": 0, "C": 0, "G": 0, "T": 0, "U": 0};
+		PLOTS_JS.misincorporationCounts = new Array(WW_JS.currentState["nbases"]+1);
+		for (var i = 0; i < PLOTS_JS.misincorporationCounts.length; i ++) {
+			PLOTS_JS.misincorporationCounts[i] = {"A": 0, "C": 0, "G": 0, "T": 0, "U": 0};
 		}
 		*/
 
@@ -1031,11 +1039,11 @@ function deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timeP
 
 	// Clear the data saved in the ABC output, and the posterior distribution
 	if (ABC_cleardata) {
-		clearABCdata_WW();
+		ABC_JS.clearABCdata_WW();
 	}
 	
 
-	getPlotData_WW(false, resolve, msgID);
+	PLOTS_JS.getPlotData_WW(false, resolve, msgID);
 
 
 }
@@ -1082,3 +1090,158 @@ function binaryFind_WW(sortedArray, searchElement) {
 
 }
 
+
+
+
+PLOTS_JS.initialiseSaveFiles_CommandLine = function(startingTime){
+
+
+	if (!RUNNING_FROM_COMMAND_LINE || WW_JS.outputFolder == null || ABC_JS.ABC_simulating) return;
+
+	if (WW_JS.outputFolder[WW_JS.outputFolder.length-1] != "/") WW_JS.outputFolder += "/";
+
+	// Create the output folder if it does not already exist
+	var fs = require('fs');
+	if (!fs.existsSync(WW_JS.outputFolder)){
+		console.log("Creating directory", WW_JS.outputFolder);
+	    fs.mkdirSync(WW_JS.outputFolder);
+	}
+
+
+	// Create the data files
+	PLOTS_JS.dvt_fileName		= WW_JS.outputFolder + "distance_versus_time.tsv";
+	PLOTS_JS.dwelltime_fileName = WW_JS.outputFolder + "catalysis_times.tsv";
+	PLOTS_JS.params_fileName 	= WW_JS.outputFolder + "parameters.tsv";
+	PLOTS_JS.pauseSite_fileName = WW_JS.outputFolder + "time_per_site.tsv";
+
+	WW_JS.writeLinesToFile(PLOTS_JS.dvt_fileName, "Distance versus time. " + startingTime + "\n");
+	WW_JS.writeLinesToFile(PLOTS_JS.dwelltime_fileName, "Time taken to polymerise at each site. " + startingTime + "\n");
+	WW_JS.writeLinesToFile(PLOTS_JS.params_fileName, "Parameter data. " + startingTime + "\n");
+	WW_JS.writeLinesToFile(PLOTS_JS.pauseSite_fileName, "Sitewise pause data. " + startingTime + "\n");
+
+
+
+	// Initialise the parameters file (column based not row based)
+	var paramToPrint = "Trial\t";
+	for (paramOrMetricID in PLOTS_JS.PARAMETERS_PLOT_DATA){
+		if (paramOrMetricID == "probability" || PLOTS_JS.PARAMETERS_PLOT_DATA[paramOrMetricID]["vals"] == null) continue;
+		if (PARAMS_JS.PHYSICAL_PARAMETERS[paramOrMetricID] != null && PARAMS_JS.PHYSICAL_PARAMETERS[paramOrMetricID]["hidden"]) continue;
+		paramToPrint += paramOrMetricID + "\t";
+	}
+	WW_JS.writeLinesToFile(PLOTS_JS.params_fileName, paramToPrint + "\n", true);
+
+
+}
+
+
+// Saves the most recent simulation's data to its respective files
+PLOTS_JS.savePlotsToFiles_CommandLine = function(){
+
+	if (!RUNNING_FROM_COMMAND_LINE || WW_JS.outputFolder == null || ABC_JS.ABC_simulating) return;
+
+
+	// Distance versus time
+	var tsv = "";
+	var DVT = PLOTS_JS.DISTANCE_VS_TIME[0];
+	tsv += "trial\t" + DVT["sim"] + "\n";
+	var xvalsSim = DVT["times"];
+	var yvalsSim = DVT["distances"];
+
+	tsv += "times\t";
+	for (var timeNum = 0; timeNum < xvalsSim.length; timeNum++){
+		tsv += WW_JS.roundToSF_WW(xvalsSim[timeNum]) + "\t";
+	}
+
+	tsv += "\ndistances\t";
+	for (var distanceNum = 0; distanceNum < yvalsSim.length; distanceNum++){
+		tsv += yvalsSim[distanceNum] + "\t";
+	}
+	tsv += "\n\n";
+
+	PLOTS_JS.DISTANCE_VS_TIME = [];
+	PLOTS_JS.DISTANCE_VS_TIME_UNSENT = {};
+	WW_JS.writeLinesToFile(PLOTS_JS.dvt_fileName, tsv, true);
+
+
+
+
+	// Dwell time per site
+	tsv = "";
+	var dwelltimes = PLOTS_JS.DWELL_TIMES[0];
+	tsv += "trial\t" + PLOTS_JS.CURRENT_SIM_NUMBER + "\n";
+	tsv += "times\t";
+	for (var timeNum = 0; timeNum < dwelltimes.length; timeNum++){
+		tsv += WW_JS.roundToSF_WW(dwelltimes[timeNum]) + "\t";
+	}
+	tsv += "\n";
+
+	PLOTS_JS.DWELL_TIMES = [];
+	PLOTS_JS.DWELL_TIMES_UNSENT = {};
+	WW_JS.writeLinesToFile(PLOTS_JS.dwelltime_fileName, tsv, true);
+
+
+
+	// Parameter plot
+	tsv = PLOTS_JS.CURRENT_SIM_NUMBER + "\t";
+	for (paramOrMetricID in PLOTS_JS.PARAMETERS_PLOT_DATA){
+
+		// Print the only value stored and reset the list of values
+		if (paramOrMetricID == "probability" || PLOTS_JS.PARAMETERS_PLOT_DATA[paramOrMetricID]["vals"] == null) continue;
+		if (PARAMS_JS.PHYSICAL_PARAMETERS[paramOrMetricID] != null && PARAMS_JS.PHYSICAL_PARAMETERS[paramOrMetricID]["hidden"]) continue;
+		tsv += WW_JS.roundToSF_WW(PLOTS_JS.PARAMETERS_PLOT_DATA[paramOrMetricID]["vals"][0], 5) + "\t";
+		PLOTS_JS.PARAMETERS_PLOT_DATA[paramOrMetricID]["vals"] = [];
+
+	}
+
+	WW_JS.writeLinesToFile(PLOTS_JS.params_fileName, tsv + "\n", true);
+
+
+}
+
+
+if (RUNNING_FROM_COMMAND_LINE){
+
+
+	module.exports = {
+		DISTANCE_VS_TIME_SIZE: PLOTS_JS.DISTANCE_VS_TIME_SIZE,
+		DISTANCE_VS_TIME_SIZE_MAX: PLOTS_JS.DISTANCE_VS_TIME_SIZE_MAX,
+		DISTANCE_VS_TIME: PLOTS_JS.DISTANCE_VS_TIME,
+		DISTANCE_VS_TIME_UNSENT: PLOTS_JS.DISTANCE_VS_TIME_UNSENT,
+		DWELL_TIMES_SIZE: PLOTS_JS.DWELL_TIMES_SIZE,
+		DWELL_TIMES_SIZE_MAX: PLOTS_JS.DWELL_TIMES_SIZE_MAX,
+		DWELL_TIMES: PLOTS_JS.DWELL_TIMES,
+		DWELL_TIMES_UNSENT: PLOTS_JS.DWELL_TIMES_UNSENT,
+		DWELL_TIMES_THIS_TRIAL: PLOTS_JS.DWELL_TIMES_THIS_TRIAL,
+		PARAMETERS_PLOT_DATA: PLOTS_JS.PARAMETERS_PLOT_DATA,
+		timesSpentOnEachTemplate: PLOTS_JS.timesSpentOnEachTemplate,
+		distancesTravelledOnEachTemplate: PLOTS_JS.distancesTravelledOnEachTemplate,
+		timeWaitedUntilNextTranslocation: PLOTS_JS.timeWaitedUntilNextTranslocation,
+		timeWaitedUntilNextCatalysis: PLOTS_JS.timeWaitedUntilNextCatalysis,
+		pauseTimePerSite: PLOTS_JS.pauseTimePerSite,
+		arrestCounts: PLOTS_JS.arrestCounts,
+		misincorporationCounts: PLOTS_JS.misincorporationCounts,
+		timeElapsed: PLOTS_JS.timeElapsed,
+		velocity: PLOTS_JS.velocity,
+		totalDisplacement: PLOTS_JS.totalDisplacement,
+		totaltimeElapsed: PLOTS_JS.totaltimeElapsed,
+		npauseSimulations: PLOTS_JS.npauseSimulations,
+		nabortionSimulations: PLOTS_JS.nabortionSimulations,
+		nMisincorporationSimulations: PLOTS_JS.nMisincorporationSimulations,
+		whichPlotInWhichCanvas: PLOTS_JS.whichPlotInWhichCanvas,
+		refreshPlotData: PLOTS_JS.refreshPlotData,
+		refreshPlotDataSequenceChangeOnly_WW: PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW,
+		getPlotData_WW: PLOTS_JS.getPlotData_WW,
+		plots_complete_simulation_WW: PLOTS_JS.plots_complete_simulation_WW,
+		updatePlotData_WW: PLOTS_JS.updatePlotData_WW,
+		showPlot_WW: PLOTS_JS.showPlot_WW,
+		selectPlot_WW: PLOTS_JS.selectPlot_WW,
+		saveSettings_WW: PLOTS_JS.saveSettings_WW,
+		delete_plot_data_WW: PLOTS_JS.delete_plot_data_WW,
+		update_custom_plot_data_WW: PLOTS_JS.update_custom_plot_data_WW,
+		getCacheSizes_WW: PLOTS_JS.getCacheSizes_WW,
+		deletePlots_WW: PLOTS_JS.deletePlots_WW,
+		savePlotsToFiles_CommandLine: PLOTS_JS.savePlotsToFiles_CommandLine,
+		initialiseSaveFiles_CommandLine: PLOTS_JS.initialiseSaveFiles_CommandLine
+	}
+
+}

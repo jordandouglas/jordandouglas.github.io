@@ -20,10 +20,13 @@
 -*/
 
 
-function transcribe_WW(nbasesToTranscribe, fastMode = false, resolve = function() {}, msgID = null){
+OPS_JS = {};
 
 
-	if (!simulating && !stopRunning_WW) return;
+OPS_JS.transcribe_WW = function(nbasesToTranscribe, fastMode = false, resolve = function() {}, msgID = null){
+
+
+	if (!simulating && !WW_JS.stopRunning_WW) return;
 
 
 	if (resolve == null) resolve = function() {};
@@ -32,34 +35,34 @@ function transcribe_WW(nbasesToTranscribe, fastMode = false, resolve = function(
 	if (fastMode) {
 		ANIMATION_TIME = 1;
 	}
-	stopRunning_WW = false;
+	WW_JS.stopRunning_WW = false;
 	//update_parameters();
 
 	var actions = [];
 	
 
-	if (!currentState["activated"]) actions.push(function() {  activate_WW(null, true) });
+	if (!WW_JS.currentState["activated"]) actions.push(function() {  OPS_JS.activate_WW(null, true) });
 
-	if (currentState["NTPbound"]) actions.push(function() {  releaseNTP_WW(null, true) });
+	if (WW_JS.currentState["NTPbound"]) actions.push(function() {  OPS_JS.releaseNTP_WW(null, true) });
 
 	
-	for (var i = currentState["mRNAPosInActiveSite"]; i < 1; i ++){
-		actions.push(function() {  forward_WW(null, true) });
+	for (var i = WW_JS.currentState["mRNAPosInActiveSite"]; i < 1; i ++){
+		actions.push(function() {  OPS_JS.forward_WW(null, true) });
 	}
-	for (var i = currentState["mRNAPosInActiveSite"]; i > 1; i --){
-		actions.push(function() {  backwards_WW(null, true) });
+	for (var i = WW_JS.currentState["mRNAPosInActiveSite"]; i > 1; i --){
+		actions.push(function() {  OPS_JS.backwards_WW(null, true) });
 	}
 	
 
 	for (var i = 0; i < nbasesToTranscribe; i ++){
-		actions.push(function() { bindNTP_WW(null, true) });
-		actions.push(function() { bindNTP_WW(null, true) });
-		actions.push(function() { activate_WW(null, true) })
-		actions.push(function() { forward_WW(null, true) });
+		actions.push(function() { OPS_JS.bindNTP_WW(null, true) });
+		actions.push(function() { OPS_JS.bindNTP_WW(null, true) });
+		actions.push(function() { OPS_JS.activate_WW(null, true) })
+		actions.push(function() { OPS_JS.forward_WW(null, true) });
 	}
 
 
-	applyActions(actions, fastMode, resolve, msgID);
+	OPS_JS.applyActions(actions, fastMode, resolve, msgID);
 	
 	
 
@@ -68,19 +71,19 @@ function transcribe_WW(nbasesToTranscribe, fastMode = false, resolve = function(
 
 
 
-function stutter_WW(nbasesToStutter, fastMode = false, resolve = function() {}, msgID = null){
+ OPS_JS.stutter_WW = function(nbasesToStutter, fastMode = false, resolve = function() {}, msgID = null){
 
 
 
-	if (all_sequences[sequenceID]["primer"].substring(0,2) == "ds") return; // Cannot stutter if nascent is double stranded
+	if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) == "ds") return; // Cannot stutter if nascent is double stranded
 
-	if (!simulating && !stopRunning_WW) return;
+	if (!simulating && !WW_JS.stopRunning_WW) return;
 	
 	ANIMATION_TIME = ANIMATION_TIME_TEMP;
 	if (fastMode) {
 		ANIMATION_TIME = 1;
 	}
-	stopRunning_WW = false;
+	WW_JS.stopRunning_WW = false;
 	//update_parameters();
 	
 	if (resolve == null) resolve = function() {};
@@ -88,18 +91,18 @@ function stutter_WW(nbasesToStutter, fastMode = false, resolve = function() {}, 
 	var actions = [];
 
 
-	if (!currentState["activated"]) actions.push(function() {  activate_WW(null, true) });
-	if (currentState["NTPbound"]) actions.push(function() { releaseNTP_WW(null, true) });
+	if (!WW_JS.currentState["activated"]) actions.push(function() {  OPS_JS.activate_WW(null, true) });
+	if (WW_JS.currentState["NTPbound"]) actions.push(function() { OPS_JS.releaseNTP_WW(null, true) });
 	
-	for (var i = currentState["bulgePos"]; i < PHYSICAL_PARAMETERS["hybridLen"]["val"] && i > 0; i ++){
-		actions.push(function() { slip_left_WW(null, true) });
+	for (var i = WW_JS.currentState["bulgePos"]; i < PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] && i > 0; i ++){
+		actions.push(function() { OPS_JS.slip_left_WW(null, true) });
 	}
 	
-	for (var i = currentState["mRNAPosInActiveSite"]; i < 0; i ++){
-		actions.push(function() { forward_WW(null, true) });
+	for (var i = WW_JS.currentState["mRNAPosInActiveSite"]; i < 0; i ++){
+		actions.push(function() { OPS_JS.forward_WW(null, true) });
 	}
-	for (var i = currentState["mRNAPosInActiveSite"]; i > 0; i --){
-		actions.push(function() { backwards_WW(null, true) });
+	for (var i = WW_JS.currentState["mRNAPosInActiveSite"]; i > 0; i --){
+		actions.push(function() { OPS_JS.backwards_WW(null, true) });
 	}
 	
 
@@ -107,16 +110,16 @@ function stutter_WW(nbasesToStutter, fastMode = false, resolve = function() {}, 
 	
 	for (var i = 0; i < nbasesToStutter; i ++){
 
-		actions.push(function() { slip_left_WW(null, true) });
-		actions.push(function() { slip_left_WW(null, true) });
-		actions.push(function() { bindNTP_WW(null, true) });
-		actions.push(function() { bindNTP_WW(null, true) });
+		actions.push(function() { OPS_JS.slip_left_WW(null, true) });
+		actions.push(function() { OPS_JS.slip_left_WW(null, true) });
+		actions.push(function() { OPS_JS.bindNTP_WW(null, true) });
+		actions.push(function() { OPS_JS.bindNTP_WW(null, true) });
 
-		for (var j = 0; j < PHYSICAL_PARAMETERS["hybridLen"]["val"] - 3; j ++) actions.push(function() { slip_left_WW(null, true) });
+		for (var j = 0; j < PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 3; j ++) actions.push(function() { OPS_JS.slip_left_WW(null, true) });
 	}
 
 
-	applyActions(actions, fastMode, resolve, msgID);
+	OPS_JS.applyActions(actions, fastMode, resolve, msgID);
 
 
 }
@@ -126,18 +129,18 @@ function stutter_WW(nbasesToStutter, fastMode = false, resolve = function() {}, 
 
 
 
-function applyActions(actions, fastMode, resolve, msgID){
+OPS_JS.applyActions = function(actions, fastMode, resolve, msgID){
 
 
 	ANIMATION_TIME = ANIMATION_TIME_TEMP;
 
-	//console.log(ANIMATION_TIME, "currentState", currentState, "actions", actions);
+	//console.log(ANIMATION_TIME, "WW_JS.currentState", WW_JS.currentState, "actions", actions);
 	
 	
-	if (actions.length == 0 || stopRunning_WW || currentState["terminated"]){
+	if (actions.length == 0 || WW_JS.stopRunning_WW || WW_JS.currentState["terminated"]){
 
 
-		if (!simulating) stopRunning_WW = true;
+		if (!simulating) WW_JS.stopRunning_WW = true;
 
 		ANIMATION_TIME = 200;
 
@@ -158,28 +161,28 @@ function applyActions(actions, fastMode, resolve, msgID){
 
 	// If this is in animation mode, then this process is synchronous with rendering so we return in between operators
 	// This block of code below will only work if this is not a WebWorker. 
-	if (!fastMode && !isWebWorker && ANIMATION_TIME > 1){
+	if (!fastMode && !WW_JS.isWebWorker && !RUNNING_FROM_COMMAND_LINE && ANIMATION_TIME > 1){
 		
 		var toCall = () => new Promise((resolve) => renderObjects(false, resolve));
 		toCall().then(() => {
 			$("#bases").children().promise().done(function(){
-				setNextBaseToAdd_WW();
-				applyActions(actions, fastMode, resolve, msgID);
+				WW_JS.setNextBaseToAdd_WW();
+				OPS_JS.applyActions(actions, fastMode, resolve, msgID);
 			});
 		});
 
 	}
 
 	// Same as above but for webworker only
-	else if (!fastMode && isWebWorker && ANIMATION_TIME > 1){
+	else if (!fastMode && WW_JS.isWebWorker && ANIMATION_TIME > 1){
 		setTimeout(function(){
-			applyActions(actions, fastMode, resolve, msgID);
+			OPS_JS.applyActions(actions, fastMode, resolve, msgID);
 		}, ANIMATION_TIME);
 	}
 
-	// If it is in asynchronous or hidden mode, then we keep going until the end
+	// If it is in asynchronous or hidden mode or running from command line, then we keep going until the end
 	else{
-		applyActions(actions, fastMode, resolve, msgID);
+		OPS_JS.applyActions(actions, fastMode, resolve, msgID);
 	}
 
 	/*
@@ -209,11 +212,11 @@ function applyActions(actions, fastMode, resolve, msgID){
 
 
 // Update the state variables associated with moving the polymerase forward
-function forward_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdates) { }, msgID = null){
+OPS_JS.forward_WW = function(state = null, UPDATE_COORDS, resolve = function(_DOMupdates) { }, msgID = null){
 
-	//if (state == null) console.log("forward_WW");
+	//if (state == null) console.log("OPS_JS.forward_WW");
 	
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 
 	var successfulOp = false;
 	var DOMupdates = {where_to_create_new_slipping_landscape: [], landscapes_to_reset: [], landscapes_to_delete: []};
@@ -224,59 +227,59 @@ function forward_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdates)
 	//if (state["mRNAPosInActiveSite"] >= 7 || state["rightGBase"] >= nbases - 1) return false;
 
 	// Move the polymerase
-	if (UPDATE_COORDS) move_obj_from_id_WW("pol", 25, 0);
+	if (UPDATE_COORDS) WW_JS.move_obj_from_id_WW("pol", 25, 0);
 	
 
 	// If bulge will move too far to the left then absorb it
 	for (var s = 0; state["partOfBulgeID"][s] == s && s < state["bulgePos"].length; s++){
-		if (state["bulgePos"][s] > 0 && state["bulgePos"][s] == PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) absorb_WW(state, UPDATE_COORDS, s, false, true, DOMupdates);
+		if (state["bulgePos"][s] > 0 && state["bulgePos"][s] == PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) OPS_JS.absorb_WW(state, UPDATE_COORDS, s, false, true, DOMupdates);
 		if (state["bulgePos"][s] > 0) state["bulgePos"][s]++;
 	}
 	
-	//if (TbulgePos == PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) absorb_T(false);
+	//if (TbulgePos == PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) absorb_T(false);
 	//if (TbulgePos > 0) TbulgePos++;
 
 
 	// Move genome bases
 	if (UPDATE_COORDS){
-		var shiftMutBaseBy = -52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1);
-		//if (templateSequence[state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) + 1] != null && templateSequence[state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) + 1]["mut"] != null) shiftMutBaseBy += 15; 
-		for (i = state["leftGBase"]; i > state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0; i--) {
+		var shiftMutBaseBy = -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1);
+		//if (templateSequence[state["leftGBase"] - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) + 1] != null && templateSequence[state["leftGBase"] - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) + 1]["mut"] != null) shiftMutBaseBy += 15; 
+		for (i = state["leftGBase"]; i > state["leftGBase"] - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0; i--) {
 			if (templateSequence[i] == null) break;
-			if (i == state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) + 1){
-				if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "g", 0, shiftMutBaseBy);
-				if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "o", 0, -shiftMutBaseBy/2);
+			if (i == state["leftGBase"] - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) + 1){
+				if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) != "ds") WW_JS.move_nt_WW(i, "g", 0, shiftMutBaseBy);
+				if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) != "ds") WW_JS.move_nt_WW(i, "o", 0, -shiftMutBaseBy/2);
 			}
 			else {
-				if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "g", 0, -52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
-				if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "o", 0, +26/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
+				if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) != "ds") WW_JS.move_nt_WW(i, "g", 0, -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
+				if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) != "ds") WW_JS.move_nt_WW(i, "o", 0, +26/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
 			}
 		
-			if (i > 0 && all_sequences[sequenceID]["template"].substring(0,2) == "ds") {
-				if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") flip_base_WW(i, "g", "m"); 
+			if (i > 0 && SEQS_JS.all_sequences[sequenceID]["template"].substring(0,2) == "ds") {
+				if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) != "ds") WW_JS.flip_base_WW(i, "g", "m"); 
 				
 			}
 		}
 	
 
-		shiftMutBaseBy = 52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1);
+		shiftMutBaseBy = 52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1);
 
-		//if (templateSequence[state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)] != null && templateSequence[state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)]["mut"] != null) shiftMutBaseBy -= 15; 
-		for (i = state["rightGBase"] + 1; i < state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1; i++) {
+		//if (templateSequence[state["rightGBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)] != null && templateSequence[state["rightGBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)]["mut"] != null) shiftMutBaseBy -= 15; 
+		for (i = state["rightGBase"] + 1; i < state["rightGBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1; i++) {
 			if (templateSequence[i] == null) break;
 
-			if (i == state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)) {
-				move_nt_WW(i, "g", 0, shiftMutBaseBy);
-				move_nt_WW(i, "o", 0, -shiftMutBaseBy/2);
+			if (i == state["rightGBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)) {
+				WW_JS.move_nt_WW(i, "g", 0, shiftMutBaseBy);
+				WW_JS.move_nt_WW(i, "o", 0, -shiftMutBaseBy/2);
 			}
 			else {
-				move_nt_WW(i, "g", 0, +52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
-				move_nt_WW(i, "o", 0, -26/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
+				WW_JS.move_nt_WW(i, "g", 0, +52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
+				WW_JS.move_nt_WW(i, "o", 0, -26/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
 			}
 		
-			if (i > 0 && all_sequences[sequenceID]["template"].substring(0,2) == "ds") {
-				flip_base_WW(i, "g", "g"); 
-				if (all_sequences[sequenceID]["primer"].substring(0,2) == "ds") flip_base_WW(i, "o", "m"); 
+			if (i > 0 && SEQS_JS.all_sequences[sequenceID]["template"].substring(0,2) == "ds") {
+				WW_JS.flip_base_WW(i, "g", "g"); 
+				if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) == "ds") WW_JS.flip_base_WW(i, "o", "m"); 
 			}
 		}
 	}
@@ -288,8 +291,8 @@ function forward_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdates)
 
 
 	// Move mRNA bases
-	if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") for (i = state["leftMBase"]; UPDATE_COORDS && i > state["leftMBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0; i--) move_nt_WW(i, "m", 0, +52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
-	for (i = state["rightMBase"] + 1; UPDATE_COORDS && i < state["rightMBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1; i++) move_nt_WW(i, "m", 0, -52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
+	if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) != "ds") for (i = state["leftMBase"]; UPDATE_COORDS && i > state["leftMBase"] - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0; i--) WW_JS.move_nt_WW(i, "m", 0, +52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
+	for (i = state["rightMBase"] + 1; UPDATE_COORDS && i < state["rightMBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1; i++) WW_JS.move_nt_WW(i, "m", 0, -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
 	
 	state["leftMBase"] ++;
 	state["rightMBase"] ++;
@@ -297,12 +300,12 @@ function forward_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdates)
 
 	// Remove NTP if single-binding site model, or if double-binding site model and transition is NOT from 0 to 1
 	if (state["NTPbound"]){
-		if (! (currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 0)){
+		if (! (FE_JS.currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 0)){
 			if (UPDATE_COORDS) delete_nt_WW(state["mRNALength"], "m");
 			state["NTPbound"] = false;
 		}else{
 			if (UPDATE_COORDS){
-				move_nt_WW(state["mRNALength"], "m", 0, 52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1))
+				WW_JS.move_nt_WW(state["mRNALength"], "m", 0, 52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1))
 			}
 		}
 	}
@@ -327,13 +330,13 @@ function forward_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdates)
 		if ((state["rightGBase"] + templateEntryChannelLength - 2 + nucleoproteinPhase) % 6 == 0){
 			var NTPoMoveUp = Math.ceil((state["rightGBase"] + templateEntryChannelLength + nucleoproteinPhase) / 6);
 			if (nucleoproteinPhase == 6) NTPoMoveUp++;
-			move_obj_from_id_WW("NP" + NTPoMoveUp, 0, -50)
+			WW_JS.move_obj_from_id_WW("NP" + NTPoMoveUp, 0, -50)
 		}
 		
 		if ((state["leftGBase"] - templateExitChannelLength - 2 + nucleoproteinPhase) % 6 == 0){
 			var NTPoMoveDown = Math.ceil((state["leftGBase"] - templateExitChannelLength - nucleoproteinPhase) / 6);
 			if (nucleoproteinPhase > 3) NTPoMoveDown++;
-			move_obj_from_id_WW("NP" + NTPoMoveDown, 0, 50)
+			WW_JS.move_obj_from_id_WW("NP" + NTPoMoveDown, 0, 50)
 		}
 	
 	}
@@ -343,7 +346,7 @@ function forward_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdates)
 	// If we are now terminated, then send the mRNA out of the exit channel (irreversibly). 
 	var totalBulgeSize = 0;
 	for (var s = 0; s < state["bulgeSize"].length; s++) totalBulgeSize += state["bulgeSize"][s];
-	if (UPDATE_COORDS && state["leftMBase"] >= state["mRNALength"] - totalBulgeSize) terminate_WW();
+	if (UPDATE_COORDS && state["leftMBase"] >= state["mRNALength"] - totalBulgeSize) OPS_JS.terminate_WW();
 	
 	
 	state["mRNAPosInActiveSite"]++;
@@ -351,11 +354,11 @@ function forward_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdates)
 			
 		
 	// Move bead to the right
-	if (UPDATE_COORDS && PHYSICAL_PARAMETERS["FAssist"]["val"] != 0){
-		move_obj_from_id_WW("rightBead", 25, 0);
-		move_obj_from_id_WW("tweezer", 25, 0);
-		move_obj_from_id_WW("forceArrow1", 25, 0);
-		move_obj_from_id_WW("forceArrow2", 25, 0);
+	if (UPDATE_COORDS && PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] != 0){
+		WW_JS.move_obj_from_id_WW("rightBead", 25, 0);
+		WW_JS.move_obj_from_id_WW("tweezer", 25, 0);
+		WW_JS.move_obj_from_id_WW("forceArrow1", 25, 0);
+		WW_JS.move_obj_from_id_WW("forceArrow2", 25, 0);
 	}
 		
 
@@ -375,24 +378,24 @@ function forward_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdates)
 
 
 // Update the state variables associated with moving the polymerase backwards
-function backwards_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdates) { }, msgID = null){
+ OPS_JS.backwards_WW = function(state = null, UPDATE_COORDS, resolve = function(_DOMupdates) { }, msgID = null){
 
 
-	//if (state == null) console.log("backwards_WW");
+	//if (state == null) console.log("OPS_JS.backwards_WW");
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 
 	var successfulOp = false;
 	var DOMupdates = {where_to_create_new_slipping_landscape: [], landscapes_to_reset: [], landscapes_to_delete: []};
 
-	if (state["leftGBase"] > 1 && state["leftGBase"] - PHYSICAL_PARAMETERS["bubbleLeft"]["val"] -1 > 2){
+	if (state["leftGBase"] > 1 && state["leftGBase"] - PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"] -1 > 2){
 
 
 		// If bulge will move too far to the left then absorb it
 		for (var s = 0; state["partOfBulgeID"][s] == s && s < state["bulgePos"].length; s++){
 
 			
-			if (state["bulgedBase"][s] == state["rightMBase"] - 1) absorb_WW(state, UPDATE_COORDS, s, true, true, DOMupdates);
+			if (state["bulgedBase"][s] == state["rightMBase"] - 1) OPS_JS.absorb_WW(state, UPDATE_COORDS, s, true, true, DOMupdates);
 			if (state["bulgePos"][s] > 0) state["bulgePos"][s]--;
 			
 		}
@@ -401,51 +404,51 @@ function backwards_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdate
 		//if (TbulgePos > 0) TbulgePos--;
 
 		// Move the polymerase
-		if (UPDATE_COORDS) move_obj_from_id_WW("pol", -25, 0);
+		if (UPDATE_COORDS) WW_JS.move_obj_from_id_WW("pol", -25, 0);
 
 		// Move genome bases
 		if (UPDATE_COORDS){
 			
-			var shiftMutBaseBy = 52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1);
+			var shiftMutBaseBy = 52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1);
 
-			//if (templateSequence[state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)] != null && templateSequence[state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)]["mut"] != null) shiftMutBaseBy -= 15; 
-			for (i = state["leftGBase"] - 1; i > state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) - 1 && i >= 0; i--) {
+			//if (templateSequence[state["leftGBase"] - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)] != null && templateSequence[state["leftGBase"] - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)]["mut"] != null) shiftMutBaseBy -= 15; 
+			for (i = state["leftGBase"] - 1; i > state["leftGBase"] - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) - 1 && i >= 0; i--) {
 				if (templateSequence[i] == null) break;
 
-				if (i == state["leftGBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)) {
-					if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "g", 0, shiftMutBaseBy);
-					if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "o", 0, -shiftMutBaseBy/2);
+				if (i == state["leftGBase"] - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)) {
+					if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) != "ds") WW_JS.move_nt_WW(i, "g", 0, shiftMutBaseBy);
+					if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) != "ds") WW_JS.move_nt_WW(i, "o", 0, -shiftMutBaseBy/2);
 				}
 				else {
-					if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "g", 0, +52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
-					if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") move_nt_WW(i, "o", 0, -26/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
+					if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) != "ds") WW_JS.move_nt_WW(i, "g", 0, +52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
+					if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) != "ds") WW_JS.move_nt_WW(i, "o", 0, -26/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
 				}
 					
 		
-				if (i > 0 && all_sequences[sequenceID]["template"].substring(0,2) == "ds") {
-					if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") flip_base_WW(i, "g", "g"); 
+				if (i > 0 && SEQS_JS.all_sequences[sequenceID]["template"].substring(0,2) == "ds") {
+					if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) != "ds") WW_JS.flip_base_WW(i, "g", "g"); 
 				}
 			}
 		
 		
 			
-			shiftMutBaseBy = -52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1);
-			//if (templateSequence[state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) - 1] != null && templateSequence[state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) - 1]["mut"] != null) shiftMutBaseBy += 15; 
-			for (i = state["rightGBase"]; i < state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1); i++) {
+			shiftMutBaseBy = -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1);
+			//if (templateSequence[state["rightGBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) - 1] != null && templateSequence[state["rightGBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) - 1]["mut"] != null) shiftMutBaseBy += 15; 
+			for (i = state["rightGBase"]; i < state["rightGBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1); i++) {
 				if (templateSequence[i] == null) break;
 
-				if (i == state["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) - 1) {
-					move_nt_WW(i, "g", 0, shiftMutBaseBy);
-					move_nt_WW(i, "o", 0, -shiftMutBaseBy/2);
+				if (i == state["rightGBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) - 1) {
+					WW_JS.move_nt_WW(i, "g", 0, shiftMutBaseBy);
+					WW_JS.move_nt_WW(i, "o", 0, -shiftMutBaseBy/2);
 				}
 				else {
-					move_nt_WW(i, "g", 0, -52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
-					move_nt_WW(i, "o", 0, +26/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
+					WW_JS.move_nt_WW(i, "g", 0, -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
+					WW_JS.move_nt_WW(i, "o", 0, +26/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
 				}
 		
-				if (i > 0 && all_sequences[sequenceID]["template"].substring(0,2) == "ds") {
-					flip_base_WW(i, "g", "m"); 
-					if (all_sequences[sequenceID]["primer"].substring(0,2) == "ds") flip_base_WW(i, "o", "g"); 
+				if (i > 0 && SEQS_JS.all_sequences[sequenceID]["template"].substring(0,2) == "ds") {
+					WW_JS.flip_base_WW(i, "g", "m"); 
+					if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) == "ds") WW_JS.flip_base_WW(i, "o", "g"); 
 				}
 			}
 		
@@ -455,8 +458,8 @@ function backwards_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdate
 		state["rightGBase"] --;
 
 		// Move mRNA bases
-		if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") for (i = state["leftMBase"] - 1; UPDATE_COORDS &&  i > state["leftMBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) - 1 && i >= 0; i--) move_nt_WW(i, "m", 0, -52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
-		for (i = state["rightMBase"]; UPDATE_COORDS && i < state["rightMBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1); i++) move_nt_WW(i, "m", 0, +52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
+		if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) != "ds") for (i = state["leftMBase"] - 1; UPDATE_COORDS &&  i > state["leftMBase"] - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) - 1 && i >= 0; i--) WW_JS.move_nt_WW(i, "m", 0, -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
+		for (i = state["rightMBase"]; UPDATE_COORDS && i < state["rightMBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1); i++) WW_JS.move_nt_WW(i, "m", 0, +52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
 		state["leftMBase"] --;
 		state["rightMBase"] --;
 
@@ -464,12 +467,12 @@ function backwards_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdate
 
 		// Remove NTP if single-binding site model, or if double-binding site model and transition is NOT from 1 to 0
 		if (state["NTPbound"]){
-			if (!(currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 1)){
+			if (!(FE_JS.currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 1)){
 				if (UPDATE_COORDS) delete_nt_WW(state["mRNALength"], "m");
 				state["NTPbound"] = false;
 			}else{
 				if (UPDATE_COORDS){
-					move_nt_WW(state["mRNALength"], "m", 0, -52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1))
+					WW_JS.move_nt_WW(state["mRNALength"], "m", 0, -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1))
 				}
 			}
 		}
@@ -496,24 +499,24 @@ function backwards_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdate
 			if ((state["rightGBase"] + 1 + templateEntryChannelLength - 2 + nucleoproteinPhase) % 6 == 0){
 				var NPToMoveUp = Math.ceil((state["rightGBase"] + templateEntryChannelLength + nucleoproteinPhase) / 6);
 				if (nucleoproteinPhase == 6) NPToMoveUp++;
-				move_obj_from_id_WW("NP" + NPToMoveUp, 0, 50)
+				WW_JS.move_obj_from_id_WW("NP" + NPToMoveUp, 0, 50)
 			}
 			
 			if ((state["leftGBase"] + 1 - templateExitChannelLength - 2 + nucleoproteinPhase) % 6 == 0){
 				var NPToMoveDown = Math.ceil((state["leftGBase"] - templateExitChannelLength - nucleoproteinPhase) / 6);
 				if (nucleoproteinPhase > 3) NPToMoveDown++;
-				move_obj_from_id_WW("NP" + NPToMoveDown, 0, -50)
+				WW_JS.move_obj_from_id_WW("NP" + NPToMoveDown, 0, -50)
 			}
 
 		}
 		
 		
 		// Move bead to the left
-		if (UPDATE_COORDS && PHYSICAL_PARAMETERS["FAssist"] != 0){
-			move_obj_from_id_WW("rightBead", -25, 0);
-			move_obj_from_id_WW("tweezer", -25, 0);
-			move_obj_from_id_WW("forceArrow1", -25, 0);
-			move_obj_from_id_WW("forceArrow2", -25, 0);
+		if (UPDATE_COORDS && PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"] != 0){
+			WW_JS.move_obj_from_id_WW("rightBead", -25, 0);
+			WW_JS.move_obj_from_id_WW("tweezer", -25, 0);
+			WW_JS.move_obj_from_id_WW("forceArrow1", -25, 0);
+			WW_JS.move_obj_from_id_WW("forceArrow2", -25, 0);
 		}
 		
 
@@ -537,11 +540,10 @@ function backwards_WW(state = null, UPDATE_COORDS, resolve = function(_DOMupdate
 
 
 
+OPS_JS.terminate_WW = function(){
 
-function terminate_WW(){
-
-	if (currentState["terminated"]) return;
-	currentState["terminated"] = true;
+	if (WW_JS.currentState["terminated"]) return;
+	WW_JS.currentState["terminated"] = true;
 
 	var primerSeq = "";
 	var insertPositions = [];
@@ -552,9 +554,9 @@ function terminate_WW(){
 	}
 
 
-	if (isWebWorker){
+	if (WW_JS.isWebWorker && !RUNNING_FROM_COMMAND_LINE){
 		postMessage("_renderTermination(" + JSON.stringify({primerSeq: primerSeq, insertPositions: insertPositions}) + ")" );
-	}else{
+	}else if(!RUNNING_FROM_COMMAND_LINE){
 		renderTermination({primerSeq: primerSeq, insertPositions: insertPositions});
 	}
 
@@ -568,17 +570,17 @@ function terminate_WW(){
 }
 
 
-function bindNTP_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgID = null){
+ OPS_JS.bindNTP_WW = function(state = null, UPDATE_COORDS, resolve = function() { }, msgID = null){
 	
 
-	//if (state == null) console.log("bindNTP_WW");
+	//if (state == null) console.log("OPS_JS.bindNTP_WW");
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 
 
 	var successfulOp = false;
 	var NTPbindingSite1Open = state["mRNAPosInActiveSite"] == 1 && !state["NTPbound"];
-	var NTPbindingSite2Open = currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 0 && !state["NTPbound"] && templateSequence[state["rightGBase"]+1] != null; // Secondary binding site
+	var NTPbindingSite2Open = FE_JS.currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 0 && !state["NTPbound"] && templateSequence[state["rightGBase"]+1] != null; // Secondary binding site
 
 	if (state["activated"] && (NTPbindingSite1Open || NTPbindingSite2Open) && !state["terminated"] && state["rightGBase"] < templateSequence.length){
 
@@ -586,8 +588,8 @@ function bindNTP_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgID
 		var xCoord = NTPbindingSite1Open ? templateSequence[state["rightGBase"]]["x"] + 10 : templateSequence[state["rightGBase"]+1]["x"] + 10;
 		var yCoord = 165;
 		if (UPDATE_COORDS) {
-			create_nucleotide_WW("m" + state["mRNALength"], "m", state["mRNALength"], xCoord, yCoord, state["NTPtoAdd"], state["NTPtoAdd"] + "m", true);
-			setPrimerSequenceBaseParent(state["mRNALength"], state["rightGBase"]);
+			WW_JS.create_nucleotide_WW("m" + state["mRNALength"], "m", state["mRNALength"], xCoord, yCoord, state["NTPtoAdd"], state["NTPtoAdd"] + "m", true);
+			WW_JS.setPrimerSequenceBaseParent(state["mRNALength"], state["rightGBase"]);
 		}
 		
 		state["NTPbound"] = true;
@@ -595,7 +597,7 @@ function bindNTP_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgID
 		
 	}
 
-	else if (state["NTPbound"] && state["mRNAPosInActiveSite"] == 1) return elongate_WW(state, UPDATE_COORDS, resolve, msgID);
+	else if (state["NTPbound"] && state["mRNAPosInActiveSite"] == 1) return OPS_JS.elongate_WW(state, UPDATE_COORDS, resolve, msgID);
 
 
 	if (msgID != null){
@@ -609,11 +611,11 @@ function bindNTP_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgID
 }
 
 
-function releaseNTP_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgID = null){
+ OPS_JS.releaseNTP_WW = function(state = null, UPDATE_COORDS, resolve = function() { }, msgID = null){
 
-	//if (state == null) console.log("releaseNTP_WW");
+	//if (state == null) console.log("OPS_JS.releaseNTP_WW");
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 
 	var successfulOp = false;
 	if (state["NTPbound"] && !state["terminated"]){
@@ -626,7 +628,7 @@ function releaseNTP_WW(state = null, UPDATE_COORDS, resolve = function() { }, ms
 		
 	}else 
 
-	return decay_WW(state, UPDATE_COORDS, resolve, msgID);
+	return OPS_JS.decay_WW(state, UPDATE_COORDS, resolve, msgID);
 
 
 
@@ -640,7 +642,7 @@ function releaseNTP_WW(state = null, UPDATE_COORDS, resolve = function() { }, ms
 	
 }
 
-function set_TP_state_WW(pos, seq, addTP){
+OPS_JS.set_TP_state_WW = function(pos, seq, addTP){
 
 	var nt = null;
 	if (seq == "m") nt = primerSequence[pos];
@@ -662,18 +664,18 @@ function set_TP_state_WW(pos, seq, addTP){
 
 }
 
-function elongate_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgID = null){
+ OPS_JS.elongate_WW = function(state = null, UPDATE_COORDS, resolve = function() { }, msgID = null){
 
 
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 
 	var successfulOp = false;
  	if (state["activated"] && state["NTPbound"] && state["mRNAPosInActiveSite"] == 1 && !state["terminated"]){
 
 		if(UPDATE_COORDS){
-			 move_nt_WW(state["mRNALength"], "m", -10, -10)
-			 set_TP_state_WW(state["mRNALength"], "m", false);
+			 WW_JS.move_nt_WW(state["mRNALength"], "m", -10, -10)
+			 OPS_JS.set_TP_state_WW(state["mRNALength"], "m", false);
 		}
 
 		state["mRNALength"]++;
@@ -681,18 +683,18 @@ function elongate_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgI
 		state["NTPbound"] = false;
 		state["nextBaseToCopy"]++;
 
-		if (all_sequences[sequenceID]["primer"].substring(0,2) == "ds") PHYSICAL_PARAMETERS["hybridLen"]["val"]++;
+		if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) == "ds") PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]++;
 
 
 		// Deactivate upon misincorporation if the model demands it
-		if (ELONGATION_MODELS[currentElongationModel]["deactivateUponMisincorporation"]){
+		if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["deactivateUponMisincorporation"]){
 
-			var baseJustCopied = templateSequence[currentState["rightGBase"]]["base"];
-			var baseJustAdded = primerSequence[currentState["rightMBase"]]["base"];
-			if(correctPairs["" + baseJustCopied + baseJustAdded] == null) deactivate_WW(state, UPDATE_COORDS);
+			var baseJustCopied = templateSequence[WW_JS.currentState["rightGBase"]]["base"];
+			var baseJustAdded = primerSequence[WW_JS.currentState["rightMBase"]]["base"];
+			if(correctPairs["" + baseJustCopied + baseJustAdded] == null) OPS_JS.deactivate_WW(state, UPDATE_COORDS);
 		}
 
-		setNextBaseToAdd_WW();
+		WW_JS.setNextBaseToAdd_WW();
 		successfulOp = true;
 
 
@@ -709,20 +711,20 @@ function elongate_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgI
 
 }
 
-function decay_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgID = null){
+OPS_JS.decay_WW = function(state = null, UPDATE_COORDS, resolve = function() { }, msgID = null){
 
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 	var successfulOp = false;
 
 
-	if (state["activated"] && !state["NTPbound"] && state["mRNALength"] > PHYSICAL_PARAMETERS["hybridLen"]["val"] && state["mRNAPosInActiveSite"] == 0 && !state["terminated"]){
+	if (state["activated"] && !state["NTPbound"] && state["mRNALength"] > PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] && state["mRNAPosInActiveSite"] == 0 && !state["terminated"]){
 
 
 		// Add the triphosphate
 		if (UPDATE_COORDS){
-			set_TP_state_WW(state["mRNALength"]-1, "m", true);
-			move_nt_WW(state["mRNALength"]-1, "m", 10, 10)
+			OPS_JS.set_TP_state_WW(state["mRNALength"]-1, "m", true);
+			WW_JS.move_nt_WW(state["mRNALength"]-1, "m", 10, 10)
 
 
 		}
@@ -731,9 +733,9 @@ function decay_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgID =
 		state["NTPbound"] = true;
 		state["nextBaseToCopy"] --;
 
-		if (all_sequences[sequenceID]["primer"].substring(0,2) == "ds") PHYSICAL_PARAMETERS["hybridLen"]["val"]--;
+		if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) == "ds") PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]--;
 		
-		setNextBaseToAdd_WW();
+		WW_JS.setNextBaseToAdd_WW();
 
 		successfulOp = true;
 	}
@@ -750,10 +752,10 @@ function decay_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgID =
 
 
 
-function activate_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgID = null){
+OPS_JS.activate_WW = function(state = null, UPDATE_COORDS, resolve = function() { }, msgID = null){
 
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 	var successfulOp = false;
 	if (!state["activated"]){
 		
@@ -766,8 +768,8 @@ function activate_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgI
 
 			var pol = HTMLobjects["pol"];
 			var newSrc = pol["src"].split("_")[0];
-			if (newSrc != null) change_src_of_object_WW(pol, newSrc);
-			move_obj_from_id_WW("pol", 0, 0);
+			if (newSrc != null) WW_JS.change_src_of_object_WW(pol, newSrc);
+			WW_JS.move_obj_from_id_WW("pol", 0, 0);
 			
 		}
 
@@ -786,17 +788,17 @@ function activate_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgI
 	
 }
 
-function deactivate_WW(state = null, UPDATE_COORDS, resolve = function() { }, msgID = null){
+OPS_JS.deactivate_WW = function(state = null, UPDATE_COORDS, resolve = function() { }, msgID = null){
 
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 	var successfulOp = false;
 
 
-	if (state["activated"] && !state["NTPbound"] && ELONGATION_MODELS[currentElongationModel]["allowInactivation"]){
+	if (state["activated"] && !state["NTPbound"] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowInactivation"]){
 
 		state["activated"] = false;
-		//if (state["NTPbound"]) releaseNTP_WW(state, UPDATE_COORDS); // This gives a very different model when kRelease is low
+		//if (state["NTPbound"]) OPS_JS.releaseNTP_WW(state, UPDATE_COORDS); // This gives a very different model when kRelease is low
 		state["NTPbound"] = false;
 		
 		
@@ -805,8 +807,8 @@ function deactivate_WW(state = null, UPDATE_COORDS, resolve = function() { }, ms
 
 			var pol = HTMLobjects["pol"];
 			var newSrc = pol["src"] + "_U";
-			if (newSrc != null) change_src_of_object_WW(pol, newSrc);
-			move_obj_from_id_WW("pol", 0, 0);
+			if (newSrc != null) WW_JS.change_src_of_object_WW(pol, newSrc);
+			WW_JS.move_obj_from_id_WW("pol", 0, 0);
 			
 		}
 
@@ -826,21 +828,21 @@ function deactivate_WW(state = null, UPDATE_COORDS, resolve = function() { }, ms
 
 
 
-function slip_left_WW(state = null, UPDATE_COORDS, S = 0, resolve = function(x) { }, msgID = null){
+OPS_JS.slip_left_WW = function(state = null, UPDATE_COORDS, S = 0, resolve = function(x) { }, msgID = null){
 
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 
 	var DOMupdates = {where_to_create_new_slipping_landscape: [], landscapes_to_reset: [], landscapes_to_delete: []};
 
 
-	if (!state["terminated"] && !(PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] &&  state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] == PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1)) {
+	if (!state["terminated"] && !(PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] &&  state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] == PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1)) {
 		
 
 
 		// If this is part of a larger bulge, then split one base off to the left and leave the rest as it is (fissure). Do Not Return. It will be followed up by a 2nd operation.
-		if (PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] != PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1 && state["partOfBulgeID"][S] != S) {
-			fissureBulgeLeft_WW(state, UPDATE_COORDS, S, DOMupdates);
+		if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] != PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1 && state["partOfBulgeID"][S] != S) {
+			OPS_JS.fissureBulgeLeft_WW(state, UPDATE_COORDS, S, DOMupdates);
 		}
 		
 
@@ -849,11 +851,11 @@ function slip_left_WW(state = null, UPDATE_COORDS, S = 0, resolve = function(x) 
 
 
 		// If there is another bulge 1 to the left then we fuse the two together
-		if (PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] + 1) != -1) fuseBulgeLeft_WW(state, UPDATE_COORDS, S, DOMupdates);
-		else if (PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] == 0 && fuseWith != -1) fuseBulgeLeft_WW(state, UPDATE_COORDS, S, DOMupdates);
-		else if (state["bulgePos"][S] > 0 && state["bulgePos"][S] < PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) diffuse_left_WW(state, UPDATE_COORDS, S, DOMupdates);
-		else if (!state["NTPbound"] && state["bulgePos"][S] == 0 && state["mRNAPosInActiveSite"] < PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2) form_bulge_WW(state, UPDATE_COORDS, S, true, DOMupdates)
-		else if (state["bulgePos"][S] != 0 && state["bulgePos"][S] == PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) absorb_WW(state, UPDATE_COORDS, S, false, false, DOMupdates);
+		if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] + 1) != -1) OPS_JS.fuseBulgeLeft_WW(state, UPDATE_COORDS, S, DOMupdates);
+		else if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] == 0 && fuseWith != -1) OPS_JS.fuseBulgeLeft_WW(state, UPDATE_COORDS, S, DOMupdates);
+		else if (state["bulgePos"][S] > 0 && state["bulgePos"][S] < PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) OPS_JS.diffuse_left_WW(state, UPDATE_COORDS, S, DOMupdates);
+		else if (!state["NTPbound"] && state["bulgePos"][S] == 0 && state["mRNAPosInActiveSite"] < PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2) OPS_JS.form_bulge_WW(state, UPDATE_COORDS, S, true, DOMupdates)
+		else if (state["bulgePos"][S] != 0 && state["bulgePos"][S] == PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) OPS_JS.absorb_WW(state, UPDATE_COORDS, S, false, false, DOMupdates);
 
 
 
@@ -876,39 +878,39 @@ function slip_left_WW(state = null, UPDATE_COORDS, S = 0, resolve = function(x) 
 
 
 
-function slip_right_WW(state = null, UPDATE_COORDS, S = 0, resolve = function(x) { }, msgID = null){
+OPS_JS.slip_right_WW = function(state = null, UPDATE_COORDS, S = 0, resolve = function(x) { }, msgID = null){
 
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 
 	var DOMupdates = {where_to_create_new_slipping_landscape: [], landscapes_to_reset: [], landscapes_to_delete: []};
 
 
 	var allowBulgeToFormRight = true;//UPDATE_COORDS;
 
-	if (!state["terminated"] && !(PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] - Math.max(0, state["mRNAPosInActiveSite"]) == 1)) {
+	if (!state["terminated"] && !(PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] - Math.max(0, state["mRNAPosInActiveSite"]) == 1)) {
 		
 
 		// Absorb bulge
-		if (!state["NTPbound"] && state["partOfBulgeID"][S] == S && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) callBackFn = absorb_WW(state, UPDATE_COORDS, S, true, false, DOMupdates);
+		if (!state["NTPbound"] && state["partOfBulgeID"][S] == S && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) callBackFn = OPS_JS.absorb_WW(state, UPDATE_COORDS, S, true, false, DOMupdates);
 
 		else{
 		
 			// If this is part of a larger bulge, then split one base off to the right and leave the rest as it is (fissure). Do Not Return. It will be followed up by a 2nd operation.
-			if (PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1 && state["partOfBulgeID"][S] != S) {
-				fissureBulgeRight_WW(state, UPDATE_COORDS, S, DOMupdates);
+			if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1 && state["partOfBulgeID"][S] != S) {
+				OPS_JS.fissureBulgeRight_WW(state, UPDATE_COORDS, S, DOMupdates);
 			}
 			
 			
-			var canFuseWith = state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1);
-			if (canFuseWith == -1)	canFuseWith = state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2);
+			var canFuseWith = state["bulgePos"].indexOf(PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1);
+			if (canFuseWith == -1)	canFuseWith = state["bulgePos"].indexOf(PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2);
 			
 
 			// If there is another bulge 1 to the right then we fuse the two together
-			if (PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] &&  state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] - 1) != -1) fuseBulgeRight_WW(state, UPDATE_COORDS, S, DOMupdates);
-			else if (allowBulgeToFormRight && state["leftMBase"] > 1 && PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] == 0 && canFuseWith != -1 && state["bulgePos"].indexOf( state["bulgePos"][canFuseWith] - 1) != -1)fuseBulgeRight_WW(state, UPDATE_COORDS, S, DOMupdates);
-			else if (state["bulgePos"][S] < PHYSICAL_PARAMETERS["hybridLen"]["val"] && state["bulgePos"][S] > 1 && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1) diffuse_right_WW(state, UPDATE_COORDS, S, DOMupdates);
-			else if (allowBulgeToFormRight && state["bulgePos"][S] == 0 && state["leftMBase"] > 1) form_bulge_WW(state, UPDATE_COORDS, S, false, DOMupdates);
+			if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] &&  state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] - 1) != -1) OPS_JS.fuseBulgeRight_WW(state, UPDATE_COORDS, S, DOMupdates);
+			else if (allowBulgeToFormRight && state["leftMBase"] > 1 && PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] == 0 && canFuseWith != -1 && state["bulgePos"].indexOf( state["bulgePos"][canFuseWith] - 1) != -1)OPS_JS.fuseBulgeRight_WW(state, UPDATE_COORDS, S, DOMupdates);
+			else if (state["bulgePos"][S] < PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] && state["bulgePos"][S] > 1 && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1) OPS_JS.diffuse_right_WW(state, UPDATE_COORDS, S, DOMupdates);
+			else if (allowBulgeToFormRight && state["bulgePos"][S] == 0 && state["leftMBase"] > 1) OPS_JS.form_bulge_WW(state, UPDATE_COORDS, S, false, DOMupdates);
 		}
 
 	}
@@ -926,18 +928,18 @@ function slip_right_WW(state = null, UPDATE_COORDS, S = 0, resolve = function(x)
 }
 
 	
-function form_bulge_WW(state = null, UPDATE_COORDS, S = 0, form_left = true, DOMupdates){
+OPS_JS.form_bulge_WW = function(state = null, UPDATE_COORDS, S = 0, form_left = true, DOMupdates){
 
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 
 	//console.log("forming", state, S);
-	if (form_left && !state["NTPbound"] &&  state["bulgePos"][S] == 0 && state["mRNAPosInActiveSite"] < PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2){
+	if (form_left && !state["NTPbound"] &&  state["bulgePos"][S] == 0 && state["mRNAPosInActiveSite"] < PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2){
 		
 
 		// Move 2nd last base to between the 2nd and 3rd to last positions, and last base into 2nd last position
 		if (state["NTPbound"]){
-			if (UPDATE_COORDS) delete_HTMLobj_WW("m" + state["mRNALength"]);
+			if (UPDATE_COORDS) WW_JS.delete_HTMLobj_WW("m" + state["mRNALength"]);
 			if (UPDATE_COORDS) delete_TP(state["mRNALength"], "m");
 			state["NTPbound"] = false;
 		}
@@ -957,11 +959,11 @@ function form_bulge_WW(state = null, UPDATE_COORDS, S = 0, form_left = true, DOM
 
 
 		var leftBoundary = state["bulgedBase"][S] - state["bulgeSize"][S];
-		if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], 1);
+		if (UPDATE_COORDS) WW_JS.position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], 1);
 		
 		for (i = state["bulgedBase"][S] + 2; UPDATE_COORDS && i < state["mRNALength"]; i ++){
-			if (i > state["rightMBase"] && i-state["rightMBase"] <= (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)) move_nt_WW(i, "m", -25, -52/(1+PHYSICAL_PARAMETERS["bubbleRight"]["val"]));
-			else move_nt_WW(i, "m", -25, 0);
+			if (i > state["rightMBase"] && i-state["rightMBase"] <= (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)) WW_JS.move_nt_WW(i, "m", -25, -52/(1+PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]));
+			else WW_JS.move_nt_WW(i, "m", -25, 0);
 		}
 		
 
@@ -970,11 +972,11 @@ function form_bulge_WW(state = null, UPDATE_COORDS, S = 0, form_left = true, DOM
 		state["mRNAPosInActiveSite"]++;
 		
 		state["nextBaseToCopy"] --;
-		if (UPDATE_COORDS) setNextBaseToAdd_WW();
+		if (UPDATE_COORDS) WW_JS.setNextBaseToAdd_WW();
 
 
-		if (PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) {
-			var graphID = create_new_slipping_params_WW(state);
+		if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) {
+			var graphID = OPS_JS.create_new_slipping_params_WW(state);
 			DOMupdates["where_to_create_new_slipping_landscape"].push(graphID);
 		}
 		
@@ -987,28 +989,28 @@ function form_bulge_WW(state = null, UPDATE_COORDS, S = 0, form_left = true, DOM
 	else if (!form_left && state["mRNAPosInActiveSite"] <= 5 && state["bulgePos"][S] == 0 && state["leftMBase"] > 1) {
 		
 
-		state["bulgedBase"][S] = all_sequences[sequenceID]["primer"].substring(0,2) == "ss" ? state["leftMBase"] : 2;
+		state["bulgedBase"][S] = SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) == "ss" ? state["leftMBase"] : 2;
 		state["bulgeSize"][S] = 1;
 
 
 
 		var leftBoundary = state["bulgedBase"][S] - 1;
-		if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[state["bulgedBase"][S]]["x"], 1);
-		if (all_sequences[sequenceID]["primer"].substring(0,2) == "ss"){
+		if (UPDATE_COORDS) WW_JS.position_bulge_WW(leftBoundary, primerSequence[state["bulgedBase"][S]]["x"], 1);
+		if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) == "ss"){
 			for (i = state["bulgedBase"][S] - 2; UPDATE_COORDS && i >= 0; i --){
-				if (state["bulgedBase"][S]-i <= PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) move_nt_WW(i, "m", 25, -52/(1+PHYSICAL_PARAMETERS["bubbleLeft"]["val"]));
-				else move_nt_WW(i, "m", 25, 0);
+				if (state["bulgedBase"][S]-i <= PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) WW_JS.move_nt_WW(i, "m", 25, -52/(1+PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]));
+				else WW_JS.move_nt_WW(i, "m", 25, 0);
 			}
 		}else{
-			move_nt_WW(0, "m", 25, 0);
-			PHYSICAL_PARAMETERS["hybridLen"]["val"]--;
+			WW_JS.move_nt_WW(0, "m", 25, 0);
+			PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]--;
 		}
 
-		state["bulgePos"][S] = PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1;
+		state["bulgePos"][S] = PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1;
 		state["leftMBase"] --;
 
-		if (PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) {
-			var graphID = create_new_slipping_params_WW(state);
+		if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) {
+			var graphID = OPS_JS.create_new_slipping_params_WW(state);
 			DOMupdates["where_to_create_new_slipping_landscape"].push(graphID);
 		}
 		
@@ -1025,17 +1027,17 @@ function form_bulge_WW(state = null, UPDATE_COORDS, S = 0, form_left = true, DOM
 
 
 
-function diffuse_left_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
+OPS_JS.diffuse_left_WW = function(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 
 
 	//console.log("diff left", state, S);
-	if (state["bulgePos"][S] > 0 && state["bulgePos"][S] < PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1){
+	if (state["bulgePos"][S] > 0 && state["bulgePos"][S] < PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1){
 		
 	    var leftBoundary = state["bulgedBase"][S] - state["bulgeSize"][S] - 1;
-		if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], state["bulgeSize"][S]);
+		if (UPDATE_COORDS) WW_JS.position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], state["bulgeSize"][S]);
 
 		state["bulgePos"][S] ++;
 		state["bulgedBase"][S] --;
@@ -1051,12 +1053,12 @@ function diffuse_left_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 
 
-function diffuse_right_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
+ OPS_JS.diffuse_right_WW = function(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 
-	if (state["bulgePos"][S] < PHYSICAL_PARAMETERS["hybridLen"]["val"] && state["bulgePos"][S] > 1 && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1){
+	if (state["bulgePos"][S] < PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] && state["bulgePos"][S] > 1 && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1){
 
 
 
@@ -1064,10 +1066,10 @@ function diffuse_right_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 		state["bulgedBase"][S] ++;
 		
 		var leftBoundary = state["bulgedBase"][S] - state["bulgeSize"][S];
-		if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[leftBoundary + state["bulgeSize"][S]]["x"], state["bulgeSize"][S]);
+		if (UPDATE_COORDS) WW_JS.position_bulge_WW(leftBoundary, primerSequence[leftBoundary + state["bulgeSize"][S]]["x"], state["bulgeSize"][S]);
 
 		if (state["NTPbound"] && state["bulgePos"][S] == 1){
-			if (UPDATE_COORDS) delete_HTMLobj_WW("m" + state["mRNALength"]);
+			if (UPDATE_COORDS) WW_JS.delete_HTMLobj_WW("m" + state["mRNALength"]);
 			if (UPDATE_COORDS) delete_TP(state["mRNALength"], "m");
 			state["NTPbound"] = false;
 		}
@@ -1086,52 +1088,52 @@ function diffuse_right_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 
 
-function absorb_WW(state = null, UPDATE_COORDS, S = 0, absorb_right = false, destroy_entire_bulge = false, DOMupdates){
+ OPS_JS.absorb_WW = function(state = null, UPDATE_COORDS, S = 0, absorb_right = false, destroy_entire_bulge = false, DOMupdates){
 
 	//console.log("absorbing", state, S);
 
-	if (!absorb_right && state["bulgeSize"][S] > 0 && state["bulgePos"][S] == PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1){
+	if (!absorb_right && state["bulgeSize"][S] > 0 && state["bulgePos"][S] == PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1){
 		
 		
 
 
 		state["leftMBase"] ++;
 		var leftBoundary = state["bulgedBase"][S] - state["bulgeSize"][S] + 1;
-		if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[leftBoundary-1]["x"], state["bulgeSize"][S]-1);
+		if (UPDATE_COORDS) WW_JS.position_bulge_WW(leftBoundary, primerSequence[leftBoundary-1]["x"], state["bulgeSize"][S]-1);
 
-		if (all_sequences[sequenceID]["primer"].substring(0,2) == "ss"){
+		if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) == "ss"){
 			for (i = state["leftMBase"] - 1; UPDATE_COORDS && i >= 0; i --){
-				if (state["leftMBase"] - i <= (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)) move_nt_WW(i, "m", -25, 52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
-				else move_nt_WW(i, "m", -25, 0);
+				if (state["leftMBase"] - i <= (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)) WW_JS.move_nt_WW(i, "m", -25, 52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
+				else WW_JS.move_nt_WW(i, "m", -25, 0);
 			}		
 		}else{
-			move_nt_WW(1, "m", -25, 0);
-			move_nt_WW(0, "m", -25, 0);
-			PHYSICAL_PARAMETERS["hybridLen"]["val"]++;
+			WW_JS.move_nt_WW(1, "m", -25, 0);
+			WW_JS.move_nt_WW(0, "m", -25, 0);
+			PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]++;
 		}
 
 		state["bulgeSize"][S] --;
 		if (state["bulgeSize"][S] == 0){
 			if (state["bulgePos"].indexOf(0) != -1)	{
-				var toDelete = delete_slipping_params_WW(state, S); // If there is already a form/absorb landscape then we can delete this one
+				var toDelete = OPS_JS.delete_slipping_params_WW(state, S); // If there is already a form/absorb landscape then we can delete this one
 				DOMupdates["landscapes_to_delete"].push(toDelete);
 			}
 			else {
-				reset_slipping_params_WW(state, S);
+				OPS_JS.reset_slipping_params_WW(state, S);
 				DOMupdates["landscapes_to_reset"].push(S);
 			}
 		}
 		
 		else if (state["bulgeSize"][S] == 1){ // If the bulge went from size 2 to size 1, we find and delete its fissure landscape
-			var bulgeIDOfDonorFissure = get_fissure_landscape_of_WW(state, S);
-			var toDelete = delete_slipping_params_WW(state, bulgeIDOfDonorFissure);
+			var bulgeIDOfDonorFissure = OPS_JS.get_fissure_landscape_of_WW(state, S);
+			var toDelete = OPS_JS.delete_slipping_params_WW(state, bulgeIDOfDonorFissure);
 			DOMupdates["landscapes_to_delete"].push(toDelete);
 		}
 
 
 		
 		if (destroy_entire_bulge){
-			absorb_WW(state, UPDATE_COORDS, S, absorb_right, destroy_entire_bulge, DOMupdates);
+			OPS_JS.absorb_WW(state, UPDATE_COORDS, S, absorb_right, destroy_entire_bulge, DOMupdates);
 		}
 		
 		return true;
@@ -1146,12 +1148,12 @@ function absorb_WW(state = null, UPDATE_COORDS, S = 0, absorb_right = false, des
 		
 
 		var leftBoundary = state["bulgedBase"][S] - state["bulgeSize"][S];
-		if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], state["bulgeSize"][S] - 1);
+		if (UPDATE_COORDS) WW_JS.position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], state["bulgeSize"][S] - 1);
 		
 		// Shift every rightward base 1 to the right
 		for (i = leftBoundary + state["bulgeSize"][S] + 1; UPDATE_COORDS && i < state["mRNALength"]; i ++){
-			if (i >= state["rightMBase"] && i-(leftBoundary + state["bulgeSize"][S]) <= (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)) move_nt_WW(i, "m", 25, 52/(1+PHYSICAL_PARAMETERS["bubbleRight"]["val"]));
-			else move_nt_WW(i, "m", 25, 0);
+			if (i >= state["rightMBase"] && i-(leftBoundary + state["bulgeSize"][S]) <= (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)) WW_JS.move_nt_WW(i, "m", 25, 52/(1+PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]));
+			else WW_JS.move_nt_WW(i, "m", 25, 0);
 		}	
 		
 		
@@ -1162,23 +1164,23 @@ function absorb_WW(state = null, UPDATE_COORDS, S = 0, absorb_right = false, des
 		
 		state["nextBaseToCopy"] ++;
 		
-		if (UPDATE_COORDS) setNextBaseToAdd_WW();
+		if (UPDATE_COORDS) WW_JS.setNextBaseToAdd_WW();
 
 
 		if (state["bulgeSize"][S] == 0){
 			if (state["bulgePos"].indexOf(0) != -1)	{
-				var toDelete = delete_slipping_params_WW(state, S); // If there is already a form/absorb landscape then we can delete this one
+				var toDelete = OPS_JS.delete_slipping_params_WW(state, S); // If there is already a form/absorb landscape then we can delete this one
 				DOMupdates["landscapes_to_delete"].push(toDelete);
 			}
 			else {
-				reset_slipping_params_WW(state, S);
+				OPS_JS.reset_slipping_params_WW(state, S);
 				DOMupdates["landscapes_to_reset"].push(S);
 			}
 		}
 		
 		else if (state["bulgeSize"][S] == 1){ // If the bulge went from size 2 to size 1, we find and delete its fissure landscape
-			var bulgeIDOfDonorFissure = get_fissure_landscape_of_WW(state, S);
-			var toDelete = delete_slipping_params_WW(state, bulgeIDOfDonorFissure);
+			var bulgeIDOfDonorFissure = OPS_JS.get_fissure_landscape_of_WW(state, S);
+			var toDelete = OPS_JS.delete_slipping_params_WW(state, bulgeIDOfDonorFissure);
 			DOMupdates["landscapes_to_delete"].push(toDelete);
 		}
 		
@@ -1186,7 +1188,7 @@ function absorb_WW(state = null, UPDATE_COORDS, S = 0, absorb_right = false, des
 
 			
 		if (destroy_entire_bulge){ // Recursively destroy bulges until there are none left
-			absorb_WW(state, UPDATE_COORDS, S, absorb_right, destroy_entire_bulge, DOMupdates);
+			OPS_JS.absorb_WW(state, UPDATE_COORDS, S, absorb_right, destroy_entire_bulge, DOMupdates);
 		}
 		
 		return true;
@@ -1203,11 +1205,11 @@ function absorb_WW(state = null, UPDATE_COORDS, S = 0, absorb_right = false, des
 
 
 
-function fuseBulgeLeft_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
+ OPS_JS.fuseBulgeLeft_WW = function(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 
 	
 	//console.log("fuse left", state, S);
@@ -1228,7 +1230,7 @@ function fuseBulgeLeft_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 		
 		
 		if (state["NTPbound"]){
-			if (UPDATE_COORDS) delete_HTMLobj_WW("m" + state["mRNALength"]);
+			if (UPDATE_COORDS) WW_JS.delete_HTMLobj_WW("m" + state["mRNALength"]);
 			if (UPDATE_COORDS) delete_TP(state["mRNALength"], "m");
 			state["NTPbound"] = false;
 		}
@@ -1241,12 +1243,12 @@ function fuseBulgeLeft_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 		
 		var leftBoundary = state["bulgedBase"][fuseWith] - state["bulgeSize"][fuseWith];
 		
-		if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], state["bulgeSize"][fuseWith]);
+		if (UPDATE_COORDS) WW_JS.position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], state["bulgeSize"][fuseWith]);
 
-		if (all_sequences[sequenceID]["primer"].substring(0,2) == "ss"){
+		if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) == "ss"){
 			for (var i = leftBoundary + state["bulgeSize"][fuseWith] + 2; UPDATE_COORDS && i < state["mRNALength"]; i ++){
-				if (i>state["rightMBase"] && i-state["rightMBase"] <= hillLengthRight) move_nt_WW(i, "m", -25, -52/hillLengthRight);
-				else move_nt_WW(i, "m", -25, 0);
+				if (i>state["rightMBase"] && i-state["rightMBase"] <= hillLengthRight) WW_JS.move_nt_WW(i, "m", -25, -52/hillLengthRight);
+				else WW_JS.move_nt_WW(i, "m", -25, 0);
 			}
 		}
 		
@@ -1255,12 +1257,12 @@ function fuseBulgeLeft_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 		
 		
 		state["nextBaseToCopy"] --;
-		if (UPDATE_COORDS) setNextBaseToAdd_WW();
+		if (UPDATE_COORDS) WW_JS.setNextBaseToAdd_WW();
 		
-		reset_slipping_params_WW(state, S);
+		OPS_JS.reset_slipping_params_WW(state, S);
 		DOMupdates["landscapes_to_reset"].push(S);
 		if (state["bulgeSize"][fuseWith] <= 2) {
-			var graphID = create_new_slipping_params_WW(state);
+			var graphID = OPS_JS.create_new_slipping_params_WW(state);
 			DOMupdates["where_to_create_new_slipping_landscape"].push(graphID);
 			state["partOfBulgeID"][S] = fuseWith;
 		}
@@ -1281,17 +1283,17 @@ function fuseBulgeLeft_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 		state["bulgedBase"][fuseWith] ++;
 
 		var leftBoundary = state["bulgedBase"][fuseWith] - state["bulgeSize"][fuseWith];
-		if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], state["bulgeSize"][fuseWith]);
+		if (UPDATE_COORDS) WW_JS.position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], state["bulgeSize"][fuseWith]);
 
 		
 		state["bulgeSize"][S] --;
 		if (state["bulgeSize"][S] == 0) {
-			reset_slipping_params_WW(state, S);
+			OPS_JS.reset_slipping_params_WW(state, S);
 			DOMupdates["landscapes_to_reset"].push(S);
 		}
 		else if (state["bulgeSize"][S] > 0){
 			leftBoundary = state["bulgedBase"][S] - state["bulgeSize"][S];
-			if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], state["bulgeSize"][S]);
+			if (UPDATE_COORDS) WW_JS.position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], state["bulgeSize"][S]);
 		}
 		
 		// If we fused together 2 bulges of size 1, we simply turn the donor's diffusion landscape into the acceptor's fission landscape
@@ -1301,21 +1303,21 @@ function fuseBulgeLeft_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 		// If this created a bulge of size 2 and the donor bulge was of size > 1, then create a fissure landscape
 		else if (state["bulgeSize"][S] > 0 && state["bulgeSize"][fuseWith] == 2) {
-			var graphID = create_new_slipping_params_WW(state);
+			var graphID = OPS_JS.create_new_slipping_params_WW(state);
 			DOMupdates["where_to_create_new_slipping_landscape"].push(graphID);
 			state["partOfBulgeID"][state["bulgePos"].length-1] = fuseWith; 
 		}
 		
 		// If the donor bulge has been destroyed, but the acceptor bulge is still large, then simply destroy this diffusion landscape
 		else if (state["bulgeSize"][S] == 0 && state["bulgeSize"][fuseWith] > 2) {
-			var toDelete = delete_slipping_params_WW(state, S);
+			var toDelete = OPS_JS.delete_slipping_params_WW(state, S);
 			DOMupdates["landscapes_to_delete"].push(toDelete);
 		}
 		
 		// If the donor bulge went from size 2 down to 1, then we need to delete its fissure landscape
 		if (DOMupdates["landscapes_to_delete"].length == 0 && state["bulgeSize"][S] == 1) {
-			var bulgeIDOfDonorFissure = get_fissure_landscape_of_WW(state, S);
-			var toDelete = delete_slipping_params_WW(state, bulgeIDOfDonorFissure);
+			var bulgeIDOfDonorFissure = OPS_JS.get_fissure_landscape_of_WW(state, S);
+			var toDelete = OPS_JS.delete_slipping_params_WW(state, bulgeIDOfDonorFissure);
 			DOMupdates["landscapes_to_delete"].push(toDelete);
 		}
 
@@ -1331,19 +1333,19 @@ function fuseBulgeLeft_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 
 
-function fuseBulgeRight_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
+OPS_JS.fuseBulgeRight_WW = function(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 
 	
 	//console.log("fuse right", state, S);
-	if (state["leftMBase"] > 1 && state["bulgePos"][S] == 0 && ((state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) != -1) || state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2) != -1)) { // Form bulge first and then fuse them
+	if (state["leftMBase"] > 1 && state["bulgePos"][S] == 0 && ((state["bulgePos"].indexOf(PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) != -1) || state["bulgePos"].indexOf(PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2) != -1)) { // Form bulge first and then fuse them
 		
 		
 		
-		var fuseWith = state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1);
-		if (fuseWith == -1)	fuseWith = state["bulgePos"].indexOf(PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2);
+		var fuseWith = state["bulgePos"].indexOf(PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1);
+		if (fuseWith == -1)	fuseWith = state["bulgePos"].indexOf(PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2);
 		
 		if (state["bulgeSize"].indexOf( state["bulgePos"][fuseWith] ) >= 6 ) return function(){};
 		
@@ -1360,17 +1362,17 @@ function fuseBulgeRight_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 		
 		
 		var leftBoundary = state["bulgedBase"][fuseWith] - state["bulgeSize"][fuseWith];
-		if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[leftBoundary+1]["x"], state["bulgeSize"][fuseWith]);
+		if (UPDATE_COORDS) WW_JS.position_bulge_WW(leftBoundary, primerSequence[leftBoundary+1]["x"], state["bulgeSize"][fuseWith]);
 		for (i = leftBoundary - 1; UPDATE_COORDS && i >= 0; i --){
 			if (i > state["leftMBase"] - hillLengthLeft) move_nt_controller(i, "m", 25, -52/hillLengthLeft);
 			else move_nt_controller(i, "m", 25, 0);
 		}
 		
 		
-		reset_slipping_params_WW(state, S);
+		OPS_JS.reset_slipping_params_WW(state, S);
 		DOMupdates["landscapes_to_reset"].push(S);
 		if (state["bulgeSize"][fuseWith] <= 2) {
-			var graphID = create_new_slipping_params_WW(state);
+			var graphID = OPS_JS.create_new_slipping_params_WW(state);
 			DOMupdates["where_to_create_new_slipping_landscape"].push(graphID);
 			state["partOfBulgeID"][S] = fuseWith;
 		}
@@ -1392,19 +1394,19 @@ function fuseBulgeRight_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 		state["bulgeSize"][fuseWith] ++; // bulgePos and bulgedBase are the rightmost positions in the bulge
 
 		var leftBoundary = state["bulgedBase"][fuseWith] - state["bulgeSize"][fuseWith];
-		if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[leftBoundary+1]["x"], state["bulgeSize"][fuseWith]);
+		if (UPDATE_COORDS) WW_JS.position_bulge_WW(leftBoundary, primerSequence[leftBoundary+1]["x"], state["bulgeSize"][fuseWith]);
 		
 		
 		state["bulgeSize"][S] --;
 		if (state["bulgeSize"][S] == 0){
-	 		reset_slipping_params_WW(state, S);
+	 		OPS_JS.reset_slipping_params_WW(state, S);
 			DOMupdates["landscapes_to_reset"].push(S);
 		}
 
 		else if (state["bulgeSize"][S] > 0){ 
 			state["bulgedBase"][S] --;
 			leftBoundary = state["bulgedBase"][S] - state["bulgeSize"][S];
-			if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[leftBoundary+1]["x"], state["bulgeSize"][S]);
+			if (UPDATE_COORDS) WW_JS.position_bulge_WW(leftBoundary, primerSequence[leftBoundary+1]["x"], state["bulgeSize"][S]);
 		}
 
 
@@ -1415,14 +1417,14 @@ function fuseBulgeRight_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 		// If this created a bulge of size 2 and the donor bulge was of size > 1, then create a fissure landscape
 		else if (state["bulgeSize"][S] > 0 && state["bulgeSize"][fuseWith] == 2) {
-			var graphID = create_new_slipping_params_WW(state);
+			var graphID = OPS_JS.create_new_slipping_params_WW(state);
 			DOMupdates["where_to_create_new_slipping_landscape"].push(graphID);
 			state["partOfBulgeID"][state["bulgePos"].length-1] = fuseWith;
 		}
 		
 		// If the donor bulge has been destroyed, but the acceptor bulge is still large, then simply destroy this diffusion landscape
 		else if (state["bulgeSize"][S] == 0 && state["bulgeSize"][fuseWith] > 2) {
-			var toDelete = delete_slipping_params_WW(state, S);
+			var toDelete = OPS_JS.delete_slipping_params_WW(state, S);
 			DOMupdates["landscapes_to_delete"].push(toDelete);
 		}
 		
@@ -1430,7 +1432,7 @@ function fuseBulgeRight_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 		// If the donor bulge went from size 2 down to 1, then we need to delete its fissure landscape
 		if (DOMupdates["landscapes_to_delete"].length == 0 && state["bulgeSize"][S] == 1) {
 			var bulgeIDOfDonorFissure = get_fissure_landscape_of(state, S);
-			var toDelete = delete_slipping_params_WW(state, bulgeIDOfDonorFissure);
+			var toDelete = OPS_JS.delete_slipping_params_WW(state, bulgeIDOfDonorFissure);
 			DOMupdates["landscapes_to_delete"].push(toDelete);
 		}
 
@@ -1442,13 +1444,13 @@ function fuseBulgeRight_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 
 
-function fissureBulgeLeft_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
+ OPS_JS.fissureBulgeLeft_WW = function(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 	
 	//console.log("fiss left", state, S);
-	if (state["bulgePos"][S] != PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1 && state["partOfBulgeID"][S] != S){
+	if (state["bulgePos"][S] != PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1 && state["partOfBulgeID"][S] != S){
 	
 		
 		var fissureFrom = state["partOfBulgeID"][S];
@@ -1464,7 +1466,7 @@ function fissureBulgeLeft_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 		
 		// Create a new landscape to continue fission, if there is still a bulge
 		if (state["bulgeSize"][fissureFrom] > 2){
-			var graphID = create_new_slipping_params_WW(state);
+			var graphID = OPS_JS.create_new_slipping_params_WW(state);
 			DOMupdates["where_to_create_new_slipping_landscape"].push(graphID);
 			var newIndex = state["bulgePos"].length - 1;
 			state["partOfBulgeID"][newIndex] = fissureFrom;
@@ -1474,7 +1476,7 @@ function fissureBulgeLeft_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 		// Reduce the visual size of the bulge
 		state["bulgeSize"][fissureFrom]--;
 		var leftBoundary = state["bulgedBase"][fissureFrom] - state["bulgeSize"][fissureFrom];
-		if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[leftBoundary-1]["x"], state["bulgeSize"][fissureFrom], true, -1);
+		if (UPDATE_COORDS) WW_JS.position_bulge_WW(leftBoundary, primerSequence[leftBoundary-1]["x"], state["bulgeSize"][fissureFrom], true, -1);
 
 		// Then exit. This action may be followed by a diffuse left or a fuse left.
 		return true;
@@ -1489,10 +1491,10 @@ function fissureBulgeLeft_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 
 
-function fissureBulgeRight_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
+ OPS_JS.fissureBulgeRight_WW = function(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 
-	if (state == null) state = currentState;
+	if (state == null) state = WW_JS.currentState;
 	
 	if (state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1 && state["partOfBulgeID"][S] != S){
 		
@@ -1509,7 +1511,7 @@ function fissureBulgeRight_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 		
 		// Create a new landscape to continue fission, if there is still a bulge
 		if (state["bulgeSize"][fissureFrom] > 2){
-			var graphID = create_new_slipping_params_WW(state);
+			var graphID = OPS_JS.create_new_slipping_params_WW(state);
 			DOMupdates["where_to_create_new_slipping_landscape"].push(graphID);
 			var newIndex = state["bulgePos"].length - 1;
 			state["partOfBulgeID"][newIndex] = fissureFrom;
@@ -1519,7 +1521,7 @@ function fissureBulgeRight_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 		state["bulgedBase"][fissureFrom]--;
 		state["bulgeSize"][fissureFrom]--;
 		var leftBoundary = state["bulgedBase"][fissureFrom] - state["bulgeSize"][fissureFrom];
-		if (UPDATE_COORDS) position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], state["bulgeSize"][fissureFrom], true, +1);
+		if (UPDATE_COORDS) WW_JS.position_bulge_WW(leftBoundary, primerSequence[leftBoundary]["x"], state["bulgeSize"][fissureFrom], true, +1);
 		
 
 		// Then exit. This action may be followed by a diffuse left or a fuse left.
@@ -1537,9 +1539,9 @@ function fissureBulgeRight_WW(state = null, UPDATE_COORDS, S = 0, DOMupdates){
 
 
 
-function create_new_slipping_params_WW(state){
+ OPS_JS.create_new_slipping_params_WW = function(state){
 	
-	if (!PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) return null;
+	if (!PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) return null;
 	
 	var graphID = state["bulgePos"].length;
 	
@@ -1557,7 +1559,7 @@ function create_new_slipping_params_WW(state){
 }
 
 
-function reset_slipping_params_WW(state, S){
+ OPS_JS.reset_slipping_params_WW = function(state, S){
 		
 	state["bulgePos"][S] = 0;
 	state["bulgedBase"][S] = -1
@@ -1568,9 +1570,9 @@ function reset_slipping_params_WW(state, S){
 }
 
 
-function delete_slipping_params_WW(state, S = 0){
+ OPS_JS.delete_slipping_params_WW = function(state, S = 0){
 	
-	if (!PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) return;
+	if (!PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) return;
 	
 	// Delete this element from all slippage related lists
 	state["bulgePos"].splice(S, 1);
@@ -1596,11 +1598,54 @@ function delete_slipping_params_WW(state, S = 0){
 
 
 // Returns the index of the fissure landscape which applies to bulge index S
-function get_fissure_landscape_of_WW(state, S){
+ OPS_JS.get_fissure_landscape_of_WW = function(state, S){
 	
 	for (var s = 0; s < state["bulgePos"].length; s++){
 		if (s == S) continue;
 		if (state["partOfBulgeID"][s] == S) return s;
 	}
 	return -1;
+}
+
+
+
+
+
+
+
+
+if (RUNNING_FROM_COMMAND_LINE){
+
+
+	module.exports = {
+		transcribe_WW: OPS_JS.transcribe_WW,
+		stutter_WW: OPS_JS.stutter_WW,
+		applyActions: OPS_JS.applyActions,
+		forward_WW: OPS_JS.forward_WW,
+		backwards_WW: OPS_JS.backwards_WW,
+		terminate_WW: OPS_JS.terminate_WW,
+		bindNTP_WW: OPS_JS.bindNTP_WW,
+		releaseNTP_WW: OPS_JS.releaseNTP_WW,
+		set_TP_state_WW: OPS_JS.set_TP_state_WW,
+		elongate_WW: OPS_JS.elongate_WW,
+		decay_WW: OPS_JS.decay_WW,
+		activate_WW: OPS_JS.activate_WW,
+		deactivate_WW: OPS_JS.deactivate_WW,
+		slip_left_WW: OPS_JS.slip_left_WW,
+		slip_right_WW: OPS_JS.slip_right_WW,
+		form_bulge_WW: OPS_JS.form_bulge_WW,
+		diffuse_left_WW: OPS_JS.diffuse_left_WW,
+		diffuse_right_WW: OPS_JS.diffuse_right_WW,
+		absorb_WW: OPS_JS.absorb_WW,
+		fuseBulgeLeft_WW: OPS_JS.fuseBulgeLeft_WW,
+		fuseBulgeRight_WW: OPS_JS.fuseBulgeRight_WW,
+		fissureBulgeLeft_WW: OPS_JS.fissureBulgeLeft_WW,
+		fissureBulgeRight_WW: OPS_JS.fissureBulgeRight_WW,
+		create_new_slipping_params_WW: OPS_JS.create_new_slipping_params_WW,
+		reset_slipping_params_WW: OPS_JS.reset_slipping_params_WW,
+		delete_slipping_params_WW: OPS_JS.delete_slipping_params_WW,
+		get_fissure_landscape_of_WW: OPS_JS.get_fissure_landscape_of_WW
+
+	}
+
 }

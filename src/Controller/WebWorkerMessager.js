@@ -45,7 +45,7 @@ function register_WebWorker(resolve = function() { }){
             			WEB_WORKER = new Worker("src/Model/WebWorker.js");
 
             			// Tell the WebWorker to initialise
-   						callWebWorkerFunction(function() { init_WW(true); });
+   						callWebWorkerFunction(function() { WW_JS.init_WW(true); });
 
 
 
@@ -58,7 +58,7 @@ function register_WebWorker(resolve = function() { }){
 					$("#browserWWdisabled").show(true);
 
 					// Tell the WebWorker to initialise
-   					init_WW(false);
+   					WW_JS.init_WW(false);
 				}
         	}
 
@@ -247,10 +247,10 @@ function refresh_controller(resolve_fn = function(x) {}){
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => refresh_WW(resolve));
+		var toCall = () => new Promise((resolve) => WW_JS.refresh_WW(resolve));
 		toCall().then((x) => resolve_fn(x));
 	}else{
-		var res = stringifyFunction("refresh_WW", [null], true);
+		var res = stringifyFunction("WW_JS.refresh_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 
@@ -267,10 +267,10 @@ function stop_controller(resolve = function() { }){
 
 
 	if (WEB_WORKER == null) {
-		resolve(stop_WW());
+		resolve(WW_JS.stop_WW());
 	}else{
 
-		var res = stringifyFunction("stop_WW", [null], true);
+		var res = stringifyFunction("WW_JS.stop_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		
@@ -287,11 +287,11 @@ function create_HTMLobject_controller(id, x, y, width, height, src, zIndex = 1){
 
 	
 	if (WEB_WORKER == null) {
-		create_HTMLobject_WW(id, x, y, width, height, src, zIndex);
+		WW_JS.create_HTMLobject_WW(id, x, y, width, height, src, zIndex);
 	}
 
 	else{
-		var fnStr = stringifyFunction("create_HTMLobject_WW", [id, x, y, width, height, src, zIndex]);
+		var fnStr = stringifyFunction("WW_JS.create_HTMLobject_WW", [id, x, y, width, height, src, zIndex]);
 		//console.log("Sending function: " + fnStr);
 		callWebWorkerFunction(fnStr);
 	}
@@ -302,11 +302,11 @@ function create_HTMLobject_controller(id, x, y, width, height, src, zIndex = 1){
 function create_pol_controller(x, y, src = "pol"){
 
 	if (WEB_WORKER == null) {
-		create_pol_WW(x, y, src);
+		WW_JS.create_pol_WW(x, y, src);
 	}
 
 	else{
-		var fnStr = stringifyFunction("create_pol_WW", [x, y, src]);
+		var fnStr = stringifyFunction("WW_JS.create_pol_WW", [x, y, src]);
 		//console.log("Sending function: " + fnStr);
 		callWebWorkerFunction(fnStr);
 	}
@@ -317,11 +317,11 @@ function create_pol_controller(x, y, src = "pol"){
 
 function flip_base_controller(pos, seq, flipTo){
 	if (WEB_WORKER == null) {
-		flip_base_WW(pos, seq, flipTo);
+		WW_JS.flip_base_WW(pos, seq, flipTo);
 	}
 
 	else{
-		var fnStr = stringifyFunction("flip_base_WW", [pos, seq, flipTo]);
+		var fnStr = stringifyFunction("WW_JS.flip_base_WW", [pos, seq, flipTo]);
 		//console.log("Sending function: " + fnStr);
 		callWebWorkerFunction(fnStr);
 	}
@@ -329,11 +329,11 @@ function flip_base_controller(pos, seq, flipTo){
 
 function create_nucleoprotein_controller(id, x, y){
 	if (WEB_WORKER == null) {
-		create_nucleoprotein_WW(id, x, y);
+		WW_JS.create_nucleoprotein_WW(id, x, y);
 	}
 
 	else{
-		var fnStr = stringifyFunction("create_nucleoprotein_WW", [id, x, y]);
+		var fnStr = stringifyFunction("WW_JS.create_nucleoprotein_WW", [id, x, y]);
 		//console.log("Sending function: " + fnStr);
 		callWebWorkerFunction(fnStr);
 	}
@@ -345,11 +345,11 @@ function create_nucleotide_controller(id, seq, pos, x, y, base, src, hasTP = fal
 
 
 	if (WEB_WORKER == null) {
-		create_nucleotide_WW(id, seq, pos, x, y, base, src, hasTP, mut);
+		WW_JS.create_nucleotide_WW(id, seq, pos, x, y, base, src, hasTP, mut);
 	}
 
 	else{
-		var fnStr = stringifyFunction("create_nucleotide_WW", [id, seq, pos, x, y, base, src, hasTP, mut]);
+		var fnStr = stringifyFunction("WW_JS.create_nucleotide_WW", [id, seq, pos, x, y, base, src, hasTP, mut]);
 		//console.log("Sending function: " + fnStr);
 		callWebWorkerFunction(fnStr);
 	}
@@ -360,11 +360,11 @@ function create_nucleotide_controller(id, seq, pos, x, y, base, src, hasTP = fal
 function delete_HTMLobj_controller(id){
 
 	if (WEB_WORKER == null) {
-		delete_HTMLobj_WW(id);
+		WW_JS.delete_HTMLobj_WW(id);
 	}
 
 	else{
-		var fnStr = stringifyFunction("delete_HTMLobj_WW", [id]);
+		var fnStr = stringifyFunction("WW_JS.delete_HTMLobj_WW", [id]);
 		//console.log("Sending function: " + fnStr);
 		callWebWorkerFunction(fnStr);
 	}
@@ -392,7 +392,7 @@ function move_obj_controller(obj, dx, dy, animationTime){
 	}
 
 	else{
-		var fnStr = stringifyFunction("move_obj_WW", [obj, dx, dy, animationTime]);
+		var fnStr = stringifyFunction("WW_JS.move_obj_WW", [obj, dx, dy, animationTime]);
 		callWebWorkerFunction(fnStr);
 	}
 }
@@ -409,11 +409,11 @@ function move_nt_controller(pos, seq, dx, dy, animationTime = ANIMATION_TIME_con
                 + currentdate.getSeconds() + ":" 
                 + currentdate.getMilliseconds();
         console.log("Time move_nt_controller", datetime); */
-		move_nt_WW(pos, seq, dx, dy, animationTime);
+		WW_JS.move_nt_WW(pos, seq, dx, dy, animationTime);
 	}
 
 	else{
-		var fnStr = stringifyFunction("move_nt_WW", [pos, seq, dx, dy, animationTime]);
+		var fnStr = stringifyFunction("WW_JS.move_nt_WW", [pos, seq, dx, dy, animationTime]);
 		callWebWorkerFunction(fnStr);
 	}
 
@@ -423,11 +423,11 @@ function move_nt_controller(pos, seq, dx, dy, animationTime = ANIMATION_TIME_con
 function move_obj_from_id_controller(id, dx, dy, animationTime = ANIMATION_TIME_controller){
 
 	if (WEB_WORKER == null) {
-		move_obj_from_id_WW(id, dx, dy, animationTime);
+		WW_JS.move_obj_from_id_WW(id, dx, dy, animationTime);
 	}
 
 	else{
-		var fnStr = stringifyFunction("move_obj_from_id_WW", [id, dx, dy, animationTime]);
+		var fnStr = stringifyFunction("WW_JS.move_obj_from_id_WW", [id, dx, dy, animationTime]);
 		callWebWorkerFunction(fnStr);
 	}
 
@@ -438,9 +438,9 @@ function get_unrenderedObjects_controller(resolve){
 
 
 	if (WEB_WORKER == null) {
-		resolve(get_unrenderedObjects_WW());
+		resolve(WW_JS.get_unrenderedObjects_WW());
 	}else{
-		var res = stringifyFunction("get_unrenderedObjects_WW", [], true);
+		var res = stringifyFunction("WW_JS.get_unrenderedObjects_WW", [], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -453,9 +453,9 @@ function get_unrenderedObjects_controller(resolve){
 function get_primerSequence_controller(resolve){
 
 	if (WEB_WORKER == null) {
-		resolve(get_primerSequence_WW());
+		resolve(WW_JS.get_primerSequence_WW());
 	}else{
-		var res = stringifyFunction("get_primerSequence_WW", [], true);
+		var res = stringifyFunction("WW_JS.get_primerSequence_WW", [], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -468,9 +468,9 @@ function get_primerSequence_controller(resolve){
 function add_pairs_controller(resolve){
 
 	if (WEB_WORKER == null) {
-		resolve(add_pairs_WW());
+		resolve(WW_JS.add_pairs_WW());
 	}else{
-		var res = stringifyFunction("add_pairs_WW", [], true);
+		var res = stringifyFunction("WW_JS.add_pairs_WW", [], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -486,10 +486,10 @@ function userInputSequence_controller(newSeq, newTemplateType, newPrimerType, in
 	
 
 	if (WEB_WORKER == null) {
-		resolve(userInputSequence_WW(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent));
+		resolve(WW_JS.userInputSequence_WW(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent));
 
 	}else{
-		var res = stringifyFunction("userInputSequence_WW", [newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent], true);
+		var res = stringifyFunction("WW_JS.userInputSequence_WW", [newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		callWebWorkerFunction(fnStr, resolve, msgID);
@@ -504,10 +504,10 @@ function userSelectSequence_controller(newSequenceID, newTemplateType, newPrimer
 
 
 	if (WEB_WORKER == null) {
-		resolve(userSelectSequence_WW(newSequenceID, newTemplateType, newPrimerType));
+		resolve(WW_JS.userSelectSequence_WW(newSequenceID, newTemplateType, newPrimerType));
 
 	}else{
-		var res = stringifyFunction("userSelectSequence_WW", [newSequenceID, newTemplateType, newPrimerType], true);
+		var res = stringifyFunction("WW_JS.userSelectSequence_WW", [newSequenceID, newTemplateType, newPrimerType], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -523,11 +523,11 @@ function refreshPlotDataSequenceChangeOnly_controller(resolve = function() { }){
 	
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => refreshPlotDataSequenceChangeOnly_WW(resolve));
+		var toCall = () => new Promise((resolve) => PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW(resolve));
 		toCall().then(() => resolve());
 
 	}else{
-		var res = stringifyFunction("refreshPlotDataSequenceChangeOnly_WW", [null], true);
+		var res = stringifyFunction("PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 
@@ -541,11 +541,11 @@ function refreshPlotDataSequenceChangeOnly_controller(resolve = function() { }){
 function getPlotData_controller(forceUpdate = false, resolve){
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getPlotData_WW(forceUpdate, resolve, null));
+		var toCall = () => new Promise((resolve) => PLOTS_JS.getPlotData_WW(forceUpdate, resolve, null));
 		toCall().then((dict) => resolve(dict));
 
 	}else{
-		var res = stringifyFunction("getPlotData_WW", [forceUpdate, null], true);
+		var res = stringifyFunction("PLOTS_JS.getPlotData_WW", [forceUpdate, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 
@@ -565,11 +565,11 @@ function setNextBaseToAdd_controller(){
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => setNextBaseToAdd_WW(resolve, null));
+		var toCall = () => new Promise((resolve) => WW_JS.setNextBaseToAdd_WW(resolve, null));
 		toCall().then((dict) => setNTP_resolve(dict));
 
 	}else{
-		var res = stringifyFunction("setNextBaseToAdd_WW", [null], true);
+		var res = stringifyFunction("WW_JS.setNextBaseToAdd_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -592,12 +592,12 @@ function userSetNextBaseToAdd_controller(ntpType){
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => userSetNextBaseToAdd_WW(ntpType, resolve));
+		var toCall = () => new Promise((resolve) => WW_JS.userSetNextBaseToAdd_WW(ntpType, resolve));
 		toCall().then((result) => updateDOM(result));
 	}
 
 	else{
-		var res = stringifyFunction("userSetNextBaseToAdd_WW", [ntpType, null], true);
+		var res = stringifyFunction("WW_JS.userSetNextBaseToAdd_WW", [ntpType, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -610,11 +610,11 @@ function userSetNextBaseToAdd_controller(ntpType){
 function refreshNTP_controller(){
 
 	if (WEB_WORKER == null) {
-		refreshNTP_WW();
+		PARAMS_JS.refreshNTP_WW();
 	}
 
 	else{
-		var fnStr = stringifyFunction("refreshNTP_WW");
+		var fnStr = stringifyFunction("PARAMS_JS.refreshNTP_WW");
 		callWebWorkerFunction(fnStr);
 	}
 
@@ -625,11 +625,11 @@ function refreshNTP_controller(){
 function getSaveSessionData_controller(resolve){
 	
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getSaveSessionData_WW(resolve));
+		var toCall = () => new Promise((resolve) => WW_JS.getSaveSessionData_WW(resolve));
 		toCall().then((dict) => resolve(dict));
 
 	}else{
-		var res = stringifyFunction("getSaveSessionData_WW", [null], true);
+		var res = stringifyFunction("WW_JS.getSaveSessionData_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -644,11 +644,11 @@ function get_PHYSICAL_PARAMETERS_controller(resolve = function(dict) {}){
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => get_PHYSICAL_PARAMETERS_WW(resolve));
+		var toCall = () => new Promise((resolve) => PARAMS_JS.get_PHYSICAL_PARAMETERS_WW(resolve));
 		toCall().then((dict) => resolve(dict));
 
 	}else{
-		var res = stringifyFunction("get_PHYSICAL_PARAMETERS_WW", [null], true);
+		var res = stringifyFunction("PARAMS_JS.get_PHYSICAL_PARAMETERS_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -669,12 +669,12 @@ function sample_parameters_controller(resolve = function() {}){
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => sample_parameters_WW(resolve));
+		var toCall = () => new Promise((resolve) => PARAMS_JS.sample_parameters_WW(resolve));
 		toCall().then((result) => updateDOM(result));
 	}
 
 	else{
-		var res = stringifyFunction("sample_parameters_WW", [null], true);
+		var res = stringifyFunction("PARAMS_JS.sample_parameters_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -761,12 +761,12 @@ function submitDistribution_controller(resolve = function() {}){
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => submitDistribution_WW(paramID, distributionName, distributionParams, resolve));
+		var toCall = () => new Promise((resolve) => PARAMS_JS.submitDistribution_WW(paramID, distributionName, distributionParams, resolve));
 		toCall().then((result) => updateDOM(result));
 	}
 
 	else{
-		var res = stringifyFunction("submitDistribution_WW", [paramID, distributionName, distributionParams, null], true);
+		var res = stringifyFunction("PARAMS_JS.submitDistribution_WW", [paramID, distributionName, distributionParams, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -813,12 +813,12 @@ function update_this_parameter_controller(element){
 		if ($("#" + paramID).attr("type") == "checkbox") val = $("#" + paramID).is(":checked");
 
 		if (WEB_WORKER == null) {
-			var toCall = () => new Promise((resolve) => update_this_parameter_WW(paramID, val, resolve));
+			var toCall = () => new Promise((resolve) => PARAMS_JS.update_this_parameter_WW(paramID, val, resolve));
 			toCall().then((result) => updateDOM(result));
 		}
 
 		else{
-			var res = stringifyFunction("update_this_parameter_WW", [paramID, val, null], true);
+			var res = stringifyFunction("PARAMS_JS.update_this_parameter_WW", [paramID, val, null], true);
 			var fnStr = res[0];
 			var msgID = res[1];
 			var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -846,14 +846,14 @@ function updateForce_controller(){
 
 	// If this is in animation mode, then this process is synchronous with rendering so we return in between operators
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => updateForce_WW(newFAssist, resolve));
+		var toCall = () => new Promise((resolve) => PARAMS_JS.updateForce_WW(newFAssist, resolve));
 		toCall().then(() => updateDOM());
 	}
 
 
 	// If it is in asynchronous or hidden mode, then we keep going until the end
 	else{
-		var res = stringifyFunction("updateForce_WW", [newFAssist, null], true);
+		var res = stringifyFunction("PARAMS_JS.updateForce_WW", [newFAssist, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -905,14 +905,14 @@ function transcribe_controller(nbasesToTranscribe = null, fastMode = false, reso
 
 	// If this is in animation mode, then this process is synchronous with rendering so we return in between operators
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => transcribe_WW(nbasesToTranscribe, fastMode, resolve));
+		var toCall = () => new Promise((resolve) => OPS_JS.transcribe_WW(nbasesToTranscribe, fastMode, resolve));
 		toCall().then(() => updateDOM());
 	}
 
 
 	// If it is in asynchronous or hidden mode, then we keep going until the end
 	else{
-		var res = stringifyFunction("transcribe_WW", [nbasesToTranscribe, fastMode, null], true);
+		var res = stringifyFunction("OPS_JS.transcribe_WW", [nbasesToTranscribe, fastMode, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 
@@ -950,14 +950,14 @@ function stutter_controller(nbasesToStutter = null, fastMode = false, resolve = 
 
 	// If this is in animation mode, then this process is synchronous with rendering so we return in between operators
 	if (WEB_WORKER == null ){// || ANIMATION_TIME_controller > 1) {
-		var toCall = () => new Promise((resolve) => stutter_WW(nbasesToStutter, fastMode, resolve));
+		var toCall = () => new Promise((resolve) => OPS_JS.stutter_WW(nbasesToStutter, fastMode, resolve));
 		toCall().then(() => updateDOM());
 	}
 
 
 	// If it is in asynchronous or hidden mode, then we keep going until the end
 	else{
-		var res = stringifyFunction("stutter_WW", [nbasesToStutter, fastMode, null], true);
+		var res = stringifyFunction("OPS_JS.stutter_WW", [nbasesToStutter, fastMode, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 
@@ -1012,13 +1012,13 @@ function forward_controller(state = null, UPDATE_COORDS = true, resolve = functi
 
 	if (WEB_WORKER == null) {
 
-		var toCall = () => new Promise((resolve) => forward_WW(state, UPDATE_COORDS, resolve));
+		var toCall = () => new Promise((resolve) => OPS_JS.forward_WW(state, UPDATE_COORDS, resolve));
 		toCall().then((result) => updateDOM(result));
 
 	}
 
 	else{
-		var res = stringifyFunction("forward_WW", [state, UPDATE_COORDS, null], true);
+		var res = stringifyFunction("OPS_JS.forward_WW", [state, UPDATE_COORDS, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -1075,12 +1075,12 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 	};
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => backwards_WW(state, UPDATE_COORDS, resolve));
+		var toCall = () => new Promise((resolve) => OPS_JS.backwards_WW(state, UPDATE_COORDS, resolve));
 		toCall().then((result) => updateDOM(result));
 	}
 
 	else{
-		var res = stringifyFunction("backwards_WW", [state, UPDATE_COORDS, null], true);
+		var res = stringifyFunction("OPS_JS.backwards_WW", [state, UPDATE_COORDS, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -1123,13 +1123,13 @@ function bindNTP_controller(state = null, UPDATE_COORDS = true, resolve = functi
 
 	if (WEB_WORKER == null) {
 
-		var toCall = () => new Promise((resolve) => bindNTP_WW(state, UPDATE_COORDS, resolve));
+		var toCall = () => new Promise((resolve) => OPS_JS.bindNTP_WW(state, UPDATE_COORDS, resolve));
 		toCall().then((result) => updateDOM(result));
 
 	}
 
 	else{
-		var res = stringifyFunction("bindNTP_WW", [state, UPDATE_COORDS, null], true);
+		var res = stringifyFunction("OPS_JS.bindNTP_WW", [state, UPDATE_COORDS, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -1161,13 +1161,13 @@ function releaseNTP_controller(state = null, UPDATE_COORDS = true, resolve = fun
 
 	if (WEB_WORKER == null) {
 
-		var toCall = () => new Promise((resolve) => releaseNTP_WW(state, UPDATE_COORDS, resolve));
+		var toCall = () => new Promise((resolve) => OPS_JS.releaseNTP_WW(state, UPDATE_COORDS, resolve));
 		toCall().then((result) => updateDOM(result));
 
 	}
 
 	else{
-		var res = stringifyFunction("releaseNTP_WW", [state, UPDATE_COORDS, null], true);
+		var res = stringifyFunction("OPS_JS.releaseNTP_WW", [state, UPDATE_COORDS, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -1197,13 +1197,13 @@ function activate_controller(state = null, UPDATE_COORDS = true, resolve = funct
 
 	if (WEB_WORKER == null) {
 
-		var toCall = () => new Promise((resolve) => activate_WW(state, UPDATE_COORDS, resolve));
+		var toCall = () => new Promise((resolve) => OPS_JS.activate_WW(state, UPDATE_COORDS, resolve));
 		toCall().then((result) => updateDOM(result));
 
 	}
 
 	else{
-		var res = stringifyFunction("activate_WW", [state, UPDATE_COORDS, null], true);
+		var res = stringifyFunction("OPS_JS.activate_WW", [state, UPDATE_COORDS, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -1234,13 +1234,13 @@ function deactivate_controller(state = null, UPDATE_COORDS = true, resolve = fun
 
 	if (WEB_WORKER == null) {
 
-		var toCall = () => new Promise((resolve) => deactivate_WW(state, UPDATE_COORDS, resolve));
+		var toCall = () => new Promise((resolve) => OPS_JS.deactivate_WW(state, UPDATE_COORDS, resolve));
 		toCall().then((result) => updateDOM(result));
 
 	}
 
 	else{
-		var res = stringifyFunction("deactivate_WW", [state, UPDATE_COORDS, null], true);
+		var res = stringifyFunction("OPS_JS.deactivate_WW", [state, UPDATE_COORDS, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -1293,13 +1293,13 @@ function slip_left_controller(S = 0, state = null, UPDATE_COORDS = true, resolve
 
 	if (WEB_WORKER == null) {
 
-		var toCall = () => new Promise((resolve) => slip_left_WW(state, UPDATE_COORDS, S, resolve));
+		var toCall = () => new Promise((resolve) => OPS_JS.slip_left_WW(state, UPDATE_COORDS, S, resolve));
 		toCall().then((result) => updateDOM(result));
 
 	}
 
 	else{
-		var res = stringifyFunction("slip_left_WW", [state, UPDATE_COORDS, S, null], true);
+		var res = stringifyFunction("OPS_JS.slip_left_WW", [state, UPDATE_COORDS, S, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -1353,13 +1353,13 @@ function slip_right_controller(S = 0, state = null, UPDATE_COORDS = true, resolv
 
 	if (WEB_WORKER == null) {
 
-		var toCall = () => new Promise((resolve) => slip_right_WW(state, UPDATE_COORDS, S, resolve));
+		var toCall = () => new Promise((resolve) => OPS_JS.slip_right_WW(state, UPDATE_COORDS, S, resolve));
 		toCall().then((result) => updateDOM(result));
 
 	}
 
 	else{
-		var res = stringifyFunction("slip_right_WW", [state, UPDATE_COORDS, S, null], true);
+		var res = stringifyFunction("OPS_JS.slip_right_WW", [state, UPDATE_COORDS, S, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -1438,12 +1438,12 @@ function changeSpeed_controller(){
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => changeSpeed_WW(speed, resolve));
+		var toCall = () => new Promise((resolve) => WW_JS.changeSpeed_WW(speed, resolve));
 		toCall().then((res) => updateDOM(res));
 	}
 
 	else{
-		var res = stringifyFunction("changeSpeed_WW", [speed, null], true);
+		var res = stringifyFunction("WW_JS.changeSpeed_WW", [speed, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -1461,12 +1461,12 @@ function getSlidingHeights_controller(ignoreModelOptions = false, resolve = func
 
 	//console.log("Asking for getSlidingHeights_controller");
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getSlidingHeights_WW(true, ignoreModelOptions, resolve));
+		var toCall = () => new Promise((resolve) => FE_JS.getSlidingHeights_WW(true, ignoreModelOptions, resolve));
 		toCall().then((result) => resolve(result));
 	}
 
 	else{
-		var res = stringifyFunction("getSlidingHeights_WW", [true, ignoreModelOptions, null], true);
+		var res = stringifyFunction("FE_JS.getSlidingHeights_WW", [true, ignoreModelOptions, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -1483,12 +1483,12 @@ function getSlidingHeights_controller(ignoreModelOptions = false, resolve = func
 function getStateDiagramInfo_controller(resolve = function(state) { }){
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getStateDiagramInfo_WW(resolve));
+		var toCall = () => new Promise((resolve) => FE_JS.getStateDiagramInfo_WW(resolve));
 		toCall().then((result) => resolve(result));
 	}
 
 	else{
-		var res = stringifyFunction("getStateDiagramInfo_WW", [null], true);
+		var res = stringifyFunction("FE_JS.getStateDiagramInfo_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -1504,12 +1504,12 @@ function getStateDiagramInfo_controller(resolve = function(state) { }){
 function getCurrentState_controller(resolve = function(state) { }){
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getCurrentState_WW(resolve));
+		var toCall = () => new Promise((resolve) => WW_JS.getCurrentState_WW(resolve));
 		toCall().then((result) => resolve(result));
 	}
 
 	else{
-		var res = stringifyFunction("getCurrentState_WW", [null], true);
+		var res = stringifyFunction("WW_JS.getCurrentState_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
@@ -1524,12 +1524,12 @@ function getCurrentState_controller(resolve = function(state) { }){
 function getTranslocationCanvasData_controller(resolve = function(result){}){
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getTranslocationCanvasData_WW(resolve));
+		var toCall = () => new Promise((resolve) => FE_JS.getTranslocationCanvasData_WW(resolve));
 		toCall().then((result) => resolve(result));
 	}
 
 	else{
-		var res = stringifyFunction("getTranslocationCanvasData_WW", [null], true);
+		var res = stringifyFunction("FE_JS.getTranslocationCanvasData_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -1545,12 +1545,12 @@ function getTranslocationCanvasData_controller(resolve = function(result){}){
 function getNTPCanvasData_controller(resolve = function(result){}){
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getNTPCanvasData_WW(resolve));
+		var toCall = () => new Promise((resolve) => FE_JS.getNTPCanvasData_WW(resolve));
 		toCall().then((result) => resolve(result));
 	}
 
 	else{
-		var res = stringifyFunction("getNTPCanvasData_WW", [null], true);
+		var res = stringifyFunction("FE_JS.getNTPCanvasData_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -1566,12 +1566,12 @@ function getNTPCanvasData_controller(resolve = function(result){}){
 function getDeactivationCanvasData_controller(resolve = function(result){}){
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getDeactivationCanvasData_WW(resolve));
+		var toCall = () => new Promise((resolve) => FE_JS.getDeactivationCanvasData_WW(resolve));
 		toCall().then((result) => resolve(result));
 	}
 
 	else{
-		var res = stringifyFunction("getDeactivationCanvasData_WW", [null], true);
+		var res = stringifyFunction("FE_JS.getDeactivationCanvasData_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -1585,12 +1585,12 @@ function getDeactivationCanvasData_controller(resolve = function(result){}){
 function getSlippageCanvasData_controller(S = 0, resolve = function(result){}){
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getSlippageCanvasData_WW(S, resolve));
+		var toCall = () => new Promise((resolve) => FE_JS.getSlippageCanvasData_WW(S, resolve));
 		toCall().then((result) => resolve(result));
 	}
 
 	else{
-		var res = stringifyFunction("getSlippageCanvasData_WW", [S, null], true);
+		var res = stringifyFunction("FE_JS.getSlippageCanvasData_WW", [S, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -1675,14 +1675,14 @@ function startTrials_controller(){
 			
 		// If this is in animation mode, then this process is synchronous with rendering so we return in between operators
 		if (WEB_WORKER == null) {
-			var toCall = () => new Promise((resolve) => startTrials_WW(ntrials, resolve));
+			var toCall = () => new Promise((resolve) => SIM_JS.startTrials_WW(ntrials, resolve));
 			toCall().then(() => updateDOM());
 		}
 
 
 		// If it is in asynchronous or hidden mode, then we keep going until the end
 		else{
-			var res = stringifyFunction("startTrials_WW", [ntrials, null], true);
+			var res = stringifyFunction("SIM_JS.startTrials_WW", [ntrials, null], true);
 			var fnStr = res[0];
 			msgID_simulation = res[1];
 
@@ -1715,12 +1715,12 @@ function selectPlot_controller(plotNum, value, deleteData, updateDOM = function(
 	
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => selectPlot_WW(plotNum, value, deleteData, true, resolve));
+		var toCall = () => new Promise((resolve) => PLOTS_JS.selectPlot_WW(plotNum, value, deleteData, true, resolve));
 		toCall().then((plotData) => updateDOM(plotData));
 	}
 
 	else{
-		var res = stringifyFunction("selectPlot_WW", [plotNum, value, deleteData, true, null], true);
+		var res = stringifyFunction("PLOTS_JS.selectPlot_WW", [plotNum, value, deleteData, true, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -1870,12 +1870,12 @@ function saveSettings_controller(){
 	
 	
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => saveSettings_WW(plotNum, plotType, values, resolve));
+		var toCall = () => new Promise((resolve) => PLOTS_JS.saveSettings_WW(plotNum, plotType, values, resolve));
 		toCall().then((whichPlotInWhichCanvas) => updateDom(whichPlotInWhichCanvas));
 	}
 
 	else{
-		var res = stringifyFunction("saveSettings_WW", [plotNum, plotType, values, null], true);
+		var res = stringifyFunction("PLOTS_JS.saveSettings_WW", [plotNum, plotType, values, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -1894,11 +1894,11 @@ function delete_plot_data_controller(plotNum){
 	
 	
 	if (WEB_WORKER == null) {
-		delete_plot_data_WW(plotNum);
+		PLOTS_JS.delete_plot_data_WW(plotNum);
 	}
 
 	else{
-		var fnStr = stringifyFunction("delete_plot_data_WW", [plotNum]);
+		var fnStr = stringifyFunction("PLOTS_JS.delete_plot_data_WW", [plotNum]);
 		callWebWorkerFunction(fnStr);
 	}
 	
@@ -1942,12 +1942,12 @@ function getElongationModels_controller(resolve = function(x) { }){
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getElongationModels_WW(resolve));
+		var toCall = () => new Promise((resolve) => FE_JS.getElongationModels_WW(resolve));
 		toCall().then((result) => resolve(result));
 	}
 
 	else{
-		var res = stringifyFunction("getElongationModels_WW", [null], true);
+		var res = stringifyFunction("FE_JS.getElongationModels_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -1962,12 +1962,12 @@ function getElongationModels_controller(resolve = function(x) { }){
 function getMisbindMatrix_controller(resolve = function(x) { }){
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getMisbindMatrix_WW(resolve));
+		var toCall = () => new Promise((resolve) => WW_JS.getMisbindMatrix_WW(resolve));
 		toCall().then((mod) => resolve(mod));
 	}
 
 	else{
-		var res = stringifyFunction("getMisbindMatrix_WW", [null], true);
+		var res = stringifyFunction("WW_JS.getMisbindMatrix_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -1992,12 +1992,12 @@ function getMFESequenceBonds_controller(){
 	};
 	
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getMFESequenceBonds_WW(resolve));
+		var toCall = () => new Promise((resolve) => MFE_JS.getMFESequenceBonds_WW(resolve));
 		toCall().then((graphInfo) => updateDOM(graphInfo));
 	}
 
 	else{
-		var res = stringifyFunction("getMFESequenceBonds_WW", [null], true);
+		var res = stringifyFunction("MFE_JS.getMFESequenceBonds_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 
@@ -2023,6 +2023,7 @@ function loadSession_controller(XMLData){
 		var seqObject = result["seq"];
 		var model = result["model"];
 		var compactState = result["compactState"];
+		var forceVelocity = result["ABC_FORCE_VELOCITIES"];
 		
 		
 			
@@ -2070,6 +2071,34 @@ function loadSession_controller(XMLData){
 			submitCustomSequence(openPlots);
 		}
 
+
+
+		// Update the ABC panel
+		if (forceVelocity != null){
+
+			console.log("forceVelocity", forceVelocity);
+			$("#ABCntrials").val(forceVelocity["ntrials"]);
+			$("#ABC_RSS").val(forceVelocity["RSSthreshold"]);
+
+			var textAreaString = "";
+			for (var fitID in forceVelocity["fits"]){
+
+				for (var obsNum = 0; obsNum < forceVelocity["fits"][fitID].length; obsNum++){
+					var force = forceVelocity["fits"][fitID][obsNum]["force"];
+					var velocity = forceVelocity["fits"][fitID][obsNum]["velocity"];
+					textAreaString += force + ", " + velocity;
+
+					if (obsNum < forceVelocity["fits"][fitID].length-1) textAreaString += "\n" 
+
+				}
+			}
+
+			$("#forceVelocityInputData").val(textAreaString);
+			validateForceVelocityInput("#forceVelocityInputData");
+
+		}
+
+
 		// Update the model DOM eg. enable hypertranslocation
 		updateModelDOM(model);
 		
@@ -2080,12 +2109,12 @@ function loadSession_controller(XMLData){
 	
 	
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => loadSession_WW(XMLData, resolve));
+		var toCall = () => new Promise((resolve) => XML_JS.loadSession_WW(XMLData, resolve));
 		toCall().then((whichPlotInWhichCanvas) => updateDom(whichPlotInWhichCanvas));
 	}
 
 	else{
-		var res = stringifyFunction("loadSession_WW", [XMLData, null], true);
+		var res = stringifyFunction("XML_JS.loadSession_WW", [XMLData, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -2104,9 +2133,9 @@ function loadSession_controller(XMLData){
 function showPlot_controller(plotNum, hidden){
 
 	if (WEB_WORKER == null) {
-		showPlot_WW(plotNum, hidden);
+		PLOTS_JS.showPlot_WW(plotNum, hidden);
 	}else{
-		var fnStr = stringifyFunction("showPlot_WW", [plotNum, hidden]);
+		var fnStr = stringifyFunction("PLOTS_JS.showPlot_WW", [plotNum, hidden]);
 		//console.log("Sending function: " + fnStr);
 		callWebWorkerFunction(fnStr);
 	}
@@ -2133,12 +2162,12 @@ function getNTPparametersAndSettings_controller(resolve = function(){}){
 
 	
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getNTPparametersAndSettings_WW(resolve));
+		var toCall = () => new Promise((resolve) => FE_JS.getNTPparametersAndSettings_WW(resolve));
 		toCall().then((mod) => resolve(mod));
 	}
 
 	else{
-		var res = stringifyFunction("getNTPparametersAndSettings_WW", [null], true);
+		var res = stringifyFunction("FE_JS.getNTPparametersAndSettings_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -2184,12 +2213,12 @@ function userInputModel_controller(){
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => userInputModel_WW(elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, resolve));
+		var toCall = () => new Promise((resolve) => FE_JS.userInputModel_WW(elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, resolve));
 		toCall().then((mod) => updateDOM(mod));
 	}
 
 	else{
-		var res = stringifyFunction("userInputModel_WW", [elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, null], true);
+		var res = stringifyFunction("FE_JS.userInputModel_WW", [elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -2206,12 +2235,12 @@ function getCacheSizes_controller(resolve = function(){}){
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => getCacheSizes_WW(resolve));
+		var toCall = () => new Promise((resolve) => PLOTS_JS.getCacheSizes_WW(resolve));
 		toCall().then((result) => resolve(result));
 	}
 
 	else{
-		var res = stringifyFunction("getCacheSizes_WW", [null], true);
+		var res = stringifyFunction("PLOTS_JS.getCacheSizes_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -2230,12 +2259,12 @@ function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardat
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, resolve));
+		var toCall = () => new Promise((resolve) => PLOTS_JS.deletePlots_WW(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, resolve));
 		toCall().then((result) => resolve(result));
 	}
 
 	else{
-		var res = stringifyFunction("deletePlots_WW", [distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, null], true);
+		var res = stringifyFunction("PLOTS_JS.deletePlots_WW", [distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -2250,7 +2279,14 @@ function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardat
 
 
 
-function beginABC_controller(rules){
+
+
+
+
+
+
+
+function beginABC_controller(forcesVelocitiesForModel){
 
 
 	running_ABC = true;
@@ -2262,25 +2298,28 @@ function beginABC_controller(rules){
 		$("#ABCntrials").css("cursor", "");
 		$("#ABCntrials").css("background-color", "#663399");
 		$("#ABCntrials").attr("disabled", false);
-		$("#ABCnRulesPerTrial").css("cursor", "");
-		$("#ABCnRulesPerTrial").css("background-color", "#663399");
-		$("#ABCnRulesPerTrial").attr("disabled", false);
+		$("#ABC_RSS").css("cursor", "");
+		$("#ABC_RSS").css("background-color", "#663399");
+		$("#ABC_RSS").attr("disabled", false);
 		$("#PreExp").attr("disabled", false);
 		$("#PreExp").css("cursor", "");
 		$("#PreExp").css("background-color", "#008CBA");
 		running_ABC = false;
 		simulationRenderingController = false;
 
+		get_unrendered_ABCoutput_controller();
+
+
 	};
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => beginABC_WW(rules, resolve));
+		var toCall = () => new Promise((resolve) => ABC_JS.beginABC_WW(forcesVelocitiesForModel, resolve));
 		toCall().then(() => updateDOM());
 	}
 
 	else{
-		var res = stringifyFunction("beginABC_WW", [rules, null], true);
+		var res = stringifyFunction("ABC_JS.beginABC_WW", [forcesVelocitiesForModel, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -2305,50 +2344,70 @@ function beginABC_controller(rules){
 }
 
 
+
+
 function get_unrendered_ABCoutput_controller(){
 
+
+	var showRejectedParameters = $("#ABC_showRejectedParameters").prop("checked");
 
 
 	// Update the ABC output 
 	var updateDOM = function(result){
 
-		// Update the counter
-		var nTrialsToGo = result["nTrialsToGo"];
-		if (nTrialsToGo != parseFloat($("#ABCntrials").val())) $("#ABCntrials").val(nTrialsToGo);
+		if (result != null) {
+
+			// Update the counter
+			var nTrialsToGo = result["nTrialsToGo"];
+			if (nTrialsToGo != parseFloat($("#ABCntrials").val())) $("#ABCntrials").val(nTrialsToGo);
 
 
-		// Update the numbers of accepted values
-		var acceptanceNumber = result["acceptanceNumber"];
-		if (acceptanceNumber != null) $("#ABCacceptance_val").html(roundToSF(acceptanceNumber));
+			// Update the numbers of accepted values
+			var acceptanceNumber = result["acceptanceNumber"];
+			if (acceptanceNumber != null) $("#ABCacceptance_val").html(roundToSF(acceptanceNumber));
 
 
-		// Update the acceptance percentage
-		var acceptancePercentage = result["acceptancePercentage"];
-		if (acceptancePercentage != null) $("#ABCacceptancePercentage_val").html(roundToSF(acceptancePercentage));
+			// Update the acceptance percentage
+			var acceptancePercentage = result["acceptancePercentage"];
+			if (acceptancePercentage != null) $("#ABCacceptancePercentage_val").html(roundToSF(acceptancePercentage));
 
-		var newLines = result["newLines"];
-		if (newLines.length == 0) return;
+			var newLines = result["newLines"];
+			if (newLines.length == 0) return;
 
-		for (var i = 0; i < newLines.length; i++){
+			for (var i = 0; i < newLines.length; i++){
 
 
+				if (newLines[i].trim() == "") continue;
 
-			// Replace all the & with a space
-			var paddedLine = "";
-			var openPipe = true; // | (pipes) denote coloured font
-			for (var j = 0; j < newLines[i].length; j ++){
+				// Replace all the & with a space
+				var rejected = newLines[i].split("|")[1].trim() == "false";
+				var paddedLine = rejected ? "<div class='ABCrejected'>" : "<div>";
 
-				if (newLines[i][j] == "|") {
-					paddedLine += openPipe ? "<span style='color:red'>" : "</span>"; 
-					openPipe = !openPipe;
+				
+
+				var openPipe = true; // | (pipes) denote coloured font
+				for (var j = 0; j < newLines[i].length; j ++){
+
+					if (newLines[i][j] == "|") {
+						paddedLine += openPipe ? "<span style='color:red'>" : "</span>"; 
+						openPipe = !openPipe;
+					}
+					else if (newLines[i][j] == "&") paddedLine += "&nbsp";
+					else paddedLine += newLines[i][j];
+
+
 				}
-				else if (newLines[i][j] == "&") paddedLine += "&nbsp";
-				else paddedLine += newLines[i][j];
+
+				var currentOutputHTML = $("#ABCoutput").html();
+				$("#ABCoutput").html(currentOutputHTML + paddedLine + "</div>");
 			}
 
-			var currentOutputHTML = $("#ABCoutput").html();
-			$("#ABCoutput").html(currentOutputHTML + paddedLine + "<br>");
 		}
+
+
+		// Hide all the rejected rows if required
+		if (showRejectedParameters) $(".ABCrejected").show(0);
+		else $(".ABCrejected").hide(0);
 
 
 		// Scroll to the bottom of the textoutput
@@ -2359,12 +2418,12 @@ function get_unrendered_ABCoutput_controller(){
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => get_unrendered_ABCoutput_WW(resolve));
+		var toCall = () => new Promise((resolve) => ABC_JS.get_unrendered_ABCoutput_WW(resolve));
 		toCall().then((lines) => updateDOM(lines));
 	}
 
 	else{
-		var res = stringifyFunction("get_unrendered_ABCoutput_WW", [null], true);
+		var res = stringifyFunction("ABC_JS.get_unrendered_ABCoutput_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -2387,12 +2446,12 @@ function get_ABCoutput_controller(resolve = function(lines) { }){
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => get_ABCoutput_WW(resolve));
+		var toCall = () => new Promise((resolve) => ABC_JS.get_ABCoutput_WW(resolve));
 		toCall().then((lines) => resolve(lines));
 	}
 
 	else{
-		var res = stringifyFunction("get_ABCoutput_WW", [null], true);
+		var res = stringifyFunction("ABC_JS.get_ABCoutput_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));

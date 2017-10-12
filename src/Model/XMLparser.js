@@ -22,10 +22,14 @@
 
 
 
-// Modified from http://xmljs.sourceforge.net/website/sampleApplications-sax.html
-function loadSession_WW(XMLstring, resolve = function() { }, msgID = null){
+XML_JS = {};
+XML_JS.ABC_FORCE_VELOCITIES = {};
 
-	//console.log("XMLdata", XMLstring);
+
+// Modified from http://xmljs.sourceforge.net/website/sampleApplications-sax.html
+ XML_JS.loadSession_WW = function(XMLstring, resolve = function() {}, msgID = null){
+
+
 
 	var arr, src='' ,parser = new SAXDriver();
 	var handler = new xmlHandler();
@@ -48,7 +52,7 @@ function loadSession_WW(XMLstring, resolve = function() { }, msgID = null){
 
 	var speedVal = "medium";
 	arr=handler.getPath_Array();
-	var N = xmlAttrArray[arr[0]]["N"];
+	XML_JS.N = xmlAttrArray[arr[0]]["N"];
 	var speedVal = xmlAttrArray[arr[0]]["speed"];
 
 	
@@ -57,16 +61,19 @@ function loadSession_WW(XMLstring, resolve = function() { }, msgID = null){
 		var splitArr = arr[i].split("/");
 		if (splitArr[2] == "sequence") parseXML_sequence_WW(xmlAttrArray[arr[i]]);
 		else if (splitArr[2] == "parameters" && splitArr.length == 4) parseXML_param_WW(splitArr[3], xmlAttrArray[arr[i]]);
-		else if (splitArr[2] == "elongation-model" && splitArr.length == 3) currentElongationModel = xmlAttrArray[arr[i]]["id"]; // Model id
+		else if (splitArr[2] == "elongation-model" && splitArr.length == 3) FE_JS.currentElongationModel = xmlAttrArray[arr[i]]["id"]; // Model id
 		else if (splitArr[2] == "elongation-model" && splitArr.length == 4) parseXML_model_WW(splitArr[3], xmlAttrArray[arr[i]]["val"]); // Model property
 		//else if (splitArr[2] == "state") compactState = parseXML_state_WW(xmlAttrArray[arr[i]]); // Current state
 		else if (splitArr[2] == "plots" && splitArr.length == 4) parseXML_plots_WW(splitArr[3], xmlAttrArray[arr[i]]); 
+		else if (splitArr[2] == "ABC" && splitArr.length == 3) parseXML_ABCmain_WW(xmlAttrArray[arr[i]]); 
+		else if (splitArr[2] == "ABC" && splitArr.length == 4) parseXML_ABCfit_WW(splitArr[3], xmlAttrArray[arr[i]]); 
 		
 		
-		}
+	}
 
 
-	var toReturn = {seq: all_sequences[sequenceID], model: ELONGATION_MODELS[currentElongationModel], N: N, speed: speedVal, whichPlotInWhichCanvas: whichPlotInWhichCanvas};
+
+	var toReturn = {seq: SEQS_JS.all_sequences[sequenceID], model: FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel], N: XML_JS.N, speed: speedVal, whichPlotInWhichCanvas: PLOTS_JS.whichPlotInWhichCanvas, ABC_FORCE_VELOCITIES: XML_JS.ABC_FORCE_VELOCITIES};
 	toReturn["seq"]["seqID"] = sequenceID;
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
@@ -84,9 +91,9 @@ function parseXML_plots_WW(attr, values){
 
 	var plotNum = parseFloat(attr.substring(4)); // Convert plotx into x where x is a number from 1 to 4
 	
-	selectPlot_WW(plotNum, values["name"], null, false); // Initialise the plot
+	PLOTS_JS.selectPlot_WW(plotNum, values["name"], null, false); // Initialise the plot
 	for (var prop in values){
-		if (prop != "name") whichPlotInWhichCanvas[plotNum][prop] = values[prop]; // Copy all the settings over
+		if (prop != "name") PLOTS_JS.whichPlotInWhichCanvas[plotNum][prop] = values[prop]; // Copy all the settings over
 	}
 
 	
@@ -94,7 +101,7 @@ function parseXML_plots_WW(attr, values){
 
 function parseXML_model_WW(attr, val){
 	var val = val == "true" ? true : val == "false" ? false : val;
-	ELONGATION_MODELS[currentElongationModel][attr] = val; 
+	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel][attr] = val; 
 }
 
 
@@ -112,24 +119,50 @@ function parseXML_sequence_WW(sequenceNode){
 	//console.log("Parsing", sequenceNode);
 
 	sequenceID = sequenceNode["seqID"];
-	all_sequences[sequenceID] = {};
-	all_sequences[sequenceID]["seq"] = sequenceNode["seq"];
-	all_sequences[sequenceID]["template"] = sequenceNode["TemplateType"];
-	all_sequences[sequenceID]["primer"] = sequenceNode["PrimerType"];
+	SEQS_JS.all_sequences[sequenceID] = {};
+	SEQS_JS.all_sequences[sequenceID]["seq"] = sequenceNode["seq"];
+	SEQS_JS.all_sequences[sequenceID]["template"] = sequenceNode["TemplateType"];
+	SEQS_JS.all_sequences[sequenceID]["primer"] = sequenceNode["PrimerType"];
 
 	// Reset secondary structure calculations
-	MFE_W = {};
-	MFE_V = {};
+	MFE_JS.MFE_W = {};
+	MFE_JS.MFE_V = {};
 
-	setStructuralParameters_WW();
+	PARAMS_JS.setStructuralParameters_WW();
 
+
+
+}
+
+
+// Parse the global ABC settings
+function parseXML_ABCmain_WW(ABCnode){
+
+	XML_JS.ABC_FORCE_VELOCITIES = {};
+	XML_JS.ABC_FORCE_VELOCITIES["ntrials"] = ABCnode["ntrials"];
+	XML_JS.ABC_FORCE_VELOCITIES["RSSthreshold"] = ABCnode["RSSthreshold"];
+	XML_JS.ABC_FORCE_VELOCITIES["fits"] = {};
+
+}
+
+
+// Parse the ABC force-velocity fit settings
+function parseXML_ABCfit_WW(fitID, fitNode){
+
+	
+	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID] = [];
+	for (var obsID in fitNode){
+		var force = parseFloat(fitNode[obsID].split(",")[0]);
+		var velocity = parseFloat(fitNode[obsID].split(",")[1]);
+		XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID].push({force: force, velocity: velocity});
+	}
 
 
 }
 
 function parseXML_param_WW(paramID, paramNode){
 
-	console.log("Parsing", paramID, paramNode);
+	//console.log("Parsing", paramID, paramNode);
 
 
 	var val = parseFloat(paramNode["val"]);
@@ -148,23 +181,37 @@ function parseXML_param_WW(paramID, paramNode){
 	var poissonRateVal = paramNode["poissonRateVal"]; 
 
 
-	PHYSICAL_PARAMETERS[paramID]["val"] = val;
-	PHYSICAL_PARAMETERS[paramID]["distribution"] = distribution;
+	PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] = val;
+	PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["distribution"] = distribution;
 
-	if (fixedDistnVal != null) PHYSICAL_PARAMETERS[paramID]["fixedDistnVal"] = parseFloat(fixedDistnVal);
-	if (uniformDistnLowerVal != null) PHYSICAL_PARAMETERS[paramID]["uniformDistnLowerVal"] = parseFloat(uniformDistnLowerVal);
-	if (uniformDistnUpperVal != null) PHYSICAL_PARAMETERS[paramID]["uniformDistnUpperVal"] = parseFloat(uniformDistnUpperVal);
-	if (ExponentialDistnVal != null) PHYSICAL_PARAMETERS[paramID]["ExponentialDistnVal"] = parseFloat(ExponentialDistnVal);
-	if (normalMeanVal != null) PHYSICAL_PARAMETERS[paramID]["normalMeanVal"] = parseFloat(normalMeanVal);
-	if (normalSdVal != null) PHYSICAL_PARAMETERS[paramID]["normalSdVal"] = parseFloat(normalSdVal);
-	if (lognormalMeanVal != null) PHYSICAL_PARAMETERS[paramID]["lognormalMeanVal"] = parseFloat(lognormalMeanVal);
-	if (lognormalSdVal != null) PHYSICAL_PARAMETERS[paramID]["lognormalSdVal"] = parseFloat(lognormalSdVal);
-	if (gammaShapeVal != null) PHYSICAL_PARAMETERS[paramID]["gammaShapeVal"] = parseFloat(gammaShapeVal);
-	if (gammaRateVal != null) PHYSICAL_PARAMETERS[paramID]["gammaRateVal"] = parseFloat(gammaRateVal);
-	if (poissonRateVal != null) PHYSICAL_PARAMETERS[paramID]["poissonRateVal"] = parseFloat(poissonRateVal);
+	if (fixedDistnVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["fixedDistnVal"] = parseFloat(fixedDistnVal);
+	if (uniformDistnLowerVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["uniformDistnLowerVal"] = parseFloat(uniformDistnLowerVal);
+	if (uniformDistnUpperVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["uniformDistnUpperVal"] = parseFloat(uniformDistnUpperVal);
+	if (ExponentialDistnVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["ExponentialDistnVal"] = parseFloat(ExponentialDistnVal);
+	if (normalMeanVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["normalMeanVal"] = parseFloat(normalMeanVal);
+	if (normalSdVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["normalSdVal"] = parseFloat(normalSdVal);
+	if (lognormalMeanVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["lognormalMeanVal"] = parseFloat(lognormalMeanVal);
+	if (lognormalSdVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["lognormalSdVal"] = parseFloat(lognormalSdVal);
+	if (gammaShapeVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["gammaShapeVal"] = parseFloat(gammaShapeVal);
+	if (gammaRateVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["gammaRateVal"] = parseFloat(gammaRateVal);
+	if (poissonRateVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["poissonRateVal"] = parseFloat(poissonRateVal);
 
 
 
+
+}
+
+
+
+
+if (RUNNING_FROM_COMMAND_LINE){
+
+
+	module.exports = {
+		loadSession_WW: XML_JS.loadSession_WW,
+		ABC_FORCE_VELOCITIES: XML_JS.ABC_FORCE_VELOCITIES
+
+	}
 
 }
 

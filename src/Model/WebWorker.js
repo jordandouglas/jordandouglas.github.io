@@ -19,14 +19,20 @@
     --------------------------------------------------------------------
 -*/
 
-isWebWorker = false;
+WW_JS = {};
+WW_JS.isWebWorker = false;
+if (typeof RUNNING_FROM_COMMAND_LINE === 'undefined') RUNNING_FROM_COMMAND_LINE = false;
 
-function init_WW(isWW){
 
-	isWebWorker = isWW;
-	
+	// Random.js from http://simjs.com/random.html
 
-	if (isWebWorker){
+
+WW_JS.init_WW = function(isWW,){
+
+	WW_JS.isWebWorker = isWW;
+
+
+	if (WW_JS.isWebWorker){
 		//postMessage("MSG:WebWorker is connected");
 		self.importScripts('sequences.js');
 		self.importScripts('parameters.js');
@@ -39,18 +45,37 @@ function init_WW(isWW){
 		self.importScripts('stateEncoding.js');
 		self.importScripts('XMLparser.js');
 		self.importScripts('../Resources/random.js');
-		self.importScripts('../Resources/jstat.min.js');
 		self.importScripts('../Resources/mersenne-twister.js');
 		self.importScripts('../Resources/xml_for_script-3.1/jsXMLParser/xmlsax.js');
-		mersenneTwister = new MersenneTwister();
 	}
 
+	else if (RUNNING_FROM_COMMAND_LINE){
 
+
+
+		SEQS_JS = require('./sequences.js');
+		PARAMS_JS = require('./parameters.js');
+		SIM_JS = require('./simulator.js');
+		OPS_JS = require('./operators.js');
+		PLOTS_JS = require('./plots.js');
+		FE_JS = require('./freeEnergy.js');
+		ABC_JS = require('./ABC.js');
+		MFE_JS = require('./MFE.js');
+		STATE_JS = require('./stateEncoding.js');
+		XML_JS = require('./XMLparser.js');
+		RAND_JS = require('../Resources/random.js');
+		MER_JS = require('../Resources/mersenne-twister.js');
+		require('../Resources/xml_for_script-3.1/jsXMLParser/xmlsax.js');
+
+
+
+
+	}
 	needToRefreshNTPParameters = true;
-	for (sequenceID in all_sequences){ break }; // Set the current sequence to the first sequence in the dict
+	for (sequenceID in SEQS_JS.all_sequences){ break }; // Set the current sequence to the first sequence in the dict
 	init_misincorporation_pairs();
-	initFreeEnergy_WW();
-	initParameters_WW();
+	FE_JS.initFreeEnergy_WW();
+	PARAMS_JS.initParameters_WW();
 
 
 	unrenderedObjects = [];
@@ -70,16 +95,18 @@ function init_WW(isWW){
 	TbulgeSize = 0;
 
 	
-	stopRunning_WW = true;
+	WW_JS.stopRunning_WW = true;
 	simulating = false;
 	simulationOnPause = false;
 	ANIMATION_TIME_TEMP = 100; // TODO: sync with DOM
 
 
 
-	//refresh_WW();
+	//WW_JS.refresh_WW();
 
-	console.log("ww connected");
+
+
+
 
 }
 
@@ -87,40 +114,43 @@ function init_WW(isWW){
 
 
 
-function refresh_WW(resolve = function() {}, msgID = null){
+ WW_JS.refresh_WW = function(resolve, msgID){
 
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
 
 
 	// Which sequence are we using
-	if(!ABC_simulating) sample_parameters_WW(); // Do not sample parameters if in the middle of an ABC experiment
+	if(!ABC_JS.ABC_simulating) PARAMS_JS.sample_parameters_WW(); // Do not sample parameters if in the middle of an ABC experiment
 	templateEntryChannelLength = 6;
 	templateExitChannelLength = 5;
 	specialSite = -1;
 
 	// Initial state
-	currentState = { leftGBase: 0, rightGBase: PHYSICAL_PARAMETERS["hybridLen"]["val"]-1, leftMBase: 0, rightMBase: PHYSICAL_PARAMETERS["hybridLen"]["val"]-1, NTPtoAdd: "X",
-					 mRNAPosInActiveSite: 0, NTPbound: false, nbases: 0, mRNALength: PHYSICAL_PARAMETERS["hybridLen"]["val"], activated:true, rateOfBindingNextBase:0,
-					 bulgePos: [0], bulgedBase: [-1], bulgeSize: [0], partOfBulgeID: [0], nextBaseToCopy: PHYSICAL_PARAMETERS["hybridLen"]["val"], terminated: false };
+	WW_JS.currentState = { leftGBase: 0, rightGBase: PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]-1, leftMBase: 0, rightMBase: PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]-1, NTPtoAdd: "X",
+					 mRNAPosInActiveSite: 0, NTPbound: false, nbases: 0, mRNALength: PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"], activated:true, rateOfBindingNextBase:0,
+					 bulgePos: [0], bulgedBase: [-1], bulgeSize: [0], partOfBulgeID: [0], nextBaseToCopy: PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"], terminated: false };
 	
 
 
-	//currentState = convertCompactStateToFullState(convertFullStateToCompactState(currentState));
+	//WW_JS.currentState = STATE_JS.convertCompactStateToFullState(STATE_JS.convertFullStateToCompactState(WW_JS.currentState));
 
 	
-	add_pairs_WW();
-	calculateAllBarrierHeights_WW();
+	WW_JS.add_pairs_WW();
+	FE_JS.calculateAllBarrierHeights_WW();
 
-	refreshPlotData();
-	//if (!simulating) transcribe_WW(2, true);
+
+	//if (!simulating) OPS_JS.transcribe_WW(2, true);
 	
 	// Update the force diagram
-	updateForce_WW();
+	PARAMS_JS.updateForce_WW();
 
-	setNextBaseToAdd_WW();
-	transcribe_WW(2 + Math.max(2, PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+2), true); // Keep moving right until transcription bubble is sealed
+	WW_JS.setNextBaseToAdd_WW();
+	OPS_JS.transcribe_WW(2 + Math.max(2, PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+2), true); // Keep moving right until transcription bubble is sealed
 
+	PLOTS_JS.refreshPlotData();
 
-	initTranslocationRateCache();
+	STATE_JS.initTranslocationRateCache();
 
 
 
@@ -136,15 +166,14 @@ function refresh_WW(resolve = function() {}, msgID = null){
 
 
 
-function add_pairs_WW(msgID = null){
+ WW_JS.add_pairs_WW = function(msgID){
 
+	if (msgID === undefined) msgID = null;
 	
-	var bases = all_sequences[sequenceID]["seq"].toUpperCase();
+	var bases = SEQS_JS.all_sequences[sequenceID]["seq"].toUpperCase();
 
 
-	if (isWebWorker){
-		//postMessage("MSG:Adding pairs " + bases);
-	}
+
 
 	
 	startX = 225;
@@ -158,23 +187,23 @@ function add_pairs_WW(msgID = null){
 	complementSequence = [];
 	
 	nucleoproteinPhase = -1;
-	if (sequenceID != "$user" && all_sequences[sequenceID]["nucleoproteinPhase"] != null){
-		nucleoproteinPhase = all_sequences[sequenceID]["nucleoproteinPhase"];
+	if (sequenceID != "$user" && SEQS_JS.all_sequences[sequenceID]["nucleoproteinPhase"] != null){
+		nucleoproteinPhase = SEQS_JS.all_sequences[sequenceID]["nucleoproteinPhase"];
 		
 		for (var i = 0; i < Math.floor(bases.length / 6) + 1; i++) {
 			var xPos = startX + 6 * 25 * (i-1) + (6-nucleoproteinPhase+1) * 25;
 			var yPos = startY - 18;
 			if (i == 0) {
-				create_nucleoprotein_WW("NP" + (i+1), xPos, yPos -50);
+				WW_JS.create_nucleoprotein_WW("NP" + (i+1), xPos, yPos -50);
 			}
-			else if (PHYSICAL_PARAMETERS["hybridLen"]["val"] + nucleoproteinPhase > i * 6 ) {
-				create_nucleoprotein_WW("NP" + (i+1), xPos, yPos -50);
+			else if (PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] + nucleoproteinPhase > i * 6 ) {
+				WW_JS.create_nucleoprotein_WW("NP" + (i+1), xPos, yPos -50);
 			}
-			else if (templateEntryChannelLength + PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2 + nucleoproteinPhase > i * 6) {
-				create_nucleoprotein_WW("NP" + (i+1), xPos, yPos -50);
+			else if (templateEntryChannelLength + PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 2 + nucleoproteinPhase > i * 6) {
+				WW_JS.create_nucleoprotein_WW("NP" + (i+1), xPos, yPos -50);
 			}
 			else{
-				create_nucleoprotein_WW("NP" + (i+1), xPos, yPos);
+				WW_JS.create_nucleoprotein_WW("NP" + (i+1), xPos, yPos);
 			}
 			
 		}
@@ -182,76 +211,76 @@ function add_pairs_WW(msgID = null){
 	
 	
 	
-	if (sequenceID == "$user" || nucleoproteinPhase == -1) create_pol_WW(165, 81);
-	else create_pol_WW(75, 70, "paraPol");
+	if (sequenceID == "$user" || nucleoproteinPhase == -1) WW_JS.create_pol_WW(165, 81);
+	else WW_JS.create_pol_WW(75, 70, "paraPol");
 	
-	if (all_sequences[sequenceID]["template"].substring(0,2) == "ds")  {
-		if (all_sequences[sequenceID]["template"] == "dsRNA") create_nucleotide_WW("o0", "o", 0, startX-75, startY - 25 - 26, "5", "5RNA");
-		else create_nucleotide_WW("o0", "o", 0, startX-75, startY - 25 - 26, "5", "5DNA");
+	if (SEQS_JS.all_sequences[sequenceID]["template"].substring(0,2) == "ds")  {
+		if (SEQS_JS.all_sequences[sequenceID]["template"] == "dsRNA") WW_JS.create_nucleotide_WW("o0", "o", 0, startX-75, startY - 25 - 26, "5", "5RNA");
+		else WW_JS.create_nucleotide_WW("o0", "o", 0, startX-75, startY - 25 - 26, "5", "5DNA");
 	}
 
-	if (all_sequences[sequenceID]["template"].substring(2,5) == "RNA") create_nucleotide_WW("g0", "g", 0, startX-75, startY + 52, "3", "3RNA");
-	else create_nucleotide_WW("g0", "g", 0, startX-75, startY + 52, "3", "3DNA");
+	if (SEQS_JS.all_sequences[sequenceID]["template"].substring(2,5) == "RNA") WW_JS.create_nucleotide_WW("g0", "g", 0, startX-75, startY + 52, "3", "3RNA");
+	else WW_JS.create_nucleotide_WW("g0", "g", 0, startX-75, startY + 52, "3", "3DNA");
 	
-	if (all_sequences[sequenceID]["primer"].substring(2) == "RNA") create_nucleotide_WW("m0", "m", 0, startX-75, startY + 77, "5", "5RNA");
-	else create_nucleotide_WW("m0", "m", 0, startX-75, startY + 77, "5", "5DNA");
+	if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(2) == "RNA") WW_JS.create_nucleotide_WW("m0", "m", 0, startX-75, startY + 77, "5", "5RNA");
+	else WW_JS.create_nucleotide_WW("m0", "m", 0, startX-75, startY + 77, "5", "5DNA");
 	
 	for (i = 0; i < bases.length; i++) {
 		
 		var baseToAdd = bases[i];
 		if (baseToAdd != "A" && baseToAdd != "C" && baseToAdd != "G" && baseToAdd != "T" && baseToAdd != "U") baseToAdd = "X";
-		if ((all_sequences[sequenceID]["template"] == "ssRNA" || all_sequences[sequenceID]["template"] == "dsRNA") && baseToAdd == "T") baseToAdd = "U";
-		if ((all_sequences[sequenceID]["template"] == "ssDNA" || all_sequences[sequenceID]["template"] == "dsDNA") && baseToAdd == "U") baseToAdd = "T";
+		if ((SEQS_JS.all_sequences[sequenceID]["template"] == "ssRNA" || SEQS_JS.all_sequences[sequenceID]["template"] == "dsRNA") && baseToAdd == "T") baseToAdd = "U";
+		if ((SEQS_JS.all_sequences[sequenceID]["template"] == "ssDNA" || SEQS_JS.all_sequences[sequenceID]["template"] == "dsDNA") && baseToAdd == "U") baseToAdd = "T";
 		
 
 
 
 		
 		
-		if (index < PHYSICAL_PARAMETERS["hybridLen"]["val"]){
+		if (index < PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]){
 			
-			create_nucleotide_WW("g" + index, "g", index, startX, startY + 52, baseToAdd, baseToAdd + "g");
+			WW_JS.create_nucleotide_WW("g" + index, "g", index, startX, startY + 52, baseToAdd, baseToAdd + "g");
 			oppositeCol = baseToAdd == "G" ? "C" : baseToAdd == "C" ? "G" : baseToAdd == "A" ? "U" : baseToAdd == "U" ? "A" : baseToAdd == "T" ? "A" : "X";
 
-			if ((all_sequences[sequenceID]["primer"].substring(2) == "RNA") && oppositeCol == "T") oppositeCol = "U";
-			if ((all_sequences[sequenceID]["primer"].substring(2) == "DNA") && oppositeCol == "U") oppositeCol = "T";
+			if ((SEQS_JS.all_sequences[sequenceID]["primer"].substring(2) == "RNA") && oppositeCol == "T") oppositeCol = "U";
+			if ((SEQS_JS.all_sequences[sequenceID]["primer"].substring(2) == "DNA") && oppositeCol == "U") oppositeCol = "T";
 
-			create_nucleotide_WW("m" + index, "m", index, startX, startY + 77, oppositeCol, oppositeCol + "m");
-			setPrimerSequenceBaseParent(index, index);
+			WW_JS.create_nucleotide_WW("m" + index, "m", index, startX, startY + 77, oppositeCol, oppositeCol + "m");
+			WW_JS.setPrimerSequenceBaseParent(index, index);
 
 
 			// The strand complementary to the template (if ds)
-			if (all_sequences[sequenceID]["template"] == "dsRNA"){
+			if (SEQS_JS.all_sequences[sequenceID]["template"] == "dsRNA"){
 				oppositeCol = baseToAdd == "G" ? "C" : baseToAdd == "C" ? "G" : baseToAdd == "A" ? "U" : baseToAdd == "U" ? "A" : "X";
-				if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") create_nucleotide_WW("o" + index, "o", index, startX, startY - 25 - 26, oppositeCol, oppositeCol + "g");
-				else create_nucleotide_WW("o" + index, "o", index, startX, startY - 25 - 26, oppositeCol, oppositeCol + "m");
+				if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) != "ds") WW_JS.create_nucleotide_WW("o" + index, "o", index, startX, startY - 25 - 26, oppositeCol, oppositeCol + "g");
+				else WW_JS.create_nucleotide_WW("o" + index, "o", index, startX, startY - 25 - 26, oppositeCol, oppositeCol + "m");
 				
 			}
-			if (all_sequences[sequenceID]["template"] == "dsDNA"){
+			if (SEQS_JS.all_sequences[sequenceID]["template"] == "dsDNA"){
 				oppositeCol = baseToAdd == "G" ? "C" : baseToAdd == "C" ? "G" : baseToAdd == "A" ? "T" : baseToAdd == "T" ? "A" : "X";
-				if (all_sequences[sequenceID]["primer"].substring(0,2) != "ds") create_nucleotide_WW("o" + index, "o", index, startX, startY - 25 - 26, oppositeCol, oppositeCol + "g");
-				else create_nucleotide_WW("o" + index, "o", index, startX, startY - 25 - 26, oppositeCol, oppositeCol + "m");
+				if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) != "ds") WW_JS.create_nucleotide_WW("o" + index, "o", index, startX, startY - 25 - 26, oppositeCol, oppositeCol + "g");
+				else WW_JS.create_nucleotide_WW("o" + index, "o", index, startX, startY - 25 - 26, oppositeCol, oppositeCol + "m");
 			}
 
 
 		}else{
-			dy = 52 - Math.min(52, (index - (PHYSICAL_PARAMETERS["hybridLen"]["val"]-1)) * 52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
-			if (all_sequences[sequenceID]["template"].substring(0,2) == "ds") {
-				create_nucleotide_WW("g" + index, "g", index, startX, startY + dy, baseToAdd, baseToAdd + "m");
+			dy = 52 - Math.min(52, (index - (PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]-1)) * 52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1));
+			if (SEQS_JS.all_sequences[sequenceID]["template"].substring(0,2) == "ds") {
+				WW_JS.create_nucleotide_WW("g" + index, "g", index, startX, startY + dy, baseToAdd, baseToAdd + "m");
 			}
 			else {
-				create_nucleotide_WW("g" + index, "g", index, startX, startY + dy, baseToAdd, baseToAdd + "g");
+				WW_JS.create_nucleotide_WW("g" + index, "g", index, startX, startY + dy, baseToAdd, baseToAdd + "g");
 			}
 
 
 			// The strand complementary to the template (if ds)
-			if (all_sequences[sequenceID]["template"] == "dsRNA"){
+			if (SEQS_JS.all_sequences[sequenceID]["template"] == "dsRNA"){
 				oppositeCol = baseToAdd == "G" ? "C" : baseToAdd == "C" ? "G" : baseToAdd == "A" ? "U" : baseToAdd == "U" ? "A" : "X";
-				create_nucleotide_WW("o" + index, "o", index, startX, startY - 25 - dy/2, oppositeCol, oppositeCol + "g");
+				WW_JS.create_nucleotide_WW("o" + index, "o", index, startX, startY - 25 - dy/2, oppositeCol, oppositeCol + "g");
 			}
-			if (all_sequences[sequenceID]["template"] == "dsDNA"){
+			if (SEQS_JS.all_sequences[sequenceID]["template"] == "dsDNA"){
 				oppositeCol = baseToAdd == "G" ? "C" : baseToAdd == "C" ? "G" : baseToAdd == "A" ? "T" : baseToAdd == "T" ? "A" : "X";
-				create_nucleotide_WW("o" + index, "o", index, startX, startY - 25 - dy/2, oppositeCol, oppositeCol + "g");
+				WW_JS.create_nucleotide_WW("o" + index, "o", index, startX, startY - 25 - dy/2, oppositeCol, oppositeCol + "g");
 			}
 
 
@@ -261,11 +290,9 @@ function add_pairs_WW(msgID = null){
 		index = index + 1;
 	}
 		
-	currentState["nbases"] = index;
+	WW_JS.currentState["nbases"] = index;
 
-	if (isWebWorker){
-		//postMessage("MSG:unrenderedObjects" + JSON.stringify(unrenderedObjects));
-	}
+
 	
 	//window.requestAnimationFrame(function(){
 		//callbackFn();
@@ -280,10 +307,14 @@ function add_pairs_WW(msgID = null){
 
 
 
-function stop_WW(resolve = function() { }, msgID = null){
+ WW_JS.stop_WW = function(resolve, msgID){
+
+
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
 
 	simulating = false;
-	stopRunning_WW = true;
+	WW_JS.stopRunning_WW = true;
 	ANIMATION_TIME = 200;
 
 	if (msgID != null){
@@ -349,9 +380,9 @@ function timedCount() {
 
 
 
-function rexp(rate){
+ WW_JS.rexp = function(rate){
 	
-	var unif01 = mersenneTwister.random();
+	var unif01 = MER_JS.random();
 	var exp = -Math.log(unif01) / rate;
 	return exp;
 	
@@ -397,7 +428,10 @@ function tagAllObjectsForGeneration(){
 
 
 
-function create_HTMLobject_WW(id, x, y, width, height, src, zIndex = 1){
+ WW_JS.create_HTMLobject_WW = function(id, x, y, width, height, src, zIndex){
+
+
+	if (zIndex === undefined) zIndex = 1;
 
 	var obj = {id:id, x:x, y:y, width:width, height:height, src: src, needsGenerating:true, needsAnimating:false, needsSourceUpdate:false, needsDeleting:false, dx: 0, dy: 0, animationTime:ANIMATION_TIME, zIndex: zIndex};
 	HTMLobjects[id] = obj;
@@ -405,11 +439,14 @@ function create_HTMLobject_WW(id, x, y, width, height, src, zIndex = 1){
 
 }
 
-function create_pol_WW(x, y, src = "pol"){
+ WW_JS.create_pol_WW = function(x, y, src){
+
+
+	if (src === undefined) src = "pol";
 
 
 	var width, height; 
-	if (all_sequences[sequenceID]["primer"].substring(0,2) == "ds"){
+	if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) == "ds"){
 		src = "square";
 	}
 
@@ -418,17 +455,17 @@ function create_pol_WW(x, y, src = "pol"){
 		height = 160;
 	}
 	else {
-		width = (PHYSICAL_PARAMETERS["hybridLen"]["val"] * 25 + 75);
+		width = (PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] * 25 + 75);
 		height = 140;
 	}
 
-	create_HTMLobject_WW("pol", x, y, width, height, src);
+	WW_JS.create_HTMLobject_WW("pol", x, y, width, height, src);
 
 }
 
 
 
-function change_src_of_object_WW(obj, newSrc){
+ WW_JS.change_src_of_object_WW = function(obj, newSrc){
 
 	obj["src"] = newSrc;
 	if (!obj["needsGenerating"] && !obj["needsAnimating"] && !obj["needsSourceUpdate"] && !obj["needsDeleting"]) unrenderedObjects.push(obj);
@@ -440,7 +477,7 @@ function change_src_of_object_WW(obj, newSrc){
 
 
 // Change the src on a nucleotide to represent the object flipping
-function flip_base_WW(pos, seq, flipTo){
+ WW_JS.flip_base_WW = function(pos, seq, flipTo){
 
 
 	var nt = null;
@@ -451,33 +488,39 @@ function flip_base_WW(pos, seq, flipTo){
 	if (nt == null) return;
 
 	var newSrc = nt["base"] + flipTo;
-	change_src_of_object_WW(nt, newSrc);
+	WW_JS.change_src_of_object_WW(nt, newSrc);
 
 
 }
 
 
 
-function create_nucleoprotein_WW(id, x, y){
-	create_HTMLobject_WW(id, x, y, 6 * 25, 55, "nucleoprotein");
+ WW_JS.create_nucleoprotein_WW = function(id, x, y){
+	WW_JS.create_HTMLobject_WW(id, x, y, 6 * 25, 55, "nucleoprotein");
 }
 
 
 
 
-function move_obj_absolute(id, newX, newY, animationTime = ANIMATION_TIME) {
+ WW_JS.move_obj_absolute = function(id, newX, newY, animationTime) {
+
+
+	if (animationTime === undefined) animationTime = ANIMATION_TIME;
 
 	var obj = HTMLobjects[id];
 	if (obj == null) return;
 	var dx = newX - obj["x"];
 	var dy = newY - obj["y"];
-	move_obj_WW(obj, dx, dy, animationTime)
+	WW_JS.move_obj_WW(obj, dx, dy, animationTime)
 
 }
 
 
 
-function move_nt_absolute_WW(pos, seq, newX, newY, animationTime = ANIMATION_TIME) {
+ WW_JS.move_nt_absolute_WW = function(pos, seq, newX, newY, animationTime) {
+
+
+	if (animationTime === undefined) animationTime = ANIMATION_TIME;
 
 	var nt = null;
 
@@ -489,14 +532,17 @@ function move_nt_absolute_WW(pos, seq, newX, newY, animationTime = ANIMATION_TIM
 	var dx = newX - nt["x"];
 	var dy = newY - nt["y"];
 
-	move_obj_WW(nt, dx, dy, animationTime)
+	WW_JS.move_obj_WW(nt, dx, dy, animationTime)
 
 
 }
 
 
 
-function position_bulge_WW(startBaseNum, startBaseXVal, bulgeSize, inPrimer = true, skip = 0){
+ WW_JS.position_bulge_WW = function(startBaseNum, startBaseXVal, bulgeSize, inPrimer, skip){
+
+	if (inPrimer === undefined) inPrimer = true;
+	if (skip === undefined) skip = 0;
 	
 	
 	var thisStrandSymbol = inPrimer ? "m" : "g";
@@ -508,93 +554,93 @@ function position_bulge_WW(startBaseNum, startBaseXVal, bulgeSize, inPrimer = tr
 
 	
 	// Flip the bases so that the bulged bases are facing outwards and the pairing bases are facing inwards
-	if(skip == 0) flip_base_WW((startBaseNum), thisStrandSymbol, thisStrandSymbol);
-	if(skip == 0) flip_base_WW((startBaseNum+bulgeSize+1), thisStrandSymbol, thisStrandSymbol);
+	if(skip == 0) WW_JS.flip_base_WW((startBaseNum), thisStrandSymbol, thisStrandSymbol);
+	if(skip == 0) WW_JS.flip_base_WW((startBaseNum+bulgeSize+1), thisStrandSymbol, thisStrandSymbol);
 	for (var bPos = startBaseNum + 1; bPos <= startBaseNum + bulgeSize; bPos ++){
-		flip_base_WW(bPos, thisStrandSymbol, otherStrandSymbol);
+		WW_JS.flip_base_WW(bPos, thisStrandSymbol, otherStrandSymbol);
 	}
 	
 	
-	if(skip == 0) move_nt_absolute_WW(startBaseNum, thisStrandSymbol, startBaseXVal, yHeight);
-	else move_nt_absolute_WW(startBaseNum, thisStrandSymbol, startBaseXVal, thisSequenceObject[startBaseNum]["y"]); // Move it to its correct x coordinate but leave at its y one
+	if(skip == 0) WW_JS.move_nt_absolute_WW(startBaseNum, thisStrandSymbol, startBaseXVal, yHeight);
+	else WW_JS.move_nt_absolute_WW(startBaseNum, thisStrandSymbol, startBaseXVal, thisSequenceObject[startBaseNum]["y"]); // Move it to its correct x coordinate but leave at its y one
 	
-	if(skip == 0) move_nt_absolute_WW(startBaseNum+bulgeSize+1, thisStrandSymbol, startBaseXVal+25, yHeight);
-	else move_nt_absolute_WW(startBaseNum+bulgeSize+1, thisStrandSymbol, startBaseXVal+25, thisSequenceObject[startBaseNum+bulgeSize+1]["y"]); // Move it to its correct x coordinate but leave at its y one
+	if(skip == 0) WW_JS.move_nt_absolute_WW(startBaseNum+bulgeSize+1, thisStrandSymbol, startBaseXVal+25, yHeight);
+	else WW_JS.move_nt_absolute_WW(startBaseNum+bulgeSize+1, thisStrandSymbol, startBaseXVal+25, thisSequenceObject[startBaseNum+bulgeSize+1]["y"]); // Move it to its correct x coordinate but leave at its y one
 	
 
 	// Bulge size 1
 	if (bulgeSize == 1){
-		move_nt_absolute_WW(startBaseNum+1, thisStrandSymbol, startBaseXVal+13, yHeight + 25);
+		WW_JS.move_nt_absolute_WW(startBaseNum+1, thisStrandSymbol, startBaseXVal+13, yHeight + 25);
 	}
 	
 	
 	// Bulge size 2
 	else if (bulgeSize == 2){
-		move_nt_absolute_WW(startBaseNum+1, thisStrandSymbol, startBaseXVal+3, yHeight + 25);
-		move_nt_absolute_WW(startBaseNum+2, thisStrandSymbol, startBaseXVal+22, yHeight + 25);
+		WW_JS.move_nt_absolute_WW(startBaseNum+1, thisStrandSymbol, startBaseXVal+3, yHeight + 25);
+		WW_JS.move_nt_absolute_WW(startBaseNum+2, thisStrandSymbol, startBaseXVal+22, yHeight + 25);
 	}
 	
 	
 	// Bulge size 3
 	else if (bulgeSize == 3){
-		move_nt_absolute_WW(startBaseNum+1, thisStrandSymbol, startBaseXVal+2, yHeight + 25);
-		move_nt_absolute_WW(startBaseNum+2, thisStrandSymbol, startBaseXVal+12, yHeight + 50);
-		move_nt_absolute_WW(startBaseNum+3, thisStrandSymbol, startBaseXVal+23, yHeight + 25);
+		WW_JS.move_nt_absolute_WW(startBaseNum+1, thisStrandSymbol, startBaseXVal+2, yHeight + 25);
+		WW_JS.move_nt_absolute_WW(startBaseNum+2, thisStrandSymbol, startBaseXVal+12, yHeight + 50);
+		WW_JS.move_nt_absolute_WW(startBaseNum+3, thisStrandSymbol, startBaseXVal+23, yHeight + 25);
 	}
 	
 	
 	// Bulge size 4
 	else if (bulgeSize == 4){
-		move_nt_absolute_WW(startBaseNum+1, thisStrandSymbol, startBaseXVal-5, yHeight + 25);
-		move_nt_absolute_WW(startBaseNum+2, thisStrandSymbol, startBaseXVal+2, yHeight + 50);
-		move_nt_absolute_WW(startBaseNum+3, thisStrandSymbol, startBaseXVal+23, yHeight + 50);
-		move_nt_absolute_WW(startBaseNum+4, thisStrandSymbol, startBaseXVal+30, yHeight + 25);
+		WW_JS.move_nt_absolute_WW(startBaseNum+1, thisStrandSymbol, startBaseXVal-5, yHeight + 25);
+		WW_JS.move_nt_absolute_WW(startBaseNum+2, thisStrandSymbol, startBaseXVal+2, yHeight + 50);
+		WW_JS.move_nt_absolute_WW(startBaseNum+3, thisStrandSymbol, startBaseXVal+23, yHeight + 50);
+		WW_JS.move_nt_absolute_WW(startBaseNum+4, thisStrandSymbol, startBaseXVal+30, yHeight + 25);
 	}
 	
 	
 	// Bulge size 5
 	else if (bulgeSize == 5){
-		move_nt_absolute_WW(startBaseNum+1, thisStrandSymbol, startBaseXVal-7, yHeight + 25);
-		move_nt_absolute_WW(startBaseNum+2, thisStrandSymbol, startBaseXVal, yHeight + 48);
-		move_nt_absolute_WW(startBaseNum+3, thisStrandSymbol, startBaseXVal+12, yHeight + 68);
-		move_nt_absolute_WW(startBaseNum+4, thisStrandSymbol, startBaseXVal+25, yHeight + 48);
-		move_nt_absolute_WW(startBaseNum+5, thisStrandSymbol, startBaseXVal+32, yHeight + 25);
+		WW_JS.move_nt_absolute_WW(startBaseNum+1, thisStrandSymbol, startBaseXVal-7, yHeight + 25);
+		WW_JS.move_nt_absolute_WW(startBaseNum+2, thisStrandSymbol, startBaseXVal, yHeight + 48);
+		WW_JS.move_nt_absolute_WW(startBaseNum+3, thisStrandSymbol, startBaseXVal+12, yHeight + 68);
+		WW_JS.move_nt_absolute_WW(startBaseNum+4, thisStrandSymbol, startBaseXVal+25, yHeight + 48);
+		WW_JS.move_nt_absolute_WW(startBaseNum+5, thisStrandSymbol, startBaseXVal+32, yHeight + 25);
 	}
 	
 	
 	// Bulge size 6
 	else if (bulgeSize == 6){
-		move_nt_absolute_WW(startBaseNum+1, thisStrandSymbol, startBaseXVal, yHeight + 25);
-		move_nt_absolute_WW(startBaseNum+2, thisStrandSymbol, startBaseXVal-7, yHeight + 48);
-		move_nt_absolute_WW(startBaseNum+3, thisStrandSymbol, startBaseXVal, yHeight + 68);
-		move_nt_absolute_WW(startBaseNum+4, thisStrandSymbol, startBaseXVal+25, yHeight + 68);
-		move_nt_absolute_WW(startBaseNum+5, thisStrandSymbol, startBaseXVal+32, yHeight + 48);
-		move_nt_absolute_WW(startBaseNum+6, thisStrandSymbol, startBaseXVal+25, yHeight + 25);
+		WW_JS.move_nt_absolute_WW(startBaseNum+1, thisStrandSymbol, startBaseXVal, yHeight + 25);
+		WW_JS.move_nt_absolute_WW(startBaseNum+2, thisStrandSymbol, startBaseXVal-7, yHeight + 48);
+		WW_JS.move_nt_absolute_WW(startBaseNum+3, thisStrandSymbol, startBaseXVal, yHeight + 68);
+		WW_JS.move_nt_absolute_WW(startBaseNum+4, thisStrandSymbol, startBaseXVal+25, yHeight + 68);
+		WW_JS.move_nt_absolute_WW(startBaseNum+5, thisStrandSymbol, startBaseXVal+32, yHeight + 48);
+		WW_JS.move_nt_absolute_WW(startBaseNum+6, thisStrandSymbol, startBaseXVal+25, yHeight + 25);
 	}
 	
 	
 	else if (bulgeSize > 6){
 		
-		move_nt_absolute_WW(startBaseNum+1, thisStrandSymbol, startBaseXVal, yHeight + 25);
-		move_nt_absolute_WW(startBaseNum+bulgeSize, thisStrandSymbol, startBaseXVal+25, yHeight + 25);
+		WW_JS.move_nt_absolute_WW(startBaseNum+1, thisStrandSymbol, startBaseXVal, yHeight + 25);
+		WW_JS.move_nt_absolute_WW(startBaseNum+bulgeSize, thisStrandSymbol, startBaseXVal+25, yHeight + 25);
 		
 		for (var i = 1; i < Math.floor((bulgeSize - 1) / 2); i ++){
-			move_nt_absolute_WW(startBaseNum+1+i, thisStrandSymbol, startBaseXVal-7, yHeight + 25 + (20*i));
-			move_nt_absolute_WW(startBaseNum+bulgeSize-i, thisStrandSymbol, startBaseXVal+32, yHeight + 25 + (20*i));
+			WW_JS.move_nt_absolute_WW(startBaseNum+1+i, thisStrandSymbol, startBaseXVal-7, yHeight + 25 + (20*i));
+			WW_JS.move_nt_absolute_WW(startBaseNum+bulgeSize-i, thisStrandSymbol, startBaseXVal+32, yHeight + 25 + (20*i));
 		}
 		
 		// Even size
 		if (bulgeSize % 2 == 0){
 			
 			var tipOfBulge = Math.floor((bulgeSize - 1) / 2) + 1;
-			move_nt_absolute_WW(startBaseNum+tipOfBulge, thisStrandSymbol, startBaseXVal, yHeight + tipOfBulge*20);
-			move_nt_absolute_WW(startBaseNum+tipOfBulge+1, thisStrandSymbol, startBaseXVal+25, yHeight + tipOfBulge*20);
+			WW_JS.move_nt_absolute_WW(startBaseNum+tipOfBulge, thisStrandSymbol, startBaseXVal, yHeight + tipOfBulge*20);
+			WW_JS.move_nt_absolute_WW(startBaseNum+tipOfBulge+1, thisStrandSymbol, startBaseXVal+25, yHeight + tipOfBulge*20);
 			
 			
 		}else{ // Odd size
 			
 			var tipOfBulge = Math.floor((bulgeSize - 1) / 2) + 1;
-			move_nt_absolute_WW(startBaseNum+tipOfBulge, thisStrandSymbol, startBaseXVal + 12, yHeight + tipOfBulge*20);
+			WW_JS.move_nt_absolute_WW(startBaseNum+tipOfBulge, thisStrandSymbol, startBaseXVal + 12, yHeight + tipOfBulge*20);
 			
 		}
 
@@ -606,7 +652,7 @@ function position_bulge_WW(startBaseNum, startBaseXVal, bulgeSize, inPrimer = tr
 
 
 // Declare which template base the primer base was copied from
-function setPrimerSequenceBaseParent(nascentBaseID, templateBaseID){
+ WW_JS.setPrimerSequenceBaseParent = function(nascentBaseID, templateBaseID){
 
 	var nt = primerSequence[nascentBaseID];
 	if (nt == null) return;
@@ -616,11 +662,9 @@ function setPrimerSequenceBaseParent(nascentBaseID, templateBaseID){
 }
 
 
-function create_nucleotide_WW(id, seq, pos, x, y, base, src, hasTP = false){
+ WW_JS.create_nucleotide_WW = function(id, seq, pos, x, y, base, src, hasTP){
 
-	if (isWebWorker){
-		//postMessage("MSG:Calling create_nucleotide_WW, id = " + id);
-	}
+	if (hasTP === undefined) hasTP = false;
 
 	var labelBase = base == "3" || base == "5";
 	var width = (labelBase ? 70 : 20);
@@ -637,7 +681,7 @@ function create_nucleotide_WW(id, seq, pos, x, y, base, src, hasTP = false){
 
 }
 
-function delete_HTMLobj_WW(id){
+ WW_JS.delete_HTMLobj_WW = function(id){
 
 	var obj = HTMLobjects[id];
 	if (obj == null) return;
@@ -648,7 +692,7 @@ function delete_HTMLobj_WW(id){
 
 
 // Remove the nucleotide from the sequence list, and tag it for destruction
-function delete_nt_WW(pos, seq){
+ delete_nt_WW = function(pos, seq){
 
 	var nt = null;
 	if (seq == "m"){
@@ -674,7 +718,10 @@ function delete_nt_WW(pos, seq){
 
 
 // Move the HTML object by updating its coordinates and adding to the list of unrendered objects
-function move_obj_WW(obj, dx, dy, animationTime = ANIMATION_TIME){
+ WW_JS.move_obj_WW = function(obj, dx, dy, animationTime){
+
+
+	if (animationTime === undefined) animationTime = ANIMATION_TIME;
 
 	obj["dx"] += dx;
 	obj["dy"] += dy;
@@ -694,20 +741,20 @@ function move_obj_WW(obj, dx, dy, animationTime = ANIMATION_TIME){
 
 
 // Move the object with the specified id
-function move_obj_from_id_WW(id, dx, dy, animationTime = ANIMATION_TIME){
+ WW_JS.move_obj_from_id_WW = function(id, dx, dy, animationTime){
 
-
+	if (animationTime === undefined) animationTime = ANIMATION_TIME;
 	var obj = HTMLobjects[id];
 	if (obj == null) return;
-	move_obj_WW(obj, dx, dy, animationTime)
+	WW_JS.move_obj_WW(obj, dx, dy, animationTime)
 
 
 }
 
 // Move the nucleotide with the specified position in the specified sequence
-function move_nt_WW(pos, seq, dx, dy, animationTime = ANIMATION_TIME) {
+ WW_JS.move_nt_WW = function(pos, seq, dx, dy, animationTime) {
 
-
+	if (animationTime === undefined) animationTime = ANIMATION_TIME;
 	var nt = null;
 
 	if (seq == "m") nt = primerSequence[pos];
@@ -718,16 +765,19 @@ function move_nt_WW(pos, seq, dx, dy, animationTime = ANIMATION_TIME) {
 
 	//console.log("Moving", nt, dx, dy);
 
-	move_obj_WW(nt, dx, dy, animationTime)
+	WW_JS.move_obj_WW(nt, dx, dy, animationTime)
 
 }
 
 
 // If on webworker will send back the list and then clear it.
 // if not webworker will send the list back but will not clear it 
-function get_unrenderedObjects_WW(msgID = null){
+ WW_JS.get_unrenderedObjects_WW = function(msgID){
+
+	if (msgID === undefined) msgID = null;
+
 	if (msgID != null){
-		//postMessage("MSG:Calling get_unrenderedObjects_WW, returning " + JSON.stringify(unrenderedObjects));
+		//postMessage("MSG:Calling WW_JS.get_unrenderedObjects_WW, returning " + JSON.stringify(unrenderedObjects));
 
 		// Send the list of objects
 		postMessage(msgID + "~X~" + JSON.stringify(unrenderedObjects));
@@ -756,7 +806,10 @@ function get_unrenderedObjects_WW(msgID = null){
 }
 
 
-function get_primerSequence_WW(msgID = null){
+ WW_JS.get_primerSequence_WW = function(msgID){
+
+	if (msgID === undefined) msgID = null;
+
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(primerSequence));
 		return;
@@ -783,34 +836,37 @@ function getComplementSequence_WW(seq, toRNA){
 
 // User inputs their own sequence in the textbox
 // Parse newTemplateType \in {"dsDNA", "dsRNA", "ssDNA", "ssRNA"} and primerType \in {"DNA", "RNA"}
-function userInputSequence_WW(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent, msgID = null){
+ WW_JS.userInputSequence_WW = function(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent){
+
+
+	if (msgID === undefined) msgID = null;
 
 	// Store the template sequence not the nascent sequence 
 	newSeq = newSeq.trim();
-	var goodLength = newSeq.length > PHYSICAL_PARAMETERS["hybridLen"]["val"];
+	var goodLength = newSeq.length > PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"];
 
 	if (inputSequenceIsNascent) newSeq = getComplementSequence_WW(newSeq, newPrimerType.substring(2) == "RNA");
 
 	// Only apply changes if there is one
-	if (goodLength && sequenceID != newSeq.substring(0, 15) || newSeq != all_sequences[sequenceID]["seq"] || newTemplateType != all_sequences[sequenceID]["template"] || newPrimerType != all_sequences[sequenceID]["primer"]){
+	if (goodLength && sequenceID != newSeq.substring(0, 15) || newSeq != SEQS_JS.all_sequences[sequenceID]["seq"] || newTemplateType != SEQS_JS.all_sequences[sequenceID]["template"] || newPrimerType != SEQS_JS.all_sequences[sequenceID]["primer"]){
 
 	
-		if (newPrimerType.substring(2) != all_sequences[sequenceID]["primer"].substring(2)) needToRefreshNTPParameters = true;  // Refresh the NTP concentrations if nascent strand changed from DNA to RNA or vice versa
+		if (newPrimerType.substring(2) != SEQS_JS.all_sequences[sequenceID]["primer"].substring(2)) needToRefreshNTPParameters = true;  // Refresh the NTP concentrations if nascent strand changed from DNA to RNA or vice versa
 
 		sequenceID = newSeq.substring(0, 15);
-		all_sequences[sequenceID] = {};
-		all_sequences[sequenceID]["seq"] = newSeq;
-		all_sequences[sequenceID]["template"] = newTemplateType;
-		all_sequences[sequenceID]["primer"] = newPrimerType;
+		SEQS_JS.all_sequences[sequenceID] = {};
+		SEQS_JS.all_sequences[sequenceID]["seq"] = newSeq;
+		SEQS_JS.all_sequences[sequenceID]["template"] = newTemplateType;
+		SEQS_JS.all_sequences[sequenceID]["primer"] = newPrimerType;
 
 		// Reset secondary structure calculations
-		MFE_W = {};
-		MFE_V = {};
+		MFE_JS.MFE_W = {};
+		MFE_JS.MFE_V = {};
 		
 		
-		translocationCacheNeedsUpdating = true;
+		STATE_JS.translocationCacheNeedsUpdating = true;
 
-		setStructuralParameters_WW();
+		PARAMS_JS.setStructuralParameters_WW();
 
 	}
 		
@@ -826,28 +882,31 @@ function userInputSequence_WW(newSeq, newTemplateType, newPrimerType, inputSeque
 
 // User selects sequence from the list of sequences. 
 // Parse newTemplateType \in {"dsDNA", "dsRNA", "ssDNA", "ssRNA"} and newPrimerType \in {"RNA", "DNA"}
-function userSelectSequence_WW(newSequenceID, newTemplateType, newPrimerType, msgID = null){
+ WW_JS.userSelectSequence_WW = function(newSequenceID, newTemplateType, newPrimerType, msgID){
+
+
+	if (msgID === undefined) msgID = null;
 
 	// Only apply change if there is one
-	if (newSequenceID != sequenceID ||newTemplateType != all_sequences[sequenceID]["template"] || newPrimerType != all_sequences[sequenceID]["primer"]){
+	if (newSequenceID != sequenceID ||newTemplateType != SEQS_JS.all_sequences[sequenceID]["template"] || newPrimerType != SEQS_JS.all_sequences[sequenceID]["primer"]){
 	
-		console.log(newPrimerType == null, newPrimerType, all_sequences[sequenceID]["primer"]);
-		if (newPrimerType == null && all_sequences[newSequenceID]["primer"].substring(2) != all_sequences[sequenceID]["primer"].substring(2)) needToRefreshNTPParameters = true; // Refresh the NTP concentrations if nascent strand changed from DNA to RNA or vice versa
-		else if (newPrimerType != null && newPrimerType != all_sequences[sequenceID]["primer"].substring(2)) needToRefreshNTPParameters = true;
+		console.log(newPrimerType == null, newPrimerType, SEQS_JS.all_sequences[sequenceID]["primer"]);
+		if (newPrimerType == null && SEQS_JS.all_sequences[newSequenceID]["primer"].substring(2) != SEQS_JS.all_sequences[sequenceID]["primer"].substring(2)) needToRefreshNTPParameters = true; // Refresh the NTP concentrations if nascent strand changed from DNA to RNA or vice versa
+		else if (newPrimerType != null && newPrimerType != SEQS_JS.all_sequences[sequenceID]["primer"].substring(2)) needToRefreshNTPParameters = true;
 	
 		sequenceID = newSequenceID;
-		if (newTemplateType != null) all_sequences[sequenceID]["template"] = newTemplateType;
-		if (newPrimerType != null) all_sequences[sequenceID]["primer"] = newPrimerType;
+		if (newTemplateType != null) SEQS_JS.all_sequences[sequenceID]["template"] = newTemplateType;
+		if (newPrimerType != null) SEQS_JS.all_sequences[sequenceID]["primer"] = newPrimerType;
 
 		
 		// Reset secondary structure calculations
-		MFE_W = {};
-		MFE_V = {};
+		MFE_JS.MFE_W = {};
+		MFE_JS.MFE_V = {};
 		
 		
-		translocationCacheNeedsUpdating = true;
+		STATE_JS.translocationCacheNeedsUpdating = true;
 		
-		setStructuralParameters_WW();
+		PARAMS_JS.setStructuralParameters_WW();
 
 	}
 
@@ -861,7 +920,7 @@ function userSelectSequence_WW(newSequenceID, newTemplateType, newPrimerType, ms
 
 
 
-function getBaseInSequenceAtPosition_WW(baseID){
+ WW_JS.getBaseInSequenceAtPosition_WW = function(baseID){
 	
 	var seq = baseID[0];
 	var pos = parseFloat(baseID.substring(1));
@@ -874,7 +933,11 @@ function getBaseInSequenceAtPosition_WW(baseID){
 }
 
 
-function getMisbindMatrix_WW(resolve = function(x) { }, msgID = null){
+ WW_JS.getMisbindMatrix_WW = function(resolve, msgID){
+
+
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
 
 	if (msgID != null){
 		postMessage( msgID + "~X~" + JSON.stringify(misbindMatrix) );
@@ -887,7 +950,7 @@ function getMisbindMatrix_WW(resolve = function(x) { }, msgID = null){
 
 
 
-function sampleBaseToAdd(baseToTranscribe){
+ WW_JS.sampleBaseToAdd = function(baseToTranscribe){
 
 
 
@@ -895,7 +958,7 @@ function sampleBaseToAdd(baseToTranscribe){
 	var bindingRates = [0,0,0,0];
 	var bindingRateSum = 0;
 
-	var TorU = all_sequences[sequenceID]["primer"].substring(2) == "DNA" ? "T" : "U";
+	var TorU = SEQS_JS.all_sequences[sequenceID]["primer"].substring(2) == "DNA" ? "T" : "U";
 	var bases = ["A", "C", "G", TorU];
 
 
@@ -907,7 +970,7 @@ function sampleBaseToAdd(baseToTranscribe){
 
 	
 	// Generate a random number to select which base to bind
-	var randNum = mersenneTwister.random() * bindingRateSum;
+	var randNum = MER_JS.random() * bindingRateSum;
 	var accumulativeSum = 0;
 	var baseToBind = 0;
 	for (baseToBind = 0; baseToBind < bindingRates.length; baseToBind ++){
@@ -923,26 +986,29 @@ function sampleBaseToAdd(baseToTranscribe){
 
 
 
-function setNextBaseToAdd_WW(resolve = function() { }, msgID = null){
+ WW_JS.setNextBaseToAdd_WW = function(resolve, msgID){
 
+
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
 
 	var NTPtoAddTemp;
-	var toTranscribe = currentState["nextBaseToCopy"];
+	var toTranscribe = WW_JS.currentState["nextBaseToCopy"];
 	if (templateSequence[toTranscribe] == null) return;
-	var baseToTranscribe = getBaseInSequenceAtPosition_WW("g" + toTranscribe);
+	var baseToTranscribe = WW_JS.getBaseInSequenceAtPosition_WW("g" + toTranscribe);
 
 
 	// Sample a base and its rate
-	var result = sampleBaseToAdd(baseToTranscribe);
+	var result = WW_JS.sampleBaseToAdd(baseToTranscribe);
 
 
 	// Update the gui and state variables so that this base is bound next
 	NTPtoAddTemp = result["base"];
-	currentState["rateOfBindingNextBase"] = result["rate"];
-	if (NTPtoAddTemp == "T" && all_sequences[sequenceID]["primer"] == "RNA") NTPtoAddTemp = "U";
+	WW_JS.currentState["rateOfBindingNextBase"] = result["rate"];
+	if (NTPtoAddTemp == "T" && SEQS_JS.all_sequences[sequenceID]["primer"] == "RNA") NTPtoAddTemp = "U";
 
 
-	currentState["NTPtoAdd"] = NTPtoAddTemp;
+	WW_JS.currentState["NTPtoAdd"] = NTPtoAddTemp;
 	var result = {NTPtoAdd: NTPtoAddTemp};
 	if (msgID != null){
 		postMessage( msgID + "~X~" + JSON.stringify(result) );
@@ -955,14 +1021,17 @@ function setNextBaseToAdd_WW(resolve = function() { }, msgID = null){
 
 }
 
-function userSetNextBaseToAdd_WW(ntpType, resolve = function() { }, msgID = null){
+ WW_JS.userSetNextBaseToAdd_WW = function(ntpType, resolve, msgID){
 
-	if (ntpType == "T" && all_sequences[sequenceID]["primer"].substring(2) == "RNA") ntpType = "U";
-	else if (ntpType == "U" && all_sequences[sequenceID]["primer"] == "DNA") ntpType = "T";
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
 
-	currentState["NTPtoAdd"] = ntpType;
-	var baseToTranscribe = templateSequence[currentState["nextBaseToCopy"]]["base"];
-	currentState["rateOfBindingNextBase"] = misbindMatrix[baseToTranscribe][ntpType];
+	if (ntpType == "T" && SEQS_JS.all_sequences[sequenceID]["primer"].substring(2) == "RNA") ntpType = "U";
+	else if (ntpType == "U" && SEQS_JS.all_sequences[sequenceID]["primer"] == "DNA") ntpType = "T";
+
+	WW_JS.currentState["NTPtoAdd"] = ntpType;
+	var baseToTranscribe = templateSequence[WW_JS.currentState["nextBaseToCopy"]]["base"];
+	WW_JS.currentState["rateOfBindingNextBase"] = misbindMatrix[baseToTranscribe][ntpType];
 
 
 	if (msgID != null){
@@ -973,14 +1042,14 @@ function userSetNextBaseToAdd_WW(ntpType, resolve = function() { }, msgID = null
 }
 
 
-function initMisbindingMatrix(){
+ WW_JS.initMisbindingMatrix = function(){
 
 
 	
 	misbindMatrix = {};
-	var TorU = all_sequences[sequenceID]["template"].substring(2) == "DNA" ? "T" : "U";
+	var TorU = SEQS_JS.all_sequences[sequenceID]["template"].substring(2) == "DNA" ? "T" : "U";
 	var fromBases = ["A", "C", "G", TorU];
-	TorU = all_sequences[sequenceID]["primer"].substring(2) == "DNA" ? "T" : "U";
+	TorU = SEQS_JS.all_sequences[sequenceID]["primer"].substring(2) == "DNA" ? "T" : "U";
 	var toBases = ["A", "C", "G", TorU];
 
 	for (var i = 0; i < 4; i ++){
@@ -1006,26 +1075,26 @@ function getRateOfBindingXtoY_WW(baseX, baseY){
 
 	var NTPconcID = baseY == "A" ? "ATPconc" : baseY == "T" ? "UTPconc" : baseY == "U" ? "UTPconc" : baseY == "C" ? "CTPconc" : "GTPconc";
 	
-	var NTPconc = ELONGATION_MODELS[currentElongationModel]["useFourNTPconcentrations"] ? PHYSICAL_PARAMETERS[NTPconcID]["val"] : PHYSICAL_PARAMETERS["NTPconc"]["val"];
+	var NTPconc = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] ? PARAMS_JS.PHYSICAL_PARAMETERS[NTPconcID]["val"] : PARAMS_JS.PHYSICAL_PARAMETERS["NTPconc"]["val"];
 	var rateOfBindingNextBaseTemp = 0;
 
 
 	// If misincorporations are not allowed then return 0
-	if (!ELONGATION_MODELS[currentElongationModel]["allowMisincorporation"] && correctPairs["" + baseX + baseY] == null) return 0;
+	if (!FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowMisincorporation"] && correctPairs["" + baseX + baseY] == null) return 0;
 
 
 
 
-	var probTransversion = 1 / (2 + PHYSICAL_PARAMETERS["TransitionTransversionRatio"]["val"]);
+	var probTransversion = 1 / (2 + PARAMS_JS.PHYSICAL_PARAMETERS["TransitionTransversionRatio"]["val"]);
 
 	// Normal basepairing
-	if (correctPairs["" + baseX + baseY] != null) rateOfBindingNextBaseTemp = PHYSICAL_PARAMETERS["RateBind"]["val"] * NTPconc;
+	if (correctPairs["" + baseX + baseY] != null) rateOfBindingNextBaseTemp = PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"]["val"] * NTPconc;
 
 	// A mis-binding event which may lead to a transition mutation
-	else if (transitionPairs["" + baseX + baseY] != null) rateOfBindingNextBaseTemp = (1 - 2*probTransversion) * NTPconc * PHYSICAL_PARAMETERS["RateMisbind"]["val"];
+	else if (transitionPairs["" + baseX + baseY] != null) rateOfBindingNextBaseTemp = (1 - 2*probTransversion) * NTPconc * PARAMS_JS.PHYSICAL_PARAMETERS["RateMisbind"]["val"];
 
 	// A mis-binding event which may lead to a transversion mutation
-	else rateOfBindingNextBaseTemp = probTransversion * NTPconc * PHYSICAL_PARAMETERS["RateMisbind"]["val"];
+	else rateOfBindingNextBaseTemp = probTransversion * NTPconc * PARAMS_JS.PHYSICAL_PARAMETERS["RateMisbind"]["val"];
 
 
 	return rateOfBindingNextBaseTemp;
@@ -1034,9 +1103,10 @@ function getRateOfBindingXtoY_WW(baseX, baseY){
 
 
 
-function roundToSF_WW(val, sf=2, ceilOrFloor = "none"){
+ WW_JS.roundToSF_WW = function(val, sf, ceilOrFloor){
 
-
+	if (sf === undefined) sf = 2;
+	if (ceilOrFloor === undefined) ceilOrFloor = "none";
 	
 	var magnitude = Math.floor(log_WW(val, 10));
 	
@@ -1065,8 +1135,10 @@ function roundToSF_WW(val, sf=2, ceilOrFloor = "none"){
 }
 
 
-function log_WW(num, base = null){
-	
+function log_WW(num, base){
+
+	if (base === undefined) base = null;
+
 	if (num == 0) return 0;
 	if (base == null) return Math.log(Math.abs(num));
 	return Math.log(Math.abs(num)) / Math.log(base);
@@ -1075,7 +1147,11 @@ function log_WW(num, base = null){
 
 
 
-function changeSpeed_WW(speed, resolve = function() { }, msgID = null){
+ WW_JS.changeSpeed_WW = function(speed, resolve, msgID){
+
+
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
 
 
 	// If changing from something to hidden, then switch to render hidden plots during the simulation
@@ -1095,7 +1171,7 @@ function changeSpeed_WW(speed, resolve = function() { }, msgID = null){
 	else if (speed == "hidden") ANIMATION_TIME_TEMP = 0;
 
 	if(renderHidden) {
-		renderPlotsHidden();
+		SIM_JS.renderPlotsHidden();
 	}
 
 	if(generateEverythingAgain){
@@ -1104,7 +1180,7 @@ function changeSpeed_WW(speed, resolve = function() { }, msgID = null){
 
 
 	// Use the geometric sampling speed up only if the speed is set to hidden, ultrafast or fast.
-	ELONGATION_MODELS[currentElongationModel]["allowGeometricCatalysis"] = speed != "slow";
+	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] = speed != "slow";
 
 
 	if (msgID != null){
@@ -1117,9 +1193,13 @@ function changeSpeed_WW(speed, resolve = function() { }, msgID = null){
 }
 
 
-function getCurrentState_WW(resolve = function() {}, msgID = null){
+ WW_JS.getCurrentState_WW = function(resolve, msgID){
 
-	var toReturn = {state: currentState, hybridLen: PHYSICAL_PARAMETERS["hybridLen"]["val"]};
+
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
+
+	var toReturn = {state: WW_JS.currentState, hybridLen: PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]};
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
 	}else{
@@ -1130,7 +1210,9 @@ function getCurrentState_WW(resolve = function() {}, msgID = null){
 }
 
 
-function getCurrentStateCopy_WW(state = currentState){
+WW_JS.getcurrentStateCopy_WW = function(state){
+
+	if (state === undefined) state = WW_JS.currentState;
 
 	return {leftMBase:state["leftMBase"], rightMBase:state["rightMBase"], leftGBase:state["leftGBase"], rightGBase:state["rightGBase"],
 		    mRNAPosInActiveSite:state["mRNAPosInActiveSite"], NTPbound:state["NTPbound"], activated:state["activated"], 
@@ -1142,7 +1224,11 @@ function getCurrentStateCopy_WW(state = currentState){
 
 
 
-function getSaveSessionData_WW(resolve = function() { }, msgID = null){
+ WW_JS.getSaveSessionData_WW = function(resolve, msgID){
+
+
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
 	
 	
 	var tempateSeq = "";
@@ -1151,7 +1237,7 @@ function getSaveSessionData_WW(resolve = function() { }, msgID = null){
 	}
 	
 	
-	var toReturn = {PHYSICAL_PARAMETERS: PHYSICAL_PARAMETERS, TEMPLATE_SEQUENCE: tempateSeq, ELONGATION_MODEL: ELONGATION_MODELS[currentElongationModel], STATE: convertFullStateToCompactState(currentState)}
+	var toReturn = {PHYSICAL_PARAMETERS: PARAMS_JS.PHYSICAL_PARAMETERS, TEMPLATE_SEQUENCE: tempateSeq, ELONGATION_MODEL: FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel], STATE: STATE_JS.convertFullStateToCompactState(WW_JS.currentState)}
 	
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
@@ -1165,7 +1251,136 @@ function getSaveSessionData_WW(resolve = function() { }, msgID = null){
 
 
 
-	
+
+
+WW_JS.getDateAndTime = function(currentdate){
+
+
+	if(currentdate == null) currentdate = new Date(); 
+	var datetime = 
+			currentdate.getFullYear() + "/"
+			+ (currentdate.getMonth()+1)  + "/" 
+			+ currentdate.getDate() + " "
+            + currentdate.getHours() + ":"  
+            + currentdate.getMinutes() + ":" 
+            + currentdate.getSeconds();
+
+	return datetime;     
+
+}
+
+
+
+// Only for node.js
+WW_JS.writeLinesToFile = function(fileName, text, append = false){
+
+	var fs = require('fs');
+
+	if (!append){
+		fs.writeFile(fileName, text, function(err) {
+			if(err) {
+			    return console.log(err);
+			}
+		}); 
+	}
+
+	else{
+
+		fs.appendFile(fileName, text, function(err) {
+			if(err) {
+			    return console.log(err);
+			}
+		}); 
+
+	}
+
+
+}
+
+
+
+
+
+WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, outputFolder){
+
+
+ 	if (!RUNNING_FROM_COMMAND_LINE) return;
+
+	XML_JS.loadSession_WW(XMLdata);
+
+
+	var toDoAfterRefr = function(){
+
+		WW_JS.outputFolder = outputFolder;
+		PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW();
+
+
+
+		var startingTime = new Date(); 
+		console.log("Starting SimPol at", WW_JS.getDateAndTime(startingTime));
+
+
+
+
+		var exit = function(){
+			var finishingTime = new Date(); 
+			var secondToFinish = (finishingTime - startingTime) / 1000;
+
+			console.log("Mean velocity: " + WW_JS.roundToSF_WW(PLOTS_JS.velocity) + "bp/s");
+			var meanTimePerTemplate = 0;
+			for (var i = 0; i < PLOTS_JS.timesSpentOnEachTemplate.length; i ++) meanTimePerTemplate += PLOTS_JS.timesSpentOnEachTemplate[i] / PLOTS_JS.timesSpentOnEachTemplate.length;
+			console.log("Mean time to copy template: " + WW_JS.roundToSF_WW(meanTimePerTemplate) + "s");
+
+			console.log("--------------------------------------");
+			console.log("Finished after " + secondToFinish + "s");
+			console.log("Exiting.");
+		}
+
+
+		// Start the simulations
+		if (!runABC) {
+
+			if (WW_JS.outputFolder != null && WW_JS.outputFolder != "") PLOTS_JS.initialiseSaveFiles_CommandLine(startingTime);
+			console.log("--------------------------------------");
+
+		
+
+			console.log("Running", XML_JS.N, "simulations");
+			SIM_JS.startTrials_WW(XML_JS.N, function(){ 
+
+				exit();
+
+			});
+
+		}
+
+		// Start the ABC
+		else{
+
+
+			if (WW_JS.outputFolder != null && WW_JS.outputFolder != "") ABC_JS.initialiseSaveFiles_CommandLine(startingTime);
+			console.log("--------------------------------------");
+
+			console.log("Performing approximate Bayesian computation");
+
+			ABC_JS.beginABC_WW(XML_JS.ABC_FORCE_VELOCITIES, function(){ 
+
+				exit();
+
+			});
+
+
+		}
+
+	}
+
+
+	var refr = () => new Promise((resolve) => WW_JS.refresh_WW(resolve));
+	refr().then(() => toDoAfterRefr());
+
+
+}
+
 
 
 
@@ -1197,4 +1412,9 @@ onmessage = function(e) {
 };
 
 
-
+if (RUNNING_FROM_COMMAND_LINE){
+	module.exports = {
+	  	init_WW: WW_JS.init_WW,
+	  	loadSessionFromCommandLine: WW_JS.loadSessionFromCommandLine
+	}
+}

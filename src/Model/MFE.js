@@ -19,8 +19,11 @@
     --------------------------------------------------------------------
 -*/
 
-MFE_W = {};
-MFE_V = {};
+MFE_JS = {};
+
+
+MFE_JS.MFE_W = {};
+MFE_JS.MFE_V = {};
 
 // MFE algorithm based on:
 //
@@ -28,10 +31,10 @@ MFE_V = {};
 // "Optimal computer folding of large RNA sequences using thermodynamics and auxiliary information." 
 // Nucleic acids research 9.1 (1981): 133-148.
 
-function getMFESequenceBonds_WW(resolve = function() { }, msgID = null){
+ MFE_JS.getMFESequenceBonds_WW = function(resolve = function() { }, msgID = null){
 
 
-	var result = calculateMFESequence_WW(currentState);
+	var result = MFE_JS.calculateMFESequence_WW(WW_JS.currentState);
 
 	//console.log("Energy", result["energy"]);
 
@@ -39,7 +42,7 @@ function getMFESequenceBonds_WW(resolve = function() { }, msgID = null){
 	if (result != null && result["structure"] != ""){
 		var structure = result["structure"];
 		var primerSeq = result["primerSeq"];
-		graphInfo = getSecondaryStructureBonds_WW(currentState, primerSeq, structure);
+		graphInfo = MFE_JS.getSecondaryStructureBonds_WW(WW_JS.currentState, primerSeq, structure);
 	}
 	
 	if (msgID != null){
@@ -57,37 +60,37 @@ function getMFESequenceBonds_WW(resolve = function() { }, msgID = null){
 
 
 
-function calculateMFESequence_WW(state){
+ MFE_JS.calculateMFESequence_WW = function(state){
 	
 
 	// Calculate secondary structure for previous nbpToFold only
 	var primerSeq = "";
-	var startAt = Math.max(1, state["leftMBase"] - PHYSICAL_PARAMETERS["nbpToFold"]["val"]);
-	//for (var i = startAt; i < state["leftMBase"] - PHYSICAL_PARAMETERS["bubbleLeft"]["val"]; i ++){
+	var startAt = Math.max(1, state["leftMBase"] - PARAMS_JS.PHYSICAL_PARAMETERS["nbpToFold"]["val"]);
+	//for (var i = startAt; i < state["leftMBase"] - PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]; i ++){
 	for (var i = startAt; i < state["leftMBase"]; i ++){
 			if (primerSequence[i] == null) break;
 			primerSeq += primerSequence[i]["base"];
 	}
 
-	if (all_sequences[sequenceID]["primer"].substring(2) == "DNA" || all_sequences[sequenceID]["primer"] == "dsRNA" || primerSeq == "") return {structure: "", primerSeq: "", energy: 0};
+	if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(2) == "DNA" || SEQS_JS.all_sequences[sequenceID]["primer"] == "dsRNA" || primerSeq == "") return {structure: "", primerSeq: "", energy: 0};
 		
 	
-	if (MFE_W[primerSeq] == null){
+	if (MFE_JS.MFE_W[primerSeq] == null){
 	
-		init_MFE_WW(primerSeq);
+		MFE_JS.init_MFE_WW(primerSeq);
 
 		// Want to find W(1, L)
 		for (var k = 6; k <= primerSeq.length; k ++){
 			//console.log("k = ", k);
-			calc_MFE_WW(primerSeq, k);
-			//console.log("MFE_W", MFE_W, "MFE_V", MFE_V)
+			MFE_JS.calc_MFE_WW(primerSeq, k);
+			//console.log("MFE_JS.MFE_W", MFE_JS.MFE_W, "MFE_JS.MFE_V", MFE_JS.MFE_V)
 		}
 	
 	}
-		//console.log("MFE_W", MFE_W, "MFE_V", MFE_V)
+		//console.log("MFE_JS.MFE_W", MFE_JS.MFE_W, "MFE_JS.MFE_V", MFE_JS.MFE_V)
 
 
-	var structure = MFE_W[primerSeq]["structure"];
+	var structure = MFE_JS.MFE_W[primerSeq]["structure"];
 
 
 	// Add the ignores bases to the structure string as unbound bases
@@ -96,7 +99,7 @@ function calculateMFESequence_WW(state){
 	structure = unboundStructure + structure;  
 
 
-	return {structure: structure, primerSeq: primerSeq, energy: MFE_W[primerSeq]["mfe"] / RT};
+	return {structure: structure, primerSeq: primerSeq, energy: MFE_JS.MFE_W[primerSeq]["mfe"] / FE_JS.RT};
 
 
 	
@@ -105,7 +108,7 @@ function calculateMFESequence_WW(state){
 }
 
 
-function getSecondaryStructureBonds_WW(state, primerSeq, structureString){
+ MFE_JS.getSecondaryStructureBonds_WW = function(state, primerSeq, structureString){
 
 
 	console.log(structureString);
@@ -120,7 +123,7 @@ function getSecondaryStructureBonds_WW(state, primerSeq, structureString){
 
 	var toHide = ["#m0"];
 	
-	//for (var i = 1; i < state["leftMBase"] - PHYSICAL_PARAMETERS["bubbleLeft"]["val"]; i ++){
+	//for (var i = 1; i < state["leftMBase"] - PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]; i ++){
 	for (var i = 1; i < state["leftMBase"]; i ++){
 		bonds.push({ source: i, target: i+1 });
 		vertices.push({src: primerSequence[i]["src"], startX: startX, startY: startY});
@@ -128,7 +131,7 @@ function getSecondaryStructureBonds_WW(state, primerSeq, structureString){
 		
 	}
 	
-	//var anchoredNode = primerSequence[state["leftMBase"] - PHYSICAL_PARAMETERS["bubbleLeft"]["val"]];
+	//var anchoredNode = primerSequence[state["leftMBase"] - PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]];
 	var anchoredNode = primerSequence[state["leftMBase"]];
 
 	vertices.push({src: anchoredNode["src"], fx: anchoredNode["x"] - startX, fy: anchoredNode["y"] - 100 - startY, fixed: true, startX: startX, startY: startY });
@@ -136,7 +139,7 @@ function getSecondaryStructureBonds_WW(state, primerSeq, structureString){
 
 	
 	// Recursively add bonds as specified by the structure
-	var index = findBondsRecurse_WW(0, structureString, bonds);
+	var index = MFE_JS.findBondsRecurse_WW(0, structureString, bonds);
 	//while (index != "DONE" && index < structureString.length) findBondsRecurse(index, structureString, bonds);
 	
 	
@@ -164,20 +167,20 @@ function getSecondaryStructureBonds_WW(state, primerSeq, structureString){
 }
 
 
-function findBondsRecurse_WW(index, structureString, bonds){
+ MFE_JS.findBondsRecurse_WW = function(index, structureString, bonds){
 	
 	while (structureString[index] == ".") index++;
 	
 	
 	if (structureString[index] == "("){
-		var bracketClosing = findBondsRecurse_WW(index + 1, structureString, bonds);
+		var bracketClosing = MFE_JS.findBondsRecurse_WW(index + 1, structureString, bonds);
 		bonds.push({source: index+1, target: bracketClosing+1, bp:true});
 		console.log("Adding bond between", index+1, "and", bracketClosing+1);
 		index = bracketClosing + 1;
 		while (structureString[index] == ".") index++;
 		
 		if (structureString[index] == "(") {
-			return findBondsRecurse_WW(index, structureString, bonds)
+			return MFE_JS.findBondsRecurse_WW(index, structureString, bonds)
 		}
 		
 	}
@@ -194,7 +197,7 @@ function findBondsRecurse_WW(index, structureString, bonds){
 
 
 
-function init_MFE_WW(seq){
+MFE_JS.init_MFE_WW = function(seq){
 	
 	// Fill in tables for all observed k-nt substrings where k = 1,2,3,4
 	var kDots = "";
@@ -206,13 +209,13 @@ function init_MFE_WW(seq){
 			var subseq = seq.substring(i,i+k);
 			
 			// W table
-			if (MFE_W[subseq] == null){
-				MFE_W[subseq] = {mfe: 0, structure: kDots};
+			if (MFE_JS.MFE_W[subseq] == null){
+				MFE_JS.MFE_W[subseq] = {mfe: 0, structure: kDots};
 			}
 			
 			// V table
-			if (MFE_V[subseq] == null){
-				MFE_V[subseq] = {mfe: Infinity, structure: kDots};
+			if (MFE_JS.MFE_V[subseq] == null){
+				MFE_JS.MFE_V[subseq] = {mfe: Infinity, structure: kDots};
 			}
 			
 			
@@ -230,15 +233,15 @@ function init_MFE_WW(seq){
 		
 		
 		// W table
-		if (MFE_W[subseq] == null){
-			MFE_W[subseq] = {mfe: 0, structure: "....."};
+		if (MFE_JS.MFE_W[subseq] == null){
+			MFE_JS.MFE_W[subseq] = {mfe: 0, structure: "....."};
 		}
 		
 		// V table
-		if (MFE_V[subseq] == null){
-			if ( (Si == "U" && Sj == "A") || (Si == "A" && Sj == "U") ) MFE_V[subseq] = {mfe: 8, structure: "(...)"};
-			else if ( (Si == "G" && Sj == "C") || (Si == "C" && Sj == "G") ) MFE_V[subseq] = {mfe: 8.4, structure: "(...)"};
-			else MFE_V[subseq] = {mfe: 0, structure: "....."};
+		if (MFE_JS.MFE_V[subseq] == null){
+			if ( (Si == "U" && Sj == "A") || (Si == "A" && Sj == "U") ) MFE_JS.MFE_V[subseq] = {mfe: 8, structure: "(...)"};
+			else if ( (Si == "G" && Sj == "C") || (Si == "C" && Sj == "G") ) MFE_JS.MFE_V[subseq] = {mfe: 8.4, structure: "(...)"};
+			else MFE_JS.MFE_V[subseq] = {mfe: 0, structure: "....."};
 		}
 		
 	}
@@ -246,7 +249,7 @@ function init_MFE_WW(seq){
 }
 
 
-function calc_MFE_WW(seq, k){
+ MFE_JS.calc_MFE_WW = function(seq, k){
 	
 	
 	// Fill in tables for all observed k-nt substrings
@@ -261,12 +264,12 @@ function calc_MFE_WW(seq, k){
 		
 		
 		// V table
-		if (MFE_V[subseq] == null){
+		if (MFE_JS.MFE_V[subseq] == null){
 			
 			
 			// If not a basepair then set this structure's mfe to infinity
 			if (correctPairs[Si + Sj] == null && !((Si == "G" && Sj =="U") || (Si == "U" && Sj =="G"))) {
-				MFE_V[subseq] = {mfe: Infinity};
+				MFE_JS.MFE_V[subseq] = {mfe: Infinity};
 			}else{
 			
 			
@@ -274,7 +277,7 @@ function calc_MFE_WW(seq, k){
 				var struct1 = "(";
 				for (var ki = 1; ki <= k-2; ki++) struct1 += ".";
 				struct1 += ")";
-				var energy1 = getFreeEnergyOfHairpin_WW(subseq); // Get energy of the hairpin
+				var energy1 = MFE_JS.getFreeEnergyOfHairpin_WW(subseq); // Get energy of the hairpin
 				var str1 = {mfe: energy1, structure: struct1, from: 1};
 			
 			
@@ -286,12 +289,12 @@ function calc_MFE_WW(seq, k){
 						var Siprime = seq[iPrime];
 						var Sjprime = seq[jPrime];
 					
-						//console.log("Do", Siprime, Sjprime, "match", Si + Siprime + Sjprime + Sj, BasePairParams[Si + Siprime + Sjprime + Sj]);
+						//console.log("Do", Siprime, Sjprime, "match", Si + Siprime + Sjprime + Sj, FE_JS.BasePairParams[Si + Siprime + Sjprime + Sj]);
 						if (correctPairs[Siprime + Sjprime] == null) continue;
 					
-						var basePairEnergy = getFreeEnergyOfFace_WW(i, j-1, iPrime, jPrime, seq); 
+						var basePairEnergy = MFE_JS.getFreeEnergyOfFace_WW(i, j-1, iPrime, jPrime, seq); 
 						//console.log("Free energy of face", basePairEnergy);
-						var obj2a = MFE_V[seq.substring(iPrime, jPrime+1)];
+						var obj2a = MFE_JS.MFE_V[seq.substring(iPrime, jPrime+1)];
 					
 					
 						if (basePairEnergy + obj2a["mfe"] < str2["mfe"]){
@@ -317,8 +320,8 @@ function calc_MFE_WW(seq, k){
 				var str3 = {mfe: Infinity};
 				for (var iPrime = i+2; iPrime < j-2; iPrime++){
 				
-					var obj3a = MFE_W[seq.substring(i+1, iPrime+1)];
-					var obj3b = MFE_W[seq.substring(iPrime+1, j-1)];
+					var obj3a = MFE_JS.MFE_W[seq.substring(i+1, iPrime+1)];
+					var obj3b = MFE_JS.MFE_W[seq.substring(iPrime+1, j-1)];
 				
 					if (obj3a["mfe"] + obj3b["mfe"] < str3["mfe"]){
 						str3 = {mfe: obj3a["mfe"] + obj3b["mfe"], structure: "(" + obj3a["structure"] + obj3b["structure"] + ")", from: 3}
@@ -333,7 +336,7 @@ function calc_MFE_WW(seq, k){
 				if (str3["mfe"] < strMFE["mfe"]) strMFE = str3;
 			
 			
-				MFE_V[subseq] = strMFE;
+				MFE_JS.MFE_V[subseq] = strMFE;
 			
 			
 			}
@@ -346,18 +349,18 @@ function calc_MFE_WW(seq, k){
 		
 		
 		// W table
-		if (MFE_W[subseq] == null){
+		if (MFE_JS.MFE_W[subseq] == null){
 
 			// Case 1: i is left as a dangling end. Use the structure from i+1 to j
-			var obj1 = MFE_W[seq.substring(i+1, j)];
+			var obj1 = MFE_JS.MFE_W[seq.substring(i+1, j)];
 			var str1 = {mfe: obj1["mfe"], structure: "." + obj1["structure"]};
 			
 			// Case 2: j is left as a dangling end. Use the structure from i to j-1
-			var obj2 = MFE_W[seq.substring(i+1, j)];
+			var obj2 = MFE_JS.MFE_W[seq.substring(i+1, j)];
 			var str2 = {mfe: obj2["mfe"], structure: obj2["structure"] + "."};
 			
 			// Case 3: i and j basepair with each other
-			var str3 = MFE_V[seq.substring(i, j)];
+			var str3 = MFE_JS.MFE_V[seq.substring(i, j)];
 			
 			// Case 4: i and j basepair but not with each other
 			var str4 = {mfe: Infinity};
@@ -365,10 +368,10 @@ function calc_MFE_WW(seq, k){
 				
 				
 				
-				var obj4a = MFE_W[seq.substring(i, iPrime+1)];
-				var obj4b = MFE_W[seq.substring(iPrime+1, j)];
+				var obj4a = MFE_JS.MFE_W[seq.substring(i, iPrime+1)];
+				var obj4b = MFE_JS.MFE_W[seq.substring(iPrime+1, j)];
 				
-				//console.log("subseq",subseq, "iPrime",iPrime, "obj4a", obj4a, "obj4b", obj4b, seq.substring(iPrime+1, j), MFE_W[seq.substring(iPrime+1, j)]);
+				//console.log("subseq",subseq, "iPrime",iPrime, "obj4a", obj4a, "obj4b", obj4b, seq.substring(iPrime+1, j), MFE_JS.MFE_W[seq.substring(iPrime+1, j)]);
 				if (obj4a["mfe"] + obj4b["mfe"] < str4["mfe"]){
 					str4 = {mfe: obj4a["mfe"] + obj4b["mfe"], structure: obj4a["structure"] + obj4b["structure"]};
 				}
@@ -383,7 +386,7 @@ function calc_MFE_WW(seq, k){
 			if (str4["mfe"] < strMFE["mfe"]) strMFE = str4;
 			
 			
-			MFE_W[subseq] = strMFE;
+			MFE_JS.MFE_W[subseq] = strMFE;
 			
 		}
 	
@@ -397,12 +400,12 @@ function calc_MFE_WW(seq, k){
 // Assumes that form of structure is
 // subseq = 1234567
 //          (.....)
-function getFreeEnergyOfHairpin_WW(subseq){
+MFE_JS.getFreeEnergyOfHairpin_WW = function(subseq){
 	
 	// Source: http://rna.urmc.rochester.edu/NNDB/turner04/hairpin.html
 	
 	// If the hairpin is in the special list of hairpins then use the parameters there
-	if (SpecialHairpinParams[subseq] != null) return SpecialHairpinParams[subseq];
+	if (FE_JS.SpecialHairpinParams[subseq] != null) return FE_JS.SpecialHairpinParams[subseq];
 	
 	var n = subseq.length - 2;
 	if (n < 3) return Infinity;
@@ -411,7 +414,7 @@ function getFreeEnergyOfHairpin_WW(subseq){
 	
 	var allC = subseq.substring(1, subseq.length-1).replace(/C/g, "").length == 0;
 	var allCPenalty = allC && n == 3 ? 1.5 : allC ? 0.3*n + 1.6 : 0; // If the loop has all C's then add the all C penalty
-	var terminalMismatchPenalty = TerminalMismatchParams[subseq[0] + subseq[1] + subseq[n+1] + subseq[n]];  //  5' 12																								//  3' 34
+	var terminalMismatchPenalty = FE_JS.TerminalMismatchParams[subseq[0] + subseq[1] + subseq[n+1] + subseq[n]];  //  5' 12																								//  3' 34
 	var firstMismatchPenalty = subseq[1] == "G" && subseq[n] == "G" ? -0.8 : 0; // See if sequence is in form xGxxxxxxGx
 	if (firstMismatchPenalty == 0) firstMismatchPenalty = ((subseq[1] == "U" && subseq[n] == "U") || (subseq[1] == "G" && subseq[n] == "A")) ? -0.9 : 0; // See if sequence is in form xGxxxxxxAx or xUxxxxxxUx
 	var closurePenalty = subseq[0] == "G" && subseq[n+1] == "U" ? -2.2 : (subseq[0] == "A" && subseq[n+1] == "U") || (subseq[0] == "U" && subseq[n+1] == "A") ? 0.45 : 0;	// Bonus if the last basepair is GU, penalty if AU or UA													
@@ -425,7 +428,7 @@ function getFreeEnergyOfHairpin_WW(subseq){
 // Calculate the free energy of the face bounded by basepairs i, j, i' and j'
 // where i and j basepair, and i' and j' basepair
 // and 5'-- i < i' < j' < j --3'
-function getFreeEnergyOfFace_WW(i, j, iPrime, jPrime, seq){
+ MFE_JS.getFreeEnergyOfFace_WW = function(i, j, iPrime, jPrime, seq){
 	
 	var Si = seq[i];
 	var Sj = seq[j];
@@ -439,17 +442,17 @@ function getFreeEnergyOfFace_WW(i, j, iPrime, jPrime, seq){
 	// If these 2 basepairs comprise the entire face then we only require the nearest neighbour basepair term
 	if (i+1 == iPrime && j-1 == jPrime) {
 		//console.log("Adding basepairs", Si + Siprime + Sj + Sjprime);
-		return BasePairParams[Si + Siprime + Sj + Sjprime];
+		return FE_JS.BasePairParams[Si + Siprime + Sj + Sjprime];
 	}
 	
 	// Bulge between i and i'
 	if (i+1 < iPrime && jPrime+1 == j) {
-		return getFreeEnergyOfBulge_WW(seq.substring(i, iPrime+1), reverseString_WW(seq.substring(jPrime, j+1)));
+		return MFE_JS.getFreeEnergyOfBulge_WW(seq.substring(i, iPrime+1), reverseString_WW(seq.substring(jPrime, j+1)));
 	}
 	
 	// Bulge between j' and j
 	if (i+1 == iPrime && jPrime+1 < j) {
-		return getFreeEnergyOfBulge_WW(seq.substring(jPrime, j+1), reverseString_WW(seq.substring(i, iPrime+1)));
+		return MFE_JS.getFreeEnergyOfBulge_WW(seq.substring(jPrime, j+1), reverseString_WW(seq.substring(i, iPrime+1)));
 	}
 
 
@@ -457,8 +460,8 @@ function getFreeEnergyOfFace_WW(i, j, iPrime, jPrime, seq){
 	if (iPrime - i == 2 && j - jPrime == 2){
 		var xIndex = seq[i+1] == "A" ? 0 : seq[i+1] == "C" ? 1 : seq[i+1] == "G" ? 2 : 3;
 		var yIndex = seq[j-1] == "A" ? 0 : seq[j-1] == "C" ? 1 : seq[j-1] == "G" ? 2 : 3;
-		//console.log("Adding 1x1 loop", LoopParams1x1[Si + Siprime + Sj + Sjprime][xIndex][yIndex]);
-		return LoopParams1x1[Si + Siprime + Sj + Sjprime][xIndex][yIndex];
+		//console.log("Adding 1x1 loop", FE_JS.LoopParams1x1[Si + Siprime + Sj + Sjprime][xIndex][yIndex]);
+		return FE_JS.LoopParams1x1[Si + Siprime + Sj + Sjprime][xIndex][yIndex];
 	}
 
 
@@ -467,8 +470,8 @@ function getFreeEnergyOfFace_WW(i, j, iPrime, jPrime, seq){
 		var xIndexFirst = seq[i+1];
 		var xIndexSecond = seq[i+2] == "A" ? 0 : seq[i+2] == "C" ? 1 : seq[i+2] == "G" ? 2 : 3;
 		var yIndex = seq[j-1] == "A" ? 0 : seq[j-1] == "C" ? 1 : seq[j-1] == "G" ? 2 : 3;
-		//console.log("Adding 2x1 loop", LoopParams2x1[Sjprime + Sj + Siprime + Si][xIndexFirst][yIndex][xIndexSecond]);
-		return LoopParams2x1[Sjprime + Sj + Siprime + Si][xIndexFirst][yIndex][xIndexSecond];
+		//console.log("Adding 2x1 loop", FE_JS.LoopParams2x1[Sjprime + Sj + Siprime + Si][xIndexFirst][yIndex][xIndexSecond]);
+		return FE_JS.LoopParams2x1[Sjprime + Sj + Siprime + Si][xIndexFirst][yIndex][xIndexSecond];
 	}
 
 
@@ -477,8 +480,8 @@ function getFreeEnergyOfFace_WW(i, j, iPrime, jPrime, seq){
 		var xIndexFirst = seq[j-1];
 		var xIndexSecond = seq[i+1] == "A" ? 0 : seq[i+1] == "C" ? 1 : seq[i+1] == "G" ? 2 : 3;
 		var yIndex = seq[j-2] == "A" ? 0 : seq[j-2] == "C" ? 1 : seq[j-2] == "G" ? 2 : 3;
-		//console.log("Adding 1x2 loop", LoopParams2x1[Si + Siprime + Sj + Sjprime][xIndexFirst][xIndexSecond][yIndex]);
-		return LoopParams2x1[Si + Siprime + Sj + Sjprime][xIndexFirst][xIndexSecond][yIndex];
+		//console.log("Adding 1x2 loop", FE_JS.LoopParams2x1[Si + Siprime + Sj + Sjprime][xIndexFirst][xIndexSecond][yIndex]);
+		return FE_JS.LoopParams2x1[Si + Siprime + Sj + Sjprime][xIndexFirst][xIndexSecond][yIndex];
 	}
 
 
@@ -492,8 +495,8 @@ function getFreeEnergyOfFace_WW(i, j, iPrime, jPrime, seq){
 		var yIndexFirst = seq[j-2] == "A" ? 0 : seq[j-2] == "C" ? 1 : seq[j-2] == "G" ? 2 : 3;
 		var yIndexSecond = seq[j-1] == "A" ? 0 : seq[j-1] == "C" ? 1 : seq[j-1] == "G" ? 2 : 3;
 		var yIndex = yIndexFirst*4 + yIndexSecond;
-		//console.log("Adding 2x2 loop", LoopParams2x2[Si + Siprime + Sj + Sjprime][xIndex][yIndex]);
-		return LoopParams2x2[Si + Siprime + Sj + Sjprime][xIndex][yIndex];
+		//console.log("Adding 2x2 loop", FE_JS.LoopParams2x2[Si + Siprime + Sj + Sjprime][xIndex][yIndex]);
+		return FE_JS.LoopParams2x2[Si + Siprime + Sj + Sjprime][xIndex][yIndex];
 	}
 
 
@@ -514,15 +517,15 @@ function getFreeEnergyOfFace_WW(i, j, iPrime, jPrime, seq){
 // Provide string of bulged bases plus the 1 basepair on either side
 // eg bulgedSeq = 5' "123456" 3' where this bulge is of size 4
 // nonBulgedSeq = 3' "AB" 5'     where 1-A and 6-B basepair
-function getFreeEnergyOfBulge_WW(bulgedSeq, nonBulgedSeq){
+ MFE_JS.getFreeEnergyOfBulge_WW = function(bulgedSeq, nonBulgedSeq){
 	
 	var bulgeSize = bulgedSeq.length-2;
 	var freeEnergy = 0;
 	if (bulgeSize == 1 && bulgedSeq == "C") freeEnergy += -0.9; // Special C bulge
 	if (bulgeSize == 1) {
 		freeEnergy += 3.81;
-		freeEnergy += BasePairParams[bulgedSeq[0] + bulgedSeq[bulgedSeq.length-1] + nonBulgedSeq];
-		if (BasePairParams[bulgedSeq[0] + bulgedSeq[bulgedSeq.length-1] + nonBulgedSeq] == null) console.log("ERROR bulge no basepair!", bulgedSeq[0] + bulgedSeq[bulgedSeq.length-1] + nonBulgedSeq);
+		freeEnergy += FE_JS.BasePairParams[bulgedSeq[0] + bulgedSeq[bulgedSeq.length-1] + nonBulgedSeq];
+		if (FE_JS.BasePairParams[bulgedSeq[0] + bulgedSeq[bulgedSeq.length-1] + nonBulgedSeq] == null) console.log("ERROR bulge no basepair!", bulgedSeq[0] + bulgedSeq[bulgedSeq.length-1] + nonBulgedSeq);
 	}
 	else if (bulgeSize == 2) freeEnergy += 2.80;
 	else freeEnergy += 3.2 + 0.4*(bulgeSize - 3);
@@ -545,6 +548,27 @@ function reverseString_WW(str) {
 
 
 
+
+
+if (RUNNING_FROM_COMMAND_LINE){
+
+
+	module.exports = {
+		MFE_W: MFE_JS.MFE_W,
+		MFE_V: MFE_JS.MFE_V,
+		getMFESequenceBonds_WW: MFE_JS.getMFESequenceBonds_WW,
+		calculateMFESequence_WW: MFE_JS.calculateMFESequence_WW,
+		getSecondaryStructureBonds_WW: MFE_JS.getSecondaryStructureBonds_WW,
+		findBondsRecurse_WW: MFE_JS.findBondsRecurse_WW,
+		init_MFE_WW: MFE_JS.init_MFE_WW,
+		calc_MFE_WW: MFE_JS.calc_MFE_WW,
+		getFreeEnergyOfHairpin_WW: MFE_JS.getFreeEnergyOfHairpin_WW,
+		getFreeEnergyOfFace_WW: MFE_JS.getFreeEnergyOfFace_WW,
+		getFreeEnergyOfBulge_WW: MFE_JS.getFreeEnergyOfBulge_WW
+
+	}
+
+}
 
 
 

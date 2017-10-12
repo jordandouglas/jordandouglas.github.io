@@ -20,39 +20,48 @@
     --------------------------------------------------------------------
 -*/
 
-translocationCacheNeedsUpdating = true;
-TRANSLOCATION_RATES = null;
-BACKTRACKING_RATES = null;
+
+STATE_JS = {};
+
+STATE_JS.translocationCacheNeedsUpdating = true;
+STATE_JS.TRANSLOCATION_RATES = null;
+STATE_JS.BACKTRACKING_RATES = null;
 
 
-function initTranslocationRateCache(){
-	
-	
-	if (!translocationCacheNeedsUpdating) return;
 
-	TRANSLOCATION_RATES = buildTranslocationRateTable();
-	BACKTRACKING_RATES = buildBacktrackRateTable();
+STATE_JS.initTranslocationRateCache = function(){
 	
 	
-	//console.log("TRANSLOCATION_RATES", TRANSLOCATION_RATES);
-	//console.log("BACKTRACKING_RATES", BACKTRACKING_RATES);
+	if (!STATE_JS.translocationCacheNeedsUpdating) return;
+
+	STATE_JS.TRANSLOCATION_RATES = STATE_JS.buildTranslocationRateTable();
+	STATE_JS.BACKTRACKING_RATES = STATE_JS.buildBacktrackRateTable();
+
 	
 	
-	translocationCacheNeedsUpdating = false;
+	//console.log("STATE_JS.TRANSLOCATION_RATES", STATE_JS.TRANSLOCATION_RATES);
+	//console.log("STATE_JS.BACKTRACKING_RATES", STATE_JS.BACKTRACKING_RATES);
+	
+	
+	STATE_JS.translocationCacheNeedsUpdating = false;
 	
 }
 
 
 
 
-function updateCoordsOfCurrentState(){
+ STATE_JS.updateCoordsOfcurrentState = function(){
+
+
+ 	if (RUNNING_FROM_COMMAND_LINE) return;
+
 
 	// Coordinates of pol
-	var h = PHYSICAL_PARAMETERS["hybridLen"]["val"];
-	var polX = 165 + 25 * (currentState["rightMBase"] - h + 1);
+	var h = PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"];
+	var polX = 165 + 25 * (WW_JS.currentState["rightMBase"] - h + 1);
 	var polY = 81;
-	move_obj_absolute("pol", polX, polY, 1);
-	change_src_of_object_WW(HTMLobjects["pol"], currentState["activated"] ? "pol" : "pol_U"); // Activated or deactivated?
+	WW_JS.move_obj_absolute("pol", polX, polY, 1);
+	WW_JS.change_src_of_object_WW(HTMLobjects["pol"], WW_JS.currentState["activated"] ? "pol" : "pol_U"); // Activated or deactivated?
 
 
 
@@ -67,21 +76,21 @@ function updateCoordsOfCurrentState(){
 		// Y value determined by whether it is part of hybrid, bubble or on the bottom
 
 		var ntY = 207;
-		if (i <= currentState["leftMBase"] &&  i > currentState["leftMBase"]  - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0) dy += -52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)
-		if (i > currentState["rightMBase"] && i < currentState["rightMBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1) dy += 52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)
+		if (i <= WW_JS.currentState["leftMBase"] &&  i > WW_JS.currentState["leftMBase"]  - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0) dy += -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)
+		if (i > WW_JS.currentState["rightMBase"] && i < WW_JS.currentState["rightMBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1) dy += 52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)
 
-		//if (all_sequences[sequenceID]["primer"] != "dsRNA") 
-		//for (i = state["leftMBase"] - 1; UPDATE_COORDS &&  i > state["leftMBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) - 1 && i >= 0; i--) move_nt_WW(i, "m", 0, -52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
+		//if (SEQS_JS.all_sequences[sequenceID]["primer"] != "dsRNA") 
+		//for (i = state["leftMBase"] - 1; UPDATE_COORDS &&  i > state["leftMBase"] - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) - 1 && i >= 0; i--) WW_JS.move_nt_WW(i, "m", 0, -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
 
 
 		// Is NTP bound?
-		if (i == primerSequence.length-1 && currentState["NTPbound"]){
+		if (i == primerSequence.length-1 && WW_JS.currentState["NTPbound"]){
 			ntX += 10;
 			ntY += 10;
 		}
-		else set_TP_state_WW(i, "m", false);
+		else OPS_JS.set_TP_state_WW(i, "m", false);
 		
-		move_nt_absolute_WW(i, "m", ntX, ntY + dy, 1); 
+		WW_JS.move_nt_absolute_WW(i, "m", ntX, ntY + dy, 1); 
 
 
 	}
@@ -95,23 +104,23 @@ function updateCoordsOfCurrentState(){
 		// Y value determined by whether it is part of hybrid, bubble or on the bottom
 
 		var ntY = 78;
-		if (i <= currentState["leftGBase"] &&  i > currentState["leftGBase"]  - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0) dy += 52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)
-		if (i > currentState["rightGBase"] && i < currentState["rightGBase"] + (PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1) dy += -52/(PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)
+		if (i <= WW_JS.currentState["leftGBase"] &&  i > WW_JS.currentState["leftGBase"]  - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0) dy += 52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)
+		if (i > WW_JS.currentState["rightGBase"] && i < WW_JS.currentState["rightGBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1) dy += -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)
 
-		//if (all_sequences[sequenceID]["primer"] != "dsRNA") 
-		//for (i = state["leftMBase"] - 1; UPDATE_COORDS &&  i > state["leftMBase"] - (PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) - 1 && i >= 0; i--) move_nt_WW(i, "m", 0, -52/(PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
+		//if (SEQS_JS.all_sequences[sequenceID]["primer"] != "dsRNA") 
+		//for (i = state["leftMBase"] - 1; UPDATE_COORDS &&  i > state["leftMBase"] - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) - 1 && i >= 0; i--) WW_JS.move_nt_WW(i, "m", 0, -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
 
-		 move_nt_absolute_WW(i, "g", ntX, ntY + dy, 1); 
+		 WW_JS.move_nt_absolute_WW(i, "g", ntX, ntY + dy, 1); 
 
 
 		 // Orientation
-		 if (i > 0 && i <= currentState["rightGBase"] + PHYSICAL_PARAMETERS["bubbleRight"]["val"] && i >= currentState["leftGBase"]) flip_base_WW(i, "g", "g"); 
-		 else if (i > 0) flip_base_WW(i, "g", "m"); 
+		 if (i > 0 && i <= WW_JS.currentState["rightGBase"] + PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"] && i >= WW_JS.currentState["leftGBase"]) WW_JS.flip_base_WW(i, "g", "g"); 
+		 else if (i > 0) WW_JS.flip_base_WW(i, "g", "m"); 
 
 		 // Complementary strand
-		 if (all_sequences[sequenceID]["template"].substring(0,2) == "ds"){
+		 if (SEQS_JS.all_sequences[sequenceID]["template"].substring(0,2) == "ds"){
 		 	ntY = 53;
-		 	move_nt_absolute_WW(i, "o", ntX, ntY - dy/2, 1); 
+		 	WW_JS.move_nt_absolute_WW(i, "o", ntX, ntY - dy/2, 1); 
 
 		 } 
 
@@ -121,8 +130,8 @@ function updateCoordsOfCurrentState(){
 
 
 	// Force beads
-	remove_force_equipment_WW();
-	if (PHYSICAL_PARAMETERS["FAssist"]["val"] != 0) add_force_equipment_WW(PHYSICAL_PARAMETERS["FAssist"]["val"]);
+	PARAMS_JS.remove_force_equipment_WW();
+	if (PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] != 0) PARAMS_JS.add_force_equipment_WW(PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"]);
 
 
 }
@@ -130,15 +139,15 @@ function updateCoordsOfCurrentState(){
 
 
 // Slippage states reset
-function convertCompactStateToFullState(compactState){
+ STATE_JS.convertCompactStateToFullState = function(compactState){
 	
 	//console.log("Input compact", compactState);
 	
 	var rightHybridBase = compactState[1] + compactState[0];
-	var leftHybridBase = rightHybridBase + 1 - PHYSICAL_PARAMETERS["hybridLen"]["val"];
+	var leftHybridBase = rightHybridBase + 1 - PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"];
 	
 	var fullState = { leftGBase: leftHybridBase, rightGBase: rightHybridBase, leftMBase: leftHybridBase, rightMBase: rightHybridBase, NTPtoAdd: "X",
-					 mRNAPosInActiveSite: compactState[1], NTPbound: compactState[2], nbases: currentState["nbases"], mRNALength: compactState[0]+1, activated:compactState[3], rateOfBindingNextBase:0,
+					 mRNAPosInActiveSite: compactState[1], NTPbound: compactState[2], nbases: WW_JS.currentState["nbases"], mRNALength: compactState[0]+1, activated:compactState[3], rateOfBindingNextBase:0,
 					 bulgePos: [0], bulgedBase: [-1], bulgeSize: [0], partOfBulgeID: [0], nextBaseToCopy: compactState[0]+1, terminated: false };
 	
 	
@@ -153,7 +162,7 @@ function convertCompactStateToFullState(compactState){
 
 
 // Slippage states will not be encoded
-function convertFullStateToCompactState(fullState){
+ STATE_JS.convertFullStateToCompactState = function(fullState){
 	
 	//console.log("Input full", fullState);
 	
@@ -168,12 +177,12 @@ function convertFullStateToCompactState(fullState){
 
 
 
-function getTranslocationRates(compactState){
+ STATE_JS.getTranslocationRates = function(compactState){
 	
 	
-	var h = PHYSICAL_PARAMETERS["hybridLen"]["val"];
+	var h = PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"];
 	
-	//console.log("State", compactState, "tables", TRANSLOCATION_RATES, BACKTRACKING_RATES);
+	//console.log("State", compactState, "tables", STATE_JS.TRANSLOCATION_RATES, STATE_JS.BACKTRACKING_RATES);
 	
 	
 	// Polymerase is not backtracked. Use regular translocation table
@@ -184,9 +193,13 @@ function getTranslocationRates(compactState){
 		var colNum = compactState[1] + 1;
 		
 		
-		var rates = TRANSLOCATION_RATES[rowNum][colNum];
+		var rates = STATE_JS.TRANSLOCATION_RATES[rowNum][colNum];
 
-		if (rates != false) return rates;
+		if (rates != false) {
+			var forceGradient = Math.exp((-PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * 3.4e-10) / (2 * 1.380649e-23 * 310));
+			var GDagRateModifier = Math.exp(-PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"]);
+			return [rates[0] * GDagRateModifier * forceGradient, rates[1] * GDagRateModifier / forceGradient];
+		}
 
 		
 		// Temporarily set state to inactive so it lets us backtrack
@@ -194,23 +207,23 @@ function getTranslocationRates(compactState){
 		compactState[3] = false;
 		
 		// If rates are not in table then add them and return them
-		var thisFullState = convertCompactStateToFullState(compactState);
-		var slidingPeakHeights = update_slidingPeakHeights_WW(thisFullState, false);
-		var slidingTroughHeights = update_slidingTroughHeights_WW(thisFullState, false);
+		var thisFullState = STATE_JS.convertCompactStateToFullState(compactState);
+		var slidingPeakHeights = FE_JS.update_slidingPeakHeights_WW(thisFullState, false, false);
+		var slidingTroughHeights = FE_JS.update_slidingTroughHeights_WW(thisFullState, false, false);
 		compactState[3] = temp;
 		
 		//console.log("compactState", compactState, "slidingPeakHeights", slidingPeakHeights);
 
 		
 
-
+		// Have not added in GdagSlide or Fassist yet, so need to multiply it in later
 		var kbck = 0;
 		var kfwd = 0;
 		if (slidingPeakHeights[2] != maxHeight) kbck = Math.exp(-(slidingPeakHeights[2] - slidingTroughHeights[3])) * 1e6;
 		if (slidingPeakHeights[3] != maxHeight)	kfwd = Math.exp(-(slidingPeakHeights[3] - slidingTroughHeights[3])) * 1e6;
 
 
-		TRANSLOCATION_RATES[rowNum][colNum] = [kbck, kfwd];
+		STATE_JS.TRANSLOCATION_RATES[rowNum][colNum] = [kbck, kfwd];
 
 		return [kbck, kfwd];
 		
@@ -229,22 +242,28 @@ function getTranslocationRates(compactState){
 		var leftHybridBase = rightHybridBase + 1 - h;
 		var indexNum = leftHybridBase - 1;
 
-		var rates = BACKTRACKING_RATES[indexNum];
+		var rates = STATE_JS.BACKTRACKING_RATES[indexNum];
 
-		if (rates != false) return rates;
+		if (rates != false) {
+			var forceGradient = Math.exp((-PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * 3.4e-10) / (2 * 1.380649e-23 * 310));
+			var GDagRateModifier = Math.exp(-PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"]);
+			return [rates[0] * GDagRateModifier * forceGradient, rates[1] * GDagRateModifier / forceGradient];
+		}
 		
 		
 		// If rates are not in table then add them and return them
-		var thisFullState = convertCompactStateToFullState(compactState);
-		var slidingPeakHeights = update_slidingPeakHeights_WW(thisFullState, false);
-		var slidingTroughHeights = update_slidingTroughHeights_WW(thisFullState, false);
+		var thisFullState = STATE_JS.convertCompactStateToFullState(compactState);
+		var slidingPeakHeights = FE_JS.update_slidingPeakHeights_WW(thisFullState,false, false);
+		var slidingTroughHeights = FE_JS.update_slidingTroughHeights_WW(thisFullState, false, false);
 
+
+		// Have not added in GdagSlide or Fassist yet, so need to multiply it in later
 		var kbck = 0;
 		var kfwd = 0;
 		if (slidingPeakHeights[2] != maxHeight) kbck = Math.exp(-(slidingPeakHeights[2] - slidingTroughHeights[3])) * 1e6;
 		if (slidingPeakHeights[3] != maxHeight)	kfwd = Math.exp(-(slidingPeakHeights[3] - slidingTroughHeights[3])) * 1e6;
 
-		BACKTRACKING_RATES[indexNum] = [kbck, kfwd];
+		STATE_JS.BACKTRACKING_RATES[indexNum] = [kbck, kfwd];
 
 		return [kbck, kfwd];
 	
@@ -258,7 +277,7 @@ function getTranslocationRates(compactState){
 
 
 
-function buildBacktrackRateTable(){
+ STATE_JS.buildBacktrackRateTable = function(){
 	
 	
 	// Once the polymerase has entered state -2 (ie backtracked by 2 positions) then all backtracking rates 
@@ -267,12 +286,12 @@ function buildBacktrackRateTable(){
 	// folding the 3' end of the nascent strand
 	
 	
-	var h = PHYSICAL_PARAMETERS["hybridLen"]["val"];
-	if (currentState["nbases"] - h - 1 < 0) return null;
-	var backtrackRates = Array(currentState["nbases"] - h - 1);
+	var h = PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"];
+	if (WW_JS.currentState["nbases"] - h - 1 < 0) return null;
+	var backtrackRates = Array(WW_JS.currentState["nbases"] - h - 1);
 	
 	
-	for (var leftHybridBase = 1; leftHybridBase <= currentState["nbases"] - h - 1; leftHybridBase ++){
+	for (var leftHybridBase = 1; leftHybridBase <= WW_JS.currentState["nbases"] - h - 1; leftHybridBase ++){
 		var indexNum = leftHybridBase - 1;
 		backtrackRates[indexNum] = false; // Will leave it empty and add values only as they are needed
 	}
@@ -287,7 +306,7 @@ function buildBacktrackRateTable(){
 
 
 
-function buildTranslocationRateTable(){
+ STATE_JS.buildTranslocationRateTable = function(){
 	
 
 	
@@ -298,15 +317,15 @@ function buildTranslocationRateTable(){
 	// Each entry is a tuple (kbck, kfwd)
 	// There are n - h rows (n is total number of bases, h is hybrid length)
 	// There are l + 1 entries in each row, where l is the length of the nascent strand in the row
-	var h = PHYSICAL_PARAMETERS["hybridLen"]["val"];
-	var nLengths = currentState["nbases"] - h;
+	var h = PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"];
+	var nLengths = WW_JS.currentState["nbases"] - h;
 	var nPositions = h + 1; 
 	
 	
 	if (nLengths < 0) return null;
 	
 	var translocationRates = Array(nLengths);
-	for(var nascentLen = h-1; nascentLen <= currentState["nbases"]; nascentLen ++){
+	for(var nascentLen = h-1; nascentLen <= WW_JS.currentState["nbases"]; nascentLen ++){
 		
 		var rowNum = nascentLen - (h-1);
 		
@@ -337,21 +356,21 @@ function buildTranslocationRateTable(){
 }
 
 
-function forward_cWW(state, resolve = function() { }){
+ STATE_JS.forward_cWW = function(state, resolve = function() { }){
 	if (!state[2]) state[1]++;
-	if (state[1] > PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) SIMULATION_VARIABLES["terminated"] = true; // Terminate if too hypertranslocated
+	if (state[1] > PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) SIM_JS.SIMULATION_VARIABLES["terminated"] = true; // Terminate if too hypertranslocated
 	resolve();
 }
 
-function backward_cWW(state, resolve = function() { }){
+ STATE_JS.backward_cWW = function(state, resolve = function() { }){
 	if (!state[2]) state[1]--;
 	resolve();
 }
 
-function bindNTP_cWW(state, resolve = function() { }){
+ STATE_JS.bindNTP_cWW = function(state, resolve = function() { }){
 	if (state[3] && !state[2] && state[1] == 1) {
 		state[2] = true; // Bind NTP
-		create_nucleotide_WW("m" + (state[0]+1), "m", state[0]+1, 0, 0, SIMULATION_VARIABLES["baseToAdd"] , SIMULATION_VARIABLES["baseToAdd"]  + "m", true);
+		WW_JS.create_nucleotide_WW("m" + (state[0]+1), "m", state[0]+1, 0, 0, SIM_JS.SIMULATION_VARIABLES["baseToAdd"] , SIM_JS.SIMULATION_VARIABLES["baseToAdd"]  + "m", true);
 	}
 	else if (state[3] && state[2] && state[1] == 1) { // Elongate
 		state[2] = false;
@@ -361,7 +380,7 @@ function bindNTP_cWW(state, resolve = function() { }){
 	resolve();
 }
 
-function releaseNTP_cWW(state, resolve = function() { }){
+ STATE_JS.releaseNTP_cWW = function(state, resolve = function() { }){
 	if (state[2]) {
 		delete_nt_WW(state[0]+1, "m");
 		state[2] = false;
@@ -369,12 +388,12 @@ function releaseNTP_cWW(state, resolve = function() { }){
 	resolve();
 }
 
-function activate_cWW(state, resolve = function() { }){
+ STATE_JS.activate_cWW = function(state, resolve = function() { }){
 	if (!state[3]) state[3] = true;
 	resolve();
 }
 
-function deactivate_cWW(state, resolve = function() { }){
+ STATE_JS.deactivate_cWW = function(state, resolve = function() { }){
 	if (state[3] && !state[2]) state[3] = false;
 	resolve();
 }
@@ -385,6 +404,30 @@ function deactivate_cWW(state, resolve = function() { }){
 
 
 
+
+if (RUNNING_FROM_COMMAND_LINE){
+
+
+	module.exports = {
+		translocationCacheNeedsUpdating: STATE_JS.translocationCacheNeedsUpdating,
+		TRANSLOCATION_RATES: STATE_JS.TRANSLOCATION_RATES,
+		BACKTRACKING_RATES: STATE_JS.BACKTRACKING_RATES,
+		initTranslocationRateCache: STATE_JS.initTranslocationRateCache,
+		updateCoordsOfcurrentState: STATE_JS.updateCoordsOfcurrentState,
+		convertCompactStateToFullState: STATE_JS.convertCompactStateToFullState,
+		convertFullStateToCompactState: STATE_JS.convertFullStateToCompactState,
+		getTranslocationRates: STATE_JS.getTranslocationRates,
+		buildBacktrackRateTable: STATE_JS.buildBacktrackRateTable,
+		buildTranslocationRateTable: STATE_JS.buildTranslocationRateTable,
+		forward_cWW: STATE_JS.forward_cWW,
+		backward_cWW: STATE_JS.backward_cWW,
+		bindNTP_cWW: STATE_JS.bindNTP_cWW,
+		releaseNTP_cWW: STATE_JS.releaseNTP_cWW,
+		activate_cWW: STATE_JS.activate_cWW,
+		deactivate_cWW: STATE_JS.deactivate_cWW
+	}
+
+}
 
 
 

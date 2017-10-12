@@ -955,6 +955,32 @@ function saveSession(){
 
 
 		saveXML.writeEndElement();
+		saveXML.writeEndElement();
+
+		// ABC settings
+		saveXML.writeStartElement('ABC');
+
+			var forcesVelocitiesForModel = getABCforceVelocityObject();
+			saveXML.writeAttributeString("ntrials", forcesVelocitiesForModel["ntrials"]);
+			saveXML.writeAttributeString("RSSthreshold", forcesVelocitiesForModel["RSSthreshold"]);
+
+			for (var fitID in forcesVelocitiesForModel["fits"]){
+
+				saveXML.writeStartElement(fitID);
+					//saveXML.writeAttributeString("fitID", fitID);
+
+					for (var obsNum = 0; obsNum < forcesVelocitiesForModel["fits"][fitID].length; obsNum++){
+						var forceVelocity = forcesVelocitiesForModel["fits"][fitID][obsNum]["force"] + "," + forcesVelocitiesForModel["fits"][fitID][obsNum]["velocity"];
+						saveXML.writeAttributeString("obs" + (obsNum+1), forceVelocity);
+					}
+
+
+				saveXML.writeEndElement();
+
+			}
+
+
+		saveXML.writeEndElement();
 		saveXML.writeEndDocument();
 		
 		//console.log( saveXML.flush());
@@ -1194,6 +1220,8 @@ function clearCache(){
 				$("#downloadABC").hide(50);
 				$("#ABCacceptancePercentage_span").hide(50);
 				$("#ABCacceptance_span").hide(50);
+				$("#ABC_showRejectedParameters_span").hide(50);
+
 			}
 
 

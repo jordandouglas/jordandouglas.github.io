@@ -195,3 +195,28 @@ MersenneTwister.prototype.genrand_res53 = function() {
 } 
 
 /* These real versions are due to Isaku Wada, 2002/01/09 added */
+
+
+
+
+
+
+
+// Code below written by Jordan Douglas 2017
+// Allows access to these functions using node.js
+
+MER_JS = {};
+twister = new MersenneTwister();
+
+MER_JS.random = function(){
+	return twister.random();
+}
+
+if (typeof RUNNING_FROM_COMMAND_LINE !== 'undefined' && RUNNING_FROM_COMMAND_LINE){
+
+
+	module.exports = {
+		random: MER_JS.random
+	}
+
+}

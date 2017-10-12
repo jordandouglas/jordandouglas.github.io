@@ -10,70 +10,24 @@ function initABCpanel(){
 	$("#beginABC_btn").attr("disabled", "disabled");
 
 	numberABCrules = 0;
-	addNewABCRuleButton();
+	//addNewABCRuleButton();
 
 }
 
 
+
+
+
 // Loads all the settings from the DOM and sends them through to the model so ABC can begin
+// Assumes that all force-velocity input textareas have already been validated
 function beginABC(){
 
 
-	// The order which these are added to the list matters because rules are fired in this order
-	// If an earlier rule fails the following will not be followed
-	var rulesDOM = $(".ABCrule");
-	var rules = {ntrials: $("#ABCntrials").val(), nruleFirings: $("#ABCnRulesPerTrial").val(), rules: {}};
-	for (var i = 0; i < rulesDOM.length; i ++){
-		var ruleDOM = $(rulesDOM[i]);
-
-		// Get the parameters and their operators and values to set (ie. the LHS)
-		var ruleNumber = ruleDOM.attr("id").substring(7);
-		if (ruleNumber >= numberABCrules) break;
-		var paramNames = ruleDOM.find(".ifParameterName" + ruleNumber);
-		//var paramOperators = ruleDOM.find(".ifOperator" + ruleNumber);
-		var paramValues = ruleDOM.find(".ifParameterVal" + ruleNumber);
-		var thisRule = {num: ruleNumber, LHS: [], RHS: []};
-		
-		for (var conditionNum = 0; conditionNum < paramNames.length; conditionNum++){
-			
-			var condition = {};
-			var param = $(paramNames[conditionNum]).val();
-			var value = parseFloat($(paramValues[conditionNum]).val());
-			if (param == "none" || value == null || isNaN(value)) continue;
-
-			condition["param"] = param;
-			//condition["operator"] = $(paramOperators[conditionNum]).val();
-			condition["value"] = value;
-			thisRule["LHS"].push(condition);
-
-		}
 
 
-		// RHS
-		var metricNames = ruleDOM.find(".thenParameterName" + ruleNumber);
-		var metricOperators = ruleDOM.find(".thenOperator" + ruleNumber);
-		var metricValues = ruleDOM.find(".thenParameterVal" + ruleNumber);
+	// Load the force-velocity values
+	var forcesVelocitiesForModel = getABCforceVelocityObject();
 
-		for (var conditionNum = 0; conditionNum < metricNames.length; conditionNum++){
-			
-			var effect = {};
-			var metric = $(metricNames[conditionNum]).val();
-			var value = parseFloat($(metricValues[conditionNum]).val());
-			if (value == null || isNaN(value)) continue;
-
-			effect["metric"] = metric;
-			effect["operator"] = $(metricOperators[conditionNum]).val();
-			effect["value"] = value;
-			thisRule["RHS"].push(effect);
-
-		}
-
-
-
-		// Add this rule to the list of rules if the RHS is not empty
-		if (thisRule["RHS"].length > 0) rules["rules"][ruleNumber] = thisRule;
-
-	}
 
 
 
@@ -87,7 +41,7 @@ function beginABC(){
 
 
 
-	beginABC_controller(rules);
+	beginABC_controller(forcesVelocitiesForModel);
 
 	
 
@@ -102,22 +56,121 @@ function beginABC(){
 	$("#ABCntrials").css("background-color", "#858280");
 	$("#ABCntrials").attr("disabled", "disabled");
 
-	$("#ABCnRulesPerTrial").css("cursor", "auto");
-	$("#ABCnRulesPerTrial").css("background-color", "#858280");
-	$("#ABCnRulesPerTrial").attr("disabled", "disabled");
+	$("#ABC_RSS").css("cursor", "auto");
+	$("#ABC_RSS").css("background-color", "#858280");
+	$("#ABC_RSS").attr("disabled", "disabled");
 
 	$("#downloadABC").show(50);
 	$("#ABCacceptancePercentage_span").show(50);
+	$("#ABC_showRejectedParameters_span").show(50);
 	$("#ABCacceptancePercentage_val").html("0");
 	$("#ABCacceptance_span").show(50);
 	$("#ABCacceptance_val").html("0");
 
 
-	
+}
 
 
+
+function getABCforceVelocityObject(){
+
+
+
+	var forceVelocityValues = $("#forceVelocityInputData").val();
+	var forcesVelocitiesForModel = {ntrials: $("#ABCntrials").val(), RSSthreshold: $("#ABC_RSS").val()};
+	forcesVelocitiesForModel["fits"] = {fit1: []};
+
+
+	var splitValues = forceVelocityValues.split("\n");
+	if (splitValues.length == 0) valid = false;
+
+	for (var lineNum = 0; lineNum < splitValues.length; lineNum++){
+		var splitLine = splitValues[lineNum].split(",");
+
+		if (splitLine.length == 1 && splitLine[0].trim() == "") continue;
+
+		var force = parseFloat(splitLine[0]);
+		var velocity = parseFloat(splitLine[1]);
+
+		forcesVelocitiesForModel["fits"]["fit1"].push({force: force, velocity: velocity});
+
+	}
+
+	return forcesVelocitiesForModel;
 
 }
+
+
+
+
+
+
+// Ensure that the force velocity input textarea is valid
+function validateForceVelocityInput(ele){
+
+
+	var valid = true;
+
+
+	// Ensure that the values in this textbox are in the format force, velocity with lines separating observations
+	var forceVelocityValues = $(ele).val();
+	var splitValues = forceVelocityValues.split("\n");
+	if (splitValues.length == 0) valid = false;
+	var thereExistsOnePairOfNumbers = false;
+	var forces = []; // Ensure no duplicate forces
+	for (var lineNum = 0; lineNum < splitValues.length; lineNum++){
+		var splitLine = splitValues[lineNum].split(",");
+		if (splitLine.length == 1 && splitLine[0].trim() == "") continue;
+
+		if (splitLine.length != 2) {
+			valid = false;
+			break;
+		}
+
+		var force = parseFloat(splitLine[0]);
+		var velocity = parseFloat(splitLine[1]);
+		if (isNaN(force) || isNaN(velocity)){
+			valid = false;
+			break;
+		}
+
+
+		if (forces.indexOf(force) != -1){
+			valid = false;
+			break;
+		}
+
+		forces.push(force);
+		thereExistsOnePairOfNumbers = true;
+
+	}
+
+
+	// If there are no observations and only empty lines then valid is set to false
+	if (!thereExistsOnePairOfNumbers) valid = false;
+
+
+	// If something is invalid then deactivate the start ABC button
+	if (!valid){
+		$("#beginABC_btn").css("cursor", "auto");
+		$("#beginABC_btn").css("background-color", "#858280");
+		$("#beginABC_btn").attr("disabled", "disabled");
+	}
+
+
+	// Else activate it
+	else{
+		$("#beginABC_btn").css("cursor", "pointer");
+		$("#beginABC_btn").css("background-color", "#663399");
+		$("#beginABC_btn").attr("disabled", false);
+	}
+
+}
+
+
+
+
+
 
 
 // Update the parameter dropdown lists in case a parameter is no longer applicable or a new parameter is applicable

@@ -157,7 +157,7 @@ function update_PLOT_DATA(plotData){
 
 
 	// Add the new values to the DISTANCE_VS_TIME_CONTROLLER data structure
-	update_DISTANCE_VS_TIME(plotData["DISTANCE_VS_TIME_UNSENT"]);
+	update_DISTANCE_VS_TIME(plotData["DVT_UNSENT"]);
 
 	// Update the dwell times
 	update_DWELL_TIMES_CONTROLLER(plotData["DWELL_TIMES_UNSENT"]);
@@ -502,7 +502,7 @@ function update_simulatedInsertDistribution(ninsert){
 	return;
 	var smallestInsertSize;
 	if (document.getElementById("SelectSequence").value == "$user") smallestInsertSize = -2;
-	else smallestInsertSize = all_sequences[document.getElementById("SelectSequence").value]["minInsertSize"];
+	else smallestInsertSize = SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["minInsertSize"];
 	ninsert = Math.min(ninsert, smallestInsertSize + observedInsertDistribution.length - 1);
 
 
@@ -533,7 +533,7 @@ function download_insertHistogramTSV(){
 	
 	var toprint = "n\tObserved\tSimulated\n";
 
-	var observedInsertDistribution_temp = all_sequences[document.getElementById("SelectSequence").value]["insertDistn"];
+	var observedInsertDistribution_temp = SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["insertDistn"];
 	for(var i = 0; i < observedInsertDistribution_temp.length; i ++){
 		var iToPrint = i < observedInsertDistribution_temp.length - 1 ? i : i + "+";
 		toprint += iToPrint + "\t" + observedInsertDistribution_temp[i] + "\t" + Math.round(nsimulations * simulatedInsertDistribution[i]) + "\n";
@@ -566,8 +566,8 @@ function barchart(newBarchart = true) {
 		observedInsertDistribution_temp = [0,0,0,0,0,0,0,0,0,0];
 	}
 	else {
-		smallestInsertSize = all_sequences[document.getElementById("SelectSequence").value]["minInsertSize"];
-		observedInsertDistribution_temp = all_sequences[document.getElementById("SelectSequence").value]["insertDistn"];
+		smallestInsertSize = SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["minInsertSize"];
+		observedInsertDistribution_temp = SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["insertDistn"];
 	}
 	
 

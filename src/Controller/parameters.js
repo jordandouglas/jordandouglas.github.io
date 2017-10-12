@@ -144,7 +144,7 @@ function update_parameters() {
 	
 
 	
-	if (document.getElementById("SelectSequence").value != "$user") specialSite = all_sequences[document.getElementById("SelectSequence").value]["editSite"];//parseFloat(document.getElementById("specialSite").value);
+	if (document.getElementById("SelectSequence").value != "$user") specialSite = SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["editSite"];//parseFloat(document.getElementById("specialSite").value);
 	else specialSite = -1;
 	
 
@@ -199,7 +199,7 @@ function refreshNTP(){
 	
 	var updateTextbox = function(PHYSICAL_PARAMETERS_LOCAL){
 
-		var ids = ELONGATION_MODELS[currentElongationModel]["useFourNTPconcentrations"] ? ["ATPconc", "GTPconc", "CTPconc", "UTPconc"] : ["NTPconc", "NTPconc", "NTPconc", "NTPconc"];
+		var ids = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] ? ["ATPconc", "GTPconc", "CTPconc", "UTPconc"] : ["NTPconc", "NTPconc", "NTPconc", "NTPconc"];
 		for (var i = 0; i < 4; i ++){
 			var paramID = ids[i];
 			$("#" + paramID).val(roundToSF(PHYSICAL_PARAMETERS_LOCAL[paramID]["val"], 3));

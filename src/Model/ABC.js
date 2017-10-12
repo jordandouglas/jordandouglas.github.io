@@ -1,20 +1,26 @@
 ﻿
 
-ABC_RULES = null;
-ABC_POSTERIOR_DISTRIBUTION = [];
-ABC_simulating = false;
-ABC_metric_values_this_simulation = {};
-ABC_parameters_and_metrics_this_simulation = {};
-ABC_outputString = [];
-ABC_outputString_unrendered = [];
-n_ABC_trials_left = null;
+ABC_JS = {};
+
+ABC_JS.ABC_FORCE_VELOCITIES = null;
+ABC_JS.ABC_POSTERIOR_DISTRIBUTION = [];
+ABC_JS.ABC_simulating = false;
+ABC_JS.ABC_parameters_and_metrics_this_simulation = {};
+ABC_JS.ABC_outputString = [];
+ABC_JS.ABC_outputString_unrendered = [];
+ABC_JS.n_ABC_trials_left = null;
+ABC_JS.nAcceptedValues = 0;
+
+
+
 
 
 // Start running ABC with the rules parsed by the controller
-function beginABC_WW(rules, resolve = function() { }, msgID = null){
+ABC_JS.beginABC_WW = function(forcesVelocities, resolve = function() {}, msgID = null){
 
 
-	if (!stopRunning_WW) {
+
+	if (!WW_JS.stopRunning_WW) {
 		if (msgID != null){
 			postMessage(msgID + "~X~" + "done");
 		}else{
@@ -24,73 +30,66 @@ function beginABC_WW(rules, resolve = function() { }, msgID = null){
 	}
 
 
-	ABC_simulating = true;
-	stopRunning_WW = false;
-	ABC_RULES = rules;
-	//ABC_POSTERIOR_DISTRIBUTION = [];
+	ABC_JS.ABC_simulating = true;
+	WW_JS.stopRunning_WW = false;
+	ABC_JS.ABC_FORCE_VELOCITIES = forcesVelocities;
+	ABC_JS.nAcceptedValues = 0;
+	//ABC_JS.ABC_POSTERIOR_DISTRIBUTION = [];
 
-	console.log("I have rules", ABC_RULES);
 
 
-	var ruleNums = []; // Build a list of rule numbers
-	var LHS_params = []; // Build a list of parameters used on the LHS
-	var RHS_params = []; // Build a list of metrics used on the RHS
-	for (var ruleNum in ABC_RULES["rules"]) {
-		ruleNums.push(ruleNum); 
-
-		var LHS = ABC_RULES["rules"][ruleNum]["LHS"];
-		for (var conditionNum = 0; conditionNum < LHS.length; conditionNum++){
-			if(LHS_params.indexOf(LHS[conditionNum]["param"]) == -1) LHS_params.push(LHS[conditionNum]["param"]);
-		}
-
-		var RHS = ABC_RULES["rules"][ruleNum]["RHS"];
-		for (var effectNum = 0; effectNum < RHS.length; effectNum++){
-			if(RHS_params.indexOf(RHS[effectNum]["metric"]) == -1) RHS_params.push(RHS[effectNum]["metric"]);
-		}
-
+	var fitNums = []; // Build a list of fit numbers
+	for (var fitNum in ABC_JS.ABC_FORCE_VELOCITIES["fits"]) {
+		fitNums.push(fitNum); 
 	}
 
 
 
 
 	// Initialise the list of parameters/metrics which will be added to the posterior distribution if accepted
-	// Each element in a list is from one rule
-	ABC_parameters_and_metrics_this_simulation = {};
-	for (var ruleNum in ABC_RULES["rules"]) {
-		ABC_parameters_and_metrics_this_simulation["Rule" + ruleNum] = null;
+	ABC_JS.ABC_parameters_and_metrics_this_simulation = {};
+	for (var fitNum in fitNums) {
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitNums[fitNum]] = null;
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitNums[fitNum]] = null;
 	}
-	ABC_parameters_and_metrics_this_simulation["accepted"] = null;
-	ABC_parameters_and_metrics_this_simulation["nrules"] = ruleNums.length;
-	for (var paramID in PHYSICAL_PARAMETERS){
-		if (!PHYSICAL_PARAMETERS[paramID]["binary"] && !PHYSICAL_PARAMETERS[paramID]["hidden"]) {
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"] = null;
+	for (var paramID in PARAMS_JS.PHYSICAL_PARAMETERS){
+		if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["binary"] && !PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["hidden"]) {
+
+
+			if (paramID == "FAssist") continue;
 
 			// If a fixed distribution and not used by ABC then only store 1 number
-			if (PHYSICAL_PARAMETERS[paramID]["distribution"] == "Fixed" && LHS_params.indexOf(paramID) == -1) 
-				ABC_parameters_and_metrics_this_simulation[paramID] = {name: PHYSICAL_PARAMETERS[paramID]["name"], val: PHYSICAL_PARAMETERS[paramID]["val"]};
+			if (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["distribution"] == "Fixed") 
+				ABC_JS.ABC_parameters_and_metrics_this_simulation[paramID] = {name: PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["name"], val: PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"]};
 
 			// Otherwise keep updating the list every trial
-			else ABC_parameters_and_metrics_this_simulation[paramID] = {name: PHYSICAL_PARAMETERS[paramID]["name"], vals: []}; 
+			else ABC_JS.ABC_parameters_and_metrics_this_simulation[paramID] = {name: PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["name"], priorVal: null}; 
 		}
 				
 	}
 
-
-	if(RHS_params.indexOf("velocity") != -1) ABC_parameters_and_metrics_this_simulation["velocity"] = {name: "Mean velocity (bp/s)", vals: []};
-	if(RHS_params.indexOf("catalyTime") != -1) ABC_parameters_and_metrics_this_simulation["catalyTime"] = {name: "Mean catalysis time (s)", vals: []};
-	if(RHS_params.indexOf("totalTime") != -1) ABC_parameters_and_metrics_this_simulation["totalTime"] = {name: "Total transcription time (s)", vals: []};
-	if(RHS_params.indexOf("nascentLen") != -1) ABC_parameters_and_metrics_this_simulation["nascentLen"] = {name: "Final nascent length (nt)", vals: []};
-
-
-	n_ABC_trials_left = ABC_RULES["ntrials"];
-
-	initialise_ABCoutput_WW(ruleNums);
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"] = {name: PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["name"], obsVals: []}; 
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"] = {name: "Mean velocity (bp/s)", vals: []};
+	//if(RHS_params.indexOf("catalyTime") != -1) ABC_JS.ABC_parameters_and_metrics_this_simulation["catalyTime"] = {name: "Mean catalysis time (s)", vals: []};
+	//if(RHS_params.indexOf("totalTime") != -1) ABC_JS.ABC_parameters_and_metrics_this_simulation["totalTime"] = {name: "Total transcription time (s)", vals: []};
+	//if(RHS_params.indexOf("nascentLen") != -1) ABC_JS.ABC_parameters_and_metrics_this_simulation["nascentLen"] = {name: "Final nascent length (nt)", vals: []};
 
 
-	if (ANIMATION_TIME_TEMP == 0) renderPlotsHidden(50); // Set up the DOM rendering loop, which will render plots, parameters, and ABC output every few seconds
+	ABC_JS.n_ABC_trials_left = ABC_JS.ABC_FORCE_VELOCITIES["ntrials"];
+
+	ABC_JS.initialise_ABCoutput_WW(fitNums);
 
 
+
+
+	if (ANIMATION_TIME_TEMP == 0) SIM_JS.renderPlotsHidden(50); // Set up the DOM rendering loop, which will render plots, parameters, and ABC output every few seconds
+
+
+
+	
 	// Start the first trial
-	ABC_trials_WW(ruleNums, resolve, msgID);
+	ABC_JS.ABC_trials_WW(fitNums, resolve, msgID);
 
 
 
@@ -101,31 +100,43 @@ function beginABC_WW(rules, resolve = function() { }, msgID = null){
 
 
 
-function clearABCdata_WW(){
+ABC_JS.clearABCdata_WW = function(){
 
-	ABC_RULES = null;
-	ABC_POSTERIOR_DISTRIBUTION = [];
-	ABC_simulating = false;
-	ABC_metric_values_this_simulation = {};
-	ABC_parameters_and_metrics_this_simulation = {};
-	ABC_outputString = [];
-	ABC_outputString_unrendered = [];
-	n_ABC_trials_left = null;
+	ABC_JS.ABC_FORCE_VELOCITIES = null;
+	ABC_JS.ABC_POSTERIOR_DISTRIBUTION = [];
+	ABC_JS.ABC_simulating = false;
+	ABC_JS.ABC_parameters_and_metrics_this_simulation = {};
+	ABC_JS.ABC_outputString = [];
+	ABC_JS.ABC_outputString_unrendered = [];
+	ABC_JS.n_ABC_trials_left = null;
+	ABC_JS.nAcceptedValues = 0;
 
 
 }
 
 
 // Perform N ABC-trials
-function ABC_trials_WW(ruleNums, resolve = function() { }, msgID = null){
+ABC_JS.ABC_trials_WW = function(fitNums, resolve = function() {}, msgID = null){
+
+
+ 	// Print out every 100th simulation when calling from command line
+ 	if (RUNNING_FROM_COMMAND_LINE && (ABC_JS.n_ABC_trials_left == 1 || ABC_JS.n_ABC_trials_left == ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] || (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left + 1) % 20 == 0)){
+
+
+ 		var acceptanceNumber = ABC_JS.nAcceptedValues;
+		var acceptancePercentage = WW_JS.roundToSF_WW(100 * ABC_JS.nAcceptedValues / (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left));
+		if (isNaN(acceptancePercentage)) acceptancePercentage = 0;
+
+ 		console.log("ABC", (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left + 1), "/", ABC_JS.ABC_FORCE_VELOCITIES["ntrials"], "| Accepted:", acceptanceNumber, "| Acceptance rate:", acceptancePercentage + "%");
+ 	}
 
 
 	// When there are no more trials, stop
-	if (n_ABC_trials_left == 0 || stopRunning_WW) {
+	if (ABC_JS.n_ABC_trials_left == 0 || WW_JS.stopRunning_WW) {
 
-		console.log("Finished ABC, posterior is", ABC_POSTERIOR_DISTRIBUTION, n_ABC_trials_left, stopRunning_WW);
-		ABC_simulating = false;
-		stopRunning_WW = true;
+		//console.log("Finished ABC, posterior is", ABC_JS.ABC_POSTERIOR_DISTRIBUTION, ABC_JS.n_ABC_trials_left, WW_JS.stopRunning_WW);
+		ABC_JS.ABC_simulating = false;
+		WW_JS.stopRunning_WW = true;
 
 		if (msgID != null){
 			postMessage(msgID + "~X~" + "done");
@@ -136,142 +147,144 @@ function ABC_trials_WW(ruleNums, resolve = function() { }, msgID = null){
 		return;
 	}
 
-	//console.log("N = ", n_ABC_trials_left);
+	//console.log("N = ", ABC_JS.n_ABC_trials_left);
 
-	// Reset the values in the object which will be added to the posterior if accepted
-	for (var paramID in ABC_parameters_and_metrics_this_simulation) {
-		if (ABC_parameters_and_metrics_this_simulation[paramID] != null && ABC_parameters_and_metrics_this_simulation[paramID]["vals"] != null) ABC_parameters_and_metrics_this_simulation[paramID]["vals"] = [];
-	}
 
-	// Reset whether or not each rule passed
-	for (var ruleNum in ABC_RULES["rules"]) {
-		ABC_parameters_and_metrics_this_simulation["Rule" + ruleNum] = null;
+	// Reset whether or not each fit was accepted
+	for (var fitNum in fitNums) {
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitNums[fitNum]] = null;
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitNums[fitNum]] = null;
 	}
-	ABC_parameters_and_metrics_this_simulation["accepted"] = null;
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"] = null;
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["obsVals"] = []; 
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"] = [];
 
 
 	// Sample all the parameters now. There will be no more random sampling between simulation trials, only in between ABC trials
-	sample_parameters_WW();
+	PARAMS_JS.sample_parameters_WW();
 	
 	
+	// Add the sampled priors to the list
+	for (var paramID in ABC_JS.ABC_parameters_and_metrics_this_simulation) {
+		if (ABC_JS.ABC_parameters_and_metrics_this_simulation[paramID] != null && ABC_JS.ABC_parameters_and_metrics_this_simulation[paramID]["priorVal"] !== undefined) {
+			ABC_JS.ABC_parameters_and_metrics_this_simulation[paramID]["priorVal"] = PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"];
+		}
+	}
 
 	
 
 	// After completing this trial, call this function again but with N decremented. If the trial was a success then add to the posterior
 	var toDoAfterTrial = function(accepted){
+		
+		
 
-
-
-		ABC_parameters_and_metrics_this_simulation["accepted"] = accepted;
-		if (accepted) {
-			//console.log("Accepted parameters", ABC_parameters_and_metrics_this_simulation);
-			ABC_POSTERIOR_DISTRIBUTION.push(JSON.parse(JSON.stringify(ABC_parameters_and_metrics_this_simulation)));
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"] = accepted;
+		if (accepted ) { // Do not cache if we are running from command line
+			ABC_JS.nAcceptedValues ++;
+			if (!RUNNING_FROM_COMMAND_LINE) ABC_JS.ABC_POSTERIOR_DISTRIBUTION.push(JSON.parse(JSON.stringify(ABC_JS.ABC_parameters_and_metrics_this_simulation)));
 		}
 
-		if (!stopRunning_WW) update_ABCoutput_WW(ruleNums);
-		n_ABC_trials_left--;
+		if (!WW_JS.stopRunning_WW) ABC_JS.update_ABCoutput_WW(fitNums);
+		ABC_JS.n_ABC_trials_left--;
 
+		ABC_JS.ABC_trials_WW(fitNums, resolve, msgID);
 
-		ABC_trials_WW(ruleNums, resolve, msgID);
 	}
 
 
-	// Perform nruleFirings trials per rule 
-	var toCall = () => new Promise((resolve) => ABC_trial_fire_rules_WW(0, true, ruleNums, resolve));
+	var toCall = () => new Promise((resolve) => ABC_JS.ABC_trial_for_curve_WW(0, true, fitNums, resolve));
 	toCall().then((acc) => toDoAfterTrial(acc));
 
 
 }
 
 
-// Execute the rules for this ABC-trial
-function ABC_trial_fire_rules_WW(currentRuleIndex, accepted, ruleNums, resolve = function(acc) { }){
+// Run the simulations for this curve for this ABC-trial
+ABC_JS.ABC_trial_for_curve_WW = function(currentFitNum, accepted, fitNums, resolve = function(acc) {}){
 
+	
 
-	//console.log("Executing rule", ruleNums[currentRuleIndex], "for trial, accepted = ", accepted);
+	//console.log("Executing curve", fitNums[currentFitNum], "for trial, accepted = ", accepted);
 
 
 	// Stop executing rules when there are no more rules or if the previous rule was rejected
 	// If user pressed the stop button then return false
-	if (ruleNums[currentRuleIndex] == null || !accepted || stopRunning_WW){
-		resolve(stopRunning_WW ? false : accepted);
+	if (fitNums[currentFitNum] == null || !accepted || WW_JS.stopRunning_WW){
+		resolve(WW_JS.stopRunning_WW ? false : accepted);
 		return;
 	}
 
 
 	// After executing this rule, update the accepted variable and then move on to the next rule
-	var toDoAfterKTrials = function(acc){
-		accepted = accepted && acc;
-		ABC_trial_fire_rules_WW(currentRuleIndex + 1, accepted, ruleNums, resolve);
-	}
-
-
-	// Perform nruleFirings trials per rule 
-	var toCall = () => new Promise((resolve) => ABC_trial_fire_rule_WW(ruleNums[currentRuleIndex], ABC_RULES["nruleFirings"], resolve));
-	toCall().then((acc) => toDoAfterKTrials(acc));
-
-
-}
-
-
-
-
-// Perform K simulations under the current rule
-function ABC_trial_fire_rule_WW(ruleNum, K, resolve = function(acc) { }){
-
-
-
-	// Set the parameters in the LHS to their required ABC value. This value will override its current value / prior distribution
-	var LHS = ABC_RULES["rules"][ruleNum]["LHS"];
-	for (var conditionNum = 0; conditionNum < LHS.length; conditionNum++){
-		var condition = LHS[conditionNum];
-		PHYSICAL_PARAMETERS[condition["param"]]["val"] = condition["value"];
-	}
-
-
-
-	// Reset the list of recorded metrics for this simulation 
-	ABC_metric_values_this_simulation = {};
-	var RHS = ABC_RULES["rules"][ruleNum]["RHS"];
-	for (var effectNum = 0; effectNum < RHS.length; effectNum++){
-		var metricName = RHS[effectNum]["metric"];
-		ABC_metric_values_this_simulation[metricName] = [];
-	}
-
-
-
-
-
 	var toDoAfterTrials = function(){
 
 
+		// Calculate the mean RSS
+		var meanRSS = 0;
+		var fitID = fitNums[currentFitNum];
+		for (var observationNum = 0; observationNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID].length; observationNum++){
+			
+			var observedVelocity = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID][observationNum]["velocity"];
+			var simulatedVelocity = ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][observationNum];
 
-		// Cache the parameters used by this rule 
-		for (var paramID in PHYSICAL_PARAMETERS){
-			if (ABC_parameters_and_metrics_this_simulation[paramID] != null && ABC_parameters_and_metrics_this_simulation[paramID]["vals"] != null) 
-				ABC_parameters_and_metrics_this_simulation[paramID]["vals"].push(PHYSICAL_PARAMETERS[paramID]["val"]);
+			var residualSquared =  Math.pow(observedVelocity - simulatedVelocity, 2);
+
+
+			meanRSS += residualSquared / ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID].length;
+
 		}
 
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitID] = meanRSS;
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitID] = meanRSS < ABC_JS.ABC_FORCE_VELOCITIES["RSSthreshold"];
+		accepted = accepted && meanRSS < ABC_JS.ABC_FORCE_VELOCITIES["RSSthreshold"];
 
-		// Set the parameters in the LHS back to their default value / sample them
-		for (var conditionNum = 0; conditionNum < LHS.length; conditionNum++){
-			var condition = LHS[conditionNum];
-			sample_parameter_WW(condition["param"]);
-		}
-
-		// Check if this satisfies the RHS
-		var accepted = acceptOrRejectParameters(ruleNum);
-		ABC_parameters_and_metrics_this_simulation["Rule" + ruleNum] = accepted;
-		resolve(accepted);
+		ABC_JS.ABC_trial_for_curve_WW(currentFitNum + 1, accepted, fitNums, resolve);
+	}
 
 
+	// Run a single simulation with this force / [NTP]
+	var toCall = () => new Promise((resolve) => ABC_JS.ABC_trial_for_observation_WW(fitNums[currentFitNum], 0, resolve));
+	toCall().then((acc) => toDoAfterTrials(acc));
+
+
+}
+
+
+
+
+// Perform a simulation under the current force and/or [NTP]
+ABC_JS.ABC_trial_for_observation_WW = function(fitID, observationNum, resolve = function() {}){
+
+
+	//console.log("Starting observation", observationNum, "for curve", fitID, ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID][observationNum]);
+
+
+	if (ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID][observationNum] == null || WW_JS.stopRunning_WW){
+		resolve();
 		return;
+	}
+
+
+	// Set the force / NTP to the required value
+	var force = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID][observationNum]["force"];
+	PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] = force;
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["obsVals"].push(force);
+
+	
+	var toDoAfterTrial = function(){
+		// Start the next trial with the next observed force / [NTP]
+		ABC_JS.ABC_trial_for_observation_WW(fitID, observationNum + 1, resolve);
+
 
 	}
 
-	// Perform K trials
-	var toCall = () => new Promise((resolve) => startTrials_WW(K, resolve));
-	toCall().then(() => toDoAfterTrials());
+
+	
+	// Perform a trial
+	var toCall = () => new Promise((resolve) => SIM_JS.startTrials_WW(1, resolve));
+	toCall().then(() => toDoAfterTrial());
+	
+
 
 
 
@@ -279,80 +292,16 @@ function ABC_trial_fire_rule_WW(ruleNum, K, resolve = function(acc) { }){
 
 
 
-// Either accept the current parameters and move onto the next rule (return true)
-// Or reject the parameters and discard them (return false)
-function acceptOrRejectParameters(ruleNum){
-
-	if (stopRunning_WW) return false;
-
-	//console.log("Accept or reject based off", ABC_metric_values_this_simulation);
 
 
-	// Go through each effect, look at the variable, the value and the operator. 
-	// If variable OPERATOR value (eg. velocity > 10) then go to next effect, else return false  
-	var RHS = ABC_RULES["rules"][ruleNum]["RHS"];
-	for (var effectNum = 0; effectNum < RHS.length; effectNum++){
-		var effect = RHS[effectNum];
-
-		var observedValueList = ABC_metric_values_this_simulation[effect["metric"]]; // There will be upto K values in this list. Will take the mean
-		if (observedValueList.length == 0) return false;
-
-		var meanObservedValue = 0;
-		var requiredValue = effect["value"];
-		for (var i = 0; i < observedValueList.length; i ++) meanObservedValue += observedValueList[i] / observedValueList.length;
-
-
-		// Cache number for later use 
-		ABC_parameters_and_metrics_this_simulation[effect["metric"]]["vals"].push(meanObservedValue);
-
-		switch(effect["operator"]){
-
-			case "greaterThan":
-				if (!(meanObservedValue > requiredValue)) return false;
-				break;
-
-			case "greaterThanEqual":
-				if (!(meanObservedValue >= requiredValue)) return false;
-				break;
-
-			case "equalTo":
-				if (!(meanObservedValue == requiredValue)) return false;
-				break;
-
-			case "lessThanEqual":
-				if (!(meanObservedValue <= requiredValue)) return false;
-				break;
-
-			case "lessThan":
-				if (!(meanObservedValue < requiredValue)) return false;
-				break;
-
-			default:
-				return false;
-
-		}
-
-
-
-	}
-
-
-
-
-	return true;
-
-}
-
-
-
-function initialise_ABCoutput_WW(ruleNums){
+ABC_JS.initialise_ABCoutput_WW = function(fitNums){
 
 
 
 	// Initialise the ABC output string
 	// The first 2 lines are in the following format:	
-	//															|						Rule1							  |	    |				Rule 2									  |
-	// Number		Rule1Param1		Rule1Param2		Rule1Metric1	Rule1Passed		Rule2Param1		Rule2Param2		Rule2Metric1	Rule2Passed		Accepted	 
+	//												|						Force-velocity curve 1						 		 			|	  							 
+	// Number		PriorParam1		PriorParam2	...	Force1	Velocity1	Force2	Velocity2	Force3	Velocity3		RSS		Passed	Accepted	 
 	// Each column will have total width of a fixed number of spaces
 
 
@@ -360,64 +309,134 @@ function initialise_ABCoutput_WW(ruleNums){
 	//for (var i = 0; i < 20; i ++) paddingString += 
 	var secondLine = (paddingString + "Trial").slice(-9);
 
-	// Add all the variable names to the row. These variables will occur one time for each rule
-	var variablesSection = "";
-	for (var objID in ABC_parameters_and_metrics_this_simulation){
-		if (ABC_parameters_and_metrics_this_simulation[objID] != null && ABC_parameters_and_metrics_this_simulation[objID]["vals"] != null) variablesSection +=  (paddingString + objID).slice(-paddingString.length);
+	// Add all the prior-sampled variable names to the row. These variables will occur one time for each rule
+	for (var objID in ABC_JS.ABC_parameters_and_metrics_this_simulation){
+		if (ABC_JS.ABC_parameters_and_metrics_this_simulation[objID] != null && ABC_JS.ABC_parameters_and_metrics_this_simulation[objID]["priorVal"] !== undefined) secondLine +=  (paddingString + objID).slice(-paddingString.length);
 	}
 
-	for (var ruleNum in ruleNums){
-		secondLine += variablesSection;
-		secondLine += (paddingString + "Rule" + ruleNums[ruleNum]).slice(-paddingString.length);
+
+	// For each curve to fit to, add the force-velocity column names
+	for (var fitNum in fitNums){
+
+		var ID = fitNums[fitNum];
+
+		for (var obsNum = 0; obsNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][ID].length; obsNum ++){
+
+
+			secondLine += (paddingString + "Force" + (obsNum+1)).slice(-paddingString.length);
+			secondLine += (paddingString + "Velocity" + (obsNum+1)).slice(-paddingString.length);
+			/*
+			var force = ABC_JS.ABC_FORCE_VELOCITIES[ID][obsNum]["force"];
+			var velocity = ABC_JS.ABC_FORCE_VELOCITIES[ID][obsNum]["velocity"];
+			*/
+
+		}
+
+		secondLine += (paddingString + "MeanRSS").slice(-paddingString.length);
+		secondLine += (paddingString + "Passed").slice(-paddingString.length);
 	}
 
 	secondLine += (paddingString + "|Accepted|").slice(-12) + "&&&"; // Add the | to denote that this should be in coloured font
 
 
-	ABC_outputString.push("", "", secondLine);
-	ABC_outputString_unrendered.push("", "", secondLine);
+	// If running from the command line then print it to the console
+	if (RUNNING_FROM_COMMAND_LINE){
+
+		ABC_JS.savePosteriorToFiles_CommandLine(secondLine);
+
+	}
+
+	// Otherwise save it for later
+	else{
+
+		ABC_JS.ABC_outputString.push("", "", secondLine);
+		ABC_JS.ABC_outputString_unrendered.push("", "", secondLine);
+	}
 
 
 }
 
 
 // Add the current ABC state to the output to be displayed on the DOM
-function update_ABCoutput_WW(ruleNums){
+ABC_JS.update_ABCoutput_WW = function(fitNums){
 
 
 
 	var paddingString = "&&&&&&&&&&&"; 
-	var trialNum = 	ABC_RULES["ntrials"] - n_ABC_trials_left + 1;
+
+	// Add the trial number
+	var trialNum = 	ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
 	var line = (paddingString + trialNum).slice(-9);
 
-	// Get the value of each parameter for this trial
-	for (var ruleIndex = 0; ruleIndex < ruleNums.length; ruleIndex++){
+
+	// All the prior-sampled parameters
+	for (var objID in ABC_JS.ABC_parameters_and_metrics_this_simulation){
+		if (ABC_JS.ABC_parameters_and_metrics_this_simulation[objID] != null && ABC_JS.ABC_parameters_and_metrics_this_simulation[objID]["priorVal"] !== undefined){
+			var val = WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation[objID]["priorVal"]);
+			line += (paddingString + val).slice(-paddingString.length);
+		}
+	}
 
 
+	var printVals = true; // When this is false, the curve was not executed because the RSS for a previous curve went too high, so leave some space but don't print any numbers
+	
 
-		var printVals = true; // When this is false, the rule has not been executed, so leave some space but don't print any numbers
-		if (ABC_parameters_and_metrics_this_simulation["Rule" + ruleNums[ruleIndex]] == null) printVals = false;
+	// Get the force and velocity values
+	for (var fitIndex = 0; fitIndex < fitNums.length; fitIndex++){
 
-		for (var objID in ABC_parameters_and_metrics_this_simulation){
+		var fitID = fitNums[fitIndex];
+		
 
+		// Iterate through each force-velocity observation in this curve
+		for (var obsNum = 0; obsNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID].length; obsNum++){
 
+			var force = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["obsVals"][obsNum]) : "";
+			var velocity = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][obsNum]) : "";
 
-			if (ABC_parameters_and_metrics_this_simulation[objID] != null && ABC_parameters_and_metrics_this_simulation[objID]["vals"] != null) {
-				var valueThisRule = printVals ? roundToSF_WW(parseFloat(ABC_parameters_and_metrics_this_simulation[objID]["vals"][ruleIndex]), 5) : "";
-				line += (paddingString + valueThisRule).slice(-paddingString.length);
+			if (isNaN(force) || isNaN(velocity)){
+				printVals = false;
+				force = "";
+				velocity = "";
 			}
 
-		} 
+
+			line += (paddingString + force).slice(-paddingString.length);
+			line += (paddingString + velocity).slice(-paddingString.length);
+
+		}
+
+		// RSS
+		var RSS = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitID]) : "";
+		line += (paddingString + RSS).slice(-paddingString.length);
 
 
-		line += (paddingString + (printVals ? ABC_parameters_and_metrics_this_simulation["Rule" + ruleNums[ruleIndex]] : "")).slice(-paddingString.length);
+		// Pass or fail
+		var passed = printVals ? ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitID] : "";
+		line += (paddingString + passed).slice(-paddingString.length);
+
+		if (!passed) printVals = false;
 
 	}
 
-	line += (paddingString + "|" + ABC_parameters_and_metrics_this_simulation["accepted"] + "|").slice(-12); // Add the | to denote that this should be in coloured font
+	// Accepted into posterior?
+	line += (paddingString + "|" + ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"] + "|").slice(-12); // Add the | to denote that this should be in coloured font
 
-	ABC_outputString.push(line);
-	ABC_outputString_unrendered.push(line);
+
+	// If running from the command line then print it to the console
+	if (RUNNING_FROM_COMMAND_LINE){
+
+		// Only log if it was accepted into posterior
+		if(ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"]) ABC_JS.savePosteriorToFiles_CommandLine(line);
+
+	}
+
+	// Otherwise save it for later
+	else{
+
+		ABC_JS.ABC_outputString.push(line);
+		ABC_JS.ABC_outputString_unrendered.push(line);
+
+	}
 
 
 }
@@ -425,12 +444,15 @@ function update_ABCoutput_WW(ruleNums){
 
 
 // Returns any new lines of the ABC output
-function get_unrendered_ABCoutput_WW(resolve = function() { }, msgID = null){
+ABC_JS.get_unrendered_ABCoutput_WW = function(resolve = function() {}, msgID= null){
 
-	var acceptanceNumber = ABC_POSTERIOR_DISTRIBUTION.length;
-	var acceptancePercentage = 100 * ABC_POSTERIOR_DISTRIBUTION.length / (ABC_RULES["ntrials"] - n_ABC_trials_left);
-	var toReturn = {newLines: ABC_outputString_unrendered, nTrialsToGo: n_ABC_trials_left, acceptanceNumber: acceptanceNumber, acceptancePercentage: acceptancePercentage};
-	
+
+	var toReturn = null;
+	if (ABC_JS.ABC_outputString_unrendered.length > 0){
+		var acceptanceNumber = ABC_JS.nAcceptedValues;
+		var acceptancePercentage = 100 * ABC_JS.nAcceptedValues / (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left);
+		toReturn = {newLines: ABC_JS.ABC_outputString_unrendered, nTrialsToGo: ABC_JS.n_ABC_trials_left, acceptanceNumber: acceptanceNumber, acceptancePercentage: acceptancePercentage};
+	}
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
 	}else{
@@ -438,16 +460,20 @@ function get_unrendered_ABCoutput_WW(resolve = function() { }, msgID = null){
 	}
 
 
-	ABC_outputString_unrendered = [];
+	ABC_JS.ABC_outputString_unrendered = [];
 
 
 }
 
 
 // Return the full ABC output. Each line is a string in the list
-function get_ABCoutput_WW(resolve = function() { }, msgID = null){
+ABC_JS.get_ABCoutput_WW = function(resolve, msgID){
 
-	var toReturn = {lines: ABC_outputString};
+
+	if (resolve === undefined) resolve = function() {};	
+	if (msgID === undefined) msgID = null;
+
+	var toReturn = {lines: ABC_JS.ABC_outputString};
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
 	}else{
@@ -460,30 +486,30 @@ function get_ABCoutput_WW(resolve = function() { }, msgID = null){
 
 
 // Returns the list of this type of value if it is in the posterior distribution
-function getListOfValuesFromPosterior_WW(paramOrMetricID){
+ABC_JS.getListOfValuesFromPosterior_WW = function(paramOrMetricID){
 
 
 	if (paramOrMetricID == "probability") return null;
 
 	var posteriorValues = [];
-	for (var i = 0; i < ABC_POSTERIOR_DISTRIBUTION.length; i ++){
+	for (var i = 0; i < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; i ++){
 		
 		// If no values sampled then move on to next value in posterior
-		//if (ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID] == null || ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["vals"] == null) continue;
+		//if (ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID] == null || ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["vals"] == null) continue;
 
 		// If there was only 1 number then use it (one time for each rule)
 
 
 		// Iterate through all rules
-		for (var j = 0; j < ABC_POSTERIOR_DISTRIBUTION[i]["nrules"]; j ++){
+		for (var j = 0; j < ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["nrules"]; j ++){
 
-			if (ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["vals"] == null){
+			if (ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["vals"] == null){
 
-				posteriorValues.push(ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["val"]);
+				posteriorValues.push(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["val"]);
 				
 			}else{
 
-				posteriorValues.push(ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["vals"][j]);
+				posteriorValues.push(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["vals"][j]);
 
 			}
 		}
@@ -494,5 +520,99 @@ function getListOfValuesFromPosterior_WW(paramOrMetricID){
 
 	return posteriorValues;
 
+
+}
+
+
+
+// Create the posterior distribution text file (only if running from command line)
+ABC_JS.initialiseSaveFiles_CommandLine = function(startingTime){
+
+
+
+	if (!RUNNING_FROM_COMMAND_LINE || WW_JS.outputFolder == null) return;
+
+	if (WW_JS.outputFolder[WW_JS.outputFolder.length-1] != "/") WW_JS.outputFolder += "/";
+
+	// Create the output folder if it does not already exist
+	var fs = require('fs');
+	if (!fs.existsSync(WW_JS.outputFolder)){
+		console.log("Creating directory", WW_JS.outputFolder);
+	    fs.mkdirSync(WW_JS.outputFolder);
+	}
+
+
+	// Create the data files
+	ABC_JS.posterior_fileName	= WW_JS.outputFolder + "posterior.tsv";
+
+	WW_JS.writeLinesToFile(ABC_JS.posterior_fileName, "Posterior distribution. " + startingTime + "\n");
+
+
+}
+
+
+
+
+// Saves the most recently added posterior to its respective file
+ABC_JS.savePosteriorToFiles_CommandLine = function(line){
+
+	if (!RUNNING_FROM_COMMAND_LINE || WW_JS.outputFolder == null) return;
+
+
+
+	var tabbedLine = "";
+	var addedTab = false;
+	for (var j = 0; j < line.length; j ++){
+
+		if (line[j] == "|") continue; // Ignore pipes. They denote coloured font
+
+		if (line[j] == "&" && !addedTab) { // Replace & with a tab (unless you have already replaced a touching & with a tab)
+			tabbedLine += "\t";
+			addedTab = true;
+		}
+		else if(line[j] != "&") {	// Add the normal character to the string
+			tabbedLine += line[j];
+			addedTab = false;
+		}
+	}
+
+
+	WW_JS.writeLinesToFile(ABC_JS.posterior_fileName, tabbedLine + "\n", true);
+
+
+}
+
+
+
+
+
+
+
+
+if (RUNNING_FROM_COMMAND_LINE){
+
+
+	module.exports = {
+		ABC_FORCE_VELOCITIES: ABC_JS.ABC_FORCE_VELOCITIES,
+		ABC_POSTERIOR_DISTRIBUTION: ABC_JS.ABC_POSTERIOR_DISTRIBUTION,
+		ABC_simulating: ABC_JS.ABC_simulating,
+		ABC_parameters_and_metrics_this_simulation: ABC_JS.ABC_parameters_and_metrics_this_simulation,
+		ABC_outputString: ABC_JS.ABC_outputString,
+		ABC_outputString_unrendered: ABC_JS.ABC_outputString_unrendered,
+		n_ABC_trials_left: ABC_JS.n_ABC_trials_left,
+	  	beginABC_WW: ABC_JS.beginABC_WW,
+	  	clearABCdata_WW: ABC_JS.clearABCdata_WW,
+	  	ABC_trials_WW: ABC_JS.ABC_trials_WW,
+	  	ABC_trial_for_curve_WW: ABC_JS.ABC_trial_for_curve_WW,
+	  	ABC_trial_for_observation_WW: ABC_JS.ABC_trial_for_observation_WW,
+	  	initialise_ABCoutput_WW: ABC_JS.initialise_ABCoutput_WW,
+	  	update_ABCoutput_WW: ABC_JS.update_ABCoutput_WW,
+	  	get_unrendered_ABCoutput_WW: ABC_JS.get_unrendered_ABCoutput_WW,
+	  	get_ABCoutput_WW: ABC_JS.get_ABCoutput_WW,
+	  	getListOfValuesFromPosterior_WW: ABC_JS.getListOfValuesFromPosterior_WW,
+	  	initialiseSaveFiles_CommandLine: ABC_JS.initialiseSaveFiles_CommandLine,
+	  	savePosteriorToFiles_CommandLine: ABC_JS.savePosteriorToFiles_CommandLine,
+	  	nAcceptedValues: ABC_JS.nAcceptedValues
+	}
 
 }

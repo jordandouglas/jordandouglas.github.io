@@ -20,15 +20,16 @@
     --------------------------------------------------------------------
 -*/
 
-SIMULATION_VARIABLES = {};
-SIMULATION_ACTIONS = [];
-renderPlotsEveryMS = 5000; // If in hidden mode, render the plots every few seconds
+SIM_JS = {};
+SIM_JS.SIMULATION_VARIABLES = {};
+SIM_JS.SIMULATION_ACTIONS = [];
+SIM_JS.renderPlotsEveryMS = 5000; // If in hidden mode, render the plots every few seconds
 
 
-function startTrials_WW(n, resolve = function() { }, msgID = null){
+ SIM_JS.startTrials_WW = function(n, resolve = function() { }, msgID = null){
 
 	
-	if (!stopRunning_WW && !ABC_simulating) { // If ABC is running then allow this to proceed 
+	if (!WW_JS.stopRunning_WW && !ABC_JS.ABC_simulating) { // If ABC is running then allow this to proceed 
 		if (msgID != null){
 			postMessage(msgID + "~X~" + "done");
 		}else{
@@ -40,7 +41,7 @@ function startTrials_WW(n, resolve = function() { }, msgID = null){
 
 	// If there have been any indels or if there is a bulge then refresh first
 	var refreshIfSlippage = function(resolve){
-		if (currentState["terminated"] || currentState["rightMBase"] != currentState["rightGBase"] || currentState["leftMBase"] != currentState["leftGBase"]) refresh_WW(); 
+		if (WW_JS.currentState["terminated"] || WW_JS.currentState["rightMBase"] != WW_JS.currentState["rightGBase"] || WW_JS.currentState["leftMBase"] != WW_JS.currentState["leftGBase"]) WW_JS.refresh_WW(); 
 		resolve();
 	};
 
@@ -53,31 +54,31 @@ function startTrials_WW(n, resolve = function() { }, msgID = null){
 			actionsSinceLastPause = pauseEveryNActions;
 
 
-			SIMULATION_VARIABLES = {baseToAdd: "X", terminated: false};
+			SIM_JS.SIMULATION_VARIABLES = {baseToAdd: "X", terminated: false};
 			
-			initTranslocationRateCache();
+			STATE_JS.initTranslocationRateCache();
 
-			var stateC = convertFullStateToCompactState(currentState);
-			SIMULATION_ACTIONS = [];
-			SIMULATION_ACTIONS.push(function(state, callback) { backward_cWW(state, callback) });
-			SIMULATION_ACTIONS.push(function(state, callback) { forward_cWW(state, callback) });
-			SIMULATION_ACTIONS.push(function(state, callback) { releaseNTP_cWW(state, callback) });
-			SIMULATION_ACTIONS.push(function(state, callback) { bindNTP_cWW(state, callback) });
-			SIMULATION_ACTIONS.push(function(state, callback) { activate_cWW(state, callback) });
-			SIMULATION_ACTIONS.push(function(state, callback) { deactivate_cWW(state, callback) });
+			var stateC = STATE_JS.convertFullStateToCompactState(WW_JS.currentState);
+			SIM_JS.SIMULATION_ACTIONS = [];
+			SIM_JS.SIMULATION_ACTIONS.push(function(state, callback) { STATE_JS.backward_cWW(state, callback) });
+			SIM_JS.SIMULATION_ACTIONS.push(function(state, callback) { STATE_JS.forward_cWW(state, callback) });
+			SIM_JS.SIMULATION_ACTIONS.push(function(state, callback) { STATE_JS.releaseNTP_cWW(state, callback) });
+			SIM_JS.SIMULATION_ACTIONS.push(function(state, callback) { STATE_JS.bindNTP_cWW(state, callback) });
+			SIM_JS.SIMULATION_ACTIONS.push(function(state, callback) { STATE_JS.activate_cWW(state, callback) });
+			SIM_JS.SIMULATION_ACTIONS.push(function(state, callback) { STATE_JS.deactivate_cWW(state, callback) });
 
 
 
-			if (!ABC_simulating) stopRunning_WW = false; // Do not modify this variable if the simulation was called by ABC
+			if (!ABC_JS.ABC_simulating) WW_JS.stopRunning_WW = false; // Do not modify this variable if the simulation was called by ABC
 			simulating = true;
 			ANIMATION_TIME = ANIMATION_TIME_TEMP;
 
-			if (ANIMATION_TIME == 0 && !ABC_simulating) renderPlotsHidden(1000);
+			if (ANIMATION_TIME == 0 && !ABC_JS.ABC_simulating) SIM_JS.renderPlotsHidden(1000);
 
 			// Use the geometric sampling speed up only if the speed is not set to slow
-			ELONGATION_MODELS[currentElongationModel]["allowGeometricCatalysis"] = ANIMATION_TIME < 200; 
+			FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] = ANIMATION_TIME < 200; 
 
-			n_simulations_WW(n, stateC, resolve, msgID);
+			SIM_JS.n_simulations_WW(n, stateC, resolve, msgID);
 			
 
 
@@ -89,14 +90,14 @@ function startTrials_WW(n, resolve = function() { }, msgID = null){
 
 
 
-function renderPlotsHidden(timeToTake = renderPlotsEveryMS){
+ SIM_JS.renderPlotsHidden = function(timeToTake = SIM_JS.renderPlotsEveryMS){
 
-	if (!isWebWorker || (!simulating && !ABC_simulating) || ANIMATION_TIME_TEMP > 0) return;
+	if (!WW_JS.isWebWorker || RUNNING_FROM_COMMAND_LINE || (!simulating && !ABC_JS.ABC_simulating) || ANIMATION_TIME_TEMP > 0) return;
 
 
 	setTimeout(function(){
 		postMessage("_renderHTML_hidden()");
-		renderPlotsHidden(renderPlotsEveryMS);
+		SIM_JS.renderPlotsHidden(SIM_JS.renderPlotsEveryMS);
 	}, timeToTake); // Give it an extra few ms to ensure that action has completed
 
 
@@ -108,18 +109,27 @@ function renderPlotsHidden(timeToTake = renderPlotsEveryMS){
 
 // These functions may be called either directly or through a WebWorker
 // Called on stateC, which is a compact state not a full state
-function n_simulations_WW(n, stateC, resolve = function() { }, msgID = null){
+ SIM_JS.n_simulations_WW = function(n, stateC, resolve = function() { }, msgID = null){
+
+
+ 	// Print out every 20th simulation when calling from command line
+ 	if (!ABC_JS.ABC_simulating && RUNNING_FROM_COMMAND_LINE && (n == 1 || n == XML_JS.N || (XML_JS.N - n + 1) % 20 == 0)){
+ 		console.log("Sim", (XML_JS.N - n + 1), "/", XML_JS.N);
+ 	}
+
 
 
 	// Stop the simulations
-	if (n == 0 || stopRunning_WW) {
+	if (n == 0 || WW_JS.stopRunning_WW) {
 
 		ANIMATION_TIME = 200;
 		simulating = false;
-		if(!ABC_simulating) stopRunning_WW = true; // Do not modify this variable if the simulation was called by ABC
+		if(!ABC_JS.ABC_simulating) WW_JS.stopRunning_WW = true; // Do not modify this variable if the simulation was called by ABC
 
-		currentState = convertCompactStateToFullState(stateC);
-		updateCoordsOfCurrentState();
+		if (!RUNNING_FROM_COMMAND_LINE){
+			WW_JS.currentState = STATE_JS.convertCompactStateToFullState(stateC);
+			STATE_JS.updateCoordsOfcurrentState();
+		}
 
 		if (msgID != null){
 			postMessage(msgID + "~X~" + "done");
@@ -130,10 +140,12 @@ function n_simulations_WW(n, stateC, resolve = function() { }, msgID = null){
 
 
 
+
 	var initialiseNextSimulation = function(aborted = false){
 
+
 		// Return
-		if (stopRunning_WW) {
+		if (WW_JS.stopRunning_WW) {
 
 			ANIMATION_TIME = 200;
 			simulating = false;
@@ -147,32 +159,37 @@ function n_simulations_WW(n, stateC, resolve = function() { }, msgID = null){
 		}
 
 		// Check if mRNApos <= 1 and the right genome base is beyond the end of the sequence
-		if (aborted || SIMULATION_VARIABLES["terminated"] || (stateC[1] <= 1 && stateC[1] + stateC[0] + 1 > currentState["nbases"])) {
-			currentState = convertCompactStateToFullState(stateC);
-			updateCoordsOfCurrentState();
-			plots_complete_simulation_WW();
-			terminate_WW();
+		if (aborted || SIM_JS.SIMULATION_VARIABLES["terminated"] || (stateC[1] <= 1 && stateC[1] + stateC[0] + 1 > WW_JS.currentState["nbases"])) {
+
+			//if (!RUNNING_FROM_COMMAND_LINE){
+				WW_JS.currentState = STATE_JS.convertCompactStateToFullState(stateC);
+				STATE_JS.updateCoordsOfcurrentState();
+			//}
+
+			PLOTS_JS.plots_complete_simulation_WW();
+			OPS_JS.terminate_WW();
+
 
 		}
 
 
-		SIMULATION_VARIABLES["terminated"] = false;
+		SIM_JS.SIMULATION_VARIABLES["terminated"] = false;
 
 		// Pause at the end of every run to make sure that everything has loaded and page is responsive during termination
 		setTimeout(function(){
 
 			// Refresh the webworker
-			var toCall = () => new Promise((resolve) => refresh_WW(resolve));
+			var toCall = () => new Promise((resolve) => WW_JS.refresh_WW(resolve));
 			toCall().then(() => {
-				stateC = convertFullStateToCompactState(currentState);
-				setNextBaseToAdd_WW();
+				stateC = STATE_JS.convertFullStateToCompactState(WW_JS.currentState);
+				WW_JS.setNextBaseToAdd_WW();
 				
-				n_simulations_WW(n-1, stateC, resolve, msgID);
+				SIM_JS.n_simulations_WW(n-1, stateC, resolve, msgID);
 				
 				/*
-				toCall = () => new Promise((resolve) => transcribe_WW(2, true, resolve));
+				toCall = () => new Promise((resolve) => OPS_JS.transcribe_WW(2, true, resolve));
 				toCall().then(() => {
-					n_simulations_WW(n-1, resolve, msgID);
+					SIM_JS.n_simulations_WW(n-1, resolve, msgID);
 				});
 				*/
 				
@@ -186,7 +203,7 @@ function n_simulations_WW(n, stateC, resolve = function() { }, msgID = null){
 	};
 
 
-	var toCall = () => new Promise((resolve) => trial_WW(stateC, resolve, msgID));
+	var toCall = () => new Promise((resolve) => SIM_JS.trial_WW(stateC, resolve, msgID));
 	toCall().then((aborted) => initialiseNextSimulation(aborted));
 
 
@@ -195,44 +212,44 @@ function n_simulations_WW(n, stateC, resolve = function() { }, msgID = null){
 }
 
 
-function trial_WW(stateC, resolve = function() { }, msgID = null){
+SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 
-
+	
 
 	ANIMATION_TIME = ANIMATION_TIME_TEMP;
 
 	
 	// Stop the simulations or refresh to begin the next trial
-	if (stopRunning_WW || SIMULATION_VARIABLES["terminated"] || (stateC[1] <= 1 && stateC[1] + stateC[0] + 1 > currentState["nbases"])) {
+	if (WW_JS.stopRunning_WW || SIM_JS.SIMULATION_VARIABLES["terminated"] || (stateC[1] <= 1 && stateC[1] + stateC[0] + 1 > WW_JS.currentState["nbases"])) {
 		resolve(false);
 		return;
 	}
 
 
 	printDateAndTime("Sampling action");
-	var result = sampleAction_WW(stateC);
+	var result = SIM_JS.sampleAction_WW(stateC);
 
 	
 
 	if (result["toDo"].length > 1){
 		for (var i = 0; i < result["toDo"].length-1; i ++){
-			SIMULATION_ACTIONS[result["toDo"][i]](stateC); // Perform all actions in list except for the last one
+			SIM_JS.SIMULATION_ACTIONS[result["toDo"][i]](stateC); // Perform all actions in list except for the last one
 		}
 		result["toDo"] = result["toDo"][result["toDo"].length-1]; // Last one
 	}
 
 
-	var actionToDo = SIMULATION_ACTIONS[result["toDo"]];
+	var actionToDo = SIM_JS.SIMULATION_ACTIONS[result["toDo"]];
 	
 	//console.log("Sampled", actionToDo, "state", stateC);
 
 	//printDateAndTime("Updating plots");
-	updatePlotData_WW(stateC, result["toDo"], result["time"]);
+	PLOTS_JS.updatePlotData_WW(stateC, result["toDo"], result["time"]);
 
 	
 	
 	// If we have been pausing too long, then abort
-	if (PHYSICAL_PARAMETERS["arrestTime"]["val"] > 0 && PHYSICAL_PARAMETERS["arrestTime"]["val"] < timeWaitedUntilNextCatalysis){
+	if (PARAMS_JS.PHYSICAL_PARAMETERS["arrestTime"]["val"] > 0 && PARAMS_JS.PHYSICAL_PARAMETERS["arrestTime"]["val"] < PLOTS_JS.timeWaitedUntilNextCatalysis){
 		resolve(true);
 		return;
 	}
@@ -245,19 +262,21 @@ function trial_WW(stateC, resolve = function() { }, msgID = null){
 		printDateAndTime("Perparing for next trial");
 		// If this is in animation mode, then this process is synchronous with rendering so we return in between operators
 		// THIS BLOCK OF CODE WILL ONLY WORK IF NOT RUNNING AS A WEBWORKER
-		if (!isWebWorker){
+		if (!WW_JS.isWebWorker && !RUNNING_FROM_COMMAND_LINE){
 
 
+			if (!RUNNING_FROM_COMMAND_LINE){
+				WW_JS.currentState = STATE_JS.convertCompactStateToFullState(stateC);
+				STATE_JS.updateCoordsOfcurrentState();
+			}
 
-			currentState = convertCompactStateToFullState(stateC);
-			updateCoordsOfCurrentState();
 			var toCall = () => new Promise((resolve) => renderObjects(false, resolve));
 			toCall().then(() => {
 				$("#bases").children().promise().done(function(){
 					setNextBaseToAdd_controller();
 					drawPlots();
 					renderParameters();
-					trial_WW(stateC, resolve, msgID);
+					SIM_JS.trial_WW(stateC, resolve, msgID);
 				});
 			});
 
@@ -265,19 +284,19 @@ function trial_WW(stateC, resolve = function() { }, msgID = null){
 
 
 		// Animation mode but for WebWorker
-		else if (isWebWorker && ANIMATION_TIME > 1){
-			currentState = convertCompactStateToFullState(stateC);
-			updateCoordsOfCurrentState();
+		else if (WW_JS.isWebWorker && ANIMATION_TIME > 1){
+			WW_JS.currentState = STATE_JS.convertCompactStateToFullState(stateC);
+			STATE_JS.updateCoordsOfcurrentState();
 
 			setTimeout(function(){
-				trial_WW(stateC, resolve, msgID);
+				SIM_JS.trial_WW(stateC, resolve, msgID);
 			}, ANIMATION_TIME + 5); // Give it an extra few ms to ensure that action has completed
 		}
 
 
-		// Ultrafast mode (instantaneous for the WebWorker). Running this way without a WebWorker will crash the browser
+		// Ultrafast mode (instantaneous for the WebWorker), or command line mode. Running this way without a WebWorker will crash the browser
 		else{
-			trial_WW(stateC, resolve, msgID);
+			SIM_JS.trial_WW(stateC, resolve, msgID);
 		}
 
 
@@ -289,12 +308,12 @@ function trial_WW(stateC, resolve = function() { }, msgID = null){
 	// If we are running on ultrafast mode then this fills up the thread. So we should pause every now and then
 	// in case the user has another request (eg. stop).
 	actionsSinceLastPause--;
-	if (isWebWorker && (ANIMATION_TIME == 1 || ANIMATION_TIME == 0) && actionsSinceLastPause <= 0){
+	if (WW_JS.isWebWorker && (ANIMATION_TIME == 1 || ANIMATION_TIME == 0) && actionsSinceLastPause <= 0){
 		actionsSinceLastPause = pauseEveryNActions;
 
 		//postMessage("MSG: pausing");
 		
-		if (isWebWorker){
+		if (WW_JS.isWebWorker){
 			//postMessage("MSG: yes pause");
 		}
 
@@ -304,8 +323,8 @@ function trial_WW(stateC, resolve = function() { }, msgID = null){
 		// Ultrafast mode -> render html then continue when its done
 		if (ANIMATION_TIME == 1) {
 
-			currentState = convertCompactStateToFullState(stateC);
-			updateCoordsOfCurrentState();
+			WW_JS.currentState = STATE_JS.convertCompactStateToFullState(stateC);
+			STATE_JS.updateCoordsOfcurrentState();
 			postMessage("_renderHTML_ultrafast()");
 		
 
@@ -320,7 +339,7 @@ function trial_WW(stateC, resolve = function() { }, msgID = null){
 
 		// Hidden mode -> pause for a fixed period
 		else{
-			currentState = convertCompactStateToFullState(stateC);
+			if (!RUNNING_FROM_COMMAND_LINE) WW_JS.currentState = STATE_JS.convertCompactStateToFullState(stateC);
 			setTimeout(function(){
 				var toCall = (state) => new Promise((resolve) => actionToDo(state, resolve));
 				toCall(stateC).then(() => prepareForNextTrial());
@@ -333,9 +352,7 @@ function trial_WW(stateC, resolve = function() { }, msgID = null){
 
 	}else{
 
-		if (isWebWorker){
-			//postMessage("MSG: no pause");
-		}
+
 
 		var toCall = (state) => new Promise((resolve) => actionToDo(state, resolve));
 		toCall(stateC).then(() => prepareForNextTrial());
@@ -351,11 +368,11 @@ function trial_WW(stateC, resolve = function() { }, msgID = null){
 
 
 
-function sampleAction_WW(stateC){
+SIM_JS.sampleAction_WW = function(stateC){
 
 
 	// If the polymerase is on the very left then move forward
-	//if (currentState["leftGBase"] == 0) return {"toDo": 1, "time": 0};
+	//if (WW_JS.currentState["leftGBase"] == 0) return {"toDo": 1, "time": 0};
 
 
 
@@ -363,16 +380,16 @@ function sampleAction_WW(stateC){
 	var kBck = 0;
 	var kFwd = 0
 	if (!stateC[2]){
-		var rateFwdAndBack = getTranslocationRates(stateC);
+		var rateFwdAndBack = STATE_JS.getTranslocationRates(stateC);
 		kFwd = rateFwdAndBack[1];
 		kBck = rateFwdAndBack[0];
 		
-		if (stateC[3] && stateC[1] == 0 && !ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"]) kBck = 0; // If state is active but we don't allow backtracking while active then set rate to zero
+		if (stateC[3] && stateC[1] == 0 && !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowBacktrackWithoutInactivation"]) kBck = 0; // If state is active but we don't allow backtracking while active then set rate to zero
 		
 	}
-	var kRelease = stateC[2] ? getReleaseRate(getBaseInSequenceAtPosition_WW("m" + (stateC[1] + stateC[0]))) : 0; // Can only release NTP if it is bound
-	var kAct = stateC[3] ? 0 : PHYSICAL_PARAMETERS["kA"]["val"]; // Can only activate if it is deactivated
-	var kDeact = stateC[3] && !stateC[2] && ELONGATION_MODELS[currentElongationModel]["allowInactivation"] ? PHYSICAL_PARAMETERS["kU"]["val"] : 0; // Can only deactivate if it is activated, NTP is not bound, and model permits it
+	var kRelease = stateC[2] ? FE_JS.getReleaseRate(WW_JS.getBaseInSequenceAtPosition_WW("m" + (stateC[1] + stateC[0]))) : 0; // Can only release NTP if it is bound
+	var kAct = stateC[3] ? 0 : PARAMS_JS.PHYSICAL_PARAMETERS["kA"]["val"]; // Can only activate if it is deactivated
+	var kDeact = stateC[3] && !stateC[2] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowInactivation"] ? PARAMS_JS.PHYSICAL_PARAMETERS["kU"]["val"] : 0; // Can only deactivate if it is activated, NTP is not bound, and model permits it
 	
 	//if (kFwd != 0) kFwd = 36.9;
 	//if (kBck != 0) kBck = 57.5;
@@ -390,21 +407,21 @@ function sampleAction_WW(stateC){
 
 
 	// If ready to bind and the model settings are right, then use the geometric boost
-	if (stateC[1] == 1 && !stateC[2] && stateC[3] && ELONGATION_MODELS[currentElongationModel]["allowGeometricCatalysis"] && ELONGATION_MODELS[currentElongationModel]["id"] == "simpleBrownian"){
+	if (stateC[1] == 1 && !stateC[2] && stateC[3] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["id"] == "simpleBrownian"){
 
 		//console.log("allowGeometricCatalysis");
 
 
 
-		var baseToTranscribe = getBaseInSequenceAtPosition_WW("g" + (stateC[1] + stateC[0]));
+		var baseToTranscribe = WW_JS.getBaseInSequenceAtPosition_WW("g" + (stateC[1] + stateC[0]));
 
 
 
-		var result = sampleBaseToAdd(baseToTranscribe);
+		var result = WW_JS.sampleBaseToAdd(baseToTranscribe);
 		var kBind = result["rate"];
-		SIMULATION_VARIABLES["baseToAdd"] = result["base"];  
-		kRelease = getReleaseRate(result["base"]); 
-		kcat = getCatalysisRate(result["base"])
+		SIM_JS.SIMULATION_VARIABLES["baseToAdd"] = result["base"];  
+		kRelease = FE_JS.getReleaseRate(result["base"]); 
+		kcat = FE_JS.getCatalysisRate(result["base"])
 		var rateRelCat = kRelease + kcat;
 
 		var rateBindRelease = kBind * kRelease / rateRelCat;
@@ -412,39 +429,39 @@ function sampleAction_WW(stateC){
 
 
 		// Keep sampling until it is NOT bind release
-		var runif = mersenneTwister.random() * rate;
+		var runif = MER_JS.random() * rate;
 		minReactionTime = 0;
 		while(runif < rateBindRelease){
 
 			
 			// This block must be resampled every time if we are using 4 different catalysis rates and 4 different dissociation constants
-			if (ELONGATION_MODELS[currentElongationModel]["NTPbindingNParams"] == 8){
-				result = sampleBaseToAdd(baseToTranscribe);
+			if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] == 8){
+				result = WW_JS.sampleBaseToAdd(baseToTranscribe);
 				kBind = result["rate"];
-				SIMULATION_VARIABLES["baseToAdd"] = result["base"];  
+				SIM_JS.SIMULATION_VARIABLES["baseToAdd"] = result["base"];  
 
 
-				kRelease = getReleaseRate(result["base"]); 
-				kcat = getCatalysisRate(result["base"])
+				kRelease = FE_JS.getReleaseRate(result["base"]); 
+				kcat = FE_JS.getCatalysisRate(result["base"])
 				rateRelCat = kRelease + kcat;
 
 				rateBindRelease = kBind * kRelease / rateRelCat;
 				rate = kBck + kFwd + kRelease + kBind + kAct + kDeact;
 			}
 
-			minReactionTime += rexp(rate); // Time taken to bind
-			minReactionTime += rexp(rateRelCat); // Time taken to release
+			minReactionTime += WW_JS.rexp(rate); // Time taken to bind
+			minReactionTime += WW_JS.rexp(rateRelCat); // Time taken to release
 
-			runif = mersenneTwister.random() * rate;
+			runif = MER_JS.random() * rate;
 		}
-		minReactionTime += rexp(rate);
+		minReactionTime += WW_JS.rexp(rate);
 
 
 		// Choose next action uniformly
 		var rateBindCat =     kBind * kcat / rateRelCat;
 		var rates = [kBck, kFwd, kRelease, rateBindCat, kAct, kDeact];
 		var sum = kBck + kFwd + kRelease + rateBindCat + kAct + kDeact;
-		runif = mersenneTwister.random() * sum;
+		runif = MER_JS.random() * sum;
 		var cumsum = 0;
 		for (var i = 0; i < rates.length; i ++){
 			cumsum += rates[i];
@@ -457,7 +474,7 @@ function sampleAction_WW(stateC){
 
 		// If next action is bindcat then add the time for catalysis
 		if (toDo == 3) {
-			minReactionTime += rexp(rateRelCat);
+			minReactionTime += WW_JS.rexp(rateRelCat);
 			toDo = [3,3];
 		}
 		
@@ -468,13 +485,13 @@ function sampleAction_WW(stateC){
 
 
 	// If using 2 site model then sample this part by ignoring state descriptions and just use simple transition / rate matrices
-	else if (currentState["mRNAPosInActiveSite"] == 0 && !currentState["NTPbound"] && currentState["activated"] && ELONGATION_MODELS[currentElongationModel]["allowGeometricCatalysis"] && ELONGATION_MODELS[currentElongationModel]["id"] == "twoSiteBrownian"){
+	else if (WW_JS.currentState["mRNAPosInActiveSite"] == 0 && !WW_JS.currentState["NTPbound"] && WW_JS.currentState["activated"] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["id"] == "twoSiteBrownian"){
 
-		var stateCopy = getCurrentStateCopy_WW(currentState);
+		var stateCopy = WW_JS.getcurrentStateCopy_WW(WW_JS.currentState);
 
 		// Calculate all sliding peaks heights for this copy
-		var slidePeaks = update_slidingPeakHeights_WW(stateCopy);
-		var slideTroughs = update_slidingTroughHeights_WW(stateCopy);
+		var slidePeaks = FE_JS.update_slidingPeakHeights_WW(stateCopy);
+		var slideTroughs = FE_JS.update_slidingTroughHeights_WW(stateCopy);
 
 		var rate0tominus1 = Math.exp(-(slidePeaks[2] - slideTroughs[3])); // Rate of backtracking
 		var rate0to1 = propSlideFwd;									  // Rate of going from 0 to 1
@@ -491,9 +508,9 @@ function sampleAction_WW(stateC){
 
 
 		// Calculate rates from the 0^N state
-		bindNTP_WW(stateCopy, false);
-		slidePeaks = update_slidingPeakHeights_WW(stateCopy, false);
-		slideTroughs = update_slidingTroughHeights_WW(stateCopy, false);
+		OPS_JS.bindNTP_WW(stateCopy, false);
+		slidePeaks = FE_JS.update_slidingPeakHeights_WW(stateCopy, false);
+		slideTroughs = FE_JS.update_slidingTroughHeights_WW(stateCopy, false);
 		var bindPeaks = update_bindingPeakHeights_WW(stateCopy);
 		var bindTroughs = update_bindingTroughHeights_WW(stateCopy);
 
@@ -502,9 +519,9 @@ function sampleAction_WW(stateC){
 
 
 		// Calculate rates from the 1^N state
-		bindNTP_WW(stateCopy, false);
-		slidePeaks = update_slidingPeakHeights_WW(stateCopy, false);
-		slideTroughs = update_slidingTroughHeights_WW(stateCopy, false);
+		OPS_JS.bindNTP_WW(stateCopy, false);
+		slidePeaks = FE_JS.update_slidingPeakHeights_WW(stateCopy, false);
+		slideTroughs = FE_JS.update_slidingTroughHeights_WW(stateCopy, false);
 		bindPeaks = update_bindingPeakHeights_WW(stateCopy);
 		bindTroughs = update_bindingTroughHeights_WW(stateCopy);
 
@@ -514,7 +531,7 @@ function sampleAction_WW(stateC){
 
 
 		// Calculate binding rate from the 0 (posttranslocated) state
-		releaseNTP_WW(stateCopy, false);
+		OPS_JS.releaseNTP_WW(stateCopy, false);
 		bindPeaks = update_bindingPeakHeights_WW(stateCopy);
 		bindTroughs = update_bindingTroughHeights_WW(stateCopy);
 		var rate1to1N = Math.exp(-(bindPeaks[3] - bindTroughs[3]));	
@@ -547,7 +564,7 @@ function sampleAction_WW(stateC){
 
 
 		// Simulate the matrix until it reaches an absorbing state
-		var result = simulateMatrix_WW(0, rateVector, probMatrix, 4);
+		var result = SIM_JS.simulateMatrix_WW(0, rateVector, probMatrix, 4);
 		minReactionTime = result["time"];
 		switch(result["state"]){
 			case 4:
@@ -579,13 +596,13 @@ function sampleAction_WW(stateC){
 		if (stateC[1] == 1 && stateC[3]){
 
 			// Sample which base to add
-			var baseToTranscribe = getBaseInSequenceAtPosition_WW("g" + (stateC[1] + stateC[0]));
-			var result = sampleBaseToAdd(baseToTranscribe);
+			var baseToTranscribe = WW_JS.getBaseInSequenceAtPosition_WW("g" + (stateC[1] + stateC[0]));
+			var result = WW_JS.sampleBaseToAdd(baseToTranscribe);
 
-			if (stateC[2]) kBindOrCat = getCatalysisRate(result["base"]); // If NTP bound then use rate of catalysis
+			if (stateC[2]) kBindOrCat = FE_JS.getCatalysisRate(result["base"]); // If NTP bound then use rate of catalysis
 			else{ // Otherwise use binding rate
 				kBindOrCat = result["rate"];
-				SIMULATION_VARIABLES["baseToAdd"] = result["base"];
+				SIM_JS.SIMULATION_VARIABLES["baseToAdd"] = result["base"];
 			}
 		}
 
@@ -594,10 +611,10 @@ function sampleAction_WW(stateC){
 		var rates = [kBck, kFwd, kRelease, kBindOrCat, kAct, kDeact];
 		var rateSum = 0;
 		for (var i = 0; i < rates.length; i++) rateSum += rates[i];
-		minReactionTime =  rexp(rateSum);
+		minReactionTime =  WW_JS.rexp(rateSum);
 
 		// Select which reaction just occurred by sampling proportional to their rates
-		var runif = mersenneTwister.random() * rateSum;
+		var runif = MER_JS.random() * rateSum;
 		var cumsum = 0;
 		for (var i = 0; i < rates.length; i ++){
 			cumsum += rates[i];
@@ -619,7 +636,7 @@ function sampleAction_WW(stateC){
 }
 
 
-function simulateMatrix_WW(s, rateVector, probMatrix, numTransientStates){
+SIM_JS.simulateMatrix_WW = function(s, rateVector, probMatrix, numTransientStates){
 
 
 	var time = 0;
@@ -629,10 +646,10 @@ function simulateMatrix_WW(s, rateVector, probMatrix, numTransientStates){
 
 
 		// Sample reaction time
-		time += rexp(rateVector[s]);
+		time += WW_JS.rexp(rateVector[s]);
 
 		// Sample next state
-		var runif = mersenneTwister.random();
+		var runif = MER_JS.random();
 		var cumsum = 0;
 		for (var i = 0; i < probMatrix[s].length; i ++){
 			cumsum += probMatrix[s][i];
@@ -664,13 +681,6 @@ function printDateAndTime(msg){
 }
 
 
-function getGlobalVariableDictionary(){
-
-	return {leftMBase:leftMBase, rightMBase:rightMBase, leftGBase:leftGBase, rightGBase:rightGBase, mRNAPosInActiveSite:mRNAPosInActiveSite, NTPbound:NTPbound, activated:activated, bulgePos:bulgePos.slice(), bulgedBase:bulgedBase.slice(), bulgeSize:bulgeSize.slice(), partOfBulgeID:partOfBulgeID.slice(), nextBaseToCopy:nextBaseToCopy};
-	
-}
-
-
 
 
 
@@ -679,7 +689,7 @@ function update_slippingPeakHeights(S = 0){
 	
 	if (true || terminated) return [maxHeight,maxHeight,maxHeight,maxHeight,maxHeight,maxHeight];
 	
-	slippingPeakHeightsTemp = [PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"],PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"],PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"],PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"],PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"],PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"]];
+	slippingPeakHeightsTemp = [PARAMS_JS.PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"],PARAMS_JS.PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"],PARAMS_JS.PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"],PARAMS_JS.PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"],PARAMS_JS.PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"],PARAMS_JS.PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"]];
 
 	// Slip left
 	var locals = getGlobalVariableDictionary();
@@ -770,3 +780,20 @@ function update_slippingTroughHeights(S = 0){
 
 
 
+
+if (RUNNING_FROM_COMMAND_LINE){
+
+
+	module.exports = {
+		SIMULATION_VARIABLES: SIM_JS.SIMULATION_VARIABLES,
+		SIMULATION_ACTIONS: SIM_JS.SIMULATION_ACTIONS,
+		renderPlotsEveryMS: SIM_JS.renderPlotsEveryMS,
+		startTrials_WW: SIM_JS.startTrials_WW,
+		renderPlotsHidden: SIM_JS.renderPlotsHidden,
+		n_simulations_WW: SIM_JS.n_simulations_WW,
+		trial_WW: SIM_JS.trial_WW,
+		sampleAction_WW: SIM_JS.sampleAction_WW,
+		simulateMatrix_WW: SIM_JS.simulateMatrix_WW
+	}
+
+}

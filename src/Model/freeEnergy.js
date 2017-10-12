@@ -20,42 +20,44 @@
     --------------------------------------------------------------------
 -*/
 
-ELONGATION_MODELS = {};
-ELONGATION_MODELS["simpleBrownian"] = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: false, allowHypertranslocation: false, 
+
+FE_JS = {};
+
+
+FE_JS.ELONGATION_MODELS = {};
+FE_JS.ELONGATION_MODELS["simpleBrownian"] = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: false, allowHypertranslocation: false, 
 										allowInactivation:false, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: false, 
 										allowGeometricCatalysis: false, allowmRNAfolding:false, allowMisincorporation:false, useFourNTPconcentrations:false,
 										NTPbindingNParams: 2};
-//ELONGATION_MODELS["twoSiteBrownian"] = {id: "twoSiteBrownian",name: "Brownian ratchet model with 2 NTP binding sites", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation:false, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
-currentElongationModel = "simpleBrownian";
+//FE_JS.ELONGATION_MODELS["twoSiteBrownian"] = {id: "twoSiteBrownian",name: "Brownian ratchet model with 2 NTP binding sites", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation:false, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
+FE_JS.currentElongationModel = "simpleBrownian";
 
 
-TRANSLOCATION_MODELS = {};
-TRANSLOCATION_MODELS["midpointBarriers"] = {id: "midpointBarriers", name: "Midpoint"};
-TRANSLOCATION_MODELS["meltingBarriers"] = {id: "meltingBarriers", name: "Melting"};
-currentTranslocationModel = "meltingBarriers";
-
-
-
+FE_JS.TRANSLOCATION_MODELS = {};
+FE_JS.TRANSLOCATION_MODELS["midpointBarriers"] = {id: "midpointBarriers", name: "Midpoint"};
+FE_JS.TRANSLOCATION_MODELS["meltingBarriers"] = {id: "meltingBarriers", name: "Melting"};
+FE_JS.currentTranslocationModel = "meltingBarriers";
 
 
 
-function initFreeEnergy_WW(){
 
 
-	slidingPeakHeights = [];
-	slidingTroughHeightsTemp = [];
 
-	RT = 0.63;
-	BasePairParams = init_BP_parameters_WW();
-	LoopParams1x1 = init_1x1_loop_parameters_WW();
-	LoopParams2x1 = init_2x1_loop_parameters_WW();
-	LoopParams2x2 = init_2x2_loop_parameters_WW();
-	SpecialHairpinParams = init_special_hairpin_parameters_WW();
-	TerminalMismatchParams = init_terminal_mismatch_parameters_WW();
+FE_JS.initFreeEnergy_WW = function(){
 
 
-	PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["hidden"] = currentElongationModel != "twoSiteBrownian";
-	PHYSICAL_PARAMETERS["nbpToFold"]["hidden"] = !ELONGATION_MODELS[currentElongationModel]["allowmRNAfolding"];
+
+	FE_JS.RT = 0.63;
+	FE_JS.BasePairParams = init_BP_parameters_WW();
+	FE_JS.LoopParams1x1 = init_1x1_loop_parameters_WW();
+	FE_JS.LoopParams2x1 = init_2x1_loop_parameters_WW();
+	FE_JS.LoopParams2x2 = init_2x2_loop_parameters_WW();
+	FE_JS.SpecialHairpinParams = init_special_hairpin_parameters_WW();
+	FE_JS.TerminalMismatchParams = init_terminal_mismatch_parameters_WW();
+
+
+	PARAMS_JS.PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["hidden"] = FE_JS.currentElongationModel != "twoSiteBrownian";
+	PARAMS_JS.PHYSICAL_PARAMETERS["nbpToFold"]["hidden"] = !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowmRNAfolding"];
 
 
 }
@@ -63,9 +65,12 @@ function initFreeEnergy_WW(){
 
 
 
-function getElongationModels_WW(resolve = function(x) { }, msgID = null){
+ FE_JS.getElongationModels_WW = function(resolve, msgID){
 
-	var toReturn = {currentElongationModel: currentElongationModel, ELONGATION_MODELS: ELONGATION_MODELS, currentTranslocationModel: currentTranslocationModel, TRANSLOCATION_MODELS: TRANSLOCATION_MODELS};
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
+
+	var toReturn = {currentElongationModel: FE_JS.currentElongationModel, ELONGATION_MODELS: FE_JS.ELONGATION_MODELS, currentTranslocationModel: FE_JS.currentTranslocationModel, TRANSLOCATION_MODELS: FE_JS.TRANSLOCATION_MODELS};
 
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
@@ -79,92 +84,98 @@ function getElongationModels_WW(resolve = function(x) { }, msgID = null){
 
 
 // When use changes the model settings (typically by changing one of the checkboxes) some of the parameters need updating
-function userInputModel_WW(elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, resolve = function() { }, msgID = null){
+ FE_JS.userInputModel_WW = function(elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, resolve, msgID){
+
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
+
+	var needToInitBindingMatrix = (allowMisincorporation != null && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowMisincorporation"] != allowMisincorporation) ||
+								  FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] != useFourNTPconcentrations || 
+								  (NTPbindingNParams != null && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] != NTPbindingNParams);
+
+	FE_JS.currentElongationModel = elongationModelID;
+	FE_JS.currentTranslocationModel = translocationModelID;
+	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowBacktracking"] = allowBacktracking;
+	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"] = allowHypertranslocation;
+	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowInactivation"] = allowInactivation;
+	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowBacktrackWithoutInactivation"] = allowBacktrackWithoutInactivation;
+	if(deactivateUponMisincorporation != null) FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["deactivateUponMisincorporation"] = deactivateUponMisincorporation;
+	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] = allowGeometricCatalysis;
+	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowmRNAfolding"] = allowmRNAfolding;
+	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] = useFourNTPconcentrations;
+	if(allowMisincorporation != null) FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowMisincorporation"] = allowMisincorporation;
+	if(NTPbindingNParams != null) FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] = NTPbindingNParams;
 
 
-	var needToInitBindingMatrix = (allowMisincorporation != null && ELONGATION_MODELS[currentElongationModel]["allowMisincorporation"] != allowMisincorporation) ||
-								  ELONGATION_MODELS[currentElongationModel]["useFourNTPconcentrations"] != useFourNTPconcentrations || 
-								  (NTPbindingNParams != null && ELONGATION_MODELS[currentElongationModel]["NTPbindingNParams"] != NTPbindingNParams);
-
-	currentElongationModel = elongationModelID;
-	currentTranslocationModel = translocationModelID;
-	ELONGATION_MODELS[currentElongationModel]["allowBacktracking"] = allowBacktracking;
-	ELONGATION_MODELS[currentElongationModel]["allowHypertranslocation"] = allowHypertranslocation;
-	ELONGATION_MODELS[currentElongationModel]["allowInactivation"] = allowInactivation;
-	ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"] = allowBacktrackWithoutInactivation;
-	if(deactivateUponMisincorporation != null) ELONGATION_MODELS[currentElongationModel]["deactivateUponMisincorporation"] = deactivateUponMisincorporation;
-	ELONGATION_MODELS[currentElongationModel]["allowGeometricCatalysis"] = allowGeometricCatalysis;
-	ELONGATION_MODELS[currentElongationModel]["allowmRNAfolding"] = allowmRNAfolding;
-	ELONGATION_MODELS[currentElongationModel]["useFourNTPconcentrations"] = useFourNTPconcentrations;
-	if(allowMisincorporation != null) ELONGATION_MODELS[currentElongationModel]["allowMisincorporation"] = allowMisincorporation;
-	if(NTPbindingNParams != null) ELONGATION_MODELS[currentElongationModel]["NTPbindingNParams"] = NTPbindingNParams;
 
 
-
-
-	PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["hidden"] = currentElongationModel != "twoSiteBrownian";
-	PHYSICAL_PARAMETERS["nbpToFold"]["hidden"] = !allowmRNAfolding
+	PARAMS_JS.PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["hidden"] = FE_JS.currentElongationModel != "twoSiteBrownian";
+	PARAMS_JS.PHYSICAL_PARAMETERS["nbpToFold"]["hidden"] = !allowmRNAfolding
 	
-	if(allowMisincorporation != null) PHYSICAL_PARAMETERS["RateMisbind"]["hidden"] = !allowMisincorporation;
-	PHYSICAL_PARAMETERS["TransitionTransversionRatio"]["hidden"] = true;// !allowMisincorporation;
+	if(allowMisincorporation != null) PARAMS_JS.PHYSICAL_PARAMETERS["RateMisbind"]["hidden"] = !allowMisincorporation;
+	PARAMS_JS.PHYSICAL_PARAMETERS["TransitionTransversionRatio"]["hidden"] = true;// !allowMisincorporation;
 	
-	PHYSICAL_PARAMETERS["kA"]["hidden"] = !allowInactivation;
-	PHYSICAL_PARAMETERS["kU"]["hidden"] = !allowInactivation;
+	PARAMS_JS.PHYSICAL_PARAMETERS["kA"]["hidden"] = !allowInactivation;
+	PARAMS_JS.PHYSICAL_PARAMETERS["kU"]["hidden"] = !allowInactivation;
 
 
-	PHYSICAL_PARAMETERS["GHyper"]["hidden"] = !allowHypertranslocation;
+	PARAMS_JS.PHYSICAL_PARAMETERS["GHyper"]["hidden"] = !allowHypertranslocation;
 
-	PHYSICAL_PARAMETERS["NTPconc"]["hidden"] = useFourNTPconcentrations;
-	PHYSICAL_PARAMETERS["ATPconc"]["hidden"] = !useFourNTPconcentrations;
-	PHYSICAL_PARAMETERS["CTPconc"]["hidden"] = !useFourNTPconcentrations;
-	PHYSICAL_PARAMETERS["GTPconc"]["hidden"] = !useFourNTPconcentrations;
-	PHYSICAL_PARAMETERS["UTPconc"]["hidden"] = !useFourNTPconcentrations;
+	PARAMS_JS.PHYSICAL_PARAMETERS["NTPconc"]["hidden"] = useFourNTPconcentrations;
+	PARAMS_JS.PHYSICAL_PARAMETERS["ATPconc"]["hidden"] = !useFourNTPconcentrations;
+	PARAMS_JS.PHYSICAL_PARAMETERS["CTPconc"]["hidden"] = !useFourNTPconcentrations;
+	PARAMS_JS.PHYSICAL_PARAMETERS["GTPconc"]["hidden"] = !useFourNTPconcentrations;
+	PARAMS_JS.PHYSICAL_PARAMETERS["UTPconc"]["hidden"] = !useFourNTPconcentrations;
 
 
 
 	if(NTPbindingNParams != null){
-		PHYSICAL_PARAMETERS["kCat"]["hidden"] = NTPbindingNParams == 8;
-		PHYSICAL_PARAMETERS["kCat_ATP"]["hidden"] = NTPbindingNParams != 8;
-		PHYSICAL_PARAMETERS["kCat_CTP"]["hidden"] = NTPbindingNParams != 8;
-		PHYSICAL_PARAMETERS["kCat_GTP"]["hidden"] = NTPbindingNParams != 8;
-		PHYSICAL_PARAMETERS["kCat_UTP"]["hidden"] = NTPbindingNParams != 8;
+		PARAMS_JS.PHYSICAL_PARAMETERS["kCat"]["hidden"] = NTPbindingNParams == 8;
+		PARAMS_JS.PHYSICAL_PARAMETERS["kCat_ATP"]["hidden"] = NTPbindingNParams != 8;
+		PARAMS_JS.PHYSICAL_PARAMETERS["kCat_CTP"]["hidden"] = NTPbindingNParams != 8;
+		PARAMS_JS.PHYSICAL_PARAMETERS["kCat_GTP"]["hidden"] = NTPbindingNParams != 8;
+		PARAMS_JS.PHYSICAL_PARAMETERS["kCat_UTP"]["hidden"] = NTPbindingNParams != 8;
 
-		PHYSICAL_PARAMETERS["Kdiss"]["hidden"] = NTPbindingNParams == 8;
-		PHYSICAL_PARAMETERS["Kdiss_ATP"]["hidden"] = NTPbindingNParams != 8;
-		PHYSICAL_PARAMETERS["Kdiss_CTP"]["hidden"] = NTPbindingNParams != 8;
-		PHYSICAL_PARAMETERS["Kdiss_GTP"]["hidden"] = NTPbindingNParams != 8;
-		PHYSICAL_PARAMETERS["Kdiss_UTP"]["hidden"] = NTPbindingNParams != 8;
+		PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss"]["hidden"] = NTPbindingNParams == 8;
+		PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_ATP"]["hidden"] = NTPbindingNParams != 8;
+		PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_CTP"]["hidden"] = NTPbindingNParams != 8;
+		PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_GTP"]["hidden"] = NTPbindingNParams != 8;
+		PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_UTP"]["hidden"] = NTPbindingNParams != 8;
 	}
 
 
 	if(needToInitBindingMatrix) {
-		initMisbindingMatrix();
-		setNextBaseToAdd_WW();
+		WW_JS.initMisbindingMatrix();
+		WW_JS.setNextBaseToAdd_WW();
 	}
 	
 
 
 
-	translocationCacheNeedsUpdating = true;
-	initTranslocationRateCache();
+	STATE_JS.translocationCacheNeedsUpdating = true;
+	STATE_JS.initTranslocationRateCache();
 
 
 	if (msgID != null){
-		postMessage(msgID + "~X~" + JSON.stringify(ELONGATION_MODELS[currentElongationModel]));
+		postMessage(msgID + "~X~" + JSON.stringify(FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]));
 	}
 
 	else{
-		resolve(ELONGATION_MODELS[currentElongationModel]);
+		resolve(FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]);
 	}
 
 }
 
 
 // Returns everything necessary to populate the NTP parameters popup
-function getNTPparametersAndSettings_WW(resolve = function(){}, msgID = null){
+ FE_JS.getNTPparametersAndSettings_WW = function(resolve, msgID){
 
 
-	var toReturn = {params: PHYSICAL_PARAMETERS, model: ELONGATION_MODELS[currentElongationModel]}
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
+
+
+	var toReturn = {params: PARAMS_JS.PHYSICAL_PARAMETERS, model: FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]}
 
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
@@ -178,23 +189,30 @@ function getNTPparametersAndSettings_WW(resolve = function(){}, msgID = null){
 }
 
 
-function calculateAllBarrierHeights_WW(sampleAll = true){
+ FE_JS.calculateAllBarrierHeights_WW = function(sampleAll){
 
-	getSlidingHeights_WW(sampleAll);
+	if (sampleAll === undefined) sampleAll = true;
+
+	FE_JS.getSlidingHeights_WW(sampleAll);
 
 }
 
 
 
 
-function getSlidingHeights_WW(sampleAll = true, ignoreModelOptions = false, resolve = function(heights) {}, msgID = null){
+ FE_JS.getSlidingHeights_WW = function(sampleAll, ignoreModelOptions, resolve, msgID){
+
+	if (sampleAll === undefined) sampleAll = true;
+	if (ignoreModelOptions === undefined) ignoreModelOptions = false;
+	if (resolve === undefined) resolve = function(heights) {};
+	if (msgID === undefined) msgID = null;
 
 
-	// TODO: only calculate when the values are not up to date
+	// Will add DGslide to the appropriate peak
 
 	// Otherwise we calculate from sr
-	slidingTroughHeights = update_slidingTroughHeights_WW(currentState, sampleAll);
-	slidingPeakHeights = update_slidingPeakHeights_WW(currentState, sampleAll, ignoreModelOptions);
+	slidingTroughHeights = FE_JS.update_slidingTroughHeights_WW(WW_JS.currentState, true, sampleAll);
+	slidingPeakHeights = FE_JS.update_slidingPeakHeights_WW(WW_JS.currentState, true, sampleAll, ignoreModelOptions);
 
 	var toReturn = {slidingPeakHeights: slidingPeakHeights, slidingTroughHeights: slidingTroughHeights};
 
@@ -213,33 +231,43 @@ function getSlidingHeights_WW(sampleAll = true, ignoreModelOptions = false, reso
 
 
 
+// If addParamsToPeaks is true, will add DeltaGSlide and Fassist to the appropriate peaks
+// Otherwise will not add them yet. This is for efficiency reasons. If we ignore these parameters now we do not need to reset the cache when they change
+ FE_JS.update_slidingPeakHeights_WW = function(stateToCalculateFor, addParamsToPeaks, sampleAll, ignoreModelOptions){
 
-function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = true, ignoreModelOptions = false){
 
-	if (stateToCalculateFor == null) stateToCalculateFor = currentState;
+	if (stateToCalculateFor === undefined) stateToCalculateFor = null;
+	if (addParamsToPeaks === undefined) addParamsToPeaks = true;
+	if (sampleAll === undefined) sampleAll = true;
+	if (ignoreModelOptions === undefined) ignoreModelOptions = false;	
 
-	var slidingPeakHeightsTemp = [PHYSICAL_PARAMETERS["GDagSlide"]["val"], PHYSICAL_PARAMETERS["GDagSlide"]["val"],PHYSICAL_PARAMETERS["GDagSlide"]["val"],PHYSICAL_PARAMETERS["GDagSlide"]["val"],PHYSICAL_PARAMETERS["GDagSlide"]["val"],PHYSICAL_PARAMETERS["GDagSlide"]["val"]];
+
+	if (stateToCalculateFor == null) stateToCalculateFor = WW_JS.currentState;
+
+	var slidingPeakHeightsTemp = addParamsToPeaks ? [PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"], PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"],PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"],PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"],PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"],PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"]] : [0,0,0,0,0,0];
 	
 	if (stateToCalculateFor["terminated"]) return [maxHeight,maxHeight,maxHeight,maxHeight,maxHeight,maxHeight];
 
 	// If the single NTP binding site model is selected then sliding is not allowed if NTP is bound 
-	if (!ignoreModelOptions && currentElongationModel == "simpleBrownian" && stateToCalculateFor["NTPbound"]) {
+	if (!ignoreModelOptions && FE_JS.currentElongationModel == "simpleBrownian" && stateToCalculateFor["NTPbound"]) {
 		return [maxHeight, maxHeight, maxHeight, maxHeight, maxHeight, maxHeight];
 	}
+
+
 
 
 	//if (2 - (WebWorkerVariables["rightGBase"] - WebWorkerVariables["specialSite"]) >= 0 && 2 - (WebWorkerVariables["rightGBase"] - WebWorkerVariables["specialSite"]) < 6 ) slidingPeakHeightsTemp[2 - (WebWorkerVariables["rightGBase"] - WebWorkerVariables["specialSite"])] += WebWorkerVariables["GDaggerSpecial"] ;
 
 	
 	// Slide backwards
-	var state = getCurrentStateCopy_WW(stateToCalculateFor);
+	var state = WW_JS.getcurrentStateCopy_WW(stateToCalculateFor);
 	for (var pos = 2; pos >= 0; pos --){
 
 
 			if (!sampleAll && pos <= 1) break; // Only sample the peak left of the main trough for effiency
 
-			var statePreOperation = getCurrentStateCopy_WW(state);
-			var possibleOperation = backwards_WW(state, false);
+			var statePreOperation = WW_JS.getcurrentStateCopy_WW(state);
+			var possibleOperation = OPS_JS.backwards_WW(state, false);
 
 
 			if (!possibleOperation) {
@@ -249,61 +277,61 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 
 
 			// Do not backtrack if it will cause the bubble to be open on the 3' end
-			if (statePreOperation["leftGBase"] - PHYSICAL_PARAMETERS["bubbleLeft"]["val"] -1 <= 2){
+			if (statePreOperation["leftGBase"] - PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"] -1 <= 2){
 				slidingPeakHeightsTemp[pos] = maxHeight;
 				break;
 			}
 
 
 			// Check if backtracking is permitted
-			if (!ignoreModelOptions && !ELONGATION_MODELS[currentElongationModel]["allowBacktracking"] && state["mRNAPosInActiveSite"] < 0){
+			if (!ignoreModelOptions && !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowBacktracking"] && state["mRNAPosInActiveSite"] < 0){
 				slidingPeakHeightsTemp[pos] = maxHeight;
 				break;
 			}
 
 			// Check if backtracking is permitted while activated
-			if (!ignoreModelOptions && !ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"] && state["activated"] && state["mRNAPosInActiveSite"] == -1){
+			if (!ignoreModelOptions && !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowBacktrackWithoutInactivation"] && state["activated"] && state["mRNAPosInActiveSite"] == -1){
 				slidingPeakHeightsTemp[pos] = maxHeight;
 				break;
 			}
 
 			// If the 2 NTP binding site model is selected and if NTP is bound then we cannot leave range [0,1]
-			if (currentElongationModel == "twoSiteBrownian" && statePreOperation["NTPbound"] && (state["mRNAPosInActiveSite"] < 0 || state["mRNAPosInActiveSite"] > 1)) {
+			if (FE_JS.currentElongationModel == "twoSiteBrownian" && statePreOperation["NTPbound"] && (state["mRNAPosInActiveSite"] < 0 || state["mRNAPosInActiveSite"] > 1)) {
 				slidingPeakHeightsTemp[pos] = maxHeight;
 				break;
 			}
 
 
 			// Add a penalty for having NTP in the secondary binding site
-			if (currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 0 && stateToCalculateFor["NTPbound"]){
-				slidingPeakHeightsTemp[pos] += PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
+			if (FE_JS.currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 0 && stateToCalculateFor["NTPbound"]){
+				slidingPeakHeightsTemp[pos] += PARAMS_JS.PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
 			}
 
 
 			// Hypertranslocation penalty
-			if(ELONGATION_MODELS[currentElongationModel]["allowHypertranslocation"]){
-				var hypertranslocationPenalty = Math.max(0, state["mRNAPosInActiveSite"] - 1.5) * PHYSICAL_PARAMETERS["GHyper"]["val"];
+			if(FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"]){
+				var hypertranslocationPenalty = Math.max(0, state["mRNAPosInActiveSite"] - 1.5) * PARAMS_JS.PHYSICAL_PARAMETERS["GHyper"]["val"];
 				slidingPeakHeightsTemp[pos] += hypertranslocationPenalty;
 			}
 
 
 			// Midpoint model: free energy barrier is halfway between the two on either side
-			if (currentTranslocationModel == "midpointBarriers"){
+			if (FE_JS.currentTranslocationModel == "midpointBarriers"){
 
 				slidingPeakHeightsTemp[pos] += (getFreeEnergyOfState_WW(statePreOperation) - getFreeEnergyOfTranscriptionBubble_WW(statePreOperation) + getFreeEnergyOfState_WW(state) - getFreeEnergyOfTranscriptionBubble_WW(state)) / 2;
 				
 				// Don't backtrack if it will break the structure
-				if (all_sequences[sequenceID]["primer"].substring(2) == "RNA" && ELONGATION_MODELS[currentElongationModel]["allowmRNAfolding"]){
-					var structure = calculateMFESequence_WW(statePreOperation)["structure"];
+				if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(2) == "RNA" && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowmRNAfolding"]){
+					var structure = MFE_JS.calculateMFESequence_WW(statePreOperation)["structure"];
 					if (structure[structure.length-1] == ")") slidingPeakHeightsTemp[pos] = maxHeight;
-					//mRNAFreeEnergy = calculateMFESequence_WW(state)["energy"];
+					//mRNAFreeEnergy = MFE_JS.calculateMFESequence_WW(state)["energy"];
 				}
 				
 
 
 			}
 
-			else if (currentTranslocationModel == "meltingBarriers"){
+			else if (FE_JS.currentTranslocationModel == "meltingBarriers"){
 
 				slidingPeakHeightsTemp[pos] += getFreeEnergyOfIntermediateState_WW(statePreOperation, state);
 				slidingPeakHeightsTemp[pos] -= getFreeEnergyOfTranscriptionBubbleIntermediate_WW(statePreOperation, state); // Subtract the free energy which we would gain if the intermediate transcription bubble was sealed
@@ -330,14 +358,14 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 
 	
 	// Slide forward
-	state = getCurrentStateCopy_WW(stateToCalculateFor);
+	state = WW_JS.getcurrentStateCopy_WW(stateToCalculateFor);
 	for (var pos = 4; pos <= 6; pos ++){
 
 			if (!sampleAll && pos >= 5) break; // Only sample the peak left of the main trough for effiency
 
 
-			var statePreOperation = getCurrentStateCopy_WW(state);
-			var possibleOperation = forward_WW(state, false);
+			var statePreOperation = WW_JS.getcurrentStateCopy_WW(state);
+			var possibleOperation = OPS_JS.forward_WW(state, false);
 			if (!possibleOperation) {
 				slidingPeakHeightsTemp[pos-1] = maxHeight;
 				break;
@@ -346,35 +374,35 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 
 
 			// Check if hypertranslocation is permitted
-			if (!ignoreModelOptions && !ELONGATION_MODELS[currentElongationModel]["allowHypertranslocation"] && state["mRNAPosInActiveSite"] > 1){
+			if (!ignoreModelOptions && !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"] && state["mRNAPosInActiveSite"] > 1){
 				slidingPeakHeightsTemp[pos-1] = maxHeight;
 				break;
 			}
 
 
 			// If the 2 NTP binding site model is selected and if NTP is bound then we cannot leave range [0,1]
-			if (currentElongationModel == "twoSiteBrownian" && statePreOperation["NTPbound"] && (state["mRNAPosInActiveSite"] < 0 || state["mRNAPosInActiveSite"] > 1)) {
+			if (FE_JS.currentElongationModel == "twoSiteBrownian" && statePreOperation["NTPbound"] && (state["mRNAPosInActiveSite"] < 0 || state["mRNAPosInActiveSite"] > 1)) {
 				slidingPeakHeightsTemp[pos-1] = maxHeight;
 				break;
 			}
 
 
 			// Add a penalty for having NTP in the secondary binding site
-			if (currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 1 && stateToCalculateFor["NTPbound"]){
-				slidingPeakHeightsTemp[pos-1] += PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
+			if (FE_JS.currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 1 && stateToCalculateFor["NTPbound"]){
+				slidingPeakHeightsTemp[pos-1] += PARAMS_JS.PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
 			}
 
 
 			// Hypertranslocation penalty
-			if(ELONGATION_MODELS[currentElongationModel]["allowHypertranslocation"]){
-				var hypertranslocationPenalty = Math.max(0, statePreOperation["mRNAPosInActiveSite"] - 0.5) * PHYSICAL_PARAMETERS["GHyper"]["val"];
+			if(FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"]){
+				var hypertranslocationPenalty = Math.max(0, statePreOperation["mRNAPosInActiveSite"] - 0.5) * PARAMS_JS.PHYSICAL_PARAMETERS["GHyper"]["val"];
 				slidingPeakHeightsTemp[pos-1] += hypertranslocationPenalty;
 			}
 
 
 
 			// Midpoint model: free energy barrier is halfway between the two on either side
-			if (currentTranslocationModel == "midpointBarriers"){
+			if (FE_JS.currentTranslocationModel == "midpointBarriers"){
 
 				slidingPeakHeightsTemp[pos-1] += (getFreeEnergyOfState_WW(statePreOperation) - getFreeEnergyOfTranscriptionBubble_WW(statePreOperation) + getFreeEnergyOfState_WW(state) - getFreeEnergyOfTranscriptionBubble_WW(state)) / 2;
 				
@@ -382,7 +410,7 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 			}
 
 			// Calculate the free energy of the intermediate state
-			else if (currentTranslocationModel == "meltingBarriers"){
+			else if (FE_JS.currentTranslocationModel == "meltingBarriers"){
 
 				slidingPeakHeightsTemp[pos-1] += getFreeEnergyOfIntermediateState_WW(statePreOperation, state);
 				slidingPeakHeightsTemp[pos-1] -= getFreeEnergyOfTranscriptionBubbleIntermediate_WW(statePreOperation, state); // Subtract the free energy which we would gain if the intermediate transcription bubble was sealed
@@ -403,15 +431,17 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 	
 	
 	// Assisting force
-	if (PHYSICAL_PARAMETERS["FAssist"]["val"] != 0){
-		var gradient = (PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * 3.4e-10) / (1.380649e-23 * 310) // Force x distance / kB T
+	if (addParamsToPeaks){
+		if (PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] != 0){
+			var gradient = (PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * 3.4e-10) / (1.380649e-23 * 310) // Force x distance / kB T
 
-		
-		for (var i = 0; i < 6; i ++){
-			if(slidingPeakHeightsTemp[i] != maxHeight) slidingPeakHeightsTemp[i] += gradient*(2.5-i);
+			
+			for (var i = 0; i < 6; i ++){
+				if(slidingPeakHeightsTemp[i] != maxHeight) slidingPeakHeightsTemp[i] += gradient*(2.5-i);
+			}
+			
+			
 		}
-		
-		
 	}
 
 	
@@ -421,7 +451,13 @@ function update_slidingPeakHeights_WW(stateToCalculateFor = null, sampleAll = tr
 }
 
 
-function update_slidingTroughHeights_WW(stateToCalculateFor = currentState, sampleAll = true){
+ FE_JS.update_slidingTroughHeights_WW = function(stateToCalculateFor, addParamsToTroughs, sampleAll){
+
+
+	if (stateToCalculateFor === undefined) stateToCalculateFor = WW_JS.currentState;
+	if (addParamsToTroughs === undefined) addParamsToTroughs = true;
+	if (sampleAll === undefined) sampleAll = true;
+
 
 
 	var slidingTroughHeightsTemp = [0,0,0,0,0,0,0];
@@ -434,35 +470,35 @@ function update_slidingTroughHeights_WW(stateToCalculateFor = currentState, samp
 
 
 	// Add a penalty for having NTP in the secondary binding site
-	if (currentElongationModel == "twoSiteBrownian" && stateToCalculateFor["mRNAPosInActiveSite"] == 0 && stateToCalculateFor["NTPbound"]){
-		slidingTroughHeightsTemp[3] += PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
+	if (FE_JS.currentElongationModel == "twoSiteBrownian" && stateToCalculateFor["mRNAPosInActiveSite"] == 0 && stateToCalculateFor["NTPbound"]){
+		slidingTroughHeightsTemp[3] += PARAMS_JS.PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
 	}
 
 
-	if(ELONGATION_MODELS[currentElongationModel]["allowHypertranslocation"]){
-		var hypertranslocationPenalty = Math.max(0, stateToCalculateFor["mRNAPosInActiveSite"] - 1) * PHYSICAL_PARAMETERS["GHyper"]["val"];
+	if(FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"]){
+		var hypertranslocationPenalty = Math.max(0, stateToCalculateFor["mRNAPosInActiveSite"] - 1) * PARAMS_JS.PHYSICAL_PARAMETERS["GHyper"]["val"];
 		slidingTroughHeightsTemp[3] += hypertranslocationPenalty;
 	}
 	
 	// Slide backwards
 	if (sampleAll){ // When simulating we only sample the middle trough (for efficiency) 
 
-		var state = getCurrentStateCopy_WW(stateToCalculateFor);
+		var state = WW_JS.getcurrentStateCopy_WW(stateToCalculateFor);
 		for (var pos = 2; sampleAll && pos >= 0; pos --){
-				backwards_WW(state, false);
+				OPS_JS.backwards_WW(state, false);
 				slidingTroughHeightsTemp[pos] = getFreeEnergyOfState_WW(state, [TbulgePos]);
 				slidingTroughHeightsTemp[pos] -= getFreeEnergyOfTranscriptionBubble_WW(state); 
 
 
 				// Add a penalty for having NTP in the secondary binding site
-				if (currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 0 && stateToCalculateFor["NTPbound"]){
-					slidingTroughHeightsTemp[pos] += PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
+				if (FE_JS.currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 0 && stateToCalculateFor["NTPbound"]){
+					slidingTroughHeightsTemp[pos] += PARAMS_JS.PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
 				}
 
 
 				// Hypertranslocation penalty
-				if(ELONGATION_MODELS[currentElongationModel]["allowHypertranslocation"]){
-					var hypertranslocationPenalty = Math.max(0, state["mRNAPosInActiveSite"] - 1) * PHYSICAL_PARAMETERS["GHyper"]["val"];
+				if(FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"]){
+					var hypertranslocationPenalty = Math.max(0, state["mRNAPosInActiveSite"] - 1) * PARAMS_JS.PHYSICAL_PARAMETERS["GHyper"]["val"];
 					//console.log("1Current state", state["mRNAPosInActiveSite"], "penalty", hypertranslocationPenalty);
 					slidingTroughHeightsTemp[pos] += hypertranslocationPenalty;
 				}
@@ -476,22 +512,22 @@ function update_slidingTroughHeights_WW(stateToCalculateFor = currentState, samp
 	
 	// Slide forward
 	if (sampleAll){ // When simulating we only sample the middle trough (for efficiency)
-		var state = getCurrentStateCopy_WW(stateToCalculateFor);
+		var state = WW_JS.getcurrentStateCopy_WW(stateToCalculateFor);
 		for (var pos = 4; pos <= 6; pos ++){
-				forward_WW(state, false);
+				OPS_JS.forward_WW(state, false);
 				slidingTroughHeightsTemp[pos] = getFreeEnergyOfState_WW(state, [TbulgePos]);
 				if (slidingTroughHeightsTemp[pos] == null)  slidingTroughHeightsTemp[pos] = maxHeight;
 				slidingTroughHeightsTemp[pos] -= getFreeEnergyOfTranscriptionBubble_WW(state); 
 
 				// Add a penalty for having NTP in the secondary binding site
-				if (currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 0 && stateToCalculateFor["NTPbound"]){	
-					slidingTroughHeightsTemp[pos] += PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
+				if (FE_JS.currentElongationModel == "twoSiteBrownian" && state["mRNAPosInActiveSite"] == 0 && stateToCalculateFor["NTPbound"]){	
+					slidingTroughHeightsTemp[pos] += PARAMS_JS.PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
 				}
 
 
 				// Hypertranslocation penalty
-				if(ELONGATION_MODELS[currentElongationModel]["allowHypertranslocation"]){
-					var hypertranslocationPenalty = Math.max(0, state["mRNAPosInActiveSite"] - 1) * PHYSICAL_PARAMETERS["GHyper"]["val"];
+				if(FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"]){
+					var hypertranslocationPenalty = Math.max(0, state["mRNAPosInActiveSite"] - 1) * PARAMS_JS.PHYSICAL_PARAMETERS["GHyper"]["val"];
 					//console.log("2Current state", state["mRNAPosInActiveSite"], "penalty", hypertranslocationPenalty);
 					slidingTroughHeightsTemp[pos] += hypertranslocationPenalty;
 				}
@@ -505,14 +541,16 @@ function update_slidingTroughHeights_WW(stateToCalculateFor = currentState, samp
 	
 	
 	// Assisting force
-	if (PHYSICAL_PARAMETERS["FAssist"]["val"] != 0){
-		var gradient = (PHYSICAL_PARAMETERS["FAssist"]["val"]* 1e-12 * 3.4e-10) / (1.380649e-23 * 310) // Force x distance (3.4A)
-		
-		for (var i = 0; i < 7; i ++){
-			if(slidingTroughHeightsTemp[i] != maxHeight) slidingTroughHeightsTemp[i] += gradient*(3-i);
+	if (addParamsToTroughs){
+		if (PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] != 0){
+			var gradient = (PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"]* 1e-12 * 3.4e-10) / (1.380649e-23 * 310) // Force x distance (3.4A)
+			
+			for (var i = 0; i < 7; i ++){
+				if(slidingTroughHeightsTemp[i] != maxHeight) slidingTroughHeightsTemp[i] += gradient*(3-i);
+			}
+			
+			
 		}
-		
-		
 	}
 
 	
@@ -530,19 +568,19 @@ function update_slidingTroughHeights_WW(stateToCalculateFor = currentState, samp
 
 
 
-function getFreeEnergyOfState_WW(state, bPosG = [TbulgePos]){
+function getFreeEnergyOfState_WW(state){
 	
-	var hybridStrings = getHybridString_WW(state, bPosG);
-	var hybridFreeEnergy = getHybridFreeEnergy_WW(hybridStrings[0], hybridStrings[1], all_sequences[sequenceID]["template"].substring(2,5), all_sequences[sequenceID]["primer"].substring(2));
+	var hybridStrings = getHybridString_WW(state);
+	var hybridFreeEnergy = getHybridFreeEnergy_WW(hybridStrings[0], hybridStrings[1], SEQS_JS.all_sequences[sequenceID]["template"].substring(2,5), SEQS_JS.all_sequences[sequenceID]["primer"].substring(2));
 
 
 	// Include the free energy of the mRNA?
 	var mRNAFreeEnergy = 0;
-	if (false && all_sequences[sequenceID]["primer"].substring(2) == "RNA" && ELONGATION_MODELS[currentElongationModel]["allowmRNAfolding"]){
-		var structure = calculateMFESequence_WW(state)["structure"];
+	if (false && SEQS_JS.all_sequences[sequenceID]["primer"].substring(2) == "RNA" && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowmRNAfolding"]){
+		var structure = MFE_JS.calculateMFESequence_WW(state)["structure"];
 		console.log("XXX", structure, structure[structure.length-1], structure[structure.length-1] == ")");
 		if (structure[structure.length-1] == ")") return null;
-		//mRNAFreeEnergy = calculateMFESequence_WW(state)["energy"];
+		//mRNAFreeEnergy = MFE_JS.calculateMFESequence_WW(state)["energy"];
 	}
 
 
@@ -554,17 +592,17 @@ function getFreeEnergyOfState_WW(state, bPosG = [TbulgePos]){
 
 
 // Find free energy of state between states 1 and 2
-function getFreeEnergyOfIntermediateState_WW(state1, state2, bPosG1 = [TbulgePos], bPosG2 = [TbulgePos]){
+function getFreeEnergyOfIntermediateState_WW(state1, state2){
 	
-	var hybridStrings1 = getHybridString_WW(state1, bPosG1);
-	var hybridStrings2 = getHybridString_WW(state2, bPosG2);
+	var hybridStrings1 = getHybridString_WW(state1);
+	var hybridStrings2 = getHybridString_WW(state2);
 	
 	var intermediateString = getHybridIntermediateString_WW(hybridStrings1, hybridStrings2, state1["leftGBase"], state1["leftMBase"], state2["leftGBase"], state2["leftMBase"]);
 	
 	//console.log("Free energy of\n", state1["leftGBase"], "-", hybridStrings1[0], "\n", state1["leftMBase"], "-",  hybridStrings1[1], "\n + \n", state2["leftGBase"], "-", hybridStrings2[0], "\n", state2["leftMBase"], "-", hybridStrings2[1], "\n = \n", intermediateString[0], "\n", intermediateString[1], "\n\n");
 	
 	
-	return getHybridFreeEnergy_WW(intermediateString[0], intermediateString[1], all_sequences[sequenceID]["template"].substring(2,5), all_sequences[sequenceID]["primer"].substring(2));
+	return getHybridFreeEnergy_WW(intermediateString[0], intermediateString[1], SEQS_JS.all_sequences[sequenceID]["template"].substring(2,5), SEQS_JS.all_sequences[sequenceID]["primer"].substring(2));
 	
 }
 
@@ -576,14 +614,16 @@ function getFreeEnergyOfIntermediateState_WW(state1, state2, bPosG1 = [TbulgePos
 // template         abcde	 jklm
 // template              fghi
 // primer                1234
-function getFreeEnergyOfTranscriptionBubble_WW(state, p = false){
+function getFreeEnergyOfTranscriptionBubble_WW(state, p){
+
+	if (p === undefined) p = false;
 	
 	// If single stranded template then there is no energy loss
-	if (all_sequences[sequenceID]["template"].substring(0,2) == "ss") return 0;
+	if (SEQS_JS.all_sequences[sequenceID]["template"].substring(0,2) == "ss") return 0;
 	
-	var leftmostTemplatePos = state["leftGBase"] - PHYSICAL_PARAMETERS["bubbleLeft"]["val"] - 1;
+	var leftmostTemplatePos = state["leftGBase"] - PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"] - 1;
 	var leftmostComplementPos = leftmostTemplatePos;
-	var rightmostTemplatePos = state["rightGBase"] + PHYSICAL_PARAMETERS["bubbleRight"]["val"] + 1;
+	var rightmostTemplatePos = state["rightGBase"] + PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"] + 1;
 	var rightmostComplementPos = rightmostTemplatePos;
 	
 	
@@ -591,7 +631,7 @@ function getFreeEnergyOfTranscriptionBubble_WW(state, p = false){
 	
 	if (p) console.log(leftmostTemplatePos, leftmostComplementPos, rightmostTemplatePos, rightmostComplementPos, hybridStrings);
 	
-	return getFreeEnergyOfTranscriptionBubbleHybridString_WW(hybridStrings[0], hybridStrings[1], all_sequences[sequenceID]["template"].substring(2,5), p);
+	return getFreeEnergyOfTranscriptionBubbleHybridString_WW(hybridStrings[0], hybridStrings[1], SEQS_JS.all_sequences[sequenceID]["template"].substring(2,5), p);
 
 }
 
@@ -601,15 +641,15 @@ function getFreeEnergyOfTranscriptionBubble_WW(state, p = false){
 function getFreeEnergyOfTranscriptionBubbleIntermediate_WW(state1, state2){
 	
 	// If single stranded template then there is no energy loss
-	if (all_sequences[sequenceID]["template"].substring(0,2) == "ss") return 0;
+	if (SEQS_JS.all_sequences[sequenceID]["template"].substring(0,2) == "ss") return 0;
 	
-	var leftmostTemplatePos = Math.min(state1["leftGBase"], state2["leftGBase"]) - PHYSICAL_PARAMETERS["bubbleLeft"]["val"] - 1;
+	var leftmostTemplatePos = Math.min(state1["leftGBase"], state2["leftGBase"]) - PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"] - 1;
 	var leftmostComplementPos = leftmostTemplatePos;
-	var rightmostTemplatePos = Math.max(state1["rightGBase"], state2["rightGBase"]) + PHYSICAL_PARAMETERS["bubbleRight"]["val"] + 1;
+	var rightmostTemplatePos = Math.max(state1["rightGBase"], state2["rightGBase"]) + PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"] + 1;
 	var rightmostComplementPos = rightmostTemplatePos;
 	
 	var hybridStrings = getHybridStringOfTranscriptionBubble_WW(leftmostTemplatePos, rightmostTemplatePos, leftmostComplementPos, rightmostComplementPos);
-	return getFreeEnergyOfTranscriptionBubbleHybridString_WW(hybridStrings[0], hybridStrings[1], all_sequences[sequenceID]["template"].substring(2,5));
+	return getFreeEnergyOfTranscriptionBubbleHybridString_WW(hybridStrings[0], hybridStrings[1], SEQS_JS.all_sequences[sequenceID]["template"].substring(2,5));
 	
 }
 
@@ -624,12 +664,12 @@ function getHybridStringOfTranscriptionBubble_WW(leftmostTemplatePos, rightmostT
 	var complementString = "";
 	for (var i = leftmostTemplatePos; i <= rightmostTemplatePos; i ++){
 		if (i < 1) continue;
-		if (i >= currentState["nbases"]) break;
+		if (i >= WW_JS.currentState["nbases"]) break;
 		templateString += templateSequence[i]["base"];
 	}
 	for (var i = leftmostComplementPos; i <= rightmostComplementPos; i ++){
 		if (i < 1) continue;
-		if (i >= currentState["nbases"]) break;
+		if (i >= WW_JS.currentState["nbases"]) break;
 		complementString += complementSequence[i]["base"];
 	}
 	
@@ -638,9 +678,9 @@ function getHybridStringOfTranscriptionBubble_WW(leftmostTemplatePos, rightmostT
 }
 
 
-function getFreeEnergyOfTranscriptionBubbleHybridString_WW(templateString, complementString, templateType, p = false){
+function getFreeEnergyOfTranscriptionBubbleHybridString_WW(templateString, complementString, templateType, p){
 	
-	
+	if (p === undefined) p = false;
 	var freeEnergy = 0;
 	for (var i = 0; i < templateString.length-1; i ++){
 		
@@ -653,23 +693,23 @@ function getFreeEnergyOfTranscriptionBubbleHybridString_WW(templateString, compl
 		var dictKey = thisComplementBase + nextComplementBase + thisTemplateBase + nextTemplateBase;
 		//var dictKey = thisMBase + nextMBase + thisGBase + nextGBase;
 		
-		if(BasePairParams[dictKey] == null) freeEnergy += -2; // TODO: need to find dGU base pairing parameters
-		else freeEnergy += BasePairParams[dictKey];
+		if(FE_JS.BasePairParams[dictKey] == null) freeEnergy += -2; // TODO: need to find dGU base pairing parameters
+		else freeEnergy += FE_JS.BasePairParams[dictKey];
 		
-		if (p) console.log("Free energy of", dictKey, "is", BasePairParams[dictKey]);
+		if (p) console.log("Free energy of", dictKey, "is", FE_JS.BasePairParams[dictKey]);
 		
 	}
 	
 	
-	return freeEnergy / RT;
+	return freeEnergy / FE_JS.RT;
 
 	
 }
 
 
-function getHybridFreeEnergy_WW(templateString, primerString, templateType, primerType, p = false){
+function getHybridFreeEnergy_WW(templateString, primerString, templateType, primerType, p){
 	
-	
+	if (p === undefined) p = false;
 	var freeEnergy = 0;
 
 
@@ -679,7 +719,7 @@ function getHybridFreeEnergy_WW(templateString, primerString, templateType, prim
 	var primerIncr = 0;
 	
 	// Find base pairing (there will be a sequential bipartite between all uppercase letters)
-	for (var hybridPos = 0; hybridPos < PHYSICAL_PARAMETERS["hybridLen"]["val"]-1; hybridPos ++){
+	for (var hybridPos = 0; hybridPos < PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]-1; hybridPos ++){
 		
 
 		var templateStringPos = hybridPos + templateIncr;
@@ -699,7 +739,7 @@ function getHybridFreeEnergy_WW(templateString, primerString, templateType, prim
 
 
 		// Are we at the end of the base pairing?
-		if (templateStringPos == templateString.length || primerStringPos == primerString.length) return freeEnergy / RT;
+		if (templateStringPos == templateString.length || primerStringPos == primerString.length) return freeEnergy / FE_JS.RT;
 		
 		
 		
@@ -717,7 +757,7 @@ function getHybridFreeEnergy_WW(templateString, primerString, templateType, prim
 
 
 		// Are we at the end of the base pairing?
-		if (templateStringPosNext == templateString.length || primerStringPosNext == primerString.length) return freeEnergy / RT;
+		if (templateStringPosNext == templateString.length || primerStringPosNext == primerString.length) return freeEnergy / FE_JS.RT;
 		
 		
 		//console.log("templateStringPos = " + templateStringPos + " templateStringPosNext " + templateStringPosNext + " primerStringPos = " + primerStringPos + " primerStringPosNext " + primerStringPosNext);
@@ -749,12 +789,12 @@ function getHybridFreeEnergy_WW(templateString, primerString, templateType, prim
 			}
 			var dictKey = thisMBase + nextMBase + thisGBase + nextGBase;
 			
-			//console.log("Looking for key", dictKey, "found value", BasePairParams[dictKey]);
-			if(BasePairParams[dictKey] == null) freeEnergy += -2; // TODO: need to find dGU base pairing parameters
-			else freeEnergy += BasePairParams[dictKey];
+			//console.log("Looking for key", dictKey, "found value", FE_JS.BasePairParams[dictKey]);
+			if(FE_JS.BasePairParams[dictKey] == null) freeEnergy += -2; // TODO: need to find dGU base pairing parameters
+			else freeEnergy += FE_JS.BasePairParams[dictKey];
 			
 			
-			//console.log("single bulge / no bulge. Adding free energy of " + BasePairParams[dictKey]);
+			//console.log("single bulge / no bulge. Adding free energy of " + FE_JS.BasePairParams[dictKey]);
 			
 			// If no bulge then move onto next position
 			if (noBulge) continue;
@@ -795,7 +835,7 @@ function getHybridFreeEnergy_WW(templateString, primerString, templateType, prim
 		
 	}
 	
-	return freeEnergy / RT;
+	return freeEnergy / FE_JS.RT;
 	
 	
 	
@@ -803,7 +843,7 @@ function getHybridFreeEnergy_WW(templateString, primerString, templateType, prim
 
 
 
-function getHybridString_WW(state, bPosG = [TbulgePos]){
+function getHybridString_WW(state){
 	
 
 
@@ -822,7 +862,7 @@ function getHybridString_WW(state, bPosG = [TbulgePos]){
 	var primerString = "";
 	var GPastBulge = 0;
 	var MPastBulge = 0;
-	var stopWhenAt = PHYSICAL_PARAMETERS["hybridLen"]["val"];
+	var stopWhenAt = PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"];
 	
 	
 	for(var hybridPos = 0; hybridPos < stopWhenAt; hybridPos++){
@@ -841,10 +881,10 @@ function getHybridString_WW(state, bPosG = [TbulgePos]){
 		// If we are interested in the rightmost base but NTP is bound then exit
 		if (Mbase == state["rightMBase"] && state["NTPbound"]) break;
 		
-		var GbaseGroup = getBaseInSequenceAtPosition_WW("g" + Gbase);
+		var GbaseGroup = WW_JS.getBaseInSequenceAtPosition_WW("g" + Gbase);
 		//TODO mut if ($("#g" + Gbase).attr("mut") != null) GbaseGroup = $("#g" + Gbase).attr("mut");
 		
-		var MbaseGroup = getBaseInSequenceAtPosition_WW("m" + Mbase)//; $('#m' + Mbase).attr("nt").substring(0,1);
+		var MbaseGroup = WW_JS.getBaseInSequenceAtPosition_WW("m" + Mbase)//; $('#m' + Mbase).attr("nt").substring(0,1);
 		//TODO mut if ($("#m" + Mbase).attr("mut") != null) MbaseGroup = $("#m" + Mbase).attr("mut");
 
 
@@ -852,16 +892,17 @@ function getHybridString_WW(state, bPosG = [TbulgePos]){
 
 		
 		// If the template base is bulged, then add it to the bulge string and keep incrementing GPastBulge until the base is not bulged
+		/*
 		var templateLoopSize = 0;
 		while (hybridPos - activeSiteShift + GPastBulge > 0 && bPosG.indexOf(hybridPos - activeSiteShift + GPastBulge) != -1) {
 			templateString = GbaseGroup.toLowerCase() + templateString;
 			GPastBulge++;
 			Gbase = state["rightGBase"] - (hybridPos + GPastBulge);
 			if (templateSequence[Gbase] == null) break;
-			GbaseGroup = getBaseInSequenceAtPosition_WW("g" + Gbase);
+			GbaseGroup = WW_JS.getBaseInSequenceAtPosition_WW("g" + Gbase);
 			templateLoopSize++;
 		}
-		
+		*/
 
 		// If the primer base is bulged, then add it to the bulge string and keep incrementing MPastBulge until the base is not bulged
 		var primerLoopSize = 0;
@@ -873,7 +914,7 @@ function getHybridString_WW(state, bPosG = [TbulgePos]){
 				MPastBulge++;
 				Mbase = state["rightMBase"] - (hybridPos + MPastBulge);
 				if (primerSequence[Mbase] == null) break;
-				MbaseGroup = getBaseInSequenceAtPosition_WW("m" + Mbase)
+				MbaseGroup = WW_JS.getBaseInSequenceAtPosition_WW("m" + Mbase)
 				primerLoopSize++;
 			}	
 			
@@ -881,10 +922,11 @@ function getHybridString_WW(state, bPosG = [TbulgePos]){
 		
 		
 		// If two bases are opposite each other in a loop then this cuts into the total base pairing count
+		/*
 		if(templateLoopSize > 0 && primerLoopSize > 0){
 			stopWhenAt -= Math.min(templateLoopSize, primerLoopSize);
 			if (hybridPos >= stopWhenAt) break;
-		}
+		}*/
 
 		
 		// If the bases are complementary, then add to their respective strings and move onto next position
@@ -901,7 +943,7 @@ function getHybridString_WW(state, bPosG = [TbulgePos]){
 		
 	}
 	
-	
+	/*
 	//console.log("-1?", bPosG, bPosM);
 	if (bPosG.indexOf(-1) != -1 && state["bulgePos"].indexOf(-1) != -1){
 		//console.log("-1 before", templateString, primerString);
@@ -910,7 +952,7 @@ function getHybridString_WW(state, bPosG = [TbulgePos]){
 		//console.log("-1 after", templateString, primerString);
 	}
 	
-	
+	*/
 	
 	
 	return [templateString, primerString];
@@ -1027,8 +1069,8 @@ function basesComplement_WW(templateBaseNum, primerBaseNum){
 
 	
 	if (templateSequence[templateBaseNum.substring(1)] == null | primerSequence[primerBaseNum.substring(1)] == null) return;
-	var templateBase = templateSequence[templateBaseNum.substring(1)]["mut"] == null ? getBaseInSequenceAtPosition_WW(templateBaseNum) : templateSequence[templateBaseNum.substring(1)]["mut"];
-	var primerBase = primerSequence[primerBaseNum.substring(1)]["mut"] == null ? getBaseInSequenceAtPosition_WW(primerBaseNum) : primerSequence[primerBaseNum.substring(1)]["mut"];
+	var templateBase = templateSequence[templateBaseNum.substring(1)]["mut"] == null ? WW_JS.getBaseInSequenceAtPosition_WW(templateBaseNum) : templateSequence[templateBaseNum.substring(1)]["mut"];
+	var primerBase = primerSequence[primerBaseNum.substring(1)]["mut"] == null ? WW_JS.getBaseInSequenceAtPosition_WW(primerBaseNum) : primerSequence[primerBaseNum.substring(1)]["mut"];
 
 
 
@@ -1051,46 +1093,38 @@ function getBaseComplement_WW(templateBaseType){
 
 
 
-function getBaseInSequenceAtPosition_WW(baseID){
-	
-	var seq = baseID[0];
-	var pos = parseFloat(baseID.substring(1));
-	if (seq == "g") return templateSequence[pos]["base"];
-	if (seq == "m") return primerSequence[pos]["base"];
-	if (seq == "o") return complementSequence[pos]["base"];
-
-	return null;
-
-}
 
 
+ FE_JS.getStateDiagramInfo_WW = function(resolve, msgID){
 
-function getStateDiagramInfo_WW(resolve = function() {}, msgID = null){
+
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
 
 	var toReturn = {};
 
-	toReturn["currentState"] = currentState;
+	toReturn["WW_JS.currentState"] = WW_JS.currentState;
 
 
 	// Calculate all terms for the state where the pol is pretranslocated unbound and activated in the appropriate position
-	var stateToCalculateFor = getCurrentStateCopy_WW();
+	var stateToCalculateFor = WW_JS.getcurrentStateCopy_WW();
 	stateToCalculateFor["activated"] = true;
 	stateToCalculateFor["NTPbound"] = false;
 
 	// Get the current state into pretranslocated
-	for (var i = currentState["mRNAPosInActiveSite"]; i < 0; i ++){
-		forward_WW(stateToCalculateFor, false);
+	for (var i = WW_JS.currentState["mRNAPosInActiveSite"]; i < 0; i ++){
+		OPS_JS.forward_WW(stateToCalculateFor, false);
 	}
-	for (var i = currentState["mRNAPosInActiveSite"]; i > 0; i --){
-		backwards_WW(stateToCalculateFor, false);
+	for (var i = WW_JS.currentState["mRNAPosInActiveSite"]; i > 0; i --){
+		OPS_JS.backwards_WW(stateToCalculateFor, false);
 	}
 
 	
 	stateToCalculateFor["activated"] = false; // Set to deactivated so we can backtrack
 
 
-	var slidePeaks = update_slidingPeakHeights_WW(stateToCalculateFor);
-	var slideTroughs = update_slidingTroughHeights_WW(stateToCalculateFor);
+	var slidePeaks = FE_JS.update_slidingPeakHeights_WW(stateToCalculateFor);
+	var slideTroughs = FE_JS.update_slidingTroughHeights_WW(stateToCalculateFor);
 
 	toReturn["k -2,-1"] = 1e6 * Math.exp(-(slidePeaks[1] - slideTroughs[1])); // From backtrack 2 to backtrack 1
 	toReturn["k -1,-2"] = 1e6 * Math.exp(-(slidePeaks[1] - slideTroughs[2])); // From backtrack 1 to backtrack 2
@@ -1108,7 +1142,7 @@ function getStateDiagramInfo_WW(resolve = function() {}, msgID = null){
 
 
 	// TODO: get this working without using update_bindingPeakHeights_WW
-	if (false && currentElongationModel == "twoSiteBrownian"){
+	if (false && FE_JS.currentElongationModel == "twoSiteBrownian"){
 
 		// Calculate bind and release rate into secondary site
 		var bindPeaks = update_bindingPeakHeights_WW(stateToCalculateFor);
@@ -1119,8 +1153,8 @@ function getStateDiagramInfo_WW(resolve = function() {}, msgID = null){
 
 		// Calculate translocation rates when NTP is bound in secondary site
 
-		slidePeaks = update_slidingPeakHeights_WW(stateToCalculateFor);
-		slideTroughs = update_slidingTroughHeights_WW(stateToCalculateFor);
+		slidePeaks = FE_JS.update_slidingPeakHeights_WW(stateToCalculateFor);
+		slideTroughs = FE_JS.update_slidingTroughHeights_WW(stateToCalculateFor);
 		toReturn["kN 0,+1"] = 1e6 * Math.exp(-(slidePeaks[3] - slideTroughs[3])); // Forward when bound (0 -> +1)
 		toReturn["kN +1,0"] = 1e6 * Math.exp(-(slidePeaks[3] - slideTroughs[4])); // Backwards when bound (+1 -> 0)
 
@@ -1137,30 +1171,34 @@ function getStateDiagramInfo_WW(resolve = function() {}, msgID = null){
 
 }
 
-function getTranslocationCanvasData_WW(resolve = function(result) { }, msgID = null){
+ FE_JS.getTranslocationCanvasData_WW = function(resolve, msgID){
+
+
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
 
 
 
 	// If NTP is not bound retrieve translocation rates from cache
 	var kBck = 0;
 	var kFwd = 0
-	var stateC = convertFullStateToCompactState(currentState);
-	if (!currentState["terminated"] && !stateC[2]){
-		var rateFwdAndBack = getTranslocationRates(stateC);
+	var stateC = STATE_JS.convertFullStateToCompactState(WW_JS.currentState);
+	if (!WW_JS.currentState["terminated"] && !stateC[2]){
+		var rateFwdAndBack = STATE_JS.getTranslocationRates(stateC);
 		kFwd = rateFwdAndBack[1];
 		kBck = rateFwdAndBack[0];
-		if (stateC[3] && stateC[1] == 0 && !ELONGATION_MODELS[currentElongationModel]["allowBacktrackWithoutInactivation"]) kBck = 0; // If state is active but we don't allow backtracking while active then set rate to zero
+		if (stateC[3] && stateC[1] == 0 && !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowBacktrackWithoutInactivation"]) kBck = 0; // If state is active but we don't allow backtracking while active then set rate to zero
 	}
 
 
 
 	var totalBulgeSize = 0;
-	for (var s = 0; s < currentState["bulgeSize"].length; s++) totalBulgeSize += currentState["bulgeSize"][s];
-	if (currentState["leftMBase"] >= currentState["mRNALength"] - totalBulgeSize) terminate_WW();
-	var fwdBtnLabel = !currentState["terminated"] && currentState["leftMBase"] >= currentState["mRNALength"] - totalBulgeSize - 1 ? "Terminate" : "Forward";
+	for (var s = 0; s < WW_JS.currentState["bulgeSize"].length; s++) totalBulgeSize += WW_JS.currentState["bulgeSize"][s];
+	if (WW_JS.currentState["leftMBase"] >= WW_JS.currentState["mRNALength"] - totalBulgeSize) OPS_JS.terminate_WW();
+	var fwdBtnLabel = !WW_JS.currentState["terminated"] && WW_JS.currentState["leftMBase"] >= WW_JS.currentState["mRNALength"] - totalBulgeSize - 1 ? "Terminate" : "Forward";
 
-	var bckBtnActive = currentState["leftGBase"] - PHYSICAL_PARAMETERS["bubbleLeft"]["val"] -1 > 2; // Do not allow backtracking if it will break the 3' bubble
-	var fwdBtnActive = currentState["leftGBase"] < currentState["nbases"]; // Do not going forward if beyond the end of the sequence
+	var bckBtnActive = WW_JS.currentState["leftGBase"] - PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"] -1 > 2; // Do not allow backtracking if it will break the 3' bubble
+	var fwdBtnActive = WW_JS.currentState["leftGBase"] < WW_JS.currentState["nbases"]; // Do not going forward if beyond the end of the sequence
 
 	var toReturn = {kBck: kBck, kFwd: kFwd, bckBtnActive: bckBtnActive, fwdBtnActive: fwdBtnActive, fwdBtnLabel: fwdBtnLabel};
 
@@ -1175,39 +1213,43 @@ function getTranslocationCanvasData_WW(resolve = function(result) { }, msgID = n
 
 
 // Get the rate of releasing bound NTP. This term may be NTP dependent, and is calculated by rearranging KD = krel / kbind
-function getReleaseRate(currentlyBoundBase){
-	var KdissID = ELONGATION_MODELS[currentElongationModel]["NTPbindingNParams"] == 2 ? "Kdiss" : "Kdiss_" + currentlyBoundBase + "TP";
-	var kRelease = PHYSICAL_PARAMETERS["RateBind"]["val"] * PHYSICAL_PARAMETERS[KdissID]["val"];
+ FE_JS.getReleaseRate = function(currentlyBoundBase){
+	var KdissID = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] == 2 ? "Kdiss" : "Kdiss_" + currentlyBoundBase + "TP";
+	var kRelease = PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"]["val"] * PARAMS_JS.PHYSICAL_PARAMETERS[KdissID]["val"];
 	return kRelease;
 }
 
 
 // Get the rate of catalysing bound NTP. This term may be NTP dependent
-function getCatalysisRate(currentlyBoundBase){
-	var kcatID = ELONGATION_MODELS[currentElongationModel]["NTPbindingNParams"] == 2 ? "kCat" : "kCat_" + currentlyBoundBase + "TP";
-	return PHYSICAL_PARAMETERS[kcatID]["val"];
+ FE_JS.getCatalysisRate = function(currentlyBoundBase){
+	var kcatID = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] == 2 ? "kCat" : "kCat_" + currentlyBoundBase + "TP";
+	return PARAMS_JS.PHYSICAL_PARAMETERS[kcatID]["val"];
 }
 
 
-function getNTPCanvasData_WW(resolve = function(result) { }, msgID = null){
+FE_JS.getNTPCanvasData_WW = function(resolve, msgID){
+
+
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
 
 	// If the polymerase is post-translocated or hypertranslocated, then return the base to be transcribed next and the pair before it
 	// Otherwise return the most recently transcribed base
 	var toReturn = null;
-	if (!currentState["terminated"]){
-		var deltaBase = currentState["mRNAPosInActiveSite"] <= 0 ? -1 : 0;
-		var baseToAdd = deltaBase == 0 ? currentState["NTPtoAdd"] : (primerSequence == null || currentState["mRNALength"] == null) ? "X" : primerSequence[currentState["mRNALength"]-1]["base"];
-		toReturn = {state: convertFullStateToCompactState(currentState), 
-						NTPbound: currentState["NTPbound"],
-						mRNAPosInActiveSite: currentState["mRNAPosInActiveSite"],
+	if (!WW_JS.currentState["terminated"]){
+		var deltaBase = WW_JS.currentState["mRNAPosInActiveSite"] <= 0 ? -1 : 0;
+		var baseToAdd = deltaBase == 0 ? WW_JS.currentState["NTPtoAdd"] : (primerSequence == null || WW_JS.currentState["mRNALength"] == null) ? "X" : primerSequence[WW_JS.currentState["mRNALength"]-1]["base"];
+		toReturn = {state: STATE_JS.convertFullStateToCompactState(WW_JS.currentState), 
+						NTPbound: WW_JS.currentState["NTPbound"],
+						mRNAPosInActiveSite: WW_JS.currentState["mRNAPosInActiveSite"],
 						baseToAdd: baseToAdd,
-						kBind: currentState["rateOfBindingNextBase"],
-						kRelease: getReleaseRate(baseToAdd),
-						kCat: getCatalysisRate(baseToAdd),
-						templateBaseBeingCopied: templateSequence[currentState["nextBaseToCopy"]+deltaBase] != null ? templateSequence[currentState["nextBaseToCopy"]+deltaBase]["base"] : null,
-						previousTemplateBase: templateSequence[currentState["nextBaseToCopy"]-1+deltaBase]["base"] != null ? templateSequence[currentState["nextBaseToCopy"]-1+deltaBase]["base"] : null,
-						previousNascentBase: primerSequence[currentState["mRNALength"]-1+deltaBase]["base"],
-						activated: currentState["activated"]
+						kBind: WW_JS.currentState["rateOfBindingNextBase"],
+						kRelease: FE_JS.getReleaseRate(baseToAdd),
+						kCat: FE_JS.getCatalysisRate(baseToAdd),
+						templateBaseBeingCopied: templateSequence[WW_JS.currentState["nextBaseToCopy"]+deltaBase] != null ? templateSequence[WW_JS.currentState["nextBaseToCopy"]+deltaBase]["base"] : null,
+						previousTemplateBase: templateSequence[WW_JS.currentState["nextBaseToCopy"]-1+deltaBase]["base"] != null ? templateSequence[WW_JS.currentState["nextBaseToCopy"]-1+deltaBase]["base"] : null,
+						previousNascentBase: primerSequence[WW_JS.currentState["mRNALength"]-1+deltaBase]["base"],
+						activated: WW_JS.currentState["activated"]
 		};
 	}
 
@@ -1222,9 +1264,13 @@ function getNTPCanvasData_WW(resolve = function(result) { }, msgID = null){
 
 
 
-function getDeactivationCanvasData_WW(resolve = function(result) { }, msgID = null){
+ FE_JS.getDeactivationCanvasData_WW = function(resolve, msgID){
 
-	var toReturn = {state: convertFullStateToCompactState(currentState), kU: PHYSICAL_PARAMETERS["kU"]["val"], kA: PHYSICAL_PARAMETERS["kA"]["val"]};
+
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
+
+	var toReturn = {state: STATE_JS.convertFullStateToCompactState(WW_JS.currentState), kU: PARAMS_JS.PHYSICAL_PARAMETERS["kU"]["val"], kA: PARAMS_JS.PHYSICAL_PARAMETERS["kA"]["val"]};
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
 	}else{
@@ -1235,12 +1281,13 @@ function getDeactivationCanvasData_WW(resolve = function(result) { }, msgID = nu
 
 
 // Gets the button label associated with slipping right
-function getSlipRightLabel_WW(state, S = 0){
+function getSlipRightLabel_WW(state, S){
 
+	if (S === undefined) S = 0;
 
 	var label = "";
-	var allowMultipleBulges = PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"];
-	var h = PHYSICAL_PARAMETERS["hybridLen"]["val"];
+	var allowMultipleBulges = PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"];
+	var h = PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"];
 
 	var fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 1, 1));
 	if (fuseWith == -1)	fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 2, 2));
@@ -1265,11 +1312,13 @@ function getSlipRightLabel_WW(state, S = 0){
 
 
 // Gets the button label associated with slipping left
-function getSlipLeftLabel_WW(state, S = 0){
+function getSlipLeftLabel_WW(state, S){
+
+	if (S === undefined) S = 0;
 
 	var label = "";
-	var allowMultipleBulges = PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"];
-	var h = PHYSICAL_PARAMETERS["hybridLen"]["val"];
+	var allowMultipleBulges = PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"];
+	var h = PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"];
 
 	var fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 1, 1));
 	if (fuseWith == -1)	fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 2, 2));
@@ -1295,18 +1344,22 @@ function getSlipLeftLabel_WW(state, S = 0){
 
 
 
-function getSlippageCanvasData_WW(S = 0, resolve = function(result) { }, msgID = null){
+ FE_JS.getSlippageCanvasData_WW = function(S, resolve, msgID){
 
 
-	var stateMiddle = getCurrentStateCopy_WW();
-	var stateLeft = getCurrentStateCopy_WW();
-	slip_left_WW(stateLeft, false, S);
-	var stateRight = getCurrentStateCopy_WW();
-	slip_right_WW(stateRight, false, S);
+	if (S === undefined) S = 0;
+	if (resolve === undefined) resolve = function() {};
+	if (msgID === undefined) msgID = null;
+
+	var stateMiddle = WW_JS.getcurrentStateCopy_WW();
+	var stateLeft = WW_JS.getcurrentStateCopy_WW();
+	OPS_JS.slip_left_WW(stateLeft, false, S);
+	var stateRight = WW_JS.getcurrentStateCopy_WW();
+	OPS_JS.slip_right_WW(stateRight, false, S);
 
 	// Return the 3 states, the 2 button names and the hybrid length
 	var toReturn = {stateMiddle: stateMiddle, stateLeft: stateLeft, stateRight:stateRight, 
-					hybridLen: PHYSICAL_PARAMETERS["hybridLen"]["val"], 
+					hybridLen: PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"], 
 					leftLabel: getSlipLeftLabel_WW(stateMiddle, S), rightLabel: getSlipRightLabel_WW(stateMiddle, S)};
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
@@ -1924,5 +1977,40 @@ function init_2x2_loop_parameters_WW() {
 
 
 
+if (RUNNING_FROM_COMMAND_LINE){
 
 
+	module.exports = {
+		ELONGATION_MODELS: FE_JS.ELONGATION_MODELS,
+		currentElongationModel: FE_JS.currentElongationModel,
+		TRANSLOCATION_MODELS: FE_JS.TRANSLOCATION_MODELS,
+		currentTranslocationModel: FE_JS.currentTranslocationModel,
+		initFreeEnergy_WW: FE_JS.initFreeEnergy_WW,
+		getElongationModels_WW: FE_JS.getElongationModels_WW,
+		userInputModel_WW: FE_JS.userInputModel_WW,
+		getNTPparametersAndSettings_WW: FE_JS.getNTPparametersAndSettings_WW,
+		calculateAllBarrierHeights_WW: FE_JS.calculateAllBarrierHeights_WW,
+		getSlidingHeights_WW: FE_JS.getSlidingHeights_WW,
+		update_slidingPeakHeights_WW: FE_JS.update_slidingPeakHeights_WW,
+		update_slidingTroughHeights_WW: FE_JS.update_slidingTroughHeights_WW,
+		getStateDiagramInfo_WW: FE_JS.getStateDiagramInfo_WW,
+		getTranslocationCanvasData_WW: FE_JS.getTranslocationCanvasData_WW,
+		getReleaseRate: FE_JS.getReleaseRate,
+		getCatalysisRate: FE_JS.getCatalysisRate,
+		getNTPCanvasData_WW: FE_JS.getNTPCanvasData_WW,
+		getDeactivationCanvasData_WW: FE_JS.getDeactivationCanvasData_WW,
+		getSlippageCanvasData_WW: FE_JS.getSlippageCanvasData_WW,
+		RT: FE_JS.RT,
+		BasePairParams: FE_JS.BasePairParams,
+		LoopParams1x1: FE_JS.LoopParams1x1,
+		LoopParams2x1: FE_JS.LoopParams2x1,
+		LoopParams2x2: FE_JS.LoopParams2x2,
+		SpecialHairpinParams: FE_JS.SpecialHairpinParams,
+		TerminalMismatchParams: FE_JS.TerminalMismatchParams,
+
+	}
+
+
+
+
+}
