@@ -191,7 +191,14 @@ ABC_JS.ABC_trials_WW = function(fitNums, resolve = function() {}, msgID = null){
 		ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"] = accepted;
 		if (accepted ) { // Do not cache if we are running from command line
 			ABC_JS.nAcceptedValues ++;
-			if (!RUNNING_FROM_COMMAND_LINE) ABC_JS.ABC_POSTERIOR_DISTRIBUTION.push(JSON.parse(JSON.stringify(ABC_JS.ABC_parameters_and_metrics_this_simulation)));
+			if (!RUNNING_FROM_COMMAND_LINE) {
+				ABC_JS.ABC_POSTERIOR_DISTRIBUTION.push(JSON.parse(JSON.stringify(ABC_JS.ABC_parameters_and_metrics_this_simulation)));
+
+
+				// Generate a force-velocity curve for this sampled point
+				//ABC_JS.generateForceVelocityCurve(ABC_JS.ABC_parameters_and_metrics_this_simulation);
+
+			}
 		}
 
 		if (!WW_JS.stopRunning_WW) ABC_JS.update_ABCoutput_WW(fitNums);
@@ -647,6 +654,19 @@ ABC_JS.savePosteriorToFiles_CommandLine = function(line){
 
 
 
+ABC_JS.getPosteriorDistribution_WW = function(resolve = function() { }, msgID = null){
+
+
+	var toReturn = {posterior: ABC_JS.ABC_POSTERIOR_DISTRIBUTION};
+	if (msgID != null){
+		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+	}else{
+		resolve(toReturn);
+	}
+
+}
+
+
 
 
 
@@ -676,7 +696,8 @@ if (RUNNING_FROM_COMMAND_LINE){
 	  	savePosteriorToFiles_CommandLine: ABC_JS.savePosteriorToFiles_CommandLine,
 	  	nAcceptedValues: ABC_JS.nAcceptedValues,
 	  	velocities_for_this_curve: ABC_JS.velocities_for_this_curve,
-	  	ABC_K_trials_for_observation_WW: ABC_JS.ABC_K_trials_for_observation_WW
+	  	ABC_K_trials_for_observation_WW: ABC_JS.ABC_K_trials_for_observation_WW,
+	  	getPosteriorDistribution_WW: ABC_JS.getPosteriorDistribution_WW
 	}
 
 }
