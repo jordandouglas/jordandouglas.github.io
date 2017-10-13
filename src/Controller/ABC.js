@@ -124,15 +124,12 @@ function validateAllForceVelocityInputs(){
 	var textareas = $(".forceVelocityInputData");
 	var valid = true;
 	for (var i = 0; i < textareas.length; i ++){
-
 		valid = valid && validateForceVelocityInput(textareas[i]);
-		if (!valid) break;
-
 	}
 
 
 	// If something is invalid then deactivate the start ABC button
-	if (!valid){
+	if (!valid || running_ABC){
 		$("#beginABC_btn").css("cursor", "auto");
 		$("#beginABC_btn").css("background-color", "#858280");
 		$("#beginABC_btn").attr("disabled", "disabled");
@@ -163,6 +160,7 @@ function validateForceVelocityInput(ele){
 	if (splitValues.length == 0) valid = false;
 	var thereExistsOnePairOfNumbers = false;
 	var forces = []; // Ensure no duplicate forces
+	var velocities = [];
 	for (var lineNum = 0; lineNum < splitValues.length; lineNum++){
 		var splitLine = splitValues[lineNum].split(",");
 		if (splitLine.length == 1 && splitLine[0].trim() == "") continue;
@@ -186,6 +184,7 @@ function validateForceVelocityInput(ele){
 		}
 
 		forces.push(force);
+		velocities.push(velocity);
 		thereExistsOnePairOfNumbers = true;
 
 	}
@@ -193,6 +192,13 @@ function validateForceVelocityInput(ele){
 
 	// If there are no observations and only empty lines then valid is set to false
 	if (!thereExistsOnePairOfNumbers) valid = false;
+
+
+	if (valid) {
+		var fitID = $(ele).attr("id").split("_")[1];
+		drawForceVelocityCurveCanvas(fitID, forces, velocities);
+	}
+
 
 	return valid;
 
@@ -307,6 +313,9 @@ function addNewForceVelocityCurve(){
 	// Switch to the other ABC table next time so we have 2 columns of curves
 	ABCtableToUse ++;
 	if (ABCtableToUse > 2) ABCtableToUse = 1;
+
+
+	drawForceVelocityCurveCanvas(fitID);
 
 
 	// Delete the new buttons and move them to the next cell
@@ -440,275 +449,183 @@ function getABCforceVelocityCurveTemplate(fitID){
 
 
 
-
-
-
-
 }
 
 
 
 
+function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
+	
+	
+	var canvas = $("#forceVelocityCurve_" + fitID)[0];
+	if (canvas == null) return;
+
+	ctx = canvas.getContext('2d');
+
+	var canvasSizeMultiplier = 1;
+	var axisGap = 45 * canvasSizeMultiplier;
+	var margin = 3 * canvasSizeMultiplier;
+
+
+	getPosteriorDistribution_controller(function(result){
+
+
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		if (forces != null && velocities != null){
+
+			var plotWidth = canvas.width - axisGap - margin;
+			var plotHeight = canvas.height - axisGap - margin;
+
+
+			var xmin = roundToSF(minimumFromList(forces), 2, "floor");
+			var xmax = roundToSF(maximumFromList(forces), 2, "ceil");
+			var ymin = 0;
+			var ymax = roundToSF(maximumFromList(velocities) * 1.3, 3, "ceil");
+
+			if (xmax == xmin){
+				xmax += 5;
+				xmin -= 5;
+			}
+
+			if (ymax == ymin){
+				ymax += 5;
+			}
+
+			var widthScale = plotWidth / (xmax - xmin);
+			var heightScale = plotHeight / (ymax - ymin);
 
 
 
-function addNewABCRuleButton() {
+			// Plot the posterior distribution of curves
+			var posterior = result["posterior"];
+			
 
-	numberABCrules++;
+			ctx.globalAlpha = 0.4;
+			ctx.strokeStyle = "#008CBA";
+			ctx.lineWidth = 2 * canvasSizeMultiplier;
+			for (var postNum = 0; postNum < posterior.length; postNum++){
 
-	if (numberABCrules == 2){
-		$("#beginABC_btn").css("cursor", "pointer");
-		$("#beginABC_btn").css("background-color", "#663399");
-		$("#beginABC_btn").attr("disabled", false);
-	}
+				console.log("postNum", postNum);
 
+				var posteriorVelocities = posterior[postNum]["velocity"]["vals"];
 
-	var html = `
-		<tr id="ABCrule` + numberABCrules + `" class="ABCrule" >
-
-
-			<td style="vertical-align:top; font-size:20px text-align:center;" colspan=2>
-				<input type=button onClick=addNewRule() value='+ New rule' title="Create a new rule to decide which parameter values will be added to the posterior distribution" class="operation" style="background-color:#663399">
-			</td>
-		</tr>
-
-	`;
+				ctx.beginPath();
+				var xPrime = widthScale * (forces[0] - xmin) + axisGap;
+				var yPrime = plotHeight + margin - heightScale * (posteriorVelocities[0] - ymin);
+				ctx.moveTo(xPrime, yPrime);
 
 
-	$("#ABCPanelTable").append(html);
+				for (var forceNum = 1; forceNum < forces.length; forceNum++ ){
+					var xPrime = widthScale * (forces[forceNum] - xmin) + axisGap;
+					var yPrime = plotHeight + margin - heightScale * (posteriorVelocities[forceNum] - ymin);
+
+					ctx.lineTo(xPrime, yPrime);
+				}
 
 
+				ctx.stroke();
 
-}
 
-function deleteABCrule(ele){
-
-	var ruleNumber = $(ele).attr("id").substring(10);
-	$("#ABCrule" + ruleNumber).remove();
-	$("#ABCruleSpacer" + ruleNumber).remove();
+			}
 
 
 
-}
+			// Add the force-velocity values to the plot
+			ctx.globalAlpha = 1;
+			ctx.strokeStyle = "black";
+			for (var obsNum = 0; obsNum < forces.length; obsNum++){
+					
+				var xPrime = widthScale * (forces[obsNum] - xmin) + axisGap;
+				var yPrime = plotHeight + margin - heightScale * (velocities[obsNum] - ymin);
 
 
-function addNewRuleTemplate(ruleNumber) {
+				// Add circle
+				ctx.beginPath();
+				ctx.fillStyle = "black"; // ;
+				ctx_ellipse(ctx, xPrime, yPrime, 3 * canvasSizeMultiplier, 3 * canvasSizeMultiplier, 0, 0, 2 * Math.PI);
+				ctx.fill();
 
 
-	// Get the row which contains this rule
-	var row = $("#ABCrule" + ruleNumber);
+			}
+				
+				
+			
 
 
-	var td = `
+			// X min and max
+			var axisPointMargin = 10 * canvasSizeMultiplier;
+			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+			ctx.textBaseline="top"; 
+			ctx.textAlign="left"; 
+			ctx.fillText(xmin, axisGap, canvas.height - axisGap + axisPointMargin);
+			ctx.textAlign="right"; 
+			ctx.fillText(xmax, canvas.width - margin, canvas.height - axisGap + axisPointMargin);
+		
+
+
+			// Y min and max
+			ctx.save()
+			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+			ctx.textBaseline="bottom"; 
+			ctx.textAlign="right"; 
+			ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
+			ctx.rotate(-Math.PI/2);
+			ctx.fillText(0, 0, 0);
+			ctx.restore();
+			
+			ctx.save()
+			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+			ctx.textAlign="right"; 
+			ctx.textBaseline="bottom"; 
+			ctx.translate(axisGap - axisPointMargin, margin);
+			ctx.rotate(-Math.PI/2);
+			ctx.fillText(ymax, 0, 0);
+			ctx.restore();
+			
+
+
+		}
+
+
+		// Axes
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = 2 * canvasSizeMultiplier;
+		ctx.beginPath();
+		ctx.moveTo(axisGap, margin);
+		ctx.lineTo(axisGap, canvas.height - axisGap);
+		ctx.lineTo(canvas.width - margin, canvas.height - axisGap);
+		ctx.stroke();
 
 		
 
-		<td style="vertical-align:middle; font-size:16px text-align:right;  min-width:90px">
-
-			<input id="deleteRule` + ruleNumber + `" type=button onClick=deleteABCrule(this) value='&times;' title="Delete this rule" class="operation" style="background-color:#663399; width:15px; font-size:12px; padding: 0 0">
-
-			<b style="font-family:Bookman;">Rule ` + ruleNumber + `:</b>
-
-		</td>
-
-
-
-
-		`;
-
-	
-	row.html(td);
-	row.before('<tr id="ABCruleSpacer' + ruleNumber + '" style="height:5px"></tr>');
-	row.css("background-color", "#b3b3b3");
-
-	var toCall = () => new Promise((resolve) => get_PHYSICAL_PARAMETERS_controller(resolve));
-	toCall().then((params) => {
-		addIfStatementABC(ruleNumber, params);
-		addThenStatementABC(ruleNumber);
-	});
-
-
-	
-}
-
-function addParametersToIfDropdownList(dropDown, params){
-
-
-	for (var paramID in params){
-		if (params[paramID]["hidden"] || params[paramID]["binary"]) continue;
-		dropDown.append(
-			`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`
-		);
-	};
-
-
-
-
-}
-
-
-function addIfStatementABC(ruleNumber, params, first = true){
-
-	
-	var ifOrAnd = first ? "IF" : "AND";
-
-
-	var ifHTML = `
-
-		<td style="vertical-align:middle; font-size:25px text-align:center; min-width:380px">
-
-			<b style="font-family:Bookman;">` + ifOrAnd + `</b> &nbsp;&nbsp;	
-				<select class="plot-dropdown ifParameterName` + ruleNumber + `" title="Select which parameter to tweak" style="vertical-align: middle; text-align:right; background-color:#663399; max-width:180px; font-size:15px">
-				</select>
-				&nbsp;&nbsp; 
-
-				<!--
-				<select class="plot-dropdown ifOperator` + ruleNumber + `" title="Select whether this parameter must be greater than or less than a number" style="vertical-align: middle; text-align:right; background-color:#663399">
-				  	<option value="greaterThan">&gt;</option>
-				  	<option value="greaterThanEqual">&ge;</option>
-				  	<option value="equalTo">=</option>
-				  	<option value="lessThanEqual">&le;</option>
-				  	<option value="lessThan">&lt;</option>
-				</select>
-
-
-				-->
-
-				<b style="font-family:Bookman; font-size:22px; vertical-align:middle">=</b> &nbsp;&nbsp;	
-
-				<input type="number" value="0" class="variable ifParameterVal` + ruleNumber + `" style="vertical-align: middle; text-align:left; width: 70px;  padding: 5px; font-size:14px; background-color:#663399">
-
-
-		</td>
-
-
-		<td style="vertical-align:middle; font-size:25px text-align:center; background-color:#ebe9e7">
-
-			<input id="newIf` + ruleNumber + `" type=button onClick=addNewIf(this) value='+ AND' title="Add another condition to this rule" class="operation" style="background-color:#663399; width:45px; font-size:12px">
-
-		</td>
-
-	`;
-
-
-
-
-	// Add a new if cell to the position before the first then cell
-	if($(".thenCell" + ruleNumber).length > 0){
-		var ele = $($(".thenCell" + ruleNumber)[0]);
-		ele.before(ifHTML);
-
-	}else{
-		var row = $("#ABCrule" + ruleNumber);
-		row.append(ifHTML);
-	}
-
-
-	// Add the parameters to the dropdown list
-	var dropDown = $($(".ifParameterName" + ruleNumber)[$(".ifParameterName" + ruleNumber).length-1]);
-	addParametersToIfDropdownList(dropDown, params);
-
-	dropDown.val("FAssist");
-
-
-	// Set the >, >= etc operator to default as =
-	//$($(".ifOperator" + ruleNumber)[$(".ifOperator" + ruleNumber).length-1]).val("equalTo");
-
-
-
-
-
-}
-
-
-function addNewIf(ele){
-
-	// Get the param list so we can add to a new cell
-	var toCall = () => new Promise((resolve) => get_PHYSICAL_PARAMETERS_controller(resolve));
-	toCall().then((params) => {
-
-		var ruleNumber = parseFloat($(ele).attr("id").substring(5)); // id is newIfi where i is the rule number
-		$(ele).parent().remove();
-		addIfStatementABC(ruleNumber, params, false);
+		// X label
+		ctx.fillStyle = "black";
+		ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+		ctx.textAlign="center"; 
+		ctx.textBaseline="top"; 
+		var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
+		var xlabYPos = canvas.height - axisGap / 2;
+		ctx.fillText("Force (pN)", xlabXPos, xlabYPos);
+		
+		// Y label
+		ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+		ctx.textAlign="center"; 
+		ctx.textBaseline="bottom"; 
+		ctx.save()
+		var ylabXPos = 2 * axisGap / 3;
+		var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
+		ctx.translate(ylabXPos, ylabYPos);
+		ctx.rotate(-Math.PI/2);
+		ctx.fillText("Velocity (bp/s)", 0 ,0);
+		ctx.restore();
 
 	});
 
-	
-
 }
 
 
 
-function addThenStatementABC(ruleNumber, first = true){
-
-	var row = $("#ABCrule" + ruleNumber);
-	var thenOrAnd = first ? "THEN" : "AND";
-
-	var thenHTML = `
-
-			
-
-			<td class="thenCell` + ruleNumber + `" style="vertical-align:middle; font-size:25px text-align:center; min-width:450px">
-
-				<b style="font-family:Bookman;">` + thenOrAnd + `</b> &nbsp;&nbsp;	
-				<select class="plot-dropdown thenParameterName` + ruleNumber + `" title="Select which metric to measure" style="vertical-align: middle; text-align:right; background-color:#663399; max-width:210px; font-size:15px">
-					<option value="velocity">Mean velocity (bp/s)</option>
-					<option value="catalyTime">Mean catalysis time (s)</option>
-					<option value="totalTime">Total copy time (s)</option>
-					<option value="nascentLen">Nascent strand length (nt)</option>
-				</select>
-
-				 &nbsp;&nbsp; 
-
-				 <select class="plot-dropdown thenOperator` + ruleNumber + `" title="Select whether this metric must be greater than or less than a number" style="vertical-align: middle; text-align:right; background-color:#663399">
-				  	<option value="greaterThan">&gt;</option>
-				  	<option value="greaterThanEqual">&ge;</option>
-				  	<option value="equalTo">=</option>
-				  	<option value="lessThanEqual">&le;</option>
-				  	<option value="lessThan">&lt;</option>
-				</select>
-				 &nbsp;&nbsp;	
-
-				 <input type="number" value="10" class="variable thenParameterVal` + ruleNumber + `" style="vertical-align: middle; text-align:left; width: 70px;  padding: 5px; font-size:14px; background-color:#663399">
-
-
-			</td>
-
-
-			<td style="vertical-align:middle; font-size:25px text-align:center; background-color:#ebe9e7">
-
-				<input id="newThen` + ruleNumber + `" type=button onClick=addNewThen(this) value='+ AND' title="Add another consequence to this rule" class="operation" style="background-color:#663399; width:45px; font-size:12px">
-
-			</td>
-		`;
-
-
-	row.append(thenHTML);
-
-}
-
-function addNewThen(ele){
-
-	var ruleNumber = parseFloat($(ele).attr("id").substring(7)); // id is newTheni where i is the rule number
-	$(ele).parent().remove();
-	addThenStatementABC(ruleNumber, false);
-
-}
-
-
-
-
-function addNewRule() {
-
-	// Delete the current add rule button and replace it with the rule template
-	addNewRuleTemplate(numberABCrules);
-
-	// Create a new add rule button on the next row
-	addNewABCRuleButton();
-
-
-
-}
 
 
 

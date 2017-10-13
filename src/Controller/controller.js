@@ -441,6 +441,7 @@ function renderHTML_hidden(){
 	drawPlots();
 	if (running_ABC) get_unrendered_ABCoutput_controller(); // Update the ABC output if ABC is running
 
+
 }
 
 
