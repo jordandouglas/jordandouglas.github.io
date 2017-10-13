@@ -435,7 +435,7 @@ function getABCforceVelocityCurveTemplate(fitID){
 
 
 					Mean RSS threshold:
-						<input type="number" id="ABC_RSS_` + fitID + `" value=3 title="Accept parameters into the posterior distribution and only if the mean residual sum of squares (RSS) for this dataset is less than this threshold"
+						<input type="number" id="ABC_RSS_` + fitID + `" value=3 title="Accept parameters into the posterior distribution only if the mean residual sum of squares (RSS) for this dataset is less than this threshold"
 							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA">
 
 			</td>
