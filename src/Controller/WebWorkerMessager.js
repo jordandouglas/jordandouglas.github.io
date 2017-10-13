@@ -2435,6 +2435,9 @@ function get_unrendered_ABCoutput_controller(){
 		$('#ABCoutput').scrollTop($('#ABCoutput')[0].scrollHeight);
 
 
+		validateAllForceVelocityInputs();
+
+
 	};
 
 
@@ -2477,6 +2480,28 @@ function get_ABCoutput_controller(resolve = function(lines) { }){
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((lines) => resolve(lines));
+
+	}
+
+
+}
+
+
+
+function getPosteriorDistribution_controller(resolve = function(posterior) { }){
+
+
+	if (WEB_WORKER == null) {
+		var toCall = () => new Promise((resolve) => ABC_JS.getPosteriorDistribution_WW(resolve));
+		toCall().then((posterior) => resolve(posterior));
+	}
+
+	else{
+		var res = stringifyFunction("ABC_JS.getPosteriorDistribution_WW", [null], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((posterior) => resolve(posterior));
 
 	}
 
