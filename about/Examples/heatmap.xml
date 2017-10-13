@@ -31,7 +31,4 @@
 		<RateBind val="250" distribution="Fixed" fixedDistnVal="250">Rate bind (μM⁻¹ s⁻¹)</RateBind>
 		<allowMultipleBulges val="false">allowMultipleBulges</allowMultipleBulges>
 	</parameters>
-	<ABC ntrials="100000" RSSthreshold="4">
-		<fit1 obs1="-10,10" obs2="-5,9.6" obs3="5,15.5" obs4="10,17.4" obs5="14,18.5" obs6="18,20.3" obs7="22,20.9" obs8="29,20.3" />
-	</ABC>
 </session>

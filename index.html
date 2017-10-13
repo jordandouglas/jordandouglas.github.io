@@ -2981,7 +2981,7 @@ function closeNav() {
 						<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
 							- Fit your parameters to experimental data using a Bayesian analysis
 							</span>
- 						<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#navigationPanelHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+ 						<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#setupABC_ABCSectionHelp"><img class="helpIcon" src="src/Images/help.png"></a>
 						
 						</span>
  
@@ -2992,47 +2992,42 @@ function closeNav() {
 
 						<br>
 
-						<table id="ABCPanelTable" style="position:relative; display:block;" cellspacing="0" cellpadding="10" >
+						<table style="width:100%; vertical-align:top">
 
-
-							<tr>
-								<td style="width:300px; text-align:center">
-
-									<div style="font-size:20px;">Force-velocity curve</div>
-
-
-										<textarea id="forceVelocityInputData" onChange="validateForceVelocityInput(this)" style="font-size:14px; padding: 5 10;  width: 300px; height: 300px; max-width:300px; max-height:500px; min-height:100px; min-width:300px"  
-										title="Input force-velocity data in the specified format" placeholder="Example.                                  5, 15.5                                 10, 17.4                                14, 18.5"></textarea>
-										<br>
-										<span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
-											Input your force (pN) and velocity (bp/s) observations. Separate force and velocity values with a comma and separate observations with a line break. 
-											Ensure there are no duplicate forces.
-										</span>
-
+							<tr style="vertical-align:top">
+								<td>
+									<table id="ABCPanelTable1" style="position:relative; display:block; width:50%; vertical-align:top" cellspacing="0" cellpadding="10" >
+									</table>
 								</td>
 
+								<td>
+									<table id="ABCPanelTable2" style="position:relative; display:block; width:50%; vertical-align:top" cellspacing="0" cellpadding="10" >
+									</table>
+								</td>
 							</tr>
 
-							
 						</table>
+
 
 
 						<br><br>
 
 						<div style="padding: 5 10">
 
-							Number of trials:
-							<input type="number" id="ABCntrials" value=1000 title="Number of simulations to run the ABC for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
+							Number of ABC iterations:
+							<input type="number" id="ABCntrials" value=1000 title="Number of iterations to run the ABC for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
 
 							&nbsp;&nbsp;&nbsp;&nbsp;
 
 
-							Mean RSS threshold:
-							<input type="number" id="ABC_RSS" value=5 title="Accept parameters into the posterior distribution if and only if the mean residual sum of squares (RSS) is less than this threshold"
-												 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
 
+
+							Number of tests per data point:
+							<input type="number" id="ABC_ntestsperdata" value=3 title="Number of tests to perform at each force/NTP setting. The median velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
 
 							&nbsp;&nbsp;&nbsp;&nbsp;
+
+
 
 
 							<input type=button id="beginABC_btn" onClick=beginABC() value='Begin ABC' title="Begin the approximate Bayesian computation with the current settings" class="operation" style="background-color:#663399"> 
@@ -3066,7 +3061,7 @@ function closeNav() {
 
 							<br><br>
 							<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
-								Parameters will be sampled from their prior distributions specified in the Parameters navigation menu
+								Parameters will be sampled from their prior distributions specified in the Parameters navigation menu.
 							</span>
 
 

@@ -59,6 +59,8 @@ function init(){
 		if (hashBits[1] == "ParamHelp") minimiseSection("#parametersBtn", true);
 		else if (hashBits[1] == "PlotHelp") minimiseSection("#displayingPlotsBtn", true); 
 		else if (hashBits[1] == "ModelHelp") minimiseSection("#kineticsBtn", true); 
+		else if (hashBits[1] == "ABCSectionHelp") minimiseSection("#ABCSectionBtn", true); 
+
 
 
 
@@ -1114,6 +1116,35 @@ function addCitations(){
 					</div>
 				</div>
 
+
+
+				<br><br><br><br>
+				<div class="main-block">
+					<div class="main-block-inner">
+						<div class="block-title"> 
+						
+						
+							<span id='ABCSectionBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
+							Approximate Bayesian Computation
+						</div> 
+						<div id="ABCSection"  style="display:none">
+
+
+							<br><br>
+								<div class="about-block">
+									<div class="about-block-inner">
+									<div id="setupABC_ABCSectionHelp" class="block-subtitle" >Setting up ABC</div> <br>
+
+										Approximate Bayesian Computation (ABC) is a simple statistical inference method, which SimPol uses to fit parameters to experimental data. 
+
+
+									</div>
+								</div>
+
+						</div>
+					</div>
+				</div>
+
 	
 				
 				<br><br><br><br>
@@ -1146,8 +1177,7 @@ function addCitations(){
 
 
 										In 2017 we ran 1000 simulations in SimPol on different operating systems using the latest versions of different web browsers, and using Node. The results are displayed below. 
-										Backtracking, hypertranslocation, inactivation, misincorporations	
-										and mRNA folding were disabled. The simulation was performed on the 4029nt E.coli ropB gene (accession number KP670789) in <b>hidden</b> mode. 
+										The simulation was performed on the 4029nt E.coli ropB gene (accession number KP670789). 
 										On all devices we tested this on Chrome was the fastest web browser.
 										Stripping away the user interface and running with Node.js gives performance comparable to Chrome. 
 

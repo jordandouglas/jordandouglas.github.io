@@ -73,7 +73,12 @@ function initNodeCompilation(){
 
 	// Parse the optional args
 	for(var i = 3; i < args.length; i ++){
+
 		var arg = args[i];
+
+		if (arg == ">" || arg == "&") break;
+
+
 		if (arg == "-o"){
 			outputFolder = args[i+1];
 			i++;
