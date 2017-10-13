@@ -506,7 +506,6 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 			ctx.lineWidth = 2 * canvasSizeMultiplier;
 			for (var postNum = 0; postNum < posterior.length; postNum++){
 
-				console.log("postNum", postNum);
 
 				var posteriorVelocities = posterior[postNum]["velocity"]["vals"];
 
