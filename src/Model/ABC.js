@@ -6,6 +6,7 @@ ABC_JS.ABC_FORCE_VELOCITIES = null;
 ABC_JS.ABC_POSTERIOR_DISTRIBUTION = [];
 ABC_JS.ABC_simulating = false;
 ABC_JS.ABC_parameters_and_metrics_this_simulation = {};
+ABC_JS.velocities_for_this_curve = [];
 ABC_JS.ABC_outputString = [];
 ABC_JS.ABC_outputString_unrendered = [];
 ABC_JS.n_ABC_trials_left = null;
@@ -28,6 +29,8 @@ ABC_JS.beginABC_WW = function(forcesVelocities, resolve = function() {}, msgID =
 		}
 		return;
 	}
+
+	//console.log("I have fits", forcesVelocities);
 
 
 	ABC_JS.ABC_simulating = true;
@@ -77,6 +80,13 @@ ABC_JS.beginABC_WW = function(forcesVelocities, resolve = function() {}, msgID =
 
 
 	ABC_JS.n_ABC_trials_left = ABC_JS.ABC_FORCE_VELOCITIES["ntrials"];
+
+
+
+	// Make sure that 4 NTPs are being used, not 1
+	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] = true;
+
+
 
 	ABC_JS.initialise_ABCoutput_WW(fitNums);
 
@@ -222,28 +232,28 @@ ABC_JS.ABC_trial_for_curve_WW = function(currentFitNum, accepted, fitNums, resol
 		// Calculate the mean RSS
 		var meanRSS = 0;
 		var fitID = fitNums[currentFitNum];
-		for (var observationNum = 0; observationNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID].length; observationNum++){
+		for (var observationNum = 0; observationNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"].length; observationNum++){
 			
-			var observedVelocity = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID][observationNum]["velocity"];
+			var observedVelocity = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"][observationNum]["velocity"];
 			var simulatedVelocity = ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][observationNum];
 
 			var residualSquared =  Math.pow(observedVelocity - simulatedVelocity, 2);
 
 
-			meanRSS += residualSquared / ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID].length;
+			meanRSS += residualSquared / ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"].length;
 
 		}
 
 		ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitID] = meanRSS;
-		ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitID] = meanRSS < ABC_JS.ABC_FORCE_VELOCITIES["RSSthreshold"];
-		accepted = accepted && meanRSS < ABC_JS.ABC_FORCE_VELOCITIES["RSSthreshold"];
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitID] = meanRSS < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["RSSthreshold"];
+		accepted = accepted && meanRSS < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["RSSthreshold"];
 
 		ABC_JS.ABC_trial_for_curve_WW(currentFitNum + 1, accepted, fitNums, resolve);
 	}
 
 
 	// Run a single simulation with this force / [NTP]
-	var toCall = () => new Promise((resolve) => ABC_JS.ABC_trial_for_observation_WW(fitNums[currentFitNum], 0, resolve));
+	var toCall = () => new Promise((resolve) => ABC_JS.ABC_K_trials_for_observation_WW(fitNums[currentFitNum], 0, resolve));
 	toCall().then((acc) => toDoAfterTrials(acc));
 
 
@@ -252,43 +262,95 @@ ABC_JS.ABC_trial_for_curve_WW = function(currentFitNum, accepted, fitNums, resol
 
 
 
-// Perform a simulation under the current force and/or [NTP]
-ABC_JS.ABC_trial_for_observation_WW = function(fitID, observationNum, resolve = function() {}){
+
+
+// Perform K simulations under the current force and/or [NTP]
+ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve = function() {}){
 
 
 	//console.log("Starting observation", observationNum, "for curve", fitID, ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID][observationNum]);
 
 
-	if (ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID][observationNum] == null || WW_JS.stopRunning_WW){
+	if (ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"][observationNum] == null || WW_JS.stopRunning_WW){
 		resolve();
 		return;
 	}
 
 
 	// Set the force / NTP to the required value
-	var force = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID][observationNum]["force"];
+	var force = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"][observationNum]["force"];
 	PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] = force;
+	PARAMS_JS.PHYSICAL_PARAMETERS["ATPconc"]["val"] = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["ATPconc"];
+	PARAMS_JS.PHYSICAL_PARAMETERS["CTPconc"]["val"] = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["CTPconc"];
+	PARAMS_JS.PHYSICAL_PARAMETERS["GTPconc"]["val"] = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["GTPconc"];
+	PARAMS_JS.PHYSICAL_PARAMETERS["UTPconc"]["val"] = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["UTPconc"];
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["obsVals"].push(force);
+
+
 
 	
 	var toDoAfterTrial = function(){
+
+		// Take the median velocity
+		ABC_JS.velocities_for_this_curve.sort();
+
+		if (ABC_JS.velocities_for_this_curve.length % 2 == 0){ // Even number, take mean of middle two
+			var middleLeft  = ABC_JS.velocities_for_this_curve[ABC_JS.velocities_for_this_curve.length/2-1];
+			var middleRight = ABC_JS.velocities_for_this_curve[ABC_JS.velocities_for_this_curve.length/2];
+			var median = (middleLeft + middleRight) / 2;
+			ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"].push(median);
+			//console.log("Taking median of", ABC_JS.velocities_for_this_curve, "got", median);
+		}
+
+		else{	// Odd number, take middle
+			var median = ABC_JS.velocities_for_this_curve[Math.floor(ABC_JS.velocities_for_this_curve.length/2)];
+			ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"].push(median);
+			//console.log("Taking median of", ABC_JS.velocities_for_this_curve, "got", median);
+		}
+
+
 		// Start the next trial with the next observed force / [NTP]
-		ABC_JS.ABC_trial_for_observation_WW(fitID, observationNum + 1, resolve);
+		ABC_JS.ABC_K_trials_for_observation_WW(fitID, observationNum + 1, resolve);
 
 
 	}
-
-
 	
 	// Perform a trial
-	var toCall = () => new Promise((resolve) => SIM_JS.startTrials_WW(1, resolve));
+	var toCall = () => new Promise((resolve) => ABC_JS.ABC_trial_for_observation_WW(ABC_JS.ABC_FORCE_VELOCITIES["testsPerData"], fitID, observationNum, resolve));
 	toCall().then(() => toDoAfterTrial());
-	
-
-
 
 
 }
+
+
+
+
+
+
+// Perform a single simulation under the current force and/or [NTP]
+ABC_JS.ABC_trial_for_observation_WW = function(K, fitID, observationNum, resolve = function() {}){
+
+
+	//console.log("Starting observation", observationNum, "for curve", fitID, ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID][observationNum]);
+
+	if (K == 0 || WW_JS.stopRunning_WW){
+		resolve();
+		return;
+	}
+
+
+	// Create an empty list. There will be K trials and therefore K velocities. The list will be filled up by plots.js. We will take the median of K
+	ABC_JS.velocities_for_this_curve = [];
+
+
+
+	// Perform K trials then resolve
+	var toCall = () => new Promise((resolve) => SIM_JS.startTrials_WW(K, resolve));
+	toCall().then(() => resolve());
+	
+
+}
+
 
 
 
@@ -320,7 +382,7 @@ ABC_JS.initialise_ABCoutput_WW = function(fitNums){
 
 		var ID = fitNums[fitNum];
 
-		for (var obsNum = 0; obsNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][ID].length; obsNum ++){
+		for (var obsNum = 0; obsNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][ID]["vals"].length; obsNum ++){
 
 
 			secondLine += (paddingString + "Force" + (obsNum+1)).slice(-paddingString.length);
@@ -388,7 +450,7 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 		
 
 		// Iterate through each force-velocity observation in this curve
-		for (var obsNum = 0; obsNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID].length; obsNum++){
+		for (var obsNum = 0; obsNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"].length; obsNum++){
 
 			var force = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["obsVals"][obsNum]) : "";
 			var velocity = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][obsNum]) : "";
@@ -612,7 +674,9 @@ if (RUNNING_FROM_COMMAND_LINE){
 	  	getListOfValuesFromPosterior_WW: ABC_JS.getListOfValuesFromPosterior_WW,
 	  	initialiseSaveFiles_CommandLine: ABC_JS.initialiseSaveFiles_CommandLine,
 	  	savePosteriorToFiles_CommandLine: ABC_JS.savePosteriorToFiles_CommandLine,
-	  	nAcceptedValues: ABC_JS.nAcceptedValues
+	  	nAcceptedValues: ABC_JS.nAcceptedValues,
+	  	velocities_for_this_curve: ABC_JS.velocities_for_this_curve,
+	  	ABC_K_trials_for_observation_WW: ABC_JS.ABC_K_trials_for_observation_WW
 	}
 
 }

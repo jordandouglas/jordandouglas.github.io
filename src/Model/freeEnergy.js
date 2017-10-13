@@ -1103,7 +1103,7 @@ function getBaseComplement_WW(templateBaseType){
 
 	var toReturn = {};
 
-	toReturn["WW_JS.currentState"] = WW_JS.currentState;
+	toReturn["currentState"] = WW_JS.currentState;
 
 
 	// Calculate all terms for the state where the pol is pretranslocated unbound and activated in the appropriate position

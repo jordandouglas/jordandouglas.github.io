@@ -2076,26 +2076,47 @@ function loadSession_controller(XMLData){
 		// Update the ABC panel
 		if (forceVelocity != null){
 
-			console.log("forceVelocity", forceVelocity);
-			$("#ABCntrials").val(forceVelocity["ntrials"]);
-			$("#ABC_RSS").val(forceVelocity["RSSthreshold"]);
 
-			var textAreaString = "";
+			// Reset the ABC DOM
+			initABCpanel();
+
+			console.log("forceVelocity", forceVelocity);
+			if(forceVelocity["ntrials"] != null) $("#ABCntrials").val(forceVelocity["ntrials"]);
+			if(forceVelocity["RSSthreshold"] != null) $("#ABC_ntestsperdata").val(forceVelocity["testsPerData"]);
+
+
 			for (var fitID in forceVelocity["fits"]){
 
-				for (var obsNum = 0; obsNum < forceVelocity["fits"][fitID].length; obsNum++){
-					var force = forceVelocity["fits"][fitID][obsNum]["force"];
-					var velocity = forceVelocity["fits"][fitID][obsNum]["velocity"];
+				// Add a new ABC curve
+				addNewForceVelocityCurve();
+				var textAreaString = "";
+
+
+				// Add the force-velocity observations to the DOM
+				for (var obsNum = 0; obsNum < forceVelocity["fits"][fitID]["vals"].length; obsNum++){
+					var force = forceVelocity["fits"][fitID]["vals"][obsNum]["force"];
+					var velocity = forceVelocity["fits"][fitID]["vals"][obsNum]["velocity"];
 					textAreaString += force + ", " + velocity;
 
-					if (obsNum < forceVelocity["fits"][fitID].length-1) textAreaString += "\n" 
+					if (obsNum < forceVelocity["fits"][fitID]["vals"].length-1) textAreaString += "\n" 
 
 				}
+
+
+				// Add the NTP concentrations and RSS threshold to the DOM
+				$("#ATPconc_" + fitID).val(forceVelocity["fits"][fitID]["ATPconc"]);
+				$("#CTPconc_" + fitID).val(forceVelocity["fits"][fitID]["CTPconc"]);
+				$("#GTPconc_" + fitID).val(forceVelocity["fits"][fitID]["GTPconc"]);
+				$("#UTPconc_" + fitID).val(forceVelocity["fits"][fitID]["UTPconc"]);
+				$("#ABC_RSS_" + fitID).val(forceVelocity["fits"][fitID]["RSSthreshold"]);
+
+
+				$("#forceVelocityInputData_" + fitID).val(textAreaString);
+
 			}
 
-			$("#forceVelocityInputData").val(textAreaString);
-			validateForceVelocityInput("#forceVelocityInputData");
-
+			validateAllForceVelocityInputs();
+			
 		}
 
 

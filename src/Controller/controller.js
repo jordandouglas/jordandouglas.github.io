@@ -962,15 +962,20 @@ function saveSession(){
 
 			var forcesVelocitiesForModel = getABCforceVelocityObject();
 			saveXML.writeAttributeString("ntrials", forcesVelocitiesForModel["ntrials"]);
-			saveXML.writeAttributeString("RSSthreshold", forcesVelocitiesForModel["RSSthreshold"]);
+			saveXML.writeAttributeString("testsPerData", forcesVelocitiesForModel["testsPerData"]);
 
 			for (var fitID in forcesVelocitiesForModel["fits"]){
 
 				saveXML.writeStartElement(fitID);
-					//saveXML.writeAttributeString("fitID", fitID);
 
-					for (var obsNum = 0; obsNum < forcesVelocitiesForModel["fits"][fitID].length; obsNum++){
-						var forceVelocity = forcesVelocitiesForModel["fits"][fitID][obsNum]["force"] + "," + forcesVelocitiesForModel["fits"][fitID][obsNum]["velocity"];
+
+					saveXML.writeAttributeString("RSSthreshold", forcesVelocitiesForModel["fits"][fitID]["RSSthreshold"]);
+					saveXML.writeAttributeString("ATPconc", forcesVelocitiesForModel["fits"][fitID]["ATPconc"]);
+					saveXML.writeAttributeString("CTPconc", forcesVelocitiesForModel["fits"][fitID]["CTPconc"]);
+					saveXML.writeAttributeString("GTPconc", forcesVelocitiesForModel["fits"][fitID]["GTPconc"]);
+					saveXML.writeAttributeString("UTPconc", forcesVelocitiesForModel["fits"][fitID]["UTPconc"]);
+					for (var obsNum = 0; obsNum < forcesVelocitiesForModel["fits"][fitID]["vals"].length; obsNum++){
+						var forceVelocity = forcesVelocitiesForModel["fits"][fitID]["vals"][obsNum]["force"] + "," + forcesVelocitiesForModel["fits"][fitID]["vals"][obsNum]["velocity"];
 						saveXML.writeAttributeString("obs" + (obsNum+1), forceVelocity);
 					}
 

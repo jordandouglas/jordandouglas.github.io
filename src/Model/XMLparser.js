@@ -140,7 +140,7 @@ function parseXML_ABCmain_WW(ABCnode){
 
 	XML_JS.ABC_FORCE_VELOCITIES = {};
 	XML_JS.ABC_FORCE_VELOCITIES["ntrials"] = ABCnode["ntrials"];
-	XML_JS.ABC_FORCE_VELOCITIES["RSSthreshold"] = ABCnode["RSSthreshold"];
+	XML_JS.ABC_FORCE_VELOCITIES["testsPerData"] = ABCnode["testsPerData"];
 	XML_JS.ABC_FORCE_VELOCITIES["fits"] = {};
 
 }
@@ -150,11 +150,18 @@ function parseXML_ABCmain_WW(ABCnode){
 function parseXML_ABCfit_WW(fitID, fitNode){
 
 	
-	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID] = [];
+	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID] = {vals: []};
+	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["RSSthreshold"] = fitNode["RSSthreshold"];
+	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["ATPconc"] = fitNode["ATPconc"];
+	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["CTPconc"] = fitNode["CTPconc"];
+	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["GTPconc"] = fitNode["GTPconc"];
+	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["UTPconc"] = fitNode["UTPconc"];
 	for (var obsID in fitNode){
+
+		if (obsID.substring(0, 3) != "obs") continue;
 		var force = parseFloat(fitNode[obsID].split(",")[0]);
 		var velocity = parseFloat(fitNode[obsID].split(",")[1]);
-		XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID].push({force: force, velocity: velocity});
+		XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"].push({force: force, velocity: velocity});
 	}
 
 

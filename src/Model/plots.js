@@ -369,6 +369,12 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 	PLOTS_JS.nMisincorporationSimulations ++;
 
 
+	// If running from command line then delete all the cached plot data (but not ABC settings) so that memory usage does not increase over time
+	if (RUNNING_FROM_COMMAND_LINE) {
+		PLOTS_JS.deletePlots_WW(true, true, true, true, false);
+	}
+
+
 	
 }
 
@@ -858,7 +864,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 	// If ABC is being run then add the appropriate metrics to this list
 	if (ABC_JS.ABC_simulating){
-		if (ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"] != null) ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"].push(velocity_thisTrial);
+		if (ABC_JS.velocities_for_this_curve != null) ABC_JS.velocities_for_this_curve.push(velocity_thisTrial);
 	}
 
 
@@ -1142,7 +1148,7 @@ PLOTS_JS.savePlotsToFiles_CommandLine = function(){
 
 	// Distance versus time
 	var tsv = "";
-	var DVT = PLOTS_JS.DISTANCE_VS_TIME[0];
+	var DVT = PLOTS_JS.DISTANCE_VS_TIME[PLOTS_JS.DISTANCE_VS_TIME.length-1];
 	tsv += "trial\t" + DVT["sim"] + "\n";
 	var xvalsSim = DVT["times"];
 	var yvalsSim = DVT["distances"];
@@ -1158,8 +1164,6 @@ PLOTS_JS.savePlotsToFiles_CommandLine = function(){
 	}
 	tsv += "\n\n";
 
-	PLOTS_JS.DISTANCE_VS_TIME = [];
-	PLOTS_JS.DISTANCE_VS_TIME_UNSENT = {};
 	WW_JS.writeLinesToFile(PLOTS_JS.dvt_fileName, tsv, true);
 
 
@@ -1175,8 +1179,6 @@ PLOTS_JS.savePlotsToFiles_CommandLine = function(){
 	}
 	tsv += "\n";
 
-	PLOTS_JS.DWELL_TIMES = [];
-	PLOTS_JS.DWELL_TIMES_UNSENT = {};
 	WW_JS.writeLinesToFile(PLOTS_JS.dwelltime_fileName, tsv, true);
 
 

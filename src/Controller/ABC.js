@@ -9,10 +9,15 @@ function initABCpanel(){
 	$("#beginABC_btn").css("background-color", "#858280");
 	$("#beginABC_btn").attr("disabled", "disabled");
 
-	numberABCrules = 0;
-	//addNewABCRuleButton();
+	$("#ABCPanelTable1").html("");
+	$("#ABCPanelTable2").html("");
+
+	nFits = 0;
+	ABCtableToUse = 1; // Alternate between the left (1) and right (2) tables
+	addNewCurveButtons();
 
 }
+
 
 
 
@@ -39,12 +44,9 @@ function beginABC(){
 	changeSpeed_controller();
 
 
-
-
 	beginABC_controller(forcesVelocitiesForModel);
 
 	
-
 	// Update the DOM so that we can see that ABC is running
 	$("#beginABC_btn").val("Stop ABC");
 	$("#beginABC_btn").attr("onclick", "stop_controller()");
@@ -76,24 +78,39 @@ function getABCforceVelocityObject(){
 
 
 
-	var forceVelocityValues = $("#forceVelocityInputData").val();
-	var forcesVelocitiesForModel = {ntrials: $("#ABCntrials").val(), RSSthreshold: $("#ABC_RSS").val()};
-	forcesVelocitiesForModel["fits"] = {fit1: []};
+	var curveTables = $(".ABCcurveRow");
+	var forcesVelocitiesForModel = {ntrials: $("#ABCntrials").val(), testsPerData: $("#ABC_ntestsperdata").val()};
+	forcesVelocitiesForModel["fits"] = {};
+	for (var fitNum = 0; fitNum <= curveTables.length; fitNum++){
+
+		var table = $(curveTables[fitNum]);
+		var fitID = table.attr("fitID");
+
+		if ($("#forceVelocityInputData_" + fitID).length == 0) continue;
+
+		var forceVelocityValues = $("#forceVelocityInputData_" + fitID).val();
+		forcesVelocitiesForModel["fits"][fitID] = {vals: []};
+		forcesVelocitiesForModel["fits"][fitID]["RSSthreshold"] = parseFloat($("#ABC_RSS_" + fitID).val());
+		forcesVelocitiesForModel["fits"][fitID]["ATPconc"] = parseFloat($("#ATPconc_" + fitID).val());
+		forcesVelocitiesForModel["fits"][fitID]["CTPconc"] = parseFloat($("#CTPconc_" + fitID).val());
+		forcesVelocitiesForModel["fits"][fitID]["GTPconc"] = parseFloat($("#GTPconc_" + fitID).val());
+		forcesVelocitiesForModel["fits"][fitID]["UTPconc"] = parseFloat($("#UTPconc_" + fitID).val());
 
 
-	var splitValues = forceVelocityValues.split("\n");
-	if (splitValues.length == 0) valid = false;
+		var splitValues = forceVelocityValues.split("\n");
+		if (splitValues.length == 0) valid = false;
 
-	for (var lineNum = 0; lineNum < splitValues.length; lineNum++){
-		var splitLine = splitValues[lineNum].split(",");
+		for (var lineNum = 0; lineNum < splitValues.length; lineNum++){
+			var splitLine = splitValues[lineNum].split(",");
 
-		if (splitLine.length == 1 && splitLine[0].trim() == "") continue;
+			if (splitLine.length == 1 && splitLine[0].trim() == "") continue;
 
-		var force = parseFloat(splitLine[0]);
-		var velocity = parseFloat(splitLine[1]);
+			var force = parseFloat(splitLine[0]);
+			var velocity = parseFloat(splitLine[1]);
 
-		forcesVelocitiesForModel["fits"]["fit1"].push({force: force, velocity: velocity});
+			forcesVelocitiesForModel["fits"][fitID]["vals"].push({force: force, velocity: velocity});
 
+		}
 	}
 
 	return forcesVelocitiesForModel;
@@ -102,7 +119,35 @@ function getABCforceVelocityObject(){
 
 
 
+function validateAllForceVelocityInputs(){
 
+	var textareas = $(".forceVelocityInputData");
+	var valid = true;
+	for (var i = 0; i < textareas.length; i ++){
+
+		valid = valid && validateForceVelocityInput(textareas[i]);
+		if (!valid) break;
+
+	}
+
+
+	// If something is invalid then deactivate the start ABC button
+	if (!valid){
+		$("#beginABC_btn").css("cursor", "auto");
+		$("#beginABC_btn").css("background-color", "#858280");
+		$("#beginABC_btn").attr("disabled", "disabled");
+	}
+
+
+	// Else activate it
+	else{
+		$("#beginABC_btn").css("cursor", "pointer");
+		$("#beginABC_btn").css("background-color", "#663399");
+		$("#beginABC_btn").attr("disabled", false);
+	}
+
+
+}
 
 
 // Ensure that the force velocity input textarea is valid
@@ -149,21 +194,7 @@ function validateForceVelocityInput(ele){
 	// If there are no observations and only empty lines then valid is set to false
 	if (!thereExistsOnePairOfNumbers) valid = false;
 
-
-	// If something is invalid then deactivate the start ABC button
-	if (!valid){
-		$("#beginABC_btn").css("cursor", "auto");
-		$("#beginABC_btn").css("background-color", "#858280");
-		$("#beginABC_btn").attr("disabled", "disabled");
-	}
-
-
-	// Else activate it
-	else{
-		$("#beginABC_btn").css("cursor", "pointer");
-		$("#beginABC_btn").css("background-color", "#663399");
-		$("#beginABC_btn").attr("disabled", false);
-	}
+	return valid;
 
 }
 
@@ -216,6 +247,207 @@ function updateABCpanel(){
 
 
 }
+
+
+function addNewCurveButtons(){
+
+	var btns = getNewCurveButtonsTemplate();
+	$("#ABCPanelTable" + ABCtableToUse).append(btns);
+
+
+	// Disable the Begin ABC button
+	$("#beginABC_btn").css("cursor", "auto");
+	$("#beginABC_btn").css("background-color", "#858280");
+	$("#beginABC_btn").attr("disabled", "disabled");
+
+
+}
+
+
+
+function getNewCurveButtonsTemplate(){
+
+
+	return `
+
+		<tr id="newABCcurve" >
+
+			<td style="vertical-align:middle; font-size:20px; text-align:center;" colspan=3>
+				<br><br>
+				<div style="padding: 5 5; background-color:#b3b3b3; font-size:16px; width:300px; margin:auto">
+
+					Add experimental data <br><br>
+					<input type=button onClick=addNewForceVelocityCurve() value='+ Force-velocity curve' title="Add force-velocity experimental data" class="operation" style="background-color:#008CBA; width: 200px"> 
+					<!--<br><br>
+					<input type=button onClick=addNewForceVelocityCurve() value='+ [NTP]-velocity curve' title="Add [NTP]-velocity experimental data" class="operation" style="background-color:#008CBA; width: 200px">-->
+					<br><br>
+				</div>
+
+			</td>
+		</tr>
+	
+	`;
+
+}
+
+
+
+function addNewForceVelocityCurve(){
+
+
+
+
+	nFits++;
+	var fitID = "fit" + nFits;
+
+	$("#ABCPanelTable" + ABCtableToUse).append(getABCforceVelocityCurveTemplate(fitID));
+
+
+
+	// Switch to the other ABC table next time so we have 2 columns of curves
+	ABCtableToUse ++;
+	if (ABCtableToUse > 2) ABCtableToUse = 1;
+
+
+	// Delete the new buttons and move them to the next cell
+	$("#newABCcurve").remove(); 
+	addNewCurveButtons();
+
+}
+
+
+
+
+
+function getABCforceVelocityCurveTemplate(fitID){
+
+
+
+	return `
+		<tr fitID="` + fitID + `" class="ABCcurveRow"> <!-- style="background-color:#b3b3b3;"> -->
+
+
+			<td class="` + fitID + `" style="width:200px; text-align:center; vertical-align:top">
+				<br><br>
+				<div style="font-size:18px;">Force-velocity experimental data</div>
+
+
+					<textarea class="forceVelocityInputData" id="forceVelocityInputData_` + fitID + `" onChange="validateAllForceVelocityInputs()" style="font-size:14px; padding: 5 10;  width: 200px; height: 200px; max-width:200px; max-height:500px; min-height:100px; min-width:200px"  
+					title="Input force-velocity data in the specified format" placeholder="Example.                                  5, 15.5                                 10, 17.4                                14, 18.5"></textarea>
+					<br><br>
+					<span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
+						Input your force (pN) and velocity (bp/s) observations. Separate force and velocity values with a comma and separate observations with a line break. 
+						Ensure there are no duplicate forces.
+					</span>
+
+			</td>
+
+
+			<td class="` + fitID + `" style="width:300px; text-align:center; vertical-align:top">
+
+				<div style="font-size:20px;">Force-velocity curve</div>
+
+
+					<canvas id="forceVelocityCurve_` + fitID + `" width=300 height=300> </canvas>
+
+			</td>
+
+
+
+			<td class="` + fitID + `" style="text-align:center; vertical-align:top">
+
+					<br><br>
+					<table style="width:250px; margin:auto">
+
+
+						<tr>
+							<td colspan=2 style="text-align:center;">
+
+								<div style="font-size:18px;">NTP Concentrations</div><br>
+							</td>
+
+						</tr>
+
+						<tr>
+							<td style="text-align:right;">
+					 			[ATP] = 
+					 		</td>
+
+					 		<td>
+					 			<input class="variable" value=1000   type="number" id="ATPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
+							</td>
+					 	</tr>
+
+
+					 	<tr>
+							<td style="text-align:right;">
+					 			[CTP] = 
+					 		</td>
+
+					 		<td>
+					 			<input class="variable" value=1000  type="number"  id="CTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+							</td>
+					 	</tr>
+
+
+
+
+					 	<tr>
+							<td style="text-align:right;">
+					 			[GTP] = 
+					 		</td>
+
+					 		<td>
+								<input class="variable" value=1000 type="number"  id="GTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+							</td>
+					 	</tr>
+
+
+
+					 	<tr>
+							<td style="text-align:right;">
+					 			[UTP] = 
+					 		</td>
+
+					 		<td>
+								<input class="variable" value=1000 type="number" id="UTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
+							</td>
+					 	</tr>
+
+
+
+					 </table>
+
+					 <br>
+					 <div style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
+						Enter the NTP concentrations for this experiment.
+					</div> <br> <br>
+
+
+
+					Mean RSS threshold:
+						<input type="number" id="ABC_RSS_` + fitID + `" value=3 title="Accept parameters into the posterior distribution and only if the mean residual sum of squares (RSS) for this dataset is less than this threshold"
+							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA">
+
+			</td>
+
+		</tr>
+
+
+
+	`;
+
+
+
+
+
+
+
+
+}
+
+
+
 
 
 
