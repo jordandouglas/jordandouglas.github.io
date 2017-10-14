@@ -973,9 +973,9 @@ function setVariableToRecord_WW(plotCanvasID, varName, axis, resolve = function 
 		PLOTS_JS.DISTANCE_VS_TIME_UNSENT[PLOTS_JS.DISTANCE_VS_TIME.length] = {sim: PLOTS_JS.DISTANCE_VS_TIME.length, times: [0], distances: [rightHybridBase] };
 		PLOTS_JS.totalDisplacement = 0;
 		PLOTS_JS.totaltimeElapsed = 0;
-		PLOTS_JS.velocity = 0;
+		if (!RUNNING_FROM_COMMAND_LINE)  PLOTS_JS.velocity = 0;
 		PLOTS_JS.timeElapsed = 0;
-		PLOTS_JS.timesSpentOnEachTemplate = [0];
+		if (!RUNNING_FROM_COMMAND_LINE) PLOTS_JS.timesSpentOnEachTemplate = [0];
 		PLOTS_JS.distancesTravelledOnEachTemplate = [0];
 	
 	}
