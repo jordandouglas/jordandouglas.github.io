@@ -1224,6 +1224,7 @@ function clearCache(){
 			if (ABC_cleardata) {
 				$("#ABCoutput").html("");
 				$("#downloadABC").hide(50);
+				$("#uploadABC").show(50);
 				$("#ABCacceptancePercentage_span").hide(50);
 				$("#ABCacceptance_span").hide(50);
 				$("#ABC_showRejectedParameters_span").hide(50);

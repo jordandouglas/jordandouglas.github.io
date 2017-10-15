@@ -63,6 +63,8 @@ function beginABC(){
 	$("#ABC_RSS").attr("disabled", "disabled");
 
 	$("#downloadABC").show(50);
+	$("#uploadABC").hide(50);
+	
 	$("#ABCacceptancePercentage_span").show(50);
 	$("#ABC_showRejectedParameters_span").show(50);
 	$("#ABCacceptancePercentage_val").html("0");
@@ -129,7 +131,7 @@ function validateAllForceVelocityInputs(){
 
 
 	// If something is invalid then deactivate the start ABC button
-	if (!valid || running_ABC){
+	if (!valid && !running_ABC){
 		$("#beginABC_btn").css("cursor", "auto");
 		$("#beginABC_btn").css("background-color", "#858280");
 		$("#beginABC_btn").attr("disabled", "disabled");
@@ -625,6 +627,51 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 
 
+
+function uploadABC(){
+	
+	return;
+	
+	document.getElementById('uploadABCinput').addEventListener('change', loadSessionFile, false);
+	$("#uploadABCinput").click();
+
+	function loadSessionFile(evt) {
+
+		var files = evt.target.files; // FileList object
+			
+		// Loop through the FileList
+		for (var i = 0, fileName; fileName = files[i]; i++) {
+
+			
+			var reader = new FileReader();
+
+			// Closure to capture the file information.
+			reader.onload = (function(theFile) {
+				return function(e) {
+
+					if (e == null || e.target.result == "") return;
+					var TSVstring = e.target.result.replace(/(\r\n|\n|\r)/gm,"");
+
+					console.log("Sending TSVstring", TSVstring);
+
+					//loadSession_controller(XMLstring);
+
+				};
+			})(fileName);
+
+			reader.readAsText(fileName);
+			
+			
+
+		}
+
+		$("#uploadABCinput").val("");
+
+	}
+
+
+	
+}
 
 
 
