@@ -2,7 +2,7 @@
 <session datetime="2017_10_15-19.28.8" N="1000" speed="hidden">
 	<sequence seqID="E.coli lacZ gene GU063697" TemplateType="dsDNA" PrimerType="ssRNA" seq="TACTTTCGACCGATGTCCTTCCGGTCTGCGCTTAATAAAAACTACCGCAATTGAGCCGCAAAGTAGACACCACGTTGCCCGCGACCCAGCCAATGCCGGTCCTGTCAGCAAACGGCAGACTTAAACTGGACTCGCGTAAAAATGCGCGGCCTCTTTTGGCGGAGCGCCACTACCACGACGCGACCTCACTGCCGTCAATAGACCTTCTAGTCCTATACACCGCCTACTCGCCGTAAAAGGCACTGCAGAGCAACGACGTATTTGGCTGATGTGTTTAGTCGCTAAAGGTACAACGGTGAGCGAAATTACTACTAAAGTCGGCGCGACATGACCTCCGACTTCAAGTCTACACGCCGCTCAACGCACTGATGGATGCCCATTGTCAAAGAAATACCGTCCCACTTTGCGTCCAGCGGTCGCCGTGGCGCGGAAAGCCGCCACTTTAATAGCTACTCGCACCACCAATACGGCTAGCGCAGTGTGATGCAGACTTGCAGCTTTTGGGCTTTGACACCTC" />
 	<plots>
-		<plot2 name="parameterHeatmap" hidden="false" plotFunction="plot_parameter_heatmap" sitesToRecord="" customParamX="Kdiss" customParamY="NTPconc" metricZ="velocity" xRange="automaticX" yRange="automaticY" zRange="0,20" zColouring="rainbow" plotFromPosterior="false" />
+		<plot2 name="parameterHeatmap" hidden="false" plotFunction="plot_parameter_heatmap" sitesToRecord="" customParamX="Kdiss" customParamY="NTPconc" metricZ="velocity" xRange="automaticX" yRange="automaticY" zRange="automaticZ" zColouring="rainbow" plotFromPosterior="false" />
 	</plots>
 	<elongation-model id="simpleBrownian">
 		<allowBacktracking val="false" />
