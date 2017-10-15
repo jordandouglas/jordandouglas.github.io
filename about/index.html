@@ -987,7 +987,7 @@ function addCitations(){
 								
 										Gibb's free energy, $\Delta G$, describes how energetically favourable a state is. A system will spend more time in states which have low free energies. 
 										Suppose we have an ensemble of molecules and each molecule can exist in a number of states. When the system has reached equilibrium, the probability of the system being in state $s$ 
-										at any given time is estimatedby a Boltzmann distribution:
+										at any given time is estimated by a Boltzmann distribution:
 										
 										<h3>
 										$$ p(s) \propto e^{-\frac{\Delta G_s}{k_B T}}, $$
@@ -1059,19 +1059,27 @@ function addCitations(){
 									A critical assumption is that these reactions are Poisson processes; the amount of time until a reaction occurs is independent of all other reactions and independent of how long you have already waited. 
 									If you were to keep flipping a coin until it landed on tails, the probability of getting tails on the next flip is not affected by how many times you have already flipped, and is not affected by how 
 									many times your friend has flipped their coin. Similarly, whether you have been waiting 1 second or 1 hour for a chemical reaction to occur, the probability of it happening right now is always the same.
-									The amount of time until reaction X &rarr; Y occurs follows the exponential distribution with rate k. <br><br>
+									The amount of time until reaction $s \rightarrow s^\prime$ occurs follows the exponential distribution with rate $k$. <br><br>
 									
 									<img id="exponential" src="../src/TutorialImages/exponential.png" style="height:350px; padding: 10 30;" align=left></img>
 									
 									If there are multiple chemical reactions competing with each other, then the reaction with the shortest reaction time will be selected. For example, suppose that you have a test-tube containing 
-									a single molecule of compound A, which can spontaneously undergo two reactions: A &rarr; B or A &rarr; C, with rate constants 0.001s<sup>-1</sup> and 0.002s<sup>-1</sup> respectively. 
+									a single molecule of compound $A$, which can spontaneously undergo two reactions: $A \rightarrow B$ or $A \rightarrow C$, with rate constants 0.001s<sup>-1</sup> and 0.002s<sup>-1</sup> respectively. 
 									The test-tube will flash a different colour of light for each reaction. <br><br>
 									
 									
 									The amount of time until either one of these reactions occurs is random, and exponentially distributed (see figures on the left). If we were to simulate this on a computer, we could 
 									generate two exponential random variables, one from each distribution. For example, suppose we sampled time 769.14s for Exponential(0.001) and 339.81s for Exponential(0.002). Then 
-									reaction A &rarr; C would be selected because it has the shorter reaction time. The probability of sampling reaction A &rarr; B is 0.001 / (0.001 + 0.002) = 1/3, and the probability 
-									of sampling reaction A &rarr; C is 0.002 / (0.001 + 0.002) = 2/3. <br><br>
+									reaction $A \rightarrow C$ would be selected because it has the shorter reaction time. The probability of sampling reaction $A \rightarrow B$ is 
+									
+									
+									<h3>
+										$$ p(A \rightarrow B) = \frac{0.001}{0.001 + 0.002} = 0.333,$$
+									</h3>
+										
+									
+									
+									and the probability of sampling reaction $A \rightarrow C$ is $0.667$. 
 									
 									Reactions are sampled this way when you press the Simulate <img src="../src/Images/dice.png"  style="vertical-align:middle; width:25px; height:25px;"></img> button.
 									
