@@ -69,6 +69,8 @@ function init(){
 		
 		// Add back the anchor to ensure that the page is in the right place. If the webpage takes too long to load and
 		// the anchored section is hidden, then the page won't anchor
+		var hash = window.location.hash;
+		window.location.hash = hash;
 		window.location.hash = window.location.hash;
 
 
