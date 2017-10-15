@@ -2750,6 +2750,7 @@ function plot_parameter_heatmap(plotNumCustom = null){
 			if(PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["metricZ"] == "probability"){
 				xValsGood = xvals;
 				yValsGood = yvals;
+				zLab = "";
 			}
 
 			else{
