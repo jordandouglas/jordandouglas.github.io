@@ -60,6 +60,7 @@ function init(){
 		else if (hashBits[1] == "PlotHelp") minimiseSection("#displayingPlotsBtn", true); 
 		else if (hashBits[1] == "ModelHelp") minimiseSection("#kineticsBtn", true); 
 		else if (hashBits[1] == "ABCSectionHelp") minimiseSection("#ABCSectionBtn", true); 
+		else minimiseSection("#referencesSectionBtn", true); 
 
 
 
@@ -138,6 +139,16 @@ $(window).on('hashchange', function() {
 function addCitations(){
 
 
+
+	var DOIspanTemplate = `
+		<span style="background-color:#ebe9e7; padding: 2 4" title="DOItitle">
+			<b style="color:#008cba">DOI:</b>
+			<a style="text-decoration:none; color:#008cba" href = "DOIhref">view</a>
+		</span>
+		
+	
+	`;
+
 	var citationTags = $("cite");
 	for (var i = 0; i < citationTags.length; i ++){
 	
@@ -155,8 +166,15 @@ function addCitations(){
 			
 				numReferences++;
 				referenceNumbers[val] = numReferences;
-				var referenceString = BIBLIOGRAPHY[val];
-				$("#references").append('<div class="ref" id="' + val + '">' + numReferences + ') ' +  referenceString + '</div><br>');
+				var referenceString = BIBLIOGRAPHY[val]["name"];
+				var DOIhtml = "";
+				if (BIBLIOGRAPHY[val]["DOI"] != null && BIBLIOGRAPHY[val]["DOI"] != "XXXX"){
+					DOIhtml = DOIspanTemplate.replace("DOIhref", "https://doi.org/" + BIBLIOGRAPHY[val]["DOI"]);
+					DOIhtml = DOIhtml.replace("DOItitle", "https://doi.org/" + BIBLIOGRAPHY[val]["DOI"]);
+					
+				}
+				
+				$("#references").append('<div class="ref" id="' + val + '">' + numReferences + ') ' +  referenceString + DOIhtml + '</div><br>');
 
 			}
 			
@@ -1099,7 +1117,7 @@ function addCitations(){
 									<div id="polymerisation_ModelHelp" class="block-subtitle" > Kinetics of nucleotide incorporation</div> <br>
 
 										
-										Adding the next base onto the $3^\prime$ end of the nascent strand is a four step process <cite val="erie1992single"></cite>.
+										Adding the next base onto the $3^\prime$ end of the nascent strand is a four step process<cite val="erie1992single"></cite>.
 										
 										
 										
