@@ -585,7 +585,7 @@ function addCitations(){
 											<img src="../src/TutorialImages/distanceVsTime.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
 											
 											<br><br><br><br><br>
-											This graph shows the progress made by the polymerase over time and is often used in single-molecule publications. The blue line represents the current simulation
+											This graph shows the progress made by the polymerase over time. The blue line represents the current simulation
 											and the grey lines represent previous simulations. The x- and y-axis ranges can be set manually in the settings <img src="../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
 											
 
@@ -666,7 +666,31 @@ function addCitations(){
 										<div id="parameterHeatmap_PlotHelp"  class="block-subtitle"> Parameter heatmap </div> <br>
 
 										
+										
+										<img src="../src/TutorialImages/parameterHeatmap1.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
+										<img src="../src/TutorialImages/parameterHeatmap2.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
+										
+										The parameter heatmap is an extension to the parameter plot, and allows one parameter on each axis. Points can be coloured to represent a third variable, such as velocity. The first image
+										shows the relationship between two parameters - $k_{cat}$ and $\Delta G^\dagger_{slide}$ -  required to achieve a velocity of 20-30bp/s. As the rate of catalysis increases, 
+										the free energy barrier of translocation must increase with it in order to achieve the same velocity. 
+										
+											
+										<span style="padding: 5 5; background-color:#ebe9e7"> 
+											<b style="color:#008cba">Elongation heatmap session:</b> 
+											<a style="text-decoration:none" href="../?elongationHeatmap.xml">Open</a> | 
+											<a style="text-decoration:none" href="Examples/elongationHeatmap.xml">View XML</a>
+										</span>		<br><br>
+										
+										
+										The second images shows the relationship between $K_D$ and [NTP]. As the dissociation constant of NTP binding increases, the concentration of NTP needed to achieve the same
+										velocity increases. 
 									
+									
+										<span style="padding: 5 5; background-color:#ebe9e7"> 
+											<b style="color:#008cba">Incorporation heatmap session:</b> 
+											<a style="text-decoration:none" href="../?incorporationHeatmap.xml">Open</a> | 
+											<a style="text-decoration:none" href="Examples/incorporationHeatmap.xml">View XML</a>
+										</span>		
 										
 
 									</div>
