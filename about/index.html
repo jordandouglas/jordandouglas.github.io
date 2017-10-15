@@ -53,7 +53,7 @@ function init(){
 	// If the url is linked to a section then make sure the section is not collapsed
 	// Sections given id in this format: RateBind_ParamHelp. This means the linkable section is in the Parameters section
 	if(window.location.hash) {
-		console.log(window.location.hash);
+		//console.log(window.location.hash);
 
 		var hashBits = window.location.hash.split("_");
 		if (hashBits[1] == "ParamHelp") minimiseSection("#parametersBtn", true);
@@ -65,6 +65,11 @@ function init(){
 
 
 		$(window.location.hash).addClass("helpSelected");
+		
+		
+		// Add back the anchor to ensure that the page is in the right place. If the webpage takes too long to load and
+		// the anchored section is hidden, then the page won't anchor
+		window.location.hash = window.location.hash;
 
 
 	}
@@ -277,12 +282,15 @@ function addCitations(){
 									
 									<br><br><br>
 									
-									The first thing you will want to do is choose your sequence.
-									There are several example sequences preloaded into the system, or you may upload your own nucleic acid sequence from the &#9776; Parameters side-navigation menu. The models in SimPol are designed for and have only been tested on
-									DNA-dependent RNA-polymerases. However, you do have the option to play around with other polymerase classes (eg. DNA polymerases or RNA-dependent RNA-polymerases) but be warned that the science behind them is not yet clear.
-									Your choice of sequence type will determine the NTP or dNTP concentrations, and which of the three sets of thermodynamic parameters are used 
-									- Turner's RNA/RNA parameters<cite val="xia1998thermodynamic"></cite>, Sugimoto's DNA/RNA parameters<cite val="wu2002temperature"></cite>, or SantaLucia's DNA/DNA parameters<cite val="santalucia1998unified"></cite>. <br><br>
+									The first thing you may want to do is choose your nucleic acid sequence. Open up the &#9776; Parameters side-navigation menu, where you can enter your own sequence or 
+									use one of the example sequences.
+									
+									
+									
+									SimPol is designed primarily for transcription with DNA-dependent RNA-polymerases. Your choice of template-type (DNA or RNA) and nascent-type (DNA or RNA) will dictate
+									which thermodynamic parameters are used - Turner's RNA/RNA parameters<cite val="xia1998thermodynamic"></cite>, Sugimoto's DNA/RNA parameters<cite val="wu2002temperature"></cite>, or SantaLucia's DNA/DNA parameters<cite val="santalucia1998unified"></cite>. <br><br>
 
+								
 
 
 							
@@ -968,12 +976,237 @@ function addCitations(){
 						<div id="kinetics"  style="display:none">
 
 
+						
+						
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+									<div class="block-subtitle" > Equilibrium and the Boltzmann distribution </div> <br>
+								
+										Gibb's free energy, $\Delta G$, describes how energetically favourable a state is. A system will spend more time in states which have low free energies. 
+										Suppose we have an ensemble of molecules and each molecule can exist in a number of states. When the system has reached equilibrium, the probability of the system being in state $s$ 
+										at any given time is estimatedby a Boltzmann distribution:
+										
+										<h3>
+										$$ p(s) \propto e^{-\frac{\Delta G_s}{k_B T}}, $$
+										</h3>
+										
+										where $\Delta G_s$ is the free energy of state $s$, $k_B$ is Boltzmann's constant ($1.3806 \times 10^{-23}$J.K$^{-1}$), and $T$ is the temperature in Kelvins. 
+										We express free energy in units of $k_B T$, by taking the experimental energy (in units of J) and dividing by $k_B T$.   <br><br>
+										
+										For example, suppose a single molecule is in equilibrium between two states, $A$ and $B$. These two states have free energies of $\Delta G_A = -3k_B T$ and $\Delta G_B = -6k_B T$,
+										respectively. We would therefore expect the molecule to be in state $A$ 4.7% of the time:
+										
+										
+										<h3>
+											$$p(A) = \frac{e^{-\frac{\Delta G_A}{k_B T}}}{e^{-\frac{\Delta G_A}{k_B T}} + e^{-\frac{\Delta G_B}{k_B T}}} = 
+													 \frac{e^{-\frac{-3k_B T}{k_B T}}}{e^{-\frac{-3k_B T}{k_B T}} + e^{-\frac{-6k_B T}{k_B T}}}  = 
+													 \frac{e^{3}}{e^{3} + e^{6}}  =
+													 0.047.$$
+										</h3>
+										
+			
+										
+										<br>
+										The Boltzmann distribution assumes that the system has been fluctuating for long enough to achieve equilibrium. However transcription occurs on too fast a timescale for equilibrium to be reached. 
+										Therefore we must model transcription as a kinetic process instead of an equilibrium one.
+							
+								</div>
+							</div>
+							
+							
+							
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+									<div class="block-subtitle" > Kinetics and the Arrhenius equation </div> <br>
+								
+										
+										Chemical kinetics is the study of rates of chemical processes, and how long reactions take to occur. A chemical reaction can be described with a rate constant $k$ (units s$^{-1}$). 
+										$k$ describes the speed of the reaction - a higher rate means that more reactions are expected to occur in a given time. 
+										
+										
+										
+										Energy is required for a system to transit from one state to another. 
+										This free energy barrier is denoted by $\Delta G^\dagger$. The larger the barrier, the more time needed for random thermal collisions to provide
+										enough energy to allow the system to make the transition. Suppose a system is currently in state $s$, with free energy $\Delta G_s$. 
+										The Arrhenius equation can estimate the rate constant of transiting from state $s$ to state $s^\prime$:
+										
+										
+										<h3>
+											$$ k_{s \rightarrow s^\prime} = A e^{-\frac{\Delta G^\dagger - \Delta G_s}{k_B T}}, $$
+										</h3>
+										
+										where $A$ is a pre-exponential constant (units s$^{-1}$), and $\Delta G^\dagger$ is the absolute height of the free energy barrier between states $s$ and $s^\prime$. 
+										Once the rate constants of all possible reactions are known, we can start the single-molecule simulation. 
+										
+										
+										
+							
+								</div>
+							</div>
+							
+							
+							
+							
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+									<div class="block-subtitle"> Poisson processes: how a reaction is randomly sampled </div> <br>
+								
+									A critical assumption is that these reactions are Poisson processes; the amount of time until a reaction occurs is independent of all other reactions and independent of how long you have already waited. 
+									If you were to keep flipping a coin until it landed on tails, the probability of getting tails on the next flip is not affected by how many times you have already flipped, and is not affected by how 
+									many times your friend has flipped their coin. Similarly, whether you have been waiting 1 second or 1 hour for a chemical reaction to occur, the probability of it happening right now is always the same.
+									The amount of time until reaction X &rarr; Y occurs follows the exponential distribution with rate k. <br><br>
+									
+									<img id="exponential" src="../src/TutorialImages/exponential.png" style="height:350px; padding: 10 30;" align=left></img>
+									
+									If there are multiple chemical reactions competing with each other, then the reaction with the shortest reaction time will be selected. For example, suppose that you have a test-tube containing 
+									a single molecule of compound A, which can spontaneously undergo two reactions: A &rarr; B or A &rarr; C, with rate constants 0.001s<sup>-1</sup> and 0.002s<sup>-1</sup> respectively. 
+									The test-tube will flash a different colour of light for each reaction. <br><br>
+									
+									
+									The amount of time until either one of these reactions occurs is random, and exponentially distributed (see figures on the left). If we were to simulate this on a computer, we could 
+									generate two exponential random variables, one from each distribution. For example, suppose we sampled time 769.14s for Exponential(0.001) and 339.81s for Exponential(0.002). Then 
+									reaction A &rarr; C would be selected because it has the shorter reaction time. The probability of sampling reaction A &rarr; B is 0.001 / (0.001 + 0.002) = 1/3, and the probability 
+									of sampling reaction A &rarr; C is 0.002 / (0.001 + 0.002) = 2/3. <br><br>
+									
+									Reactions are sampled this way when you press the Simulate <img src="../src/Images/dice.png"  style="vertical-align:middle; width:25px; height:25px;"></img> button.
+									
+									
+									
+									
+							
+								</div>
+							</div>
+				
+
+						
+						
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+									<div id="polymerisation_ModelHelp" class="block-subtitle" > Kinetics of nucleotide incorporation</div> <br>
+
+										
+										Adding the next base onto the $3^\prime$ end of the nascent strand is a four step process <cite val="erie1992single"></cite>.
+										
+										
+										
+										<div style="padding: 10 10; background-color:#ebe9e7" >
+
+											<b>1. NTP binding.</b> A free nucleoside triphosphate (NTP) molecule enters the active site and binds to the active site and its complementary base in the template. 
+
+										</div><br>
+										
+										
+										
+										<div style="padding: 10 10; background-color:#ebe9e7" >
+
+											<b>2. Triphosphate cleavage.</b> The triphosphate in the bound NTP is cleaved, resulting in a nucleoside monophosphate (NMP) and a pyrophosphate, both still bound within the active site.
+
+										</div><br>
+										
+										
+										<div style="padding: 10 10; background-color:#ebe9e7" >
+
+											<b>3. Phosphodisester bond formation.</b> The $5^\prime$ phosphate of the NMP is linked to the $3^\prime$-OH of the nascent strand.
+
+										</div><br>
+										
+		
+
+										<div style="padding: 10 10; background-color:#ebe9e7" >
+
+											<b>4. Pyrophosphate release.</b> The bound pyrophosphate is released back into solution.
+
+										</div><br><br>	
+										
+										Any of these steps could be reversible.
+										As there is not sufficent information to model all four steps, nucleotide incorporation has been compressed into to a two step process.
+										
+										
+										<div style="padding: 10 10; background-color:#ebe9e7" >
+
+											<b>1. NTP binding.</b> Step 1 from above. This is a reversible process. NTP binding/release is dictated by two parameters: $k_{bind}$ and $K_D$. 
+		
+
+										</div><br>
+										
+										
+										
+										<div style="padding: 10 10; background-color:#ebe9e7" >
+
+											<b>2. Catalysis.</b> Steps 2-4 from above. This is assumed to be an irreversible process. The rate of incorporating a bound nucleotide is $k_{cat}$.
+
+										</div><br><br>	
+										
+										
+										 
+											$k_{bind}$ (units s$^{-1}$&mu;M$^{-1}$) is the second order rate constant of binding NTP.
+											The rate of binding an NTP is equal to $k_{bind}$[NTP]. Once the NTP has been bound, it may be released back into solution.
+											The rate of release is calculated from the dissociation constant $K_D$ (units &mu;M). Rate of NTP release is equal to $K_D \times k_{bind}$. 
+											<br><br>
+											
+											
+											When the NTP concentration is high, or if $k_{bind}$ is large, then NTP binding becomes so rapid that equilibrium is achieved. Under these conditions,
+											the kinetics of NTP binding are no longer relevant. $K_D$ simply describes the proportion of time that NTP is bound. For example, if $K_D = 35$&mu;M and [NTP] = 1000&mu;M,
+											then the proportion of time that NTP is bound (while in this two-state system) is around 97%:
+											
+										
+											
+											<h3>
+												$$ p(\text{bound}) = \frac{ \frac{\text{[NTP]}}{K_D} }{\frac{\text{[NTP]}}{K_D} + 1} = \frac{ \frac{1000\text{&mu;M}}{35 \text{&mu;M}} }{\frac{1000\text{&mu;M}}{35 \text{&mu;M}} + 1} = 0.966, $$
+											</h3>
+										
+											<br>
+											$k_{cat}$ is the rate of incorporating a bound NTP. This reaction is one of the rate limiting steps of transcription. <br><br>
+											
+											
+											<span style="line-height:28px;">
+												In SimPol, by default there is one concentration for all four NTPs, and one dissociation constant and rate of catalysis for all four bases. You can set the concentrations
+												and incorporation parameters for each of the four nucleotides independently using 
+												
+												<span style="background-color:#ebe9e7; padding: 7 6;">
+													<span style="font-size:15px; vertical-align:middle; font-family:Arial" >1 concentration</span>
+													<label class="switch">
+														 <input type="checkbox"> </input>
+														 <span class="slider round notboolean"></span>
+													</label> 
+													<span style="font-size:15px; vertical-align:middle; font-family:Arial" >4 concentrations</span>
+												</span>
+												
+												&nbsp;and 
+												
+												<span style="background-color:#ebe9e7; padding: 7 6;">
+													<span style="font-size:15px; vertical-align:middle; font-family:Arial" >2 params</span>	
+													<label class="switch">
+														 <input type="checkbox"> </input>
+														 <span class="slider round notboolean"></span>
+													</label> 
+													<span style="font-size:15px; vertical-align:middle; font-family:Arial" >8 params</span>	
+												</span>											
+												
+												&nbsp;respectively. While $K_D$ and $k_{cat}$ can be set independently for each nucleotide, $k_{bind}$ is held constant for all four.
+											
+											</span>
+											
+											
+								
+							
+								</div>
+							</div>
+
+
+						
+						
+						
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
 									<div id="translocation_ModelHelp" class="block-subtitle" > Calculating translocation rates</div> <br>
 								
-										Basepairs may need to be broken in order for the polymerase to translocate forwards (right) or backwards (left) from its current position. For example, consider the image below. 
+										Basepairs may need to be broken in order for the polymerase to translocate forwards (right) or backwards (left) from its current position. For example, consider the state below. 
 
 										<br><br>
 
@@ -1066,49 +1299,8 @@ function addCitations(){
 
 
 
-							<br><br>
-							<div class="about-block">
-								<div class="about-block-inner">
-									<div id="polymerisation_ModelHelp" class="block-subtitle" > Calculating polymerisation and misincorporation rates</div> <br>
+						
 
-								
-							
-								</div>
-							</div>
-
-
-
-							<br><br>
-							<div class="about-block">
-								<div class="about-block-inner">
-									<div class="block-subtitle"> Poisson processes: how a reaction is randomly sampled </div> <br>
-								
-									A critical assumption is that these reactions are Poisson processes; the amount of time until a reaction occurs is independent of all other reactions and independent of how long you have already waited. 
-									If you were to keep flipping a coin until it landed on tails, the probability of getting tails on the next flip is not affected by how many times you have already flipped, and is not affected by how 
-									many times your friend has flipped their coin. Similarly, whether you have been waiting 1 second or 1 hour for a chemical reaction to occur, the probability of it happening right now is always the same.
-									The amount of time until reaction X &rarr; Y occurs follows the exponential distribution with rate k. <br><br>
-									
-									<img id="exponential" src="../src/TutorialImages/exponential.png" style="height:350px; padding: 10 30;" align=left></img>
-									
-									If there are multiple chemical reactions competing with each other, then the reaction with the shortest reaction time will be selected. For example, suppose that you have a test-tube containing 
-									a single molecule of compound A, which can spontaneously undergo two reactions: A &rarr; B or A &rarr; C, with rate constants 0.001s<sup>-1</sup> and 0.002s<sup>-1</sup> respectively. 
-									The test-tube will flash a different colour of light for each reaction. <br><br>
-									
-									
-									The amount of time until either one of these reactions occurs is random, and exponentially distributed (see figures on the left). If we were to simulate this on a computer, we could 
-									generate two exponential random variables, one from each distribution. For example, suppose we sampled time 769.14s for Exponential(0.001) and 339.81s for Exponential(0.002). Then 
-									reaction A &rarr; C would be selected because it has the shorter reaction time. The probability of sampling reaction A &rarr; B is 0.001 / (0.001 + 0.002) = 1/3, and the probability 
-									of sampling reaction A &rarr; C is 0.002 / (0.001 + 0.002) = 2/3. <br><br>
-									
-									Reactions are sampled this way when you press the Simulate <img src="../src/Images/dice.png"  style="vertical-align:middle; width:25px; height:25px;"></img> button.
-									
-									
-									
-									<br><br><br><br>
-							
-								</div>
-							</div>
-				
 
 
 					
@@ -1207,7 +1399,7 @@ function addCitations(){
 													Program
 												</td>
 												<td>
-													Total time (min)
+													Time (min)
 												</td>
 											</tr>
 											
@@ -1401,7 +1593,7 @@ function addCitations(){
 											<tr style="background-color:#ebe9e7; font-size:18px">
 												
 												<td rowspan=2  style="background-color:#a4c639">
-													Android 7
+													Android 7.0
 												</td>
 												
 												<td rowspan=2>
@@ -1953,10 +2145,10 @@ function addCitations(){
 			<div class="block-title"> 
 			
 			
-				<span id='referencesSectionBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="false" onClick="minimiseSection(this)">&minus;</span>
+				<span id='referencesSectionBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
 				References 
 				</div> 
-					<div id="referencesSection">
+					<div id="referencesSection" style="display:none">
 
 						<br><br>
 						<div class="about-block" style="width:90%; margin:auto">
