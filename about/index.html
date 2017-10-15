@@ -1004,8 +1004,8 @@ function addCitations(){
 									<div class="block-subtitle" > Equilibrium and the Boltzmann distribution </div> <br>
 								
 										Gibb's free energy, $\Delta G$, describes how energetically favourable a state is. A system will spend more time in states which have low free energies. 
-										Suppose we have an ensemble of molecules and each molecule can exist in a number of states. When the system has reached equilibrium, the probability of the system being in state $s$ 
-										at any given time is estimated by a Boltzmann distribution:
+										Suppose we have a single molecule which can exist in a number of chemical states. When the system has reached equilibrium, the probability of the molecule being in state $s$ 
+										at any given time is estimated with a Boltzmann distribution:
 										
 										<h3>
 										$$ p(s) \propto e^{-\frac{\Delta G_s}{k_B T}}, $$
@@ -1177,8 +1177,8 @@ function addCitations(){
 											<br><br>
 											
 											
-											When the NTP concentration is high, or if $k_{bind}$ is large, then NTP binding becomes so rapid that equilibrium is achieved. Under these conditions,
-											the kinetics of NTP binding are no longer relevant. $K_D$ simply describes the proportion of time that NTP is bound. For example, if $K_D = 35$&mu;M and [NTP] = 1000&mu;M,
+											When the NTP concentration is high, or if $k_{bind}$ is large, then NTP binding becomes so rapid that equilibrium between these two states is achieved. Under these conditions,
+											the kinetics of NTP binding are no longer relevant. $K_D$ simply describes the proportion of time that NTP is bound. For example, if $K_D$ = 35&mu;M and [NTP] = 1000&mu;M,
 											then the proportion of time that NTP is bound (while in this two-state system) is around 97%:
 											
 										
@@ -1298,7 +1298,7 @@ function addCitations(){
 										</div>
 
 										The estimated basepairing contribution to free energy for any given state can readily be calculated using RNA or DNA free energy parameters. This program uses these values to estimate the free energy 
-										barrier heights of translocating forwards and backwards. Let $\Delta G_x$ and $\Delta G_y$ be the basepairing free energies of neighbouring states x and y, respectively. Then, the free energy barrier
+										barrier heights of translocating forwards and backwards. Let $\Delta G_x$ and $\Delta G_y$ be the basepairing free energies of neighbouring states x and y, respectively (units $k_B T$). Then, the free energy barrier
 										height of transition from state x to y is calculated as 
 										
 										$$
@@ -1307,7 +1307,7 @@ function addCitations(){
 										
 									
 										
-										where the value of parameter $\Delta G^\dagger_{slide}$ can be manually tweaked. This is a very simplistic estimation of translocation barrier heights. 
+										where the value of parameter $\Delta G^\dagger_{slide}$ (units $k_B T$) can be manually tweaked. This is a very simplistic estimation of translocation barrier heights. 
 										The rate constants of translocation are derived from the free energy barrier heights using the Arrhenius equation with a pre-exponential constant of $10^6$ s<sup>-1</sup>:
 
 										
