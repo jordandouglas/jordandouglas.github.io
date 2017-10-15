@@ -85,8 +85,7 @@ BIBLIOGRAPHY["gubbay2001sendai"] = `Gubbay, Oliver, Joseph Curran, and Daniel Ko
 BIBLIOGRAPHY["plumet2005dynamics"] = `Plumet, Sébastien, W. Paul Duprex, and Denis Gerlier. "Dynamics of viral RNA synthesis during measles virus infection." Journal of virology 79.11 (2005): 6900-6908.`;
 BIBLIOGRAPHY["iverson1981localized"] = `Iverson, Linda E., and John K. Rose. "Localized attenuation and discontinuous synthesis during vesicular stomatitis virus transcription." Cell 23.2 (1981): 477-484.`;
 BIBLIOGRAPHY["hodges2009nucleosomal"] = `Hodges, Courtney, et al. "Nucleosomal fluctuations govern the transcription dynamics of RNA polymerase II." Science 325.5940 (2009): 626-628.`;
-
-BIBLIOGRAPHY["XXX"] = ``;
+BIBLIOGRAPHY["erie1992single"] = `Erie, Dorothy A., Thomas D. Yager, and Peter H. Von Hippel. "The single-nucleotide addition cycle in transcription: a biophysical and biochemical perspective." Annual review of biophysics and biomolecular structure 21.1 (1992): 379-415.`;
 
 BIBLIOGRAPHY["XXX"] = ``;
 
