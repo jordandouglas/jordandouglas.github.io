@@ -2736,7 +2736,7 @@ function plot_parameter_heatmap(plotNumCustom = null){
 
 		// Get the z-axis range and filter out points which are not within this range. 
 		// If a colour gradient is being used then assign colours to the points
-		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"] == "automaticZ"){
+		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"] == "automaticZ" && PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["metricZ"] != "probability"){
 			zmin = minimumFromList(zvals);
 			zmax = maximumFromList(zvals);
 			xValsGood = xvals;
