@@ -27,7 +27,7 @@ if (typeof RUNNING_FROM_COMMAND_LINE === 'undefined') RUNNING_FROM_COMMAND_LINE 
 	// Random.js from http://simjs.com/random.html
 
 
-WW_JS.init_WW = function(isWW,){
+WW_JS.init_WW = function(isWW = false){
 
 	WW_JS.isWebWorker = isWW;
 
