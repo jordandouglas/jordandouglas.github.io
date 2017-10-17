@@ -584,7 +584,7 @@ function addCitations(){
 										
 											<img src="../src/TutorialImages/distanceVsTime.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
 											
-											<br><br><br><br><br>
+											<br>
 											This graph shows the progress made by the polymerase over time. The blue line represents the current simulation
 											and the grey lines represent previous simulations. The x- and y-axis ranges can be set manually in the settings <img src="../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
 											
@@ -604,7 +604,7 @@ function addCitations(){
 											<img src="../src/TutorialImages/pauseHistogram.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30; margin:auto; float:right"></img>
 											<img src="../src/TutorialImages/pauseHistogram2.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30; margin:auto; float:right"></img>
 											
-											<br><br><br>
+											<br>
 											Depending on the settings <img src="../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>, this will either show the total time taken to copy the template (one value per trial) or the time in
 											between successive catalysis events. The x-axis of the latter plot can be restricted so that it only shows pause times (greater than 1s). 
 											
@@ -674,8 +674,8 @@ function addCitations(){
 										shows the relationship between two parameters - $k_{cat}$ and $\Delta G^\dagger_{slide}$ -  required to achieve a velocity of 20-30bp/s. As the rate of catalysis increases, 
 										the free energy barrier of translocation must increase with it in order to achieve the same velocity. 
 										
-											
-										<span style="padding: 5 5; background-color:#ebe9e7"> 
+										
+										<span style="padding: 2 5; background-color:#ebe9e7"> 
 											<b style="color:#008cba">Elongation heatmap session:</b> 
 											<a style="text-decoration:none" href="../?elongationHeatmap.xml">Open</a> | 
 											<a style="text-decoration:none" href="Examples/elongationHeatmap.xml">View XML</a>
@@ -685,8 +685,8 @@ function addCitations(){
 										The second images shows the relationship between $K_D$ and [NTP]. As the dissociation constant of NTP binding increases, the concentration of NTP needed to achieve the same
 										velocity increases. 
 									
-									
-										<span style="padding: 5 5; background-color:#ebe9e7"> 
+										
+										<span style="padding: 2 5; background-color:#ebe9e7"> 
 											<b style="color:#008cba">Incorporation heatmap session:</b> 
 											<a style="text-decoration:none" href="../?incorporationHeatmap.xml">Open</a> | 
 											<a style="text-decoration:none" href="Examples/incorporationHeatmap.xml">View XML</a>
@@ -862,10 +862,7 @@ function addCitations(){
 													<div class="parameter-title" style="font-size:18px">Kinetics of binding/releasing NTP, and catalysing polymerisation.</div>  <br> 
 
 
-														<div class="paramHelp" id="RateBind_ParamHelp">
-															<b style="font-size:20px">$k_{bind}$</b> - used to calculate rate constant of binding the complementary NTP, which is calculated as [NTP] k<sub>bind</sub>. 
-																	See k<sub>misbind</sub> for the rate of binding a non-complementary NTP. This parameter is constant across all NTPs. Default: 30&mu;M<sup>-1</sup>.s<sup>-1</sup>  
-														</div><br>
+														
 
 
 														<div class="paramHelp" id="Kdissociate_ParamHelp">
@@ -881,14 +878,19 @@ function addCitations(){
 																	Defaults: $k_{cat} = 30, k_{cat}^{ATP} = 38, k_{cat}^{CTP} = 7, k_{cat}^{GTP} = 62, k_{cat}^{UTP} = 24\;$ <cite val="bai2007mechanochemical"></cite>
 
 														</div><br>
+														
+														<div class="paramHelp" id="RateBind_ParamHelp">
+															<b style="font-size:20px">$k_{bind}$</b> - used to calculate rate constant of binding the complementary NTP, which is calculated as [NTP] k<sub>bind</sub>. 
+																	This parameter is constant across all NTPs. Default: 30&mu;M<sup>-1</sup>.s<sup>-1</sup>  
+														</div><br>
 
-
+														<!--
 														<div class="paramHelp" id="RateMisbind_ParamHelp">
 															<b style="font-size:20px">$k_{misbind}$</b> - used to calculate rate constant of binding a non-complementary NTP, which is calculated as [NTP] k<sub>misbind</sub>. 
 																		If the bound NTP is added onto the end of the chain without correction then there is a misincorporation event. This parameter is only applicable when "Enable misincorporations" is enabled. The overall rate of uncorrected misincorpations during transcription is
 																		around 1 in 10<sup>4</sup> - 10<sup>5</sup> bases<cite val="imashimizu2013direct,rosenberger1981estimate,shaw2002use"></cite>. Default: 0.25s<sup>-1</sup> 
 														</div><br>
-
+														-->
 
 														<!--
 														<div class="paramHelp" stule="display:none">
@@ -992,6 +994,24 @@ function addCitations(){
 											-->
 											
 
+
+											
+
+									</div>
+								</div>
+								
+								
+								
+									
+								<br><br>
+								<div class="about-block">
+									<div class="about-block-inner">
+										<div class="block-subtitle" >  Polymerisation model settings </div> <br>
+											
+											
+											
+											
+										
 
 											
 
@@ -1175,7 +1195,7 @@ function addCitations(){
 										</div><br><br>	
 										
 										Any of these steps could be reversible.
-										As there is not sufficent information to model all four steps, nucleotide incorporation has been compressed into to a two step 
+										As there is not sufficent information to model all four steps, nucleotide incorporation has been compressed into a two step 
 										process.<cite val="bai2004sequence,abbondanzieri2005direct,maoileidigh2011unified"></cite>
 										
 										
@@ -1209,7 +1229,7 @@ function addCitations(){
 										
 											
 											<h3>
-												$$ p(\text{bound}) = \frac{ \frac{\text{[NTP]}}{K_D} }{\frac{\text{[NTP]}}{K_D} + 1} = \frac{ \frac{1000\text{&mu;M}}{35 \text{&mu;M}} }{\frac{1000\text{&mu;M}}{35 \text{&mu;M}} + 1} = 0.966, $$
+												$$ p(\text{bound}) = \frac{ \frac{\text{[NTP]}}{K_D} }{\frac{\text{[NTP]}}{K_D} + 1} = \frac{ \frac{1000\text{&mu;M}}{35 \text{&mu;M}} }{\frac{1000\text{&mu;M}}{35 \text{&mu;M}} + 1} = 0.966. $$
 											</h3>
 										
 											<br>
@@ -1218,7 +1238,7 @@ function addCitations(){
 											
 											<span style="line-height:28px;">
 												In SimPol, by default there is one concentration for all four NTPs, and one dissociation constant and rate of catalysis for all four bases. You can set the concentrations
-												and incorporation parameters for each of the four nucleotides independently using 
+												and incorporation parameters for each of the four nucleotides independently by toggling 
 												
 												<span style="background-color:#ebe9e7; padding: 7 6;">
 													<span style="font-size:15px; vertical-align:middle; font-family:Arial" >1 concentration</span>
@@ -1240,7 +1260,7 @@ function addCitations(){
 													<span style="font-size:15px; vertical-align:middle; font-family:Arial" >8 params</span>	
 												</span>											
 												
-												&nbsp;respectively. While $K_D$ and $k_{cat}$ can be set independently for each nucleotide, $k_{bind}$ is held constant for all four. If you do not wish to assume that NTP binding in in equilibrium you can toggle  
+												&nbsp;respectively. While $K_D$ and $k_{cat}$ can be set independently for each nucleotide, $k_{bind}$ is held constant for all four. If you do not wish to assume that NTP binding is in equilibrium you can toggle  
 												
 												
 													<span style="background-color:#ebe9e7; padding: 7 6;">
