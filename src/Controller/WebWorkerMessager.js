@@ -2216,6 +2216,9 @@ function userInputModel_controller(){
 	var allowMisincorporation = $("#allowMisincorporation").length == 0 ? null : $("#allowMisincorporation").is(":checked");
 	var useFourNTPconcentrations = $("#useFourNTPconcentrations").is(":checked");
 	var NTPbindingNParams = $("#NTPbindingNParams").length == 0 ? null : $("#NTPbindingNParams").is(":checked") ? 8 : 2;
+	var assumeBindingEquilibrium = $("#assumeBindingEquilibrium").length == 0 ? null : $("#assumeBindingEquilibrium").is(":checked");
+	
+	
 
 
 
@@ -2227,19 +2230,18 @@ function userInputModel_controller(){
 
 
 		refreshNavigationCanvases();
-		updateABCpanel();
 		
 		updateModelDOM(mod);
 	};
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => FE_JS.userInputModel_WW(elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, resolve));
+		var toCall = () => new Promise((resolve) => FE_JS.userInputModel_WW(elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, assumeBindingEquilibrium, resolve));
 		toCall().then((mod) => updateDOM(mod));
 	}
 
 	else{
-		var res = stringifyFunction("FE_JS.userInputModel_WW", [elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, null], true);
+		var res = stringifyFunction("FE_JS.userInputModel_WW", [elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, assumeBindingEquilibrium, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));

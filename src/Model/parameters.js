@@ -49,14 +49,14 @@ PARAMS_JS.PHYSICAL_PARAMETERS["kCat_CTP"] = {distribution:"Fixed", fixedDistnVal
 PARAMS_JS.PHYSICAL_PARAMETERS["kCat_GTP"] = {distribution:"Fixed", fixedDistnVal: 62, name: "Rate of catalysis for GTP (s\u207B\u00B9)", title: "Rate constant of catalysing bound GTP", zeroTruncated: true, integer: false, hidden:true};
 PARAMS_JS.PHYSICAL_PARAMETERS["kCat_UTP"] = {distribution:"Fixed", fixedDistnVal: 24, name: "Rate of catalysis for UTP (s\u207B\u00B9)", title: "Rate constant of catalysing bound UTP", zeroTruncated: true, integer: false, hidden:true};
 
-PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss"] = {distribution:"Fixed", fixedDistnVal: 4, name: "Dissociation constant of NTP (\u03bcM)", title: "Equilibrium constant of NTP dissociation", zeroTruncated: true, integer: false, hidden:false};
+PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss"] = {distribution:"Fixed", fixedDistnVal: 35, name: "Dissociation constant of NTP (\u03bcM)", title: "Equilibrium constant of NTP dissociation", zeroTruncated: true, integer: false, hidden:false};
 PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_ATP"] = {distribution:"Fixed", fixedDistnVal: 50, name: "Dissociation constant of ATP (\u03bcM)", title: "Equilibrium constant of ATP dissociation", zeroTruncated: true, integer: false, hidden:true};
 PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_CTP"] = {distribution:"Fixed", fixedDistnVal: 33, name: "Dissociation constant of CTP (\u03bcM)", title: "Equilibrium constant of CTP dissociation", zeroTruncated: true, integer: false, hidden:true};
 PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_GTP"] = {distribution:"Fixed", fixedDistnVal: 36, name: "Dissociation constant of GTP (\u03bcM)", title: "Equilibrium constant of GTP dissociation", zeroTruncated: true, integer: false, hidden:true};
 PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_UTP"] = {distribution:"Fixed", fixedDistnVal: 18, name: "Dissociation constant of UTP (\u03bcM)", title: "Equilibrium constant of UTP dissociation", zeroTruncated: true, integer: false, hidden:true};
 
 
-PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"] = {distribution:"Fixed", fixedDistnVal: 250, name: "Rate bind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of binding the correct NTP", zeroTruncated: true, integer: false};
+PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"] = {distribution:"Fixed", fixedDistnVal: 250, name: "Rate bind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of binding the correct NTP", zeroTruncated: true, integer: false, hidden: true};
 PARAMS_JS.PHYSICAL_PARAMETERS["RateMisbind"] = {distribution:"Fixed", fixedDistnVal: 1, name: "Rate misbind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of NTP mis-binding which can lead to transition/transversion mutations", zeroTruncated: true, integer: false, hidden:true};
 PARAMS_JS.PHYSICAL_PARAMETERS["TransitionTransversionRatio"] = {distribution:"Fixed", fixedDistnVal: 4, name: "Transition:transversion", title: "How much more likely is a transition mis-binding event than a transversion mis-binding event", zeroTruncated: true, integer: false, hidden:true};
 

@@ -29,6 +29,7 @@ BIBLIOGRAPHY["santalucia1998unified"] = {name: `SantaLucia, John. "A unified vie
 BIBLIOGRAPHY["traut1994physiological"] = {name: `Traut, Thomas W. "Physiological concentrations of purines and pyrimidines." Molecular and cellular biochemistry 140.1 (1994): 1-22.`, DOI: "10.1007/BF00928361"};
 BIBLIOGRAPHY["zuker1981optimal"] = {name: `Zuker, Michael, and Patrick Stiegler. "Optimal computer folding of large RNA sequences using thermodynamics and auxiliary information." Nucleic acids research 9.1 (1981): 133-148.`, DOI: "10.1093%2Fnar%2F9.1.133"};
 
+BIBLIOGRAPHY["watson1953molecular"] = {name: `Watson, James D., and Francis HC Crick. "Molecular structure of nucleic acids." Nature 171.4356 (1953): 737-738.`, DOI: "10.1176%2Fappi.ajp.160.4.623"};
 
 BIBLIOGRAPHY["maoileidigh2011unified"] = {name: `Maoiléidigh, Dáibhid Ó., et al. "A unified model of transcription elongation: what have we learned from single-molecule experiments?" Biophysical journal 100.5 (2011): 1157-1166.`, DOI: "10.1016%2Fj.bpj.2010.12.3734"};
 BIBLIOGRAPHY["tadigotla2006thermodynamic"] = {name: `Tadigotla, Vasisht R., et al. "Thermodynamic and kinetic modeling of transcriptional pausing." Proceedings of the National Academy of Sciences of the United States of America 103.12 (2006): 4439-4444.`, DOI: "10.1073%2Fpnas.0600508103"};
@@ -92,7 +93,6 @@ BIBLIOGRAPHY["iverson1981localized"] = {name: `Iverson, Linda E., and John K. Ro
 BIBLIOGRAPHY["hodges2009nucleosomal"] = {name: `Hodges, Courtney, et al. "Nucleosomal fluctuations govern the transcription dynamics of RNA polymerase II." Science 325.5940 (2009): 626-628.`, DOI: "10.1126/science.1172926"};
 
 
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 

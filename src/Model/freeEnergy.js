@@ -28,7 +28,7 @@ FE_JS.ELONGATION_MODELS = {};
 FE_JS.ELONGATION_MODELS["simpleBrownian"] = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: false, allowHypertranslocation: false, 
 										allowInactivation:false, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: false, 
 										allowGeometricCatalysis: false, allowmRNAfolding:false, allowMisincorporation:false, useFourNTPconcentrations:false,
-										NTPbindingNParams: 2};
+										NTPbindingNParams: 2, assumeBindingEquilibrium: true};
 //FE_JS.ELONGATION_MODELS["twoSiteBrownian"] = {id: "twoSiteBrownian",name: "Brownian ratchet model with 2 NTP binding sites", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation:false, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
 FE_JS.currentElongationModel = "simpleBrownian";
 
@@ -84,7 +84,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 
 // When use changes the model settings (typically by changing one of the checkboxes) some of the parameters need updating
- FE_JS.userInputModel_WW = function(elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, resolve, msgID){
+ FE_JS.userInputModel_WW = function(elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, assumeBindingEquilibrium, resolve, msgID){
 
 	if (resolve === undefined) resolve = function() {};
 	if (msgID === undefined) msgID = null;
@@ -105,7 +105,11 @@ FE_JS.initFreeEnergy_WW = function(){
 	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] = useFourNTPconcentrations;
 	if(allowMisincorporation != null) FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowMisincorporation"] = allowMisincorporation;
 	if(NTPbindingNParams != null) FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] = NTPbindingNParams;
+	
+	if(assumeBindingEquilibrium != null) FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeBindingEquilibrium"] = assumeBindingEquilibrium;
+	
 
+	PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"]["hidden"] = assumeBindingEquilibrium;
 
 
 

@@ -402,8 +402,10 @@ SIM_JS.sampleAction_WW = function(stateC){
 	var minReactionTime = -1;
 
 
+
+
 	// If ready to bind and the model settings are right, then use the geometric boost
-	if (stateC[1] == 1 && !stateC[2] && stateC[3] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["id"] == "simpleBrownian"){
+	if (!FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeBindingEquilibrium"] && stateC[1] == 1 && !stateC[2] && stateC[3] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["id"] == "simpleBrownian"){
 
 		//console.log("allowGeometricCatalysis");
 
@@ -586,21 +588,50 @@ SIM_JS.sampleAction_WW = function(stateC){
 		*/
 	} else {
 
-		
+
+
 
 		var kBindOrCat = 0; // Sample binding or catalysis rate
+		var sampledBaseToAdd = null;
 		if (stateC[1] == 1 && stateC[3]){
 
 			// Sample which base to add
 			var baseToTranscribe = WW_JS.getBaseInSequenceAtPosition_WW("g" + (stateC[1] + stateC[0]));
-			var result = WW_JS.sampleBaseToAdd(baseToTranscribe);
+			sampledBaseToAdd = WW_JS.sampleBaseToAdd(baseToTranscribe);
 
-			if (stateC[2]) kBindOrCat = FE_JS.getCatalysisRate(result["base"]); // If NTP bound then use rate of catalysis
+			if (stateC[2]) kBindOrCat = FE_JS.getCatalysisRate(sampledBaseToAdd["base"]); // If NTP bound then use rate of catalysis
 			else{ // Otherwise use binding rate
-				kBindOrCat = result["rate"];
-				SIM_JS.SIMULATION_VARIABLES["baseToAdd"] = result["base"];
+				kBindOrCat = sampledBaseToAdd["rate"];
+				SIM_JS.SIMULATION_VARIABLES["baseToAdd"] = sampledBaseToAdd["base"];
 			}
 		}
+
+
+		// If NTP is not bound and we are in posttranslocated state, as user has requested to assume binding equilibrium
+		var bindingEquilibrium = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeBindingEquilibrium"] && stateC[1] == 1 && !stateC[2] && stateC[3];
+		if(bindingEquilibrium){
+
+
+			var KD_name = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] == 2 ? "Kdiss" : "Kdiss_" + sampledBaseToAdd["base"] + "TP";
+			var NTPconc_name = !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] ? "NTPconc" : sampledBaseToAdd["base"] + "TPconc";
+			var KD = PARAMS_JS.PHYSICAL_PARAMETERS[KD_name]["val"];
+			var NTPconc = PARAMS_JS.PHYSICAL_PARAMETERS[NTPconc_name]["val"];
+			var probabilityBound = (NTPconc/KD) / (NTPconc/KD + 1);
+			var probabilityUnbound = 1 - probabilityBound;
+			
+			//console.log("Current base", sampledBaseToAdd["base"] , "KD = ", KD, "conc = ", NTPconc, "pbound = ", probabilityBound);
+
+
+			kBindOrCat = FE_JS.getCatalysisRate(sampledBaseToAdd["base"]) * probabilityBound; // Can only catalyse if NTP bound
+
+			kFwd = kFwd * probabilityUnbound; // Can only translocate if NTP is not bound
+			kBck = kBck * probabilityUnbound;
+			kDeact = kDeact * probabilityUnbound; // Can only deactivate if NTP is not bound
+
+
+		}
+
+
 
 
 		// Sample 1 random from exp(rateSum) where rateSum is the sum of all rates
@@ -624,6 +655,11 @@ SIM_JS.sampleAction_WW = function(stateC){
 
 	}
 
+	// If assume binding equilibrium and sampled catalysis then this is actually a double operation (bind then catalysis)
+	if(bindingEquilibrium && toDo == 3){
+		toDo = [3, 3];
+		
+	}
 
 	return {"toDo": toDo, "time": minReactionTime};
 	

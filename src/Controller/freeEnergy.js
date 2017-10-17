@@ -175,7 +175,7 @@ function updateModelDOM(elongation_model_temp){
 	$("#useFourNTPconcentrations").prop('checked', elongation_model_temp["useFourNTPconcentrations"]);
 	$("#NTPbindingNParams").prop('checked', elongation_model_temp["NTPbindingNParams"] == 8);
 
-
+	$("#assumeBindingEquilibrium").prop('checked', elongation_model_temp["assumeBindingEquilibrium"]);
 
 
 	if (elongation_model_temp["allowBacktracking"] && elongation_model_temp["allowInactivation"]) $("#allowBacktrackWithoutInactivation_container").show(100);
@@ -281,6 +281,14 @@ function updateModelDOM(elongation_model_temp){
 	}
 
 
+	// Assume NTP binding at equilibrium
+	if (elongation_model_temp["assumeBindingEquilibrium"]){
+		$("#RateBind_container").hide(0);
+	}
+	else{
+		$("#RateBind_container").show(100);
+	}
+	
 
 	//if (elongation_model_temp["id"] == "twoSiteBrownian") $("#allowGeometricCatalysis_container").hide(100);
 	//else $("#allowGeometricCatalysis_container").show(100);
@@ -798,10 +806,34 @@ function getNTPModelSettingsTemplate(){
 
 
 
-						<tr>
+							
+
+
+
+							<tr>
 							<td colspan=4>
 
 								<table style="width:50%; margin:auto">
+								
+								
+									<tr id="assumeBindingEquilibrium_container" title="Assume that binding NTP is an equilibrium process? This assumption will speed up the simulation">
+
+
+										<td style="text-align:left; font-size:10px; float:left;">
+											<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
+								 		</td>
+
+
+								 		<td colspan=3>
+									 		<label class="switch">
+										 		 <input type="checkbox" id="assumeBindingEquilibrium" OnChange="userInputModel_controller()"> </input>
+										 		 <span class="slider round"></span>
+											</label> 
+											<span style="font-size:15px; vertical-align:middle"> Assume NTP binding at equilibrium</span>
+								 		</td>
+
+
+									</tr>
 
 
 									<tr id="RateBind_container">
@@ -827,7 +859,7 @@ function getNTPModelSettingsTemplate(){
 								 	</tr>
 
 
-
+									<!--
 									<tr id="allowMisincorporation_container" title="Can the wrong nucleotide bind (during the simulation)?">
 
 
@@ -846,8 +878,9 @@ function getNTPModelSettingsTemplate(){
 
 
 									</tr>
+									-->
 
-
+									<!--
 									<tr id="deactivateUponMisincorporation_container" title="Does the polymerase enter the inactivated state upon a nucleotide misincorporation (during the simulation)?">
 
 										<td style="text-align:left; float:left; width:20px">
@@ -864,7 +897,7 @@ function getNTPModelSettingsTemplate(){
 
 
 									</tr>
-
+									-->
 
 
 
@@ -890,6 +923,12 @@ function getNTPModelSettingsTemplate(){
 								 		</td>
 
 									</tr>
+									
+									
+									
+									
+
+										</tr>
 
 						
 
