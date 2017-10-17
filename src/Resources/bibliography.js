@@ -33,7 +33,7 @@ BIBLIOGRAPHY["watson1953molecular"] = {name: `Watson, James D., and Francis HC C
 
 BIBLIOGRAPHY["maoileidigh2011unified"] = {name: `Maoiléidigh, Dáibhid Ó., et al. "A unified model of transcription elongation: what have we learned from single-molecule experiments?" Biophysical journal 100.5 (2011): 1157-1166.`, DOI: "10.1016%2Fj.bpj.2010.12.3734"};
 BIBLIOGRAPHY["tadigotla2006thermodynamic"] = {name: `Tadigotla, Vasisht R., et al. "Thermodynamic and kinetic modeling of transcriptional pausing." Proceedings of the National Academy of Sciences of the United States of America 103.12 (2006): 4439-4444.`, DOI: "10.1073%2Fpnas.0600508103"};
-
+BIBLIOGRAPHY["bai2004sequence"] = {name: `Bai, Lu, Alla Shundrovsky, and Michelle D. Wang. "Sequence-dependent kinetic model for transcription elongation by RNA polymerase." Journal of molecular biology 344.2 (2004): 335-349.`, DOI: "10.1016/j.jmb.2004.08.107"};
 
 BIBLIOGRAPHY["komissarova1997transcriptional"] = {name: `Komissarova, Natalia, and Mikhail Kashlev. "Transcriptional arrest: Escherichia coli RNA polymerase translocates backward, leaving the 3′ end of the RNA intact and extruded." Proceedings of the National Academy of Sciences 94.5 (1997): 1755-1760.`, DOI: "10.1073%2Fpnas.94.5.1755"};
 BIBLIOGRAPHY["gnatt2001structural"] = {name: `Gnatt, Averell L., et al. "Structural basis of transcription: an RNA polymerase II elongation complex at 3.3 Å resolution." Science 292.5523 (2001): 1876-1882.`, DOI: "10.1126/science.1059495"};
@@ -94,7 +94,7 @@ BIBLIOGRAPHY["hodges2009nucleosomal"] = {name: `Hodges, Courtney, et al. "Nucleo
 
 
 
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
+
 
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 
