@@ -1239,7 +1239,18 @@ function addCitations(){
 													<span style="font-size:15px; vertical-align:middle; font-family:Arial" >8 params</span>	
 												</span>											
 												
-												&nbsp;respectively. While $K_D$ and $k_{cat}$ can be set independently for each nucleotide, $k_{bind}$ is held constant for all four.
+												&nbsp;respectively. While $K_D$ and $k_{cat}$ can be set independently for each nucleotide, $k_{bind}$ is held constant for all four. If you do not wish to assume that NTP binding in in equilibrium you can toggle  
+												
+												
+													<span style="background-color:#ebe9e7; padding: 7 6;">
+														<label class="switch">
+															 <input type="checkbox" checked> </input>
+															 <span class="slider round"></span>
+														</label> 
+														<span style="font-size:15px; vertical-align:middle; font-family:Arial" >Assume NTP binding at equilibrium</span>	
+													</span> 
+													
+													&nbsp;which is defaulted to true. Note that making this assumption is equivalent to setting $k_{bind}$ to a high value, but is much faster to simulate.
 											
 											</span>
 											
@@ -1320,30 +1331,81 @@ function addCitations(){
 											<span style="width:33;  display:inline-block;"></span> doublet on the left of the hybrid must both be broken. 
 
 										</div>
+										<br>
+										The estimated basepairing contribution to free energy for any given state can readily be calculated using RNA or DNA free energy parameters. 
+										 Let $\Delta G_x$ and $\Delta G_y$ be the basepairing free energies of neighbouring states x and y, respectively (units $k_B T$), where the free energy of the unknown intermediate state is $\Delta G_{x,y}^\dagger$. Once this free energy barrier height has been estimated, the sequence-specific rate constant of translocation can be calculated using the Arrhenius equation:
 
-										The estimated basepairing contribution to free energy for any given state can readily be calculated using RNA or DNA free energy parameters. This program uses these values to estimate the free energy 
-										barrier heights of translocating forwards and backwards. Let $\Delta G_x$ and $\Delta G_y$ be the basepairing free energies of neighbouring states x and y, respectively (units $k_B T$). Then, the free energy barrier
-										height of transition from state x to y is calculated as 
+
+											<h3>
+											$$
+												k_{x \rightarrow y} = 10^6 e^{-(\Delta G_{x,y}^\dagger - \Delta G_x)}.
+											$$
+											</h3>
 										
+										
+											We use a pre-exponential constant of $A = 10^6$ s<sup>-1</sup>.	SimPol has two models for estimating the $\Delta G^\dagger_{x,y}$ term. <br><br><br>
+										
+									<div style="padding: 10 10; background-color:#ebe9e7">		
+										<div id="translocation_ModelHelp" class="block-subtitle" style="font-size:30px; text-align:left"> 1. Midpoint model</div> 
+										
+										
+										
+										The free energy barrier height of transition from state x to y is calculated as 
+										
+										<h3>
 										$$
 											\Delta G^\dagger_{x,y} = \frac{\Delta G_x + \Delta G_y}{2} + \Delta G^\dagger_{slide},
 										$$
-										
+										</h3>
 									
 										
-										where the value of parameter $\Delta G^\dagger_{slide}$ (units $k_B T$) can be manually tweaked. This is a very simplistic estimation of translocation barrier heights. 
-										The rate constants of translocation are derived from the free energy barrier heights using the Arrhenius equation with a pre-exponential constant of $10^6$ s<sup>-1</sup>:
-
+										where the value of parameter $\Delta G^\dagger_{slide}$ (units $k_B T$) can be manually tweaked. While this estimation is simplistic, it has the desirable property of
+										$\Delta G^\dagger_{slide}$ being equal to the mean translocation barrier across the whole sequence.
+										The midpoint model was introduced by Tadigotla et al.<cite val="maoileidigh2011unified,tadigotla2006thermodynamic"></cite>
 										
-										$$
-											k_{x \rightarrow y} = 10^6 e^{-(\Delta G_{x,y}^\dagger - \Delta G_x)}.
-										$$
+									</div>
 										
-				
-										This model of translocation has been borrowed from Tadigotla et al.<cite val="maoileidigh2011unified,tadigotla2006thermodynamic"></cite>
+										<br><br><br>
+										
+										
+									<div style="padding: 10 10; background-color:#ebe9e7">
+										<div id="translocation_ModelHelp" class="block-subtitle" style="font-size:30px; text-align:left"> 2. Melting model</div> 
+										
+										
+										
+										This translocation model assumes that the intermediate translocation state is a nucleic acid complex which contains only the basepairs which exist in both $x$ and $y$ 
+										(ie. the intersection between the two sets of basepairs). Let $\Delta G^\dagger_{x \cap y}$ be the free energy of basepairing of this intermediate state, 
+										which can easily be calculated from experimental parameters. Then, 
+										the total barrier height of translocation is.
+										
+										<h3>
+										$$
+											\Delta G^\dagger_{x,y} = \Delta G^\dagger_{x \cap y} + \Delta G^\dagger_{slide},
+										$$
+										</h3>
+									
+										
+										again where the value of parameter $\Delta G^\dagger_{slide}$ (units $k_B T$) can be manually tweaked. This parameter therefore has a different meaning across 
+										the two translocation models. The melting model is the default model in SimPol.
+									</div>
+									
+									<br><br><br>
+									
+									In optical trapping experiments, beads are tethered to single molecules of RNA polymerase and optical tweezers are used to exert a force (units pN) upon the elongation complex. 
+									Positive forces $F_{assist} = F > 0$ act in the same direction as transcription (an assisting load) while negative forces $F < 0$ act in the opposite direction 
+									(a hindering load). Increasing the assisting force serves to decrease the free energy barrier of forward translocation and increase the barrier of backwards translocation. This 
+									process is modelled by adding an additional term to the Arrhenius equation:
 
 
-								
+
+										<h3>
+											$$ 	k_{x \rightarrow y} = 10^6 e^{-(\Delta G_{x,y}^\dagger - \Delta G_x) - 0.5F \delta},$$
+										</h3>
+
+									where $\delta$ is the distance between consecutive basepairs ($\delta = 3.4$&#8491; in dsDNA<cite val="watson1953molecular"></cite>), and the intermediate state 
+									 is assumed to be $0.5\delta$&#8491; between the two neighbouring positions <cite val="depken2009origin"></cite>.
+
+
 							
 								</div>
 							</div>
