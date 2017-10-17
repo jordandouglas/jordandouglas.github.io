@@ -326,7 +326,6 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 
 
-
 	if (forceUpdate || JSON.stringify(plotData) != "{}" || thereExistsAParameterPlot){
 	
 		plotData["nbases"] = WW_JS.currentState["nbases"];
