@@ -2998,7 +2998,8 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	
 
 	var axisGap = 45 * canvasSizeMultiplier;
-	var legendGap = zlab == null ? 0 : 45 * canvasSizeMultiplier; // If there are multiple colours then need a legend
+	var legendGap = zlab == null ? 3 * canvasSizeMultiplier : 45 * canvasSizeMultiplier; // If there are multiple colours then need a legend
+	var topGap = 3 * canvasSizeMultiplier;
 	
 	var canvas = $('#' + id)[0];
 	if (canvas == null) return;
@@ -3012,7 +3013,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	
 	var plotWidth = canvas.width - axisGap - legendGap;
-	var plotHeight = canvas.height - axisGap;
+	var plotHeight = canvas.height - axisGap - topGap;
 
 
 	var widthScale = 1;
@@ -3044,9 +3045,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 
 
 
-	
-	//var widthScale = (plotWidth / (range[1] - range[0]));
-	//var heightScale = (plotHeight / (range[3] - range[2]));
+
 
 	
 	if (xvals != null && xvals.length > 0 && yvals != null && yvals.length > 0) {
@@ -3057,10 +3056,19 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 		ctx.font = 10 * canvasSizeMultiplier + "px Arial";
 		ctx.textBaseline="top"; 
 		ctx.textAlign="center"; 
+		var tickLength = 10 * canvasSizeMultiplier;
+		ctx.lineWidth = 1 * canvasSizeMultiplier;
 
 		for (var labelID = 0; labelID < xlabPos.length; labelID++){
 			var x0 = widthScale * (xlabPos[labelID] - range[0]) + axisGap;
 			ctx.fillText(xlabPos[labelID], x0, canvas.height - axisGap + axisPointMargin);
+
+			// Draw a tick on the axis
+			ctx.beginPath();
+			ctx.moveTo(x0, canvas.height - axisGap - tickLength/2);
+			ctx.lineTo(x0, canvas.height - axisGap + tickLength/2);
+			ctx.stroke();
+			
 		}
 
 
@@ -3075,6 +3083,14 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 		for (var labelID = 0; labelID < ylabPos.length; labelID++){
 			var y0 = heightScale * (ylabPos[labelID] - range[2]);
 			ctx.fillText(ylabPos[labelID], y0, 0);
+			
+			// Draw a tick on the axis
+			ctx.beginPath();
+			ctx.moveTo(y0, axisPointMargin - tickLength/2);
+			ctx.lineTo(y0, axisPointMargin + tickLength/2);
+			ctx.stroke();
+			
+			
 		}
 		ctx.restore();
 
@@ -3089,9 +3105,9 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 		
 			
 			xPrime = widthScale * (xvals[valIndex] - range[0]) + axisGap;
-			yPrime = plotHeight - heightScale * (yvals[valIndex] - range[2]);
+			yPrime = plotHeight - heightScale * (yvals[valIndex] - range[2]) + topGap;
 			
-			if (xPrime < axisGap || xPrime > axisGap + plotWidth || yPrime > plotHeight - axisGap || yPrime < 0) continue; // Don't plot if out of range
+			if (xPrime < axisGap || xPrime > plotWidth + axisGap || yPrime > plotHeight + topGap|| yPrime < 0) continue; // Don't plot if out of range
 			
 			// Add circle
 			ctx.beginPath();
