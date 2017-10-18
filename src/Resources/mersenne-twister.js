@@ -206,16 +206,21 @@ MersenneTwister.prototype.genrand_res53 = function() {
 // Allows access to these functions using node.js
 
 MER_JS = {};
-twister = new MersenneTwister();
+
+
+MER_JS.init = function(seed){
+	MER_JS.twister = new MersenneTwister(seed);
+}
 
 MER_JS.random = function(){
-	return twister.random();
+	return MER_JS.twister.random();
 }
 
 if (typeof RUNNING_FROM_COMMAND_LINE !== 'undefined' && RUNNING_FROM_COMMAND_LINE){
 
 
 	module.exports = {
+		init: MER_JS.init,
 		random: MER_JS.random
 	}
 
