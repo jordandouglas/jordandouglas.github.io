@@ -153,7 +153,18 @@ function initNodeCompilation(){
 		    if (err) throw err;
 
 			WW_JS.loadSessionFromCommandLine(data, runABC, startingTime, nthreads, workerID, function(){
-				cluster.worker.kill();
+				if (cluster.isWorker) cluster.worker.kill();
+				else{
+					
+					
+					var finishingTime = new Date(); 
+					var secondToFinish = (finishingTime - startingTime) / 1000;
+					
+					console.log("--------------------------------------");
+					console.log("Finished after " + secondToFinish + "s");
+					console.log("Exiting.");	
+					
+				}
 			});
 			
 
@@ -197,9 +208,6 @@ function initNodeCompilation(){
 
 
 	}
-
-
-
 
 
 
