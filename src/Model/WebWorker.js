@@ -1301,7 +1301,17 @@ WW_JS.writeLinesToFile = function(fileName, text, append = false){
 
 
 
-WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, outputFolder){
+WW_JS.setOutputFolder = function(folderName){
+
+	if (!RUNNING_FROM_COMMAND_LINE) return;
+	if (folderName != null && folderName[folderName.length-1] != "/") folderName += "/";
+	WW_JS.outputFolder = folderName;
+
+
+}
+
+
+WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthreads, workerID, resolve = function() { }){
 
 
  	if (!RUNNING_FROM_COMMAND_LINE) return;
@@ -1311,42 +1321,47 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, outputFolder){
 
 	var toDoAfterRefr = function(){
 
-		WW_JS.outputFolder = outputFolder;
+		
 		PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW();
+		WW_JS.WORKER_ID = workerID;
 
 
 
-		var startingTime = new Date(); 
-		console.log("Starting SimPol at", WW_JS.getDateAndTime(startingTime));
-
-
-
+	
 
 		var exit = function(){
-			var finishingTime = new Date(); 
-			var secondToFinish = (finishingTime - startingTime) / 1000;
+			
 
-			console.log("Mean velocity: " + WW_JS.roundToSF_WW(PLOTS_JS.velocity) + "bp/s");
+			var workerNum = workerID == null ? "" : "Worker " + workerID + " finished. ";
+			console.log(workerNum + "Mean velocity: " + WW_JS.roundToSF_WW(PLOTS_JS.velocity) + "bp/s");
 			var meanTimePerTemplate = 0;
 			for (var i = 0; i < PLOTS_JS.timesSpentOnEachTemplate.length; i ++) meanTimePerTemplate += PLOTS_JS.timesSpentOnEachTemplate[i] / PLOTS_JS.timesSpentOnEachTemplate.length;
-			console.log("Mean time to copy template: " + WW_JS.roundToSF_WW(meanTimePerTemplate) + "s");
+			console.log(workerNum + "Mean time to copy template: " + WW_JS.roundToSF_WW(meanTimePerTemplate, 5) + "s");
 
-			console.log("--------------------------------------");
-			console.log("Finished after " + secondToFinish + "s");
-			console.log("Exiting.");
+			resolve();
+
+
 		}
 
 
 		// Start the simulations
 		if (!runABC) {
 
-			if (WW_JS.outputFolder != null && WW_JS.outputFolder != "") PLOTS_JS.initialiseSaveFiles_CommandLine(startingTime);
-			console.log("--------------------------------------");
+			// Split the number of trials evenly among the number of workers
+			if (nthreads > 1){
+				var nTrialsThisWorker = Math.floor(XML_JS.N / nthreads);
+				var remainingNumberOfTrials = XML_JS.N % nthreads;
 
-		
+				if (workerID <= remainingNumberOfTrials) nTrialsThisWorker++;
 
-			console.log("Running", XML_JS.N, "simulations");
-			SIM_JS.startTrials_WW(XML_JS.N, function(){ 
+				XML_JS.N = nTrialsThisWorker;
+				console.log("Running", nTrialsThisWorker, "simulations on worker", workerID);
+			}
+
+			else console.log("Running", nTrialsThisWorker, "simulations");
+
+
+			SIM_JS.startTrials_WW(nTrialsThisWorker, function(){ 
 
 				exit();
 
@@ -1357,11 +1372,19 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, outputFolder){
 		// Start the ABC
 		else{
 
+			// Split the number of iterations evenly among the number of workers
+			if (nthreads > 1){
+				var nIterationsThisWorker = Math.floor(XML_JS.ABC_FORCE_VELOCITIES["ntrials"] / nthreads);
+				var remainingNumberOfTrials = XML_JS.ABC_FORCE_VELOCITIES["ntrials"] % nthreads;
 
-			if (WW_JS.outputFolder != null && WW_JS.outputFolder != "") ABC_JS.initialiseSaveFiles_CommandLine(startingTime);
-			console.log("--------------------------------------");
+				if (workerID <= remainingNumberOfTrials) nIterationsThisWorker++;
 
-			console.log("Performing approximate Bayesian computation");
+				XML_JS.ABC_FORCE_VELOCITIES["ntrials"] = nIterationsThisWorker;
+				console.log("Running", nIterationsThisWorker, "ABC iterations on worker", workerID);
+			}
+
+			else console.log("Running", XML_JS.ABC_FORCE_VELOCITIES["ntrials"], "ABC iterations");
+
 
 			ABC_JS.beginABC_WW(XML_JS.ABC_FORCE_VELOCITIES, function(){ 
 
@@ -1415,6 +1438,10 @@ onmessage = function(e) {
 if (RUNNING_FROM_COMMAND_LINE){
 	module.exports = {
 	  	init_WW: WW_JS.init_WW,
-	  	loadSessionFromCommandLine: WW_JS.loadSessionFromCommandLine
+	  	loadSessionFromCommandLine: WW_JS.loadSessionFromCommandLine,
+	  	getDateAndTime: WW_JS.getDateAndTime,
+	  	setOutputFolder: WW_JS.setOutputFolder,
+	  	WORKER_ID: WW_JS.WORKER_ID
+
 	}
 }

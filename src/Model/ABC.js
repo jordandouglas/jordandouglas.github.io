@@ -132,12 +132,13 @@ ABC_JS.ABC_trials_WW = function(fitNums, resolve = function() {}, msgID = null){
  	// Print out every 100th simulation when calling from command line
  	if (RUNNING_FROM_COMMAND_LINE && (ABC_JS.n_ABC_trials_left == 1 || ABC_JS.n_ABC_trials_left == ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] || (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left + 1) % 20 == 0)){
 
+ 		var workerString = WW_JS.WORKER_ID == null ? "" : "Worker " + WW_JS.WORKER_ID + " | ";
 
  		var acceptanceNumber = ABC_JS.nAcceptedValues;
 		var acceptancePercentage = WW_JS.roundToSF_WW(100 * ABC_JS.nAcceptedValues / (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left));
 		if (isNaN(acceptancePercentage)) acceptancePercentage = 0;
 
- 		console.log("ABC", (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left + 1), "/", ABC_JS.ABC_FORCE_VELOCITIES["ntrials"], "| Accepted:", acceptanceNumber, "| Acceptance rate:", acceptancePercentage + "%");
+ 		console.log(workerString + "ABC", (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left + 1) + "/" + ABC_JS.ABC_FORCE_VELOCITIES["ntrials"], "| Accepted:", acceptanceNumber, "| Acceptance rate:", acceptancePercentage + "%");
  	}
 
 
@@ -408,8 +409,8 @@ ABC_JS.initialise_ABCoutput_WW = function(fitNums){
 	secondLine += (paddingString + "|Accepted|").slice(-12) + "&&&"; // Add the | to denote that this should be in coloured font
 
 
-	// If running from the command line then print it to the console
-	if (RUNNING_FROM_COMMAND_LINE){
+	// If running from the command line and is the first worker then print the first line to the console
+	if (RUNNING_FROM_COMMAND_LINE && (WW_JS.WORKER_ID == null || WW_JS.WORKER_ID == 1)){
 
 		ABC_JS.savePosteriorToFiles_CommandLine(secondLine);
 
@@ -434,8 +435,9 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 	var paddingString = "&&&&&&&&&&&"; 
 
 	// Add the trial number
+	var workerNum = RUNNING_FROM_COMMAND_LINE && WW_JS.WORKER_ID != null ? WW_JS.WORKER_ID + "." : "";// Print the worker number if multithreading from the command line
 	var trialNum = 	ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
-	var line = (paddingString + trialNum).slice(-9);
+	var line = (paddingString + workerNum + trialNum).slice(-9);
 
 
 	// All the prior-sampled parameters
@@ -593,6 +595,15 @@ ABC_JS.getListOfValuesFromPosterior_WW = function(paramOrMetricID){
 }
 
 
+ABC_JS.initialiseFileNames_CommandLine = function(){
+
+	if (!RUNNING_FROM_COMMAND_LINE || WW_JS.outputFolder == null) return;
+
+	// Set the posterior file name
+	ABC_JS.posterior_fileName	= WW_JS.outputFolder + "posterior.tsv";
+
+}
+
 
 // Create the posterior distribution text file (only if running from command line)
 ABC_JS.initialiseSaveFiles_CommandLine = function(startingTime){
@@ -601,7 +612,6 @@ ABC_JS.initialiseSaveFiles_CommandLine = function(startingTime){
 
 	if (!RUNNING_FROM_COMMAND_LINE || WW_JS.outputFolder == null) return;
 
-	if (WW_JS.outputFolder[WW_JS.outputFolder.length-1] != "/") WW_JS.outputFolder += "/";
 
 	// Create the output folder if it does not already exist
 	var fs = require('fs');
@@ -612,8 +622,6 @@ ABC_JS.initialiseSaveFiles_CommandLine = function(startingTime){
 
 
 	// Create the data files
-	ABC_JS.posterior_fileName	= WW_JS.outputFolder + "posterior.tsv";
-
 	WW_JS.writeLinesToFile(ABC_JS.posterior_fileName, "Posterior distribution. " + startingTime + "\n");
 
 
@@ -697,7 +705,8 @@ if (RUNNING_FROM_COMMAND_LINE){
 	  	nAcceptedValues: ABC_JS.nAcceptedValues,
 	  	velocities_for_this_curve: ABC_JS.velocities_for_this_curve,
 	  	ABC_K_trials_for_observation_WW: ABC_JS.ABC_K_trials_for_observation_WW,
-	  	getPosteriorDistribution_WW: ABC_JS.getPosteriorDistribution_WW
+	  	getPosteriorDistribution_WW: ABC_JS.getPosteriorDistribution_WW,
+	  	initialiseFileNames_CommandLine: ABC_JS.initialiseFileNames_CommandLine 
 	}
 
 }

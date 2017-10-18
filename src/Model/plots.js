@@ -1097,13 +1097,27 @@ function binaryFind_WW(sortedArray, searchElement) {
 
 
 
+PLOTS_JS.initialiseFileNames_CommandLine = function(){
+
+	if (!RUNNING_FROM_COMMAND_LINE || WW_JS.outputFolder == null) return;
+
+	// Create the data file names
+	PLOTS_JS.dvt_fileName		= WW_JS.outputFolder + "distance_versus_time.tsv";
+	PLOTS_JS.dwelltime_fileName = WW_JS.outputFolder + "catalysis_times.tsv";
+	PLOTS_JS.params_fileName 	= WW_JS.outputFolder + "parameters.tsv";
+	PLOTS_JS.pauseSite_fileName = WW_JS.outputFolder + "time_per_site.tsv";
+
+}
+
+
 
 PLOTS_JS.initialiseSaveFiles_CommandLine = function(startingTime){
 
 
 	if (!RUNNING_FROM_COMMAND_LINE || WW_JS.outputFolder == null || ABC_JS.ABC_simulating) return;
 
-	if (WW_JS.outputFolder[WW_JS.outputFolder.length-1] != "/") WW_JS.outputFolder += "/";
+
+
 
 	// Create the output folder if it does not already exist
 	var fs = require('fs');
@@ -1113,11 +1127,6 @@ PLOTS_JS.initialiseSaveFiles_CommandLine = function(startingTime){
 	}
 
 
-	// Create the data files
-	PLOTS_JS.dvt_fileName		= WW_JS.outputFolder + "distance_versus_time.tsv";
-	PLOTS_JS.dwelltime_fileName = WW_JS.outputFolder + "catalysis_times.tsv";
-	PLOTS_JS.params_fileName 	= WW_JS.outputFolder + "parameters.tsv";
-	PLOTS_JS.pauseSite_fileName = WW_JS.outputFolder + "time_per_site.tsv";
 
 	WW_JS.writeLinesToFile(PLOTS_JS.dvt_fileName, "Distance versus time. " + startingTime + "\n");
 	WW_JS.writeLinesToFile(PLOTS_JS.dwelltime_fileName, "Time taken to polymerise at each site. " + startingTime + "\n");
@@ -1142,13 +1151,16 @@ PLOTS_JS.initialiseSaveFiles_CommandLine = function(startingTime){
 // Saves the most recent simulation's data to its respective files
 PLOTS_JS.savePlotsToFiles_CommandLine = function(){
 
+
+
 	if (!RUNNING_FROM_COMMAND_LINE || WW_JS.outputFolder == null || ABC_JS.ABC_simulating) return;
 
 
 	// Distance versus time
+	var workerString = WW_JS.WORKER_ID == null ? "" : WW_JS.WORKER_ID + ".";
 	var tsv = "";
 	var DVT = PLOTS_JS.DISTANCE_VS_TIME[PLOTS_JS.DISTANCE_VS_TIME.length-1];
-	tsv += "trial\t" + DVT["sim"] + "\n";
+	tsv += "trial\t" + workerString + DVT["sim"] + "\n";
 	var xvalsSim = DVT["times"];
 	var yvalsSim = DVT["distances"];
 
@@ -1171,7 +1183,7 @@ PLOTS_JS.savePlotsToFiles_CommandLine = function(){
 	// Dwell time per site
 	tsv = "";
 	var dwelltimes = PLOTS_JS.DWELL_TIMES[0];
-	tsv += "trial\t" + PLOTS_JS.CURRENT_SIM_NUMBER + "\n";
+	tsv += "trial\t" + workerString + PLOTS_JS.CURRENT_SIM_NUMBER + "\n";
 	tsv += "times\t";
 	for (var timeNum = 0; timeNum < dwelltimes.length; timeNum++){
 		tsv += WW_JS.roundToSF_WW(dwelltimes[timeNum]) + "\t";
@@ -1183,7 +1195,7 @@ PLOTS_JS.savePlotsToFiles_CommandLine = function(){
 
 
 	// Parameter plot
-	tsv = PLOTS_JS.CURRENT_SIM_NUMBER + "\t";
+	tsv = workerString + PLOTS_JS.CURRENT_SIM_NUMBER + "\t";
 	for (paramOrMetricID in PLOTS_JS.PARAMETERS_PLOT_DATA){
 
 		// Print the only value stored and reset the list of values
@@ -1242,7 +1254,8 @@ if (RUNNING_FROM_COMMAND_LINE){
 		getCacheSizes_WW: PLOTS_JS.getCacheSizes_WW,
 		deletePlots_WW: PLOTS_JS.deletePlots_WW,
 		savePlotsToFiles_CommandLine: PLOTS_JS.savePlotsToFiles_CommandLine,
-		initialiseSaveFiles_CommandLine: PLOTS_JS.initialiseSaveFiles_CommandLine
+		initialiseSaveFiles_CommandLine: PLOTS_JS.initialiseSaveFiles_CommandLine,
+		initialiseFileNames_CommandLine: PLOTS_JS.initialiseFileNames_CommandLine
 	}
 
 }
