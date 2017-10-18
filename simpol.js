@@ -45,8 +45,9 @@
 
 		Optional arguments:
 
-			-o <folder> : Saves all sequence and plot data into the specified folder. Creates the folder if it does not exist
-			-ABC		: Performs an ABC analysis instead of just simulations
+			-o <folder> 	: Saves all sequence and plot data into the specified folder. Creates the folder if it does not exist
+			-ABC			: Performs an ABC analysis instead of just simulations
+			-nthreads	n	: Runs an ABC analysis over n workers (and 1 worker is required to be the master worker)
 
 
 			Example: simpol.js session.xml -o path/to/OutputFolder -ABC
@@ -58,8 +59,10 @@
 initNodeCompilation();
 
 function initNodeCompilation(){
-	
 
+
+
+	var cluster = require('cluster'); // If more than 1 core then multithread
 	var args = process.argv;
 	if (args.length <= 2){
 		console.log("Please parse a SimPol session in XML format!");
@@ -70,6 +73,7 @@ function initNodeCompilation(){
 	var XMLfileDirectory = args[2];
 	var outputFolder = null;
 	var runABC = false;
+	var nthreads = 1;
 
 	// Parse the optional args
 	for(var i = 3; i < args.length; i ++){
@@ -83,6 +87,17 @@ function initNodeCompilation(){
 			outputFolder = args[i+1];
 			i++;
 		}
+
+		else if (arg == "-nthreads"){
+			nthreads = args[i+1];
+			i++;
+
+			if (isNaN(nthreads) || Math.ceil(parseFloat(nthreads)) < 1){
+				console.log("Invalid number of threads!");
+				return;
+			}
+		}
+
 		else if (arg == "-ABC"){
 			runABC = true;
 		}
@@ -92,22 +107,96 @@ function initNodeCompilation(){
 		}
 	}
 
+
+
 	if (outputFolder == "") outputFolder = null;
 
 
-	// Read the XML file
-	fs.readFile(XMLfileDirectory, 'utf8', function(err, data) {  
-	    if (err) throw err;
-
-	    // Load all the appropriate scripts and initialise the program
-	    RUNNING_FROM_COMMAND_LINE = true;
-		var WW_JS = require('./src/Model/WebWorker.js');
-		WW_JS.init_WW(false);
-		WW_JS.loadSessionFromCommandLine(data, runABC, outputFolder);
 
 
-	});
 
+	// Load all the appropriate scripts and initialise the program
+	RUNNING_FROM_COMMAND_LINE = true;
+	var WW_JS = require('./src/Model/WebWorker.js');
+	WW_JS.init_WW(false);
+	WW_JS.setOutputFolder(outputFolder);
+
+	if (!runABC && outputFolder != null) PLOTS_JS.initialiseFileNames_CommandLine(); // Initialise the save file names
+	else if (runABC && outputFolder != null) ABC_JS.initialiseFileNames_CommandLine(); // Initialise the save file names
+
+
+	// Print the welcome message
+	var startingTime = new Date(); 
+	if (cluster.isMaster){
+
+		console.log("Starting SimPol at", WW_JS.getDateAndTime(startingTime)); 
+
+
+		if (!runABC && outputFolder != null) PLOTS_JS.initialiseSaveFiles_CommandLine(startingTime); // Initialise the plots.js save files
+		else if (runABC && outputFolder != null) ABC_JS.initialiseSaveFiles_CommandLine(startingTime); // Initialise the ABC posterior save file
+
+		console.log("--------------------------------------");
+
+	}
+
+
+
+
+	// If single core or this is a worker thread then run the analysis
+	if (nthreads == 1 || cluster.isWorker){
+
+
+		var workerID = cluster.isWorker ? cluster.worker.id : null;
+
+		// Read the XML file
+		fs.readFile(XMLfileDirectory, 'utf8', function(err, data) {  
+		    if (err) throw err;
+
+			WW_JS.loadSessionFromCommandLine(data, runABC, startingTime, nthreads, workerID, function(){
+				cluster.worker.kill();
+			});
+			
+
+		});
+
+	}
+
+
+	// If this is the master thread then open up other threads. In total there will be n+1 threads (including this one)
+	else{
+
+
+		for (var i = 1; i <= nthreads; i ++){
+			cluster.fork();
+		}
+
+
+		var nConnectedWorkers = nthreads;
+		cluster.on('disconnect', (worker) => {
+
+  			nConnectedWorkers--;
+
+  			if (nConnectedWorkers == 0){
+
+  				var finishingTime = new Date(); 
+				var secondToFinish = (finishingTime - startingTime) / 1000;
+
+				console.log("--------------------------------------");
+				console.log("Finished after " + secondToFinish + "s");
+				console.log("Exiting.");
+
+
+				cluster.disconnect();
+
+
+  			}
+
+
+		});
+
+
+
+	}
 
 
 
