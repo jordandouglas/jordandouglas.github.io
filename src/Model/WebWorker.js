@@ -47,6 +47,7 @@ WW_JS.init_WW = function(isWW = false){
 		self.importScripts('../Resources/random.js');
 		self.importScripts('../Resources/mersenne-twister.js');
 		self.importScripts('../Resources/xml_for_script-3.1/jsXMLParser/xmlsax.js');
+		MER_JS.init();
 	}
 
 	else if (RUNNING_FROM_COMMAND_LINE){
@@ -68,9 +69,10 @@ WW_JS.init_WW = function(isWW = false){
 		require('../Resources/xml_for_script-3.1/jsXMLParser/xmlsax.js');
 
 
-
-
 	}
+	
+	else MER_JS.init();
+	
 	needToRefreshNTPParameters = true;
 	for (sequenceID in SEQS_JS.all_sequences){ break }; // Set the current sequence to the first sequence in the dict
 	init_misincorporation_pairs();
@@ -1315,8 +1317,14 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 
 
  	if (!RUNNING_FROM_COMMAND_LINE) return;
+	
+	
 
 	XML_JS.loadSession_WW(XMLdata);
+	
+	// Initialise the mersenne-twister using the current time and the worker number as the random seed.
+	// If you only use the time there is a decent chance of two threads having the same random seed
+	MER_JS.init(new Date().getTime() + (workerID == null ? 0 : 100000 * workerID));
 
 
 	var toDoAfterRefr = function(){
@@ -1348,6 +1356,7 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 		if (!runABC) {
 
 			// Split the number of trials evenly among the number of workers
+			var nTrialsThisWorker = XML_JS.N;
 			if (nthreads > 1){
 				var nTrialsThisWorker = Math.floor(XML_JS.N / nthreads);
 				var remainingNumberOfTrials = XML_JS.N % nthreads;
