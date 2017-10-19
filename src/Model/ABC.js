@@ -55,6 +55,7 @@ ABC_JS.beginABC_WW = function(forcesVelocities, resolve = function() {}, msgID =
 		ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitNums[fitNum]] = null;
 		ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitNums[fitNum]] = null;
 	}
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"] = null;
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"] = null;
 	for (var paramID in PARAMS_JS.PHYSICAL_PARAMETERS){
 		if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["binary"] && !PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["hidden"]) {
@@ -72,7 +73,7 @@ ABC_JS.beginABC_WW = function(forcesVelocities, resolve = function() {}, msgID =
 				
 	}
 
-	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"] = {name: PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["name"], obsVals: []}; 
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"] = {name: PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["name"], vals: []}; 
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"] = {name: "Mean velocity (bp/s)", vals: []};
 	//if(RHS_params.indexOf("catalyTime") != -1) ABC_JS.ABC_parameters_and_metrics_this_simulation["catalyTime"] = {name: "Mean catalysis time (s)", vals: []};
 	//if(RHS_params.indexOf("totalTime") != -1) ABC_JS.ABC_parameters_and_metrics_this_simulation["totalTime"] = {name: "Total transcription time (s)", vals: []};
@@ -162,12 +163,13 @@ ABC_JS.ABC_trials_WW = function(fitNums, resolve = function() {}, msgID = null){
 
 
 	// Reset whether or not each fit was accepted
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"] = ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
 	for (var fitNum in fitNums) {
 		ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitNums[fitNum]] = null;
 		ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitNums[fitNum]] = null;
 	}
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"] = null;
-	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["obsVals"] = []; 
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"] = []; 
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"] = [];
 
 
@@ -292,7 +294,7 @@ ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve
 	PARAMS_JS.PHYSICAL_PARAMETERS["CTPconc"]["val"] = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["CTPconc"];
 	PARAMS_JS.PHYSICAL_PARAMETERS["GTPconc"]["val"] = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["GTPconc"];
 	PARAMS_JS.PHYSICAL_PARAMETERS["UTPconc"]["val"] = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["UTPconc"];
-	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["obsVals"].push(force);
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"].push(force);
 
 
 
@@ -419,8 +421,12 @@ ABC_JS.initialise_ABCoutput_WW = function(fitNums){
 	// Otherwise save it for later
 	else{
 
-		ABC_JS.ABC_outputString.push("", "", secondLine);
-		ABC_JS.ABC_outputString_unrendered.push("", "", secondLine);
+		ABC_JS.ABC_outputString.push("");
+		ABC_JS.ABC_outputString.push("");
+		ABC_JS.ABC_outputString.push(secondLine);
+		ABC_JS.ABC_outputString_unrendered.push("");
+		ABC_JS.ABC_outputString_unrendered.push("");
+		ABC_JS.ABC_outputString_unrendered.push(secondLine);
 	}
 
 
@@ -435,7 +441,7 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 	var paddingString = "&&&&&&&&&&&"; 
 
 	// Add the trial number
-	var workerNum = RUNNING_FROM_COMMAND_LINE && WW_JS.WORKER_ID != null ? WW_JS.WORKER_ID + "." : "";// Print the worker number if multithreading from the command line
+	var workerNum = RUNNING_FROM_COMMAND_LINE && WW_JS.WORKER_ID != null ? WW_JS.WORKER_ID + ":" : "";// Print the worker number if multithreading from the command line
 	var trialNum = 	ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
 	var line = (paddingString + workerNum + trialNum).slice(-9);
 
@@ -461,7 +467,7 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 		// Iterate through each force-velocity observation in this curve
 		for (var obsNum = 0; obsNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"].length; obsNum++){
 
-			var force = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["obsVals"][obsNum]) : "";
+			var force = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"][obsNum]) : "";
 			var velocity = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][obsNum]) : "";
 
 			if (isNaN(force) || isNaN(velocity)){
@@ -497,7 +503,7 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 	if (RUNNING_FROM_COMMAND_LINE){
 
 		// Only log if it was accepted into posterior
-		if(ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"]) ABC_JS.savePosteriorToFiles_CommandLine(line);
+		if(XML_JS.showRejectedParameters || ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"]) ABC_JS.savePosteriorToFiles_CommandLine(line);
 
 	}
 
@@ -518,10 +524,11 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 ABC_JS.get_unrendered_ABCoutput_WW = function(resolve = function() {}, msgID= null){
 
 
+
 	var toReturn = null;
 	if (ABC_JS.ABC_outputString_unrendered.length > 0){
 		var acceptanceNumber = ABC_JS.nAcceptedValues;
-		var acceptancePercentage = 100 * ABC_JS.nAcceptedValues / (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left);
+		var acceptancePercentage = ABC_JS.ABC_FORCE_VELOCITIES == null ? null : (100 * ABC_JS.nAcceptedValues / (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left));
 		toReturn = {newLines: ABC_JS.ABC_outputString_unrendered, nTrialsToGo: ABC_JS.n_ABC_trials_left, acceptanceNumber: acceptanceNumber, acceptancePercentage: acceptancePercentage};
 	}
 	if (msgID != null){
@@ -560,31 +567,33 @@ ABC_JS.get_ABCoutput_WW = function(resolve, msgID){
 ABC_JS.getListOfValuesFromPosterior_WW = function(paramOrMetricID){
 
 
-	if (paramOrMetricID == "probability") return null;
+
+
+	if (paramOrMetricID == "probability" || paramOrMetricID ==  "catalyTime" || paramOrMetricID ==  "totalTime" || paramOrMetricID ==  "nascentLen") return null;
+
 
 	var posteriorValues = [];
 	for (var i = 0; i < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; i ++){
 		
-		// If no values sampled then move on to next value in posterior
-		//if (ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID] == null || ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["vals"] == null) continue;
-
-		// If there was only 1 number then use it (one time for each rule)
 
 
-		// Iterate through all rules
-		for (var j = 0; j < ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["nrules"]; j ++){
+		// The length of the list returned should be the same number of forces sampled in this entry
+		var nVals = ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["FAssist"]["vals"].length;
 
-			if (ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["vals"] == null){
+		if (paramOrMetricID == "FAssist") for (var j = 0; j < nVals; j ++) posteriorValues.push(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["FAssist"]["vals"][j]);
+		else if (paramOrMetricID == "velocity") for (var j = 0; j < nVals; j ++) posteriorValues.push(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["velocity"]["vals"][j]);
 
-				posteriorValues.push(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["val"]);
-				
-			}else{
+		else{
 
-				posteriorValues.push(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["vals"][j]);
+			for (var j = 0; j < nVals; j ++){
+
+				if (ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["val"] != null) posteriorValues.push(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["val"]);
+
+				else if (ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["priorVal"] != null) posteriorValues.push(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramOrMetricID]["priorVal"]);
 
 			}
-		}
 
+		}
 
 
 	}
@@ -675,6 +684,163 @@ ABC_JS.getPosteriorDistribution_WW = function(resolve = function() { }, msgID = 
 }
 
 
+
+
+ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null){
+
+
+
+	var lines = TSVstring.split("|");
+	var success = true;
+
+	//console.log("lines", lines[0], lines[0].includes("Posterior distribution."));
+	//ABC_JS.ABC_POSTERIOR_DISTRIBUTION = [];
+
+
+
+	// Generate the console log string (which is the same string except that we use padding spaces instead of tabs)
+	var paddingString = "&&&&&&&&&&&"; 
+	var firstConsoleLine = "";
+
+
+	// Check that this is indeed a posterior file
+	if (lines[0].includes("Posterior distribution.")){
+
+
+		// Build the first row
+		var colNames = lines[1].split("\t");
+		var posteriorObjectEmptyTemplate = {trial: null, accepted: null}; // The template for a single row in the posterior or rejected distribution
+		posteriorObjectEmptyTemplate["FAssist"] = {name: PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["name"], vals: []}; 
+		posteriorObjectEmptyTemplate["velocity"] = {name: "Mean velocity (bp/s)", vals: []};
+
+
+
+		var nfits = 0; // Total number of graphs which have been fit to
+		var columnNumTSV_to_columnNameObj = {};
+		var fitNums = []; // Build a list of fit numbers
+		for (var colNum = 1; colNum <= colNames.length; colNum++){
+
+
+			var col = colNames[colNum-1];
+
+			if (col.trim() == "") continue;
+
+
+			if (col.includes("Accepted")) {
+				firstConsoleLine += (paddingString + "|Accepted|").slice(-12) + "&&&";
+				columnNumTSV_to_columnNameObj[colNum] = "accepted";
+				continue;
+			}
+
+
+			if (col.includes("Trial")) {
+				firstConsoleLine += (paddingString + col).slice(-9);
+				columnNumTSV_to_columnNameObj[colNum] = "trial";
+				continue;
+			}
+
+
+			firstConsoleLine += (paddingString + col).slice(-paddingString.length);
+			if (col.includes("Velocity")) columnNumTSV_to_columnNameObj[colNum] = "velocity";
+			if (col.includes("Force")) columnNumTSV_to_columnNameObj[colNum] = "FAssist";
+
+
+			// Increment the number of graphs being fitted to
+			if (col.includes("MeanRSS")){
+				nfits ++;
+				posteriorObjectEmptyTemplate["meanRSS" + nfits] = null;
+				posteriorObjectEmptyTemplate["Passed" + nfits] = null;
+				columnNumTSV_to_columnNameObj[colNum] = "meanRSS" + nfits;
+				columnNumTSV_to_columnNameObj[colNum+1] = "Passed" + nfits;
+				fitNums.push("fit" + nfits);
+
+			}
+
+			else if (PARAMS_JS.PHYSICAL_PARAMETERS[col] != null){
+				columnNumTSV_to_columnNameObj[colNum] = col;
+				posteriorObjectEmptyTemplate[col] = {name: PARAMS_JS.PHYSICAL_PARAMETERS[col]["name"], priorVal: false};
+			}
+
+
+		}
+
+		// Add this line to the console output
+		ABC_JS.ABC_outputString.push("");
+		ABC_JS.ABC_outputString.push("");
+		ABC_JS.ABC_outputString.push(firstConsoleLine);
+		ABC_JS.ABC_outputString_unrendered.push("");
+		ABC_JS.ABC_outputString_unrendered.push("");
+		ABC_JS.ABC_outputString_unrendered.push(firstConsoleLine);
+
+		//console.log("Created objects", posteriorObjectEmptyTemplate, columnNumTSV_to_columnNameObj, colNames);
+
+
+		// Populate the remaining rows with numbers
+		for (var lineNum = 2; lineNum < lines.length; lineNum++){
+
+			if (lines[lineNum].trim() == "") continue;
+
+			var rowTemplateCopy = JSON.parse(JSON.stringify(posteriorObjectEmptyTemplate));
+
+			var splitLine = lines[lineNum].split("\t");
+			var consoleLine = "";
+
+			for (var colNum = 2; colNum <= splitLine.length; colNum++){
+
+				
+				var colName = columnNumTSV_to_columnNameObj[colNum];
+				if (colName == null) continue;
+
+				var value = splitLine[colNum-1];
+				if (!isNaN(parseFloat(value))) value = parseFloat(value);
+				else if (value == "true") value = true;
+				else if (value == "false") value = false;
+
+				if (colNames[colNum-1] == "Accepted") consoleLine += (paddingString + "|" + value + "|").slice(-12) + "&&&";
+				else if (colNames[colNum-1] == "Trial") consoleLine += (paddingString + value).slice(-9);
+				else consoleLine += (paddingString + value).slice(-paddingString.length);
+
+
+				// Add the value to the list or set it as the value 
+				if (rowTemplateCopy[colName] == null) rowTemplateCopy[colName] = value;
+				else if (rowTemplateCopy[colName]["vals"] != null) rowTemplateCopy[colName]["vals"].push(value);
+				else if (rowTemplateCopy[colName]["val"] != null) rowTemplateCopy[colName]["val"] = value;
+				else if (rowTemplateCopy[colName]["priorVal"] != null) rowTemplateCopy[colName]["priorVal"] = value;
+
+
+
+			}
+
+			// Add to the posterior distribution if applicable
+			if (rowTemplateCopy["accepted"]) ABC_JS.ABC_POSTERIOR_DISTRIBUTION.push(rowTemplateCopy);
+
+
+			//console.log("Created rowTemplateCopy", rowTemplateCopy);
+
+			// Add to the list of lines to print
+			ABC_JS.ABC_outputString.push(consoleLine);
+			ABC_JS.ABC_outputString_unrendered.push(consoleLine);
+
+
+		}
+
+		//console.log("Created objects", ABC_JS.ABC_POSTERIOR_DISTRIBUTION);
+
+
+	}
+
+	else success = false;
+
+
+	var toReturn = {success: success};
+
+	if (msgID != null){
+		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+	}else{
+		resolve(toReturn);
+	}
+
+}
 
 
 

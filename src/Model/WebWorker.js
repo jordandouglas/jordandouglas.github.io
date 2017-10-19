@@ -1324,7 +1324,7 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 	
 	// Initialise the mersenne-twister using the current time and the worker number as the random seed.
 	// If you only use the time there is a decent chance of two threads having the same random seed
-	MER_JS.init(new Date().getTime() + (workerID == null ? 0 : 100000 * workerID));
+	MER_JS.init(new Date().getTime() * (workerID == null ? 1 : workerID * workerID));
 
 
 	var toDoAfterRefr = function(){

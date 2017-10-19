@@ -550,9 +550,6 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 			}
 				
-				
-			
-
 
 			// X min and max
 			var axisPointMargin = 10 * canvasSizeMultiplier;
@@ -562,7 +559,6 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 			ctx.fillText(xmin, axisGap, canvas.height - axisGap + axisPointMargin);
 			ctx.textAlign="right"; 
 			ctx.fillText(xmax, canvas.width - margin, canvas.height - axisGap + axisPointMargin);
-		
 
 
 			// Y min and max
@@ -584,7 +580,6 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 			ctx.fillText(ymax, 0, 0);
 			ctx.restore();
 			
-
 
 		}
 
@@ -630,7 +625,6 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 function uploadABC(){
 	
-	return;
 	
 	document.getElementById('uploadABCinput').addEventListener('change', loadSessionFile, false);
 	$("#uploadABCinput").click();
@@ -650,11 +644,11 @@ function uploadABC(){
 				return function(e) {
 
 					if (e == null || e.target.result == "") return;
-					var TSVstring = e.target.result.replace(/(\r\n|\n|\r)/gm,"");
+					var TSVstring = e.target.result.replace(/(\r\n|\n|\r)/gm,"|");
 
-					console.log("Sending TSVstring", TSVstring);
+					//console.log("Sending TSVstring", TSVstring);
 
-					//loadSession_controller(XMLstring);
+					uploadABC_controller(TSVstring);
 
 				};
 			})(fileName);

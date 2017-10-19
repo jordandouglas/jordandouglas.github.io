@@ -964,6 +964,9 @@ function saveSession(){
 			var forcesVelocitiesForModel = getABCforceVelocityObject();
 			saveXML.writeAttributeString("ntrials", forcesVelocitiesForModel["ntrials"]);
 			saveXML.writeAttributeString("testsPerData", forcesVelocitiesForModel["testsPerData"]);
+			saveXML.writeAttributeString("showRejectedParameters", $("#ABC_showRejectedParameters").is(":checked").length = 0 ? false : $("#ABC_showRejectedParameters").is(":checked"));
+
+
 
 			for (var fitID in forcesVelocitiesForModel["fits"]){
 

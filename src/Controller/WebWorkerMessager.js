@@ -2302,7 +2302,50 @@ function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardat
 
 
 
+// Uploads the string in tsv format to the posterior distribution
+function uploadABC_controller(TSVstring){
 
+
+	var updateDOM = function(result){
+
+
+		var success = result["success"];
+		if (success){
+
+			console.log("Rendering");
+			//$("#ABCoutput").html("");
+			get_unrendered_ABCoutput_controller();
+
+		}else{
+
+			console.log("Failed to upload ABC output");
+		}
+
+	}
+
+
+	if (WEB_WORKER == null) {
+		var toCall = () => new Promise((resolve) => ABC_JS.uploadABC_WW(TSVstring, resolve));
+		toCall().then((result) => updateDOM(result));
+	}
+
+	else{
+		var res = stringifyFunction("ABC_JS.uploadABC_WW", [TSVstring, null], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => updateDOM(result));
+
+
+	}
+
+
+
+
+
+
+
+}
 
 
 
@@ -2380,6 +2423,8 @@ function get_unrendered_ABCoutput_controller(){
 
 		if (result != null) {
 
+
+
 			// Update the counter
 			var nTrialsToGo = result["nTrialsToGo"];
 			if (nTrialsToGo != parseFloat($("#ABCntrials").val())) $("#ABCntrials").val(nTrialsToGo);
@@ -2400,25 +2445,29 @@ function get_unrendered_ABCoutput_controller(){
 			for (var i = 0; i < newLines.length; i++){
 
 
-				if (newLines[i].trim() == "") continue;
+				var paddedLine = null;
+				if (newLines[i].trim() == "") paddedLine = "<br>";
 
-				// Replace all the & with a space
-				var rejected = newLines[i].split("|")[1].trim() == "false";
-				var paddedLine = rejected ? "<div class='ABCrejected'>" : "<div>";
+				else{
 
-				
+					// Replace all the & with a space
+					var rejected = newLines[i].split("|")[1].trim() == "false";
+					var paddedLine = rejected ? "<div class='ABCrejected'>" : "<div>";
 
-				var openPipe = true; // | (pipes) denote coloured font
-				for (var j = 0; j < newLines[i].length; j ++){
+					
 
-					if (newLines[i][j] == "|") {
-						paddedLine += openPipe ? "<span style='color:red'>" : "</span>"; 
-						openPipe = !openPipe;
+					var openPipe = true; // | (pipes) denote coloured font
+					for (var j = 0; j < newLines[i].length; j ++){
+
+						if (newLines[i][j] == "|") {
+							paddedLine += openPipe ? "<span style='color:red'>" : "</span>"; 
+							openPipe = !openPipe;
+						}
+						else if (newLines[i][j] == "&") paddedLine += "&nbsp";
+						else paddedLine += newLines[i][j];
+
+
 					}
-					else if (newLines[i][j] == "&") paddedLine += "&nbsp";
-					else paddedLine += newLines[i][j];
-
-
 				}
 
 				var currentOutputHTML = $("#ABCoutput").html();

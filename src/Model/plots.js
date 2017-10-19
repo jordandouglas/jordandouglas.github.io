@@ -317,6 +317,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
 				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY};
 				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"]["name"], vals:valuesZ};
+
 			}
 		}
 

@@ -72,6 +72,8 @@ XML_JS.ABC_FORCE_VELOCITIES = {};
 	}
 
 
+	//console.log("Parsed", XML_JS.showRejectedParameters);
+
 
 	var toReturn = {seq: SEQS_JS.all_sequences[sequenceID], model: FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel], N: XML_JS.N, speed: speedVal, whichPlotInWhichCanvas: PLOTS_JS.whichPlotInWhichCanvas, ABC_FORCE_VELOCITIES: XML_JS.ABC_FORCE_VELOCITIES};
 	toReturn["seq"]["seqID"] = sequenceID;
@@ -142,6 +144,7 @@ function parseXML_ABCmain_WW(ABCnode){
 	XML_JS.ABC_FORCE_VELOCITIES = {};
 	XML_JS.ABC_FORCE_VELOCITIES["ntrials"] = ABCnode["ntrials"];
 	XML_JS.ABC_FORCE_VELOCITIES["testsPerData"] = ABCnode["testsPerData"];
+	XML_JS.showRejectedParameters = ABCnode["showRejectedParameters"] == null ? false : ABCnode["showRejectedParameters"] == "true";
 	XML_JS.ABC_FORCE_VELOCITIES["fits"] = {};
 
 }
@@ -217,7 +220,8 @@ if (RUNNING_FROM_COMMAND_LINE){
 
 	module.exports = {
 		loadSession_WW: XML_JS.loadSession_WW,
-		ABC_FORCE_VELOCITIES: XML_JS.ABC_FORCE_VELOCITIES
+		ABC_FORCE_VELOCITIES: XML_JS.ABC_FORCE_VELOCITIES,
+		showRejectedParameters: XML_JS.showRejectedParameters
 
 	}
 
