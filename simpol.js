@@ -61,7 +61,6 @@ initNodeCompilation();
 function initNodeCompilation(){
 
 
-
 	var cluster = require('cluster'); // If more than 1 core then multithread
 	var args = process.argv;
 	if (args.length <= 2){
