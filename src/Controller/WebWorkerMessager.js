@@ -2314,7 +2314,10 @@ function uploadABC_controller(TSVstring){
 
 			console.log("Rendering");
 			//$("#ABCoutput").html("");
+			onABCStart();
 			get_unrendered_ABCoutput_controller();
+			validateAllForceVelocityInputs();
+
 
 		}else{
 
@@ -2441,6 +2444,9 @@ function get_unrendered_ABCoutput_controller(){
 
 			var newLines = result["newLines"];
 			if (newLines.length == 0) return;
+
+
+			console.log("lines", newLines);
 
 			for (var i = 0; i < newLines.length; i++){
 

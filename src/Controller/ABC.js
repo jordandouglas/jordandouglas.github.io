@@ -46,7 +46,6 @@ function beginABC(){
 
 	beginABC_controller(forcesVelocitiesForModel);
 
-	
 	// Update the DOM so that we can see that ABC is running
 	$("#beginABC_btn").val("Stop ABC");
 	$("#beginABC_btn").attr("onclick", "stop_controller()");
@@ -62,6 +61,20 @@ function beginABC(){
 	$("#ABC_RSS").css("background-color", "#858280");
 	$("#ABC_RSS").attr("disabled", "disabled");
 
+
+
+	onABCStart();
+
+
+
+}
+
+
+
+function onABCStart(){
+
+
+
 	$("#downloadABC").show(50);
 	$("#uploadABC").hide(50);
 	
@@ -72,8 +85,8 @@ function beginABC(){
 	$("#ABCacceptance_val").html("0");
 
 
-}
 
+}
 
 
 function getABCforceVelocityObject(){
@@ -457,19 +470,24 @@ function getABCforceVelocityCurveTemplate(fitID){
 
 
 function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
-	
+
+
 	
 	var canvas = $("#forceVelocityCurve_" + fitID)[0];
 	if (canvas == null) return;
 
-	ctx = canvas.getContext('2d');
+	var ctx = canvas.getContext('2d');
 
 	var canvasSizeMultiplier = 1;
 	var axisGap = 45 * canvasSizeMultiplier;
 	var margin = 3 * canvasSizeMultiplier;
 
 
+
+
 	getPosteriorDistribution_controller(function(result){
+
+
 
 
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -582,6 +600,7 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 			
 
 		}
+
 
 
 		// Axes
