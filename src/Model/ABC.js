@@ -388,15 +388,17 @@ ABC_JS.initialise_ABCoutput_WW = function(fitNums){
 
 
 	// For each curve to fit to, add the force-velocity column names
+	var forceNumber = 0;
+	var passNumber = 0;
 	for (var fitNum in fitNums){
 
 		var ID = fitNums[fitNum];
 
 		for (var obsNum = 0; obsNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][ID]["vals"].length; obsNum ++){
 
-
-			secondLine += (paddingString + "Force" + (obsNum+1)).slice(-paddingString.length);
-			secondLine += (paddingString + "Velocity" + (obsNum+1)).slice(-paddingString.length);
+			forceNumber++;
+			secondLine += (paddingString + "F" + (forceNumber)).slice(-paddingString.length);
+			secondLine += (paddingString + "v(F" + (forceNumber) + ")").slice(-paddingString.length);
 			/*
 			var force = ABC_JS.ABC_FORCE_VELOCITIES[ID][obsNum]["force"];
 			var velocity = ABC_JS.ABC_FORCE_VELOCITIES[ID][obsNum]["velocity"];
@@ -404,8 +406,9 @@ ABC_JS.initialise_ABCoutput_WW = function(fitNums){
 
 		}
 
-		secondLine += (paddingString + "MeanRSS").slice(-paddingString.length);
-		secondLine += (paddingString + "Passed").slice(-paddingString.length);
+		passNumber ++;
+		secondLine += (paddingString + "MeanRSS" + passNumber).slice(-paddingString.length);
+		secondLine += (paddingString + "Passed" + passNumber).slice(-paddingString.length);
 	}
 
 	secondLine += (paddingString + "|Accepted|").slice(-12) + "&&&"; // Add the | to denote that this should be in coloured font
@@ -467,13 +470,13 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 		// Iterate through each force-velocity observation in this curve
 		for (var obsNum = 0; obsNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"].length; obsNum++){
 
-			var force = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"][obsNum]) : "";
-			var velocity = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][obsNum]) : "";
+			var force = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"][obsNum]) : "-";
+			var velocity = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][obsNum]) : "-";
 
 			if (isNaN(force) || isNaN(velocity)){
 				printVals = false;
-				force = "";
-				velocity = "";
+				force = "-";
+				velocity = "-";
 			}
 
 
@@ -483,12 +486,12 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 		}
 
 		// RSS
-		var RSS = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitID]) : "";
+		var RSS = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitID]) : "-";
 		line += (paddingString + RSS).slice(-paddingString.length);
 
 
 		// Pass or fail
-		var passed = printVals ? ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitID] : "";
+		var passed = printVals ? ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitID] : "-";
 		line += (paddingString + passed).slice(-paddingString.length);
 
 		if (!passed) printVals = false;
@@ -718,6 +721,7 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 		var nfits = 0; // Total number of graphs which have been fit to
 		var columnNumTSV_to_columnNameObj = {};
 		var fitNums = []; // Build a list of fit numbers
+		var acceptedCol = -1;
 		for (var colNum = 1; colNum <= colNames.length; colNum++){
 
 
@@ -729,6 +733,7 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 			if (col.includes("Accepted")) {
 				firstConsoleLine += (paddingString + "|Accepted|").slice(-12) + "&&&";
 				columnNumTSV_to_columnNameObj[colNum] = "accepted";
+				acceptedCol = colNum;
 				continue;
 			}
 
@@ -740,9 +745,10 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 			}
 
 
+			// Parse force and velocity values
 			firstConsoleLine += (paddingString + col).slice(-paddingString.length);
-			if (col.includes("Velocity")) columnNumTSV_to_columnNameObj[colNum] = "velocity";
-			if (col.includes("Force")) columnNumTSV_to_columnNameObj[colNum] = "FAssist";
+			if (col.match(/F[0-9]*$/gi) != null) columnNumTSV_to_columnNameObj[colNum] = "FAssist"; // Matches to force (F1, F2, etc)
+			if (col.match(/v\(F[0-9]*\)$/gi) != null) columnNumTSV_to_columnNameObj[colNum] = "velocity";	// Matches to velocity ( v(F1), v(F2), etc )
 
 
 			// Increment the number of graphs being fitted to
@@ -772,7 +778,7 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 		ABC_JS.ABC_outputString_unrendered.push("");
 		ABC_JS.ABC_outputString_unrendered.push(firstConsoleLine);
 
-		//console.log("Created objects", posteriorObjectEmptyTemplate, columnNumTSV_to_columnNameObj, colNames);
+		console.log("Created objects", posteriorObjectEmptyTemplate, columnNumTSV_to_columnNameObj, colNames);
 
 
 		// Populate the remaining rows with numbers
@@ -783,7 +789,14 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 			var rowTemplateCopy = JSON.parse(JSON.stringify(posteriorObjectEmptyTemplate));
 
 			var splitLine = lines[lineNum].split("\t");
+
+
+			// Skip if rejected
+			if (splitLine[acceptedCol-1] != "true") continue;
+
+
 			var consoleLine = "";
+
 
 			for (var colNum = 2; colNum <= splitLine.length; colNum++){
 
@@ -792,20 +805,29 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 				if (colName == null) continue;
 
 				var value = splitLine[colNum-1];
-				if (!isNaN(parseFloat(value))) value = parseFloat(value);
+
+
+				if (value.match(/[0-9]\:[0-9]/gi)) value = value; // Don't parse as float if it contains a : (which the trial numbers do if it was multithreaded)
+				else if (!isNaN(parseFloat(value))) value = parseFloat(value);
 				else if (value == "true") value = true;
 				else if (value == "false") value = false;
+
 
 				if (colNames[colNum-1] == "Accepted") consoleLine += (paddingString + "|" + value + "|").slice(-12) + "&&&";
 				else if (colNames[colNum-1] == "Trial") consoleLine += (paddingString + value).slice(-9);
 				else consoleLine += (paddingString + value).slice(-paddingString.length);
 
 
+				if (value == "-") continue;
+
 				// Add the value to the list or set it as the value 
 				if (rowTemplateCopy[colName] == null) rowTemplateCopy[colName] = value;
 				else if (rowTemplateCopy[colName]["vals"] != null) rowTemplateCopy[colName]["vals"].push(value);
 				else if (rowTemplateCopy[colName]["val"] != null) rowTemplateCopy[colName]["val"] = value;
 				else if (rowTemplateCopy[colName]["priorVal"] != null) rowTemplateCopy[colName]["priorVal"] = value;
+
+
+				//console.log(colNum, colNames[colNum-1], value);
 
 
 
