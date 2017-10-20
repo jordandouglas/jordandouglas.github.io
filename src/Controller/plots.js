@@ -2668,7 +2668,7 @@ function getColourPalette(paletteName){
 			return ["#FF80CC", "#E680FF", "#9980FF", "#80B2FF", "#80FFFF", "#80FFB3", "#99FF80", "#E5FF80", "#FFCC80", "#FF8080"];
 			break;
 		case "purpleYellow": 
-			return ["#9D00E5", "#A518CC", "#AE31B3", "#B7499B", "#C06282", "#C97A69", "#D29351", "#DBAB38", "#E4C41F", "#EDDD07"];
+			return ["#9D00E5", "#AE31B3", "#B7499B", "#C06282", "#C97A69", "#D29351", "#DBAB38", "#E4C41F", "#E8D112", "#EDDD07"];
 			break;
 		case "yellowRed":
 			return ["#FFFFBF", "#FFFF40", "#FFFF00", "#FFDB00", "#FFB600", "#FF9200", "#FF6D00", "#FF4900", "#FF2400", "#FF0000"];
