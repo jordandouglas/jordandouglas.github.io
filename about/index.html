@@ -60,8 +60,9 @@ function init(){
 		else if (hashBits[1] == "PlotHelp") minimiseSection("#displayingPlotsBtn", true); 
 		else if (hashBits[1] == "ModelHelp") minimiseSection("#kineticsBtn", true); 
 		else if (hashBits[1] == "ABCSectionHelp") minimiseSection("#ABCSectionBtn", true); 
+		else if (hashBits[1] == "performance") minimiseSection("#performanceBtn", true); 
 		else minimiseSection("#referencesSectionBtn", true); 
-
+		
 
 
 
@@ -354,35 +355,63 @@ function addCitations(){
 									
 									You can control the polymerase directly using the Navigation panel at the top of the main page. You should play around with the different reactions to see how they work. You may wish to
 									Simulate <img src="../src/Images/dice.png"  style="vertical-align:middle; width:25px; height:25px;"></img> reactions, whereby the reactions described below are selected randomly based off experimental parameters.
-									
+									Use <input type=button value='View model diagram' title="View the kinetic diagram of this model" class="operation" style="width:160px; cursor:auto"> to see how these reactions can be 
+									applied by the simulator under the current model settings.
 								
+									
 									<br><br>
-									<span class="block-subsubtitle" > Translocation. </span> There are two translocation reactions: Backwards and Forwards. These operations move the polymerase one base-pair left and right respectively, with respect to the 
+									<div style="padding: 10 10; background-color:#ebe9e7" >
+
+										<span class="block-subsubtitle" > <b>1. Translocation:</b> </span>
+										
+										There are two translocation reactions: Backwards and Forwards. These operations move the polymerase one base-pair left and right respectively, with respect to the 
 									template and nascent strand. These operations involve reconfiguring the base-pairs within the hybrid, and within the chromosome if it is double-stranded. If the polymerase moves beyond the 3&prime; end of the nascent strand, 
 									then the nascent strand will be released (termination). 
+
+									</div> 
+									
 									
 
-									<br><br><br>
-									<span class="block-subsubtitle" > Catalysis. </span> 
-									
+
+									<br><br>
+									<div style="padding: 10 10; background-color:#ebe9e7" >
+
+										<span class="block-subsubtitle" > <b>2. Nucleotide incorporation:</b> </span>
+										
 										If the active site is free and next to the 3&prime; end of the nascent strand, then the polymerase may bind NTP.
 										Once bound, the polymerase may catalyse the reaction, or it may release the NTP back into the cell. Reverse-catalysis is also possible in SimPol using 
 										the Decay reaction, although it is very improbable in nature. The canonical pathway of transcription 
 										elongation is a three step cycle: 1) forward translocation, 2) NTP binding, 3) catalysis. This may also be achieved with the Copy 
 										<img src="../src/Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function. 
-									</span>
+
+									</div> 
 									
 									
-									<br><br><br>
-									<span class="block-subsubtitle" > Deactivation. </span>  RNA polymerases are believed to occassionally deactivate whereby they undergo 
-									conformational changes and enter a catalytically inactive state, sometimes known as the intermediate state. In this state the protein cannot polymerise but it may still translocate. Factors known to increase the 
-									rate of entering the inactive state are 1) weak basepairing in the hybrid, 2) interactions between the polymerase and upstream or downstream elements of the template, and 3) interactions between the polymerase and
-									a secondary structure in the nascent strand <cite val="artsimovitch2000pausing,depken2009origin,imashimizu2013intrinsic"></cite>. Inactivation causes the polymerase to pause indefinitely, 
-									and elongation can only resume following an activation event.
 									
 									
-									<br><br><br>
-									<span class="block-subsubtitle" > Slippage. </span> Sometimes the nascent and template strand temporarily melt and a bulge forms in one of the strands. This can be performed by the
+									<br><br>
+									<div style="padding: 10 10; background-color:#ebe9e7" >
+
+										<span class="block-subsubtitle" > <b>3. Deactivation:</b> </span>
+										
+										RNA polymerases are believed to occassionally deactivate whereby they undergo 
+										conformational changes and enter a catalytically inactive state, sometimes known as the intermediate state. In this state the protein cannot polymerise but it may still translocate. Factors known to increase the 
+										rate of entering the inactive state are 1) weak basepairing in the hybrid, 2) interactions between the polymerase and upstream or downstream elements of the template, and 3) interactions between the polymerase and
+										a secondary structure in the nascent strand <cite val="artsimovitch2000pausing,depken2009origin,imashimizu2013intrinsic"></cite>. Inactivation causes the polymerase to pause indefinitely, 
+										and elongation can only resume following an activation event.
+
+									</div> 
+									
+				
+									
+									
+									
+										<br><br>
+									<div style="padding: 10 10; background-color:#ebe9e7" >
+
+										<span class="block-subsubtitle" > <b>4. Slippage:</b> </span>
+										
+										Sometimes the nascent and template strand temporarily melt and a bulge forms in one of the strands. This can be performed by the
 									Form Bulge reaction.
 									When this happens, a bulge (kink) forms within the duplex. This can occur within either the template or nascent strand (although in SimPol it can currently only occur within the nascent strand). When a bulge forms,
 									the active site may be opened up, allowing one of the template bases to be copied twice. This would lead to an insertion. The bulge may 
@@ -391,6 +420,9 @@ function addCitations(){
 									 was inspired by Neher et al.<cite val="neher2004dynamics,kuhner2007force"></cite> and is believed to be the mechanism behind transcriptional slippage. Iterative slippage and elongation can lead to large insertions. This is sometimes called stuttering and
 									can also be achieved with the Stutter <img src="../src/Images/stutter.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function.
 							
+
+									</div> 
+									
 								</div>
 							</div>
 
@@ -1452,21 +1484,323 @@ function addCitations(){
 						
 						
 							<span id='ABCSectionBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
-							Approximate Bayesian Computation
+							Parameter Inference
 						</div> 
 						<div id="ABCSection"  style="display:none">
 
 
 							<br><br>
-								<div class="about-block">
-									<div class="about-block-inner">
-									<div id="setupABC_ABCSectionHelp" class="block-subtitle" >Setting up ABC</div> <br>
+							<div class="about-block">
+								<div class="about-block-inner">
+								<div id="setupABC_ABCSectionHelp" class="block-subtitle" >Approximate Bayesian Computation</div> <br>
 
-										Approximate Bayesian Computation (ABC) is a simple statistical inference method, which SimPol uses to fit parameters to experimental data. 
+									Approximate Bayesian Computation (ABC) is a statistical inference method which SimPol uses to fit parameters to experimental data<cite val="csillery2010approximate"></cite>. Let $\Theta$ be the set of
+									parameters to estimate. Parameter inference is the process of finding estimates for these parameters such that the model will explain empirical data $D$.
 
+									First, a prior distribution is specified for each model 
+									parameter. These prior probability distributions should reflect your pre-exisiting or <i>prior</i> belief about what values would be sensible for these parameters. 
+									Let $\Theta_p$ be their respective values sampled from their prior distributions. Second, ABC is used to find a set of parameter values $\hat{\Theta}$ which adequately 
+									explain data $D$.
+									
+									The ABC algorithm is very simple: <br><br>
+									
+									
+									
+									<div style="padding: 2 10; background-color:#ebe9e7; font-size:18px" >
 
+									
+										<ol class="code">
+										
+											<li>
+												&Theta;<sup style='position: relative; left: -.65em;'>&Hat;</sup> &larr; {}
+														<span class="comment"> // The posterior distribution </span>
+											</li>
+											
+											<li>
+												for n = 1:N {
+											</li>
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &Theta;<sub>p</sub> ~ prior()
+															<span class="comment"> // Sample &Theta;<sub>p</sub> from prior distribution </span>
+											</li>
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; D<sup style='position: relative; left: -.65em;'>&Hat;</sup> &larr; run_model(&Theta;<sub>p</sub>) 
+														<span class="comment"> // Simulate data D<sup style='position: relative; left: -.65em;'>&Hat;</sup> using parameter values &Theta;<sub>p</sub> </span>
+											</li>
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; if (D<sup style='position: relative; left: -.65em;'>&Hat;</sup>&approx; D) &Theta;<sup style='position: relative; left: -.65em;'>&Hat;</sup>&larr; 
+													&Theta;<sup style='position: relative; left: -.65em;'>&Hat;</sup> &cup; &Theta;<sub>p</sub> 
+													<span class="comment"> // If D<sup style='position: relative; left: -.65em;'>&Hat;</sup> is close to D, add &Theta;<sub>p</sub> to the posterior distribution </span>
+											</li>
+											
+											
+											<li>
+												}
+											</li>
+											
+											
+										</ol>
+									
 									</div>
+								<br>
+								
+								The number of iterations $N$ should be large enough produce a reasonable sized posterior distribution. A rejection algorithm $\hat{D} \approx D$ is required to determine whether
+								the predicted data is close enough to the true empirical data to be accepted into the posterior distribution. 
+
+								ABC has the advantage of being simple to set up
+								compared with a complex hillclimbing algorithm like Markov chain Monte Carlo, and is easy to parallelise. However, the nature of ABC means that the posterior 
+								distribution is not comprised of true probabilities and has limited statistical meaning<cite val="templeton2009statistical"></cite>.
+								Furthermore, since each trial is sampled independently this means that when the number of parameters or the dataset becomes too large,
+								the amount of time required may become infeasible<cite val="bertorelle2010abc"></cite>. 
+
+							</div>
+						</div>
+							
+							
+							
+							
+							
+							
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+								<div class="block-subtitle">The ABC algorithm in SimPol</div> <br>
+
+									
+									
+									The following algorithm is used during ABC in SimPol:   <br><br>
+									
+									
+									
+									<div style="padding: 2 10; background-color:#ebe9e7; font-size:18x" >
+
+									
+										<ol class="code">
+										
+										
+											<li>
+												function SimPol_ABC(N, K, D) {
+											</li>
+										
+											<li>
+												&nbsp;&nbsp;&nbsp; &Theta;<sup style='position: relative; left: -.65em;'>&Hat;</sup> &larr; {}
+														<span class="comment"> // The posterior distribution </span>
+											</li>
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; for n = 1:N {
+											</li>
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &Theta;<sub>p</sub> ~ prior()
+															<span class="comment"> // Sample &Theta;<sub>p</sub> from prior distribution </span>
+											</li>
+											
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; for d<sub>i</sub> in D {
+														<span class="comment"> // Iterate through each experiment in the data D </span>
+											</li>
+											
+											
+											<li>
+												
+											</li>
+											
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="comment"> // d<sub>i</sub> consists of experimental settings s<sub>i</sub>, observed values o<sub>i</sub>, and rejection threshold &alpha;<sub>i</sub> </span>
+											</li>
+											
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; d<sub>i</sub> = (s<sub>i</sub>,o<sub>i</sub>,&alpha;<sub>i</sub>) 
+															
+											</li>
+											
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; RSS &larr; 0
+														<span class="comment"> // Residual sum of squares </span>
+															
+											</li>
+											
+											
+											<li>
+												
+											</li>
+											
+											
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; for s<sub>i</sub><sup>j</sup> in s<sub>i</sub> {
+														<span class="comment"> // Iterate through each experimental setting </span>
+											</li>
+											
+											<li>
+												
+											</li>
+											
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="comment"> // Simulate K times using parameters &Theta;<sub>p</sub> under experimental settings s<sub>i</sub><sup >j</sup> and take the median simulated value </span>
+											</li>
+											
+											
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; o<sub>i</sub><sup style='position: relative; left: -1.2em;'>&Hat;</sup><sup style='position: relative; left: -0.5em;'>j</sup>&larr; median(run_k_simulations(K, &Theta;<sub>p</sub>, s<sub>i</sub><sup >j</sup>))
+														
+											</li>
+											
+											
+												<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; RSS &larr; RSS + (o<sub>i</sub><sup style='position: relative; left: -1.2em;'>&Hat;</sup><sup style='position: relative; left: -0.5em;'>j</sup> - 
+																																			 o<sub>i</sub><sup>j</sup>)<sup>2</sup>
+														<span class="comment"> // Compare the observed value o<sub>i</sub><sup>j</sup> with the expected value o<sub>i</sub><sup style='position: relative; left: -1.2em;'>&Hat;</sup><sup style='position: relative; left: -0.5em;'>j</sup> </span>
+															
+											</li>
+											
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }
+											</li>
+											
+											
+											<li>
+												
+											</li>
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="comment"> // If the residual sum of squares is too high reject these parameters
+											</li>
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if (RSS > &alpha;<sub>i</sub>*|o<sub>i</sub>|) {
+															
+												
+											</li>
+											
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; n &larr; n + 1
+											</li>
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;  goto(4)
+											</li>
+											
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }
+											</li>
+											
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }
+											</li>
+											
+											
+											<li>
+												
+											</li>
+											
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &Theta;<sup style='position: relative; left: -.65em;'>&Hat;</sup>&larr; &Theta;<sup style='position: relative; left: -.65em;'>&Hat;</sup> &cup; &Theta;<sub>p</sub> 
+													<span class="comment"> // &Theta;<sub>p</sub> adequately fits all experiments in D, so add it to the posterior distribution </span>
+											</li>
+
+											<li>
+												&nbsp;&nbsp;&nbsp; }
+											</li>
+											
+											
+											<li>
+												&nbsp;&nbsp;&nbsp; return &Theta;<sup style='position: relative; left: -.65em;'>&Hat;</sup>
+											</li>
+											
+											
+											
+											<li>
+												}
+											</li>
+											
+											
+										</ol>
+									
+									</div>
+								<br>
+								SimPol's implementation of ABC requires three user arguments. First, the number of iterations $N$, which can be changed using 
+								
+								<span style="padding: 2 6; background-color:#ebe9e7">
+									Number of ABC iterations: <input type="number" value=1000 title="Number of iterations to run the ABC for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
+								</span>.
+								
+								Second, the number of simulations $K$ to run per set of experimental data 
+								
+								<span style="padding: 2 6; background-color:#ebe9e7">
+									Number of tests per data point: <input type="number" value=20 title="Number of tests to perform at each force/NTP setting. The median velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
+								</span>.
+								
+								Third, the experimental data $D$. Various types of experimental data could be used for parameter inference. The experiments supported by SimPol are detailed in the next section. <br><br>
+								
+								
+								It is important to note that the algorithm will move on to the next prior sample if the current fit is bad. The ordering of the 
+								experimental datasets in $D$ therefore matters. To maximise efficiency you should place tests which are more likely to fail at the beginning of $D$ instead of the end.
+								If you are running ABC over a large $NK$, since ABC is <i>embarrassingly parallel</i> we recommend you download SimPol to utilise its multithreading potential. 
+
+								See <b><a style="text-decoration:none; color:#008cba" onclick="minimiseSection('#performanceBtn', true);" href="#fromCommandLine_performance">Running SimPol from the command line.</a></b>
+								
+		
+
 								</div>
+							</div>
+							
+							
+							<br><br>
+							<div class="about-block">
+								<div class="about-block-inner">
+								<div  class="block-subtitle">Adding experimental data</div> <br>
+
+									Each experimental dataset $d_i \in D$ consists of a set of $l$ experimental settings $s_i = (s_i^1, s_i^2 , \dotso , s_i^l)$, 
+									a set of $l$ observed values $o_i = (o_i^1, o_i^2 , \dotso , o_i^l)$, and 
+									a user-specified rejection threshold $\alpha_i$. $s$ and $o$ have different meanings for different types of experimental data. For all cases,
+									$\alpha_i$ is the mean residual sum of squares (mRSS) threshold for experiment $d_i$.  <br><br>							
+									
+					
+									<div style="padding: 10 10; background-color:#ebe9e7">
+									<div class="block-subtitle" style="font-size:30px; text-align:left"> 1. Force-velocity curves</div> 
+										
+										In optical trapping experiments, varying forces (units pN) are applied to the RNA polymerase using optical tweezers 
+										<cite val="neuman2003ubiquitous,abbondanzieri2005direct,mejia2015trigger,dulin2015elongation"></cite>. As the assisting force increases, the rate of forward translocation
+										will increase with it. If translocation is a rate limiting step, then the transcription velocity should also increase with force. Only some optical trapping experiments  
+										exhibit force-sensitivity, suggesting that translocation may or may not be a rate limiting step during transcription elongation. <br><br>
+										
+										
+										Experimental setting $s_i^j \in s_i$ describes the applied forces and NTP concentrations used in the experiment. 
+										Observation $o_i^j \in o_i$ is the mean velocity measured in experiment $s_i$. Each force is associated with a single velocity, but
+										the NTP concentrations are shared by all $o_i^j \in o_i$.  <br><br>
+										
+										
+										
+										
+										
+										
+									</div>
+									
+									<br><br><br>
+									
+
+								</div>
+							</div>
+							
+							
+							
+							
 
 						</div>
 					</div>
@@ -1498,7 +1832,7 @@ function addCitations(){
 										button. If a component is minimised then rendering will not occur. The polymerase animation can be minimised by setting the speed to <b>hidden</b>. This will happen automatically when simulating large sequences. <br><br>
 
 
-										It SimPol is still too slow on the web browser, then you can downlpad SimPol and run it through the command line using Node.js. 
+										It SimPol is still too slow on the web browser, then you can download SimPol and run it through the command line using Node.js. 
 										Node.js employs the powerful V8 JavaScript engine
 										used by Chrome. Running through the command line allows you to multithread.  <br><br>
 
@@ -1838,7 +2172,7 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div class="block-subtitle"> Running SimPol from the command line </div> <br>
+									<div id="fromCommandLine_performance" class="block-subtitle"> Running SimPol from the command line </div> <br>
 										
 
 
