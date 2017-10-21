@@ -96,11 +96,9 @@ BIBLIOGRAPHY["hodges2009nucleosomal"] = {name: `Hodges, Courtney, et al. "Nucleo
 
 
 
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
-
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
-
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
+BIBLIOGRAPHY["templeton2009statistical"] = {name: `Templeton, Alan R. "Statistical hypothesis testing in intraspecific phylogeography: nested clade phylogeographical analysis vs. approximate Bayesian computation." Molecular Ecology 18.2 (2009): 319-331.`, DOI: "10.1111/j.1365-294X.2008.04026.x"};
+BIBLIOGRAPHY["bertorelle2010abc"] = {name: `Bertorelle, G., A. Benazzo, and S. Mona. "ABC as a flexible framework to estimate demography over space and time: some cons, many pros." Molecular ecology 19.13 (2010): 2609-2625.`, DOI: "10.1111/j.1365-294X.2010.04690.x"};
+BIBLIOGRAPHY["csillery2010approximate"] = {name: `Csilléry, Katalin, et al. "Approximate Bayesian computation (ABC) in practice." Trends in ecology & evolution 25.7 (2010): 410-418.`, DOI: "10.1016/j.tree.2010.04.001"};
 
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 

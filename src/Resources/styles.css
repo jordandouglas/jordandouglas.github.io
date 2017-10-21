@@ -29,10 +29,41 @@ canvas {
 	Vertical-align: middle;
 }
 
+.comment {
+		color: #228b22;
+	}
+
 .code {
 	font-family:'Courier New';
 	%font-weight:bold;
 }
+
+
+.code ol { 
+	    counter-reset: item;
+	}
+	
+
+.code ol li { 
+	display: block; 
+}
+
+
+.code ol li:before { 
+	content: counter(item) "  "; 
+	counter-increment: item;
+	color:#545454;
+	font-weight: bold;
+	text-align:right;
+	-webkit-touch-callout: none; /* iOS Safari */
+		-webkit-user-select: none; /* Safari */
+		 -khtml-user-select: none; /* Konqueror HTML */
+		   -moz-user-select: none; /* Firefox */
+			-ms-user-select: none; /* Internet Explorer/Edge */
+				user-select: none; /* Non-prefixed version, currently
+									  supported by Chrome and Opera */
+}
+	
 
 
 .errorMsg{
@@ -243,7 +274,7 @@ div.vertical{
 
 .block-subsubtitle{
 	text-align:center; 
-	font-size:25px; 
+	font-size:20px; 
 	color:#008CBA
 }
 
