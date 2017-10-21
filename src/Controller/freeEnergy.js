@@ -636,7 +636,7 @@ function getNTPModelSettingsTemplate(){
 					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:right" href="about/#polymerisation_ModelHelp"><img class="helpIcon" src="src/Images/help.png"></a>
 				</span>
 				<span style='font-size: 30px; cursor:pointer; position:absolute; vertical-align:top; left:793px; top:2px' onclick='closeNTPModelPopup()'>&times;</span>
-				<div style='padding:2; font-size:22px;'> Select the parameters for binding, catalysing and misincorporating NTP</div>
+				<div style='padding:2; font-size:22px;'> Select the parameters for nucleotide incorporation</div>
 
 				<div id="ntpmodelDiagramDiv" style="width:90%; margin:auto; vertical-align:middle; display:block">
 					

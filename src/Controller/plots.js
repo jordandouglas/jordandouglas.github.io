@@ -690,7 +690,7 @@ function plotTimeChart(){
 			if (PLOT_DATA["medianDistanceTravelledPerTemplate"] > distTravelled){
 				ymax = PLOT_DATA["medianDistanceTravelledPerTemplate"];
 			}else{
-				ymax = distTravelled * 1.5;
+				ymax = distTravelled * 1.2;
 			}
 
 			ymax = roundToSF(ymax, 2, "ceil");
