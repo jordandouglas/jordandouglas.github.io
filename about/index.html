@@ -1494,13 +1494,13 @@ function addCitations(){
 								<div class="about-block-inner">
 								<div id="setupABC_ABCSectionHelp" class="block-subtitle" >Approximate Bayesian Computation</div> <br>
 
-									Approximate Bayesian Computation (ABC) is a statistical inference method which SimPol uses to fit parameters to experimental data<cite val="csillery2010approximate"></cite>. Let $\Theta$ be the set of
-									parameters to estimate. Parameter inference is the process of finding estimates for these parameters such that the model will explain empirical data $D$.
+									Approximate Bayesian Computation (ABC) is a statistical inference method used to fit parameters to experimental data<cite val="csillery2010approximate"></cite>. Let $\Theta$ be the set of
+									parameters to estimate. Parameter inference is the process of finding an estimate for $\Theta$ such that the model will accurately explain or predict empirical data $D$.
 
-									First, a prior distribution is specified for each model 
-									parameter. These prior probability distributions should reflect your pre-exisiting or <i>prior</i> belief about what values would be sensible for these parameters. 
-									Let $\Theta_p$ be their respective values sampled from their prior distributions. Second, ABC is used to find a set of parameter values $\hat{\Theta}$ which adequately 
-									explain data $D$.
+									First, a prior distribution is specified for each parameter in $\Theta$. 
+									These probability distributions should reflect your pre-exisiting or <i>prior</i> belief about what values would be sensible for these parameters before observing experimental data $D$. 
+									Second, ABC is used to find a set of parameter values $\hat{\Theta}$ which adequately 
+									explain $D$.
 									
 									The ABC algorithm is very simple: <br><br>
 									
@@ -1547,12 +1547,12 @@ function addCitations(){
 									</div>
 								<br>
 								
-								The number of iterations $N$ should be large enough produce a reasonable sized posterior distribution. A rejection algorithm $\hat{D} \approx D$ is required to determine whether
+								The number of iterations $N$ should be large enough to produce a reasonable sized posterior distribution. A rejection algorithm $\hat{D} \approx D$ is required to determine whether
 								the predicted data is close enough to the true empirical data to be accepted into the posterior distribution. 
 
 								ABC has the advantage of being simple to set up
 								compared with a complex hillclimbing algorithm like Markov chain Monte Carlo, and is easy to parallelise. However, the nature of ABC means that the posterior 
-								distribution is not comprised of true probabilities and has limited statistical meaning<cite val="templeton2009statistical"></cite>.
+								distribution is not associated with true probabilities and has limited statistical meaning<cite val="templeton2009statistical"></cite>.
 								Furthermore, since each trial is sampled independently this means that when the number of parameters or the dataset becomes too large,
 								the amount of time required may become infeasible<cite val="bertorelle2010abc"></cite>. 
 
@@ -1768,17 +1768,17 @@ function addCitations(){
 
 									Each experimental dataset $d_i \in D$ consists of a set of $l$ experimental settings $s_i = (s_i^1, s_i^2 , \dotso , s_i^l)$, 
 									a set of $l$ observed values $o_i = (o_i^1, o_i^2 , \dotso , o_i^l)$, and 
-									a user-specified rejection threshold $\alpha_i$. $s$ and $o$ have different meanings for different types of experimental data. For all cases,
+									a user-specified rejection threshold $\alpha_i$. $s$ and $o$ have different meanings for different types of experimental data. But in all cases,
 									$\alpha_i$ is the mean residual sum of squares (mRSS) threshold for experiment $d_i$.  <br><br>							
 									
 					
 									<div style="padding: 10 10; background-color:#ebe9e7">
 									<div class="block-subtitle" style="font-size:30px; text-align:left"> 1. Force-velocity curves</div> 
 										
-										In optical trapping experiments, varying forces (units pN) are applied to the RNA polymerase using optical tweezers 
-										<cite val="neuman2003ubiquitous,abbondanzieri2005direct,mejia2015trigger,dulin2015elongation"></cite>. As the assisting force increases, the rate of forward translocation
-										will increase with it. If translocation is a rate limiting step, then the transcription velocity should also increase with force. Only some optical trapping experiments  
-										exhibit force-sensitivity, suggesting that translocation may or may not be a rate limiting step during transcription elongation. <br><br>
+										In optical trapping experiments, varying forces (units pN) are applied to the RNA polymerase using optical  
+										tweezers<cite val="neuman2003ubiquitous,abbondanzieri2005direct,mejia2015trigger,dulin2015elongation"></cite>. As the assisting force increases, the rate of forward translocation
+										will increase with it. <!--If translocation is a rate limiting step, then the transcription velocity should also increase with force. Only some optical trapping experiments  
+										exhibit force-sensitivity, suggesting that translocation may or may not be a rate limiting step during transcription elongation.--> <br><br>
 										
 										
 										Experimental setting $s_i^j \in s_i$ describes the applied forces and NTP concentrations used in the experiment. 
