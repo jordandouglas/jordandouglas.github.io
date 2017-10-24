@@ -2809,6 +2809,7 @@ function closeNav() {
 
 
 				<span class="noselect"  style="font-size:18px; font-family:Bookman;">
+					<input type=button id='showSitewisePlot' class='minimise' value='+' onClick="showSitewisePlot()">
 					<b>Sitewise panel</b>
 					&nbsp;&nbsp;&nbsp;
 					<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot4" OnChange="selectPlot(4);" style="vertical-align: middle; text-align:right;">
@@ -2819,8 +2820,7 @@ function closeNav() {
 					</select>
 					<span id="plot4Buttons" style="display:none; font-size:16px">
 						&nbsp;&nbsp;&nbsp;
-						<input type=button id='showPlot4' class='minimise' value='+' onClick=showPlot(4)>
-						&nbsp;
+
 						<input type=image id='plotOptions4' title="Change the settings of this plot" onClick=plotOptions(4) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px;">  
 
 						&nbsp;&nbsp;
@@ -2846,11 +2846,15 @@ function closeNav() {
 			<br>
 			<div id="plots123"  class="parameter-bg" style="background-color:#ebe9e7;  margin-left:130px">
 
-				<span class="noselect"  style="font-size:18px; font-family:Bookman; position:absolute"><b>Plot panel</b></span>
+				
+				<span class="noselect"  style="font-size:18px; font-family:Bookman;">
+					<input type=button id='showPlots' class='minimise' value='-' onClick="showPlots()">
+					<b>Plot panel</b>
+				</span>
 
-					<div class="scrollbar" style="overflow-x:scroll">
-					<table style="width:100%">
-						<tr style="text-align:center; ">
+					<div id="plotsTableDIV" class="scrollbar" style="width: 100%; position: relative; display: block; overflow-x: scroll;">
+					<table  style="width:100%">
+						<tr style="text-align:center;">
 						
 								
 						
@@ -2875,7 +2879,7 @@ function closeNav() {
 														  <option value="parameterHeatmap">Parameter heatmap</option>
 											</select>
 										
-										<input type=button id='showPlot1' class='minimise' value='+' onClick=showPlot(1) style="display:none">
+
 										<input type=image id='plotOptions1' title="Change the settings of this plot" onClick=plotOptions(1) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
 										<input type=image id='downloadPlot1' title="Download the data displayed in this plot" onClick=downloadPlot(1) src="src/Images/download.png" style="vertical-align: middle; height:20px; display:none">  
 										<a id="helpPlot1" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="src/Images/help.png"></a>
@@ -2908,7 +2912,6 @@ function closeNav() {
 														  <option value="parameterHeatmap">Parameter heatmap</option>
 										</select>
 									
-									<input type=button id='showPlot2' class='minimise' value='+' onClick=showPlot(2) style="display:none">
 									<input type=image id='plotOptions2' title="Change the settings of this plot" onClick=plotOptions(2) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
 									<input type=image id='downloadPlot2' title="Download the data displayed in this plot" onClick=downloadPlot(2) src="src/Images/download.png" style="vertical-align: middle;  height:20px; display:none ">  
 									<a id="helpPlot2" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="src/Images/help.png"></a>
@@ -2945,7 +2948,6 @@ function closeNav() {
 												
 									</select>
 								
-								<input type=button id='showPlot3' class='minimise' value='+' onClick=showPlot(3) style="display:none">
 								<input type=image id='plotOptions3' title="Change the settings of this plot" onClick=plotOptions(3) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
 								<input type=image id='downloadPlot3' title="Download the data displayed in this plot" onClick=downloadPlot(3) src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px; ">  
 								<a id="helpPlot3" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="src/Images/help.png"></a>

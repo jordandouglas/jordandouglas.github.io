@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <session datetime="2017_10_12-17.10.39" N="2000" speed="hidden">
 	<sequence seqID="E.coli lacZ gene GU063697" TemplateType="dsDNA" PrimerType="ssRNA" seq="TACTTTCGACCGATGTCCTTCCGGTCTGCGCTTAATAAAAACTACCGCAATTGAGCCGCAAAGTAGACACCACGTTGCCCGCGACCCAGCCAATGCCGGTCCTGTCAGCAAACGGCAGACTTAAACTGGACTCGCGTAAAAATGCGCGGCCTCTTTTGGCGGAGCGCCACTACCACGACGCGACCTCACTGCCGTCAATAGACCTTCTAGTCCTATACACCGCCTACTCGCCGTAAAAGGCACTGCAGAGCAACGACGTATTTGGCTGATGTGTTTAGTCGCTAAAGGTACAACGGTGAGCGAAATTACTACTAAAGTCGGCGCGACATGACCTCCGACTTCAAGTCTACACGCCGCTCAACGCACTGATGGATGCCCATTGTCAAAGAAATACCGTCCCACTTTGCGTCCAGCGGTCGCCGTGGCGCGGAAAGCCGCCACTTTAATAGCTACTCGCACCACCAATACGGCTAGCGCAGTGTGATGCAGACTTGCAGCTTTTGGGCTTTGACACCTC" />
-	<plots>
-		<plot1 name="distanceVsTime" hidden="false" plotFunction="plotTimeChart" xRange="automaticX" yRange="automaticY" />
-		<plot2 name="velocityHistogram" hidden="false" plotFunction="plot_velocity_distribution" displayBottomProportionOf="1" windowSize="1" xRange="automaticX" timeSpaceX="linearSpace" timeSpaceY="linearSpace" />
-		<plot3 name="parameterHeatmap" hidden="false" plotFunction="plot_parameter_heatmap" sitesToRecord="" customParamX="kCat" customParamY="GDagSlide" metricZ="velocity" xRange="automaticX" yRange="automaticY" zRange="automaticZ" zColouring="rainbow" plotFromPosterior="false" />
+	<plots hidden="false">
+		<plot1 name="distanceVsTime" plotFunction="plotTimeChart" xRange="automaticX" yRange="automaticY" />
+		<plot2 name="velocityHistogram" plotFunction="plot_velocity_distribution" displayBottomProportionOf="1" windowSize="1" xRange="automaticX" timeSpaceX="linearSpace" timeSpaceY="linearSpace" />
+		<plot3 name="parameterHeatmap" plotFunction="plot_parameter_heatmap" sitesToRecord="" customParamX="kCat" customParamY="GDagSlide" metricZ="velocity" xRange="automaticX" yRange="automaticY" zRange="automaticZ" zColouring="rainbow" plotFromPosterior="false" />
 	</plots>
 	<elongation-model id="simpleBrownian">
 		<allowBacktracking val="false" />
@@ -17,6 +17,7 @@
 		<allowMisincorporation val="false" />
 		<useFourNTPconcentrations val="false" />
 		<NTPbindingNParams val="2" />
+		<currentTranslocationModel val="meltingBarriers" />
 	</elongation-model>
 	<parameters>
 		<NTPconc val="1000" distribution="Fixed" fixedDistnVal="1000">[NTP] (μM)</NTPconc>

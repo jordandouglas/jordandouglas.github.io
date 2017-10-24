@@ -13,6 +13,7 @@
 		<useFourNTPconcentrations val="false" />
 		<NTPbindingNParams val="2" />
 		<assumeBindingEquilibrium val="false" />
+		<currentTranslocationModel val="meltingBarriers" />
 	</elongation-model>
 	<parameters>
 		<NTPconc val="1000" distribution="Fixed" fixedDistnVal="1000">[NTP] (μM)</NTPconc>
