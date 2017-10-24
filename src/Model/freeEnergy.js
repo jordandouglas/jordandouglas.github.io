@@ -28,7 +28,7 @@ FE_JS.ELONGATION_MODELS = {};
 FE_JS.ELONGATION_MODELS["simpleBrownian"] = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: false, allowHypertranslocation: false, 
 										allowInactivation:false, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: false, 
 										allowGeometricCatalysis: false, allowmRNAfolding:false, allowMisincorporation:false, useFourNTPconcentrations:false,
-										NTPbindingNParams: 2, assumeBindingEquilibrium: true};
+										NTPbindingNParams: 2, assumeBindingEquilibrium: true, currentTranslocationModel: "meltingBarriers"};
 //FE_JS.ELONGATION_MODELS["twoSiteBrownian"] = {id: "twoSiteBrownian",name: "Brownian ratchet model with 2 NTP binding sites", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation:false, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
 FE_JS.currentElongationModel = "simpleBrownian";
 
@@ -36,7 +36,6 @@ FE_JS.currentElongationModel = "simpleBrownian";
 FE_JS.TRANSLOCATION_MODELS = {};
 FE_JS.TRANSLOCATION_MODELS["midpointBarriers"] = {id: "midpointBarriers", name: "Midpoint"};
 FE_JS.TRANSLOCATION_MODELS["meltingBarriers"] = {id: "meltingBarriers", name: "Melting"};
-FE_JS.currentTranslocationModel = "meltingBarriers";
 
 
 
@@ -70,7 +69,7 @@ FE_JS.initFreeEnergy_WW = function(){
 	if (resolve === undefined) resolve = function() {};
 	if (msgID === undefined) msgID = null;
 
-	var toReturn = {currentElongationModel: FE_JS.currentElongationModel, ELONGATION_MODELS: FE_JS.ELONGATION_MODELS, currentTranslocationModel: FE_JS.currentTranslocationModel, TRANSLOCATION_MODELS: FE_JS.TRANSLOCATION_MODELS};
+	var toReturn = {currentElongationModel: FE_JS.currentElongationModel, ELONGATION_MODELS: FE_JS.ELONGATION_MODELS, TRANSLOCATION_MODELS: FE_JS.TRANSLOCATION_MODELS};
 
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
@@ -94,7 +93,7 @@ FE_JS.initFreeEnergy_WW = function(){
 								  (NTPbindingNParams != null && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] != NTPbindingNParams);
 
 	FE_JS.currentElongationModel = elongationModelID;
-	FE_JS.currentTranslocationModel = translocationModelID;
+	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] = translocationModelID;
 	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowBacktracking"] = allowBacktracking;
 	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"] = allowHypertranslocation;
 	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowInactivation"] = allowInactivation;
@@ -320,7 +319,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 
 			// Midpoint model: free energy barrier is halfway between the two on either side
-			if (FE_JS.currentTranslocationModel == "midpointBarriers"){
+			if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] == "midpointBarriers"){
 
 				slidingPeakHeightsTemp[pos] += (getFreeEnergyOfState_WW(statePreOperation) - getFreeEnergyOfTranscriptionBubble_WW(statePreOperation) + getFreeEnergyOfState_WW(state) - getFreeEnergyOfTranscriptionBubble_WW(state)) / 2;
 				
@@ -335,7 +334,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 			}
 
-			else if (FE_JS.currentTranslocationModel == "meltingBarriers"){
+			else if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] == "meltingBarriers"){
 
 				slidingPeakHeightsTemp[pos] += getFreeEnergyOfIntermediateState_WW(statePreOperation, state);
 				slidingPeakHeightsTemp[pos] -= getFreeEnergyOfTranscriptionBubbleIntermediate_WW(statePreOperation, state); // Subtract the free energy which we would gain if the intermediate transcription bubble was sealed
@@ -406,7 +405,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 
 			// Midpoint model: free energy barrier is halfway between the two on either side
-			if (FE_JS.currentTranslocationModel == "midpointBarriers"){
+			if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] == "midpointBarriers"){
 
 				slidingPeakHeightsTemp[pos-1] += (getFreeEnergyOfState_WW(statePreOperation) - getFreeEnergyOfTranscriptionBubble_WW(statePreOperation) + getFreeEnergyOfState_WW(state) - getFreeEnergyOfTranscriptionBubble_WW(state)) / 2;
 				
@@ -414,7 +413,7 @@ FE_JS.initFreeEnergy_WW = function(){
 			}
 
 			// Calculate the free energy of the intermediate state
-			else if (FE_JS.currentTranslocationModel == "meltingBarriers"){
+			else if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] == "meltingBarriers"){
 
 				slidingPeakHeightsTemp[pos-1] += getFreeEnergyOfIntermediateState_WW(statePreOperation, state);
 				slidingPeakHeightsTemp[pos-1] -= getFreeEnergyOfTranscriptionBubbleIntermediate_WW(statePreOperation, state); // Subtract the free energy which we would gain if the intermediate transcription bubble was sealed
@@ -1988,7 +1987,6 @@ if (RUNNING_FROM_COMMAND_LINE){
 		ELONGATION_MODELS: FE_JS.ELONGATION_MODELS,
 		currentElongationModel: FE_JS.currentElongationModel,
 		TRANSLOCATION_MODELS: FE_JS.TRANSLOCATION_MODELS,
-		currentTranslocationModel: FE_JS.currentTranslocationModel,
 		initFreeEnergy_WW: FE_JS.initFreeEnergy_WW,
 		getElongationModels_WW: FE_JS.getElongationModels_WW,
 		userInputModel_WW: FE_JS.userInputModel_WW,

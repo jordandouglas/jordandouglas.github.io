@@ -178,6 +178,9 @@ function updateModelDOM(elongation_model_temp){
 	$("#assumeBindingEquilibrium").prop('checked', elongation_model_temp["assumeBindingEquilibrium"]);
 
 
+	$("#SelectTranslocationModel").val(elongation_model_temp["currentTranslocationModel"]);
+
+
 	if (elongation_model_temp["allowBacktracking"] && elongation_model_temp["allowInactivation"]) $("#allowBacktrackWithoutInactivation_container").show(100);
 	else $("#allowBacktrackWithoutInactivation_container").hide(100);
 
@@ -288,8 +291,9 @@ function updateModelDOM(elongation_model_temp){
 	else{
 		$("#RateBind_container").show(100);
 	}
-	
 
+
+	$("#SelectTranslocationModel").val(elongation_model_temp["currentTranslocationModel"]);
 	//if (elongation_model_temp["id"] == "twoSiteBrownian") $("#allowGeometricCatalysis_container").hide(100);
 	//else $("#allowGeometricCatalysis_container").show(100);
 
@@ -306,8 +310,8 @@ function setModelOptions(){
 		
 		$("#SelectElongationModel").empty();
 		var currentElongationModel = result["currentElongationModel"];
-		var elongation_model = result["ELONGATION_MODELS"]
-		var currentTranslocationModel = result["currentTranslocationModel"];
+		var elongation_model = result["ELONGATION_MODELS"];
+		var currentTranslocationModel = elongation_model[currentElongationModel]["currentTranslocationModel"];
 		var translocation_model = result["TRANSLOCATION_MODELS"];
 
 		// Elongation models

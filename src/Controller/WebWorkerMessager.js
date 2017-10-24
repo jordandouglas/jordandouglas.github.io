@@ -2036,8 +2036,6 @@ function loadSession_controller(XMLData){
 				
 				var pltName = result["whichPlotInWhichCanvas"][plt]["name"];
 				$("#selectPlot" + plt).val(pltName);
-				$("#showPlot" + plt).show(0);
-				$("#showPlot" + plt).val("-");
 				$("#plotDIV" + plt).show(0);
 				$("#plotOptions" + plt).show(0);
 				$("#downloadPlot" + plt).show(0);
@@ -2055,7 +2053,10 @@ function loadSession_controller(XMLData){
 			
 		}
 		
-		
+		if (result["showPlots"] != null) showPlots(result["showPlots"]);
+
+
+
 		
 		// Update the sequence settings
 		if (result["N"] != null) $("#nbasesToSimulate").val(result["N"]);
@@ -2122,6 +2123,8 @@ function loadSession_controller(XMLData){
 
 		// Update the model DOM eg. enable hypertranslocation
 		updateModelDOM(model);
+
+
 		
 	
 		
@@ -2151,12 +2154,12 @@ function loadSession_controller(XMLData){
 
 
 
-function showPlot_controller(plotNum, hidden){
+function showPlot_controller(hidden){
 
 	if (WEB_WORKER == null) {
-		PLOTS_JS.showPlot_WW(plotNum, hidden);
+		PLOTS_JS.showPlot_WW(hidden);
 	}else{
-		var fnStr = stringifyFunction("PLOTS_JS.showPlot_WW", [plotNum, hidden]);
+		var fnStr = stringifyFunction("PLOTS_JS.showPlot_WW", [hidden]);
 		//console.log("Sending function: " + fnStr);
 		callWebWorkerFunction(fnStr);
 	}
