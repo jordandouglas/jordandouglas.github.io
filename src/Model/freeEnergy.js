@@ -1270,10 +1270,11 @@ FE_JS.getNTPCanvasData_WW = function(resolve, msgID){
  FE_JS.getDeactivationCanvasData_WW = function(resolve, msgID){
 
 
+
 	if (resolve === undefined) resolve = function() {};
 	if (msgID === undefined) msgID = null;
 
-	var toReturn = {state: STATE_JS.convertFullStateToCompactState(WW_JS.currentState), kU: PARAMS_JS.PHYSICAL_PARAMETERS["kU"]["val"], kA: PARAMS_JS.PHYSICAL_PARAMETERS["kA"]["val"]};
+	var toReturn = {state: STATE_JS.convertFullStateToCompactState(WW_JS.currentState), kU: PARAMS_JS.PHYSICAL_PARAMETERS["kU"]["val"], kA: PARAMS_JS.PHYSICAL_PARAMETERS["kA"]["val"], allowDeactivation:  FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel].allowInactivation};
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
 	}else{
@@ -1286,6 +1287,8 @@ FE_JS.getNTPCanvasData_WW = function(resolve, msgID){
 // Gets the button label associated with slipping right
 function getSlipRightLabel_WW(state, S){
 
+
+	var toReturn = {label: ""};
 	if (S === undefined) S = 0;
 
 	var label = "";
@@ -1298,16 +1301,16 @@ function getSlipRightLabel_WW(state, S){
 
 
 	if (state["terminated"]) label = "";
-	else if (allowMultipleBulges && state["partOfBulgeID"][S] != i && state["bulgePos"][ state["partOfBulgeID"][S] ] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) label = "";
-	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S) label = "Fissure";
-	else if (!state["NTPbound"] && state["partOfBulgeID"][S] == S && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) label = "Absorb";	
-	else if (allowMultipleBulges && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] - 1) != -1) label = "Fuse";	
-	else if (state["leftMBase"] > 1 && allowMultipleBulges &&  state["bulgePos"][S] == 0 && ((state["bulgePos"].indexOf(h - 1) != -1) || state["bulgePos"].indexOf(h - 2) != -1)) label = "Form";	
-	else if (state["bulgePos"][S] < h && state["bulgePos"][S] > 1 && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1) label = "Diffuse";
-	else if (state["bulgePos"][S] == 0) label = "Form";
+	else if (allowMultipleBulges && state["partOfBulgeID"][S] != i && state["bulgePos"][ state["partOfBulgeID"][S] ] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) toReturn = {label: ""};
+	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S) toReturn = {label: "Fissure"};
+	else if (!state["NTPbound"] && state["partOfBulgeID"][S] == S && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) toReturn = {label: "Absorb", title: "Absorb the bulge at the left end of the hybrid (ctrl + &rarr;)"};	
+	else if (allowMultipleBulges && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] - 1) != -1) toReturn = {label: "Fuse"};	
+	else if (state["leftMBase"] > 1 && allowMultipleBulges &&  state["bulgePos"][S] == 0 && ((state["bulgePos"].indexOf(h - 1) != -1) || state["bulgePos"].indexOf(h - 2) != -1)) toReturn = {label: "Form", title: "Create a bulge at the left end of the hybrid (ctrl + &rarr;)"};	
+	else if (state["bulgePos"][S] < h && state["bulgePos"][S] > 1 && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1) toReturn = {label: "Diffuse", title: "Move the bulge one step to the right (ctrl + &rarr;)"};
+	else if (state["bulgePos"][S] == 0) toReturn = {label: "Form", title: "Create a bulge at the left end of the hybrid (ctrl + &)"};
 	
 
-	return label;
+	return toReturn;
 
 
 
@@ -1317,9 +1320,10 @@ function getSlipRightLabel_WW(state, S){
 // Gets the button label associated with slipping left
 function getSlipLeftLabel_WW(state, S){
 
+	var toReturn = {label: ""};
+
 	if (S === undefined) S = 0;
 
-	var label = "";
 	var allowMultipleBulges = PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"];
 	var h = PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"];
 
@@ -1327,20 +1331,20 @@ function getSlipLeftLabel_WW(state, S){
 	if (fuseWith == -1)	fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 2, 2));
 
 
-	if (state["terminated"]) label = "";
-	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] == h - 1) label = "";
-	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S) label = "Fissure";
-	else if (allowMultipleBulges && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] + 1) != -1) label = "Fuse";
+	if (state["terminated"]) toReturn = {label: ""};
+	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] == h - 1) toReturn = {label: ""};
+	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S) toReturn = {label: "Fissure"};
+	else if (allowMultipleBulges && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] + 1) != -1) toReturn = {label: "Fuse"};
 	else if (allowMultipleBulges && state["bulgePos"][S] == 0 && allowMultipleBulges && state["bulgePos"][S] == 0 && fuseWith != -1) {
-		if (state["mRNAPosInActiveSite"] >= 0 && state["bulgePos"].indexOf( state["bulgePos"][fuseWith] +1 ) != -1) label = "";
-		else label = "Form";
+		if (state["mRNAPosInActiveSite"] >= 0 && state["bulgePos"].indexOf( state["bulgePos"][fuseWith] +1 ) != -1) toReturn = {label: ""};
+		else toReturn = {label: "Form", title: "Create a bulge at the right end of the hybrid (ctrl + &larr;)"};
 	}
-	else if (state["bulgePos"][S] > 0 && state["bulgePos"][S] < h - 1) label = "Diffuse";
+	else if (state["bulgePos"][S] > 0 && state["bulgePos"][S] < h - 1) toReturn = {label: "Diffuse", title: "Move the bulge one step to the left (ctrl + &larr;)"};
 
-	else if (!state["NTPbound"] && state["bulgePos"][S] == 0 && state["mRNAPosInActiveSite"] != h - 1) label = "Form";
-	else if (state["bulgePos"][S] == h - 1) label = "Absorb";
+	else if (!state["NTPbound"] && state["bulgePos"][S] == 0 && state["mRNAPosInActiveSite"] != h - 1) toReturn = {label: "Form", title: "Create a bulge at the right end of the hybrid (ctrl + &larr;)"};
+	else if (state["bulgePos"][S] == h - 1) toReturn = {label: "Absorb", title: "Absorb the bulge at the left end of the hybrid (ctrl + &larr;)"};
 			
-	return label;
+	return toReturn;
 
 
 }
