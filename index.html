@@ -667,7 +667,12 @@ function userChangeNTPType(ntpType){
 }
 
 
-
+// Disable the default function of the left and right arrow keys
+window.addEventListener("keydown", function(e) {
+    if([37, 39].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
+}, false);
 
 
 
@@ -675,9 +680,13 @@ window.onkeyup = function(e) {
 
    var key = e.keyCode ? e.keyCode : e.which;
 	if (key == 39 && !simulating) { // Right arrow
-		forward_controller();
+		if (e.ctrlKey && !e.shiftKey) slip_right_controller(); // Ctrl + right = slippage
+		else if (e.shiftKey) bindNTP_controller(); // Shift + right = bind/catalyse
+		else forward_controller();
 	}else if (key == 37 && !simulating) { // Left arrow
-		backwards_controller();
+		if (e.ctrlKey && !e.shiftKey) slip_left_controller(); // Ctrl + left = slippage
+		else if (e.shiftKey) releaseNTP_controller(); // Shift + left = release/decay
+		else backwards_controller();
 	}
 
 	/*
@@ -905,7 +914,7 @@ function disable_all_buttons(){
 		if (buttons[i].type == "button" && buttons[i].className != "minimise") buttons[i].disabled = true;
 	}
 	disabledButtons = true;
-	
+
 	
 
 	$("#ntpA").attr("disabled", false);
@@ -2668,7 +2677,7 @@ function closeNav() {
 									<div style="font-size:18px; font-family:Arial; vertical-align:top">
 										Deactivation reactions
 									</div> <br>
-									<div id="deactivationCanvasDIV">
+									<div id="deactivationCanvasDIV" style="position:relative; margin:auto; width: 350px">
 										<canvas id="deactivationCanvas"  height=70 width=350></canvas>
 									</div><br>
 
@@ -2683,7 +2692,7 @@ function closeNav() {
 									<div style="font-size:18px; font-family:Arial; vertical-align:top">
 										Slippage reactions
 									</div> <br><br>
-									<div id="slippageCanvasDIV">
+									<div id="slippageCanvasDIV" style="position:relative; margin:auto; width: 450px">
 										<canvas id="slippageCanvas"  height=50 width=450></canvas>
 									</div><br>
 
