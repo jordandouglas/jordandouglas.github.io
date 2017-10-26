@@ -125,21 +125,23 @@ function removeArrow(ele){
 
 function plotArrowButton_navigationPanel(ctx, fromx, fromy, direction, label = "", rate, onClick = "", hoverTitle = "", spacingBetweenStates, canvas, reactionApplicable = true){
 
-	
 
-
+	var arrowPadding = IS_MOBILE ? 12 : 0;
 	var arrowWidth = spacingBetweenStates + 15;
 	var arrowHeight = 55;
-	var arrowTop =  $(canvas).offset().top - $(canvas).parent().offset().top + fromy - arrowHeight/2;
-	var arrowLeft =  fromx + (direction == "right" ? 0 : -arrowWidth);
+	var arrowTop =  $(canvas).offset().top - $(canvas).parent().offset().top + fromy - arrowHeight/2 - arrowPadding;
+	var arrowLeft =  fromx + (direction == "right" ? 0 : -arrowWidth) - arrowPadding;
 	var cssclass = direction == "left" ? "" : "rotate180";
 	var textAlign = direction == "left" ? "right" : "left";
 	var src = "src/Images/arrow" + (reactionApplicable ? "" : "Grey") + ".png";
 	var cursorClass = reactionApplicable ? "pointer" : "not-allowed";
+	var labelY = arrowTop + 18 + arrowPadding;
+	var labelX = arrowLeft + arrowPadding;
+
 
 	var arrowHTML = `
-		<input type="image" class="navArrow ` + cssclass + `" src="` + src + `" title="` + hoverTitle + `" onclick="` + onClick + `;" style = "cursor:` + cursorClass + `;position:absolute; width:` + arrowWidth + `px; height:` + arrowHeight + `px; top:` + arrowTop + `px; left:` + arrowLeft + `px; ">
-		<div class="navArrow noselect" onclick="` + onClick + `();" title="` + hoverTitle + `" style="cursor:` + cursorClass + `; color:white; font-family:Arial; text-align:` + textAlign + `; position:absolute; font-size:17px; top:` + (arrowTop + 18) + `px; left:` + arrowLeft + `px; width:` + arrowWidth + `px">&nbsp;` + label + `&nbsp;</div>
+		<input type="image" class="navArrow ` + cssclass + `" src="` + src + `" title="` + hoverTitle + `" onclick="` + onClick + `();" style = "padding:` + arrowPadding + `; cursor:` + cursorClass + `;position:absolute; width:` + arrowWidth + `px; height:` + arrowHeight + `px; top:` + arrowTop + `px; left:` + arrowLeft + `px; z-index:2 ">
+		<div class="navArrow noselect" onclick="` + onClick + `();" title="` + hoverTitle + `" style="cursor:` + cursorClass + `; vertical-align:middle; color:white; font-family:Arial; text-align:` + textAlign + `; position:absolute; font-size:17px; top:` + labelY + `px; left:` + labelX + `px; width:` + arrowWidth + `px; z-index:2">&nbsp;` + label + `&nbsp;</div>
 
 	`;
 
