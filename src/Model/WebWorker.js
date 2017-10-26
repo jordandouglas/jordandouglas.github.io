@@ -1395,6 +1395,10 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 			else console.log("Running", XML_JS.ABC_FORCE_VELOCITIES["ntrials"], "ABC iterations");
 
 
+
+			PLOTS_JS.DISTANCE_VS_TIME_SIZE_MAX = 1;
+			PLOTS_JS.DWELL_TIMES_SIZE_MAX = 1;
+
 			ABC_JS.beginABC_WW(XML_JS.ABC_FORCE_VELOCITIES, function(){ 
 
 				exit();

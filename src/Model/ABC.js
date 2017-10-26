@@ -129,8 +129,8 @@ ABC_JS.clearABCdata_WW = function(){
 ABC_JS.ABC_trials_WW = function(fitNums, resolve = function() {}, msgID = null){
 
 
- 	// Print out every 100th simulation when calling from command line
- 	if (RUNNING_FROM_COMMAND_LINE && (ABC_JS.n_ABC_trials_left == 1 || ABC_JS.n_ABC_trials_left == ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] || (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left + 1) % 20 == 0)){
+ 	// Print out every 20th simulation when calling from command line
+ 	if (RUNNING_FROM_COMMAND_LINE && (ABC_JS.n_ABC_trials_left == 1 || ABC_JS.n_ABC_trials_left == ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] || (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left + 1) % 100 == 0)){
 
  		var workerString = WW_JS.WORKER_ID == null ? "" : "Worker " + WW_JS.WORKER_ID + " | ";
 

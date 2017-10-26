@@ -394,7 +394,8 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 	PLOTS_JS.totaltimeElapsed += reactionTime;
 	PLOTS_JS.timeWaitedUntilNextTranslocation += reactionTime;
 	PLOTS_JS.timeWaitedUntilNextCatalysis += reactionTime;
-	
+
+
 
 	// If we have been pausing too long, then abort
 	if (PARAMS_JS.PHYSICAL_PARAMETERS["arrestTime"]["val"] > 0 && PARAMS_JS.PHYSICAL_PARAMETERS["arrestTime"]["val"] < PLOTS_JS.timeWaitedUntilNextCatalysis){
@@ -421,8 +422,12 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 		// Update total displacement
 		PLOTS_JS.timeElapsed += PLOTS_JS.timeWaitedUntilNextTranslocation;
-		PLOTS_JS.totalDisplacement += lastAction == 0 ? -1 : 1;
+		for (var actionNum = 0; actionNum < actionsToDo.length; actionNum++) {
+			if (actionsToDo[actionNum] < 2) PLOTS_JS.totalDisplacement += actionsToDo[actionNum] == 0 ? -1 : 1;
+		}
 		PLOTS_JS.velocity = PLOTS_JS.totalDisplacement / PLOTS_JS.totaltimeElapsed;
+
+
 
 
 		PLOTS_JS.pauseTimePerSite[rightHybridBase] += PLOTS_JS.timeWaitedUntilNextTranslocation;

@@ -244,6 +244,11 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 
 
 	var actionToDo = SIM_JS.SIMULATION_ACTIONS[result["toDo"][result["toDo"].length-1]];
+
+	if (actionToDo == null){
+		resolve(true);
+		return;
+	}
 	
 	//console.log("Sampled", actionToDo, "state", stateC);
 
@@ -630,7 +635,7 @@ SIM_JS.sampleAction_WW = function(stateC){
 
 
 			// Calculate the probabilities of being in the 3 states (0, 1 and 1N)
-			var A = NTPconc / KD;
+			var A = KD / NTPconc;
 			var B = k0_1 / k1_0;
 			var probabilityPretranslocated = A / (A*B + A + B);
 			var probabilityPosttranslocated = A*B / (A*B + A + B);
@@ -654,6 +659,8 @@ SIM_JS.sampleAction_WW = function(stateC){
 			kBck = k0_minus1 * probabilityPretranslocated; // Can only backtrack from pretranslocated
 			kDeact = kDeact * (probabilityPosttranslocated + probabilityPretranslocated); // Can only deactivate from post and pretranslocated states
 
+			console.log("k1_2", k1_2, "probabilityPosttranslocated", probabilityPosttranslocated);
+
 
 
 		}
@@ -666,6 +673,8 @@ SIM_JS.sampleAction_WW = function(stateC){
 		var rateSum = 0;
 		for (var i = 0; i < rates.length; i++) rateSum += rates[i];
 		minReactionTime =  WW_JS.rexp(rateSum);
+
+
 
 		// Select which reaction just occurred by sampling proportional to their rates
 		var runif = MER_JS.random() * rateSum;
@@ -714,7 +723,6 @@ SIM_JS.sampleAction_WW = function(stateC){
 
 
 	}
-
 
 
 
