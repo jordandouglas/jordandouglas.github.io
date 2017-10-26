@@ -667,7 +667,12 @@ function userChangeNTPType(ntpType){
 }
 
 
-
+// Disable the default function of the left and right arrow keys
+window.addEventListener("keydown", function(e) {
+    if([37, 39].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
+}, false);
 
 
 
@@ -675,9 +680,13 @@ window.onkeyup = function(e) {
 
    var key = e.keyCode ? e.keyCode : e.which;
 	if (key == 39 && !simulating) { // Right arrow
-		forward_controller();
+		if (e.ctrlKey && !e.shiftKey) slip_right_controller(); // Ctrl + right = slippage
+		else if (e.shiftKey) bindNTP_controller(); // Shift + right = bind/catalyse
+		else forward_controller();
 	}else if (key == 37 && !simulating) { // Left arrow
-		backwards_controller();
+		if (e.ctrlKey && !e.shiftKey) slip_left_controller(); // Ctrl + left = slippage
+		else if (e.shiftKey) releaseNTP_controller(); // Shift + left = release/decay
+		else backwards_controller();
 	}
 
 	/*
@@ -905,7 +914,7 @@ function disable_all_buttons(){
 		if (buttons[i].type == "button" && buttons[i].className != "minimise") buttons[i].disabled = true;
 	}
 	disabledButtons = true;
-	
+
 	
 
 	$("#ntpA").attr("disabled", false);
@@ -1694,7 +1703,7 @@ function closeNav() {
 						 
 				 		<td colspan=3>
 					 		<label class="switch">
-						 		 <input type="checkbox" id="useFourNTPconcentrations" OnChange="userInputModel_controller()"> </input>
+						 		 <input class="modelSetting" type="checkbox" id="useFourNTPconcentrations" OnChange="userInputModel_controller()"> </input>
 						 		 <span class="slider round notboolean"></span>
 							</label> 
 							<span style="font-size:15px; vertical-align:middle" >4 concentrations</span>
@@ -1923,9 +1932,12 @@ function closeNav() {
 				</div>
 
 
-
+				<br>
 
 				<table style="width:100%">
+
+
+
 
 					<tr id="GDagSlide_container">
 
@@ -2043,7 +2055,7 @@ function closeNav() {
 
 
 
-				 	<tr id="SelectTranslocationModel_container">
+				 	<tr id="currentTranslocationModel_container">
 
 						<td style="text-align:left; font-size:10px; float:left; width:20px">
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#translocation_ModelHelp"><img class="helpIcon" src="src/Images/help.png"></a>
@@ -2051,7 +2063,7 @@ function closeNav() {
 
 						<td colspan = 3 style="text-align:center">
 				 			Barrier height model:
-				 			<select class="dropdown" style="width:150px;" name="SelectTranslocationModel" id = "SelectTranslocationModel" title="Select which model to use for estimating translocation free energy barrier heights" OnChange="userInputModel_controller()">
+				 			<select class="dropdown modelSetting" style="width:150px;"  id = "currentTranslocationModel" title="Select which model to use for estimating translocation free energy barrier heights" OnChange="userInputModel_controller()">
 						 </select>
 				 		</td>
 
@@ -2061,6 +2073,29 @@ function closeNav() {
 
 
 
+					<tr id="assumeTranslocationEquilibrium_container"  title="Do you want to assume that translocation between the pretranslocated and posttranslocated states is in equilibrium?">
+
+
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#GDagSlide_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+
+				 		<td colspan=3>
+		 					<label class="switch">
+					 	 		<input class="modelSetting" type="checkbox" id="assumeTranslocationEquilibrium" OnChange="userInputModel_controller()"> </input>
+					 	 		<span class="slider round"></span>
+
+							</label> 
+							<span style="font-size:15px; vertical-align:middle" >Assume translocation equilibrium</span>
+
+				 		</td>
+
+
+
+
+				 	</tr>
 
 
 
@@ -2112,7 +2147,7 @@ function closeNav() {
 
 				 		<td colspan=3>
 		 					<label class="switch">
-					 	 		<input type="checkbox" id="allowInactivation" OnChange="userInputModel_controller()"> </input>
+					 	 		<input class="modelSetting" type="checkbox" id="allowInactivation" OnChange="userInputModel_controller()"> </input>
 					 	 		<span class="slider round"></span>
 
 							</label> 
@@ -2225,7 +2260,7 @@ function closeNav() {
 
 					 		<td colspan=3>
 			 					<label class="switch">
-							 	 <input type="checkbox" id="allowmRNAfolding" OnChange="userInputModel_controller()"> </input>
+							 	 <input class="modelSetting" type="checkbox" id="allowmRNAfolding" OnChange="userInputModel_controller()"> </input>
 							 	 <span class="slider round"></span>
 
 								</label> 
@@ -2297,7 +2332,7 @@ function closeNav() {
 
 					 		<td>
 			 					<label class="switch">
-							 	 <input type="checkbox" id="allowHypertranslocation" OnChange="userInputModel_controller()"> </input>
+							 	 <input class="modelSetting" type="checkbox" id="allowHypertranslocation" OnChange="userInputModel_controller()"> </input>
 							 	 <span class="slider round"></span>
 
 								</label> 
@@ -2318,7 +2353,7 @@ function closeNav() {
 
 					 		<td>
 			 					<label class="switch">
-							 	 <input type="checkbox" id="allowBacktracking" OnChange="userInputModel_controller()"> </input>
+							 	 <input class="modelSetting" type="checkbox" id="allowBacktracking" OnChange="userInputModel_controller()"> </input>
 							 	 <span class="slider round"></span>
 
 								</label> 
@@ -2340,7 +2375,7 @@ function closeNav() {
 
 					 		<td>
 			 					<label class="switch">
-						 		 <input type="checkbox" id="allowBacktrackWithoutInactivation" OnChange="userInputModel_controller()"> </input>
+						 		 <input class="modelSetting" type="checkbox" id="allowBacktrackWithoutInactivation" OnChange="userInputModel_controller()"> </input>
 						 	 	<span class="slider round"></span>
 
 								</label> 
@@ -2404,7 +2439,7 @@ function closeNav() {
 				<div class="parameter-title">Algorithm Settings </div>
 
 				<div id="allowGeometricCatalysis_container">
-					<label style="cursor:pointer;"> <input class="variable" OnChange="userInputModel_controller()"  type="checkbox" style="cursor:pointer;" id="allowGeometricCatalysis">Enable geometric catalysis sampling</input> </label>
+					<label style="cursor:pointer;"> <input class="variable" class="modelSetting" OnChange="userInputModel_controller()"  type="checkbox" style="cursor:pointer;" id="allowGeometricCatalysis">Enable geometric catalysis sampling</input> </label>
 				</div>
 				
 			</div>
@@ -2668,7 +2703,7 @@ function closeNav() {
 									<div style="font-size:18px; font-family:Arial; vertical-align:top">
 										Deactivation reactions
 									</div> <br>
-									<div id="deactivationCanvasDIV">
+									<div id="deactivationCanvasDIV" style="position:relative; margin:auto; width: 350px">
 										<canvas id="deactivationCanvas"  height=70 width=350></canvas>
 									</div><br>
 
@@ -2683,7 +2718,7 @@ function closeNav() {
 									<div style="font-size:18px; font-family:Arial; vertical-align:top">
 										Slippage reactions
 									</div> <br><br>
-									<div id="slippageCanvasDIV">
+									<div id="slippageCanvasDIV" style="position:relative; margin:auto; width: 450px">
 										<canvas id="slippageCanvas"  height=50 width=450></canvas>
 									</div><br>
 
@@ -2809,6 +2844,7 @@ function closeNav() {
 
 
 				<span class="noselect"  style="font-size:18px; font-family:Bookman;">
+					<input type=button id='showSitewisePlot' class='minimise' value='+' onClick="showSitewisePlot()">
 					<b>Sitewise panel</b>
 					&nbsp;&nbsp;&nbsp;
 					<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot4" OnChange="selectPlot(4);" style="vertical-align: middle; text-align:right;">
@@ -2819,8 +2855,7 @@ function closeNav() {
 					</select>
 					<span id="plot4Buttons" style="display:none; font-size:16px">
 						&nbsp;&nbsp;&nbsp;
-						<input type=button id='showPlot4' class='minimise' value='+' onClick=showPlot(4)>
-						&nbsp;
+
 						<input type=image id='plotOptions4' title="Change the settings of this plot" onClick=plotOptions(4) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px;">  
 
 						&nbsp;&nbsp;
@@ -2846,11 +2881,15 @@ function closeNav() {
 			<br>
 			<div id="plots123"  class="parameter-bg" style="background-color:#ebe9e7;  margin-left:130px">
 
-				<span class="noselect"  style="font-size:18px; font-family:Bookman; position:absolute"><b>Plot panel</b></span>
+				
+				<span class="noselect"  style="font-size:18px; font-family:Bookman;">
+					<input type=button id='showPlots' class='minimise' value='-' onClick="showPlots()">
+					<b>Plot panel</b>
+				</span>
 
-					<div class="scrollbar" style="overflow-x:scroll">
-					<table style="width:100%">
-						<tr style="text-align:center; ">
+					<div id="plotsTableDIV" class="scrollbar" style="width: 100%; position: relative; display: block; overflow-x: scroll;">
+					<table  style="width:100%">
+						<tr style="text-align:center;">
 						
 								
 						
@@ -2875,7 +2914,7 @@ function closeNav() {
 														  <option value="parameterHeatmap">Parameter heatmap</option>
 											</select>
 										
-										<input type=button id='showPlot1' class='minimise' value='+' onClick=showPlot(1) style="display:none">
+
 										<input type=image id='plotOptions1' title="Change the settings of this plot" onClick=plotOptions(1) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
 										<input type=image id='downloadPlot1' title="Download the data displayed in this plot" onClick=downloadPlot(1) src="src/Images/download.png" style="vertical-align: middle; height:20px; display:none">  
 										<a id="helpPlot1" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="src/Images/help.png"></a>
@@ -2908,7 +2947,6 @@ function closeNav() {
 														  <option value="parameterHeatmap">Parameter heatmap</option>
 										</select>
 									
-									<input type=button id='showPlot2' class='minimise' value='+' onClick=showPlot(2) style="display:none">
 									<input type=image id='plotOptions2' title="Change the settings of this plot" onClick=plotOptions(2) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
 									<input type=image id='downloadPlot2' title="Download the data displayed in this plot" onClick=downloadPlot(2) src="src/Images/download.png" style="vertical-align: middle;  height:20px; display:none ">  
 									<a id="helpPlot2" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="src/Images/help.png"></a>
@@ -2945,7 +2983,6 @@ function closeNav() {
 												
 									</select>
 								
-								<input type=button id='showPlot3' class='minimise' value='+' onClick=showPlot(3) style="display:none">
 								<input type=image id='plotOptions3' title="Change the settings of this plot" onClick=plotOptions(3) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
 								<input type=image id='downloadPlot3' title="Download the data displayed in this plot" onClick=downloadPlot(3) src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px; ">  
 								<a id="helpPlot3" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="src/Images/help.png"></a>
