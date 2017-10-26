@@ -54,6 +54,8 @@ XML_JS.ABC_FORCE_VELOCITIES = {};
 	arr=handler.getPath_Array();
 	XML_JS.N = xmlAttrArray[arr[0]]["N"];
 	var speedVal = xmlAttrArray[arr[0]]["speed"];
+	nABCfits = 0;
+
 
 	
 	for (var i=0;i<arr.length;i++){
@@ -64,9 +66,10 @@ XML_JS.ABC_FORCE_VELOCITIES = {};
 		else if (splitArr[2] == "elongation-model" && splitArr.length == 3) FE_JS.currentElongationModel = xmlAttrArray[arr[i]]["id"]; // Model id
 		else if (splitArr[2] == "elongation-model" && splitArr.length == 4) parseXML_model_WW(splitArr[3], xmlAttrArray[arr[i]]["val"]); // Model property
 		//else if (splitArr[2] == "state") compactState = parseXML_state_WW(xmlAttrArray[arr[i]]); // Current state
+		else if (splitArr[2] == "plots" && splitArr.length == 3) parseXML_plot_main_WW(xmlAttrArray[arr[i]]); 
 		else if (splitArr[2] == "plots" && splitArr.length == 4) parseXML_plots_WW(splitArr[3], xmlAttrArray[arr[i]]); 
 		else if (splitArr[2] == "ABC" && splitArr.length == 3) parseXML_ABCmain_WW(xmlAttrArray[arr[i]]); 
-		else if (splitArr[2] == "ABC" && splitArr.length == 4) parseXML_ABCfit_WW(splitArr[3], xmlAttrArray[arr[i]]); 
+		else if (splitArr[2] == "ABC" && splitArr.length == 4) parseXML_ABCfit_WW(xmlAttrArray[arr[i]]); 
 		
 		
 	}
@@ -75,7 +78,8 @@ XML_JS.ABC_FORCE_VELOCITIES = {};
 	//console.log("Parsed", XML_JS.showRejectedParameters);
 
 
-	var toReturn = {seq: SEQS_JS.all_sequences[sequenceID], model: FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel], N: XML_JS.N, speed: speedVal, whichPlotInWhichCanvas: PLOTS_JS.whichPlotInWhichCanvas, ABC_FORCE_VELOCITIES: XML_JS.ABC_FORCE_VELOCITIES};
+	var toReturn = {seq: SEQS_JS.all_sequences[sequenceID], model: FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel], N: XML_JS.N, speed: speedVal, whichPlotInWhichCanvas: PLOTS_JS.whichPlotInWhichCanvas, ABC_FORCE_VELOCITIES: XML_JS.ABC_FORCE_VELOCITIES,
+						showPlots: !PLOTS_JS.plotsAreHidden};
 	toReturn["seq"]["seqID"] = sequenceID;
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
@@ -88,6 +92,14 @@ XML_JS.ABC_FORCE_VELOCITIES = {};
 }
 
 
+function parseXML_plot_main_WW(values){
+	if (values["hidden"] != null){
+		PLOTS_JS.plotsAreHidden = (values["hidden"] == "true");
+	} 
+
+}
+
+
 function parseXML_plots_WW(attr, values){
 	
 
@@ -95,14 +107,14 @@ function parseXML_plots_WW(attr, values){
 	
 	PLOTS_JS.selectPlot_WW(plotNum, values["name"], null, false); // Initialise the plot
 	for (var prop in values){
-		if (prop != "name" && prop != "hidden") PLOTS_JS.whichPlotInWhichCanvas[plotNum][prop] = values[prop]; // Copy all the settings over
-		if (prop == "hidden") PLOTS_JS.whichPlotInWhichCanvas[plotNum][prop] = values[prop] == "true";
+		if (prop != "name") PLOTS_JS.whichPlotInWhichCanvas[plotNum][prop] = values[prop]; // Copy all the settings over
 	}
 
 	
 }
 
 function parseXML_model_WW(attr, val){
+
 	var val = val == "true" ? true : val == "false" ? false : val;
 	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel][attr] = val; 
 }
@@ -151,9 +163,12 @@ function parseXML_ABCmain_WW(ABCnode){
 
 
 // Parse the ABC force-velocity fit settings
-function parseXML_ABCfit_WW(fitID, fitNode){
+function parseXML_ABCfit_WW(fitNode){
 
-	
+	nABCfits++;
+	var fitID = "fit" + nABCfits;
+
+		
 	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID] = {vals: []};
 	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["RSSthreshold"] = fitNode["RSSthreshold"];
 	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["ATPconc"] = fitNode["ATPconc"];

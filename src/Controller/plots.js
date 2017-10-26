@@ -123,7 +123,8 @@ function update_DISTANCE_VS_TIME(DISTANCE_VS_TIME_UNSENT){
 
 
 function drawPlots(forceUpdate = false){
-	
+
+
 	
 	// Only make a request if there exists a visible plot
 	//console.log("visibilities", $("#plotDIV1").is(":visible"), $("#plotDIV2").is(":visible"), $("#plotDIV3").is(":visible"), $("#plotDIV4").is(":visible"));
@@ -133,7 +134,6 @@ function drawPlots(forceUpdate = false){
 	toCall().then((plotData) => {
 
 
-			//console.log("Received data", plotData);
 			update_PLOT_DATA(plotData)
 	
 			window.requestAnimationFrame(function(){
@@ -190,9 +190,6 @@ function resetAllPlots(){
 	haveShownDVTerrorMessage = false;
 	
 	for (var i = 0; i < PLOT_DATA["whichPlotInWhichCanvas"].length; i ++){
-		//$("#selectPlot" + (i+1)).val("none");
-		//$("#showPlot" + (i+1)).hide(true);
-		//showPlot((i+1), false);
 
 		if (i+1 == 4) $("#plot4Buttons").hide(true);
 		else{
@@ -206,10 +203,15 @@ function resetAllPlots(){
 }
 
 
+
+
 function selectPlot(plotNum, deleteData = null){
 
 	var plotSelect = $("#selectPlot" + plotNum);
 	var value = plotSelect.val();
+
+
+
 	
 	
 	// Update the model
@@ -248,17 +250,20 @@ function selectPlot(plotNum, deleteData = null){
 		}
 
 
+
 		if ( value != "none") {
 
-			console.log("Displaying plot", plotNum);
 
 			// If there is a plot display the buttons
-			$("#showPlot" + plotNum).show(true);
-			showPlot(plotNum, true);
+			$("#plotDIV" + plotNum).show(300);
 
 
-			if (plotNum == 4) $("#plot4Buttons").show(true);
+			if (plotNum == 4) {
+				showSitewisePlot(true);
+				$("#plot4Buttons").show(true);
+			}
 			else{
+				showPlots(true);
 				$("#plotOptions" + plotNum).show(true);
 				$("#downloadPlot" + plotNum).show(true);
 				$("#helpPlot" + plotNum).show(true);
@@ -269,15 +274,12 @@ function selectPlot(plotNum, deleteData = null){
 		}else{
 
 			// If no plot then hide the buttons
-			
-			showPlot(plotNum, false);
 			if (plotNum == 4) $("#plot4Buttons").hide(true);
 			else{
-				$("#showPlot" + plotNum).hide(true);
 				$("#downloadPlot" + plotNum).hide(true);
 				$("#plotOptions" + plotNum).hide(true);
 				$("#helpPlot" + plotNum).hide(true);
-
+				$("#plotDIV" + plotNum).hide(true);
 
 			}
 
@@ -3251,26 +3253,43 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 }
 
 
-function showPlot(plotNum, setTo = null){
-	
-	if (setTo == false || (setTo == null && document.getElementById("showPlot" + plotNum).value == "-")){
-		document.getElementById("showPlot" + plotNum).value = "+";
-		$("#plotDIV" + plotNum).hide(100);
+function showSitewisePlot(setTo = null){
 
-		showPlot_controller(plotNum, true);
+	if ((setTo != null && !setTo) || (setTo == null && $("#showSitewisePlot").val() == "-")){ // Hide the sitewise plot
 
-	}
-	else if(setTo == true || (setTo == null && document.getElementById("showPlot" + plotNum).value == "+")){
-		document.getElementById("showPlot" + plotNum).value = "-";
-		$("#plotDIV" + plotNum).show(300);
+		$("#showSitewisePlot").val("+");
+		$("#plotDIV4").slideUp(100);
 
-		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFunction"])(plotNum);
-		else if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] != "none") eval(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFunction"])();
+	}else{	// Show the sitewise plot
 
-		showPlot_controller(plotNum, false);
+		$("#showSitewisePlot").val("-");
+		$("#plotDIV4").slideDown(100);
+
+		drawPlots();
 	}
 
-	
+}
+
+
+function showPlots(setTo = null){
+
+	if ((setTo != null && !setTo) || (setTo == null && $("#showPlots").val() == "-")){ // Hide the plots
+
+		$("#showPlots").val("+");
+		$("#plotsTableDIV").slideUp(100);
+		showPlot_controller(true); // Inform the model that the plots are hidden so that it stops sending through data
+
+	}else{	// Show the plots
+
+		$("#showPlots").val("-");
+		$("#plotsTableDIV").slideDown(100);
+		showPlot_controller(false);
+
+
+		drawPlots();
+	}
+
+
 }
 
 

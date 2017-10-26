@@ -94,10 +94,12 @@ SIM_JS.renderPlotsEveryMS = 5000; // If in hidden mode, render the plots every f
 
 	if (!WW_JS.isWebWorker || RUNNING_FROM_COMMAND_LINE || (!simulating && !ABC_JS.ABC_simulating) || ANIMATION_TIME_TEMP > 0) return;
 
-
 	setTimeout(function(){
+
+		if (!WW_JS.isWebWorker || RUNNING_FROM_COMMAND_LINE || (!simulating && !ABC_JS.ABC_simulating) || ANIMATION_TIME_TEMP > 0) return;
 		postMessage("_renderHTML_hidden()");
 		SIM_JS.renderPlotsHidden(SIM_JS.renderPlotsEveryMS);
+
 	}, timeToTake); // Give it an extra few ms to ensure that action has completed
 
 
@@ -237,11 +239,11 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 		for (var i = 0; i < result["toDo"].length-1; i ++){
 			SIM_JS.SIMULATION_ACTIONS[result["toDo"][i]](stateC); // Perform all actions in list except for the last one
 		}
-		result["toDo"] = result["toDo"][result["toDo"].length-1]; // Last one
+		//result["toDo"] = result["toDo"][result["toDo"].length-1]; // Last one
 	}
 
 
-	var actionToDo = SIM_JS.SIMULATION_ACTIONS[result["toDo"]];
+	var actionToDo = SIM_JS.SIMULATION_ACTIONS[result["toDo"][result["toDo"].length-1]];
 	
 	//console.log("Sampled", actionToDo, "state", stateC);
 
@@ -403,7 +405,7 @@ SIM_JS.sampleAction_WW = function(stateC){
 
 	var toDo = -1;
 	var minReactionTime = -1;
-
+	var actionsToDoList = [];
 
 
 
@@ -474,125 +476,17 @@ SIM_JS.sampleAction_WW = function(stateC){
 		}
 
 		// If next action is bindcat then add the time for catalysis
+		actionsToDoList = [toDo];
 		if (toDo == 3) {
 			minReactionTime += WW_JS.rexp(rateRelCat);
-			toDo = [3,3];
+			actionsToDoList = [3,3];
 		}
 		
 
-		
-
-	/*}
-
-
-	// If using 2 site model then sample this part by ignoring state descriptions and just use simple transition / rate matrices
-	else if (WW_JS.currentState["mRNAPosInActiveSite"] == 0 && !WW_JS.currentState["NTPbound"] && WW_JS.currentState["activated"] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["id"] == "twoSiteBrownian"){
-
-		var stateCopy = WW_JS.getcurrentStateCopy_WW(WW_JS.currentState);
-
-		// Calculate all sliding peaks heights for this copy
-		var slidePeaks = FE_JS.update_slidingPeakHeights_WW(stateCopy);
-		var slideTroughs = FE_JS.update_slidingTroughHeights_WW(stateCopy);
-
-		var rate0tominus1 = Math.exp(-(slidePeaks[2] - slideTroughs[3])); // Rate of backtracking
-		var rate0to1 = propSlideFwd;									  // Rate of going from 0 to 1
-		var rate1to0 = Math.exp(-(slidePeaks[3] - slideTroughs[4]));      // Rate of going from 1 to 0
-		var rate1to2 = Math.exp(-(slidePeaks[4] - slideTroughs[4]));      // Rate of going from 1 to +2
-
-
-		var ratePause0 = propPauseFwd;									  // Pause while pretranslocated
-		var ratePause1 = propPauseFwd;
-
-		// Bind rate from state 0
-		var rate0to0N = propBindFwd;									  // Bind NTP while pretranslocated WHY IS THIS ZERO???
-
-
-
-		// Calculate rates from the 0^N state
-		OPS_JS.bindNTP_WW(stateCopy, false);
-		slidePeaks = FE_JS.update_slidingPeakHeights_WW(stateCopy, false);
-		slideTroughs = FE_JS.update_slidingTroughHeights_WW(stateCopy, false);
-		var bindPeaks = update_bindingPeakHeights_WW(stateCopy);
-		var bindTroughs = update_bindingTroughHeights_WW(stateCopy);
-
-		var rate0Nto0 = Math.exp(-(bindPeaks[2] - bindTroughs[3]));		// Release NTP while pretranslocated
-		var rate0Nto1N = Math.exp(-(slidePeaks[3] - slideTroughs[3]));	// Slide forward to posttranslocated with NTP bound
-
-
-		// Calculate rates from the 1^N state
-		OPS_JS.bindNTP_WW(stateCopy, false);
-		slidePeaks = FE_JS.update_slidingPeakHeights_WW(stateCopy, false);
-		slideTroughs = FE_JS.update_slidingTroughHeights_WW(stateCopy, false);
-		bindPeaks = update_bindingPeakHeights_WW(stateCopy);
-		bindTroughs = update_bindingTroughHeights_WW(stateCopy);
-
-		var rate1Nto1 = Math.exp(-(bindPeaks[2] - bindTroughs[3]));		// Release NTP while posttranslocated
-		var rate1NtoC = Math.exp(-(bindPeaks[3] - bindTroughs[3]));		// Catalyse NTP
-		var rate1Nto0N = Math.exp(-(slidePeaks[2] - slideTroughs[3]));	// Slide backwards to pretranslocated with NTP bound
-
-
-		// Calculate binding rate from the 0 (posttranslocated) state
-		OPS_JS.releaseNTP_WW(stateCopy, false);
-		bindPeaks = update_bindingPeakHeights_WW(stateCopy);
-		bindTroughs = update_bindingTroughHeights_WW(stateCopy);
-		var rate1to1N = Math.exp(-(bindPeaks[3] - bindTroughs[3]));	
-
-
-		// Build the rate matrix. index 0 = 0, 1 = 1, 2 = 0N, 3 = 1N, 4 = 0pause, 5 = 1pause, 6 = backtracked, 7 = hypertranslocated, 8 = catalysed
-		// 4-8 are absorbing states
-		var rateMatrix = [[], [], [], []];
-		rateMatrix[0] = [0, rate0to1, rate0to0N, 0, ratePause0, 0, rate0tominus1, 0, 0]; // From pretranslocated state
-		rateMatrix[1] = [rate1to0, 0, 0, rate1to1N, 0, ratePause1, 0, rate1to2, 0]; 	 // From posttranslocated state
-		rateMatrix[2] = [rate0Nto0, 0, 0, rate0Nto1N, 0, 0, 0, 0, 0];					 // From pretranslocated-NTP state
-		rateMatrix[3] = [0, rate1Nto1, rate1Nto1, 0, 0, 0, 0, 0, rate1NtoC];			 // From posttranslocated-NTP state
-
-
-
-		// Convert the rate matrix into a probability matrix, and build a rate vector (the rate to sample with in each state)
-		var probMatrix = [[], [], [], []];
-		var rateVector = [0,0,0,0];
-		for (var row = 0; row < 4; row++){
-			var rowSum = 0;
-			for (var col = 0; col < rateMatrix[row].length; col++)  rowSum += rateMatrix[row][col];
-			for (var col = 0; col < rateMatrix[row].length; col++){
-				probMatrix[row][col] = rateMatrix[row][col] / rowSum;
-				rateVector[row] += probMatrix[row][col];
-			}
-
-		}
-
-		console.log("Sampling from rateMatrix", rateMatrix);
-
-
-		// Simulate the matrix until it reaches an absorbing state
-		var result = SIM_JS.simulateMatrix_WW(0, rateVector, probMatrix, 4);
-		minReactionTime = result["time"];
-		switch(result["state"]){
-			case 4:
-				toDo = 5;
-				break
-			case 5:
-				toDo = [1,5];
-				break
-			case 6:
-				toDo = 0;
-				break
-			case 7:
-				toDo = [1,1];
-				break
-			case 8:
-				toDo = [3,1,3];
-				break
-		}
-
-		console.log("Sampled todo", toDo);
-
-
-		*/
 	} else {
 
 
-
+		
 
 		var kBindOrCat = 0; // Sample binding or catalysis rate
 		var sampledBaseToAdd = null;
@@ -610,10 +504,32 @@ SIM_JS.sampleAction_WW = function(stateC){
 		}
 
 
-		// If NTP is not bound and we are in posttranslocated state, as user has requested to assume binding equilibrium
-		var bindingEquilibrium = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeBindingEquilibrium"] && stateC[1] == 1 && !stateC[2] && stateC[3];
-		if(bindingEquilibrium){
+		// If NTP is not bound and we are in posttranslocated state, and user has requested to assume binding equilibrium but NOT translocation
+		var justBindingEquilibrium =     FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeBindingEquilibrium"]
+								 && !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeTranslocationEquilibrium"] 
+								 && stateC[1] == 1 && !stateC[2] && stateC[3];
 
+
+
+		// If NTP is not bound and we are in pre/posttranslocated state, and user has requested to assume translocation equilibrium but NOT binding
+		var justTranslocationEquilibrium =  !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeBindingEquilibrium"]
+											&&  FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeTranslocationEquilibrium"] 
+											&& (stateC[1] == 0 || stateC[1] == 1) && !stateC[2] && stateC[3];
+
+
+
+
+		// If we are in pre/posttranslocated state, and user has requested to assume translocation equilibrium AND binding equilibrium
+		var bindingAndTranslocationEquilibrium =  	   FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeBindingEquilibrium"]
+													&& FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeTranslocationEquilibrium"] 
+													&& (stateC[1] == 0 || stateC[1] == 1)  && !stateC[2] && stateC[3];
+
+
+
+
+		// Assume equilbirium between bound and unbound states but NOT pre and post translocated states
+		if(justBindingEquilibrium){
+			
 
 			var KD_name = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] == 2 ? "Kdiss" : "Kdiss_" + sampledBaseToAdd["base"] + "TP";
 			var NTPconc_name = !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] ? "NTPconc" : sampledBaseToAdd["base"] + "TPconc";
@@ -630,6 +546,114 @@ SIM_JS.sampleAction_WW = function(stateC){
 			kFwd = kFwd * probabilityUnbound; // Can only translocate if NTP is not bound
 			kBck = kBck * probabilityUnbound;
 			kDeact = kDeact * probabilityUnbound; // Can only deactivate if NTP is not bound
+
+
+		}
+
+
+
+		// Assume equilbirium between pre and post translocated states but NOT between bound and unbound states
+		else if(justTranslocationEquilibrium){
+
+
+			// Get rate of translocating from 0 to 1
+			var currentTranslocationPosition = stateC[1];
+			stateC[1] = 0; 
+			var k0_1 = STATE_JS.getTranslocationRates(stateC)[1];
+			var k0_minus1 = STATE_JS.getTranslocationRates(stateC)[0];
+
+
+			// Get rate of translocating from 1 to 0
+			stateC[1] = 1; 
+			var k1_0 = STATE_JS.getTranslocationRates(stateC)[0];
+			var k1_2 = STATE_JS.getTranslocationRates(stateC)[1];
+
+
+			stateC[1] = currentTranslocationPosition;
+
+
+			var eqConstantFwdTranslocation = k0_1 / k1_0;
+			var probabilityPosttranslocated = eqConstantFwdTranslocation / (eqConstantFwdTranslocation + 1);
+			var probabilityPretranslocated = 1 - probabilityPosttranslocated;
+
+			
+
+			// Can only bind NTP if not beyond the end of the sequence, go forward to terminate
+			if (stateC[0] + 1 < WW_JS.currentState["nbases"]){
+
+				// Sample a base to add
+				var baseToTranscribe = WW_JS.getBaseInSequenceAtPosition_WW("g" + (1 + stateC[0]));
+				sampledBaseToAdd = WW_JS.sampleBaseToAdd(baseToTranscribe);
+				kBindOrCat = sampledBaseToAdd["rate"]  * probabilityPosttranslocated; // Can only bind if in posttranslocated state
+				SIM_JS.SIMULATION_VARIABLES["baseToAdd"] = sampledBaseToAdd["base"];
+
+			}
+
+
+			kFwd = k1_2 * probabilityPosttranslocated; // Can only enter hypertranslocated state from posttranslocated
+			kBck = k0_minus1 * probabilityPretranslocated; // Can only backtrack from pretranslocated
+			kDeact = kDeact; // Can deactivate from either state with equal probability
+
+			//console.log("Rate bind", kBindOrCat, kFwd, kBck);
+			if (stateC[0] == 100) {
+				console.log("probabilityPosttranslocated", probabilityPosttranslocated, "k0_1", k0_1, "k1_0", k1_0);
+
+			}
+
+		}
+
+
+
+		// Assume equilbirium between pre and post translocated states AND between bound and unbound states
+		else if (bindingAndTranslocationEquilibrium){
+
+
+			// Get rate of translocating from 0 to 1
+			var currentTranslocationPosition = stateC[1];
+			stateC[1] = 0; 
+			var k0_1 = STATE_JS.getTranslocationRates(stateC)[1];
+			var k0_minus1 = STATE_JS.getTranslocationRates(stateC)[0];
+
+			// Get rate of translocating from 1 to 0
+			stateC[1] = 1; 
+			var k1_0 = STATE_JS.getTranslocationRates(stateC)[0];
+			var k1_2 = STATE_JS.getTranslocationRates(stateC)[1];
+			stateC[1] = currentTranslocationPosition;
+
+
+			// Get KD and [NTP]
+			var KD_name = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] == 2 ? "Kdiss" : "Kdiss_" + sampledBaseToAdd["base"] + "TP";
+			var NTPconc_name = !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] ? "NTPconc" : sampledBaseToAdd["base"] + "TPconc";
+			var KD = PARAMS_JS.PHYSICAL_PARAMETERS[KD_name]["val"];
+			var NTPconc = PARAMS_JS.PHYSICAL_PARAMETERS[NTPconc_name]["val"];
+
+
+
+			// Calculate the probabilities of being in the 3 states (0, 1 and 1N)
+			var A = NTPconc / KD;
+			var B = k0_1 / k1_0;
+			var probabilityPretranslocated = A / (A*B + A + B);
+			var probabilityPosttranslocated = A*B / (A*B + A + B);
+			var probabilityBound = B / (A*B + A + B);
+
+
+
+			// Can only catalyse if not beyond the end of the sequence, go forward to terminate
+			if (stateC[0] + 1 < WW_JS.currentState["nbases"]){
+
+				// Sample a base to add
+				var baseToTranscribe = WW_JS.getBaseInSequenceAtPosition_WW("g" + (1 + stateC[0]));
+				sampledBaseToAdd = WW_JS.sampleBaseToAdd(baseToTranscribe);
+				kBindOrCat = FE_JS.getCatalysisRate(sampledBaseToAdd["base"]) * probabilityBound; // Can only catalyse if NTP bound
+				SIM_JS.SIMULATION_VARIABLES["baseToAdd"] = sampledBaseToAdd["base"];
+
+			}
+
+
+			kFwd = k1_2 * probabilityPosttranslocated; // Can only enter hypertranslocated state from posttranslocated
+			kBck = k0_minus1 * probabilityPretranslocated; // Can only backtrack from pretranslocated
+			kDeact = kDeact * (probabilityPosttranslocated + probabilityPretranslocated); // Can only deactivate from post and pretranslocated states
+
 
 
 		}
@@ -656,48 +680,48 @@ SIM_JS.sampleAction_WW = function(stateC){
 		}
 
 
-	}
-
-	// If assume binding equilibrium and sampled catalysis then this is actually a double operation (bind then catalysis)
-	if(bindingEquilibrium && toDo == 3){
-		toDo = [3, 3];
-		
-	}
-
-	return {"toDo": toDo, "time": minReactionTime};
-	
-	
-	
-}
 
 
-SIM_JS.simulateMatrix_WW = function(s, rateVector, probMatrix, numTransientStates){
+		actionsToDoList = [toDo];
+
+		// If assume binding equilibrium and sampled catalysis then this is actually a double operation (bind then catalysis)
+		if(justBindingEquilibrium && toDo == 3){
+			actionsToDoList = [3, 3];
+		}
 
 
-	var time = 0;
-	while(true){
+		// If assume translocation equilibrium
+		else if(justTranslocationEquilibrium){
 
-		if (s >= numTransientStates) return {state: s, time: time}; // Return if this is an absorbing state
-
-
-		// Sample reaction time
-		time += WW_JS.rexp(rateVector[s]);
-
-		// Sample next state
-		var runif = MER_JS.random();
-		var cumsum = 0;
-		for (var i = 0; i < probMatrix[s].length; i ++){
-			cumsum += probMatrix[s][i];
-			if (runif < cumsum) {
-				s = i;
-				break;
-			}
+			if (toDo == 3 && stateC[1] == 0) actionsToDoList = [1, 3]; // Need to be in posttranslocated state before binding 
+			else if (toDo == 1 && stateC[1] == 0) actionsToDoList = [1, 1]; // Need to be in posttranslocated state before moving forward 
+			else if (toDo == 0 && stateC[1] == 1) actionsToDoList = [0, 0]; // Need to be in pretranslocated state before moving backwards 
 
 		}
 
+
+
+		// If assume binding AND translocation equilibrium. NTP is required to be unbound
+		else if(bindingAndTranslocationEquilibrium){
+
+			if (toDo == 3 && stateC[1] == 0) actionsToDoList = [1, 3, 3]; // Forward, bind, catalyse
+			else if (toDo == 3 && stateC[1] == 1) actionsToDoList = [3, 3]; // Bind, catalyse
+			else if (toDo == 1 && stateC[1] == 0) actionsToDoList = [1, 1]; // Forward, forward
+			else if (toDo == 0 && stateC[1] == 1) actionsToDoList = [0, 0]; // Backwards, backwards
+
+		}
+
+
+
 	}
 
 
+
+
+	return {"toDo": actionsToDoList, "time": minReactionTime};
+	
+	
+	
 }
 
 
@@ -827,8 +851,7 @@ if (RUNNING_FROM_COMMAND_LINE){
 		renderPlotsHidden: SIM_JS.renderPlotsHidden,
 		n_simulations_WW: SIM_JS.n_simulations_WW,
 		trial_WW: SIM_JS.trial_WW,
-		sampleAction_WW: SIM_JS.sampleAction_WW,
-		simulateMatrix_WW: SIM_JS.simulateMatrix_WW
+		sampleAction_WW: SIM_JS.sampleAction_WW
 	}
 
 }

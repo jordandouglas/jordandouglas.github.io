@@ -877,6 +877,7 @@ function saveSession(){
 			// Plots
 			if (PLOT_DATA["whichPlotInWhichCanvas"] != null) {
 				saveXML.writeStartElement('plots');
+					saveXML.writeAttributeString("hidden", $("#showPlots").val() == "+");
 					for (var i = 1; i <=4; i ++){
 						if (PLOT_DATA["whichPlotInWhichCanvas"][i] == null) continue;
 						
@@ -907,6 +908,9 @@ function saveSession(){
 		// Model settings
 		saveXML.writeStartElement('elongation-model');
 		saveXML.writeAttributeString('id', ELONGATION_MODEL["id"]);
+
+
+		// All model properties
 		for (var modelProperty in ELONGATION_MODEL){
 
 			if (modelProperty == "id" || modelProperty == "name") continue;
@@ -967,8 +971,14 @@ function saveSession(){
 			saveXML.writeAttributeString("showRejectedParameters", $("#ABC_showRejectedParameters").is(":checked").length = 0 ? false : $("#ABC_showRejectedParameters").is(":checked"));
 
 
+			// Sort the fits so that they are printed in the right order
+			var fits = [];
+			for (var fitID in forcesVelocitiesForModel["fits"]) fits.push(fitID);
+			fits.sort();
 
-			for (var fitID in forcesVelocitiesForModel["fits"]){
+			for (var i = 0; i < fits.length; i ++){
+
+				var fitID = fits[i];
 
 				saveXML.writeStartElement(fitID);
 

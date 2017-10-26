@@ -40,12 +40,11 @@ ABC_JS.beginABC_WW = function(forcesVelocities, resolve = function() {}, msgID =
 	//ABC_JS.ABC_POSTERIOR_DISTRIBUTION = [];
 
 
-
 	var fitNums = []; // Build a list of fit numbers
 	for (var fitNum in ABC_JS.ABC_FORCE_VELOCITIES["fits"]) {
 		fitNums.push(fitNum); 
 	}
-
+	fitNums.sort();
 
 
 

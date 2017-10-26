@@ -2028,6 +2028,7 @@ function loadSession_controller(XMLData){
 		
 			
 		var openPlots = function(){
+
 			// Open up the appropriate plots
 			//PLOT_DATA = {};
 			//PLOT_DATA["whichPlotInWhichCanvas"] = result["whichPlotInWhichCanvas"];
@@ -2036,14 +2037,11 @@ function loadSession_controller(XMLData){
 				
 				var pltName = result["whichPlotInWhichCanvas"][plt]["name"];
 				$("#selectPlot" + plt).val(pltName);
-				$("#showPlot" + plt).show(0);
-				$("#showPlot" + plt).val("-");
 				$("#plotDIV" + plt).show(0);
 				$("#plotOptions" + plt).show(0);
 				$("#downloadPlot" + plt).show(0);
 				$("#helpPlot" + plt).show(0);
 				$("#helpPlot" + plt).attr("href", "about/#" + pltName + "_PlotHelp");
-				
 				
 				
 				//if (result["whichPlotInWhichCanvas"][plt]["name"] != "none" && result["whichPlotInWhichCanvas"][plt]["name"] != "custom" && result["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(result["whichPlotInWhichCanvas"][plt]["plotFunction"])();
@@ -2055,7 +2053,9 @@ function loadSession_controller(XMLData){
 			
 		}
 		
-		
+		if (result["showPlots"] != null) showPlots(result["showPlots"]);
+
+
 		
 		// Update the sequence settings
 		if (result["N"] != null) $("#nbasesToSimulate").val(result["N"]);
@@ -2064,6 +2064,7 @@ function loadSession_controller(XMLData){
 		$("#SelectTemplateType").val(seqObject["template"]);
 		$("#SelectPrimerType").val(seqObject["primer"]);
 		userChangeSequence(openPlots);
+
 
 		if (seqObject["seqID"] == "$user") {
 			$("#UserSequence").val(seqObject["seq"]);
@@ -2122,7 +2123,7 @@ function loadSession_controller(XMLData){
 
 		// Update the model DOM eg. enable hypertranslocation
 		updateModelDOM(model);
-		
+
 	
 		
 	};
@@ -2151,12 +2152,12 @@ function loadSession_controller(XMLData){
 
 
 
-function showPlot_controller(plotNum, hidden){
+function showPlot_controller(hidden){
 
 	if (WEB_WORKER == null) {
-		PLOTS_JS.showPlot_WW(plotNum, hidden);
+		PLOTS_JS.showPlot_WW(hidden);
 	}else{
-		var fnStr = stringifyFunction("PLOTS_JS.showPlot_WW", [plotNum, hidden]);
+		var fnStr = stringifyFunction("PLOTS_JS.showPlot_WW", [hidden]);
 		//console.log("Sending function: " + fnStr);
 		callWebWorkerFunction(fnStr);
 	}
@@ -2204,22 +2205,21 @@ function getNTPparametersAndSettings_controller(resolve = function(){}){
 
 function userInputModel_controller(){
 
-	var elongationModelID = $("#SelectElongationModel").val();
-	var translocationModelID = $("#SelectTranslocationModel").val();
-	var allowBacktracking = $("#allowBacktracking").is(":checked");
-	var allowHypertranslocation = $("#allowHypertranslocation").is(":checked");
-	var allowInactivation = $("#allowInactivation").is(":checked");
-	var allowBacktrackWithoutInactivation = $("#allowBacktrackWithoutInactivation").is(":checked");
-	var deactivateUponMisincorporation = $("#deactivateUponMisincorporation").length == 0 ? null :  $("#deactivateUponMisincorporation").is(":checked");
-	var allowGeometricCatalysis = $("#allowGeometricCatalysis").is(":checked");
-	var allowmRNAfolding = $("#allowmRNAfolding").is(":checked");
-	var allowMisincorporation = $("#allowMisincorporation").length == 0 ? null : $("#allowMisincorporation").is(":checked");
-	var useFourNTPconcentrations = $("#useFourNTPconcentrations").is(":checked");
-	var NTPbindingNParams = $("#NTPbindingNParams").length == 0 ? null : $("#NTPbindingNParams").is(":checked") ? 8 : 2;
-	var assumeBindingEquilibrium = $("#assumeBindingEquilibrium").length == 0 ? null : $("#assumeBindingEquilibrium").is(":checked");
 	
-	
+	// Iterate through the model settings on page and capture their values
+	var toSend = {};
+	var elements = $(".modelSetting");
+	for (var i = 0; i < elements.length; i ++){
 
+
+		var ele = elements[i];
+		var id = $(ele).attr("id");
+		var val = $(ele).is(":checked");
+		if (id == "NTPbindingNParams") val = (val == true ? 8 : 2); 
+		else if (id == "currentTranslocationModel") val = $(ele).val();
+		toSend[id] = val;
+
+	}
 
 
 
@@ -2236,12 +2236,12 @@ function userInputModel_controller(){
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => FE_JS.userInputModel_WW(elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, assumeBindingEquilibrium, resolve));
+		var toCall = () => new Promise((resolve) => FE_JS.userInputModel_WW(toSend, resolve));
 		toCall().then((mod) => updateDOM(mod));
 	}
 
 	else{
-		var res = stringifyFunction("FE_JS.userInputModel_WW", [elongationModelID, translocationModelID, allowBacktracking, allowHypertranslocation, allowInactivation, allowBacktrackWithoutInactivation, deactivateUponMisincorporation, allowGeometricCatalysis, allowmRNAfolding, allowMisincorporation, useFourNTPconcentrations, NTPbindingNParams, assumeBindingEquilibrium, null], true);
+		var res = stringifyFunction("FE_JS.userInputModel_WW", [toSend, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));

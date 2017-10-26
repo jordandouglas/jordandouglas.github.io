@@ -62,7 +62,7 @@ PLOTS_JS.totaltimeElapsed = 0;
 PLOTS_JS.npauseSimulations = 0;
 PLOTS_JS.nabortionSimulations = 0;
 PLOTS_JS.nMisincorporationSimulations = 0;
-
+PLOTS_JS.plotsAreHidden = false;
 
 
 
@@ -198,36 +198,40 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
  PLOTS_JS.getPlotData_WW = function(forceUpdate = false, resolve = function(plotData) { }, msgID = null){
 	
-	
+
+
 	var plotData = {};
 
 	
 	
 	// Only send plot data which is needed
-	if (PLOTS_JS.whichPlotInWhichCanvas[4] != null && !PLOTS_JS.whichPlotInWhichCanvas[4]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[4]["name"] == "abortionSite"){
+	if (PLOTS_JS.whichPlotInWhichCanvas[4] != null && !PLOTS_JS.plotsAreHidden && PLOTS_JS.whichPlotInWhichCanvas[4]["name"] == "abortionSite"){
 		plotData["arrestCounts"] = PLOTS_JS.arrestCounts;
 		plotData["nabortionSimulations"] = PLOTS_JS.nabortionSimulations;
-	}else if (PLOTS_JS.whichPlotInWhichCanvas[4] != null && !PLOTS_JS.whichPlotInWhichCanvas[4]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[4]["name"] == "pauseSite"){
+	}else if (PLOTS_JS.whichPlotInWhichCanvas[4] != null && !PLOTS_JS.plotsAreHidden && PLOTS_JS.whichPlotInWhichCanvas[4]["name"] == "pauseSite"){
 		plotData["pauseTimePerSite"] = PLOTS_JS.pauseTimePerSite;
 		plotData["npauseSimulations"] = PLOTS_JS.npauseSimulations
-	}else if (PLOTS_JS.whichPlotInWhichCanvas[4] != null && !PLOTS_JS.whichPlotInWhichCanvas[4]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[4]["name"] == "misincorporationSite"){
+	}else if (PLOTS_JS.whichPlotInWhichCanvas[4] != null && !PLOTS_JS.plotsAreHidden && PLOTS_JS.whichPlotInWhichCanvas[4]["name"] == "misincorporationSite"){
 		plotData["misincorporationCounts"] = PLOTS_JS.misincorporationCounts;
 		plotData["nMisincorporationSimulations"] = PLOTS_JS.nMisincorporationSimulations;
 	}
 
 
 
-	var distanceVsTime_needsData = 	(PLOTS_JS.whichPlotInWhichCanvas[1] != null && !PLOTS_JS.whichPlotInWhichCanvas[1]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "distanceVsTime") || 
-			 						(PLOTS_JS.whichPlotInWhichCanvas[2] != null && !PLOTS_JS.whichPlotInWhichCanvas[2]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "distanceVsTime") || 
-									(PLOTS_JS.whichPlotInWhichCanvas[3] != null && !PLOTS_JS.whichPlotInWhichCanvas[3]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "distanceVsTime");
+	var distanceVsTime_needsData = 	 !PLOTS_JS.plotsAreHidden &&
+									((PLOTS_JS.whichPlotInWhichCanvas[1] != null && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "distanceVsTime") || 
+			 						 (PLOTS_JS.whichPlotInWhichCanvas[2] != null && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "distanceVsTime") || 
+									 (PLOTS_JS.whichPlotInWhichCanvas[3] != null && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "distanceVsTime"));
 
-	var pauseHistogram_needsData = 	(PLOTS_JS.whichPlotInWhichCanvas[1] != null && !PLOTS_JS.whichPlotInWhichCanvas[1]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "pauseHistogram") || 
-			 						(PLOTS_JS.whichPlotInWhichCanvas[2] != null && !PLOTS_JS.whichPlotInWhichCanvas[2]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "pauseHistogram") || 
-									(PLOTS_JS.whichPlotInWhichCanvas[3] != null && !PLOTS_JS.whichPlotInWhichCanvas[3]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "pauseHistogram");
+	var pauseHistogram_needsData = 	!PLOTS_JS.plotsAreHidden &&
+									((PLOTS_JS.whichPlotInWhichCanvas[1] != null && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "pauseHistogram") || 
+			 						 (PLOTS_JS.whichPlotInWhichCanvas[2] != null && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "pauseHistogram") || 
+									 (PLOTS_JS.whichPlotInWhichCanvas[3] != null && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "pauseHistogram"));
 
-	var velocityHistogram_needsData = 	(PLOTS_JS.whichPlotInWhichCanvas[1] && !PLOTS_JS.whichPlotInWhichCanvas[1]["hidden"] != null && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "velocityHistogram") || 
-			 							(PLOTS_JS.whichPlotInWhichCanvas[2] && !PLOTS_JS.whichPlotInWhichCanvas[2]["hidden"] != null && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "velocityHistogram") || 
-										(PLOTS_JS.whichPlotInWhichCanvas[3] && !PLOTS_JS.whichPlotInWhichCanvas[3]["hidden"] != null && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "velocityHistogram");
+	var velocityHistogram_needsData = 	!PLOTS_JS.plotsAreHidden &&
+										((PLOTS_JS.whichPlotInWhichCanvas[1] != null && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "velocityHistogram") || 
+			 						 	 (PLOTS_JS.whichPlotInWhichCanvas[2] != null && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "velocityHistogram") || 
+										 (PLOTS_JS.whichPlotInWhichCanvas[3] != null && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "velocityHistogram"));
 	
 	
 	if (distanceVsTime_needsData || velocityHistogram_needsData){
@@ -269,12 +273,13 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 	}
 
 	
-	var thereExistsAParameterPlot = (PLOTS_JS.whichPlotInWhichCanvas[1] != null && !PLOTS_JS.whichPlotInWhichCanvas[1]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "custom") || 
-			 					 (PLOTS_JS.whichPlotInWhichCanvas[2] != null && !PLOTS_JS.whichPlotInWhichCanvas[2]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "custom") || 
-			 				     (PLOTS_JS.whichPlotInWhichCanvas[3] != null && !PLOTS_JS.whichPlotInWhichCanvas[3]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "custom") ||
-			 				     (PLOTS_JS.whichPlotInWhichCanvas[1] != null && !PLOTS_JS.whichPlotInWhichCanvas[1]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "parameterHeatmap") || 
-			 					 (PLOTS_JS.whichPlotInWhichCanvas[2] != null && !PLOTS_JS.whichPlotInWhichCanvas[2]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "parameterHeatmap") || 
-			 				     (PLOTS_JS.whichPlotInWhichCanvas[3] != null && !PLOTS_JS.whichPlotInWhichCanvas[3]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "parameterHeatmap");
+	var thereExistsAParameterPlot = !PLOTS_JS.plotsAreHidden &&
+								 ((PLOTS_JS.whichPlotInWhichCanvas[1] != null && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "custom") || 
+			 					  (PLOTS_JS.whichPlotInWhichCanvas[2] != null && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "custom") || 
+			 				      (PLOTS_JS.whichPlotInWhichCanvas[3] != null && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "custom") ||
+			 				      (PLOTS_JS.whichPlotInWhichCanvas[1] != null && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "parameterHeatmap") || 
+			 					  (PLOTS_JS.whichPlotInWhichCanvas[2] != null && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "parameterHeatmap") || 
+			 				      (PLOTS_JS.whichPlotInWhichCanvas[3] != null && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "parameterHeatmap"));
 
 
 
@@ -285,7 +290,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 		
 		
 		for (var plotNum = 1; plotNum <= 3; plotNum++){
-			if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && !PLOTS_JS.whichPlotInWhichCanvas[plotNum]["hidden"] && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
+			if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && !PLOTS_JS.plotsAreHidden && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
 
 				var valuesX = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParam"]);
 				var valuesY = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customMetric"]);
@@ -301,11 +306,9 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 		for (var plotNum = 1; plotNum <= 3; plotNum++){
 
-			// TODO: add back  && !PLOTS_JS.whichPlotInWhichCanvas[plotNum]["hidden"]
-			if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
+			if (!PLOTS_JS.plotsAreHidden && PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
 
 
-				
 
 				var valuesX = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamX"]);
 				var valuesY = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamY"]);
@@ -339,6 +342,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 		plotData["thereExistsPosteriorDistribution"] = ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length > 0;
 	
 	}
+
 
 
 	if (msgID != null){
@@ -379,10 +383,13 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 }
 
 
- PLOTS_JS.updatePlotData_WW = function(stateC, actionNumber, reactionTime){
+ PLOTS_JS.updatePlotData_WW = function(stateC, actionsToDo, reactionTime){
 	
 
 	var rightHybridBase = stateC[1] + stateC[0];
+
+	var lastAction = actionsToDo[actionsToDo.length-1]; // The last element in the list was a kinetic action. 
+														// Reactions before it were all equilibrium ones
 
 	PLOTS_JS.totaltimeElapsed += reactionTime;
 	PLOTS_JS.timeWaitedUntilNextTranslocation += reactionTime;
@@ -395,9 +402,10 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 		PLOTS_JS.arrestCounts[abortionSite] ++;
 	}
 	
-	// If this is a translocation event, add it to the distance~time chart, and update the time spent at this site
-	if (actionNumber < 2) {
 
+	// If there has been a translocation action, add it to the distance~time chart, and update the time spent at this site
+	if (actionsToDo.indexOf(0) != -1 || actionsToDo.indexOf(1) != -1) {
+		
 
 		if (PLOTS_JS.DISTANCE_VS_TIME_SIZE < PLOTS_JS.DISTANCE_VS_TIME_SIZE_MAX){ // Maximum size of the distance vs time object
 			var index = PLOTS_JS.DISTANCE_VS_TIME.length-1;
@@ -413,17 +421,18 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 		// Update total displacement
 		PLOTS_JS.timeElapsed += PLOTS_JS.timeWaitedUntilNextTranslocation;
-		PLOTS_JS.totalDisplacement += actionNumber == 0 ? -1 : 1;
+		PLOTS_JS.totalDisplacement += lastAction == 0 ? -1 : 1;
 		PLOTS_JS.velocity = PLOTS_JS.totalDisplacement / PLOTS_JS.totaltimeElapsed;
 
 
 		PLOTS_JS.pauseTimePerSite[rightHybridBase] += PLOTS_JS.timeWaitedUntilNextTranslocation;
 		PLOTS_JS.timeWaitedUntilNextTranslocation = 0;
 	}
+
 	
 	
 	// If this is a catalysis event, add it to the pause histogram and if it is a misincorporation then add to misincorportion plot
-	if (actionNumber == 3 && stateC[2]) {
+	if (lastAction == 3 && stateC[2]) {
 
 
 		// Dwell time histogram
@@ -463,11 +472,9 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 
 
- PLOTS_JS.showPlot_WW = function(plotNum, isHidden){
+ PLOTS_JS.showPlot_WW = function(isHidden){
 
-	if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null){
-		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["hidden"] = isHidden;
-	}
+	PLOTS_JS.plotsAreHidden = isHidden;
 
 }
 
@@ -478,7 +485,6 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 	PLOTS_JS.whichPlotInWhichCanvas[plotNum] = {};
 	PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] = value;
-	PLOTS_JS.whichPlotInWhichCanvas[plotNum]["hidden"] = false;
 
 
 	

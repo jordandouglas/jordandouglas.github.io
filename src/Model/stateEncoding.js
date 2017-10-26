@@ -161,6 +161,8 @@ STATE_JS.initTranslocationRateCache = function(){
 
 
 
+
+
 // Slippage states will not be encoded
  STATE_JS.convertFullStateToCompactState = function(fullState){
 	
@@ -194,10 +196,10 @@ STATE_JS.initTranslocationRateCache = function(){
 		
 		
 		var rates = STATE_JS.TRANSLOCATION_RATES[rowNum][colNum];
+		var forceGradient = Math.exp((-PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * 3.4e-10) / (2 * 1.380649e-23 * 310));
+		var GDagRateModifier = Math.exp(-PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"]);
 
 		if (rates != false) {
-			var forceGradient = Math.exp((-PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * 3.4e-10) / (2 * 1.380649e-23 * 310));
-			var GDagRateModifier = Math.exp(-PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"]);
 			return [rates[0] * GDagRateModifier * forceGradient, rates[1] * GDagRateModifier / forceGradient];
 		}
 
@@ -225,7 +227,7 @@ STATE_JS.initTranslocationRateCache = function(){
 
 		STATE_JS.TRANSLOCATION_RATES[rowNum][colNum] = [kbck, kfwd];
 
-		return [kbck, kfwd];
+		return [kbck * GDagRateModifier * forceGradient, kfwd * GDagRateModifier / forceGradient];
 		
 		
 		
@@ -243,10 +245,10 @@ STATE_JS.initTranslocationRateCache = function(){
 		var indexNum = leftHybridBase - 1;
 
 		var rates = STATE_JS.BACKTRACKING_RATES[indexNum];
+		var forceGradient = Math.exp((-PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * 3.4e-10) / (2 * 1.380649e-23 * 310));
+		var GDagRateModifier = Math.exp(-PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"]);
 
 		if (rates != false) {
-			var forceGradient = Math.exp((-PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * 3.4e-10) / (2 * 1.380649e-23 * 310));
-			var GDagRateModifier = Math.exp(-PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"]);
 			return [rates[0] * GDagRateModifier * forceGradient, rates[1] * GDagRateModifier / forceGradient];
 		}
 		
@@ -265,7 +267,7 @@ STATE_JS.initTranslocationRateCache = function(){
 
 		STATE_JS.BACKTRACKING_RATES[indexNum] = [kbck, kfwd];
 
-		return [kbck, kfwd];
+		return [kbck * GDagRateModifier * forceGradient, kfwd * GDagRateModifier / forceGradient];
 	
 		
 		

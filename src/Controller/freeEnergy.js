@@ -163,19 +163,29 @@ function update_sliding_curve_horizontal_sync(startTime, dir, animationTimeLands
 
 function updateModelDOM(elongation_model_temp){
 
-	$("#SelectElongationModel").val(elongation_model_temp["id"]);
-	$("#allowHypertranslocation").prop('checked', elongation_model_temp["allowHypertranslocation"]);
-	$("#allowBacktracking").prop('checked', elongation_model_temp["allowBacktracking"]);
-	$("#allowInactivation").prop('checked', elongation_model_temp["allowInactivation"]);
-	$("#allowBacktrackWithoutInactivation").prop('checked', elongation_model_temp["allowBacktrackWithoutInactivation"]);
-	$("#deactivateUponMisincorporation").prop('checked', elongation_model_temp["deactivateUponMisincorporation"]);
-	$("#allowGeometricCatalysis").prop('checked', elongation_model_temp["allowGeometricCatalysis"]);
-	$("#allowmRNAfolding").prop('checked', elongation_model_temp["allowmRNAfolding"]);
-	$("#allowMisincorporation").prop('checked', elongation_model_temp["allowMisincorporation"]);
-	$("#useFourNTPconcentrations").prop('checked', elongation_model_temp["useFourNTPconcentrations"]);
-	$("#NTPbindingNParams").prop('checked', elongation_model_temp["NTPbindingNParams"] == 8);
 
-	$("#assumeBindingEquilibrium").prop('checked', elongation_model_temp["assumeBindingEquilibrium"]);
+	for (var modelSettingID in elongation_model_temp){
+		if ($("#" + modelSettingID).length == 0) continue;
+
+		var val = elongation_model_temp[modelSettingID];
+
+		// Checkbox 
+		if (val == true || val == false) {
+			$("#" + modelSettingID).prop('checked', val);
+		}
+
+		// Special checkbox
+		else if (modelSettingID == "NTPbindingNParams"){
+			$("#" + modelSettingID).prop('checked', val == 8);
+		}
+
+		// Dropdown
+		else{
+			$("#" + modelSettingID).val(val);
+		}
+
+	}
+	
 
 
 	if (elongation_model_temp["allowBacktracking"] && elongation_model_temp["allowInactivation"]) $("#allowBacktrackWithoutInactivation_container").show(100);
@@ -288,8 +298,9 @@ function updateModelDOM(elongation_model_temp){
 	else{
 		$("#RateBind_container").show(100);
 	}
-	
 
+
+	$("#currentTranslocationModel").val(elongation_model_temp["currentTranslocationModel"]);
 	//if (elongation_model_temp["id"] == "twoSiteBrownian") $("#allowGeometricCatalysis_container").hide(100);
 	//else $("#allowGeometricCatalysis_container").show(100);
 
@@ -306,8 +317,8 @@ function setModelOptions(){
 		
 		$("#SelectElongationModel").empty();
 		var currentElongationModel = result["currentElongationModel"];
-		var elongation_model = result["ELONGATION_MODELS"]
-		var currentTranslocationModel = result["currentTranslocationModel"];
+		var elongation_model = result["ELONGATION_MODELS"];
+		var currentTranslocationModel = elongation_model[currentElongationModel]["currentTranslocationModel"];
 		var translocation_model = result["TRANSLOCATION_MODELS"];
 
 		// Elongation models
@@ -323,7 +334,7 @@ function setModelOptions(){
 		console.log("Translocation models", translocation_model, "currentTranslocationModel", currentTranslocationModel);
 
 		// Translocation models
-		dropdown = document.getElementById('SelectTranslocationModel');
+		dropdown = document.getElementById('currentTranslocationModel');
 		for (var mod in translocation_model){
 			var opt = document.createElement('option');
  			opt.value = translocation_model[mod]["id"];
@@ -335,7 +346,7 @@ function setModelOptions(){
 
 		ELONGATION_MODEL_TEMP = elongation_model[currentElongationModel];
 		$("#SelectElongationModel").val(currentElongationModel);
-		$("#SelectTranslocationModel").val(currentTranslocationModel);
+		$("#currentTranslocationModel").val(currentTranslocationModel);
 		updateModelDOM(ELONGATION_MODEL_TEMP);
 
 	});
@@ -657,7 +668,7 @@ function getNTPModelSettingsTemplate(){
 							 
 					 		<td colspan=3 style="text-align:left;">
 						 		<label class="switch">
-							 		 <input type="checkbox" id="NTPbindingNParams" OnChange="userInputModel_controller()"> </input>
+							 		 <input class="modelSetting" type="checkbox" id="NTPbindingNParams" OnChange="userInputModel_controller()"> </input>
 							 		 <span class="slider round notboolean"></span>
 								</label> 
 								<span style="font-size:15px; vertical-align:middle" >8 params</span>
@@ -826,7 +837,7 @@ function getNTPModelSettingsTemplate(){
 
 								 		<td colspan=3>
 									 		<label class="switch">
-										 		 <input type="checkbox" id="assumeBindingEquilibrium" OnChange="userInputModel_controller()"> </input>
+										 		 <input class="modelSetting" type="checkbox" id="assumeBindingEquilibrium" OnChange="userInputModel_controller()"> </input>
 										 		 <span class="slider round"></span>
 											</label> 
 											<span style="font-size:15px; vertical-align:middle"> Assume NTP binding at equilibrium</span>
@@ -870,7 +881,7 @@ function getNTPModelSettingsTemplate(){
 										 
 								 		<td colspan=3>
 									 		<label class="switch">
-										 		 <input type="checkbox" id="allowMisincorporation" OnChange="userInputModel_controller()"> </input>
+										 		 <input class="modelSetting" type="checkbox" id="allowMisincorporation" OnChange="userInputModel_controller()"> </input>
 										 		 <span class="slider round"></span>
 											</label> 
 											<span style="font-size:15px; vertical-align:middle" >Enable misincorporations</span>
@@ -889,7 +900,7 @@ function getNTPModelSettingsTemplate(){
 
 								 		<td colspan=3>
 									 		<label class="switch">
-										 		 <input type="checkbox" id="deactivateUponMisincorporation" OnChange="userInputModel_controller()"> </input>
+										 		 <input class="modelSetting" type="checkbox" id="deactivateUponMisincorporation" OnChange="userInputModel_controller()"> </input>
 										 		 <span class="slider round"></span>
 											</label> 
 											<span style="font-size:15px; vertical-align:middle" >Inactivate after misincorporations</span>
