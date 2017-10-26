@@ -1155,7 +1155,7 @@ function addCitations(){
 									many times your friend has flipped their coin. Similarly, whether you have been waiting 1 second or 1 hour for a chemical reaction to occur, the probability of it happening right now is always the same.
 									The amount of time until reaction $s \rightarrow s^\prime$ occurs follows the exponential distribution with rate $k$. <br><br>
 									
-									<img id="exponential" src="../src/TutorialImages/exponential.png" style="height:350px; padding: 10 30;" align=left></img>
+									<img id="exponential" src="../src/TutorialImages/exponential.png" style="width:60%; padding: 10 30;" align=left></img>
 									
 									If there are multiple chemical reactions competing with each other, then the reaction with the shortest reaction time will be selected. For example, suppose that you have a test-tube containing 
 									a single molecule of compound $A$, which can spontaneously undergo two reactions: $A \rightarrow B$ or $A \rightarrow C$, with rate constants 0.001s<sup>-1</sup> and 0.002s<sup>-1</sup> respectively. 
@@ -1193,7 +1193,7 @@ function addCitations(){
 									<div id="polymerisation_ModelHelp" class="block-subtitle" > Kinetics of nucleotide incorporation</div> <br>
 
 										
-										Adding the next base onto the $3^\prime$ end of the nascent strand requires at least four steps<cite val="erie1992single"></cite>.
+										Adding the next base onto the $3^\prime$ end of the nascent strand requires one translocation step (detailed in the next section) at least three chemical steps<cite val="erie1992single"></cite>.
 										
 										
 										
@@ -1207,27 +1207,19 @@ function addCitations(){
 										
 										<div style="padding: 10 10; background-color:#ebe9e7" >
 
-											<b>2. Triphosphate cleavage.</b> The triphosphate in the bound NTP is cleaved, resulting in a nucleoside monophosphate (NMP) and a pyrophosphate, both still bound within the active site.
+											<b>2. Phosphodisester bond formation.</b> The $5^\prime$ phosphate of the NMP is linked to the $3^\prime$-OH of the nascent strand.
 
 										</div><br>
-										
-										
-										<div style="padding: 10 10; background-color:#ebe9e7" >
-
-											<b>3. Phosphodisester bond formation.</b> The $5^\prime$ phosphate of the NMP is linked to the $3^\prime$-OH of the nascent strand.
-
-										</div><br>
-										
 		
 
 										<div style="padding: 10 10; background-color:#ebe9e7" >
 
-											<b>4. Pyrophosphate release.</b> The bound pyrophosphate is released back into solution.
+											<b>3. Pyrophosphate release.</b> The bound pyrophosphate is released back into solution.
 
 										</div><br><br>	
 										
 										Any of these steps could be reversible.
-										As there is not sufficent information to model all four steps, nucleotide incorporation has been compressed into a two step 
+										As there is not sufficent information to model all three steps, nucleotide incorporation has been compressed into a two step 
 										process.<cite val="bai2004sequence,abbondanzieri2005direct,maoileidigh2011unified"></cite>
 										
 										
@@ -1242,7 +1234,7 @@ function addCitations(){
 										
 										<div style="padding: 10 10; background-color:#ebe9e7" >
 
-											<b>2. Catalysis.</b> Steps 2-4 from above. This is assumed to be an irreversible process. The rate of incorporating a bound nucleotide is $k_{cat}$.
+											<b>2. Catalysis.</b> Steps 2-3 from above. This is assumed to be an irreversible process. The rate of incorporating a bound nucleotide is $k_{cat}$.
 
 										</div><br><br>	
 										
@@ -1327,7 +1319,7 @@ function addCitations(){
 										<br><br>
 
 
-										<img id="breakingPairs" src="../src/TutorialImages/breakingPairs.png" style="width:1200px; display:block;  margin: 0 auto;" border="1" ></img>
+										<img id="breakingPairs" src="../src/TutorialImages/breakingPairs.png" style="width:90%; display:block;  margin: 0 auto;" border="1" ></img>
 
 										<br><br>
 
