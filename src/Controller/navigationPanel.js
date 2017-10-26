@@ -33,8 +33,8 @@ function refreshNavigationCanvases(){
 
 
 function plotArrow_navigationPanel(ctx, fromx, fromy, direction, label = "", rate, spacingBetweenStates, hovering = false, reactionApplicable = true){
-	
-	
+
+
 
 
 	ctx.globalAlpha = 1;
@@ -119,43 +119,46 @@ function plotArrow_navigationPanel(ctx, fromx, fromy, direction, label = "", rat
 
 
 
-function removeArrow(ele){
-	$(ele).remove();
-}
 
-function plotArrowButton_navigationPanel(ctx, fromx, fromy, direction, label = "", rate, onClick = "", hoverTitle = "", spacingBetweenStates, canvas, reactionApplicable = true){
+function plotArrowButton_navigationPanel(ctx, fromx, fromy, direction, label = "", rate, onClick = function() { }, navigationHoverEvents, spacingBetweenStates, canvas, reactionApplicable = true){
 
 	
+	// Draw the arrow
+	var arrowDimensions = plotArrow_navigationPanel(ctx, fromx, fromy, direction, label, rate, spacingBetweenStates, false, reactionApplicable)
 
 
-	var arrowWidth = spacingBetweenStates + 15;
-	var arrowHeight = 55;
-	var arrowTop =  $(canvas).offset().top - $(canvas).parent().offset().top + fromy - arrowHeight/2;
-	var arrowLeft =  fromx + (direction == "right" ? 0 : -arrowWidth);
-	var cssclass = direction == "left" ? "" : "rotate180";
-	var textAlign = direction == "left" ? "right" : "left";
-	var src = "src/Images/arrow" + (reactionApplicable ? "" : "Grey") + ".png";
-	var cursorClass = reactionApplicable ? "pointer" : "not-allowed";
-
-	var arrowHTML = `
-		<input type="image" class="navArrow ` + cssclass + `" src="` + src + `" title="` + hoverTitle + `" onclick="` + onClick + `;" style = "cursor:` + cursorClass + `;position:absolute; width:` + arrowWidth + `px; height:` + arrowHeight + `px; top:` + arrowTop + `px; left:` + arrowLeft + `px; ">
-		<div class="navArrow noselect" onclick="` + onClick + `();" title="` + hoverTitle + `" style="cursor:` + cursorClass + `; color:white; font-family:Arial; text-align:` + textAlign + `; position:absolute; font-size:17px; top:` + (arrowTop + 18) + `px; left:` + arrowLeft + `px; width:` + arrowWidth + `px">&nbsp;` + label + `&nbsp;</div>
-
-	`;
-
-	// Rate above label
-	if(rate != null){
-
-		var rateHTML = `
-			<div class="navArrow" style="color:black; font-family:Arial; text-align:` + textAlign + `; position:absolute; font-size:14px; top:` + (arrowTop) + `px; left:` + arrowLeft + `px; width:` + arrowWidth + `px">` + roundToSF(rate, 3) + `s<sup>-1</sup></div>
-		`;
-
-		arrowHTML += rateHTML;
-
-	}
+    // Mouseover event
+	navigationHoverEvents.push(function(e, rect) {
 
 
-	$(canvas).parent().append(arrowHTML);
+		if (label == "" || e == null) return;
+
+		var mouseInArrow = true;
+
+        var mouseX = e.clientX - rect.left - 10;
+		var mouseY = e.clientY - rect.top - 10;
+
+		// X-axis collision
+		if(direction == "left") mouseInArrow = mouseInArrow && arrowDimensions["tox"] - arrowDimensions["headlen"] <= mouseX && fromx >= mouseX; 
+		else mouseInArrow = mouseInArrow && fromx  <= mouseX && arrowDimensions["tox"] + arrowDimensions["headlen"] >= mouseX; 
+
+
+		// Y-axis collision
+		mouseInArrow = mouseInArrow && fromy - 20 <= mouseY && fromy >= mouseY; 
+
+
+
+		if (!simulating && reactionApplicable && mouseInArrow){
+			canvas.addEventListener('click', onClick, false);
+			return true
+		}else{
+			canvas.removeEventListener('click', onClick);
+			return false;
+		}
+
+
+
+	});
 
 
 }
@@ -206,7 +209,6 @@ function drawTranslocationCanvas(){
 	var ctx = canvas.getContext('2d');
 	ctx.globalAlpha = 1;
 
-
 	
 	var plotWidth = canvas.width;
 	var plotHeight = canvas.height;
@@ -215,8 +217,8 @@ function drawTranslocationCanvas(){
 	getTranslocationCanvasData_controller(function(result){
 
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		$(canvas).parent().find(".navArrow").remove();
 
+		var navigationHoverEvents = [];
 		var currentStateMargin = 2;
 		var spacingBetweenStates = plotWidth * 0.25 - 2*currentStateMargin;
 
@@ -224,16 +226,56 @@ function drawTranslocationCanvas(){
 		// Backwards arrow
 		var fromX = canvas.width / 2 - 25;
 		var kBck = result["kBck"];
+		var onClickBackwards = function(){
+			canvas.removeEventListener('click', onClickBackwards);
+			backwards_controller();
+		};
 
-		plotArrowButton_navigationPanel(ctx, fromX, canvas.height/2, "left", "Backwards", kBck, "backwards_controller", "Translocate the polymerase backwards (&larr; key)", spacingBetweenStates, canvas, result["bckBtnActive"]);
+		plotArrowButton_navigationPanel(ctx, fromX, canvas.height/2+8, "left", "Backwards", kBck, onClickBackwards, navigationHoverEvents, spacingBetweenStates, canvas, result["bckBtnActive"]);
 
 
 
 		// Forwards arrow
 		var fromX = canvas.width / 2 + 25;
 		var kFwd = result["kFwd"];
+		var onClickForwards = function(){
+			canvas.removeEventListener('click', onClickForwards);
+			forward_controller();
+		};
 
-		plotArrowButton_navigationPanel(ctx, fromX, canvas.height/2, "right", result["fwdBtnLabel"], kFwd, "forward_controller", "Translocate the polymerase forwards (&rarr; key)", spacingBetweenStates, canvas, result["fwdBtnActive"]);
+		plotArrowButton_navigationPanel(ctx, fromX, canvas.height/2+8, "right", result["fwdBtnLabel"], kFwd, onClickForwards, navigationHoverEvents, spacingBetweenStates, canvas, result["fwdBtnActive"]);
+
+
+
+		var mouseMoveFunction = function(e, rect){
+			var mouseHover = false;
+			for (var i = 0; i < navigationHoverEvents.length; i++){
+				if (navigationHoverEvents[i](e, rect)){
+					mouseHover = true;
+				 	break;
+				}
+			}
+
+			if (mouseHover){
+				$("#translocationCanvas").css('cursor','pointer');
+			}
+			else{
+				//$("#kineticStateSescription").hide(1);
+				$("#translocationCanvas").css('cursor','auto');
+			}
+
+		}
+
+		// If the mouse is already here then enable the mosuemove event now
+		mouseMoveFunction(window.event, document.getElementById("translocationCanvas").getBoundingClientRect());
+
+
+		canvas.onmousemove = function(e) { 
+			var rect = this.getBoundingClientRect();
+			mouseMoveFunction(e, rect);
+		};
+
+
 
 
 	});
@@ -266,11 +308,11 @@ function drawNTPcanvas(){
 	
 	var plotWidth = canvas.width;
 	var plotHeight = canvas.height;
+	var navigationHoverEvents = [];
 
 	getNTPCanvasData_controller(function(result){
 
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		$(canvas).parent().find(".navArrow").remove();
 		$("#ntpCanvasDIV img").remove();
 
 		if (result == null || result["templateBaseBeingCopied"] == null) return;
@@ -350,22 +392,27 @@ function drawNTPcanvas(){
 		// Unbound or bound state
 		if (result["mRNAPosInActiveSite"] >= 1){
 			var bindOrReleaseRate = result["NTPbound"] ? result["kRelease"] : result["kBind"];
-			var onClickLeft = result["NTPbound"] && result["mRNAPosInActiveSite"] == 1 ? "releaseNTP_controller" : "bindNTP_controller";
+			var onClickLeft = function(){
+				canvas.removeEventListener('click', onClickLeft);
+				result["NTPbound"] && result["mRNAPosInActiveSite"] == 1 ? releaseNTP_controller() : bindNTP_controller();
+			};
 
 			var arrowX = result["NTPbound"] ? middleStateX - 10: leftStateX + 50;
 			var bindingOrReleasingApplicable = result["mRNAPosInActiveSite"] == 1 && result["activated"];
 			if (!bindingOrReleasingApplicable) bindOrReleaseRate = 0;
-			plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, result["NTPbound"] ? "left" : "right", result["NTPbound"] ? "Release" : "Bind", bindOrReleaseRate, onClickLeft, result["NTPbound"] ? "Release the NTP (shift + &larr;)" : "Bind an NTP molecule (shift + &rarr;)", spacingBetweenStates, canvas, bindingOrReleasingApplicable);
-
+			plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, result["NTPbound"] ? "left" : "right", result["NTPbound"] ? "Release" : "Bind", bindOrReleaseRate, onClickLeft, navigationHoverEvents, spacingBetweenStates, canvas, bindingOrReleasingApplicable);
 
 
 			// NTP bound state
 			if (result["NTPbound"]){
 
-				var onClickRight = "bindNTP_controller";
+				var onClickRight = function(){
+					canvas.removeEventListener('click', onClickRight);
+					bindNTP_controller();
+				};
 
 				var arrowX = middleStateX + 55;
-				plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "right", "Catalyse", result["kCat"], onClickRight, "Add the bound NTP onto the end of the nascent strand (shift + &rarr;)", spacingBetweenStates, canvas, true);
+				plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "right", "Catalyse", result["kCat"], onClickRight, navigationHoverEvents, spacingBetweenStates, canvas, true);
 
 
 			}
@@ -379,14 +426,49 @@ function drawNTPcanvas(){
 		else if (!result["NTPbound"] && result["mRNAPosInActiveSite"] <= 0){
 
 			var decayRate = 0;
-			var onClickLeft = "releaseNTP_controller";
+			var onClickLeft = function(){
+				canvas.removeEventListener('click', onClickLeft);
+				releaseNTP_controller();
+			};
 
 			var arrowX = rightStateX - 10;
 			var decayApplicable = result["mRNAPosInActiveSite"] == 0 && result["activated"];
-			plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "left", "Decay", decayRate, onClickLeft, "Remove the most recently added base from the chain (shift + &larr;)", spacingBetweenStates, canvas, decayApplicable);
+			plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "left", "Decay", decayRate, onClickLeft, navigationHoverEvents, spacingBetweenStates, canvas, decayApplicable);
 
 
 		}
+
+
+
+
+		var mouseMoveFunction = function(e, rect){
+			var mouseHover = false;
+			for (var i = 0; i < navigationHoverEvents.length; i++){
+				
+				if (navigationHoverEvents[i](e, rect)){
+					mouseHover = true;
+				 	break;
+				}
+			}
+			if (mouseHover){
+				$("#ntpCanvas").css('cursor','pointer');
+			}
+
+			else{
+				//$("#kineticStateSescription").hide(1);
+				$("#ntpCanvas").css('cursor','auto');
+			}
+		}
+
+
+		// If the mouse is already here then enable the mosuemove event now
+		mouseMoveFunction(window.event, document.getElementById("ntpCanvas").getBoundingClientRect());
+
+
+		canvas.onmousemove = function(e) { 
+			var rect = this.getBoundingClientRect();
+			mouseMoveFunction(e, rect);
+		};
 
 
 	});
@@ -433,11 +515,11 @@ function drawDeactivationCanvas(){
 		var kA = result["kA"];
 		var kU = result["kU"];
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		$(canvas).parent().find(".navArrow").remove();
 		
 
 		//state[3] = !state[3];
 
+		var navigationHoverEvents = [];
 		var currentStateMargin = 2;
 		var spacingBetweenStates = plotWidth * 0.25 - 2*currentStateMargin;
 
@@ -507,12 +589,43 @@ function drawDeactivationCanvas(){
 		// Arrow from current state to other state
 		var fromX = (state[3] ?  plotWidth * 0.35 + currentStateMargin : plotWidth * 0.65 - currentStateMargin);
 		var rate = state[3] ? kU : kA;
-		var onClick = state[3] ? "deactivate_controller" : "activate_controller";
+		var onClick = function(){
+			canvas.removeEventListener('click', onClick);
+			state[3] ? deactivate_controller() : activate_controller();
+		};
 
-		if (state[2] || !result.allowDeactivation) rate = 0; // Cannot deactivate if NTP bound
-		plotArrowButton_navigationPanel(ctx, fromX, plotHeight / 2, state[3] ? "right" : "left", state[3] ? "Deactivate" : "Activate", rate, onClick, state[3] ? "Send the polymerase into a catalytically inactive state" : "Bring the polymerase back into its catalytically active form", spacingBetweenStates, canvas, !state[2]);
+		if (state[2]) rate = 0; // Cannot deactivate if NTP bound
+		plotArrowButton_navigationPanel(ctx, fromX, plotHeight / 2, state[3] ? "right" : "left", state[3] ? "Deactivate" : "Activate", rate, onClick, navigationHoverEvents, spacingBetweenStates, canvas, !state[2]);
 
 
+
+
+		var mouseMoveFunction = function(e, rect){
+			var mouseHover = false;
+			for (var i = 0; i < navigationHoverEvents.length; i++){
+				if (navigationHoverEvents[i](e, rect)){
+					mouseHover = true;
+				 	break;
+				}
+			}
+			if (mouseHover){
+				$("#deactivationCanvas").css('cursor','pointer');
+			}
+
+			else{
+				//$("#kineticStateSescription").hide(1);
+				$("#deactivationCanvas").css('cursor','auto');
+			}
+		}
+
+		// If the mouse is already here then enable the mosuemove event now
+		mouseMoveFunction(window.event, document.getElementById("deactivationCanvas").getBoundingClientRect());
+
+
+		canvas.onmousemove = function(e) { 
+			var rect = this.getBoundingClientRect();
+			mouseMoveFunction(e, rect);
+		};
 
 
 	});
@@ -552,7 +665,7 @@ function drawSlippageCanvas(S = 0){
 
 
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		$(canvas).parent().find(".navArrow").remove();
+		var navigationHoverEvents = [];
 		
 		var stateWidth = 0.2 * plotWidth;
 		var spacingBetweenStates = (plotWidth - 3*stateWidth) / 2 - 20;
@@ -647,22 +760,57 @@ function drawSlippageCanvas(S = 0){
 
 		// Slip left 
 		var decayRate = 0;
-		var onClickLeft = "slip_left_controller";
+		var onClickLeft = function(){
+			canvas.removeEventListener('click', onClickLeft);
+			slip_left_controller();
+		};
 		var arrowX = middleStateX - 5;
 		//var decayApplicable = result["mRNAPosInActiveSite"] == 0 && result["activated"];
-		plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "left", result.leftLabel.label, null, onClickLeft, result.leftLabel.title, spacingBetweenStates, canvas, result["leftLabel"].label != "");
+		plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "left", result["leftLabel"], null, onClickLeft, navigationHoverEvents, spacingBetweenStates, canvas, result["leftLabel"] != "");
 
 
 
 		// Slip right 
 		var decayRate = 0;
-		var onClickRight = "slip_right_controller";
+		var onClickRight = function(){
+			canvas.removeEventListener('click', onClickRight);
+			slip_right_controller();
+		};
 		var arrowX = middleStateX + stateWidth + 5;
 		//var decayApplicable = result["mRNAPosInActiveSite"] == 0 && result["activated"];
-		plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "right", result.rightLabel.label, null, onClickRight, result.rightLabel.title, spacingBetweenStates, canvas, result["rightLabel"].label != "");
+		plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "right", result["rightLabel"], null, onClickRight, navigationHoverEvents, spacingBetweenStates, canvas, result["rightLabel"] != "");
 
 
 
+
+
+
+		var mouseMoveFunction = function(e, rect){
+			var mouseHover = false;
+			for (var i = 0; i < navigationHoverEvents.length; i++){
+				if (navigationHoverEvents[i](e, rect)){
+					mouseHover = true;
+				 	break;
+				}
+			}
+			if (mouseHover){
+				$("#slippageCanvas").css('cursor','pointer');
+			}
+
+			else{
+				//$("#kineticStateSescription").hide(1);
+				$("#slippageCanvas").css('cursor','auto');
+			}
+		}
+
+		// If the mouse is already here then enable the mosuemove event now
+		mouseMoveFunction(window.event, document.getElementById("slippageCanvas").getBoundingClientRect());
+
+
+		canvas.onmousemove = function(e) { 
+			var rect = this.getBoundingClientRect();
+			mouseMoveFunction(e, rect);
+		};
 
 
 	});

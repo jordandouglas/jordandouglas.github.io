@@ -28,7 +28,7 @@ FE_JS.ELONGATION_MODELS = {};
 FE_JS.ELONGATION_MODELS["simpleBrownian"] = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: false, allowHypertranslocation: false, 
 										allowInactivation:false, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: false, 
 										allowGeometricCatalysis: false, allowmRNAfolding:false, allowMisincorporation:false, useFourNTPconcentrations:false,
-										NTPbindingNParams: 2, assumeBindingEquilibrium: true, currentTranslocationModel: "meltingBarriers"};
+										NTPbindingNParams: 2, assumeBindingEquilibrium: true};
 //FE_JS.ELONGATION_MODELS["twoSiteBrownian"] = {id: "twoSiteBrownian",name: "Brownian ratchet model with 2 NTP binding sites", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation:false, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
 FE_JS.currentElongationModel = "simpleBrownian";
 
@@ -36,6 +36,7 @@ FE_JS.currentElongationModel = "simpleBrownian";
 FE_JS.TRANSLOCATION_MODELS = {};
 FE_JS.TRANSLOCATION_MODELS["midpointBarriers"] = {id: "midpointBarriers", name: "Midpoint"};
 FE_JS.TRANSLOCATION_MODELS["meltingBarriers"] = {id: "meltingBarriers", name: "Melting"};
+FE_JS.currentTranslocationModel = "meltingBarriers";
 
 
 
@@ -69,7 +70,7 @@ FE_JS.initFreeEnergy_WW = function(){
 	if (resolve === undefined) resolve = function() {};
 	if (msgID === undefined) msgID = null;
 
-	var toReturn = {currentElongationModel: FE_JS.currentElongationModel, ELONGATION_MODELS: FE_JS.ELONGATION_MODELS, TRANSLOCATION_MODELS: FE_JS.TRANSLOCATION_MODELS};
+	var toReturn = {currentElongationModel: FE_JS.currentElongationModel, ELONGATION_MODELS: FE_JS.ELONGATION_MODELS, currentTranslocationModel: FE_JS.currentTranslocationModel, TRANSLOCATION_MODELS: FE_JS.TRANSLOCATION_MODELS};
 
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
@@ -93,7 +94,7 @@ FE_JS.initFreeEnergy_WW = function(){
 								  (NTPbindingNParams != null && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] != NTPbindingNParams);
 
 	FE_JS.currentElongationModel = elongationModelID;
-	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] = translocationModelID;
+	FE_JS.currentTranslocationModel = translocationModelID;
 	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowBacktracking"] = allowBacktracking;
 	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"] = allowHypertranslocation;
 	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowInactivation"] = allowInactivation;
@@ -319,7 +320,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 
 			// Midpoint model: free energy barrier is halfway between the two on either side
-			if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] == "midpointBarriers"){
+			if (FE_JS.currentTranslocationModel == "midpointBarriers"){
 
 				slidingPeakHeightsTemp[pos] += (getFreeEnergyOfState_WW(statePreOperation) - getFreeEnergyOfTranscriptionBubble_WW(statePreOperation) + getFreeEnergyOfState_WW(state) - getFreeEnergyOfTranscriptionBubble_WW(state)) / 2;
 				
@@ -334,7 +335,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 			}
 
-			else if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] == "meltingBarriers"){
+			else if (FE_JS.currentTranslocationModel == "meltingBarriers"){
 
 				slidingPeakHeightsTemp[pos] += getFreeEnergyOfIntermediateState_WW(statePreOperation, state);
 				slidingPeakHeightsTemp[pos] -= getFreeEnergyOfTranscriptionBubbleIntermediate_WW(statePreOperation, state); // Subtract the free energy which we would gain if the intermediate transcription bubble was sealed
@@ -405,7 +406,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 
 			// Midpoint model: free energy barrier is halfway between the two on either side
-			if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] == "midpointBarriers"){
+			if (FE_JS.currentTranslocationModel == "midpointBarriers"){
 
 				slidingPeakHeightsTemp[pos-1] += (getFreeEnergyOfState_WW(statePreOperation) - getFreeEnergyOfTranscriptionBubble_WW(statePreOperation) + getFreeEnergyOfState_WW(state) - getFreeEnergyOfTranscriptionBubble_WW(state)) / 2;
 				
@@ -413,7 +414,7 @@ FE_JS.initFreeEnergy_WW = function(){
 			}
 
 			// Calculate the free energy of the intermediate state
-			else if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] == "meltingBarriers"){
+			else if (FE_JS.currentTranslocationModel == "meltingBarriers"){
 
 				slidingPeakHeightsTemp[pos-1] += getFreeEnergyOfIntermediateState_WW(statePreOperation, state);
 				slidingPeakHeightsTemp[pos-1] -= getFreeEnergyOfTranscriptionBubbleIntermediate_WW(statePreOperation, state); // Subtract the free energy which we would gain if the intermediate transcription bubble was sealed
@@ -1270,11 +1271,10 @@ FE_JS.getNTPCanvasData_WW = function(resolve, msgID){
  FE_JS.getDeactivationCanvasData_WW = function(resolve, msgID){
 
 
-
 	if (resolve === undefined) resolve = function() {};
 	if (msgID === undefined) msgID = null;
 
-	var toReturn = {state: STATE_JS.convertFullStateToCompactState(WW_JS.currentState), kU: PARAMS_JS.PHYSICAL_PARAMETERS["kU"]["val"], kA: PARAMS_JS.PHYSICAL_PARAMETERS["kA"]["val"], allowDeactivation:  FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel].allowInactivation};
+	var toReturn = {state: STATE_JS.convertFullStateToCompactState(WW_JS.currentState), kU: PARAMS_JS.PHYSICAL_PARAMETERS["kU"]["val"], kA: PARAMS_JS.PHYSICAL_PARAMETERS["kA"]["val"]};
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
 	}else{
@@ -1287,8 +1287,6 @@ FE_JS.getNTPCanvasData_WW = function(resolve, msgID){
 // Gets the button label associated with slipping right
 function getSlipRightLabel_WW(state, S){
 
-
-	var toReturn = {label: ""};
 	if (S === undefined) S = 0;
 
 	var label = "";
@@ -1301,16 +1299,16 @@ function getSlipRightLabel_WW(state, S){
 
 
 	if (state["terminated"]) label = "";
-	else if (allowMultipleBulges && state["partOfBulgeID"][S] != i && state["bulgePos"][ state["partOfBulgeID"][S] ] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) toReturn = {label: ""};
-	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S) toReturn = {label: "Fissure"};
-	else if (!state["NTPbound"] && state["partOfBulgeID"][S] == S && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) toReturn = {label: "Absorb", title: "Absorb the bulge at the left end of the hybrid (ctrl + &rarr;)"};	
-	else if (allowMultipleBulges && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] - 1) != -1) toReturn = {label: "Fuse"};	
-	else if (state["leftMBase"] > 1 && allowMultipleBulges &&  state["bulgePos"][S] == 0 && ((state["bulgePos"].indexOf(h - 1) != -1) || state["bulgePos"].indexOf(h - 2) != -1)) toReturn = {label: "Form", title: "Create a bulge at the left end of the hybrid (ctrl + &rarr;)"};	
-	else if (state["bulgePos"][S] < h && state["bulgePos"][S] > 1 && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1) toReturn = {label: "Diffuse", title: "Move the bulge one step to the right (ctrl + &rarr;)"};
-	else if (state["bulgePos"][S] == 0) toReturn = {label: "Form", title: "Create a bulge at the left end of the hybrid (ctrl + &)"};
+	else if (allowMultipleBulges && state["partOfBulgeID"][S] != i && state["bulgePos"][ state["partOfBulgeID"][S] ] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) label = "";
+	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S) label = "Fissure";
+	else if (!state["NTPbound"] && state["partOfBulgeID"][S] == S && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) label = "Absorb";	
+	else if (allowMultipleBulges && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] - 1) != -1) label = "Fuse";	
+	else if (state["leftMBase"] > 1 && allowMultipleBulges &&  state["bulgePos"][S] == 0 && ((state["bulgePos"].indexOf(h - 1) != -1) || state["bulgePos"].indexOf(h - 2) != -1)) label = "Form";	
+	else if (state["bulgePos"][S] < h && state["bulgePos"][S] > 1 && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1) label = "Diffuse";
+	else if (state["bulgePos"][S] == 0) label = "Form";
 	
 
-	return toReturn;
+	return label;
 
 
 
@@ -1320,10 +1318,9 @@ function getSlipRightLabel_WW(state, S){
 // Gets the button label associated with slipping left
 function getSlipLeftLabel_WW(state, S){
 
-	var toReturn = {label: ""};
-
 	if (S === undefined) S = 0;
 
+	var label = "";
 	var allowMultipleBulges = PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"];
 	var h = PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"];
 
@@ -1331,20 +1328,20 @@ function getSlipLeftLabel_WW(state, S){
 	if (fuseWith == -1)	fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 2, 2));
 
 
-	if (state["terminated"]) toReturn = {label: ""};
-	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] == h - 1) toReturn = {label: ""};
-	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S) toReturn = {label: "Fissure"};
-	else if (allowMultipleBulges && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] + 1) != -1) toReturn = {label: "Fuse"};
+	if (state["terminated"]) label = "";
+	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] == h - 1) label = "";
+	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S) label = "Fissure";
+	else if (allowMultipleBulges && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] + 1) != -1) label = "Fuse";
 	else if (allowMultipleBulges && state["bulgePos"][S] == 0 && allowMultipleBulges && state["bulgePos"][S] == 0 && fuseWith != -1) {
-		if (state["mRNAPosInActiveSite"] >= 0 && state["bulgePos"].indexOf( state["bulgePos"][fuseWith] +1 ) != -1) toReturn = {label: ""};
-		else toReturn = {label: "Form", title: "Create a bulge at the right end of the hybrid (ctrl + &larr;)"};
+		if (state["mRNAPosInActiveSite"] >= 0 && state["bulgePos"].indexOf( state["bulgePos"][fuseWith] +1 ) != -1) label = "";
+		else label = "Form";
 	}
-	else if (state["bulgePos"][S] > 0 && state["bulgePos"][S] < h - 1) toReturn = {label: "Diffuse", title: "Move the bulge one step to the left (ctrl + &larr;)"};
+	else if (state["bulgePos"][S] > 0 && state["bulgePos"][S] < h - 1) label = "Diffuse";
 
-	else if (!state["NTPbound"] && state["bulgePos"][S] == 0 && state["mRNAPosInActiveSite"] != h - 1) toReturn = {label: "Form", title: "Create a bulge at the right end of the hybrid (ctrl + &larr;)"};
-	else if (state["bulgePos"][S] == h - 1) toReturn = {label: "Absorb", title: "Absorb the bulge at the left end of the hybrid (ctrl + &larr;)"};
+	else if (!state["NTPbound"] && state["bulgePos"][S] == 0 && state["mRNAPosInActiveSite"] != h - 1) label = "Form";
+	else if (state["bulgePos"][S] == h - 1) label = "Absorb";
 			
-	return toReturn;
+	return label;
 
 
 }
@@ -1991,6 +1988,7 @@ if (RUNNING_FROM_COMMAND_LINE){
 		ELONGATION_MODELS: FE_JS.ELONGATION_MODELS,
 		currentElongationModel: FE_JS.currentElongationModel,
 		TRANSLOCATION_MODELS: FE_JS.TRANSLOCATION_MODELS,
+		currentTranslocationModel: FE_JS.currentTranslocationModel,
 		initFreeEnergy_WW: FE_JS.initFreeEnergy_WW,
 		getElongationModels_WW: FE_JS.getElongationModels_WW,
 		userInputModel_WW: FE_JS.userInputModel_WW,

@@ -795,7 +795,7 @@ OPS_JS.deactivate_WW = function(state = null, UPDATE_COORDS, resolve = function(
 	var successfulOp = false;
 
 
-	if (state["activated"] && !state["NTPbound"]){
+	if (state["activated"] && !state["NTPbound"] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowInactivation"]){
 
 		state["activated"] = false;
 		//if (state["NTPbound"]) OPS_JS.releaseNTP_WW(state, UPDATE_COORDS); // This gives a very different model when kRelease is low

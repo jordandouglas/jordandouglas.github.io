@@ -1168,7 +1168,7 @@ function log_WW(num, base){
 
 	if (speed == "slow") ANIMATION_TIME_TEMP = 200;
 	else if (speed == "medium") ANIMATION_TIME_TEMP = 60;
-	else if (speed == "fast") ANIMATION_TIME_TEMP = 8;
+	else if (speed == "fast") ANIMATION_TIME_TEMP = 15;
 	else if (speed == "ultrafast") ANIMATION_TIME_TEMP = 1;
 	else if (speed == "hidden") ANIMATION_TIME_TEMP = 0;
 

@@ -877,7 +877,6 @@ function saveSession(){
 			// Plots
 			if (PLOT_DATA["whichPlotInWhichCanvas"] != null) {
 				saveXML.writeStartElement('plots');
-					saveXML.writeAttributeString("hidden", $("#showPlots").val() == "+");
 					for (var i = 1; i <=4; i ++){
 						if (PLOT_DATA["whichPlotInWhichCanvas"][i] == null) continue;
 						
@@ -908,9 +907,6 @@ function saveSession(){
 		// Model settings
 		saveXML.writeStartElement('elongation-model');
 		saveXML.writeAttributeString('id', ELONGATION_MODEL["id"]);
-
-
-		// All model properties
 		for (var modelProperty in ELONGATION_MODEL){
 
 			if (modelProperty == "id" || modelProperty == "name") continue;
