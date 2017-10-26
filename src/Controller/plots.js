@@ -4189,8 +4189,12 @@ function customPlotSelectParameterTemplate(){
 	return `
 
 		<legend><b>Parameter (x-axis)</b></legend>
-		<select class="dropdown" title="Which parameter do you want to show on the x-axis?" id = "customParam" style="vertical-align: middle; text-align:right;">
+		<select class="dropdown" title="What do you want to show on the x-axis?" id = "customParam" style="vertical-align: middle; text-align:right;">
 			<option value="none">Select a parameter...</option>
+			<option value="velocity">Mean velocity (bp/s)</option>
+			<option value="catalyTime">Mean catalysis time (s)</option>
+			<option value="totalTime">Mean transcription time (s)</option>
+			<option value="nascentLen">Nascent strand length (nt)</option>
 		</select>
 
 	`;
@@ -4203,7 +4207,7 @@ function customPlotSelectPropertyTemplate(){
 	return `
 
 		<legend><b>Metric (y-axis)</b></legend>
-		<select class="dropdown" onChange="customYVariableChange()" title="Which metric do you want to show on the y-axis?" id = "customMetric" style="vertical-align: middle; text-align:right;">
+		<select class="dropdown" onChange="customYVariableChange()" title="What do you want to show on the y-axis?" id = "customMetric" style="vertical-align: middle; text-align:right;">
 			<option value="probability">Probability</option>
 			<option value="velocity">Mean velocity (bp/s)</option>
 			<option value="catalyTime">Mean catalysis time (s)</option>
@@ -4400,26 +4404,29 @@ function plotOptions(plotNum){
 		case "custom": 
 
 
-			// X-axis parameter
+			// X-axis and Y-axis parameters
 			$("#settingCell1").html(customPlotSelectParameterTemplate());
+			$("#settingCell3").html(customPlotSelectPropertyTemplate());
 
 			get_PHYSICAL_PARAMETERS_controller(function(params){
 				//console.log("params",params, params.length);
 				for (var paramID in params){
-					if (!params[paramID]["hidden"] && !params[paramID]["binary"]) $("#customParam").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
+					if (!params[paramID]["hidden"] && !params[paramID]["binary"]) {
+						$("#customParam").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
+						$("#customMetric").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
+					}
 				}
 
 				$("#customParam").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParam"]);
+				$("#customMetric").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customMetric"]);
+				customYVariableChange();
 
 			});
 
 
 
 
-			// Y-axis attribute
-			$("#settingCell3").html(customPlotSelectPropertyTemplate());
-			$("#customMetric").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customMetric"]);
-			customYVariableChange();
+		
 
 
 			$("#settingCell2").html(distanceVsTimeOptionsTemplate1().replace("Time range", "X-axis range").replace("XUNITS", "").replace("XUNITS", ""));
@@ -4481,25 +4488,28 @@ function plotOptions(plotNum){
 			// X-axis parameter
 			$("#settingCell1").html(customPlotSelectParameterTemplate().replace("customParam", "customParamX"));
 			$("#settingCell3").html(customPlotSelectParameterTemplate().replace("x-axis", "y-axis").replace("x-axis", "y-axis").replace("customParam", "customParamY"));
+			$("#settingCell5").html(parameterHeatmapZAxisTemplate());
 
 			get_PHYSICAL_PARAMETERS_controller(function(params){
 				console.log("params",params, params.length);
 				for (var paramID in params){
-					if (!params[paramID]["hidden"] && !params[paramID]["binary"]) $("#customParamX").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
-					if (!params[paramID]["hidden"] && !params[paramID]["binary"]) $("#customParamY").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
+					if (!params[paramID]["hidden"] && !params[paramID]["binary"]) {
+						$("#customParamX").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
+						$("#customParamY").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
+						$("#customMetric").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
+					}
 				}
 
 				$("#customParamX").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamX"]);
 				$("#customParamY").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamY"]);
+				$("#customMetric").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["metricZ"]);
+				heatmapZVariableChange();
 
 			});
 
 
 			// Z-axis
-			$("#settingCell5").html(parameterHeatmapZAxisTemplate());
 			$("#settingCell6").html(distanceVsTimeOptionsTemplate3().replace("ZMINDEFAULT", 0).replace("ZMAXDEFAULT", 1));
-			$("#customMetric").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["metricZ"]);
-			heatmapZVariableChange();
 
 
 			// Z axis colouring
