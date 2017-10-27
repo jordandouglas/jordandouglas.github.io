@@ -110,7 +110,7 @@ FE_JS.initFreeEnergy_WW = function(){
 	PARAMS_JS.PHYSICAL_PARAMETERS["kU"]["hidden"] = !modelSettings.allowInactivation;
 
 
-	PARAMS_JS.PHYSICAL_PARAMETERS["GHyper"]["hidden"] = !modelSettings.allowHypertranslocation;
+	PARAMS_JS.PHYSICAL_PARAMETERS["DGHyperDag"]["hidden"] = !modelSettings.allowHypertranslocation;
 
 	PARAMS_JS.PHYSICAL_PARAMETERS["NTPconc"]["hidden"] = modelSettings.useFourNTPconcentrations;
 	PARAMS_JS.PHYSICAL_PARAMETERS["ATPconc"]["hidden"] = !modelSettings.useFourNTPconcentrations;
@@ -300,8 +300,8 @@ FE_JS.initFreeEnergy_WW = function(){
 
 
 			// Hypertranslocation penalty
-			if(FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"]){
-				var hypertranslocationPenalty = Math.max(0, state["mRNAPosInActiveSite"] - 1.5) * PARAMS_JS.PHYSICAL_PARAMETERS["GHyper"]["val"];
+			if(addParamsToPeaks && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"]){
+				var hypertranslocationPenalty = Math.max(0, state["mRNAPosInActiveSite"] - 0.5) * PARAMS_JS.PHYSICAL_PARAMETERS["DGHyperDag"]["val"];
 				slidingPeakHeightsTemp[pos] += hypertranslocationPenalty;
 			}
 
@@ -383,10 +383,9 @@ FE_JS.initFreeEnergy_WW = function(){
 				slidingPeakHeightsTemp[pos-1] += PARAMS_JS.PHYSICAL_PARAMETERS["GsecondarySitePenalty"]["val"];
 			}
 
-
 			// Hypertranslocation penalty
-			if(FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"]){
-				var hypertranslocationPenalty = Math.max(0, statePreOperation["mRNAPosInActiveSite"] - 0.5) * PARAMS_JS.PHYSICAL_PARAMETERS["GHyper"]["val"];
+			if(addParamsToPeaks && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"]){
+				var hypertranslocationPenalty = Math.max(0, statePreOperation["mRNAPosInActiveSite"] - 0.5) * PARAMS_JS.PHYSICAL_PARAMETERS["DGHyperDag"]["val"];
 				slidingPeakHeightsTemp[pos-1] += hypertranslocationPenalty;
 			}
 
@@ -459,6 +458,11 @@ FE_JS.initFreeEnergy_WW = function(){
 
 
 
+	// Bonus free energy for being in the posttranslocated state
+	if (stateToCalculateFor["mRNAPosInActiveSite"] == 1) slidingTroughHeightsTemp[3] += PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val;
+
+
+
 
 	// Add a penalty for having NTP in the secondary binding site
 	if (FE_JS.currentElongationModel == "twoSiteBrownian" && stateToCalculateFor["mRNAPosInActiveSite"] == 0 && stateToCalculateFor["NTPbound"]){
@@ -467,7 +471,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 
 	if(FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"]){
-		var hypertranslocationPenalty = Math.max(0, stateToCalculateFor["mRNAPosInActiveSite"] - 1) * PARAMS_JS.PHYSICAL_PARAMETERS["GHyper"]["val"];
+		var hypertranslocationPenalty = Math.max(0, stateToCalculateFor["mRNAPosInActiveSite"] - 1) * PARAMS_JS.PHYSICAL_PARAMETERS["DGHyperDag"]["val"];
 		slidingTroughHeightsTemp[3] += hypertranslocationPenalty;
 	}
 	
@@ -489,11 +493,15 @@ FE_JS.initFreeEnergy_WW = function(){
 
 				// Hypertranslocation penalty
 				if(FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"]){
-					var hypertranslocationPenalty = Math.max(0, state["mRNAPosInActiveSite"] - 1) * PARAMS_JS.PHYSICAL_PARAMETERS["GHyper"]["val"];
+					var hypertranslocationPenalty = Math.max(0, state["mRNAPosInActiveSite"] - 1) * PARAMS_JS.PHYSICAL_PARAMETERS["DGHyperDag"]["val"];
 					//console.log("1Current state", state["mRNAPosInActiveSite"], "penalty", hypertranslocationPenalty);
 					slidingTroughHeightsTemp[pos] += hypertranslocationPenalty;
 				}
 
+
+
+				// Bonus free energy for being in the posttranslocated state
+				if (state["mRNAPosInActiveSite"] == 1) slidingTroughHeightsTemp[pos] += PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val;
 
 
 
@@ -518,10 +526,15 @@ FE_JS.initFreeEnergy_WW = function(){
 
 				// Hypertranslocation penalty
 				if(FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"]){
-					var hypertranslocationPenalty = Math.max(0, state["mRNAPosInActiveSite"] - 1) * PARAMS_JS.PHYSICAL_PARAMETERS["GHyper"]["val"];
+					var hypertranslocationPenalty = Math.max(0, state["mRNAPosInActiveSite"] - 1) * PARAMS_JS.PHYSICAL_PARAMETERS["DGHyperDag"]["val"];
 					//console.log("2Current state", state["mRNAPosInActiveSite"], "penalty", hypertranslocationPenalty);
 					slidingTroughHeightsTemp[pos] += hypertranslocationPenalty;
 				}
+
+
+				// Bonus free energy for being in the posttranslocated state
+				if (state["mRNAPosInActiveSite"] == 1) slidingTroughHeightsTemp[pos] += PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val;
+
 
 		}
 	}

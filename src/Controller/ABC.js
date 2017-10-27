@@ -298,9 +298,9 @@ function getNewCurveButtonsTemplate(){
 				<div style="padding: 5 5; background-color:#b3b3b3; font-size:16px; width:300px; margin:auto">
 
 					Add experimental data <br><br>
-					<input type=button onClick=addNewForceVelocityCurve() value='+ Force-velocity curve' title="Add force-velocity experimental data" class="operation" style="background-color:#008CBA; width: 200px"> 
+					<input type=button onClick=addNewForceVelocityCurve() value='+ Force-velocity curve' title="Add force-velocity experimental data" class="operation ABCbtn" style="background-color:#008CBA; width: 200px"> 
 					<!--<br><br>
-					<input type=button onClick=addNewForceVelocityCurve() value='+ [NTP]-velocity curve' title="Add [NTP]-velocity experimental data" class="operation" style="background-color:#008CBA; width: 200px">-->
+					<input type=button onClick=addNewForceVelocityCurve() value='+ [NTP]-velocity curve' title="Add [NTP]-velocity experimental data" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">-->
 					<br><br>
 				</div>
 

@@ -838,10 +838,9 @@ function getComplementSequence_WW(seq, toRNA){
 
 // User inputs their own sequence in the textbox
 // Parse newTemplateType \in {"dsDNA", "dsRNA", "ssDNA", "ssRNA"} and primerType \in {"DNA", "RNA"}
- WW_JS.userInputSequence_WW = function(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent){
+ WW_JS.userInputSequence_WW = function(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent, msgID = null){
 
 
-	if (msgID === undefined) msgID = null;
 
 	// Store the template sequence not the nascent sequence 
 	newSeq = newSeq.trim();
@@ -884,10 +883,9 @@ function getComplementSequence_WW(seq, toRNA){
 
 // User selects sequence from the list of sequences. 
 // Parse newTemplateType \in {"dsDNA", "dsRNA", "ssDNA", "ssRNA"} and newPrimerType \in {"RNA", "DNA"}
- WW_JS.userSelectSequence_WW = function(newSequenceID, newTemplateType, newPrimerType, msgID){
+ WW_JS.userSelectSequence_WW = function(newSequenceID, newTemplateType, newPrimerType, msgID = null){
 
 
-	if (msgID === undefined) msgID = null;
 
 	// Only apply change if there is one
 	if (newSequenceID != sequenceID ||newTemplateType != SEQS_JS.all_sequences[sequenceID]["template"] || newPrimerType != SEQS_JS.all_sequences[sequenceID]["primer"]){

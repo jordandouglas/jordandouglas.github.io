@@ -978,7 +978,6 @@ function forward_controller(state = null, UPDATE_COORDS = true, resolve = functi
 
 	var updateDOM = function(DOMupdates){
 		if(DOMupdates["successfulOp"]){
-			enable_buttons();
 			set_state_desc();
 			refreshNavigationCanvases();
 			update_sliding_curve(1);
@@ -1040,7 +1039,6 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 	var updateDOM = function(DOMupdates){
 
 		if(DOMupdates["successfulOp"]){
-			enable_buttons();
 			set_state_desc();
 			refreshNavigationCanvases();
 			update_sliding_curve(-1);
@@ -1109,7 +1107,6 @@ function bindNTP_controller(state = null, UPDATE_COORDS = true, resolve = functi
 
 
 	var updateDOM = function(x){
-		enable_buttons();
 		set_state_desc();
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
@@ -1147,7 +1144,6 @@ function releaseNTP_controller(state = null, UPDATE_COORDS = true, resolve = fun
 
 
 	var updateDOM = function(x){
-		enable_buttons();
 		set_state_desc();
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
@@ -1185,7 +1181,6 @@ function activate_controller(state = null, UPDATE_COORDS = true, resolve = funct
 
 
 	var updateDOM = function(x){
-		enable_buttons();
 		set_state_desc();
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
@@ -1222,7 +1217,6 @@ function deactivate_controller(state = null, UPDATE_COORDS = true, resolve = fun
 
 
 	var updateDOM = function(x){
-		enable_buttons();
 		set_state_desc();
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
@@ -1261,7 +1255,6 @@ function slip_left_controller(S = 0, state = null, UPDATE_COORDS = true, resolve
 
 	var updateDOM = function(DOMupdates){
 
-		enable_buttons();
 		set_state_desc();
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
@@ -1322,7 +1315,6 @@ function slip_right_controller(S = 0, state = null, UPDATE_COORDS = true, resolv
 
 	var updateDOM = function(DOMupdates){
 
-		enable_buttons();
 		set_state_desc();
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
@@ -2446,7 +2438,7 @@ function get_unrendered_ABCoutput_controller(){
 			if (newLines.length == 0) return;
 
 
-			console.log("lines", newLines);
+			//console.log("lines", newLines);
 
 			for (var i = 0; i < newLines.length; i++){
 

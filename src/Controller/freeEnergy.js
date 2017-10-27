@@ -64,6 +64,8 @@ function update_sliding_curve(dir){
 		trueSlidingTroughHeights = dict["slidingTroughHeights"];
 
 
+		//console.log("trueSlidingPeakHeights", trueSlidingPeakHeights, "trueSlidingTroughHeights", trueSlidingTroughHeights);
+
 		// dir = -1: move waves right. dir = +1: move waves left. dir = 0: vertical syncing (ie change in landscape)
 		var time = new Date();
 
@@ -75,6 +77,8 @@ function update_sliding_curve(dir){
 	};
 
 	getSlidingHeights_controller(true, updateHeights);
+
+
 
 
 }
@@ -195,8 +199,8 @@ function updateModelDOM(elongation_model_temp){
 	//else $("#deactivateUponMisincorporation_container").hide(100);
 
 
-	if(elongation_model_temp["allowHypertranslocation"]) $("#GHyper_container").show(300);
-	else  $("#GHyper_container").hide(0);
+	if(elongation_model_temp["allowHypertranslocation"]) $("#DGHyperDag_container").show(300);
+	else  $("#DGHyperDag_container").hide(0);
 	
 	
 	if (elongation_model_temp["allowInactivation"]) {

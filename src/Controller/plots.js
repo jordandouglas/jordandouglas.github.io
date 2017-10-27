@@ -3610,7 +3610,6 @@ function stopHighlightingVariables(plotCanvasID){
 	$("select:visible").prop('disabled', false);
 	$("input:visible").prop('disabled', false);
 	$("#SelectVariable").hide(true);
-	enable_buttons();
 	
 	// Restore default cursor
 	//$('body, html').css('cursor', 'auto');

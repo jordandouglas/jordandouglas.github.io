@@ -196,11 +196,19 @@ STATE_JS.initTranslocationRateCache = function(){
 		
 		
 		var rates = STATE_JS.TRANSLOCATION_RATES[rowNum][colNum];
-		var forceGradient = Math.exp((-PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * 3.4e-10) / (2 * 1.380649e-23 * 310));
 		var GDagRateModifier = Math.exp(-PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"]);
+		var forceGradient = Math.exp((-PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * 3.4e-10) / (2 * 1.380649e-23 * 310));
+
+		var hypertranslocationGradientForward = 1; // Modify the rate of hypertranslocating forwards
+		var hypertranslocationGradientBackwards = 1; // Modify the rate of translocating backwards when in a hypertranslocated state
+		if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowHypertranslocation"]){
+			if (compactState[1] > 0) hypertranslocationGradientForward = Math.exp(-PARAMS_JS.PHYSICAL_PARAMETERS["DGHyperDag"]["val"] * 0.5);
+			if (compactState[1] > 1) hypertranslocationGradientBackwards = Math.exp(PARAMS_JS.PHYSICAL_PARAMETERS["DGHyperDag"]["val"] * 0.5);
+		}
+
 
 		if (rates != false) {
-			return [rates[0] * GDagRateModifier * forceGradient, rates[1] * GDagRateModifier / forceGradient];
+			return [rates[0] * GDagRateModifier * hypertranslocationGradientBackwards * forceGradient, rates[1] * GDagRateModifier * hypertranslocationGradientForward / forceGradient];
 		}
 
 		
@@ -227,7 +235,7 @@ STATE_JS.initTranslocationRateCache = function(){
 
 		STATE_JS.TRANSLOCATION_RATES[rowNum][colNum] = [kbck, kfwd];
 
-		return [kbck * GDagRateModifier * forceGradient, kfwd * GDagRateModifier / forceGradient];
+		return [kbck * GDagRateModifier * hypertranslocationGradientBackwards * forceGradient, kfwd * GDagRateModifier * hypertranslocationGradientForward / forceGradient];
 		
 		
 		

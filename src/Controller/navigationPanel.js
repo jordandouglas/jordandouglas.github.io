@@ -140,8 +140,8 @@ function plotArrowButton_navigationPanel(ctx, fromx, fromy, direction, label = "
 
 
 	var arrowHTML = `
-		<input type="image" class="navArrow ` + cssclass + `" src="` + src + `" title="` + hoverTitle + `" onclick="` + onClick + `();" style = "padding:` + arrowPadding + `; cursor:` + cursorClass + `;position:absolute; width:` + arrowWidth + `px; height:` + arrowHeight + `px; top:` + arrowTop + `px; left:` + arrowLeft + `px; z-index:2 ">
-		<div class="navArrow noselect" onclick="` + onClick + `();" title="` + hoverTitle + `" style="cursor:` + cursorClass + `; vertical-align:middle; color:white; font-family:Arial; text-align:` + textAlign + `; position:absolute; font-size:17px; top:` + labelY + `px; left:` + labelX + `px; width:` + arrowWidth + `px; z-index:2">&nbsp;` + label + `&nbsp;</div>
+		<input type="image" class="navArrow ` + cssclass + `" src="` + src + `" title="` + hoverTitle + `" onclick="if (!simulating)` + onClick + `();" style = "padding:` + arrowPadding + `; cursor:` + cursorClass + `;position:absolute; width:` + arrowWidth + `px; height:` + arrowHeight + `px; top:` + arrowTop + `px; left:` + arrowLeft + `px; z-index:2 ">
+		<div class="navArrow noselect" onclick="if (!simulating) ` + onClick + `();" title="` + hoverTitle + `" style="cursor:` + cursorClass + `; vertical-align:middle; color:white; font-family:Arial; text-align:` + textAlign + `; position:absolute; font-size:17px; top:` + labelY + `px; left:` + labelX + `px; width:` + arrowWidth + `px; z-index:2">&nbsp;` + label + `&nbsp;</div>
 
 	`;
 
