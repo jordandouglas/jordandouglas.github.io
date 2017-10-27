@@ -570,7 +570,6 @@ function refresh(resolve = function(){}){
 			renderParameters();
 
 			changeSpeed_controller();
-			enable_buttons();
 
 			setNextBaseToAdd_controller();
 
@@ -689,6 +688,12 @@ window.onkeyup = function(e) {
 		else backwards_controller();
 	}
 
+
+	else if (key == 82 && !simulating && !e.ctrlKey && !e.shiftKey) { // R 
+		refresh();
+	}
+
+
 	/*
 	else if (key == 32) { // Space
 		bindNTP_controller();
@@ -697,10 +702,10 @@ window.onkeyup = function(e) {
 		renderParameters();
 	}
 	*/
-	else if (key == 78 && !simulating) { // n
+	else if (key == 78 && !simulating && !e.ctrlKey && !e.shiftKey) { // n
 		$("#nbasesToSimulate").focus();
 		$("#nbasesToSimulate").select();
-	}else if (key == 27) { // Escape
+	}else if (key == 27 && !e.ctrlKey && !e.shiftKey) { // Escape
 		stop_controller();
 
 
@@ -782,131 +787,6 @@ function draw_Tslipping_plot(dx){
 }
 	
 
-function enable_buttons(){
-
-	return;
-	if (!ALLOW_ANIMATIONS) return;
-	if (disabledButtons) return;
-		
-	var enable_buttons_fn = function(result){
-
-		//console.log("Enabling buttons");
-
-		var state = result["state"];
-		var hybridLen_val= result["hybridLen"];
-		
-		if (document.getElementById("SelectTemplateType").value.substring(2,5) == "RNA") $("#mutateBtn").hide();
-		else $("#mutateBtn").show();
-
-
-		
-		document.getElementById("ntpA").disabled = false;
-		document.getElementById("ntpC").disabled = false;
-		document.getElementById("ntpG").disabled = false;
-		document.getElementById("ntpT").disabled = false;
-		
-		
-		
-		document.getElementById("fwd").disabled = false;// mRNAPosInActiveSite >= 6 || rightGBase >= nbases - 1;
-		if(state["mRNAPosInActiveSite"] >= hybridLen_val - 1 && !state["terminated"]) document.getElementById("fwd").value = "Terminate";
-		else document.getElementById("fwd").value = "Forward";
-		
-		document.getElementById("bck").disabled = state["leftGBase"] <= 1; 
-
-
-
-
-		if (state["terminated"]) document.getElementById("ntp").value = "";
-		else if (state["activated"] && !state["NTPbound"] && (state["mRNAPosInActiveSite"] == 1 || state["mRNAPosInActiveSite"] == 0)) document.getElementById("ntp").value = "Bind NTP";
-		else if (state["activated"] && state["NTPbound"]) document.getElementById("ntp").value = "Polymerise";
-		else document.getElementById("ntp").value = "";
-		document.getElementById("ntp").disabled = document.getElementById("ntp").value == "";
-		
-		document.getElementById("nntp").disabled = state["terminated"] || !(state["NTPbound"] || (!state["NTPbound"] && state["mRNALength"] > hybridLen_val && state["mRNAPosInActiveSite"] == 0));
-		if (state["terminated"]) document.getElementById("nntp").value = "";
-		else if (state["NTPbound"]) document.getElementById("nntp").value = "Release NTP";
-		else if (state["activated"] && !state["NTPbound"] && state["mRNALength"] > 0 && state["mRNAPosInActiveSite"] == 0) document.getElementById("nntp").value = "Decay";
-		else document.getElementById("nntp").value = "";
-		
-		
-		
-		
-		if (state["terminated"] || state["activated"]) document.getElementById("unpauseBtn").value = "";
-		else document.getElementById("unpauseBtn").value = "Activate";
-		document.getElementById("unpauseBtn").disabled = document.getElementById("unpauseBtn").value == "";
-		
-		
-		if (state["terminated"] || !state["activated"]) document.getElementById("pauseBtn").value = "";
-		else document.getElementById("pauseBtn").value = "Deactivate";
-		document.getElementById("pauseBtn").disabled = document.getElementById("pauseBtn").value == "";
-		
-
-
-
-		/*
-		document.getElementById("Tdbr").disabled = state["terminated"] || ((TbulgePos <= 1 || (TbulgePos == 1 && TbulgeSize == 2) || TbulgePos >= hybridLen_val)) && !((TbulgePos == 2 && NTPbound)) && TbulgePos != 1 && !(mRNAPosInActiveSite <= 5 && TbulgePos == 0  && leftGBase > 1);
-		if (state["terminated"]) document.getElementById("Tdbr").value = "";
-		else if (TbulgePos == 1  && !(TbulgePos == 2 && state["NTPbound"])) document.getElementById("Tdbr").value = "Absorb bulge";	
-		else if (TbulgePos < hybridLen_val && TbulgeSize == 1 && TbulgePos > 1) document.getElementById("Tdbr").value = "Diffuse right";
-		else if (TbulgePos == 0  && state["leftGBase"] > 1) document.getElementById("Tdbr").value = "Form bulge";
-		
-		
-		document.getElementById("Tdbl").disabled = state["terminated"] || !(TbulgePos == 0) && !(TbulgePos > 0 && TbulgePos < hybridLen_val - 1) && !(TbulgePos == hybridLen_val - 1);
-		if (state["terminated"]) document.getElementById("Tdbl").value = "";
-		else if (TbulgePos > 0 && TbulgePos < hybridLen_val - 1) document.getElementById("Tdbl").value = "Diffuse left";
-		else if (TbulgePos == 0) document.getElementById("Tdbl").value = "Form bulge";
-		else if (TbulgePos == hybridLen_val - 1) document.getElementById("Tdbl").value = "Absorb bulge";
-		*/
-		
-		for (var i = 0; i < state["bulgePos"].length; i++){
-
-
-			if ($("#primerSlipBtnCell1" + i).length == 0) continue;
-
-			var fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 1, 1));
-			if (fuseWith == -1)	fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 2, 2));
-
-
-			if (state["terminated"]) document.getElementById("dbl" + i).value = "";
-			else if (allowMultipleBulges && state["partOfBulgeID"][i] != i && state["bulgePos"][ state["partOfBulgeID"][i] ] == hybridLen_val - 1) document.getElementById("dbl" + i).value = "";
-			else if (allowMultipleBulges && state["partOfBulgeID"][i] != i) document.getElementById("dbl" + i).value = "Fissure bulge";
-			else if (allowMultipleBulges && state["bulgePos"][i] > 0 && state["bulgePos"].indexOf(state["bulgePos"][i] + 1) != -1) document.getElementById("dbl" + i).value = "Fuse bulges";
-			else if (allowMultipleBulges && state["bulgePos"][i] == 0 && allowMultipleBulges && state["bulgePos"][i] == 0 && fuseWith != -1) {
-				if (state["mRNAPosInActiveSite"] >= 0 && state["bulgePos"].indexOf( state["bulgePos"][fuseWith] +1 ) != -1) document.getElementById("dbl" + i).value = "";
-				 else document.getElementById("dbl" + i).value = "Form bulge";
-			}
-			else if (state["bulgePos"][i] > 0 && state["bulgePos"][i] < hybridLen_val - 1) document.getElementById("dbl" + i).value = "Diffuse left";
-			else if (!state["NTPbound"] && state["bulgePos"][i] == 0 && state["mRNAPosInActiveSite"] != hybridLen_val - 1) document.getElementById("dbl" + i).value = "Form bulge";
-			else if (state["bulgePos"][i] == hybridLen_val - 1) document.getElementById("dbl" + i).value = "Absorb bulge";
-			else document.getElementById("dbl" + i).value = "";
-			document.getElementById("dbl" + i).disabled = document.getElementById("dbl" + i).value == "";
-			
-
-			if (state["terminated"]) document.getElementById("dbr" + i).value = "";
-			else if (allowMultipleBulges && state["partOfBulgeID"][i] != i && state["bulgePos"][ state["partOfBulgeID"][i] ] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) document.getElementById("dbr" + i).value = "";
-			else if (allowMultipleBulges &&  state["partOfBulgeID"][i] != i) document.getElementById("dbr" + i).value = "Fissure bulge";
-			else if (!state["NTPbound"] && state["partOfBulgeID"][i] == i && state["bulgePos"][i] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) document.getElementById("dbr" + i).value = "Absorb bulge";	
-			else if (allowMultipleBulges &&  state["bulgePos"][i] > 0 && state["bulgePos"].indexOf(state["bulgePos"][i] - 1) != -1) document.getElementById("dbr" + i).value = "Fuse bulges";	
-			else if (state["leftMBase"] > 1 && allowMultipleBulges &&  state["bulgePos"][i] == 0 && ((state["bulgePos"].indexOf(hybridLen_val - 1) != -1) || state["bulgePos"].indexOf(hybridLen_val - 2) != -1)) document.getElementById("dbr" + i).value = "Form bulge";	
-			else if (state["bulgePos"][i] < hybridLen_val && state["bulgePos"][i] > 1 && state["bulgePos"][i] - Math.max(0, state["mRNAPosInActiveSite"]) != 1) document.getElementById("dbr" + i).value = "Diffuse right";
-			else if (state["bulgePos"][i] == 0) document.getElementById("dbr" + i).value = "Form bulge";
-			else document.getElementById("dbr" + i).value = "";
-			
-			document.getElementById("dbr" + i).disabled = document.getElementById("dbr" + i).value == "";
-		}
-		
-	};
-
-	getWW_JS.currentState_controller(enable_buttons_fn);
-	
-	$(".parameter-disabled").prop("disabled", true);
-	$(".dropdown-disabled").prop("disabled", true);
-	
-
-
-
-}
-
 function disable_all_buttons(){
 
 	var buttons = document.getElementsByTagName('input');
@@ -915,7 +795,10 @@ function disable_all_buttons(){
 	}
 	disabledButtons = true;
 
-	
+
+	// Disable the reaction arrows
+	$(".navArrow").attr("src", "src/Images/arrowGrey.png");
+	$(".navArrow").css("cursor", "not-allowed");
 
 	$("#ntpA").attr("disabled", false);
 	$("#ntpC").attr("disabled", false);
@@ -936,7 +819,12 @@ function reactivate_buttons(){
 	// Temp TODO
 	$("select:visible").prop('disabled', false);
 	$("input:visible").prop('disabled', false);
-	
+
+	$(".ABCbtn").prop('disabled', false);
+
+	// Re-enable the reaction arrows
+	$(".navArrow").attr("src", "src/Images/arrow.png");
+	$(".navArrow").css("cursor", "pointer");
 	
 	document.getElementById("trans").disabled = false;
 	document.getElementById("stutter").disabled = false;
@@ -944,7 +832,6 @@ function reactivate_buttons(){
 	document.getElementById("startTrials").disabled = false;
 	
 	
-	enable_buttons();
 }
 
 
@@ -1262,7 +1149,6 @@ function form_bulge_T(form_left){
 		}
 		
 		
-		enable_buttons();
 		set_state_desc();
 		
 		update_Tslipping_curve(-1);
@@ -1291,7 +1177,6 @@ function form_bulge_T(form_left){
 	
 		TbulgeSize = 1;
 		leftGBase --;
-		enable_buttons();
 		set_state_desc();
 		
 		update_Tslipping_curve(-1);
@@ -1335,7 +1220,6 @@ function diffuse_left_T(){
 			TbulgedBase --;
 		}
 
-		enable_buttons();
 		set_state_desc();
 		
 		
@@ -1385,7 +1269,6 @@ function diffuse_right_T(){
 			NTPbound = false;
 		}
 		
-		enable_buttons();
 		set_state_desc();
 		update_Tslipping_curve(1);
 		update_slipping_curve(0);
@@ -1425,7 +1308,6 @@ function absorb_T(absorb_right = false){
 		TbulgedBase = -1;
 		TbulgeSize = 0;
 		leftGBase ++;
-		enable_buttons();
 		set_state_desc();
 		
 		update_Tslipping_curve(-1);
@@ -1467,7 +1349,6 @@ function absorb_T(absorb_right = false){
 			polMol.setAttribute('src', "src/Images/polS.png");
 		}
 		
-		enable_buttons();
 		set_state_desc();
 		
 		update_Tslipping_curve(-1);
@@ -1962,8 +1843,31 @@ function closeNav() {
 
 
 
+				 	<tr id="DGPost_container">
 
-				 	<tr id="GHyper_container">
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#GDagSlide_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			&Delta;G<sub>post</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="DGPost" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
+			 			</td>
+
+
+				 		<td>
+							<input type=image id='DGPost_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
+				 		</td>
+
+				 	</tr>
+
+
+
+
+				 	<tr id="DGHyperDag_container">
 
 						<td style="text-align:left; font-size:10px; float:left; width:20px">
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#GDagSlide_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
@@ -1974,12 +1878,12 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="GHyper" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
+							<input class="variable"  type="number" id="DGHyperDag" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
 			 			</td>
 
 
 				 		<td>
-							<input type=image id='GHyper_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
+							<input type=image id='DGHyperDag_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
 				 		</td>
 
 				 	</tr>
@@ -2680,7 +2584,7 @@ function closeNav() {
 									<div style="width:100%;">
 									
 										<div style="font-size:18px; font-family:Arial; vertical-align:top">
-											Catalysis reactions
+											Nucleotide incorporation reactions
 										</div> <br>
 
 										<div id="ntpCanvasDIV" style="position:relative; margin:auto; width: 350px">
@@ -2885,6 +2789,12 @@ function closeNav() {
 				<span class="noselect"  style="font-size:18px; font-family:Bookman;">
 					<input type=button id='showPlots' class='minimise' value='-' onClick="showPlots()">
 					<b>Plot panel</b>
+
+					<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
+						- Visualise the simulation output in real-time
+					</span>
+						
+
 				</span>
 
 					<div id="plotsTableDIV" class="scrollbar" style="width: 100%; position: relative; display: block; overflow-x: scroll;">
@@ -3022,10 +2932,10 @@ function closeNav() {
 					<b class="noselect">Approximate Bayesian Computation</b> 
 						<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
 							- Fit your parameters to experimental data using a Bayesian analysis
-							</span>
+						</span>
  						<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#setupABC_ABCSectionHelp"><img class="helpIcon" src="src/Images/help.png"></a>
 						
-						</span>
+
  
 				</span>
 

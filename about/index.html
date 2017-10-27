@@ -862,7 +862,7 @@ function addCitations(){
 														<div class="paramHelp" id="GDagSlide_ParamHelp">
 															<b style="font-size:20px">$\Delta G^\dagger_{slide}$</b> - free energy barrier height of translocation. To translocate forwards or backwards, several
 																	basepairs may need to be broken. The energy barrier which must be overcome in order to translocate is estimated as the energy needed to break these basepairs
-																	plus the value of this parameter. Increasing this value will make translocation slower. Default: 8.7RT 
+																	plus the value of this parameter. Increasing this value will make translocation slower. Default: 4.5k<sub>B</sub>T
 														</div><br>	
 
 														
@@ -1031,25 +1031,7 @@ function addCitations(){
 
 									</div>
 								</div>
-								
-								
-								
 									
-								<br><br>
-								<div class="about-block">
-									<div class="about-block-inner">
-										<div class="block-subtitle" >  Polymerisation model settings </div> <br>
-											
-											
-											
-											
-										
-
-											
-
-									</div>
-								</div>
-								
 								
 
 											
@@ -1466,6 +1448,115 @@ function addCitations(){
 						</div>
 					</div>
 				</div>
+
+
+
+
+
+
+
+
+
+
+
+				
+				<br><br><br><br>
+				<div class="main-block">
+					<div class="main-block-inner">
+						<div class="block-title"> 
+						
+						
+							<span id='modelsBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
+							Models of Polymerisation
+							</div> 
+								<div id="models"  style="display:none">
+
+
+										<br><br>
+										<div class="about-block">
+											<div class="about-block-inner">
+												<div id="intro_modelsHelp" class="block-subtitle" >State notation</div> <br>
+
+
+
+
+													<img src="../src/TutorialImages/backtracked.png" style="width:30%; padding: 2 10;" align=right></img>
+
+												Let $S(l, m)$ denote a polymerase state, where $l$ is the length of the nascent strand (units nt) and
+												$m \in \mathbb{Z}$ is the current position of the $3^\prime$ end of the nascent strand with respect to the active site of the polymerase.  
+												When $m = 1$, the polymerase is in the <i>posttranslocated</i> state - a prerequisite for NTP binding.   
+												The polymerase is <i> pretranslocated</i> when $m = 0$, <i>backtracked</i> when $m < 0$, and <i>hypertranslocated</i> when $m > 1$.
+												$S(l, m)^N$ denotes that NTP is bound and $S(l, m)^i$ denotes that the polymerase is catalytically inactive. 
+												For example, the state displayed is described by $S(14, -1)$ because the RNA is 14 nucleotides long and the polymerase
+												is backtracked 1 position. NTP is not bound and the polymerase is catalytically active.
+												   
+
+
+											
+
+
+												<br><br>
+
+
+
+
+
+												This section describes how the kinetic model of polymerisation can be altered. The currently selected model
+												can be viewed at any time by pressing 
+
+												<input type=button value='View model diagram' title="View the kinetic diagram of this model" class="operation" style="z-index: 100; width:160px">
+												.
+
+
+
+
+
+
+
+
+
+											</div>
+										</div>
+
+										<br><br>
+										<div class="about-block">
+											<div class="about-block-inner">
+												<div id="simple_modelsHelp" class="block-subtitle" >Simple kinetic model</div> <br>
+
+													
+													The simplest model of polymerisation is the model with no off-pathway events (eg. hypertranslocation, backtracking, inactivation),
+													and is described by the Brownian ratchet mechanism. The polymerase is restricted to the main polymerisation pathway.
+													This model also does not make any explicit assumptions about equilibrium during NTP binding or translocation. 
+													The subsequent subsections will show the alterations which can be made to this model.
+
+
+
+												
+
+
+
+
+											</div>
+										</div>
+
+
+								</div>
+							</div>
+				
+				
+						</div>
+					</div>
+				</div>
+
+
+
+
+
+
+
+
+
+
 
 
 
