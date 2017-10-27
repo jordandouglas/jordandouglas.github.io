@@ -268,7 +268,7 @@ PARAMS_JS.update_this_parameter_WW = function(paramID, fixedVal, resolve = funct
 	
 	
 	// If the parameter has been changed and it will affect translocation rates then we calculate everything again
-	if (initialVal != PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "DGHyperDag" || paramID == "hybridLen" || paramID == "bubbleLeft" || paramID == "bubbleRight" || paramID == "nbpToFold")){
+	if (initialVal != PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "DGPost" || paramID == "hybridLen" || paramID == "bubbleLeft" || paramID == "bubbleRight" || paramID == "nbpToFold")){
 		STATE_JS.translocationCacheNeedsUpdating = true; // Recalculate the translocation rate cache
 		STATE_JS.initTranslocationRateCache();
 	}
@@ -372,7 +372,7 @@ PARAMS_JS.sample_parameter_WW = function(paramID, resolve = function() { }, msgI
 	}
 	
 	// If a parameter has been changed and it will affect translocation rates then we calculate everything again
-	if (initialVal != PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "DGHyperDag" || paramID == "hybridLen" || paramID == "bubbleLeft" || paramID == "bubbleRight" || paramID == "nbpToFold")){
+	if (initialVal != PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "DGPost" || paramID == "hybridLen" || paramID == "bubbleLeft" || paramID == "bubbleRight" || paramID == "nbpToFold")){
 		STATE_JS.translocationCacheNeedsUpdating = true;
 		STATE_JS.initTranslocationRateCache();
 	}
