@@ -600,9 +600,8 @@ SIM_JS.sampleAction_WW = function(stateC){
 			kDeact = kDeact; // Can deactivate from either state with equal probability
 
 			//console.log("Rate bind", kBindOrCat, kFwd, kBck);
-			if (stateC[0] == 100) {
-				console.log("probabilityPosttranslocated", probabilityPosttranslocated, "k0_1", k0_1, "k1_0", k1_0);
-
+			if (stateC[0] == 25) {
+				//console.log("probabilityPosttranslocated", probabilityPosttranslocated, "kFwd", kFwd, "kBck", kBck);
 			}
 
 		}
@@ -635,12 +634,24 @@ SIM_JS.sampleAction_WW = function(stateC){
 
 
 			// Calculate the probabilities of being in the 3 states (0, 1 and 1N)
+			/*
 			var A = KD / NTPconc;
 			var B = k0_1 / k1_0;
 			var probabilityPretranslocated = A / (A*B + A + B);
 			var probabilityPosttranslocated = A*B / (A*B + A + B);
 			var probabilityBound = B / (A*B + A + B);
+			*/
 
+			var thisFullState = STATE_JS.convertCompactStateToFullState(stateC);
+			var slidingTroughHeights = FE_JS.update_slidingTroughHeights_WW(thisFullState, true, true);
+			var boltzmannG0 = Math.exp(-(stateC[1] == 0 ? slidingTroughHeights[3] : slidingTroughHeights[2]));
+			var boltzmannG1 = Math.exp(-(stateC[1] == 0 ? slidingTroughHeights[4] : slidingTroughHeights[3]));
+			var boltzmannGN = boltzmannG1 * NTPconc / KD;
+			var normalisationZ = boltzmannG0 + boltzmannG1 + boltzmannGN;
+
+			var probabilityPretranslocated = boltzmannG0 / normalisationZ;
+			var probabilityPosttranslocated = boltzmannG1 / normalisationZ;
+			var probabilityBound = boltzmannGN / normalisationZ;
 
 
 			// Can only catalyse if not beyond the end of the sequence, go forward to terminate
@@ -659,7 +670,7 @@ SIM_JS.sampleAction_WW = function(stateC){
 			kBck = k0_minus1 * probabilityPretranslocated; // Can only backtrack from pretranslocated
 			kDeact = kDeact * (probabilityPosttranslocated + probabilityPretranslocated); // Can only deactivate from post and pretranslocated states
 
-			console.log("k1_2", k1_2, "probabilityPosttranslocated", probabilityPosttranslocated);
+			//console.log("probabilityPretranslocated", probabilityPretranslocated, "probabilityPosttranslocated", probabilityPosttranslocated, "probabilityBound", probabilityBound);
 
 
 
@@ -725,6 +736,9 @@ SIM_JS.sampleAction_WW = function(stateC){
 	}
 
 
+	if (stateC[0] == 25) {
+		//console.log("actionsToDoList", actionsToDoList);
+	}
 
 	return {"toDo": actionsToDoList, "time": minReactionTime};
 	

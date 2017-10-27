@@ -178,8 +178,7 @@ STATE_JS.initTranslocationRateCache = function(){
 
 
 
-
- STATE_JS.getTranslocationRates = function(compactState){
+STATE_JS.getTranslocationRates = function(compactState){
 	
 	
 	var h = PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"];
