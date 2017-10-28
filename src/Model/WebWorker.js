@@ -1181,7 +1181,7 @@ function log_WW(num, base){
 
 
 	// Use the geometric sampling speed up only if the speed is set to hidden, ultrafast or fast.
-	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] = speed != "slow";
+	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] = speed != "slow" && speed != "medium";
 
 
 	if (msgID != null){

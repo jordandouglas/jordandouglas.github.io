@@ -55,7 +55,7 @@ function renderParameters_givenParameters(PHYSICAL_PARAMETERS_LOCAL){
 
 			//console.log("Setting", "#" + paramID, "to", roundToSF(PHYSICAL_PARAMETERS_LOCAL[paramID]["val"], 3));
 			if (PHYSICAL_PARAMETERS_LOCAL[paramID]["binary"] == null || PHYSICAL_PARAMETERS_LOCAL[paramID]["binary"] == false){
-				$("#" + paramID).val(roundToSF(PHYSICAL_PARAMETERS_LOCAL[paramID]["val"], 3));
+				if (PHYSICAL_PARAMETERS_LOCAL[paramID]["distribution"] != "Fixed" || !simulating) $("#" + paramID).val(roundToSF(PHYSICAL_PARAMETERS_LOCAL[paramID]["val"], 3));
 				
 				
 				if (PHYSICAL_PARAMETERS_LOCAL[paramID]["distribution"] != "Fixed") {
@@ -73,10 +73,6 @@ function renderParameters_givenParameters(PHYSICAL_PARAMETERS_LOCAL){
 			$("#" + paramID).attr("title", PHYSICAL_PARAMETERS_LOCAL[paramID]["title"]);
 			$("#" + paramID).attr("name", PHYSICAL_PARAMETERS_LOCAL[paramID]["name"]);
 
-
-
-
-			
 		}
 
 

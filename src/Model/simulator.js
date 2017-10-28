@@ -75,8 +75,8 @@ SIM_JS.renderPlotsEveryMS = 5000; // If in hidden mode, render the plots every f
 
 			if (ANIMATION_TIME == 0 && !ABC_JS.ABC_simulating) SIM_JS.renderPlotsHidden(1000);
 
-			// Use the geometric sampling speed up only if the speed is not set to slow
-			FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] = ANIMATION_TIME < 200; 
+			// Use the geometric sampling speed up only if the speed is not set to slow/medium
+			FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] = ANIMATION_TIME < 60; 
 
 			SIM_JS.n_simulations_WW(n, stateC, resolve, msgID);
 			

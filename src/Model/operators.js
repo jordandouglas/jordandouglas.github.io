@@ -560,7 +560,7 @@ OPS_JS.terminate_WW = function(){
 		renderTermination({primerSeq: primerSeq, insertPositions: insertPositions});
 	}
 
-	for (var i = 1; i <= primerSequence.length - 1; i ++){
+	for (var i = 0; i <= primerSequence.length - 1; i ++){
 		delete_nt_WW(i, "m");
 	}
 
