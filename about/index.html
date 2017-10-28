@@ -8,6 +8,8 @@
 <link rel="stylesheet" type="text/css" href="../src/Resources/styles.css">
 <script language='JavaScript' type='text/JavaScript' src="../src/Resources/jquery-3.1.1.min.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="../src/Resources/bibliography.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Controller/freeEnergy.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Controller/plots.js"></script>
 <script type="text/javascript" src="../src/Resources/gifplayer-master/dist/jquery.gifplayer.js"></script>
 
 <script type="text/x-mathjax-config">
@@ -78,6 +80,77 @@ function init(){
 
 	}
 	
+	
+	// Draw the model diagram canvases
+	drawModelDiagrams();
+	
+}
+
+
+function drawModelDiagrams(){
+
+	var paramsResult = {};
+	paramsResult["currentState"] = { leftGBase: 6, rightGBase: 15, leftMBase: 6, rightMBase: 15, NTPtoAdd: "A",
+					 mRNAPosInActiveSite: -5, NTPbound: false, nbases: 0, mRNALength: 15, activated:true, rateOfBindingNextBase:0,
+					 bulgePos: [0], bulgedBase: [-1], bulgeSize: [0], partOfBulgeID: [0], nextBaseToCopy: 16, terminated: false };
+					 
+	paramsResult["k -2,-1"] = 0;
+	paramsResult["k -1,-2"] = 0;
+	paramsResult["k -1,0"]  = 0;
+	paramsResult["k 0,-1"]  = 0;
+	paramsResult["k 0,+1"]  = 0;
+	paramsResult["k +1,0"]  = 0;
+	paramsResult["k +1,+2"] = 0;
+	paramsResult["k +2,+1"] = 0;
+	paramsResult["k +2,+3"] = 0;
+	paramsResult["k +3,+2"] = 0;
+	paramsResult["kN 0,+1"] = 0;
+	paramsResult["kN +1,0"] = 0;
+	paramsResult["k release0"] = 0;
+
+
+
+	stateHoverEvents = [];
+	var elongationModel = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: false, allowHypertranslocation: false, 
+						allowInactivation:false, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: false, 
+						allowGeometricCatalysis: false, allowmRNAfolding:false, allowMisincorporation:false, useFourNTPconcentrations:false,
+						NTPbindingNParams: 2, assumeBindingEquilibrium: false, currentTranslocationModel: "meltingBarriers",
+						assumeTranslocationEquilibrium: false};
+										
+				
+	// Simpl;e kinetic model
+	drawModelDiagramCanvas_givenParams("modelDiagramCanvas_1", "kineticStateDescription_1", paramsResult, elongationModel);
+	
+	
+	// Hypertranslocation enabled
+	elongationModel.allowHypertranslocation = true;
+	elongationModel.allowBacktracking = false;
+	elongationModel.allowInactivation = false;
+	drawModelDiagramCanvas_givenParams("modelDiagramCanvas_2", "kineticStateDescription_2", paramsResult, elongationModel);
+	
+	
+	// Backtracking enabled
+	elongationModel.allowHypertranslocation = false;
+	elongationModel.allowBacktracking = true;
+	elongationModel.allowInactivation = false;
+	drawModelDiagramCanvas_givenParams("modelDiagramCanvas_3", "kineticStateDescription_3", paramsResult, elongationModel);
+	
+	
+	// Inactivation enabled
+	elongationModel.allowHypertranslocation = false;
+	elongationModel.allowBacktracking = true;
+	elongationModel.allowInactivation = true;
+	drawModelDiagramCanvas_givenParams("modelDiagramCanvas_4", "kineticStateDescription_4", paramsResult, elongationModel);
+	
+	
+	
+	// Full model
+	elongationModel.allowHypertranslocation = true;
+	elongationModel.allowBacktracking = true;
+	elongationModel.allowInactivation = true;
+	drawModelDiagramCanvas_givenParams("modelDiagramCanvas_5", "kineticStateDescription_5", paramsResult, elongationModel);
+
+
 }
 
 
@@ -1457,10 +1530,10 @@ function addCitations(){
 						<div class="block-title"> 
 						
 						
-							<span id='modelsBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
+							<span id='modelsBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="false" onClick="minimiseSection(this)">&minus;</span>
 							Models of Polymerisation
 							</div> 
-								<div id="models"  style="display:none">
+								<div id="models"  style="">
 
 
 										<br><br>
@@ -1495,7 +1568,7 @@ function addCitations(){
 												This section describes how the kinetic model of polymerisation can be altered. The currently selected model
 												can be viewed at any time by pressing 
 
-												<input type=button value='View model diagram' title="View the kinetic diagram of this model" class="operation" style="z-index: 100; width:160px">
+												<input type=button value='View model diagram' title="View the kinetic diagram of this model" class="operation" style="z-index: 100; width:160px; cursor:auto">
 												.
 
 
@@ -1517,13 +1590,217 @@ function addCitations(){
 													
 													The simplest model of polymerisation is the model with no off-pathway events (eg. hypertranslocation, backtracking, inactivation),
 													and is described by the Brownian ratchet mechanism. The polymerase is restricted to the main polymerisation pathway.
-													This model also does not make any explicit assumptions about equilibrium during NTP binding or translocation. 
+													This model also does not make any explicit assumptions about equilibrium during NTP binding or translocation. Within each nascent
+													strand length $l$, there are 3 states: the polymerase can be pretranslocated $S(l, 0)$, posttranslocated $S(l, 1)$ or posttranslocated with
+													NTP bound $S(1, 1)^N$: <br><br>
+													
+													
+													
+													
+														<div style='background-color:adadad; padding: 10 10;  width: 50%; left: 25%; margin:auto'>
+															<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+																<span style='font-size: 30px'> Kinetic diagram for Simple kinetic model </span>
+
+																<div id="modelDiagramDiv" style="text-align:center">
+																	<canvas id="modelDiagramCanvas_1" class="noselect" style="padding:10 10;" width=1000 height=500></canvas>
+																</div>
+																
+
+																<div style="font-size:24; height:60px;">
+																	<div id="kineticStateDescription_1" style="display:block; text-align:left">  </div>
+																</div>
+																<div style="font-size:15"> Hover over a state or arrow to read its description. </div>
+																
+
+															</div>
+														</div>
+													
+													
+													<br><br>
+													
+													
+													
+													
+													
+													
+													
 													The subsequent subsections will show the alterations which can be made to this model.
 
 
 
 											</div>
 										</div>
+										
+										
+										
+										
+										
+										
+										
+										<br><br>
+										<div class="about-block">
+											<div class="about-block-inner">
+												<div id="simple_modelsHelp" class="block-subtitle" >Hypertranslocation</div> <br>
+
+													
+													
+													
+													
+													
+													
+														<div style='background-color:adadad; padding: 10 10;  width: 50%; left: 25%; margin:auto'>
+															<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+																<span style='font-size: 30px'> Kinetic diagram for Kinetic model with hypertranslocation </span>
+
+																<div id="modelDiagramDiv" style="text-align:center">
+																	<canvas id="modelDiagramCanvas_2" class="noselect" style="padding:10 10;" width=1000 height=500></canvas>
+																</div>
+																
+
+																<div style="font-size:24; height:60px;">
+																	<div id="kineticStateDescription_2" style="display:block; text-align:left">  </div>
+																</div>
+																<div style="font-size:15"> Hover over a state or arrow to read its description. </div>
+																
+
+															</div>
+														</div>
+													
+													
+													<br><br>
+													
+			
+
+
+											</div>
+										</div>
+										
+										
+										
+										
+										
+										<br><br>
+										<div class="about-block">
+											<div class="about-block-inner">
+												<div id="simple_modelsHelp" class="block-subtitle" >Backtracking</div> <br>
+
+													
+													
+													
+													
+													
+													
+														<div style='background-color:adadad; padding: 10 10;  width: 50%; left: 25%; margin:auto'>
+															<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+																<span style='font-size: 30px'> Kinetic diagram for Kinetic model with backtracking </span>
+
+																<div id="modelDiagramDiv" style="text-align:center">
+																	<canvas id="modelDiagramCanvas_3" class="noselect" style="padding:10 10;" width=1000 height=500></canvas>
+																</div>
+																
+
+																<div style="font-size:24; height:60px;">
+																	<div id="kineticStateDescription_3" style="display:block; text-align:left">  </div>
+																</div>
+																<div style="font-size:15"> Hover over a state or arrow to read its description. </div>
+																
+
+															</div>
+														</div>
+													
+													
+													<br><br>
+													
+			
+
+
+											</div>
+										</div>
+										
+										
+										
+										
+										<br><br>
+										<div class="about-block">
+											<div class="about-block-inner">
+												<div id="simple_modelsHelp" class="block-subtitle" >Backtracking via inactivation</div> <br>
+
+													
+													
+													
+													
+													
+													
+														<div style='background-color:adadad; padding: 10 10;  width: 50%; left: 25%; margin:auto'>
+															<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+																<span style='font-size: 30px'> Kinetic diagram for Kinetic model with inactivation pausing </span>
+
+																<div id="modelDiagramDiv" style="text-align:center">
+																	<canvas id="modelDiagramCanvas_4" class="noselect" style="padding:10 10;" width=1000 height=600></canvas>
+																</div>
+																
+
+																<div style="font-size:24; height:60px;">
+																	<div id="kineticStateDescription_4" style="display:block; text-align:left">  </div>
+																</div>
+																<div style="font-size:15"> Hover over a state or arrow to read its description. </div>
+																
+
+															</div>
+														</div>
+													
+													
+													<br><br>
+													
+			
+
+
+											</div>
+										</div>
+										
+										
+										
+										
+										<br><br>
+										<div class="about-block">
+											<div class="about-block-inner">
+												<div id="simple_modelsHelp" class="block-subtitle" >Backtracking via inactivation, hypertranslocation</div> <br>
+
+													
+													
+													
+													
+													
+													
+														<div style='background-color:adadad; padding: 10 10;  width: 50%; left: 25%; margin:auto'>
+															<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+																<span style='font-size: 30px'> Kinetic diagram for Kinetic model with inactivation pausing and hypertranslocation </span>
+
+																<div id="modelDiagramDiv" style="text-align:center">
+																	<canvas id="modelDiagramCanvas_5" class="noselect" style="padding:10 10;" width=1000 height=600></canvas>
+																</div>
+																
+
+																<div style="font-size:24; height:60px;">
+																	<div id="kineticStateDescription_5" style="display:block; text-align:left">  </div>
+																</div>
+																<div style="font-size:15"> Hover over a state or arrow to read its description. </div>
+																
+
+															</div>
+														</div>
+													
+													
+													<br><br>
+													
+			
+
+
+											</div>
+										</div>
+										
+										
+										
 
 
 								</div>
