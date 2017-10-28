@@ -63,7 +63,7 @@ PLOTS_JS.npauseSimulations = 0;
 PLOTS_JS.nabortionSimulations = 0;
 PLOTS_JS.nMisincorporationSimulations = 0;
 PLOTS_JS.plotsAreHidden = false;
-
+PLOTS_JS.arrestTimeoutReached = false;
 
 
 PLOTS_JS.whichPlotInWhichCanvas = {};
@@ -92,6 +92,7 @@ PLOTS_JS.whichPlotInWhichCanvas = {};
 	PLOTS_JS.timeElapsed = 0;
 	PLOTS_JS.timeWaitedUntilNextTranslocation = 0;
 	PLOTS_JS.timeWaitedUntilNextCatalysis = 0;
+	PLOTS_JS.arrestTimeoutReached = false;
 
 }
 
@@ -371,6 +372,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 	PLOTS_JS.nabortionSimulations ++;
 	PLOTS_JS.npauseSimulations++;
 	PLOTS_JS.nMisincorporationSimulations ++;
+	PLOTS_JS.arrestTimeoutReached = false;
 
 
 	// If running from command line then delete all the cached plot data (but not ABC settings) so that memory usage does not increase over time
@@ -397,10 +399,13 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 
 
+
 	// If we have been pausing too long, then abort
 	if (PARAMS_JS.PHYSICAL_PARAMETERS["arrestTime"]["val"] > 0 && PARAMS_JS.PHYSICAL_PARAMETERS["arrestTime"]["val"] < PLOTS_JS.timeWaitedUntilNextCatalysis){
 		var abortionSite = stateC[0] + 1;
 		PLOTS_JS.arrestCounts[abortionSite] ++;
+		PLOTS_JS.arrestTimeoutReached = true;
+		
 	}
 	
 
@@ -549,8 +554,8 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_parameter_heatmap";
 		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["sitesToRecord"] = [];
 		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamX"] = "none";
-		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamY"] = "none";
-		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["metricZ"] = "probability";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamY"] = "probability";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["metricZ"] = "none";
 		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
 		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
 		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zRange"] = "automaticZ";
@@ -1267,7 +1272,8 @@ if (RUNNING_FROM_COMMAND_LINE){
 		deletePlots_WW: PLOTS_JS.deletePlots_WW,
 		savePlotsToFiles_CommandLine: PLOTS_JS.savePlotsToFiles_CommandLine,
 		initialiseSaveFiles_CommandLine: PLOTS_JS.initialiseSaveFiles_CommandLine,
-		initialiseFileNames_CommandLine: PLOTS_JS.initialiseFileNames_CommandLine
+		initialiseFileNames_CommandLine: PLOTS_JS.initialiseFileNames_CommandLine,
+		arrestTimeoutReached: PLOTS_JS.arrestTimeoutReached
 	}
 
 }

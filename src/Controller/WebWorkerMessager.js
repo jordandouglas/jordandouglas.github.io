@@ -1825,7 +1825,7 @@ function saveSettings_controller(){
 
 			values.push($("#customParamX").val());
 			values.push($("#customParamY").val());
-			values.push($("#customMetric").val());
+			values.push($("#customParamZ").val());
 
 
 			if ($('input[name="xRange"][value="automaticX"]').prop("checked")) values.push("automaticX");

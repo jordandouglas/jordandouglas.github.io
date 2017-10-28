@@ -321,7 +321,6 @@ PARAMS_JS.sample_parameter_WW = function(paramID, resolve = function() { }, msgI
 	// The Random() function sometimes generates the same number multiple times in a row if you do not use a seed 
 	// (which will often give different parameters the same value if they have the same distribution)
 
-
 	var initialVal = PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"];
 
 
@@ -374,7 +373,7 @@ PARAMS_JS.sample_parameter_WW = function(paramID, resolve = function() { }, msgI
 	// If a parameter has been changed and it will affect translocation rates then we calculate everything again
 	if (initialVal != PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "DGPost" || paramID == "hybridLen" || paramID == "bubbleLeft" || paramID == "bubbleRight" || paramID == "nbpToFold")){
 		STATE_JS.translocationCacheNeedsUpdating = true;
-		STATE_JS.initTranslocationRateCache();
+		if (!initialising_node) STATE_JS.initTranslocationRateCache();
 	}
 	
 

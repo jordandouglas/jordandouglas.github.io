@@ -30,7 +30,7 @@ if (typeof RUNNING_FROM_COMMAND_LINE === 'undefined') RUNNING_FROM_COMMAND_LINE 
 WW_JS.init_WW = function(isWW = false){
 
 	WW_JS.isWebWorker = isWW;
-
+	initialising_node = false;
 
 	if (WW_JS.isWebWorker){
 		//postMessage("MSG:WebWorker is connected");
@@ -53,7 +53,7 @@ WW_JS.init_WW = function(isWW = false){
 	else if (RUNNING_FROM_COMMAND_LINE){
 
 
-
+		initialising_node = true;
 		SEQS_JS = require('./sequences.js');
 		PARAMS_JS = require('./parameters.js');
 		SIM_JS = require('./simulator.js');
@@ -122,11 +122,14 @@ WW_JS.init_WW = function(isWW = false){
 	if (msgID === undefined) msgID = null;
 
 
+
 	// Which sequence are we using
 	if(!ABC_JS.ABC_simulating) PARAMS_JS.sample_parameters_WW(); // Do not sample parameters if in the middle of an ABC experiment
 	templateEntryChannelLength = 6;
 	templateExitChannelLength = 5;
 	specialSite = -1;
+
+
 
 	// Initial state
 	WW_JS.currentState = { leftGBase: 0, rightGBase: PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]-1, leftMBase: 0, rightMBase: PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]-1, NTPtoAdd: "X",
@@ -137,7 +140,6 @@ WW_JS.init_WW = function(isWW = false){
 
 	//WW_JS.currentState = STATE_JS.convertCompactStateToFullState(STATE_JS.convertFullStateToCompactState(WW_JS.currentState));
 
-	
 	WW_JS.add_pairs_WW();
 	FE_JS.calculateAllBarrierHeights_WW();
 
@@ -153,7 +155,6 @@ WW_JS.init_WW = function(isWW = false){
 	PLOTS_JS.refreshPlotData();
 
 	STATE_JS.initTranslocationRateCache();
-
 
 
 	if (msgID != null){
@@ -1316,7 +1317,7 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 
  	if (!RUNNING_FROM_COMMAND_LINE) return;
 	
-	
+	initialising_node = true;
 
 	XML_JS.loadSession_WW(XMLdata);
 	
@@ -1327,10 +1328,10 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 
 	var toDoAfterRefr = function(){
 
-		
+		 
 		PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW();
 		WW_JS.WORKER_ID = workerID;
-
+		initialising_node = false;
 
 
 	
@@ -1352,6 +1353,8 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 
 		// Start the simulations
 		if (!runABC) {
+
+			
 
 			// Split the number of trials evenly among the number of workers
 			var nTrialsThisWorker = XML_JS.N;
@@ -1378,6 +1381,8 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 
 		// Start the ABC
 		else{
+
+			
 
 			// Split the number of iterations evenly among the number of workers
 			if (nthreads > 1){

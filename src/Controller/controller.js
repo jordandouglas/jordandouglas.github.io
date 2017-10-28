@@ -22,7 +22,9 @@
 
 
 
-// Toggles the navigation panel between hidden and shown
+
+
+// Toggle the navigation panel between hidden and shown
 function showABCPanelFn(){
 
 	if($("#showABCPanel").val() == "-"){
@@ -99,37 +101,16 @@ function initSequencesPanel(){
 
 
 
-	if ($("#sequences").html() == "") {
+	if ($("#sequencesTableDIV").html() == "") {
 
-		$("#sequences").show();
 		nTimes20SequencesToDisplay = 1;
-
 		numSeqsDisplayed = 0;
-		
-
-		var firstLine = `
-			<div class="noselect" style='font-size:16px; font-family:Bookman;'>
-				<input type=button class='minimise' id='hideSequences'  value='-' title='Hide/show the sequence window' onClick=toggleSequences()>
-				<span style='font-size:18px; '><b>Copied sequences</b> &nbsp;&nbsp;&nbsp;</span>
-				<input type=button id='minus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='&larr;20' onClick=minusSequences() title='See previous 20 sequences'>
-				&nbsp;Showing seqs <span id='numSeqsDisplayed'>0</span> out of <span id='numSeqsSimulated'>0</span>&nbsp;
-				<input type=button id='plus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='20&rarr;' onClick=plusSequences() title='See next 20 sequences'>
-					&nbsp;&nbsp;&nbsp;
-				<input type="image" style="vertical-align: middle; height:20px;  padding: 5 0" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="src/Images/download.png"> </input>
-			</div>
-
-			<div id='sequencesTableDIV' class='scrollbar' style='overflow-x: scroll; position:relative; width:100%;'></div>
-		`;
-
-		$("#sequences").html(firstLine)
-		$("#sequencesTableDIV").height(20 * 21 + 100 + "px");
-
+		$("#downloadSeqs").show(100);
+		if ($("#hideSequences").val() == "-") $("#sequencesTableDIV").height(20 * 21 + 100 + "px");
 
 		if($("#PreExp").val() == "hidden") toggleSequences();
 
-
 	}
-
 
 
 }
@@ -139,7 +120,7 @@ function initSequencesPanel(){
 // the whole program even if it is invisible
 function initSequenceTable(){
 
-	if((simulating && $("#PreExp").val() == "hidden") || ($("#sequencesTableDIV").length != 0 && $("#sequencesTableDIV").html() != "")) return;
+	if((simulating && $("#PreExp").val() == "hidden")  || $("#hideSequences").val() == "+" || ($("#sequencesTableDIV").length != 0 && $("#sequencesTableDIV").html() != "")) return;
 
 
 	// Add a table with site numbers
@@ -171,6 +152,7 @@ function addTerminatedSequenceToTable(seqNum, insertPositions){
 
 	if (seqNum > terminatedSequences.length) return;
 
+
 	var displaySeq = !(simulating && $("#PreExp").val() == "hidden") && $("#sequencesTableDIV").length != 0;
 	// Only add the row if it is in the correct range
 	if (seqNum >= (20 * (nTimes20SequencesToDisplay-1) + 1) && seqNum <= 20 * nTimes20SequencesToDisplay){
@@ -190,6 +172,7 @@ function addTerminatedSequenceToTable(seqNum, insertPositions){
 					else newNumberCells += "<td style='padding:0; margin:0;'><span style='padding:0 5; display:inline; position:absolute; text-align:center; vertical-align:top'></span></td>";
 				}
 				$("#terminationTableNumbers").append(newNumberCells);
+
 
 				largestTerminatedSequence = primerSeq.length;
 
@@ -354,12 +337,16 @@ function toggleSequences(){
 
 function clearSequences(){
 
-	$("#sequences").hide(300);
+	$("#sequencesTableDIV").hide(300);
+	$("#numSeqsDisplayed").html(0);
+	$("#numSeqsSimulated").html(0);
 	wait(300).then(() => {
-		$("#sequences").html("");
+		$("#sequencesTableDIV").html("");
+		$("#sequencesTableDIV").show(0);
 	});
 	terminatedSequences = [];
 	largestTerminatedSequence = null;
+	$("#downloadSeqs").hide(100);
 }
 
 

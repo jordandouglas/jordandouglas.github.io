@@ -2597,7 +2597,7 @@ function download_customDataTSV(plotNum){
 	}
 	tsv += "\n";
 
-	if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customMetric"] != "probability"){
+	if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customMetric"] != "n"){
 		tsv += yLab + "\t";
 		for (var i = 0; i < yvals.length; i ++){
 			tsv += yvals[i] + "\t";
@@ -2641,7 +2641,7 @@ function download_heatmapDataTSV(plotNum){
 	}
 	tsv += "\n";
 
-	if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["metricZ"] != "probability"){
+	if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["metricZ"] != "none"){
 		tsv += zLab + "\t";
 		for (var i = 0; i < zvals.length; i ++){
 			tsv += zvals[i] + "\t";
@@ -2727,10 +2727,17 @@ function plot_parameter_heatmap(plotNumCustom = null){
 
 		var xLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xData"]["name"];
 		var yLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["name"];
-		var zLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["name"];
+		var zLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"] == null ? null : PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["name"];
 		var xvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xData"]["vals"];
 		var yvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["vals"];
-		var zvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["vals"];
+		var zvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"] == null ? null : PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["vals"];
+
+
+		// If y is probability make a histogram 
+		if (xvals != null && PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParamY"] == "probability"){
+			histogram(xvals, "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"], xLab, "Probability density", false, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"]);
+			return;
+		}
 
 
 
@@ -2742,43 +2749,51 @@ function plot_parameter_heatmap(plotNumCustom = null){
 
 		// Get the z-axis range and filter out points which are not within this range. 
 		// If a colour gradient is being used then assign colours to the points
-		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"] == "automaticZ" && PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["metricZ"] != "probability"){
-			zmin = minimumFromList(zvals);
-			zmax = maximumFromList(zvals);
-			xValsGood = xvals;
-			yValsGood = yvals;
-			zValsGood = zvals;
-		}else{
-			zmin = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"][0];
-			zmax = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"][1];
+		if (zvals != null){
 
-
-			if(PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["metricZ"] == "probability"){
+			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"] == "automaticZ" && PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["metricZ"] != "none"){
+				zmin = minimumFromList(zvals);
+				zmax = maximumFromList(zvals);
 				xValsGood = xvals;
 				yValsGood = yvals;
-				zLab = "";
-			}
+				zValsGood = zvals;
+			}else{
+				zmin = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"][0];
+				zmax = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zRange"][1];
 
-			else{
 
-				for (var trialID = 0; trialID < zvals.length; trialID++){
-
-					if (zvals[trialID] <= zmax && zvals[trialID] >= zmin) {
-						xValsGood.push(xvals[trialID]);
-						yValsGood.push(yvals[trialID]);
-						zValsGood.push(zvals[trialID]);
-					}
-
+				if(PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["metricZ"] == "none"){
+					xValsGood = xvals;
+					yValsGood = yvals;
+					zLab = "";
 				}
+
+				else{
+
+					for (var trialID = 0; trialID < zvals.length; trialID++){
+
+						if (zvals[trialID] <= zmax && zvals[trialID] >= zmin) {
+							xValsGood.push(xvals[trialID]);
+							yValsGood.push(yvals[trialID]);
+							zValsGood.push(zvals[trialID]);
+						}
+
+					}
+				}
+
 			}
 
 		}
 
-
+		// There is no z-axis
+		else{
+			xValsGood = xvals;
+			yValsGood = yvals;
+		}
 
 
 	
-		// Get the x and y ranged
+		// Get the x and y range
 		var xmin, xmax, ymin, ymax;
 		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"] == "automaticX"){
 			xmin = minimumFromList(xValsGood);
@@ -2815,7 +2830,7 @@ function plot_parameter_heatmap(plotNumCustom = null){
 		// Set the point colouring
 		var cols = "#008CBA"; // Either a single colour or a gradient
 		var colouringFn = null;
-		if(PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["metricZ"] != "probability"){
+		if(zvals != null && PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["metricZ"] != "none"){
 			
 			cols = [];
 			colouringFn = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zColouring"];
@@ -2826,8 +2841,8 @@ function plot_parameter_heatmap(plotNumCustom = null){
 		}
 
 
-
-		scatter_plot(xValsGood, yValsGood, [xmin, xmax, ymin, ymax, zmin, zmax], "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], xLab, yLab, zLab, cols, colouringFn);
+		if (zvals == null) scatter_plot(xValsGood, yValsGood, [xmin, xmax, ymin, ymax], "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], xLab, yLab, "");
+		else scatter_plot(xValsGood, yValsGood, [xmin, xmax, ymin, ymax, zmin, zmax], "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], xLab, yLab, zLab, cols, colouringFn);
 
 
 	}
@@ -4188,13 +4203,14 @@ function customPlotSelectParameterTemplate(){
 	return `
 
 		<legend><b>Parameter (x-axis)</b></legend>
-		<select class="dropdown" title="What do you want to show on the x-axis?" id = "customParam" style="vertical-align: middle; text-align:right;">
+		<select class="dropdown" onChange="updateParameterPlotSettings()" title="What do you want to show on the x-axis?" id = "customParamX" style="vertical-align: middle; text-align:right;">
 			<option value="none">Select a parameter...</option>
 			<option value="velocity">Mean velocity (bp/s)</option>
 			<option value="catalyTime">Mean catalysis time (s)</option>
 			<option value="totalTime">Mean transcription time (s)</option>
 			<option value="nascentLen">Nascent strand length (nt)</option>
 		</select>
+		Calculated per trial.
 
 	`;
 	
@@ -4206,7 +4222,7 @@ function customPlotSelectPropertyTemplate(){
 	return `
 
 		<legend><b>Metric (y-axis)</b></legend>
-		<select class="dropdown" onChange="customYVariableChange()" title="What do you want to show on the y-axis?" id = "customMetric" style="vertical-align: middle; text-align:right;">
+		<select class="dropdown" onChange="updateParameterPlotSettings()" title="What do you want to show on the y-axis?" id = "customParamY" style="vertical-align: middle; text-align:right;">
 			<option value="probability">Probability</option>
 			<option value="velocity">Mean velocity (bp/s)</option>
 			<option value="catalyTime">Mean catalysis time (s)</option>
@@ -4225,8 +4241,8 @@ function parameterHeatmapZAxisTemplate(){
 	return `
 
 		<legend><b>Metric (z-axis)</b></legend>
-		<select class="dropdown" onChange="heatmapZVariableChange()" title="Which metric do you want to show on the z-axis?" id = "customMetric" style="vertical-align: middle; text-align:right;">
-			<option value="probability">Probability</option>
+		<select class="dropdown" onChange="updateParameterPlotSettings()" title="What do you want to show on the z-axis?" id = "customParamZ" style="vertical-align: middle; text-align:right;">
+			<option value="none">Select a parameter...</option>
 			<option value="velocity">Mean velocity (bp/s)</option>
 			<option value="catalyTime">Mean catalysis time (s)</option>
 			<option value="totalTime">Mean transcription time (s)</option>
@@ -4279,6 +4295,49 @@ function plus100Sites(){
 
 }
 
+
+
+function updateParameterPlotSettings(){
+
+
+	// Only show the y-axis selection box when the x-axis variable has been selected 
+	if ($("#customParamX").val() != "none"){
+		$("#settingCell3").show(300);
+
+
+		// Only show the z-axis selection box when the y-axis variable has been selected and is not 'probability'
+		if ($("#customParamY").val() != "probability"){
+			$("#settingCell4").show(300)
+			$("#settingCell5").show(300);
+
+			// Only show the colour selection box when the z-axis variable has been selected
+			if ($("#customParamZ").val() != "none"){
+				$("#settingCell6").show(300);
+				$("#settingCell7").show(300);
+			}else{
+				$("#settingCell6").hide(0);
+				$("#settingCell7").hide(0);
+			}
+
+		}
+		else{
+			$("#settingCell4").hide(0);
+			$("#settingCell5").hide(0);
+			$("#settingCell6").hide(0);
+			$("#settingCell7").hide(0);
+		}
+
+
+	}else{
+		$("#settingCell3").hide(0);
+		$("#settingCell4").hide(0);
+		$("#settingCell5").hide(0);
+		$("#settingCell6").hide(0);
+		$("#settingCell7").hide(0);
+	}
+
+
+}
 
 
 
@@ -4399,7 +4458,7 @@ function plotOptions(plotNum){
 			$('input[name="Yaxis"][value="' + PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yAxis"] + '"]').prop('checked', true)
 			break;
 
-
+		/*
 		case "custom": 
 
 
@@ -4477,16 +4536,16 @@ function plotOptions(plotNum){
 			}
 			*/
 			//$('input[name="Yaxis"][value="' + whichPlotInWhichCanvas[plotNum]["yAxis"] + '"]').prop('checked', true)
-			break;
+			//break;
 
 
-
+		
 		case "parameterHeatmap": 
 
 
 			// X-axis parameter
-			$("#settingCell1").html(customPlotSelectParameterTemplate().replace("customParam", "customParamX"));
-			$("#settingCell3").html(customPlotSelectParameterTemplate().replace("x-axis", "y-axis").replace("x-axis", "y-axis").replace("customParam", "customParamY"));
+			$("#settingCell1").html(customPlotSelectParameterTemplate());
+			$("#settingCell3").html(customPlotSelectPropertyTemplate());
 			$("#settingCell5").html(parameterHeatmapZAxisTemplate());
 
 			get_PHYSICAL_PARAMETERS_controller(function(params){
@@ -4495,14 +4554,14 @@ function plotOptions(plotNum){
 					if (!params[paramID]["hidden"] && !params[paramID]["binary"]) {
 						$("#customParamX").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
 						$("#customParamY").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
-						$("#customMetric").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
+						$("#customParamZ").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
 					}
 				}
 
 				$("#customParamX").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamX"]);
 				$("#customParamY").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamY"]);
-				$("#customMetric").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["metricZ"]);
-				heatmapZVariableChange();
+				$("#customParamZ").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["metricZ"]);
+				updateParameterPlotSettings();
 
 			});
 
@@ -4602,22 +4661,6 @@ function perTemplateDeselected(){
 }
 
 
-function customYVariableChange(){
-	if ($("#customMetric").length != 0 && $("#customMetric").val() == "probability") $("#settingCell4").hide(0);
-	else $("#settingCell4").show(0);
-}
-
-
-function heatmapZVariableChange(){
-	if ($("#customMetric").length != 0 && $("#customMetric").val() == "probability") {
-		$("#settingCell6").hide(0);
-		$("#settingCell7").hide(0);
-	}
-	else {
-		$("#settingCell6").show(0);
-		$("#settingCell7").show(0);
-	}
-}
 
 
 

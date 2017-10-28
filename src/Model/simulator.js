@@ -258,8 +258,9 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 	
 	
 	// If we have been pausing too long, then abort
-	if (PARAMS_JS.PHYSICAL_PARAMETERS["arrestTime"]["val"] > 0 && PARAMS_JS.PHYSICAL_PARAMETERS["arrestTime"]["val"] < PLOTS_JS.timeWaitedUntilNextCatalysis){
+	if (PLOTS_JS.arrestTimeoutReached){
 		resolve(true);
+		PLOTS_JS.arrestTimeoutReached = false;
 		return;
 	}
 
@@ -415,7 +416,10 @@ SIM_JS.sampleAction_WW = function(stateC){
 
 
 	// If ready to bind and the model settings are right, then use the geometric boost
-	if (!FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeBindingEquilibrium"] && stateC[1] == 1 && !stateC[2] && stateC[3] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["id"] == "simpleBrownian"){
+	if (!FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeBindingEquilibrium"] && 
+		!FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeTranslocationEquilibrium"] && 
+		stateC[1] == 1 && !stateC[2] && stateC[3] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] && 
+		FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["id"] == "simpleBrownian"){
 
 		//console.log("allowGeometricCatalysis");
 
@@ -601,7 +605,7 @@ SIM_JS.sampleAction_WW = function(stateC){
 
 			//console.log("Rate bind", kBindOrCat, kFwd, kBck);
 			if (stateC[0] == 25) {
-				//console.log("probabilityPosttranslocated", probabilityPosttranslocated, "kFwd", kFwd, "kBck", kBck);
+				//console.log("probabilityPosttranslocated", probabilityPosttranslocated, stateC, "kFwd", kFwd, "kBck", kBck);
 			}
 
 		}
@@ -625,12 +629,36 @@ SIM_JS.sampleAction_WW = function(stateC){
 			stateC[1] = currentTranslocationPosition;
 
 
-			// Get KD and [NTP]
-			var KD_name = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] == 2 ? "Kdiss" : "Kdiss_" + sampledBaseToAdd["base"] + "TP";
-			var NTPconc_name = !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] ? "NTPconc" : sampledBaseToAdd["base"] + "TPconc";
-			var KD = PARAMS_JS.PHYSICAL_PARAMETERS[KD_name]["val"];
-			var NTPconc = PARAMS_JS.PHYSICAL_PARAMETERS[NTPconc_name]["val"];
 
+			//console.log("sampledBaseToAdd", sampledBaseToAdd);
+
+
+
+
+
+
+			var thisFullState = STATE_JS.convertCompactStateToFullState(stateC);
+			var slidingTroughHeights = FE_JS.update_slidingTroughHeights_WW(thisFullState, true, true);
+			var boltzmannG0 = Math.exp(-(stateC[1] == 0 ? slidingTroughHeights[3] : slidingTroughHeights[2]));
+			var boltzmannG1 = Math.exp(-(stateC[1] == 0 ? slidingTroughHeights[4] : slidingTroughHeights[3]));
+			var boltzmannGN = 0;
+
+			// Get KD and [NTP]
+			if (stateC[0] + 1 < WW_JS.currentState["nbases"]){
+
+				var baseToTranscribe = WW_JS.getBaseInSequenceAtPosition_WW("g" + (1 + stateC[0]));
+				sampledBaseToAdd = WW_JS.sampleBaseToAdd(baseToTranscribe);
+				SIM_JS.SIMULATION_VARIABLES["baseToAdd"] = sampledBaseToAdd["base"];
+				var KD_name = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] == 2 ? "Kdiss" : "Kdiss_" + sampledBaseToAdd["base"] + "TP";
+				var NTPconc_name = !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] ? "NTPconc" : sampledBaseToAdd["base"] + "TPconc";
+				var KD = PARAMS_JS.PHYSICAL_PARAMETERS[KD_name]["val"];
+				var NTPconc = PARAMS_JS.PHYSICAL_PARAMETERS[NTPconc_name]["val"];
+				boltzmannGN = boltzmannG1 * NTPconc / KD;
+
+			}
+
+
+		
 
 
 			// Calculate the probabilities of being in the 3 states (0, 1 and 1N)
@@ -642,11 +670,7 @@ SIM_JS.sampleAction_WW = function(stateC){
 			var probabilityBound = B / (A*B + A + B);
 			*/
 
-			var thisFullState = STATE_JS.convertCompactStateToFullState(stateC);
-			var slidingTroughHeights = FE_JS.update_slidingTroughHeights_WW(thisFullState, true, true);
-			var boltzmannG0 = Math.exp(-(stateC[1] == 0 ? slidingTroughHeights[3] : slidingTroughHeights[2]));
-			var boltzmannG1 = Math.exp(-(stateC[1] == 0 ? slidingTroughHeights[4] : slidingTroughHeights[3]));
-			var boltzmannGN = boltzmannG1 * NTPconc / KD;
+
 			var normalisationZ = boltzmannG0 + boltzmannG1 + boltzmannGN;
 
 			var probabilityPretranslocated = boltzmannG0 / normalisationZ;
@@ -656,13 +680,7 @@ SIM_JS.sampleAction_WW = function(stateC){
 
 			// Can only catalyse if not beyond the end of the sequence, go forward to terminate
 			if (stateC[0] + 1 < WW_JS.currentState["nbases"]){
-
-				// Sample a base to add
-				var baseToTranscribe = WW_JS.getBaseInSequenceAtPosition_WW("g" + (1 + stateC[0]));
-				sampledBaseToAdd = WW_JS.sampleBaseToAdd(baseToTranscribe);
 				kBindOrCat = FE_JS.getCatalysisRate(sampledBaseToAdd["base"]) * probabilityBound; // Can only catalyse if NTP bound
-				SIM_JS.SIMULATION_VARIABLES["baseToAdd"] = sampledBaseToAdd["base"];
-
 			}
 
 
@@ -737,7 +755,7 @@ SIM_JS.sampleAction_WW = function(stateC){
 
 
 	if (stateC[0] == 25) {
-		//console.log("actionsToDoList", actionsToDoList);
+		//console.log("actionsToDoList", actionsToDoList, stateC);
 	}
 
 	return {"toDo": actionsToDoList, "time": minReactionTime};
