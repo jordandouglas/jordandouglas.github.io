@@ -554,9 +554,9 @@ OPS_JS.terminate_WW = function(){
 	}
 
 
-	if (WW_JS.isWebWorker && !RUNNING_FROM_COMMAND_LINE){
+	if (WW_JS.isWebWorker && !RUNNING_FROM_COMMAND_LINE && !ABC_JS.ABC_simulating){
 		postMessage("_renderTermination(" + JSON.stringify({primerSeq: primerSeq, insertPositions: insertPositions}) + ")" );
-	}else if(!RUNNING_FROM_COMMAND_LINE){
+	}else if(!RUNNING_FROM_COMMAND_LINE && !ABC_JS.ABC_simulating){
 		renderTermination({primerSeq: primerSeq, insertPositions: insertPositions});
 	}
 
