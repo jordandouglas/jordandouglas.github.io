@@ -978,7 +978,7 @@ function forward_controller(state = null, UPDATE_COORDS = true, resolve = functi
 
 	var updateDOM = function(DOMupdates){
 		if(DOMupdates["successfulOp"]){
-			set_state_desc();
+			
 			refreshNavigationCanvases();
 			update_sliding_curve(1);
 			update_slipping_curve(0);
@@ -1039,7 +1039,7 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 	var updateDOM = function(DOMupdates){
 
 		if(DOMupdates["successfulOp"]){
-			set_state_desc();
+			
 			refreshNavigationCanvases();
 			update_sliding_curve(-1);
 			update_slipping_curve(0);
@@ -1107,7 +1107,7 @@ function bindNTP_controller(state = null, UPDATE_COORDS = true, resolve = functi
 
 
 	var updateDOM = function(x){
-		set_state_desc();
+		
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(0);
@@ -1144,7 +1144,7 @@ function releaseNTP_controller(state = null, UPDATE_COORDS = true, resolve = fun
 
 
 	var updateDOM = function(x){
-		set_state_desc();
+		
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(0);
@@ -1181,7 +1181,7 @@ function activate_controller(state = null, UPDATE_COORDS = true, resolve = funct
 
 
 	var updateDOM = function(x){
-		set_state_desc();
+		
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(0);
@@ -1217,7 +1217,7 @@ function deactivate_controller(state = null, UPDATE_COORDS = true, resolve = fun
 
 
 	var updateDOM = function(x){
-		set_state_desc();
+		
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(0);
@@ -1255,7 +1255,7 @@ function slip_left_controller(S = 0, state = null, UPDATE_COORDS = true, resolve
 
 	var updateDOM = function(DOMupdates){
 
-		set_state_desc();
+		
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(-1, S);
@@ -1315,7 +1315,7 @@ function slip_right_controller(S = 0, state = null, UPDATE_COORDS = true, resolv
 
 	var updateDOM = function(DOMupdates){
 
-		set_state_desc();
+		
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(1, S);
@@ -2450,7 +2450,7 @@ function get_unrendered_ABCoutput_controller(){
 
 					// Replace all the & with a space
 					var rejected = newLines[i].split("|")[1].trim() == "false";
-					var paddedLine = rejected ? "<div class='ABCrejected'>" : "<div>";
+					var paddedLine = rejected ? "<div class='ABCrejected' onclick='highlightABCoutputRow(this)'>" : "<div onclick='highlightABCoutputRow(this)'>";
 
 					
 

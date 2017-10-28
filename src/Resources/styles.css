@@ -430,6 +430,13 @@ div.vertical{
 }
 
 
+.ABC_output_highlighted {
+
+	background-color:#663399;
+	color:white;
+
+}
+
 .parameter-bg {
 	background-color: #ebe9e7;
     border: none;

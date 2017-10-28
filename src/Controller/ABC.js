@@ -270,6 +270,26 @@ function updateABCpanel(){
 }
 
 
+
+
+highlightABCoutputRow = function(element){
+
+
+
+	// If already highlighted, remove it
+	if(element.className.indexOf("ABC_output_highlighted") != -1){
+		$(element).removeClass("ABC_output_highlighted");
+	}
+
+	// Else highlight it
+	else $(element).addClass("ABC_output_highlighted");
+
+}
+
+
+
+
+
 function addNewCurveButtons(){
 
 	var btns = getNewCurveButtonsTemplate();
