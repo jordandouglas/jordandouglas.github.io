@@ -671,7 +671,7 @@ function addCitations(){
 								<br><br><br>
 								<div class="about-block">
 									<div class="about-block-inner">
-										<div id="custom_PlotHelp"  class="block-subtitle"> Parameter plot </div> <br>
+										<div id="parameterHeatmap_PlotHelp"  class="block-subtitle"> Parameter plot </div> <br>
 
 										
 										<img src="../src/TutorialImages/customPlot2.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
@@ -679,30 +679,21 @@ function addCitations(){
 										
 										<br>
 										
-										Any parameter in the &#9776; Parameters menu can be plotted onto the x-axis of this graph through the settings menu <img src="../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
+										Any parameter in the &#9776; Parameters menu can be plotted onto this graph through the settings menu <img src="../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
 										Note that this parameter will remain constant unless you decide to change it yourself, which you may either do (1) manually, or (2) by adding a prior distribution
-										<img src="../src/Images/distn.png" style="vertical-align:middle; width:38px; height:12px;"></img>. By setting the y-axis, you can explore the effect of changing this parameter. Parameters are sampled
-										from their prior distribution once per trial. There will be one value added to this plot at the end of each trial. 
+										<img src="../src/Images/distn.png" style="vertical-align:middle; width:38px; height:12px;"></img>. Parameters are sampled
+										from their prior distribution once per trial. There will be one value added to this plot at the end of each trial. Parameters can be compared with each other
+										or with various metrics calculated from the simulation (mean velocity, mean catalysis time, mean total transcription time, and the final length of the
+										nascent strand). 
 										
 										
-
-									</div>
-								</div>								
-								
-								<br><br><br>
-
-
-
-								<div class="about-block">
-									<div class="about-block-inner">
-										<div id="parameterHeatmap_PlotHelp"  class="block-subtitle"> Parameter heatmap </div> <br>
-
+										<br><br>
 										
 										
 										<img src="../src/TutorialImages/parameterHeatmap1.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
 										<img src="../src/TutorialImages/parameterHeatmap2.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
 										
-										The parameter heatmap is an extension to the parameter plot, and allows one parameter on each axis. Points can be coloured to represent a third variable, such as velocity. The first image
+										Points can be coloured to represent a third variable, such as velocity. The first image
 										shows the relationship between two parameters - $k_{cat}$ and $\Delta G^\dagger_{slide}$ -  required to achieve a velocity of 20-30bp/s. As the rate of catalysis increases, 
 										the free energy barrier of translocation must increase with it in order to achieve the same velocity. 
 										
@@ -1528,11 +1519,6 @@ function addCitations(){
 													and is described by the Brownian ratchet mechanism. The polymerase is restricted to the main polymerisation pathway.
 													This model also does not make any explicit assumptions about equilibrium during NTP binding or translocation. 
 													The subsequent subsections will show the alterations which can be made to this model.
-
-
-
-												
-
 
 
 
