@@ -121,6 +121,12 @@ function init(){
 		NTPtoAdd = "A";
 		mersenneTwister = new MersenneTwister();
 
+
+		ABClines = [];
+		ABClinesAcceptedOnly = [];
+		nTimes30ABCrowsToDisplay = 1;
+
+
 		hideSlip = [true];
 		hideTSlip = true;
 		hideBind = true;
@@ -170,6 +176,10 @@ function init(){
 			numSeqsDisplayed = 0;
 			basesToDisplayTimes100 = 1;
 			//refreshNTP();
+
+
+
+
 
 			removeWebworkerRegistrationHTML();
 			movedToolbarRight = true;
@@ -348,6 +358,7 @@ function submitCustomSequence(resolveAfterRefresh = function() { }){
 				$("#uploadABC").show(50);
 				$("#ABCacceptancePercentage_span").hide(50);
 				$("#ABC_showRejectedParameters_span").hide(50);
+				$("#nRowsToDisplayABC").hide(50);
 				$("#ABCacceptance_span").hide(50);
 				resolveAfterRefresh();
 				drawPlots(true);
@@ -416,6 +427,7 @@ function userChangeSequence(resolveAfterRefresh = function() { }){
 					$("#uploadABC").show(50);
 					$("#ABCacceptancePercentage_span").hide(50);
 					$("#ABC_showRejectedParameters_span").hide(50);
+					$("#nRowsToDisplayABC").hide(50);
 					$("#ABCacceptance_span").hide(50);
 					resolveAfterRefresh();
 					drawPlots(true);
@@ -666,9 +678,9 @@ function userChangeNTPType(ntpType){
 }
 
 
-// Disable the default function of the left and right arrow keys
+// Disable the default function of the left and right arrow keys (unless in a textbox)
 window.addEventListener("keydown", function(e) {
-    if([37, 39].indexOf(e.keyCode) > -1) {
+    if(!$("textarea").is(':focus') && [37, 39].indexOf(e.keyCode) > -1) {
         e.preventDefault();
     }
 }, false);
@@ -676,6 +688,10 @@ window.addEventListener("keydown", function(e) {
 
 
 window.onkeyup = function(e) {
+
+
+
+	if ($("textarea").is(':focus')) return;
 
    var key = e.keyCode ? e.keyCode : e.which;
 	if (key == 39 && !simulating) { // Right arrow
@@ -2994,23 +3010,26 @@ function closeNav() {
 							&nbsp;&nbsp;&nbsp;&nbsp;
 							<span id="ABC_showRejectedParameters_span" style="font-size:15px; vertical-align:middle">
 							<label class="switch">
-						 		<input type="checkbox" id="ABC_showRejectedParameters" OnChange="get_unrendered_ABCoutput_controller()"> </input>
+						 		<input type="checkbox" id="ABC_showRejectedParameters" OnChange="toggleAcceptedOrRejected()"> </input>
 						 	 	<span class="slider round"></span>
 
 							</label> 
 							Show rejected parameters</span>
 							
-						
+							
 							
 
 
 							<br><br>
-							<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
-								Parameters will be sampled from their prior distributions specified in the Parameters navigation menu.
-							</span>
 
 
-							<br><br>
+							<div id="nRowsToDisplayABC" style="margin-left:10px;">
+								<input type=button id='minusABCrows' class='minimise dropdown-disabled' style='width:40px'  value='&larr;30' onClick=minusABCrows() title='See previous 30 rows'>
+								&nbsp;Displaying lines <span id='numABCrowsDisplayed'>0</span> out of <span id='numABCrowsGenerated'>0</span>&nbsp;
+								<input type=button id='plusABCrows' class='minimise dropdown-disabled' style='width:40px'  value='30&rarr;' onClick=plusABCrows() title='See next 30 rows'>
+							</div>
+							<br>
+
 							<div id="ABCoutput" style="width:95%; font-family:'Courier New'; background-color:white; color: black; font-size: 14px; padding: 10 20; max-height: 300px; overflow-y:scroll; overflow-x:scroll">
 
 							</div>
@@ -3042,7 +3061,7 @@ function closeNav() {
 						<input type=button class='minimise' id='hideSequences'  value='+' title='Hide/show the sequence window' onClick=toggleSequences()>
 						<span style='font-size:18px; '><b>Copied sequences</b> &nbsp;&nbsp;&nbsp;</span>
 						<input type=button id='minus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='&larr;20' onClick=minusSequences() title='See previous 20 sequences'>
-						&nbsp;Showing seqs <span id='numSeqsDisplayed'>0</span> out of <span id='numSeqsSimulated'>0</span>&nbsp;
+						&nbsp;Displaying seqs <span id='numSeqsDisplayed'>0</span> out of <span id='numSeqsSimulated'>0</span>&nbsp;
 						<input type=button id='plus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='20&rarr;' onClick=plusSequences() title='See next 20 sequences'>
 						&nbsp;&nbsp;&nbsp;
 						<input type="image" style="vertical-align: middle; height:20px;  padding: 5 0; display:none" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="src/Images/download.png"> </input>
