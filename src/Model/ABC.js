@@ -295,7 +295,7 @@ ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve
 	PARAMS_JS.PHYSICAL_PARAMETERS["UTPconc"]["val"] = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["UTPconc"];
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"].push(force);
 
-
+	
 
 	
 	var toDoAfterTrial = function(){
@@ -461,6 +461,7 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 	
 
 	// Get the force and velocity values
+	var forceVeloNum = 0;
 	for (var fitIndex = 0; fitIndex < fitNums.length; fitIndex++){
 
 		var fitID = fitNums[fitIndex];
@@ -469,8 +470,8 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 		// Iterate through each force-velocity observation in this curve
 		for (var obsNum = 0; obsNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"].length; obsNum++){
 
-			var force = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"][obsNum]) : "-";
-			var velocity = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][obsNum]) : "-";
+			var force = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"][forceVeloNum]) : "-";
+			var velocity = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][forceVeloNum]) : "-";
 
 			if (isNaN(force) || isNaN(velocity)){
 				printVals = false;
@@ -482,6 +483,8 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 			line += (paddingString + force).slice(-paddingString.length);
 			line += (paddingString + velocity).slice(-paddingString.length);
 
+
+			forceVeloNum++;
 		}
 
 		// RSS
@@ -571,7 +574,7 @@ ABC_JS.getListOfValuesFromPosterior_WW = function(paramOrMetricID){
 
 
 
-	if (paramOrMetricID == "probability" || paramOrMetricID ==  "catalyTime" || paramOrMetricID ==  "totalTime" || paramOrMetricID ==  "nascentLen") return null;
+	if (paramOrMetricID == "probability" || paramOrMetricID ==  "catalyTime" || paramOrMetricID ==  "none" || paramOrMetricID ==  "totalTime" || paramOrMetricID ==  "nascentLen") return null;
 
 
 	var posteriorValues = [];

@@ -2407,7 +2407,7 @@ function beginABC_controller(forcesVelocitiesForModel){
 
 
 
-function get_unrendered_ABCoutput_controller(){
+function get_unrendered_ABCoutput_controller(resolve = function() { }){
 
 
 	var showRejectedParameters = $("#ABC_showRejectedParameters").prop("checked");
@@ -2434,43 +2434,8 @@ function get_unrendered_ABCoutput_controller(){
 			var acceptancePercentage = result["acceptancePercentage"];
 			if (acceptancePercentage != null) $("#ABCacceptancePercentage_val").html(roundToSF(acceptancePercentage));
 
-			var newLines = result["newLines"];
-			if (newLines.length == 0) return;
-
-
-			//console.log("lines", newLines);
-
-			for (var i = 0; i < newLines.length; i++){
-
-
-				var paddedLine = null;
-				if (newLines[i].trim() == "") paddedLine = "<br>";
-
-				else{
-
-					// Replace all the & with a space
-					var rejected = newLines[i].split("|")[1].trim() == "false";
-					var paddedLine = rejected ? "<div class='ABCrejected' onclick='highlightABCoutputRow(this)'>" : "<div onclick='highlightABCoutputRow(this)'>";
-
-					
-
-					var openPipe = true; // | (pipes) denote coloured font
-					for (var j = 0; j < newLines[i].length; j ++){
-
-						if (newLines[i][j] == "|") {
-							paddedLine += openPipe ? "<span style='color:red'>" : "</span>"; 
-							openPipe = !openPipe;
-						}
-						else if (newLines[i][j] == "&") paddedLine += "&nbsp";
-						else paddedLine += newLines[i][j];
-
-
-					}
-				}
-
-				var currentOutputHTML = $("#ABCoutput").html();
-				$("#ABCoutput").html(currentOutputHTML + paddedLine + "</div>");
-			}
+			// Update the ABC output
+			addNewABCRows(result["newLines"]);
 
 		}
 
@@ -2480,11 +2445,9 @@ function get_unrendered_ABCoutput_controller(){
 		else $(".ABCrejected").hide(0);
 
 
-		// Scroll to the bottom of the textoutput
-		$('#ABCoutput').scrollTop($('#ABCoutput')[0].scrollHeight);
-
 
 		validateAllForceVelocityInputs();
+		resolve();
 
 
 	};

@@ -82,6 +82,7 @@ function onABCStart(){
 	$("#ABC_showRejectedParameters_span").show(50);
 	$("#ABCacceptancePercentage_val").html("0");
 	$("#ABCacceptance_span").show(50);
+	$("#nRowsToDisplayABC").show(50);
 	$("#ABCacceptance_val").html("0");
 
 
@@ -748,5 +749,151 @@ function downloadABC(){
 	});
 
 
+
+}
+
+
+
+function addNewABCRows(lines){
+
+
+	if (lines.length == 0) return;
+
+	//console.log("lines", lines);
+
+	for (var i = 0; i < lines.length; i++){
+
+
+		var paddedLine = null;
+		var rejected = false;
+		if (lines[i].trim() == "") paddedLine = "<br>";
+
+		else{
+
+			// Replace all the & with a space
+			rejected = rejected || lines[i].split("|")[1].trim() == "false";
+			var paddedLine = "<div linenum='" + ABClines.length + "' onclick='highlightABCoutputRow(this)'>";
+
+			
+
+			var openPipe = true; // | (pipes) denote coloured font
+			for (var j = 0; j < lines[i].length; j ++){
+
+				if (lines[i][j] == "|") {
+					paddedLine += openPipe ? "<span style='color:red'>" : "</span>"; 
+					openPipe = !openPipe;
+				}
+				else if (lines[i][j] == "&") paddedLine += "&nbsp";
+				else paddedLine += lines[i][j];
+
+			}
+		}
+
+		paddedLine += "</div>";
+		ABClines.push(paddedLine);
+		if (!rejected) ABClinesAcceptedOnly.push(paddedLine);
+
+	}
+
+
+	renderABCoutput();
+
+
+
+
+}
+
+
+
+function renderABCoutput(){
+
+	// Print ALL lines or just accepted lines?
+	var linesToUse = $("#ABC_showRejectedParameters").prop("checked") ? ABClines : ABClinesAcceptedOnly;
+
+
+	var ABCoutputHTML = "";
+
+
+	// Always print the top 3 rows (header)
+	if ($("[linenum='2']").length == 0) ABCoutputHTML += "<br><br>" + linesToUse[2];
+
+
+	var startRow = (nTimes30ABCrowsToDisplay-1)*30 + 1;
+	var stopRow = startRow + 29;
+	var numRowsDisplayed = 0;
+	for (var rowNum = startRow; rowNum <= stopRow; rowNum ++){
+		
+		var rowIndex = rowNum -1 + 3;
+		if (linesToUse[rowIndex] == null) break;
+		numRowsDisplayed ++;
+
+		// Don't add back if already displayed
+		if ($("[linenum='" + rowIndex + "']").length == 0) ABCoutputHTML += linesToUse[rowIndex];
+
+
+
+	}
+
+
+	if (numRowsDisplayed > 0 && ABCoutputHTML.trim() != "") $("#numABCrowsDisplayed").html(startRow + "-" + (startRow + numRowsDisplayed - 1));
+	$("#numABCrowsGenerated").html(linesToUse.length - 3);
+
+
+	// Add the new lines to the output
+	if (ABCoutputHTML.trim() != "") $("#ABCoutput").html($("#ABCoutput").html() + ABCoutputHTML);
+
+
+
+	// Enable/disable the plus 30 sequences button
+	if (stopRow < linesToUse.length - 3 && numRowsDisplayed == 30) {
+		$("#plusABCrows").removeClass("dropdown-disabled");
+		$("#plusABCrows").prop("disabled", false);
+	}else{
+		$("#plusABCrows").addClass("dropdown-disabled");
+		$("#plusABCrows").prop("disabled", "disabled");
+	}
+
+
+	// Enable/disable the minus 30 sequences button
+	if (startRow >= 30) {
+		$("#minusABCrows").removeClass("dropdown-disabled");
+		$("#minusABCrows").prop("disabled", false);
+	}else{
+		$("#minusABCrows").addClass("dropdown-disabled");
+		$("#minusABCrows").prop("disabled", "disabled");
+	}
+
+
+
+}
+
+
+function minusABCrows(){
+
+	$("#ABCoutput").html("");
+	nTimes30ABCrowsToDisplay--;
+	renderABCoutput();
+
+}
+
+
+
+function plusABCrows(){
+
+	$("#ABCoutput").html("");
+	nTimes30ABCrowsToDisplay++;
+	renderABCoutput();
+
+}
+
+
+
+function toggleAcceptedOrRejected(){
+
+	nTimes30ABCrowsToDisplay = 1;
+	$("#ABCoutput").html("");
+	get_unrendered_ABCoutput_controller(function(){
+		renderABCoutput();
+	});
 
 }
