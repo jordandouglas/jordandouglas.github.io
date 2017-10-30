@@ -793,8 +793,6 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 			var splitLine = lines[lineNum].split("\t");
 
 
-			// Skip if rejected
-			if (splitLine[acceptedCol-1] != "true") continue;
 
 
 			var consoleLine = "";
