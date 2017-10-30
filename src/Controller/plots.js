@@ -4209,7 +4209,7 @@ function customPlotSelectParameterTemplate(){
 			<option value="catalyTime">Mean catalysis time (s)</option>
 			<option value="totalTime">Mean transcription time (s)</option>
 			<option value="nascentLen">Nascent strand length (nt)</option>
-		</select>
+		</select><br>
 		Calculated per trial.
 
 	`;
