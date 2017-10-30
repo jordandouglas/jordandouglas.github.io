@@ -191,7 +191,7 @@ ABC_JS.ABC_trials_WW = function(fitNums, resolve = function() {}, msgID = null){
 		
 
 		ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"] = accepted;
-		if (accepted ) { // Do not cache if we are running from command line
+		if (accepted) { // Do not cache if we are running from command line
 			ABC_JS.nAcceptedValues ++;
 			if (!RUNNING_FROM_COMMAND_LINE) {
 				ABC_JS.ABC_POSTERIOR_DISTRIBUTION.push(JSON.parse(JSON.stringify(ABC_JS.ABC_parameters_and_metrics_this_simulation)));
@@ -238,14 +238,23 @@ ABC_JS.ABC_trial_for_curve_WW = function(currentFitNum, accepted, fitNums, resol
 	var toDoAfterTrials = function(){
 
 
+		// What force-velocity index are we upto
+		var force_velocity_num = -1;
+		for (var fitNumPrev = 0; fitNumPrev < currentFitNum; fitNumPrev++){
+			force_velocity_num += ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitNums[fitNumPrev]]["vals"].length;
+		}
+
+
 		// Calculate the mean RSS
 		var meanRSS = 0;
 		var fitID = fitNums[currentFitNum];
 		for (var observationNum = 0; observationNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"].length; observationNum++){
-			
-			var observedVelocity = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"][observationNum]["velocity"];
-			var simulatedVelocity = ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][observationNum];
 
+
+
+			force_velocity_num++;
+			var observedVelocity = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"][observationNum]["velocity"];
+			var simulatedVelocity = ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][force_velocity_num];
 			var residualSquared =  Math.pow(observedVelocity - simulatedVelocity, 2);
 
 
@@ -451,7 +460,7 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 	// All the prior-sampled parameters
 	for (var objID in ABC_JS.ABC_parameters_and_metrics_this_simulation){
 		if (ABC_JS.ABC_parameters_and_metrics_this_simulation[objID] != null && ABC_JS.ABC_parameters_and_metrics_this_simulation[objID]["priorVal"] !== undefined){
-			var val = WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation[objID]["priorVal"]);
+			var val = WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation[objID]["priorVal"], 3);
 			line += (paddingString + val).slice(-paddingString.length);
 		}
 	}
@@ -471,7 +480,7 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 		for (var obsNum = 0; obsNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"].length; obsNum++){
 
 			var force = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"][forceVeloNum]) : "-";
-			var velocity = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][forceVeloNum]) : "-";
+			var velocity = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][forceVeloNum], 3) : "-";
 
 			if (isNaN(force) || isNaN(velocity)){
 				printVals = false;
@@ -488,7 +497,7 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 		}
 
 		// RSS
-		var RSS = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitID]) : "-";
+		var RSS = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitID], 3) : "-";
 		line += (paddingString + RSS).slice(-paddingString.length);
 
 
