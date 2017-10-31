@@ -767,6 +767,7 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 		var colNames = lines[1].split("\t");
 		var posteriorObjectEmptyTemplate = {trial: null, accepted: null}; // The template for a single row in the posterior or rejected distribution
 		posteriorObjectEmptyTemplate["FAssist"] = {name: PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["name"], vals: []}; 
+		posteriorObjectEmptyTemplate["NTPeq"] = {name: "NTP concentration divided by [NTP]eq", vals: []}; 
 		posteriorObjectEmptyTemplate["velocity"] = {name: "Mean velocity (bp/s)", vals: []};
 
 
@@ -801,7 +802,8 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 			// Parse force and velocity values
 			firstConsoleLine += (paddingString + col).slice(-paddingString.length);
 			if (col.match(/F[0-9]*$/gi) != null) columnNumTSV_to_columnNameObj[colNum] = "FAssist"; // Matches to force (F1, F2, etc)
-			if (col.match(/v\(F[0-9]*\)$/gi) != null) columnNumTSV_to_columnNameObj[colNum] = "velocity";	// Matches to velocity ( v(F1), v(F2), etc )
+			if (col.match(/NTP[0-9]*$/gi) != null) columnNumTSV_to_columnNameObj[colNum] = "NTPeq"; // Matches to NTP (NTP1, NTP2, etc)
+			if (col.match(/v\(F[0-9]*\)$/gi) != null || col.match(/v\(NTP[0-9]*\)$/gi) != null) columnNumTSV_to_columnNameObj[colNum] = "velocity";	// Matches to velocity ( v(F1), v(F2), etc ) or ( v(NTP1), v(NTP2), etc )
 
 
 			// Increment the number of graphs being fitted to
