@@ -679,6 +679,8 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 	getPosteriorDistribution_controller(function(result){
 
+		
+		var abcDataObjectForModel = getAbcDataObject();
 
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -714,6 +716,20 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 			ctx.globalAlpha = 0.4;
 			ctx.strokeStyle = "#008CBA";
 			ctx.lineWidth = 2 * canvasSizeMultiplier;
+
+
+			// Find the starting and stopping index of these posterior velocities in the list
+			var fitIDs = [];
+			for (var fitID_temp in abcDataObjectForModel["fits"]) fitIDs.push(fitID_temp);
+			fitIDs.sort();
+			var startingObsNum = 0;
+			for (var fitNum = 0; fitNum < fitIDs.length; fitNum++){
+				if (fitIDs[fitNum] == fitID) break;
+				startingObsNum += abcDataObjectForModel["fits"][fitIDs[fitNum]]["vals"].length;
+			}
+
+
+
 			for (var postNum = 0; postNum < posterior.length; postNum++){
 
 
@@ -721,14 +737,18 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 				ctx.beginPath();
 				var xPrime = widthScale * (forces[0] - xmin) + axisGap;
-				var yPrime = plotHeight + margin - heightScale * (posteriorVelocities[0] - ymin);
+				var yPrime = plotHeight + margin - heightScale * (posteriorVelocities[startingObsNum] - ymin);
 				ctx.moveTo(xPrime, yPrime);
 
 
-				for (var forceNum = 1; forceNum < forces.length; forceNum++ ){
-					var xPrime = widthScale * (forces[forceNum] - xmin) + axisGap;
-					var yPrime = plotHeight + margin - heightScale * (posteriorVelocities[forceNum] - ymin);
+				//console.log("Plotting starting from", startingObsNum);
 
+				for (var forceNum = 1; forceNum < forces.length; forceNum++ ){
+					
+					var index = startingObsNum + forceNum;
+					var xPrime = widthScale * (forces[forceNum] - xmin) + axisGap;
+					var yPrime = plotHeight + margin - heightScale * (posteriorVelocities[index] - ymin);
+					//console.log("Plotting starting", index);
 					ctx.lineTo(xPrime, yPrime);
 				}
 

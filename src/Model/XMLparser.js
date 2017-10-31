@@ -78,6 +78,9 @@ XML_JS.ABC_EXPERIMENTAL_DATA = {};
 	//console.log("Parsed", XML_JS.showRejectedParameters);
 
 
+
+	ABC_JS.ABC_EXPERIMENTAL_DATA = XML_JS.ABC_EXPERIMENTAL_DATA;
+
 	var toReturn = {seq: SEQS_JS.all_sequences[sequenceID], model: FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel], N: XML_JS.N, speed: speedVal, whichPlotInWhichCanvas: PLOTS_JS.whichPlotInWhichCanvas, ABC_EXPERIMENTAL_DATA: XML_JS.ABC_EXPERIMENTAL_DATA,
 						showPlots: !PLOTS_JS.plotsAreHidden};
 	toReturn["seq"]["seqID"] = sequenceID;

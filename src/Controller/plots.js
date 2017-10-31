@@ -4458,86 +4458,6 @@ function plotOptions(plotNum){
 			$('input[name="Yaxis"][value="' + PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yAxis"] + '"]').prop('checked', true)
 			break;
 
-		/*
-		case "custom": 
-
-
-			// X-axis and Y-axis parameters
-			$("#settingCell1").html(customPlotSelectParameterTemplate());
-			$("#settingCell3").html(customPlotSelectPropertyTemplate());
-
-			get_PHYSICAL_PARAMETERS_controller(function(params){
-				//console.log("params",params, params.length);
-				for (var paramID in params){
-					if (!params[paramID]["hidden"] && !params[paramID]["binary"]) {
-						$("#customParam").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
-						$("#customMetric").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
-					}
-				}
-
-				$("#customParam").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParam"]);
-				$("#customMetric").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customMetric"]);
-				customYVariableChange();
-
-			});
-
-
-
-
-		
-
-
-			$("#settingCell2").html(distanceVsTimeOptionsTemplate1().replace("Time range", "X-axis range").replace("XUNITS", "").replace("XUNITS", ""));
-			$("#settingCell4").html(distanceVsTimeOptionsTemplate2().replace("Distance range", "Y-axis range").replace("YUNITS", "").replace("YUNITS", "").replace("YMINDEFAULT", 0).replace("YMAXDEFAULT", 1));
-
-
-			$("#pauseXRow").remove();
-			$("#shortPauseXRow").remove();
-
-
-			// Set xmax and xmin
-			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"] == "automaticX") $('input[name="xRange"][value="automaticX"]').click()
-			else {
-				$('input[name="xRange"][value="specifyX"]').click()
-				$("#xMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][0]);
-				$("#xMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][1]);
-			}
-
-
-			// Set ymax and ymin
-			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"] == "automaticY") $('input[name="yRange"][value="automaticY"]').click()
-			else {
-				$('input[name="yRange"][value="specifyY"]').click()
-				$("#yMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][0]);
-				$("#yMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][1]);
-			}
-
-
-			$("#settingCell5").html(getPosteriorCheckboxTemplate());
-			if (!PLOT_DATA["thereExistsPosteriorDistribution"]) {
-				$("#plotFromPosterior").css("cursor", "auto");
-				$("#plotFromPosterior").attr("disabled", "disabled");
-			}
-			else $("#plotFromPosterior").prop("checked", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFromPosterior"]);
-
-
-			/*
-			// Site selection KEEP THIS CODE
-			$("#settingCell3").html(customPlotSiteConstraintTemplate());
-			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecord"].length == 0) {
-				$('input[name="sitesToRecord"][value="allSites"]').prop('checked', true)
-				disableTextbox("#sitesToRecord_textbox");
-				
-			}else{
-				$('input[name="sitesToRecord"][value="specifySites"]').prop('checked', true)
-				enableTextbox("#sitesToRecord_textbox");
-				$("#sitesToRecord_textbox").val(  convertListToCommaString(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecord"])  );
-
-			}
-			*/
-			//$('input[name="Yaxis"][value="' + whichPlotInWhichCanvas[plotNum]["yAxis"] + '"]').prop('checked', true)
-			//break;
-
 
 		
 		case "parameterHeatmap": 
@@ -4612,12 +4532,11 @@ function plotOptions(plotNum){
 
 
 			$("#settingCell8").html(getPosteriorCheckboxTemplate());
-			console.log("exists", PLOT_DATA["thereExistsPosteriorDistribution"]);
-			if (!PLOT_DATA["thereExistsPosteriorDistribution"]) {
-				$("#plotFromPosterior").css("cursor", "auto");
-				$("#plotFromPosterior").attr("disabled", "disabled");
-			}
-			else $("#plotFromPosterior").prop("checked", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFromPosterior"]);
+			//if (!PLOT_DATA["thereExistsPosteriorDistribution"]) {
+			//	$("#plotFromPosterior").css("cursor", "auto");
+				//$("#plotFromPosterior").attr("disabled", "disabled");
+			//}
+			$("#plotFromPosterior").prop("checked", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFromPosterior"]);
 
 			break;
 

@@ -174,6 +174,18 @@ ABC_JS.ABC_trials_WW = function(fitNums, resolve = function() {}, msgID = null){
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"] = [];
 
 
+	/*
+	// Show the start and stop positions of each fit. Their values will all be pooled together
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["fitStartStopIndices"] = {};
+	var previousForceIndex = 0;
+	for (var currentFitNum = 0; currentFitNum < fitNums.length; currentFitNum++){
+		var fitID = fitNums[currentFitNum];
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["forceVelocityIndices"][fitID] = [previousForceIndex, previousForceIndex + ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitNums[currentFitNum]]["vals"].length-1];
+		previousForceIndex += ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitNums[currentFitNum]]["vals"].length;
+	}
+	*/
+
+
 	// Sample all the parameters now. There will be no more random sampling between simulation trials, only in between ABC trials
 	PARAMS_JS.sample_parameters_WW();
 	
@@ -307,6 +319,7 @@ ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve
 			PARAMS_JS.PHYSICAL_PARAMETERS["GTPconc"]["val"] = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["GTPconc"];
 			PARAMS_JS.PHYSICAL_PARAMETERS["UTPconc"]["val"] = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["UTPconc"];
 			ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"].push(force);
+			ABC_JS.ABC_parameters_and_metrics_this_simulation["NTPeq"]["vals"].push(null);
 			break;
 
 
@@ -318,6 +331,7 @@ ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve
 			PARAMS_JS.PHYSICAL_PARAMETERS["CTPconc"]["val"] = ntpDividedByNTPeq * ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["CTPconc"];
 			PARAMS_JS.PHYSICAL_PARAMETERS["GTPconc"]["val"] = ntpDividedByNTPeq * ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["GTPconc"];
 			PARAMS_JS.PHYSICAL_PARAMETERS["UTPconc"]["val"] = ntpDividedByNTPeq * ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["UTPconc"];
+			ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"].push(ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["force"]);
 			ABC_JS.ABC_parameters_and_metrics_this_simulation["NTPeq"]["vals"].push(ntpDividedByNTPeq);
 			break;
 
@@ -630,13 +644,13 @@ ABC_JS.getListOfValuesFromPosterior_WW = function(paramOrMetricID){
 
 	var posteriorValues = [];
 	for (var i = 0; i < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; i ++){
-		
 
 
 		// The length of the list returned should be the same number of forces sampled in this entry
-		var nVals = ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["FAssist"]["vals"].length;
+		var nVals = ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["FAssist"]["vals"].length + ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["NTPeq"]["vals"].length;
 
 		if (paramOrMetricID == "FAssist") for (var j = 0; j < nVals; j ++) posteriorValues.push(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["FAssist"]["vals"][j]);
+		if (paramOrMetricID == "NTPeq") for (var j = 0; j < nVals; j ++) posteriorValues.push(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["NTPeq"]["vals"][j]);
 		else if (paramOrMetricID == "velocity") for (var j = 0; j < nVals; j ++) posteriorValues.push(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["velocity"]["vals"][j]);
 
 		else{
@@ -654,6 +668,7 @@ ABC_JS.getListOfValuesFromPosterior_WW = function(paramOrMetricID){
 
 	}
 
+	console.log("Returning posterior", ABC_JS.ABC_POSTERIOR_DISTRIBUTION, "for", paramOrMetricID);
 	return posteriorValues;
 
 
@@ -730,6 +745,7 @@ ABC_JS.savePosteriorToFiles_CommandLine = function(line){
 ABC_JS.getPosteriorDistribution_WW = function(resolve = function() { }, msgID = null){
 
 
+
 	var toReturn = {posterior: ABC_JS.ABC_POSTERIOR_DISTRIBUTION};
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
@@ -769,7 +785,6 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 		posteriorObjectEmptyTemplate["FAssist"] = {name: PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["name"], vals: []}; 
 		posteriorObjectEmptyTemplate["NTPeq"] = {name: "NTP concentration divided by [NTP]eq", vals: []}; 
 		posteriorObjectEmptyTemplate["velocity"] = {name: "Mean velocity (bp/s)", vals: []};
-
 
 
 		var nfits = 0; // Total number of graphs which have been fit to
