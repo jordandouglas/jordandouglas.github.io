@@ -966,18 +966,27 @@ function saveSession(){
 			for (var i = 0; i < fits.length; i ++){
 
 				var fitID = fits[i];
+				var dataType = $("#forceVelocityInputData_" + fitID).length > 0 ? "forceVelocity" : $("#ntpVelocityInputData_" + fitID).length > 0 ? "ntpVelocity" : null;
 
 				saveXML.writeStartElement(fitID);
 
 
+					saveXML.writeAttributeString("dataType", dataType);
 					saveXML.writeAttributeString("RSSthreshold", abcDataObjectForModel["fits"][fitID]["RSSthreshold"]);
 					saveXML.writeAttributeString("ATPconc", abcDataObjectForModel["fits"][fitID]["ATPconc"]);
 					saveXML.writeAttributeString("CTPconc", abcDataObjectForModel["fits"][fitID]["CTPconc"]);
 					saveXML.writeAttributeString("GTPconc", abcDataObjectForModel["fits"][fitID]["GTPconc"]);
 					saveXML.writeAttributeString("UTPconc", abcDataObjectForModel["fits"][fitID]["UTPconc"]);
+					if (dataType == "ntpVelocity") saveXML.writeAttributeString("force", abcDataObjectForModel["fits"][fitID]["force"]);
 					for (var obsNum = 0; obsNum < abcDataObjectForModel["fits"][fitID]["vals"].length; obsNum++){
-						var forceVelocity = abcDataObjectForModel["fits"][fitID]["vals"][obsNum]["force"] + "," + abcDataObjectForModel["fits"][fitID]["vals"][obsNum]["velocity"];
-						saveXML.writeAttributeString("obs" + (obsNum+1), forceVelocity);
+						if (dataType == "forceVelocity"){
+							var forceVelocity = abcDataObjectForModel["fits"][fitID]["vals"][obsNum]["force"] + "," + abcDataObjectForModel["fits"][fitID]["vals"][obsNum]["velocity"];
+							saveXML.writeAttributeString("obs" + (obsNum+1), forceVelocity);
+						}
+						else if (dataType == "ntpVelocity"){
+							var ntpVelocity = abcDataObjectForModel["fits"][fitID]["vals"][obsNum]["ntp"] + "," + abcDataObjectForModel["fits"][fitID]["vals"][obsNum]["velocity"];
+							saveXML.writeAttributeString("obs" + (obsNum+1), ntpVelocity);
+						}
 					}
 
 
