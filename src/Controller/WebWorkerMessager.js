@@ -2090,9 +2090,18 @@ function loadSession_controller(XMLData){
 
 				// Add the force-velocity observations to the DOM
 				for (var obsNum = 0; obsNum < experimentalData["fits"][fitID]["vals"].length; obsNum++){
-					var force = experimentalData["fits"][fitID]["vals"][obsNum]["force"];
-					var velocity = experimentalData["fits"][fitID]["vals"][obsNum]["velocity"];
-					textAreaString += force + ", " + velocity;
+					if (dataType == "forceVelocity"){
+						var force = experimentalData["fits"][fitID]["vals"][obsNum]["force"];
+						var velocity = experimentalData["fits"][fitID]["vals"][obsNum]["velocity"];
+						textAreaString += force + ", " + velocity;
+					}
+
+					else if (dataType == "ntpVelocity"){
+						var ntp = experimentalData["fits"][fitID]["vals"][obsNum]["ntp"];
+						var velocity = experimentalData["fits"][fitID]["vals"][obsNum]["velocity"];
+						textAreaString += ntp + ", " + velocity;
+					}
+
 
 					if (obsNum < experimentalData["fits"][fitID]["vals"].length-1) textAreaString += "\n" 
 
