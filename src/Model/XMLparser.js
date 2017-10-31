@@ -167,20 +167,25 @@ function parseXML_ABCfit_WW(fitNode){
 
 	nABCfits++;
 	var fitID = "fit" + nABCfits;
-
 		
 	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID] = {vals: []};
-	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["RSSthreshold"] = fitNode["RSSthreshold"];
-	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["ATPconc"] = fitNode["ATPconc"];
-	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["CTPconc"] = fitNode["CTPconc"];
-	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["GTPconc"] = fitNode["GTPconc"];
-	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["UTPconc"] = fitNode["UTPconc"];
+	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["dataType"] = fitNode["dataType"];
+	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["RSSthreshold"] = parseFloat(fitNode["RSSthreshold"]);
+	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["ATPconc"] = parseFloat(fitNode["ATPconc"]);
+	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["CTPconc"] = parseFloat(fitNode["CTPconc"]);
+	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["GTPconc"] = parseFloat(fitNode["GTPconc"]);
+	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["UTPconc"] = parseFloat(fitNode["UTPconc"]);
+	if (fitNode["dataType"] == "ntpVelocity") XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["force"] = parseFloat(fitNode["force"]);
+
 	for (var obsID in fitNode){
 
 		if (obsID.substring(0, 3) != "obs") continue;
-		var force = parseFloat(fitNode[obsID].split(",")[0]);
+		var X_axis_value = parseFloat(fitNode[obsID].split(",")[0]);
 		var velocity = parseFloat(fitNode[obsID].split(",")[1]);
-		XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].push({force: force, velocity: velocity});
+
+		if (fitNode["dataType"] == "forceVelocity") XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].push({force: X_axis_value, velocity: velocity});
+		else if (fitNode["dataType"] == "ntpVelocity") XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].push({ntp: X_axis_value, velocity: velocity});
+
 	}
 
 
