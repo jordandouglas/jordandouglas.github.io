@@ -2015,7 +2015,7 @@ function loadSession_controller(XMLData){
 		var seqObject = result["seq"];
 		var model = result["model"];
 		var compactState = result["compactState"];
-		var forceVelocity = result["ABC_EXPERIMENTAL_DATA"];
+		var experimentalData = result["ABC_EXPERIMENTAL_DATA"];
 		
 		
 			
@@ -2067,44 +2067,48 @@ function loadSession_controller(XMLData){
 
 
 		// Update the ABC panel
-		if (forceVelocity != null){
+		if (experimentalData != null){
 
 
 			// Reset the ABC DOM
 			initABCpanel();
 
-			console.log("forceVelocity", forceVelocity);
-			if(forceVelocity["ntrials"] != null) $("#ABCntrials").val(forceVelocity["ntrials"]);
-			if(forceVelocity["RSSthreshold"] != null) $("#ABC_ntestsperdata").val(forceVelocity["testsPerData"]);
+			console.log("experimentalData", experimentalData);
+			if(experimentalData["ntrials"] != null) $("#ABCntrials").val(experimentalData["ntrials"]);
+			if(experimentalData["RSSthreshold"] != null) $("#ABC_ntestsperdata").val(experimentalData["testsPerData"]);
 
 
-			for (var fitID in forceVelocity["fits"]){
+			for (var fitID in experimentalData["fits"]){
+
+
+				var dataType = experimentalData["fits"][fitID]["dataType"];
 
 				// Add a new ABC curve
-				addNewForceVelocityCurve();
+				addNewABCData(dataType);
 				var textAreaString = "";
 
 
 				// Add the force-velocity observations to the DOM
-				for (var obsNum = 0; obsNum < forceVelocity["fits"][fitID]["vals"].length; obsNum++){
-					var force = forceVelocity["fits"][fitID]["vals"][obsNum]["force"];
-					var velocity = forceVelocity["fits"][fitID]["vals"][obsNum]["velocity"];
+				for (var obsNum = 0; obsNum < experimentalData["fits"][fitID]["vals"].length; obsNum++){
+					var force = experimentalData["fits"][fitID]["vals"][obsNum]["force"];
+					var velocity = experimentalData["fits"][fitID]["vals"][obsNum]["velocity"];
 					textAreaString += force + ", " + velocity;
 
-					if (obsNum < forceVelocity["fits"][fitID]["vals"].length-1) textAreaString += "\n" 
+					if (obsNum < experimentalData["fits"][fitID]["vals"].length-1) textAreaString += "\n" 
 
 				}
 
 
 				// Add the NTP concentrations and RSS threshold to the DOM
-				$("#ATPconc_" + fitID).val(forceVelocity["fits"][fitID]["ATPconc"]);
-				$("#CTPconc_" + fitID).val(forceVelocity["fits"][fitID]["CTPconc"]);
-				$("#GTPconc_" + fitID).val(forceVelocity["fits"][fitID]["GTPconc"]);
-				$("#UTPconc_" + fitID).val(forceVelocity["fits"][fitID]["UTPconc"]);
-				$("#ABC_RSS_" + fitID).val(forceVelocity["fits"][fitID]["RSSthreshold"]);
+				$("#ATPconc_" + fitID).val(experimentalData["fits"][fitID]["ATPconc"]);
+				$("#CTPconc_" + fitID).val(experimentalData["fits"][fitID]["CTPconc"]);
+				$("#GTPconc_" + fitID).val(experimentalData["fits"][fitID]["GTPconc"]);
+				$("#UTPconc_" + fitID).val(experimentalData["fits"][fitID]["UTPconc"]);
+				$("#ABC_RSS_" + fitID).val(experimentalData["fits"][fitID]["RSSthreshold"]);
+				if (dataType == "ntpVelocity") $("#ABC_force_" + fitID).val(experimentalData["fits"][fitID]["force"]);
 
 
-				$("#forceVelocityInputData_" + fitID).val(textAreaString);
+				$("#" + dataType + "InputData_" + fitID).val(textAreaString);
 
 			}
 
