@@ -23,7 +23,7 @@
 
 
 XML_JS = {};
-XML_JS.ABC_FORCE_VELOCITIES = {};
+XML_JS.ABC_EXPERIMENTAL_DATA = {};
 
 
 // Modified from http://xmljs.sourceforge.net/website/sampleApplications-sax.html
@@ -78,7 +78,7 @@ XML_JS.ABC_FORCE_VELOCITIES = {};
 	//console.log("Parsed", XML_JS.showRejectedParameters);
 
 
-	var toReturn = {seq: SEQS_JS.all_sequences[sequenceID], model: FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel], N: XML_JS.N, speed: speedVal, whichPlotInWhichCanvas: PLOTS_JS.whichPlotInWhichCanvas, ABC_FORCE_VELOCITIES: XML_JS.ABC_FORCE_VELOCITIES,
+	var toReturn = {seq: SEQS_JS.all_sequences[sequenceID], model: FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel], N: XML_JS.N, speed: speedVal, whichPlotInWhichCanvas: PLOTS_JS.whichPlotInWhichCanvas, ABC_EXPERIMENTAL_DATA: XML_JS.ABC_EXPERIMENTAL_DATA,
 						showPlots: !PLOTS_JS.plotsAreHidden};
 	toReturn["seq"]["seqID"] = sequenceID;
 	if (msgID != null){
@@ -153,11 +153,11 @@ function parseXML_sequence_WW(sequenceNode){
 // Parse the global ABC settings
 function parseXML_ABCmain_WW(ABCnode){
 
-	XML_JS.ABC_FORCE_VELOCITIES = {};
-	XML_JS.ABC_FORCE_VELOCITIES["ntrials"] = ABCnode["ntrials"];
-	XML_JS.ABC_FORCE_VELOCITIES["testsPerData"] = ABCnode["testsPerData"];
+	XML_JS.ABC_EXPERIMENTAL_DATA = {};
+	XML_JS.ABC_EXPERIMENTAL_DATA["ntrials"] = ABCnode["ntrials"];
+	XML_JS.ABC_EXPERIMENTAL_DATA["testsPerData"] = ABCnode["testsPerData"];
 	XML_JS.showRejectedParameters = ABCnode["showRejectedParameters"] == null ? false : ABCnode["showRejectedParameters"] == "true";
-	XML_JS.ABC_FORCE_VELOCITIES["fits"] = {};
+	XML_JS.ABC_EXPERIMENTAL_DATA["fits"] = {};
 
 }
 
@@ -169,18 +169,18 @@ function parseXML_ABCfit_WW(fitNode){
 	var fitID = "fit" + nABCfits;
 
 		
-	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID] = {vals: []};
-	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["RSSthreshold"] = fitNode["RSSthreshold"];
-	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["ATPconc"] = fitNode["ATPconc"];
-	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["CTPconc"] = fitNode["CTPconc"];
-	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["GTPconc"] = fitNode["GTPconc"];
-	XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["UTPconc"] = fitNode["UTPconc"];
+	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID] = {vals: []};
+	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["RSSthreshold"] = fitNode["RSSthreshold"];
+	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["ATPconc"] = fitNode["ATPconc"];
+	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["CTPconc"] = fitNode["CTPconc"];
+	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["GTPconc"] = fitNode["GTPconc"];
+	XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["UTPconc"] = fitNode["UTPconc"];
 	for (var obsID in fitNode){
 
 		if (obsID.substring(0, 3) != "obs") continue;
 		var force = parseFloat(fitNode[obsID].split(",")[0]);
 		var velocity = parseFloat(fitNode[obsID].split(",")[1]);
-		XML_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"].push({force: force, velocity: velocity});
+		XML_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].push({force: force, velocity: velocity});
 	}
 
 
@@ -235,7 +235,7 @@ if (RUNNING_FROM_COMMAND_LINE){
 
 	module.exports = {
 		loadSession_WW: XML_JS.loadSession_WW,
-		ABC_FORCE_VELOCITIES: XML_JS.ABC_FORCE_VELOCITIES,
+		ABC_EXPERIMENTAL_DATA: XML_JS.ABC_EXPERIMENTAL_DATA,
 		showRejectedParameters: XML_JS.showRejectedParameters
 
 	}

@@ -952,15 +952,15 @@ function saveSession(){
 		// ABC settings
 		saveXML.writeStartElement('ABC');
 
-			var forcesVelocitiesForModel = getABCforceVelocityObject();
-			saveXML.writeAttributeString("ntrials", forcesVelocitiesForModel["ntrials"]);
-			saveXML.writeAttributeString("testsPerData", forcesVelocitiesForModel["testsPerData"]);
+			var abcDataObjectForModel = getAbcDataObject();
+			saveXML.writeAttributeString("ntrials", abcDataObjectForModel["ntrials"]);
+			saveXML.writeAttributeString("testsPerData", abcDataObjectForModel["testsPerData"]);
 			saveXML.writeAttributeString("showRejectedParameters", $("#ABC_showRejectedParameters").is(":checked").length = 0 ? false : $("#ABC_showRejectedParameters").is(":checked"));
 
 
 			// Sort the fits so that they are printed in the right order
 			var fits = [];
-			for (var fitID in forcesVelocitiesForModel["fits"]) fits.push(fitID);
+			for (var fitID in abcDataObjectForModel["fits"]) fits.push(fitID);
 			fits.sort();
 
 			for (var i = 0; i < fits.length; i ++){
@@ -970,13 +970,13 @@ function saveSession(){
 				saveXML.writeStartElement(fitID);
 
 
-					saveXML.writeAttributeString("RSSthreshold", forcesVelocitiesForModel["fits"][fitID]["RSSthreshold"]);
-					saveXML.writeAttributeString("ATPconc", forcesVelocitiesForModel["fits"][fitID]["ATPconc"]);
-					saveXML.writeAttributeString("CTPconc", forcesVelocitiesForModel["fits"][fitID]["CTPconc"]);
-					saveXML.writeAttributeString("GTPconc", forcesVelocitiesForModel["fits"][fitID]["GTPconc"]);
-					saveXML.writeAttributeString("UTPconc", forcesVelocitiesForModel["fits"][fitID]["UTPconc"]);
-					for (var obsNum = 0; obsNum < forcesVelocitiesForModel["fits"][fitID]["vals"].length; obsNum++){
-						var forceVelocity = forcesVelocitiesForModel["fits"][fitID]["vals"][obsNum]["force"] + "," + forcesVelocitiesForModel["fits"][fitID]["vals"][obsNum]["velocity"];
+					saveXML.writeAttributeString("RSSthreshold", abcDataObjectForModel["fits"][fitID]["RSSthreshold"]);
+					saveXML.writeAttributeString("ATPconc", abcDataObjectForModel["fits"][fitID]["ATPconc"]);
+					saveXML.writeAttributeString("CTPconc", abcDataObjectForModel["fits"][fitID]["CTPconc"]);
+					saveXML.writeAttributeString("GTPconc", abcDataObjectForModel["fits"][fitID]["GTPconc"]);
+					saveXML.writeAttributeString("UTPconc", abcDataObjectForModel["fits"][fitID]["UTPconc"]);
+					for (var obsNum = 0; obsNum < abcDataObjectForModel["fits"][fitID]["vals"].length; obsNum++){
+						var forceVelocity = abcDataObjectForModel["fits"][fitID]["vals"][obsNum]["force"] + "," + abcDataObjectForModel["fits"][fitID]["vals"][obsNum]["velocity"];
 						saveXML.writeAttributeString("obs" + (obsNum+1), forceVelocity);
 					}
 
@@ -1247,9 +1247,13 @@ function clearCache(){
 					
 					
 				});
-				
-				
-			
+
+
+				if (ABC_cleardata) {
+					ABClines = [];
+					ABClinesAcceptedOnly = [];
+					validateAllAbcDataInputs();
+				}
 
 				
 			});

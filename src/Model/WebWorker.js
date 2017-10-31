@@ -1386,23 +1386,23 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 
 			// Split the number of iterations evenly among the number of workers
 			if (nthreads > 1){
-				var nIterationsThisWorker = Math.floor(XML_JS.ABC_FORCE_VELOCITIES["ntrials"] / nthreads);
-				var remainingNumberOfTrials = XML_JS.ABC_FORCE_VELOCITIES["ntrials"] % nthreads;
+				var nIterationsThisWorker = Math.floor(XML_JS.ABC_EXPERIMENTAL_DATA["ntrials"] / nthreads);
+				var remainingNumberOfTrials = XML_JS.ABC_EXPERIMENTAL_DATA["ntrials"] % nthreads;
 
 				if (workerID <= remainingNumberOfTrials) nIterationsThisWorker++;
 
-				XML_JS.ABC_FORCE_VELOCITIES["ntrials"] = nIterationsThisWorker;
+				XML_JS.ABC_EXPERIMENTAL_DATA["ntrials"] = nIterationsThisWorker;
 				console.log("Running", nIterationsThisWorker, "ABC iterations on worker", workerID);
 			}
 
-			else console.log("Running", XML_JS.ABC_FORCE_VELOCITIES["ntrials"], "ABC iterations");
+			else console.log("Running", XML_JS.ABC_EXPERIMENTAL_DATA["ntrials"], "ABC iterations");
 
 
 
 			PLOTS_JS.DISTANCE_VS_TIME_SIZE_MAX = 1;
 			PLOTS_JS.DWELL_TIMES_SIZE_MAX = 1;
 
-			ABC_JS.beginABC_WW(XML_JS.ABC_FORCE_VELOCITIES, function(){ 
+			ABC_JS.beginABC_WW(XML_JS.ABC_EXPERIMENTAL_DATA, function(){ 
 
 				exit();
 

@@ -2,7 +2,7 @@
 
 ABC_JS = {};
 
-ABC_JS.ABC_FORCE_VELOCITIES = null;
+ABC_JS.ABC_EXPERIMENTAL_DATA = null;
 ABC_JS.ABC_POSTERIOR_DISTRIBUTION = [];
 ABC_JS.ABC_simulating = false;
 ABC_JS.ABC_parameters_and_metrics_this_simulation = {};
@@ -17,7 +17,7 @@ ABC_JS.nAcceptedValues = 0;
 
 
 // Start running ABC with the rules parsed by the controller
-ABC_JS.beginABC_WW = function(forcesVelocities, resolve = function() {}, msgID = null){
+ABC_JS.beginABC_WW = function(experimentalData, resolve = function() {}, msgID = null){
 
 
 
@@ -30,18 +30,18 @@ ABC_JS.beginABC_WW = function(forcesVelocities, resolve = function() {}, msgID =
 		return;
 	}
 
-	//console.log("I have fits", forcesVelocities);
+	//console.log("I have fits", experimentalData);
 
 
 	ABC_JS.ABC_simulating = true;
 	WW_JS.stopRunning_WW = false;
-	ABC_JS.ABC_FORCE_VELOCITIES = forcesVelocities;
+	ABC_JS.ABC_EXPERIMENTAL_DATA = experimentalData;
 	ABC_JS.nAcceptedValues = 0;
 	//ABC_JS.ABC_POSTERIOR_DISTRIBUTION = [];
 
 
 	var fitNums = []; // Build a list of fit numbers
-	for (var fitNum in ABC_JS.ABC_FORCE_VELOCITIES["fits"]) {
+	for (var fitNum in ABC_JS.ABC_EXPERIMENTAL_DATA["fits"]) {
 		fitNums.push(fitNum); 
 	}
 	fitNums.sort();
@@ -73,13 +73,14 @@ ABC_JS.beginABC_WW = function(forcesVelocities, resolve = function() {}, msgID =
 	}
 
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"] = {name: PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["name"], vals: []}; 
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["NTPeq"] = {name: "NTP concentration divided by [NTP]eq", vals: []}; 
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"] = {name: "Mean velocity (bp/s)", vals: []};
 	//if(RHS_params.indexOf("catalyTime") != -1) ABC_JS.ABC_parameters_and_metrics_this_simulation["catalyTime"] = {name: "Mean catalysis time (s)", vals: []};
 	//if(RHS_params.indexOf("totalTime") != -1) ABC_JS.ABC_parameters_and_metrics_this_simulation["totalTime"] = {name: "Total transcription time (s)", vals: []};
 	//if(RHS_params.indexOf("nascentLen") != -1) ABC_JS.ABC_parameters_and_metrics_this_simulation["nascentLen"] = {name: "Final nascent length (nt)", vals: []};
 
 
-	ABC_JS.n_ABC_trials_left = ABC_JS.ABC_FORCE_VELOCITIES["ntrials"];
+	ABC_JS.n_ABC_trials_left = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"];
 
 
 
@@ -112,7 +113,7 @@ ABC_JS.beginABC_WW = function(forcesVelocities, resolve = function() {}, msgID =
 
 ABC_JS.clearABCdata_WW = function(){
 
-	ABC_JS.ABC_FORCE_VELOCITIES = null;
+	ABC_JS.ABC_EXPERIMENTAL_DATA = null;
 	ABC_JS.ABC_POSTERIOR_DISTRIBUTION = [];
 	ABC_JS.ABC_simulating = false;
 	ABC_JS.ABC_parameters_and_metrics_this_simulation = {};
@@ -130,15 +131,15 @@ ABC_JS.ABC_trials_WW = function(fitNums, resolve = function() {}, msgID = null){
 
 
  	// Print out every 20th simulation when calling from command line
- 	if (RUNNING_FROM_COMMAND_LINE && (ABC_JS.n_ABC_trials_left == 1 || ABC_JS.n_ABC_trials_left == ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] || (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left + 1) % 100 == 0)){
+ 	if (RUNNING_FROM_COMMAND_LINE && (ABC_JS.n_ABC_trials_left == 1 || ABC_JS.n_ABC_trials_left == ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] || (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1) % 100 == 0)){
 
  		var workerString = WW_JS.WORKER_ID == null ? "" : "Worker " + WW_JS.WORKER_ID + " | ";
 
  		var acceptanceNumber = ABC_JS.nAcceptedValues;
-		var acceptancePercentage = WW_JS.roundToSF_WW(100 * ABC_JS.nAcceptedValues / (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left));
+		var acceptancePercentage = WW_JS.roundToSF_WW(100 * ABC_JS.nAcceptedValues / (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left));
 		if (isNaN(acceptancePercentage)) acceptancePercentage = 0;
 
- 		console.log(workerString + "ABC", (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left + 1) + "/" + ABC_JS.ABC_FORCE_VELOCITIES["ntrials"], "| Accepted:", acceptanceNumber, "| Acceptance rate:", acceptancePercentage + "%");
+ 		console.log(workerString + "ABC", (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1) + "/" + ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"], "| Accepted:", acceptanceNumber, "| Acceptance rate:", acceptancePercentage + "%");
  	}
 
 
@@ -162,13 +163,14 @@ ABC_JS.ABC_trials_WW = function(fitNums, resolve = function() {}, msgID = null){
 
 
 	// Reset whether or not each fit was accepted
-	ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"] = ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"] = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
 	for (var fitNum in fitNums) {
 		ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitNums[fitNum]] = null;
 		ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitNums[fitNum]] = null;
 	}
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"] = null;
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"] = []; 
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["NTPeq"]["vals"] = []; 
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"] = [];
 
 
@@ -241,30 +243,29 @@ ABC_JS.ABC_trial_for_curve_WW = function(currentFitNum, accepted, fitNums, resol
 		// What force-velocity index are we upto
 		var force_velocity_num = -1;
 		for (var fitNumPrev = 0; fitNumPrev < currentFitNum; fitNumPrev++){
-			force_velocity_num += ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitNums[fitNumPrev]]["vals"].length;
+			force_velocity_num += ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitNums[fitNumPrev]]["vals"].length;
 		}
 
 
 		// Calculate the mean RSS
 		var meanRSS = 0;
 		var fitID = fitNums[currentFitNum];
-		for (var observationNum = 0; observationNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"].length; observationNum++){
-
+		for (var observationNum = 0; observationNum < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].length; observationNum++){
 
 
 			force_velocity_num++;
-			var observedVelocity = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"][observationNum]["velocity"];
+			var observedVelocity = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum]["velocity"];
 			var simulatedVelocity = ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][force_velocity_num];
 			var residualSquared =  Math.pow(observedVelocity - simulatedVelocity, 2);
 
 
-			meanRSS += residualSquared / ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"].length;
+			meanRSS += residualSquared / ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].length;
 
 		}
 
 		ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitID] = meanRSS;
-		ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitID] = meanRSS < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["RSSthreshold"];
-		accepted = accepted && meanRSS < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["RSSthreshold"];
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitID] = meanRSS < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["RSSthreshold"];
+		accepted = accepted && meanRSS < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["RSSthreshold"];
 
 		ABC_JS.ABC_trial_for_curve_WW(currentFitNum + 1, accepted, fitNums, resolve);
 	}
@@ -286,23 +287,41 @@ ABC_JS.ABC_trial_for_curve_WW = function(currentFitNum, accepted, fitNums, resol
 ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve = function() {}){
 
 
-	//console.log("Starting observation", observationNum, "for curve", fitID, ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID][observationNum]);
+	//console.log("Starting observation", observationNum, "for curve", fitID, ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID][observationNum]);
 
 
-	if (ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"][observationNum] == null || WW_JS.stopRunning_WW){
+	if (ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum] == null || WW_JS.stopRunning_WW){
 		resolve();
 		return;
 	}
 
 
 	// Set the force / NTP to the required value
-	var force = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"][observationNum]["force"];
-	PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] = force;
-	PARAMS_JS.PHYSICAL_PARAMETERS["ATPconc"]["val"] = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["ATPconc"];
-	PARAMS_JS.PHYSICAL_PARAMETERS["CTPconc"]["val"] = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["CTPconc"];
-	PARAMS_JS.PHYSICAL_PARAMETERS["GTPconc"]["val"] = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["GTPconc"];
-	PARAMS_JS.PHYSICAL_PARAMETERS["UTPconc"]["val"] = ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["UTPconc"];
-	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"].push(force);
+	switch(ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["dataType"]){ 
+
+		case "forceVelocity":
+			var force = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum]["force"];
+			PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] = force;
+			PARAMS_JS.PHYSICAL_PARAMETERS["ATPconc"]["val"] = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["ATPconc"];
+			PARAMS_JS.PHYSICAL_PARAMETERS["CTPconc"]["val"] = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["CTPconc"];
+			PARAMS_JS.PHYSICAL_PARAMETERS["GTPconc"]["val"] = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["GTPconc"];
+			PARAMS_JS.PHYSICAL_PARAMETERS["UTPconc"]["val"] = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["UTPconc"];
+			ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"].push(force);
+			break;
+
+
+		case "ntpVelocity":
+			
+			var ntpDividedByNTPeq = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum]["ntp"];
+			PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["force"];
+			PARAMS_JS.PHYSICAL_PARAMETERS["ATPconc"]["val"] = ntpDividedByNTPeq * ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["ATPconc"];
+			PARAMS_JS.PHYSICAL_PARAMETERS["CTPconc"]["val"] = ntpDividedByNTPeq * ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["CTPconc"];
+			PARAMS_JS.PHYSICAL_PARAMETERS["GTPconc"]["val"] = ntpDividedByNTPeq * ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["GTPconc"];
+			PARAMS_JS.PHYSICAL_PARAMETERS["UTPconc"]["val"] = ntpDividedByNTPeq * ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["UTPconc"];
+			ABC_JS.ABC_parameters_and_metrics_this_simulation["NTPeq"]["vals"].push(ntpDividedByNTPeq);
+			break;
+
+	}
 
 	
 
@@ -334,7 +353,7 @@ ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve
 	}
 	
 	// Perform a trial
-	var toCall = () => new Promise((resolve) => ABC_JS.ABC_trial_for_observation_WW(ABC_JS.ABC_FORCE_VELOCITIES["testsPerData"], fitID, observationNum, resolve));
+	var toCall = () => new Promise((resolve) => ABC_JS.ABC_trial_for_observation_WW(ABC_JS.ABC_EXPERIMENTAL_DATA["testsPerData"], fitID, observationNum, resolve));
 	toCall().then(() => toDoAfterTrial());
 
 
@@ -349,7 +368,7 @@ ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve
 ABC_JS.ABC_trial_for_observation_WW = function(K, fitID, observationNum, resolve = function() {}){
 
 
-	//console.log("Starting observation", observationNum, "for curve", fitID, ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID][observationNum]);
+	//console.log("Starting observation", observationNum, "for curve", fitID, ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID][observationNum]);
 
 	if (K == 0 || WW_JS.stopRunning_WW){
 		resolve();
@@ -395,22 +414,35 @@ ABC_JS.initialise_ABCoutput_WW = function(fitNums){
 	}
 
 
-	// For each curve to fit to, add the force-velocity column names
+	// For each curve to fit to, add the ntp-velocity or force-velocity column names
 	var forceNumber = 0;
+	var concentrationNumber = 0;
 	var passNumber = 0;
 	for (var fitNum in fitNums){
 
 		var ID = fitNums[fitNum];
+		var dataType = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][ID]["dataType"];
 
-		for (var obsNum = 0; obsNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][ID]["vals"].length; obsNum ++){
+		for (var obsNum = 0; obsNum < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][ID]["vals"].length; obsNum ++){
 
-			forceNumber++;
-			secondLine += (paddingString + "F" + (forceNumber)).slice(-paddingString.length);
-			secondLine += (paddingString + "v(F" + (forceNumber) + ")").slice(-paddingString.length);
+			switch(dataType){
+				case "forceVelocity":
+					forceNumber++;
+					secondLine += (paddingString + "F" + (forceNumber)).slice(-paddingString.length);
+					secondLine += (paddingString + "v(F" + (forceNumber) + ")").slice(-paddingString.length);
+					break;
+
+				case "ntpVelocity":
+					concentrationNumber++;
+					secondLine += (paddingString + "NTP" + (concentrationNumber)).slice(-paddingString.length);
+					secondLine += (paddingString + "v(NTP" + (concentrationNumber) + ")").slice(-paddingString.length);
+					break;				
 			/*
-			var force = ABC_JS.ABC_FORCE_VELOCITIES[ID][obsNum]["force"];
-			var velocity = ABC_JS.ABC_FORCE_VELOCITIES[ID][obsNum]["velocity"];
+			var force = ABC_JS.ABC_EXPERIMENTAL_DATA[ID][obsNum]["force"];
+			var velocity = ABC_JS.ABC_EXPERIMENTAL_DATA[ID][obsNum]["velocity"];
 			*/
+
+			}
 
 		}
 
@@ -453,7 +485,7 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 
 	// Add the trial number
 	var workerNum = RUNNING_FROM_COMMAND_LINE && WW_JS.WORKER_ID != null ? WW_JS.WORKER_ID + ":" : "";// Print the worker number if multithreading from the command line
-	var trialNum = 	ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
+	var trialNum = 	ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
 	var line = (paddingString + workerNum + trialNum).slice(-9);
 
 
@@ -470,30 +502,40 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 	
 
 	// Get the force and velocity values
-	var forceVeloNum = 0;
+	var experimentalSettingNumber = 0;
+	var forceNumber = 0;
+	var concentrationNumber = 0;
 	for (var fitIndex = 0; fitIndex < fitNums.length; fitIndex++){
 
 		var fitID = fitNums[fitIndex];
-		
+
+		var dataType = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["dataType"];
+
 
 		// Iterate through each force-velocity observation in this curve
-		for (var obsNum = 0; obsNum < ABC_JS.ABC_FORCE_VELOCITIES["fits"][fitID]["vals"].length; obsNum++){
+		for (var obsNum = 0; obsNum < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].length; obsNum++){
 
-			var force = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"][forceVeloNum]) : "-";
-			var velocity = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][forceVeloNum], 3) : "-";
+			var X_axis_value = "-";
+			if (printVals && dataType == "forceVelocity") X_axis_value = WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"][forceNumber]);
+			else if(printVals && dataType == "ntpVelocity") X_axis_value = WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["NTPeq"]["vals"][concentrationNumber]);
 
-			if (isNaN(force) || isNaN(velocity)){
+			var velocity = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][experimentalSettingNumber], 3) : "-";
+
+
+			if (isNaN(X_axis_value) || isNaN(velocity)){
 				printVals = false;
-				force = "-";
+				X_axis_value = "-";
 				velocity = "-";
 			}
 
 
-			line += (paddingString + force).slice(-paddingString.length);
+			line += (paddingString + X_axis_value).slice(-paddingString.length);
 			line += (paddingString + velocity).slice(-paddingString.length);
 
+			if (dataType == "forceVelocity") forceNumber ++;
+			if (dataType == "ntpVelocity") concentrationNumber ++;
+			experimentalSettingNumber++;
 
-			forceVeloNum++;
 		}
 
 		// RSS
@@ -542,7 +584,7 @@ ABC_JS.get_unrendered_ABCoutput_WW = function(resolve = function() {}, msgID= nu
 	var toReturn = null;
 	if (ABC_JS.ABC_outputString_unrendered.length > 0){
 		var acceptanceNumber = ABC_JS.nAcceptedValues;
-		var acceptancePercentage = ABC_JS.ABC_FORCE_VELOCITIES == null ? null : (100 * ABC_JS.nAcceptedValues / (ABC_JS.ABC_FORCE_VELOCITIES["ntrials"] - ABC_JS.n_ABC_trials_left));
+		var acceptancePercentage = ABC_JS.ABC_EXPERIMENTAL_DATA == null ? null : (100 * ABC_JS.nAcceptedValues / (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left));
 		toReturn = {newLines: ABC_JS.ABC_outputString_unrendered, nTrialsToGo: ABC_JS.n_ABC_trials_left, acceptanceNumber: acceptanceNumber, acceptancePercentage: acceptancePercentage};
 	}
 	if (msgID != null){
@@ -789,7 +831,6 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 		ABC_JS.ABC_outputString_unrendered.push("");
 		ABC_JS.ABC_outputString_unrendered.push(firstConsoleLine);
 
-		console.log("Created objects", posteriorObjectEmptyTemplate, columnNumTSV_to_columnNameObj, colNames);
 
 
 		// Populate the remaining rows with numbers
@@ -880,7 +921,7 @@ if (RUNNING_FROM_COMMAND_LINE){
 
 
 	module.exports = {
-		ABC_FORCE_VELOCITIES: ABC_JS.ABC_FORCE_VELOCITIES,
+		ABC_EXPERIMENTAL_DATA: ABC_JS.ABC_EXPERIMENTAL_DATA,
 		ABC_POSTERIOR_DISTRIBUTION: ABC_JS.ABC_POSTERIOR_DISTRIBUTION,
 		ABC_simulating: ABC_JS.ABC_simulating,
 		ABC_parameters_and_metrics_this_simulation: ABC_JS.ABC_parameters_and_metrics_this_simulation,

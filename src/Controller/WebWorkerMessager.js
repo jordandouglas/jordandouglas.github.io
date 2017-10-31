@@ -2015,7 +2015,7 @@ function loadSession_controller(XMLData){
 		var seqObject = result["seq"];
 		var model = result["model"];
 		var compactState = result["compactState"];
-		var forceVelocity = result["ABC_FORCE_VELOCITIES"];
+		var forceVelocity = result["ABC_EXPERIMENTAL_DATA"];
 		
 		
 			
@@ -2108,7 +2108,7 @@ function loadSession_controller(XMLData){
 
 			}
 
-			validateAllForceVelocityInputs();
+			validateAllAbcDataInputs();
 			
 		}
 
@@ -2308,7 +2308,7 @@ function uploadABC_controller(TSVstring){
 			//$("#ABCoutput").html("");
 			onABCStart();
 			get_unrendered_ABCoutput_controller();
-			validateAllForceVelocityInputs();
+			validateAllAbcDataInputs();
 
 
 		}else{
@@ -2347,7 +2347,7 @@ function uploadABC_controller(TSVstring){
 
 
 
-function beginABC_controller(forcesVelocitiesForModel){
+function beginABC_controller(abcDataObjectForModel){
 
 
 	running_ABC = true;
@@ -2375,12 +2375,12 @@ function beginABC_controller(forcesVelocitiesForModel){
 
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => ABC_JS.beginABC_WW(forcesVelocitiesForModel, resolve));
+		var toCall = () => new Promise((resolve) => ABC_JS.beginABC_WW(abcDataObjectForModel, resolve));
 		toCall().then(() => updateDOM());
 	}
 
 	else{
-		var res = stringifyFunction("ABC_JS.beginABC_WW", [forcesVelocitiesForModel, null], true);
+		var res = stringifyFunction("ABC_JS.beginABC_WW", [abcDataObjectForModel, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -2446,7 +2446,7 @@ function get_unrendered_ABCoutput_controller(resolve = function() { }){
 
 
 
-		validateAllForceVelocityInputs();
+		validateAllAbcDataInputs();
 		resolve();
 
 
