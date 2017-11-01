@@ -59,6 +59,7 @@ PLOTS_JS.timeElapsed = 0;
 PLOTS_JS.velocity = 0;
 PLOTS_JS.totalDisplacement = 0;
 PLOTS_JS.totaltimeElapsed = 0;
+PLOTS_JS.totaltimeElapsedThisTrial = 0;
 PLOTS_JS.npauseSimulations = 0;
 PLOTS_JS.nabortionSimulations = 0;
 PLOTS_JS.nMisincorporationSimulations = 0;
@@ -138,6 +139,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 	PLOTS_JS.nMisincorporationSimulations = 1;
 	PLOTS_JS.totalDisplacement = 0;
 	PLOTS_JS.totaltimeElapsed = 0;
+	PLOTS_JS.totaltimeElapsedThisTrial = 0;
 	
 	PLOTS_JS.pauseTimePerSite = new Array(WW_JS.currentState["nbases"]+1);
 	for (var i = 0; i < PLOTS_JS.pauseTimePerSite.length; i ++) PLOTS_JS.pauseTimePerSite[i] = 0;
@@ -373,6 +375,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 	PLOTS_JS.npauseSimulations++;
 	PLOTS_JS.nMisincorporationSimulations ++;
 	PLOTS_JS.arrestTimeoutReached = false;
+	PLOTS_JS.totaltimeElapsedThisTrial = 0;
 
 
 	// If running from command line then delete all the cached plot data (but not ABC settings) so that memory usage does not increase over time
@@ -396,6 +399,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 	PLOTS_JS.totaltimeElapsed += reactionTime;
 	PLOTS_JS.timeWaitedUntilNextTranslocation += reactionTime;
 	PLOTS_JS.timeWaitedUntilNextCatalysis += reactionTime;
+	PLOTS_JS.totaltimeElapsedThisTrial += reactionTime;
 
 
 
@@ -405,7 +409,6 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 		var abortionSite = stateC[0] + 1;
 		PLOTS_JS.arrestCounts[abortionSite] ++;
 		PLOTS_JS.arrestTimeoutReached = true;
-		
 	}
 	
 
@@ -842,16 +845,10 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 
 
-	var totalTime_thisTrial = 0;
-	for (var timeNum = 0; timeNum < PLOTS_JS.DWELL_TIMES_THIS_TRIAL.length; timeNum ++){
-		totalTime_thisTrial += PLOTS_JS.DWELL_TIMES_THIS_TRIAL[timeNum];
-	}
+	if (PLOTS_JS.totaltimeElapsedThisTrial == 0) return;
+	
 
-
-	if (totalTime_thisTrial == 0) return;
-
-
-	sortedPush_WW(PLOTS_JS.timesSpentOnEachTemplate, totalTime_thisTrial);
+	sortedPush_WW(PLOTS_JS.timesSpentOnEachTemplate, PLOTS_JS.totaltimeElapsedThisTrial);
 	var rightHybridBase = WW_JS.currentState["rightGBase"] - WW_JS.currentState["mRNAPosInActiveSite"];
 	sortedPush_WW(PLOTS_JS.distancesTravelledOnEachTemplate, rightHybridBase);
 
@@ -860,8 +857,8 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 	var increaseInPrimerLength = WW_JS.currentState["mRNALength"] - (PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] + PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"] + 2);
 	//if(increaseInPrimerLength < 100) return; // Disqualify early terminations because they will skew everything
-	var velocity_thisTrial = increaseInPrimerLength / totalTime_thisTrial;
-	var meanDwellTime_thisTrial = totalTime_thisTrial / PLOTS_JS.DWELL_TIMES_THIS_TRIAL.length;
+	var velocity_thisTrial = increaseInPrimerLength / PLOTS_JS.totaltimeElapsedThisTrial;
+	var meanDwellTime_thisTrial = PLOTS_JS.totaltimeElapsedThisTrial / PLOTS_JS.DWELL_TIMES_THIS_TRIAL.length;
 	
 
 
@@ -873,7 +870,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 	// Y values
 	PLOTS_JS.PARAMETERS_PLOT_DATA["velocity"]["vals"].push(velocity_thisTrial);
-	PLOTS_JS.PARAMETERS_PLOT_DATA["totalTime"]["vals"].push(totalTime_thisTrial);
+	PLOTS_JS.PARAMETERS_PLOT_DATA["totalTime"]["vals"].push(PLOTS_JS.totaltimeElapsedThisTrial);
 	PLOTS_JS.PARAMETERS_PLOT_DATA["catalyTime"]["vals"].push(meanDwellTime_thisTrial);
 	PLOTS_JS.PARAMETERS_PLOT_DATA["nascentLen"]["vals"].push(WW_JS.currentState["mRNALength"]-1);
 
@@ -917,42 +914,6 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 	
 }
 
-
-
-/*
-function setVariableToRecord_WW(plotCanvasID, varName, axis, resolve = function () { }, msgID = null){
-	
-	
-	// Set the x variable data for this element
-	if (axis == "x" && PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataIDX"] != varName) {
-		
-		PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataIDX"] = varName;
-		PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataY"] = [];
-		PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataX"] = [];
-		
-	}
-
-
-	// Set the y variable data
-	else if (axis == "y" && PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataIDY"] != varName) {
-		
-		PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataIDY"] = varName;
-		PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataY"] = [];
-		PLOTS_JS.whichPlotInWhichCanvas[plotCanvasID]["customDataX"] = [];
-		
-	}
-
-	
-
-	if (msgID != null){
-		postMessage(msgID + "~X~" + JSON.stringify(PLOTS_JS.whichPlotInWhichCanvas));
-	}
-	
-	else resolve(PLOTS_JS.whichPlotInWhichCanvas);
-
-	
-}
-*/
 
 
 
@@ -1001,6 +962,7 @@ function setVariableToRecord_WW(plotCanvasID, varName, axis, resolve = function 
 		PLOTS_JS.DWELL_TIMES = [];
 		PLOTS_JS.DWELL_TIMES_UNSENT = {};
 		PLOTS_JS.DWELL_TIMES_THIS_TRIAL = [];
+		PLOTS_JS.totaltimeElapsedThisTrial = 0;
 	}
 
 	if (customPlot_cleardata){
