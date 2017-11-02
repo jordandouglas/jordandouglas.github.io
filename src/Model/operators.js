@@ -133,6 +133,7 @@ OPS_JS.applyActions = function(actions, fastMode, resolve, msgID){
 
 
 	ANIMATION_TIME = ANIMATION_TIME_TEMP;
+	OPS_JS.deterministic_mode = true;
 
 	//console.log(ANIMATION_TIME, "WW_JS.currentState", WW_JS.currentState, "actions", actions);
 	
@@ -150,6 +151,7 @@ OPS_JS.applyActions = function(actions, fastMode, resolve, msgID){
 		}
 
 		resolve();
+		OPS_JS.deterministic_mode = false;
 		
 
 		return;
@@ -1644,7 +1646,8 @@ if (RUNNING_FROM_COMMAND_LINE){
 		create_new_slipping_params_WW: OPS_JS.create_new_slipping_params_WW,
 		reset_slipping_params_WW: OPS_JS.reset_slipping_params_WW,
 		delete_slipping_params_WW: OPS_JS.delete_slipping_params_WW,
-		get_fissure_landscape_of_WW: OPS_JS.get_fissure_landscape_of_WW
+		get_fissure_landscape_of_WW: OPS_JS.get_fissure_landscape_of_WW,
+		deterministic_mode: OPS_JS.deterministic_mode
 
 	}
 

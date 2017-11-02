@@ -120,7 +120,7 @@ WW_JS.init_WW = function(isWW = false){
 
 	if (resolve === undefined) resolve = function() {};
 	if (msgID === undefined) msgID = null;
-
+	OPS_JS.deterministic_mode = true;
 
 
 	// Which sequence are we using
@@ -155,7 +155,7 @@ WW_JS.init_WW = function(isWW = false){
 	PLOTS_JS.refreshPlotData();
 
 	STATE_JS.initTranslocationRateCache();
-
+	OPS_JS.deterministic_mode = false;
 
 	if (msgID != null){
 		postMessage(msgID + "~X~" + "done");
@@ -962,6 +962,17 @@ function getComplementSequence_WW(seq, toRNA){
 	var TorU = SEQS_JS.all_sequences[sequenceID]["primer"].substring(2) == "DNA" ? "T" : "U";
 	var bases = ["A", "C", "G", TorU];
 
+
+
+	// If running in deterministic mode then add the correct base without any mutations, even if concentration is 0
+	if (OPS_JS.deterministic_mode){
+		var complement = baseToTranscribe == "C" ? "G" : baseToTranscribe == "G" ? "C" : baseToTranscribe == "T" ? "A" : baseToTranscribe == "U" ? "A" : 
+						 (baseToTranscribe == "A" && SEQS_JS.all_sequences[sequenceID]["primer"].substring(2) == "DNA") ? "T" :
+						 (baseToTranscribe == "A" && SEQS_JS.all_sequences[sequenceID]["primer"].substring(2) == "RNA") ? "U" :
+						 "X";
+
+		return {base: complement, rate: 0};
+	}
 
 
 	for (var i = 0; i < bindingRates.length; i ++){

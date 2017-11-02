@@ -26,48 +26,48 @@ PARAMS_JS = {};
 
 PARAMS_JS.PHYSICAL_PARAMETERS = {}; // The complete list of parameters which can be tuned using the side navigation menu
 
-PARAMS_JS.PHYSICAL_PARAMETERS["NTPconc"] = {distribution:"Fixed", zeroTruncated: true, integer: false, hidden:false};
-PARAMS_JS.PHYSICAL_PARAMETERS["ATPconc"] = {distribution:"Fixed", zeroTruncated: true, integer: false, hidden:true};
-PARAMS_JS.PHYSICAL_PARAMETERS["CTPconc"] = {distribution:"Fixed", zeroTruncated: true, integer: false, hidden:true};
-PARAMS_JS.PHYSICAL_PARAMETERS["GTPconc"] = {distribution:"Fixed", zeroTruncated: true, integer: false, hidden:true};
-PARAMS_JS.PHYSICAL_PARAMETERS["UTPconc"] = {distribution:"Fixed", zeroTruncated: true, integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["NTPconc"] = {distribution:"Fixed", zeroTruncated: "inclusive", integer: false, hidden:false};
+PARAMS_JS.PHYSICAL_PARAMETERS["ATPconc"] = {distribution:"Fixed", zeroTruncated: "inclusive", integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["CTPconc"] = {distribution:"Fixed", zeroTruncated: "inclusive", integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["GTPconc"] = {distribution:"Fixed", zeroTruncated: "inclusive", integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["UTPconc"] = {distribution:"Fixed", zeroTruncated: "inclusive", integer: false, hidden:true};
 
-PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 7, minVal: 5, name: "Hybrid length (bp)", title: "Number of base pairs inside the polymerase", zeroTruncated: true, integer: true};
-PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 2, name: "Bubble length left (bp)",  title: "Number of unpaired template bases 3' of the hybrid", zeroTruncated: true, integer: true, hidden:true};
-PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 1, name: "Bubble length right (bp)", title: "Number of unpaired template bases 5' of the hybrid", zeroTruncated: true, integer: true, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 7, minVal: 5, name: "Hybrid length (bp)", title: "Number of base pairs inside the polymerase", zeroTruncated: "exclusive", integer: true};
+PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 2, name: "Bubble length left (bp)",  title: "Number of unpaired template bases 3' of the hybrid", zeroTruncated: "exclusive", integer: true, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 1, name: "Bubble length right (bp)", title: "Number of unpaired template bases 5' of the hybrid", zeroTruncated: "exclusive", integer: true, hidden:true};
 
 PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"] = {distribution:"Fixed", fixedDistnVal: 4.5, uniformDistnLowerVal: 2, uniformDistnUpperVal: 6, name: "\u0394G\u2020slide", title: "Free energy barrier height of translocation", zeroTruncated: false, integer: false};
 PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"] = {distribution:"Fixed", fixedDistnVal: 0, uniformDistnLowerVal: -4, uniformDistnUpperVal: 4, name: "\u0394Gpost", title: "Free energy added on to posttranslocated ground state", zeroTruncated: false, integer: false};
 PARAMS_JS.PHYSICAL_PARAMETERS["DGHyperDag"] = {distribution:"Fixed", fixedDistnVal: 0, name: "\u0394DGHyperDag", title: "Free energy penalty height of hypertranslocation", zeroTruncated: false, integer: false, hidden: false};
 PARAMS_JS.PHYSICAL_PARAMETERS["GsecondarySitePenalty"] = {distribution:"Fixed", fixedDistnVal: 1.336, name: "\u0394G\u2020NTP2", title: "Free energy penalty of binding NTP in the secondary binding site", zeroTruncated: false, integer: false};
 PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"] = {distribution:"Fixed", fixedDistnVal: 0, uniformDistnLowerVal: -10, uniformDistnUpperVal: 30, name: "Force (pN)", title: "Assisting force applied to the polymerase during single-molecule experiments.", zeroTruncated: false, integer: false};
-PARAMS_JS.PHYSICAL_PARAMETERS["arrestTime"] = {distribution:"Fixed", fixedDistnVal: 60, name: "Arrest timeout (s)", title: "Maximum pause duration before the simulation is arrested. Set to zero to prevent arrests.", zeroTruncated: true, integer: false};
+PARAMS_JS.PHYSICAL_PARAMETERS["arrestTime"] = {distribution:"Fixed", fixedDistnVal: 60, name: "Arrest timeout (s)", title: "Maximum pause duration before the simulation is arrested. Set to zero to prevent arrests.", zeroTruncated: "inclusive", integer: false};
 
 
-PARAMS_JS.PHYSICAL_PARAMETERS["kCat"] = {distribution:"Fixed", fixedDistnVal: 30, uniformDistnLowerVal: 0, uniformDistnUpperVal: 100, normalSdVal: 5, name: "Rate of catalysis (s\u207B\u00B9)", title: "Rate constant of catalysing bound NTP", zeroTruncated: true, integer: false, hidden:false};
-PARAMS_JS.PHYSICAL_PARAMETERS["kCat_ATP"] = {distribution:"Fixed", fixedDistnVal: 38, name: "Rate of catalysis for A (s\u207B\u00B9)", title: "Rate constant of catalysing bound ATP", zeroTruncated: true, integer: false, hidden:true};
-PARAMS_JS.PHYSICAL_PARAMETERS["kCat_CTP"] = {distribution:"Fixed", fixedDistnVal: 7, name: "Rate of catalysis for C (s\u207B\u00B9)", title: "Rate constant of catalysing bound CTP", zeroTruncated: true, integer: false, hidden:true};
-PARAMS_JS.PHYSICAL_PARAMETERS["kCat_GTP"] = {distribution:"Fixed", fixedDistnVal: 62, name: "Rate of catalysis for G (s\u207B\u00B9)", title: "Rate constant of catalysing bound GTP", zeroTruncated: true, integer: false, hidden:true};
-PARAMS_JS.PHYSICAL_PARAMETERS["kCat_UTP"] = {distribution:"Fixed", fixedDistnVal: 24, name: "Rate of catalysis for U (s\u207B\u00B9)", title: "Rate constant of catalysing bound UTP", zeroTruncated: true, integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["kCat"] = {distribution:"Fixed", fixedDistnVal: 30, uniformDistnLowerVal: 0, uniformDistnUpperVal: 100, normalSdVal: 5, name: "Rate of catalysis (s\u207B\u00B9)", title: "Rate constant of catalysing bound NTP", zeroTruncated: "inclusive", integer: false, hidden:false};
+PARAMS_JS.PHYSICAL_PARAMETERS["kCat_ATP"] = {distribution:"Fixed", fixedDistnVal: 38, name: "Rate of catalysis for A (s\u207B\u00B9)", title: "Rate constant of catalysing bound ATP", zeroTruncated: "inclusive", integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["kCat_CTP"] = {distribution:"Fixed", fixedDistnVal: 7, name: "Rate of catalysis for C (s\u207B\u00B9)", title: "Rate constant of catalysing bound CTP", zeroTruncated: "inclusive", integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["kCat_GTP"] = {distribution:"Fixed", fixedDistnVal: 62, name: "Rate of catalysis for G (s\u207B\u00B9)", title: "Rate constant of catalysing bound GTP", zeroTruncated: "inclusive", integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["kCat_UTP"] = {distribution:"Fixed", fixedDistnVal: 24, name: "Rate of catalysis for U (s\u207B\u00B9)", title: "Rate constant of catalysing bound UTP", zeroTruncated: "inclusive", integer: false, hidden:true};
 
-PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss"] = {distribution:"Fixed", fixedDistnVal: 35, uniformDistnLowerVal: 0, uniformDistnUpperVal: 100, name: "KD (\u03bcM)", title: "Dissociation constant of NTP", zeroTruncated: true, integer: false, hidden:false};
-PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_ATP"] = {distribution:"Fixed", fixedDistnVal: 50, name: "KD of ATP (\u03bcM)", title: "Dissociation constant of ATP", zeroTruncated: true, integer: false, hidden:true};
-PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_CTP"] = {distribution:"Fixed", fixedDistnVal: 33, name: "KD of CTP (\u03bcM)", title: "Dissociation constant of CTP", zeroTruncated: true, integer: false, hidden:true};
-PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_GTP"] = {distribution:"Fixed", fixedDistnVal: 36, name: "KD of GTP (\u03bcM)", title: "Dissociation constant of GTP", zeroTruncated: true, integer: false, hidden:true};
-PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_UTP"] = {distribution:"Fixed", fixedDistnVal: 18, name: "KD of UTP (\u03bcM)", title: "Dissociation constant of UTP", zeroTruncated: true, integer: false, hidden:true};
-
-
-PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"] = {distribution:"Fixed", fixedDistnVal: 250, name: "Rate bind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of binding the correct NTP", zeroTruncated: true, integer: false, hidden: true};
-PARAMS_JS.PHYSICAL_PARAMETERS["RateMisbind"] = {distribution:"Fixed", fixedDistnVal: 1, name: "Rate misbind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of NTP mis-binding which can lead to transition/transversion mutations", zeroTruncated: true, integer: false, hidden:true};
-PARAMS_JS.PHYSICAL_PARAMETERS["TransitionTransversionRatio"] = {distribution:"Fixed", fixedDistnVal: 4, name: "Transition:transversion", title: "How much more likely is a transition mis-binding event than a transversion mis-binding event", zeroTruncated: true, integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss"] = {distribution:"Fixed", fixedDistnVal: 35, uniformDistnLowerVal: 0, uniformDistnUpperVal: 100, name: "KD (\u03bcM)", title: "Dissociation constant of NTP", zeroTruncated: "exclusive", integer: false, hidden:false};
+PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_ATP"] = {distribution:"Fixed", fixedDistnVal: 50, name: "KD of ATP (\u03bcM)", title: "Dissociation constant of ATP", zeroTruncated: "exclusive", integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_CTP"] = {distribution:"Fixed", fixedDistnVal: 33, name: "KD of CTP (\u03bcM)", title: "Dissociation constant of CTP", zeroTruncated: "exclusive", integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_GTP"] = {distribution:"Fixed", fixedDistnVal: 36, name: "KD of GTP (\u03bcM)", title: "Dissociation constant of GTP", zeroTruncated: "exclusive", integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_UTP"] = {distribution:"Fixed", fixedDistnVal: 18, name: "KD of UTP (\u03bcM)", title: "Dissociation constant of UTP", zeroTruncated: "exclusive", integer: false, hidden:true};
 
 
-PARAMS_JS.PHYSICAL_PARAMETERS["kU"] = {distribution:"Fixed", fixedDistnVal: 0.05, name: "kU (s\u207B\u00B9)", title: "Rate constant of polymerase entering the unactive state", zeroTruncated: true, integer: false, hidden:true};
-PARAMS_JS.PHYSICAL_PARAMETERS["kA"] = {distribution:"Fixed", fixedDistnVal: 3, name: "kA (s\u207B\u00B9)", title: "Rate constant of polymerase leaving the unactive state", zeroTruncated: true, integer: false, hidden:true};
-PARAMS_JS.PHYSICAL_PARAMETERS["kUspecial"] = {distribution:"Fixed", fixedDistnVal: 1, name: "kU' (s\u207B\u00B9)", title: "Rate of entry into unactivated state multiplier at edit site", zeroTruncated: true, integer: false, hidden:true};
-PARAMS_JS.PHYSICAL_PARAMETERS["kAspecial"] = {distribution:"Fixed", fixedDistnVal: 1, name: "kA' (s\u207B\u00B9)", title: "Rate of entry into activated state multiplier at edit site", zeroTruncated: true, integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"] = {distribution:"Fixed", fixedDistnVal: 250, name: "Rate bind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of binding the correct NTP", zeroTruncated: "inclusive", integer: false, hidden: true};
+PARAMS_JS.PHYSICAL_PARAMETERS["RateMisbind"] = {distribution:"Fixed", fixedDistnVal: 1, name: "Rate misbind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of NTP mis-binding which can lead to transition/transversion mutations", zeroTruncated: "inclusive", integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["TransitionTransversionRatio"] = {distribution:"Fixed", fixedDistnVal: 4, name: "Transition:transversion", title: "How much more likely is a transition mis-binding event than a transversion mis-binding event", zeroTruncated: "exclusive", integer: false, hidden:true};
 
-PARAMS_JS.PHYSICAL_PARAMETERS["nbpToFold"] = {distribution:"Fixed", fixedDistnVal: 150, name: "Number of bases to fold", title: "The number of most recently added bases in the nascent strand to fold", zeroTruncated: true, integer: true, maxVal: 300, hidden:true};
+
+PARAMS_JS.PHYSICAL_PARAMETERS["kU"] = {distribution:"Fixed", fixedDistnVal: 0.05, name: "kU (s\u207B\u00B9)", title: "Rate constant of polymerase entering the unactive state", zeroTruncated: "inclusive", integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["kA"] = {distribution:"Fixed", fixedDistnVal: 3, name: "kA (s\u207B\u00B9)", title: "Rate constant of polymerase leaving the unactive state", zeroTruncated: "inclusive", integer: false, hidden:true};
+//PARAMS_JS.PHYSICAL_PARAMETERS["kUspecial"] = {distribution:"Fixed", fixedDistnVal: 1, name: "kU' (s\u207B\u00B9)", title: "Rate of entry into unactivated state multiplier at edit site", zeroTruncated: true, integer: false, hidden:true};
+//PARAMS_JS.PHYSICAL_PARAMETERS["kAspecial"] = {distribution:"Fixed", fixedDistnVal: 1, name: "kA' (s\u207B\u00B9)", title: "Rate of entry into activated state multiplier at edit site", zeroTruncated: true, integer: false, hidden:true};
+
+PARAMS_JS.PHYSICAL_PARAMETERS["nbpToFold"] = {distribution:"Fixed", fixedDistnVal: 150, name: "Number of bases to fold", title: "The number of most recently added bases in the nascent strand to fold", zeroTruncated: "exclusive", integer: true, maxVal: 300, hidden:true};
 
 
 
@@ -241,9 +241,11 @@ PARAMS_JS.update_this_parameter_WW = function(paramID, fixedVal, resolve = funct
 	if (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["integer"] != null && PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["integer"]) fixedVal = Math.ceil(fixedVal);
 	
 	// Do not accept the change if it is out of range
-	if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["zeroTruncated"] || (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["zeroTruncated"] && fixedVal > 0)) {
-	
-	
+	if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["zeroTruncated"]
+		 || (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["zeroTruncated"] == "exclusive" && fixedVal > 0)
+		 || (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["zeroTruncated"] == "inclusive" && fixedVal >= 0)) {
+		
+		
 		// Change the values
 		PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] = fixedVal;
 		PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["fixedDistnVal"] = fixedVal;
@@ -292,6 +294,7 @@ PARAMS_JS.sample_parameters_WW = function(resolve = function(){ }, msgID = null)
 PARAMS_JS.rpoiss = function(rate, aboveZero = false, minVal = null, maxVal = null){
 	
 	if (aboveZero == null) aboveZero = false;
+	if (aboveZero != false) aboveZero = true;
 	
 	var minPossibleValue = minVal != null ? minVal : aboveZero ? 1 : 0;
 
@@ -339,7 +342,8 @@ PARAMS_JS.sample_parameter_WW = function(paramID, resolve = function() { }, msgI
 		
 		case "Normal": // May have to repeatedly resample if this parameter is zero-truncated
 			var value = RAND_JS.normal(PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["normalMeanVal"], PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["normalSdVal"]);
-			while (value <= 0 && PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["zeroTruncated"]) value = RAND_JS.normal(PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["normalMeanVal"], PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["normalSdVal"]);
+			while ((PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["zeroTruncated"] == "exclusive" && value <= 0) ||
+				   (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["zeroTruncated"] == "inclusive" && value < 0)) value = RAND_JS.normal(PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["normalMeanVal"], PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["normalSdVal"]);
 			PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] = value;
 			break;
 			

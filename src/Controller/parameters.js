@@ -354,6 +354,12 @@ function addFixedPrior(){
 	var inputBox = $("#popup_distn").attr("paramName") + " = <input type='number' title='Select the fixed value for this parameter' id='fixedDistnVal' value=" + currentVal + " style='vertical-align: middle; text-align:right; width: 70px'></input>";
 	
 	$("#parameterDistnCell").append(inputBox);
+
+
+	if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null){
+		$("#fixedDistnVal").attr("min", PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]);
+	}
+
 	
 	var xmin = roundToSF(currentVal - currentVal*0.2, 1);
 	var xmax = roundToSF(currentVal + currentVal*0.2, 1);
@@ -402,11 +408,16 @@ function addUniformPrior(){
 	}
 	
 	
-	
+
 	var lowerLimitTextBox = "Lower: <input type='number' title='Select the lower limit for this parameter' id='uniformDistnLowerVal' value=" + lowerLimitVal + " style='vertical-align: middle; text-align:right; width: 70px' onChange=plotUniformDistrbutionCanvas()></input>";
 	var upperLimitTextBox = "Upper: <input type='number' title='Select the upper limit for this parameter' id='uniformDistnUpperVal' value=" + upperLimitVal + " style='vertical-align: middle; text-align:right; width: 70px' onChange=plotUniformDistrbutionCanvas()></input>";
 	
 	$("#parameterDistnCell").append(lowerLimitTextBox + "&nbsp;" + upperLimitTextBox);
+
+
+	if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null){
+		$("#uniformDistnLowerVal").attr("min", PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]);
+	}
 	
 	
 	
@@ -653,6 +664,12 @@ function addPoissonPrior(){
 		
 
 	$("#parameterDistnCell").append(rateTextBox);
+
+
+	if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null){
+		$("#poissonRateVal").attr("min", PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]);
+	}
+
 	
 	
 }
@@ -698,6 +715,11 @@ function addDiscreteUniformPrior(){
 	var upperLimitTextBox = "Upper: <input type='number' title='Select the upper limit for this parameter' id='uniformDistnUpperVal' value=" + upperLimitVal + " style='vertical-align: middle; text-align:right; width: 70px'></input>";
 	
 	$("#parameterDistnCell").append(lowerLimitTextBox + "&nbsp;" + upperLimitTextBox);
+
+
+	if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null){
+		$("#uniformDistnLowerVal").attr("min", PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]);
+	}
 
 }
 

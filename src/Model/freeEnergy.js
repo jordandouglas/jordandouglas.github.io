@@ -886,10 +886,9 @@ function getHybridString_WW(state){
 		if (Mbase == state["rightMBase"] && state["NTPbound"]) break;
 		
 		var GbaseGroup = WW_JS.getBaseInSequenceAtPosition_WW("g" + Gbase);
-		//TODO mut if ($("#g" + Gbase).attr("mut") != null) GbaseGroup = $("#g" + Gbase).attr("mut");
 		
 		var MbaseGroup = WW_JS.getBaseInSequenceAtPosition_WW("m" + Mbase)//; $('#m' + Mbase).attr("nt").substring(0,1);
-		//TODO mut if ($("#m" + Mbase).attr("mut") != null) MbaseGroup = $("#m" + Mbase).attr("mut");
+		if (GbaseGroup == null || MbaseGroup == null) continue; 
 
 
 		//console.log("GbaseGroup", GbaseGroup, "MbaseGroup", MbaseGroup, "Mbase", Mbase, state["NTPbound"], primerSequence);

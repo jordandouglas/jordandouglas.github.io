@@ -4202,7 +4202,7 @@ function customPlotSelectParameterTemplate(){
 	
 	return `
 
-		<legend><b>Parameter (x-axis)</b></legend>
+		<legend><b>Variable (x-axis)</b></legend>
 		<select class="dropdown" onChange="updateParameterPlotSettings()" title="What do you want to show on the x-axis?" id = "customParamX" style="vertical-align: middle; text-align:right;">
 			<option value="none">Select a parameter...</option>
 			<option value="velocity">Mean velocity (bp/s)</option>
@@ -4221,7 +4221,7 @@ function customPlotSelectPropertyTemplate(){
 	
 	return `
 
-		<legend><b>Metric (y-axis)</b></legend>
+		<legend><b>Variable (y-axis)</b></legend>
 		<select class="dropdown" onChange="updateParameterPlotSettings()" title="What do you want to show on the y-axis?" id = "customParamY" style="vertical-align: middle; text-align:right;">
 			<option value="probability">Probability</option>
 			<option value="velocity">Mean velocity (bp/s)</option>
@@ -4240,7 +4240,7 @@ function parameterHeatmapZAxisTemplate(){
 
 	return `
 
-		<legend><b>Metric (z-axis)</b></legend>
+		<legend><b>Variable (z-axis)</b></legend>
 		<select class="dropdown" onChange="updateParameterPlotSettings()" title="What do you want to show on the z-axis?" id = "customParamZ" style="vertical-align: middle; text-align:right;">
 			<option value="none">Select a parameter...</option>
 			<option value="velocity">Mean velocity (bp/s)</option>

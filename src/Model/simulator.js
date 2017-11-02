@@ -435,8 +435,13 @@ SIM_JS.sampleAction_WW = function(stateC){
 		kRelease = FE_JS.getReleaseRate(result["base"]); 
 		kcat = FE_JS.getCatalysisRate(result["base"])
 		var rateRelCat = kRelease + kcat;
-
 		var rateBindRelease = kBind * kRelease / rateRelCat;
+
+		if (isNaN(rateBindRelease)) rateBindRelease = 0;
+		if (isNaN(kRelease)) kRelease = 0;
+		if (isNaN(kBind)) kBind = 0;
+		if (isNaN(rateRelCat)) rateRelCat = 0;
+
 		var rate = kBck + kFwd + kRelease + kBind + kAct + kDeact;
 
 
@@ -512,6 +517,7 @@ SIM_JS.sampleAction_WW = function(stateC){
 			}
 		}
 
+		if (isNaN(kBindOrCat)) kBindOrCat = 0;
 
 		// If NTP is not bound and we are in posttranslocated state, and user has requested to assume binding equilibrium but NOT translocation
 		var justBindingEquilibrium =     FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeBindingEquilibrium"]
@@ -538,15 +544,19 @@ SIM_JS.sampleAction_WW = function(stateC){
 
 		// Assume equilbirium between bound and unbound states but NOT pre and post translocated states
 		if(justBindingEquilibrium){
-			
 
-			var KD_name = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] == 2 ? "Kdiss" : "Kdiss_" + sampledBaseToAdd["base"] + "TP";
-			var NTPconc_name = !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] ? "NTPconc" : sampledBaseToAdd["base"] + "TPconc";
-			var KD = PARAMS_JS.PHYSICAL_PARAMETERS[KD_name]["val"];
-			var NTPconc = PARAMS_JS.PHYSICAL_PARAMETERS[NTPconc_name]["val"];
-			var probabilityBound = (NTPconc/KD) / (NTPconc/KD + 1);
+
+			// Calculate probability of NTP being bound or unbound. If concentration is zero it will never bind
+			var probabilityBound = 0;
+			if (sampledBaseToAdd["base"] != null){
+				var KD_name = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] == 2 ? "Kdiss" : "Kdiss_" + sampledBaseToAdd["base"] + "TP";
+				var NTPconc_name = !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] ? "NTPconc" : sampledBaseToAdd["base"] + "TPconc";
+				var KD = PARAMS_JS.PHYSICAL_PARAMETERS[KD_name]["val"];
+				var NTPconc = PARAMS_JS.PHYSICAL_PARAMETERS[NTPconc_name]["val"];
+				probabilityBound = (NTPconc/KD) / (NTPconc/KD + 1);
+			}
+
 			var probabilityUnbound = 1 - probabilityBound;
-			
 			//console.log("Current base", sampledBaseToAdd["base"] , "KD = ", KD, "conc = ", NTPconc, "pbound = ", probabilityBound);
 
 
@@ -646,14 +656,18 @@ SIM_JS.sampleAction_WW = function(stateC){
 			// Get KD and [NTP]
 			if (stateC[0] + 1 < WW_JS.currentState["nbases"]){
 
+
 				var baseToTranscribe = WW_JS.getBaseInSequenceAtPosition_WW("g" + (1 + stateC[0]));
 				sampledBaseToAdd = WW_JS.sampleBaseToAdd(baseToTranscribe);
-				SIM_JS.SIMULATION_VARIABLES["baseToAdd"] = sampledBaseToAdd["base"];
-				var KD_name = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] == 2 ? "Kdiss" : "Kdiss_" + sampledBaseToAdd["base"] + "TP";
-				var NTPconc_name = !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] ? "NTPconc" : sampledBaseToAdd["base"] + "TPconc";
-				var KD = PARAMS_JS.PHYSICAL_PARAMETERS[KD_name]["val"];
-				var NTPconc = PARAMS_JS.PHYSICAL_PARAMETERS[NTPconc_name]["val"];
-				boltzmannGN = boltzmannG1 * NTPconc / KD;
+
+				if (sampledBaseToAdd["base"] != null){
+					SIM_JS.SIMULATION_VARIABLES["baseToAdd"] = sampledBaseToAdd["base"];
+					var KD_name = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] == 2 ? "Kdiss" : "Kdiss_" + sampledBaseToAdd["base"] + "TP";
+					var NTPconc_name = !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] ? "NTPconc" : sampledBaseToAdd["base"] + "TPconc";
+					var KD = PARAMS_JS.PHYSICAL_PARAMETERS[KD_name]["val"];
+					var NTPconc = PARAMS_JS.PHYSICAL_PARAMETERS[NTPconc_name]["val"];
+					boltzmannGN = boltzmannG1 * NTPconc / KD;
+				}
 
 			}
 
