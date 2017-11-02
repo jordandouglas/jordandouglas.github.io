@@ -541,10 +541,10 @@ function getABCntpVelocityCurveTemplate(fitID){
 
 
 					<textarea class="ABCinputData ntpVelocityInputData" id="ntpVelocityInputData_` + fitID + `" onChange="validateAllAbcDataInputs()" style="font-size:14px; padding: 5 10;  width: 200px; height: 200px; max-width:200px; max-height:500px; min-height:100px; min-width:200px"  
-					title="Input force-velocity data in the specified format" placeholder="Example.                                  1, 0.5                                 10, 12.8                                50, 19.6"></textarea>
+					title="Input NTP-velocity data in the specified format" placeholder="Example.                                  1, 0.5                                 10, 12.8                                50, 19.6"></textarea>
 					<br><br>
 					<span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
-						Input [NTP]/[NTP]<sub>eq</sub> ratios, and velocity (bp/s) observations. Separate concentratuon and velocity values with a comma and separate observations with a line break. 
+						Input [NTP]/[NTP]<sub>eq</sub> ratios, and velocity (bp/s) observations. Separate concentration and velocity values with a comma and separate observations with a line break. 
 						Ensure there are no duplicate concentrations.
 					</span>
 

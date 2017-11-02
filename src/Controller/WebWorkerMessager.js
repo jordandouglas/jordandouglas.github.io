@@ -2322,6 +2322,7 @@ function uploadABC_controller(TSVstring){
 			onABCStart();
 			get_unrendered_ABCoutput_controller();
 			validateAllAbcDataInputs();
+			drawPlots(true);
 
 
 		}else{
