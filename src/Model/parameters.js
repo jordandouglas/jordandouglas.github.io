@@ -44,7 +44,7 @@ PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"] = {distribution:"Fixed", fixedDistnVal:
 PARAMS_JS.PHYSICAL_PARAMETERS["arrestTime"] = {distribution:"Fixed", fixedDistnVal: 60, name: "Arrest timeout (s)", title: "Maximum pause duration before the simulation is arrested. Set to zero to prevent arrests.", zeroTruncated: "inclusive", integer: false};
 
 
-PARAMS_JS.PHYSICAL_PARAMETERS["kCat"] = {distribution:"Fixed", fixedDistnVal: 30, uniformDistnLowerVal: 0, uniformDistnUpperVal: 100, normalSdVal: 5, name: "Rate of catalysis (s\u207B\u00B9)", title: "Rate constant of catalysing bound NTP", zeroTruncated: "inclusive", integer: false, hidden:false};
+PARAMS_JS.PHYSICAL_PARAMETERS["kCat"] = {distribution:"Uniform", fixedDistnVal: 30, uniformDistnLowerVal: 0, uniformDistnUpperVal: 100, normalSdVal: 5, name: "Rate of catalysis (s\u207B\u00B9)", title: "Rate constant of catalysing bound NTP", zeroTruncated: "inclusive", integer: false, hidden:false};
 PARAMS_JS.PHYSICAL_PARAMETERS["kCat_ATP"] = {distribution:"Fixed", fixedDistnVal: 38, name: "Rate of catalysis for A (s\u207B\u00B9)", title: "Rate constant of catalysing bound ATP", zeroTruncated: "inclusive", integer: false, hidden:true};
 PARAMS_JS.PHYSICAL_PARAMETERS["kCat_CTP"] = {distribution:"Fixed", fixedDistnVal: 7, name: "Rate of catalysis for C (s\u207B\u00B9)", title: "Rate constant of catalysing bound CTP", zeroTruncated: "inclusive", integer: false, hidden:true};
 PARAMS_JS.PHYSICAL_PARAMETERS["kCat_GTP"] = {distribution:"Fixed", fixedDistnVal: 62, name: "Rate of catalysis for G (s\u207B\u00B9)", title: "Rate constant of catalysing bound GTP", zeroTruncated: "inclusive", integer: false, hidden:true};

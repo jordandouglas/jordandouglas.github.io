@@ -85,10 +85,8 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 
 		var logPrior = MCMC_JS.getLogPrior();
 		var logLikelihood = MCMC_JS.getLogLikelihood(fitNums);
-		var logPosterior = logLikelihood + logPrior;
 		ABC_JS.ABC_parameters_and_metrics_this_simulation.logPrior = logPrior;
 		ABC_JS.ABC_parameters_and_metrics_this_simulation.logLikelihood = logLikelihood;
-		ABC_JS.ABC_parameters_and_metrics_this_simulation.logPosterior = logPosterior;
 
 
 
@@ -164,14 +162,12 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 
 			// Calculate the log prior / likelihood of this state
 			var logLikelihood = MCMC_JS.getLogLikelihood(fitNums);
-			var logPosterior = logPrior + logLikelihood;
 			ABC_JS.ABC_parameters_and_metrics_this_simulation.logPrior = logPrior;
 			ABC_JS.ABC_parameters_and_metrics_this_simulation.logLikelihood = logLikelihood;
-			ABC_JS.ABC_parameters_and_metrics_this_simulation.logPosterior = logPosterior;
 
 
 			// Accept or reject the current state using Metropolis-Hastings formula. Accept the new state with probability min(1, alpha)
-			var alpha = Math.exp(logPosterior - MCMC_JS.MCMC_parameters_and_metrics_previous_simulation.logPosterior);
+			var alpha = -logLikelihood > ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold ? 0 : Math.exp(logPrior - MCMC_JS.MCMC_parameters_and_metrics_previous_simulation.logPrior);
 
 			// Accept
 			if (alpha >= 1 || RAND_JS.uniform(0, 1) < alpha){
@@ -216,7 +212,6 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"] = [];
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["logPrior"] = null;
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["logLikelihood"] = null;
-	ABC_JS.ABC_parameters_and_metrics_this_simulation["logPosterior"] = null;
 	ABC_JS.n_ABC_trials_left--;
 
 

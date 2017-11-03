@@ -83,7 +83,6 @@ ABC_JS.beginABC_WW = function(experimentalData, resolve = function() {}, msgID =
 
 		ABC_JS.ABC_parameters_and_metrics_this_simulation["logPrior"] = null;
 		ABC_JS.ABC_parameters_and_metrics_this_simulation["logLikelihood"] = null;
-		ABC_JS.ABC_parameters_and_metrics_this_simulation["logPosterior"] = null;
 
 	}
 
@@ -508,8 +507,7 @@ ABC_JS.initialise_ABCoutput_WW = function(fitNums){
 	else if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "MCMC"){
 
 		secondLine += (paddingString + "logPrior").slice(-paddingString.length);
-		secondLine += (paddingString + "-RSS").slice(-paddingString.length);
-		secondLine += (paddingString + "logPost").slice(-paddingString.length);
+		secondLine += (paddingString + "RSS").slice(-paddingString.length);
 
 	}
 
@@ -631,10 +629,8 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 		// Likelihood, prior and posterior
 		var prior = printVals ? WW_JS.roundToSF_WW(stateToLog["logPrior"], 3) : "-";
 		line += (paddingString + prior).slice(-paddingString.length);
-		var likelihood = printVals ? WW_JS.roundToSF_WW(stateToLog["logLikelihood"], 3) : "-";
+		var likelihood = printVals ? WW_JS.roundToSF_WW(-stateToLog["logLikelihood"], 3) : "-";
 		line += (paddingString + likelihood).slice(-paddingString.length);
-		var posterior = printVals ? WW_JS.roundToSF_WW(stateToLog["logPosterior"], 3) : "-";
-		line += (paddingString + posterior).slice(-paddingString.length);
 
 
 	} 

@@ -132,6 +132,8 @@ function getAbcDataObject(which = "ABC"){
 		abcDataObjectForModel.testsPerData = $("#MCMC_ntestsperdata").val();
 		abcDataObjectForModel.burnin = $("#MCMC_burnin").val();
 		abcDataObjectForModel.logEvery = $("#MCMC_logevery").val();
+		abcDataObjectForModel.RSSthreshold = $("#MCMC_RSSthreshold").val();
+		
 	}
 
 	abcDataObjectForModel["fits"] = {};

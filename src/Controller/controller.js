@@ -958,6 +958,7 @@ function saveSession(){
 			saveXML.writeAttributeString("ntrials", abcDataObjectForModel["ntrials"]);
 			saveXML.writeAttributeString("testsPerData", abcDataObjectForModel["testsPerData"]);
 			if (abcDataObjectForModel["inferenceMethod"] == "MCMC"){
+				saveXML.writeAttributeString("RSSthreshold", abcDataObjectForModel["MCMC_RSSthreshold"]);
 				saveXML.writeAttributeString("burnin", abcDataObjectForModel["burnin"]);
 				saveXML.writeAttributeString("logEvery", abcDataObjectForModel["logEvery"]);
 			}

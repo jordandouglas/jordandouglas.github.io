@@ -37,7 +37,7 @@ STATE_JS.initTranslocationRateCache = function(){
 	STATE_JS.TRANSLOCATION_RATES = STATE_JS.buildTranslocationRateTable();
 	STATE_JS.BACKTRACKING_RATES = STATE_JS.buildBacktrackRateTable();
 
-	console.log("resetting cache");
+	//console.log("resetting cache");
 	
 	//console.log("STATE_JS.TRANSLOCATION_RATES", STATE_JS.TRANSLOCATION_RATES);
 	//console.log("STATE_JS.BACKTRACKING_RATES", STATE_JS.BACKTRACKING_RATES);

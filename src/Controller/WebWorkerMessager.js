@@ -2377,7 +2377,7 @@ function beginABC_controller(abcDataObjectForModel){
 
 		hideStopButtonAndShow("simulate");
 		$("#beginABC_btn").val("Begin ABC");
-		$("#beginMCMC_btn").val("Begin ABC MCMC");
+		$("#beginMCMC_btn").val("Begin MCMC-ABC");
 		$(".beginABC_btn").attr("onclick", "beginABC()");
 		$("#ABCntrials").css("cursor", "");
 		$("#ABCntrials").css("background-color", "#663399");
