@@ -1,13 +1,32 @@
 ﻿
+/* 
+	--------------------------------------------------------------------
+	--------------------------------------------------------------------
+	This file is part of SimPol.
 
+    SimPol is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    SimPol is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with SimPol.  If not, see <http://www.gnu.org/licenses/>. 
+    --------------------------------------------------------------------
+    --------------------------------------------------------------------
+-*/
 
 
 
 function initABCpanel(){
 
-	$("#beginABC_btn").css("cursor", "auto");
-	$("#beginABC_btn").css("background-color", "#858280");
-	$("#beginABC_btn").attr("disabled", "disabled");
+	$(".beginABC_btn").css("cursor", "auto");
+	$(".beginABC_btn").css("background-color", "#858280");
+	$(".beginABC_btn").attr("disabled", "disabled");
 
 	$("#ABCPanelTable1").html("");
 	$("#ABCPanelTable2").html("");
@@ -25,11 +44,11 @@ function initABCpanel(){
 
 // Loads all the settings from the DOM and sends them through to the model so ABC can begin
 // Assumes that all force-velocity input textareas have already been validated
-function beginABC(){
+function beginABC(which = "ABC"){
 
 
 	// Load the force-velocity values
-	var abcDataObjectForModel = getAbcDataObject();
+	var abcDataObjectForModel = getAbcDataObject(which)
 
 	console.log("Sending object", abcDataObjectForModel);
 
@@ -45,20 +64,27 @@ function beginABC(){
 	beginABC_controller(abcDataObjectForModel);
 
 	// Update the DOM so that we can see that ABC is running
-	$("#beginABC_btn").val("Stop ABC");
-	$("#beginABC_btn").attr("onclick", "stop_controller()");
+	$(".beginABC_btn").val("Stop ABC");
+	$(".beginABC_btn").attr("onclick", "stop_controller()");
 	hideButtonAndShowStopButton("simulate");
 
 
-	// Disable the ntrials and nrulespertrial textboxes
+	// Disable the ntrials textboxes
 	$("#ABCntrials").css("cursor", "auto");
 	$("#ABCntrials").css("background-color", "#858280");
 	$("#ABCntrials").attr("disabled", "disabled");
 
-	$("#ABC_RSS").css("cursor", "auto");
-	$("#ABC_RSS").css("background-color", "#858280");
-	$("#ABC_RSS").attr("disabled", "disabled");
 
+	$("#MCMCntrials").css("cursor", "auto");
+	$("#MCMCntrials").css("background-color", "#858280");
+	$("#MCMCntrials").attr("disabled", "disabled");
+
+
+
+
+	//$("#ABC_RSS").css("cursor", "auto");
+	//$("#ABC_RSS").css("background-color", "#858280");
+	//$("#ABC_RSS").attr("disabled", "disabled");
 
 
 	onABCStart();
@@ -77,7 +103,7 @@ function onABCStart(){
 	$("#uploadABC").hide(50);
 	
 	$("#ABCacceptancePercentage_span").show(50);
-	$("#ABC_showRejectedParameters_span").show(50);
+	if (!$("#ABC_useMCMC").prop("checked")) $("#ABC_showRejectedParameters_span").show(50);
 	$("#ABCacceptancePercentage_val").html("0");
 	$("#ABCacceptance_span").show(50);
 	$("#nRowsToDisplayABC").show(50);
@@ -88,11 +114,26 @@ function onABCStart(){
 }
 
 
-function getAbcDataObject(){
+function getAbcDataObject(which = "ABC"){
 	
 	
 	var curveTables = $(".ABCcurveRow");
-	var abcDataObjectForModel = {ntrials: $("#ABCntrials").val(), testsPerData: $("#ABC_ntestsperdata").val()};
+	var abcDataObjectForModel = {};
+
+	if (which == "ABC"){
+		abcDataObjectForModel.inferenceMethod = "ABC";
+		abcDataObjectForModel.ntrials = $("#ABCntrials").val();
+		abcDataObjectForModel.testsPerData = $("#ABC_ntestsperdata").val();
+	}
+
+	else if (which == "MCMC"){
+		abcDataObjectForModel.inferenceMethod = "MCMC";
+		abcDataObjectForModel.ntrials = $("#MCMCntrials").val();
+		abcDataObjectForModel.testsPerData = $("#MCMC_ntestsperdata").val();
+		abcDataObjectForModel.burnin = $("#MCMC_burnin").val();
+		abcDataObjectForModel.logEvery = $("#MCMC_logevery").val();
+	}
+
 	abcDataObjectForModel["fits"] = {};
 	for (var fitNum = 0; fitNum <= curveTables.length; fitNum++){
 
@@ -147,6 +188,9 @@ function getAbcDataObject(){
 
 
 
+
+
+
 function validateAllAbcDataInputs(){
 
 	var textareas = $(".ABCinputData");
@@ -158,17 +202,17 @@ function validateAllAbcDataInputs(){
 
 	// If something is invalid then deactivate the start ABC button
 	if (!valid && !running_ABC){
-		$("#beginABC_btn").css("cursor", "auto");
-		$("#beginABC_btn").css("background-color", "#858280");
-		$("#beginABC_btn").attr("disabled", "disabled");
+		$(".beginABC_btn").css("cursor", "auto");
+		$(".beginABC_btn").css("background-color", "#858280");
+		$(".beginABC_btn").attr("disabled", "disabled");
 	}
 
 
 	// Else activate it
 	else{
-		$("#beginABC_btn").css("cursor", "pointer");
-		$("#beginABC_btn").css("background-color", "#663399");
-		$("#beginABC_btn").attr("disabled", false);
+		$(".beginABC_btn").css("cursor", "pointer");
+		$(".beginABC_btn").css("background-color", "#663399");
+		$(".beginABC_btn").attr("disabled", false);
 	}
 
 
@@ -324,9 +368,9 @@ function addNewCurveButtons(){
 
 
 	// Disable the Begin ABC button
-	$("#beginABC_btn").css("cursor", "auto");
-	$("#beginABC_btn").css("background-color", "#858280");
-	$("#beginABC_btn").attr("disabled", "disabled");
+	$(".beginABC_btn").css("cursor", "auto");
+	$(".beginABC_btn").css("background-color", "#858280");
+	$(".beginABC_btn").attr("disabled", "disabled");
 
 
 }
@@ -730,7 +774,10 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 
 
-			for (var postNum = 0; postNum < posterior.length; postNum++){
+			// If MCMC then account for the burn-in
+			var startingPosteriorNum = $("#ABC_useMCMC").prop("checked") ? Math.floor(parseFloat($("#MCMC_burnin").val()) / 100 * posterior.length) : 0;
+
+			for (var postNum = startingPosteriorNum; postNum < posterior.length; postNum++){
 
 
 				var posteriorVelocities = posterior[postNum]["velocity"]["vals"];
@@ -855,7 +902,7 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 
 
-function drawNtpVelocityCurveCanvas(fitID, forces = null, velocities = null){
+function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = null){
 
 
 	
@@ -873,17 +920,17 @@ function drawNtpVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 	getPosteriorDistribution_controller(function(result){
 
-
+		var abcDataObjectForModel = getAbcDataObject();
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-		if (forces != null && velocities != null){
+		if (concentrations != null && velocities != null){
 
 			var plotWidth = canvas.width - axisGap - margin;
 			var plotHeight = canvas.height - axisGap - margin;
 
 
 			var xmin = 0;
-			var xmax = roundToSF(maximumFromList(forces), 2, "ceil");
+			var xmax = roundToSF(maximumFromList(concentrations), 2, "ceil");
 			var ymin = 0;
 			var ymax = roundToSF(maximumFromList(velocities) * 1.3, 3, "ceil");
 
@@ -907,26 +954,48 @@ function drawNtpVelocityCurveCanvas(fitID, forces = null, velocities = null){
 			ctx.globalAlpha = 0.4;
 			ctx.strokeStyle = "#008CBA";
 			ctx.lineWidth = 2 * canvasSizeMultiplier;
-			for (var postNum = 0; postNum < posterior.length; postNum++){
+
+
+
+
+
+
+			// Find the starting and stopping index of these posterior velocities in the list
+			var fitIDs = [];
+			for (var fitID_temp in abcDataObjectForModel["fits"]) fitIDs.push(fitID_temp);
+			fitIDs.sort();
+			var startingObsNum = 0;
+			for (var fitNum = 0; fitNum < fitIDs.length; fitNum++){
+				if (fitIDs[fitNum] == fitID) break;
+				startingObsNum += abcDataObjectForModel["fits"][fitIDs[fitNum]]["vals"].length;
+			}
+
+
+			// If MCMC then account for the burn-in
+			var startingPosteriorNum = $("#ABC_useMCMC").prop("checked") ? Math.floor(parseFloat($("#MCMC_burnin").val()) / 100 * posterior.length) : 0;
+
+			for (var postNum = startingPosteriorNum; postNum < posterior.length; postNum++){
 
 
 				var posteriorVelocities = posterior[postNum]["velocity"]["vals"];
 
 				ctx.beginPath();
-				var xPrime = widthScale * (forces[0] - xmin) + axisGap;
-				var yPrime = plotHeight + margin - heightScale * (posteriorVelocities[0] - ymin);
+				var xPrime = widthScale * (concentrations[0] - xmin) + axisGap;
+				var yPrime = plotHeight + margin - heightScale * (posteriorVelocities[startingObsNum] - ymin);
 				ctx.moveTo(xPrime, yPrime);
 
 
-				for (var forceNum = 1; forceNum < forces.length; forceNum++ ){
-					var xPrime = widthScale * (forces[forceNum] - xmin) + axisGap;
-					var yPrime = plotHeight + margin - heightScale * (posteriorVelocities[forceNum] - ymin);
+				for (var concNum = 1; concNum < concentrations.length; concNum++ ){
+					var index = startingObsNum + concNum;
+					var xPrime = widthScale * (concentrations[concNum] - xmin) + axisGap;
+					var yPrime = plotHeight + margin - heightScale * (posteriorVelocities[index] - ymin);
 
 					ctx.lineTo(xPrime, yPrime);
 				}
 
 
 				ctx.stroke();
+
 
 
 			}
@@ -936,9 +1005,9 @@ function drawNtpVelocityCurveCanvas(fitID, forces = null, velocities = null){
 			// Add the force-velocity values to the plot
 			ctx.globalAlpha = 1;
 			ctx.strokeStyle = "black";
-			for (var obsNum = 0; obsNum < forces.length; obsNum++){
+			for (var obsNum = 0; obsNum < concentrations.length; obsNum++){
 					
-				var xPrime = widthScale * (forces[obsNum] - xmin) + axisGap;
+				var xPrime = widthScale * (concentrations[obsNum] - xmin) + axisGap;
 				var yPrime = plotHeight + margin - heightScale * (velocities[obsNum] - ymin);
 
 
@@ -1137,7 +1206,7 @@ function addNewABCRows(lines){
 		else{
 
 			// Replace all the & with a space
-			rejected = rejected || lines[i].split("|")[1].trim() == "false";
+			if (lines[i].split("|").length > 1) rejected = rejected || lines[i].split("|")[1].trim() == "false";
 			var paddedLine = "<div linenum='" + ABClines.length + "' onclick='highlightABCoutputRow(this)'>";
 			
 
@@ -1258,5 +1327,22 @@ function toggleAcceptedOrRejected(){
 	get_unrendered_ABCoutput_controller(function(){
 		renderABCoutput();
 	});
+
+}
+
+
+function toggleMCMC(){
+
+
+
+	if ($("#ABC_useMCMC").prop("checked")){
+		$("#ABC_settings").hide(0);
+		$("#MCMC_settings").show(100);
+
+	}else{
+		$("#ABC_settings").show(100);
+		$("#MCMC_settings").hide(0);
+	}
+
 
 }

@@ -2367,15 +2367,17 @@ function beginABC_controller(abcDataObjectForModel){
 	running_ABC = true;
 	var updateDOM = function(){
 
+
 		hideStopButtonAndShow("simulate");
 		$("#beginABC_btn").val("Begin ABC");
-		$("#beginABC_btn").attr("onclick", "beginABC()");
+		$("#beginMCMC_btn").val("Begin ABC MCMC");
+		$(".beginABC_btn").attr("onclick", "beginABC()");
 		$("#ABCntrials").css("cursor", "");
 		$("#ABCntrials").css("background-color", "#663399");
 		$("#ABCntrials").attr("disabled", false);
-		$("#ABC_RSS").css("cursor", "");
-		$("#ABC_RSS").css("background-color", "#663399");
-		$("#ABC_RSS").attr("disabled", false);
+		$("#MCMCntrials").css("cursor", "");
+		$("#MCMCntrials").css("background-color", "#663399");
+		$("#MCMCntrials").attr("disabled", false);
 		$("#PreExp").attr("disabled", false);
 		$("#PreExp").css("cursor", "");
 		$("#PreExp").css("background-color", "#008CBA");
@@ -2436,7 +2438,10 @@ function get_unrendered_ABCoutput_controller(resolve = function() { }){
 
 			// Update the counter
 			var nTrialsToGo = result["nTrialsToGo"];
-			if (nTrialsToGo != parseFloat($("#ABCntrials").val())) $("#ABCntrials").val(nTrialsToGo);
+			if (nTrialsToGo != parseFloat($("#ABCntrials").val())) {
+				$("#ABCntrials").val(nTrialsToGo);
+				$("#MCMCntrials").val(nTrialsToGo);
+			}
 
 
 			// Update the numbers of accepted values

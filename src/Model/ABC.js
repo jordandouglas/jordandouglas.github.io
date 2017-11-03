@@ -1,4 +1,23 @@
-﻿
+﻿/* 
+	--------------------------------------------------------------------
+	--------------------------------------------------------------------
+	This file is part of SimPol.
+
+    SimPol is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    SimPol is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with SimPol.  If not, see <http://www.gnu.org/licenses/>. 
+    --------------------------------------------------------------------
+    --------------------------------------------------------------------
+-*/
 
 ABC_JS = {};
 
@@ -50,12 +69,25 @@ ABC_JS.beginABC_WW = function(experimentalData, resolve = function() {}, msgID =
 
 	// Initialise the list of parameters/metrics which will be added to the posterior distribution if accepted
 	ABC_JS.ABC_parameters_and_metrics_this_simulation = {};
-	for (var fitNum in fitNums) {
-		ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitNums[fitNum]] = null;
-		ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitNums[fitNum]] = null;
+	if (experimentalData.inferenceMethod == "ABC"){
+		for (var fitNum in fitNums) {
+			ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitNums[fitNum]] = null;
+			ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitNums[fitNum]] = null;
+		}
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"] = null;
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"] = null;
 	}
-	ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"] = null;
-	ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"] = null;
+
+
+	else if (experimentalData.inferenceMethod == "MCMC") {
+
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["logPrior"] = null;
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["logLikelihood"] = null;
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["logPosterior"] = null;
+
+	}
+
+
 	for (var paramID in PARAMS_JS.PHYSICAL_PARAMETERS){
 		if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["binary"] && !PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["hidden"]) {
 
@@ -98,12 +130,17 @@ ABC_JS.beginABC_WW = function(experimentalData, resolve = function() {}, msgID =
 
 
 
-	
-	// Start the first trial
-	ABC_JS.ABC_trials_WW(fitNums, resolve, msgID);
+
+	// Divert to the MCMC page if the MCMC option has been selected
+	if (experimentalData.inferenceMethod == "MCMC"){
+		MCMC_JS.beginMCMC(fitNums, resolve, msgID);
+	}
 
 
-
+	// Start the first ABC trial (not MCMC)
+	else if (experimentalData.inferenceMethod == "ABC"){
+		ABC_JS.ABC_trials_WW(fitNums, resolve, msgID);
+	}
 
 
 
@@ -121,6 +158,8 @@ ABC_JS.clearABCdata_WW = function(){
 	ABC_JS.ABC_outputString_unrendered = [];
 	ABC_JS.n_ABC_trials_left = null;
 	ABC_JS.nAcceptedValues = 0;
+
+	MCMC_JS.clearMCMCdata_WW();
 
 
 }
@@ -155,7 +194,6 @@ ABC_JS.ABC_trials_WW = function(fitNums, resolve = function() {}, msgID = null){
 		}else{
 			resolve();
 		}
-
 		return;
 	}
 
@@ -173,17 +211,6 @@ ABC_JS.ABC_trials_WW = function(fitNums, resolve = function() {}, msgID = null){
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["NTPeq"]["vals"] = []; 
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"] = [];
 
-
-	/*
-	// Show the start and stop positions of each fit. Their values will all be pooled together
-	ABC_JS.ABC_parameters_and_metrics_this_simulation["fitStartStopIndices"] = {};
-	var previousForceIndex = 0;
-	for (var currentFitNum = 0; currentFitNum < fitNums.length; currentFitNum++){
-		var fitID = fitNums[currentFitNum];
-		ABC_JS.ABC_parameters_and_metrics_this_simulation["forceVelocityIndices"][fitID] = [previousForceIndex, previousForceIndex + ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitNums[currentFitNum]]["vals"].length-1];
-		previousForceIndex += ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitNums[currentFitNum]]["vals"].length;
-	}
-	*/
 
 
 	// Sample all the parameters now. There will be no more random sampling between simulation trials, only in between ABC trials
@@ -252,32 +279,36 @@ ABC_JS.ABC_trial_for_curve_WW = function(currentFitNum, accepted, fitNums, resol
 	var toDoAfterTrials = function(){
 
 
-		// What force-velocity index are we upto
-		var force_velocity_num = -1;
-		for (var fitNumPrev = 0; fitNumPrev < currentFitNum; fitNumPrev++){
-			force_velocity_num += ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitNums[fitNumPrev]]["vals"].length;
+		// If regular ABC (not MCMC) then reject now if the RSS is too high
+		if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "ABC"){
+
+
+			// What force-velocity index are we upto
+			var force_velocity_num = -1;
+			for (var fitNumPrev = 0; fitNumPrev < currentFitNum; fitNumPrev++){
+				force_velocity_num += ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitNums[fitNumPrev]]["vals"].length;
+			}
+
+
+			// Calculate the mean RSS
+			var meanRSS = 0;
+			var fitID = fitNums[currentFitNum];
+			for (var observationNum = 0; observationNum < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].length; observationNum++){
+
+				force_velocity_num++;
+				var observedVelocity = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum]["velocity"];
+				var simulatedVelocity = ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][force_velocity_num];
+				var residualSquared =  Math.pow(observedVelocity - simulatedVelocity, 2);
+				meanRSS += residualSquared / ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].length;
+
+			}
+
+			ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitID] = meanRSS;
+			ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitID] = meanRSS < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["RSSthreshold"];
+			accepted = accepted && meanRSS < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["RSSthreshold"];
+
 		}
 
-
-		// Calculate the mean RSS
-		var meanRSS = 0;
-		var fitID = fitNums[currentFitNum];
-		for (var observationNum = 0; observationNum < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].length; observationNum++){
-
-
-			force_velocity_num++;
-			var observedVelocity = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum]["velocity"];
-			var simulatedVelocity = ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][force_velocity_num];
-			var residualSquared =  Math.pow(observedVelocity - simulatedVelocity, 2);
-
-
-			meanRSS += residualSquared / ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].length;
-
-		}
-
-		ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitID] = meanRSS;
-		ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitID] = meanRSS < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["RSSthreshold"];
-		accepted = accepted && meanRSS < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["RSSthreshold"];
 
 		ABC_JS.ABC_trial_for_curve_WW(currentFitNum + 1, accepted, fitNums, resolve);
 	}
@@ -460,12 +491,27 @@ ABC_JS.initialise_ABCoutput_WW = function(fitNums){
 
 		}
 
-		passNumber ++;
-		secondLine += (paddingString + "MeanRSS" + passNumber).slice(-paddingString.length);
-		secondLine += (paddingString + "Passed" + passNumber).slice(-paddingString.length);
+
+		if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "ABC"){
+			passNumber ++;
+			secondLine += (paddingString + "MeanRSS" + passNumber).slice(-paddingString.length);
+			secondLine += (paddingString + "Passed" + passNumber).slice(-paddingString.length);
+		}
+
+
 	}
 
-	secondLine += (paddingString + "|Accepted|").slice(-12) + "&&&"; // Add the | to denote that this should be in coloured font
+	if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "ABC"){
+		secondLine += (paddingString + "|Accepted|").slice(-12) + "&&&"; // Add the | to denote that this should be in coloured font
+	}
+
+	else if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "MCMC"){
+
+		secondLine += (paddingString + "logPrior").slice(-paddingString.length);
+		secondLine += (paddingString + "-RSS").slice(-paddingString.length);
+		secondLine += (paddingString + "logPost").slice(-paddingString.length);
+
+	}
 
 
 	// If running from the command line and is the first worker then print the first line to the console
@@ -497,16 +543,20 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 
 	var paddingString = "&&&&&&&&&&&"; 
 
+	// In ABC we log the current state, in MCMC we log the previous state
+	var stateToLog = ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "MCMC" ? MCMC_JS.MCMC_parameters_and_metrics_previous_simulation : ABC_JS.ABC_parameters_and_metrics_this_simulation;
+
+
 	// Add the trial number
 	var workerNum = RUNNING_FROM_COMMAND_LINE && WW_JS.WORKER_ID != null ? WW_JS.WORKER_ID + ":" : "";// Print the worker number if multithreading from the command line
-	var trialNum = 	ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
+	var trialNum = 	ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"]; //ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
 	var line = (paddingString + workerNum + trialNum).slice(-9);
 
 
 	// All the prior-sampled parameters
-	for (var objID in ABC_JS.ABC_parameters_and_metrics_this_simulation){
-		if (ABC_JS.ABC_parameters_and_metrics_this_simulation[objID] != null && ABC_JS.ABC_parameters_and_metrics_this_simulation[objID]["priorVal"] !== undefined){
-			var val = WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation[objID]["priorVal"], 3);
+	for (var objID in stateToLog){
+		if (stateToLog[objID] != null && stateToLog[objID]["priorVal"] !== undefined){
+			var val = WW_JS.roundToSF_WW(stateToLog[objID]["priorVal"], 4);
 			line += (paddingString + val).slice(-paddingString.length);
 		}
 	}
@@ -530,10 +580,10 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 		for (var obsNum = 0; obsNum < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].length; obsNum++){
 
 			var X_axis_value = "-";
-			if (printVals && dataType == "forceVelocity") X_axis_value = WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"][forceNumber]);
-			else if(printVals && dataType == "ntpVelocity") X_axis_value = WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["NTPeq"]["vals"][concentrationNumber]);
+			if (printVals && dataType == "forceVelocity") X_axis_value = WW_JS.roundToSF_WW(stateToLog["FAssist"]["vals"][forceNumber]);
+			else if(printVals && dataType == "ntpVelocity") X_axis_value = WW_JS.roundToSF_WW(stateToLog["NTPeq"]["vals"][concentrationNumber]);
 
-			var velocity = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][experimentalSettingNumber], 3) : "-";
+			var velocity = printVals ? WW_JS.roundToSF_WW(stateToLog["velocity"]["vals"][experimentalSettingNumber], 3) : "-";
 
 
 			if (isNaN(X_axis_value) || isNaN(velocity)){
@@ -552,28 +602,48 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 
 		}
 
-		// RSS
-		var RSS = printVals ? WW_JS.roundToSF_WW(ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitID], 3) : "-";
-		line += (paddingString + RSS).slice(-paddingString.length);
+		if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "ABC"){
+
+			// RSS
+			var RSS = printVals ? WW_JS.roundToSF_WW(stateToLog["meanRSS" + fitID], 3) : "-";
+			line += (paddingString + RSS).slice(-paddingString.length);
 
 
-		// Pass or fail
-		var passed = printVals ? ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitID] : "-";
-		line += (paddingString + passed).slice(-paddingString.length);
+			// Pass or fail
+			var passed = printVals ? stateToLog["Passed" + fitID] : "-";
+			line += (paddingString + passed).slice(-paddingString.length);
+		}
 
-		if (!passed) printVals = false;
+
+
+		if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "ABC" && !passed) printVals = false;
 
 	}
 
-	// Accepted into posterior?
-	line += (paddingString + "|" + ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"] + "|").slice(-12); // Add the | to denote that this should be in coloured font
 
+	// Accepted into posterior?
+	if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "ABC"){
+		line += (paddingString + "|" + stateToLog["accepted"] + "|").slice(-12); // Add the | to denote that this should be in coloured font
+	}
+
+	else if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "MCMC"){
+
+		// Likelihood, prior and posterior
+		var prior = printVals ? WW_JS.roundToSF_WW(stateToLog["logPrior"], 3) : "-";
+		line += (paddingString + prior).slice(-paddingString.length);
+		var likelihood = printVals ? WW_JS.roundToSF_WW(stateToLog["logLikelihood"], 3) : "-";
+		line += (paddingString + likelihood).slice(-paddingString.length);
+		var posterior = printVals ? WW_JS.roundToSF_WW(stateToLog["logPosterior"], 3) : "-";
+		line += (paddingString + posterior).slice(-paddingString.length);
+
+
+	} 
 
 	// If running from the command line then print it to the console
 	if (RUNNING_FROM_COMMAND_LINE){
 
 		// Only log if it was accepted into posterior
-		if(XML_JS.showRejectedParameters || ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"]) ABC_JS.savePosteriorToFiles_CommandLine(line);
+		if(XML_JS.showRejectedParameters || stateToLog["accepted"]) ABC_JS.savePosteriorToFiles_CommandLine(line);
 
 	}
 

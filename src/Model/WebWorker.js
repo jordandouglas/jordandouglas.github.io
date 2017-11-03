@@ -41,6 +41,7 @@ WW_JS.init_WW = function(isWW = false){
 		self.importScripts('plots.js');
 		self.importScripts('freeEnergy.js');
 		self.importScripts('ABC.js');
+		self.importScripts('MCMC.js');
 		self.importScripts('MFE.js');
 		self.importScripts('stateEncoding.js');
 		self.importScripts('XMLparser.js');
@@ -61,6 +62,7 @@ WW_JS.init_WW = function(isWW = false){
 		PLOTS_JS = require('./plots.js');
 		FE_JS = require('./freeEnergy.js');
 		ABC_JS = require('./ABC.js');
+		MCMC_JS = require('./MCMC.js');
 		MFE_JS = require('./MFE.js');
 		STATE_JS = require('./stateEncoding.js');
 		XML_JS = require('./XMLparser.js');
