@@ -37,7 +37,7 @@ STATE_JS.initTranslocationRateCache = function(){
 	STATE_JS.TRANSLOCATION_RATES = STATE_JS.buildTranslocationRateTable();
 	STATE_JS.BACKTRACKING_RATES = STATE_JS.buildBacktrackRateTable();
 
-	
+	console.log("resetting cache");
 	
 	//console.log("STATE_JS.TRANSLOCATION_RATES", STATE_JS.TRANSLOCATION_RATES);
 	//console.log("STATE_JS.BACKTRACKING_RATES", STATE_JS.BACKTRACKING_RATES);
@@ -197,6 +197,7 @@ STATE_JS.getTranslocationRates = function(compactState){
 		var rates = STATE_JS.TRANSLOCATION_RATES[rowNum][colNum];
 		var GDagRateModifier = Math.exp(-PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"]);
 		var forceGradient = Math.exp((-PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * 3.4e-10) / (2 * 1.380649e-23 * 310));
+		var DGPostModifier = compactState[1] == 1 ? Math.exp(-PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val) : 1;
 
 		var hypertranslocationGradientForward = 1; // Modify the rate of hypertranslocating forwards
 		var hypertranslocationGradientBackwards = 1; // Modify the rate of translocating backwards when in a hypertranslocated state
@@ -207,7 +208,7 @@ STATE_JS.getTranslocationRates = function(compactState){
 
 
 		if (rates != false) {
-			return [rates[0] * GDagRateModifier * hypertranslocationGradientBackwards * forceGradient, rates[1] * GDagRateModifier * hypertranslocationGradientForward / forceGradient];
+			return [rates[0] * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradient, rates[1] * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward / forceGradient];
 		}
 
 		
@@ -230,11 +231,14 @@ STATE_JS.getTranslocationRates = function(compactState){
 		var kfwd = 0;
 		if (slidingPeakHeights[2] != maxHeight) kbck = Math.exp(-(slidingPeakHeights[2] - slidingTroughHeights[3])) * 1e6;
 		if (slidingPeakHeights[3] != maxHeight)	kfwd = Math.exp(-(slidingPeakHeights[3] - slidingTroughHeights[3])) * 1e6;
-
+		
 
 		STATE_JS.TRANSLOCATION_RATES[rowNum][colNum] = [kbck, kfwd];
+		
+	
+		
 
-		return [kbck * GDagRateModifier * hypertranslocationGradientBackwards * forceGradient, kfwd * GDagRateModifier * hypertranslocationGradientForward / forceGradient];
+		return [kbck * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradient, kfwd * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward / forceGradient];
 		
 		
 		

@@ -459,7 +459,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 
 	// Bonus free energy for being in the posttranslocated state
-	if (stateToCalculateFor["mRNAPosInActiveSite"] == 1) slidingTroughHeightsTemp[3] += PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val;
+	if (addParamsToTroughs && stateToCalculateFor["mRNAPosInActiveSite"] == 1) slidingTroughHeightsTemp[3] += PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val;
 
 
 
@@ -501,7 +501,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 
 				// Bonus free energy for being in the posttranslocated state
-				if (state["mRNAPosInActiveSite"] == 1) slidingTroughHeightsTemp[pos] += PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val;
+				if (addParamsToTroughs && state["mRNAPosInActiveSite"] == 1) slidingTroughHeightsTemp[pos] += PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val;
 
 
 
@@ -533,7 +533,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 
 				// Bonus free energy for being in the posttranslocated state
-				if (state["mRNAPosInActiveSite"] == 1) slidingTroughHeightsTemp[pos] += PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val;
+				if (addParamsToTroughs && state["mRNAPosInActiveSite"] == 1) slidingTroughHeightsTemp[pos] += PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val;
 
 
 		}
