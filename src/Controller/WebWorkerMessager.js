@@ -2074,8 +2074,15 @@ function loadSession_controller(XMLData){
 			initABCpanel();
 
 			console.log("experimentalData", experimentalData);
-			if(experimentalData["ntrials"] != null) $("#ABCntrials").val(experimentalData["ntrials"]);
-			if(experimentalData["RSSthreshold"] != null) $("#ABC_ntestsperdata").val(experimentalData["testsPerData"]);
+			if (experimentalData["ntrials"] != null) {
+				if (experimentalData["inferenceMethod"] == "ABC") $("#ABCntrials").val(experimentalData["ntrials"]);
+				else if (experimentalData["inferenceMethod"] == "MCMC") $("#MCMCntrials").val(experimentalData["ntrials"]);
+			}
+			if (experimentalData["testsPerData"] != null) $("#ABC_ntestsperdata").val(experimentalData["testsPerData"]);
+			if (experimentalData["burnin"] != null) $("#MCMC_burnin").val(experimentalData["burnin"]);
+			if (experimentalData["logEvery"] != null) $("#MCMC_logevery").val(experimentalData["logEvery"]);
+			$("#ABC_useMCMC").prop("checked", experimentalData["inferenceMethod"] == "MCMC");
+			toggleMCMC();
 
 
 			for (var fitID in experimentalData["fits"]){
@@ -2432,16 +2439,16 @@ function get_unrendered_ABCoutput_controller(resolve = function() { }){
 	// Update the ABC output 
 	var updateDOM = function(result){
 
-		if (result != null) {
+		// Update the counter
+		var nTrialsToGo = result["nTrialsToGo"];
+		if (nTrialsToGo != parseFloat($("#ABCntrials").val())) {
+			$("#ABCntrials").val(nTrialsToGo);
+			$("#MCMCntrials").val(nTrialsToGo);
+		}
 
 
 
-			// Update the counter
-			var nTrialsToGo = result["nTrialsToGo"];
-			if (nTrialsToGo != parseFloat($("#ABCntrials").val())) {
-				$("#ABCntrials").val(nTrialsToGo);
-				$("#MCMCntrials").val(nTrialsToGo);
-			}
+		if (result["newLines"] != null) {
 
 
 			// Update the numbers of accepted values

@@ -952,9 +952,16 @@ function saveSession(){
 		// ABC settings
 		saveXML.writeStartElement('ABC');
 
-			var abcDataObjectForModel = getAbcDataObject();
+			var abcDataObjectForModel = getAbcDataObject($("#ABC_useMCMC").prop("checked") ? "MCMC" : "ABC");
+			
+			saveXML.writeAttributeString("inferenceMethod", abcDataObjectForModel["inferenceMethod"]);
 			saveXML.writeAttributeString("ntrials", abcDataObjectForModel["ntrials"]);
 			saveXML.writeAttributeString("testsPerData", abcDataObjectForModel["testsPerData"]);
+			if (abcDataObjectForModel["inferenceMethod"] == "MCMC"){
+				saveXML.writeAttributeString("burnin", abcDataObjectForModel["burnin"]);
+				saveXML.writeAttributeString("logEvery", abcDataObjectForModel["logEvery"]);
+			}
+
 			saveXML.writeAttributeString("showRejectedParameters", $("#ABC_showRejectedParameters").is(":checked").length = 0 ? false : $("#ABC_showRejectedParameters").is(":checked"));
 
 

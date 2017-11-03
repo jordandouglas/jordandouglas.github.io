@@ -157,9 +157,15 @@ function parseXML_sequence_WW(sequenceNode){
 function parseXML_ABCmain_WW(ABCnode){
 
 	XML_JS.ABC_EXPERIMENTAL_DATA = {};
+	XML_JS.ABC_EXPERIMENTAL_DATA["inferenceMethod"] = ABCnode["inferenceMethod"];
 	XML_JS.ABC_EXPERIMENTAL_DATA["ntrials"] = ABCnode["ntrials"];
 	XML_JS.ABC_EXPERIMENTAL_DATA["testsPerData"] = ABCnode["testsPerData"];
 	XML_JS.showRejectedParameters = ABCnode["showRejectedParameters"] == null ? false : ABCnode["showRejectedParameters"] == "true";
+	if (XML_JS.ABC_EXPERIMENTAL_DATA["inferenceMethod"] == "MCMC"){
+		XML_JS.ABC_EXPERIMENTAL_DATA["burnin"] = ABCnode["burnin"];
+		XML_JS.ABC_EXPERIMENTAL_DATA["logEvery"] = ABCnode["logEvery"];
+	}
+
 	XML_JS.ABC_EXPERIMENTAL_DATA["fits"] = {};
 
 }

@@ -661,11 +661,11 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 
 
 // Returns any new lines of the ABC output
-ABC_JS.get_unrendered_ABCoutput_WW = function(resolve = function() {}, msgID= null){
+ABC_JS.get_unrendered_ABCoutput_WW = function(resolve = function() {}, msgID = null){
 
 
 
-	var toReturn = null;
+	var toReturn = {nTrialsToGo: ABC_JS.n_ABC_trials_left};
 	if (ABC_JS.ABC_outputString_unrendered.length > 0){
 		var acceptanceNumber = ABC_JS.nAcceptedValues;
 		var acceptancePercentage = ABC_JS.ABC_EXPERIMENTAL_DATA == null ? null : (100 * ABC_JS.nAcceptedValues / (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left));
