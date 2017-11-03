@@ -2965,11 +2965,11 @@ function closeNav() {
 
 						<br><br>
 
-							ABC
-							<label class="switch" title="Perform standard ABC search or ABC with MCMC? For more information please read the Parameter Inference section at www.polymerase.nz/about">
+							Rejection ABC
+							<label class="switch" title="Perform rejection-ABC or MCMC-ABC? For more information please read the Parameter Inference section at www.polymerase.nz/about">
 						 		<input type="checkbox" id="ABC_useMCMC" OnChange="toggleMCMC()"> </input>
 						 	 	<span class="slider round notboolean"></span>
-							</label> ABC-MCMC
+							</label> MCMC-ABC
 
 						<br><br>
 
@@ -3010,25 +3010,31 @@ function closeNav() {
 
 
 								Number of trials per data point:
-								<input type="number" id="MCMC_ntestsperdata" min=1 value=5 title="Number of tests to perform at each force/NTP setting. The median velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
+								<input type="number" id="MCMC_ntestsperdata" min=1 value=5 title="Number of tests to perform at each force/NTP setting. The median velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 40px;  font-size:14px; background-color:#663399">
 
 								&nbsp;&nbsp;&nbsp;&nbsp;
 
+								
+								Mean RSS threshold:
+								<input type="number" id="MCMC_RSSthreshold" min=0 value=3 title="Mean-RSS threshold which must be met to accept a point into the posterior" class="variable" style="vertical-align: middle; text-align:left; width: 40px;  font-size:14px; background-color:#663399">
+
+								&nbsp;&nbsp;&nbsp;&nbsp;
+								
 
 								Burn-in percentage:
-								<input type="number" id="MCMC_burnin" onChange="validateAllAbcDataInputs()" min=0 max=100 value=10 title="Percentage of points to throw away before reaching the posterior distribution" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">%
+								<input type="number" id="MCMC_burnin" onChange="validateAllAbcDataInputs()" min=0 max=100 value=10 title="Percentage of points to throw away before reaching the posterior distribution" class="variable" style="vertical-align: middle; text-align:left; width: 40px;  font-size:14px; background-color:#663399">%
 
 								&nbsp;&nbsp;&nbsp;&nbsp;
 
 
 								Log every:
-								<input type="number" id="MCMC_logevery" min=1 value=20 title="How often do you want to log the current position" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">states
+								<input type="number" id="MCMC_logevery" min=1 value=20 title="How often do you want to log the current position" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">states
 
 								&nbsp;&nbsp;&nbsp;&nbsp;
 
 
 
-								<input type=button id="beginMCMC_btn" onClick='beginABC("MCMC")' value='Begin ABC MCMC' title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="operation beginABC_btn" style="background-color:#663399; width: 150px"> 
+								<input type=button id="beginMCMC_btn" onClick='beginABC("MCMC")' value='Begin MCMC-ABC' title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="operation beginABC_btn" style="background-color:#663399; width: 150px"> 
 								
 			
 							
