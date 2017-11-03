@@ -1405,7 +1405,7 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 				if (workerID <= remainingNumberOfTrials) nIterationsThisWorker++;
 
 				XML_JS.ABC_EXPERIMENTAL_DATA["ntrials"] = nIterationsThisWorker;
-				console.log("Running", nIterationsThisWorker, "ABC iterations on worker", workerID);
+				console.log("Running", nIterationsThisWorker, XML_JS.ABC_EXPERIMENTAL_DATA["inferenceMethod"], "iterations on worker", workerID);
 			}
 
 			else console.log("Running", XML_JS.ABC_EXPERIMENTAL_DATA["ntrials"], "ABC iterations");

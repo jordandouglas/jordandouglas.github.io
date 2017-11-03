@@ -642,8 +642,8 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 	// If running from the command line then print it to the console
 	if (RUNNING_FROM_COMMAND_LINE){
 
-		// Only log if it was accepted into posterior
-		if(XML_JS.showRejectedParameters || stateToLog["accepted"]) ABC_JS.savePosteriorToFiles_CommandLine(line);
+		// Only log if it was accepted into posterior or if running MCMC
+		if(XML_JS.showRejectedParameters || stateToLog["accepted"] || ABC_JS.ABC_EXPERIMENTAL_DATA["inferenceMethod"] == "MCMC") ABC_JS.savePosteriorToFiles_CommandLine(line);
 
 	}
 

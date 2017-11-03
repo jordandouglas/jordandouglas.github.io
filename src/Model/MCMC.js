@@ -63,7 +63,6 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 
 	}
 
-	console.log("Priors:", MCMC_JS.parametersWithPriors);
 
 
 	if (MCMC_JS.parametersWithPriors.length == 0){
@@ -77,8 +76,6 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 
 	var toDoAfterFirstSimulation = function(){
 
-
-		console.log("toDoAfterFirstSimulation");
 
 		if (WW_JS.stopRunning_WW){
 			exitMCMC();
@@ -95,7 +92,6 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 
 
 
-		console.log("logPrior", logPrior, logLikelihood);
 
 		// Copy this current state and save it as the previous state
 		MCMC_JS.MCMC_parameters_and_metrics_previous_simulation = JSON.parse(JSON.stringify(ABC_JS.ABC_parameters_and_metrics_this_simulation));
@@ -143,13 +139,22 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 	//console.log("Performing MCMC trial", ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1);
 
 	if (ABC_JS.n_ABC_trials_left == 0 || WW_JS.stopRunning_WW){
-
 		console.log("Stopping MCMC");
 		resolve();
-
 		return;
-
 	}
+
+
+		// Print out every 20th simulation when calling from command line
+ 	if (RUNNING_FROM_COMMAND_LINE && (ABC_JS.n_ABC_trials_left == 1 || ABC_JS.n_ABC_trials_left == ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] || (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1) % 100 == 0)){
+
+ 		var workerString = WW_JS.WORKER_ID == null ? "" : "Worker " + WW_JS.WORKER_ID + " | ";
+ 		var acceptanceNumber = ABC_JS.nAcceptedValues;
+		var acceptancePercentage = WW_JS.roundToSF_WW(100 * ABC_JS.nAcceptedValues / (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left));
+		if (isNaN(acceptancePercentage)) acceptancePercentage = 0;
+ 		console.log(workerString + "MCMC", (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1) + "/" + ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"], "| Accepted:", acceptanceNumber, "| Acceptance rate:", acceptancePercentage + "%");
+ 	}
+
 
 	var toDoAfterTrial = function(){
 
@@ -173,7 +178,6 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 				MCMC_JS.MCMC_parameters_and_metrics_previous_simulation = JSON.parse(JSON.stringify(ABC_JS.ABC_parameters_and_metrics_this_simulation));
 				MCMC_JS.MCMC_parameters_and_metrics_previous_simulation["trial"] = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
 				ABC_JS.nAcceptedValues++;
-				console.log("Accepted with alpha=", alpha);
 			}else{
 				ABC_JS.ABC_parameters_and_metrics_this_simulation = JSON.parse(JSON.stringify(MCMC_JS.MCMC_parameters_and_metrics_previous_simulation));
 				ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"] = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
@@ -203,7 +207,6 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 	// Modify the parameters using the proposal function
 	MCMC_JS.makeProposal();
 
-	console.log("Kcat = ", ABC_JS.ABC_parameters_and_metrics_this_simulation["kCat"]["priorVal"]);
 
 
 	// Reset the state
@@ -351,7 +354,13 @@ if (RUNNING_FROM_COMMAND_LINE){
 	module.exports = {
 		beginMCMC: MCMC_JS.beginMCMC,
 		clearMCMCdata_WW: MCMC_JS.clearMCMCdata_WW,
-		MCMC_SIMULATING: MCMC_JS.MCMC_SIMULATING 
+		MCMC_SIMULATING: MCMC_JS.MCMC_SIMULATING,
+		getLogPrior: MCMC_JS.getLogPrior,
+		wrapProposal: MCMC_JS.wrapProposal,
+		makeProposal: MCMC_JS.makeProposal,
+		getLogLikelihood: MCMC_JS.getLogLikelihood,
+		performMCMCtrial: MCMC_JS.performMCMCtrial,
+		clearMCMCdata_WW: MCMC_JS.clearMCMCdata_WW
 
 	}
 
