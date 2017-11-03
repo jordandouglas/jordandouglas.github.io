@@ -63,6 +63,7 @@
 <script language='JavaScript' type='text/JavaScript' src="src/Model/plots.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Model/MFE.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Model/ABC.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Model/MCMC.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Model/stateEncoding.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Model/XMLparser.js"></script>
 
@@ -725,10 +726,9 @@ window.onkeyup = function(e) {
 	}else if (key == 27 && !e.ctrlKey && !e.shiftKey) { // Escape
 		stop_controller();
 
-
-
 		//getSlidingHeights_controller(function(result){ console.log(result)});
 		//addNotificationMessage("Hello there", 100, 100);
+
 		
 	}
 	
@@ -2965,31 +2965,82 @@ function closeNav() {
 
 						<br><br>
 
+							ABC
+							<label class="switch" title="Perform standard ABC search or ABC with MCMC? For more information please read the Parameter Inference section at www.polymerase.nz/about">
+						 		<input type="checkbox" id="ABC_useMCMC" OnChange="toggleMCMC()"> </input>
+						 	 	<span class="slider round notboolean"></span>
+							</label> ABC-MCMC
+
+						<br><br>
+
 						<div style="padding: 5 10">
 
-							Number of ABC iterations:
-							<input type="number" id="ABCntrials" value=1000 title="Number of iterations to run the ABC for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
-
-							&nbsp;&nbsp;&nbsp;&nbsp;
 
 
+							<span id="ABC_settings">
+								Number of ABC iterations:
+								<input type="number" id="ABCntrials" min=0 value=1000 title="Number of iterations to run the ABC for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
 
-
-							Number of tests per data point:
-							<input type="number" id="ABC_ntestsperdata" value=20 title="Number of tests to perform at each force/NTP setting. The median velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
-
-							&nbsp;&nbsp;&nbsp;&nbsp;
+								&nbsp;&nbsp;&nbsp;&nbsp;
 
 
 
 
-							<input type=button id="beginABC_btn" onClick=beginABC() value='Begin ABC' title="Begin the approximate Bayesian computation with the current settings" class="operation" style="background-color:#663399"> 
+								Number of trials per data point:
+								<input type="number" id="ABC_ntestsperdata" min=1 value=20 title="Number of tests to perform at each force/NTP setting. The median velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
+
+								&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+
+
+								<input type=button id="beginABC_btn" onClick=beginABC("ABC") value='Begin ABC' title="Begin the approximate Bayesian computation with the current settings" class="operation beginABC_btn" style="background-color:#663399"> 
+								
+	
+
+							</span>
+
+							<span id="MCMC_settings" style="display:none">
+
+
+								Number of MCMC iterations:
+								<input type="number" id="MCMCntrials" min=0 value=10000 title="Number of iterations to run the MCMC chain for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
+
+								&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+								Number of trials per data point:
+								<input type="number" id="MCMC_ntestsperdata" min=1 value=5 title="Number of tests to perform at each force/NTP setting. The median velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
+
+								&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+								Burn-in percentage:
+								<input type="number" id="MCMC_burnin" onChange="validateAllAbcDataInputs()" min=0 max=100 value=10 title="Percentage of points to throw away before reaching the posterior distribution" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">%
+
+								&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+								Log every:
+								<input type="number" id="MCMC_logevery" min=1 value=20 title="How often do you want to log the current position" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">states
+
+								&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+
+								<input type=button id="beginMCMC_btn" onClick='beginABC("MCMC")' value='Begin ABC MCMC' title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="operation beginABC_btn" style="background-color:#663399; width: 150px"> 
+								
+			
 							
-		
+
+
+							</span>
+
 							&nbsp;&nbsp;&nbsp;
 							<input type=image id="uploadABC" class="rotate180" title="Upload an ABC output in .tsv format" onClick=uploadABC() src="src/Images/download.png" style="vertical-align: middle; height:20px; ">  
 								<input style="display:none" type="file" id="uploadABCinput" accept=".tsv"> 
 							<input type=image id="downloadABC" title="Download the ABC output (displayed below) in .tsv format" onClick=downloadABC() src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px; ">  
+					
 
 							
 							&nbsp;&nbsp;&nbsp;
