@@ -422,9 +422,14 @@ function addNewABCData(type = "forceVelocity"){
 			break;
 	}
 
+	
+	
+	
+	
 	// Add the curve template to the newly opened cell
 	$("#ABCPanelTable" + ABCtableToUse).append(HTMLtemplate);
-
+	if ($("#ABC_useMCMC").prop("checked")) $(".rejection_ABC_RSS").hide(0);
+	else $(".rejection_ABC_RSS").show(0);
 
 	// Switch to the other ABC table next time so we have 2 columns of curves
 	ABCtableToUse ++;
@@ -559,11 +564,11 @@ function getABCforceVelocityCurveTemplate(fitID){
 					</div> <br> <br>
 
 
-
-					Mean RSS threshold:
-						<input type="number" id="ABC_RSS_` + fitID + `" value=3 title="Accept parameters into the posterior distribution only if the mean residual sum of squares (RSS) for this dataset is less than this threshold"
-							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA">
-
+					<div class="rejection_ABC_RSS">
+						Mean RSS threshold:
+							<input type="number" id="ABC_RSS_` + fitID + `" value=3 title="Accept parameters into the posterior distribution only if the mean residual sum of squares (RSS) for this dataset is less than this threshold"
+								 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA">
+					</div>
 			</td>
 
 		</tr>
@@ -1225,7 +1230,7 @@ function addNewABCRows(lines){
 			}
 		}
 
-		paddedLine += "</div>";
+		paddedLine += "<br></div>";
 		ABClines.push(paddedLine);
 		if (!rejected) ABClinesAcceptedOnly.push(paddedLine);
 
@@ -1340,11 +1345,19 @@ function toggleMCMC(){
 	if ($("#ABC_useMCMC").prop("checked")){
 		$("#ABC_settings").hide(0);
 		$("#MCMC_settings").show(100);
+		$(".rejection_ABC_RSS").hide(0);
 
 	}else{
 		$("#ABC_settings").show(100);
 		$("#MCMC_settings").hide(0);
+		$(".rejection_ABC_RSS").show(100);
 	}
 
 
 }
+
+
+
+
+
+
