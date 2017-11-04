@@ -3041,8 +3041,20 @@ function closeNav() {
 								&nbsp;&nbsp;&nbsp;&nbsp;
 
 								
-								&isin; =
-								<input type="number" id="MCMC_RSSthreshold" min=0 value=3 title="RSS threshold which must be met to accept a point into the posterior" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">
+								&isin;<sub>min</sub> =
+								<input type="number" id="MCMC_RSSthreshold_min" min=0 value=100 title="RSS threshold which must be met to accept a point into the posterior" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">
+
+								&nbsp;&nbsp;
+								
+								
+								&isin;<sub>0</sub> =
+								<input type="number" id="MCMC_RSSthreshold_0" min=0 value=10000 title="Initial RSS threshold. This will be decreased every iteration until reaching the minimum threshold" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">
+
+								&nbsp;&nbsp;
+								
+								
+								&gamma; =
+								<input type="number" id="MCMC_RSSthreshold_gamma" min=0 max=1 value=0.98 title="Exponential decrease in RSS threshold" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">
 
 								&nbsp;&nbsp;&nbsp;&nbsp;
 								
@@ -3053,7 +3065,7 @@ function closeNav() {
 								&nbsp;&nbsp;&nbsp;&nbsp;
 
 
-								Log every:
+								Log every
 								<input type="number" id="MCMC_logevery" min=1 value=20 title="How often do you want to log the current position" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">states
 
 								&nbsp;&nbsp;&nbsp;&nbsp;
