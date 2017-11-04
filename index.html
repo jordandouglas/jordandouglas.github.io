@@ -200,16 +200,16 @@ function init(){
 				 
 			// On desktop make the toolbar draggable
 			if (!IS_MOBILE){
-				$("#theToolbar").draggable({
-					containment: "#main",
-					cursor: "crosshair"
-				});
+				//$("#theToolbar").draggable({
+					//containment: "#main",
+					//cursor: "crosshair"
+				//});
 			}
 			
 			// On a mobile device make the toolbar static
 			else{
 				$("#theToolbar").css("position", "absolute");
-				$("#theToolbar").css("top", "180px");
+				//$("#theToolbar").css("top", "180px");
 			}
 				 
 
@@ -1438,13 +1438,14 @@ function openNav() {
 	
 	document.getElementById("mySidenav").style.width = "380px";
 	document.getElementById("main").style.marginLeft = "380px";
-	
+	document.getElementById("paramsTab").style.marginLeft = "380px";
 
 
 	$("#bases_container").animate({
     	width: '-=30px'
 	}, 100);
 
+	
 
 	$("#hiddenNotification").animate( {left: "+=" + 380}, 100 );
 
@@ -1471,7 +1472,7 @@ function closeNav() {
 
 	document.getElementById("mySidenav").style.width = "0";
 	document.getElementById("main").style.marginLeft= "0";
-		
+	document.getElementById("paramsTab").style.marginLeft = "0";
 
 	
 	$("#bases_container").animate({
@@ -2219,7 +2220,7 @@ function closeNav() {
 			
 			
 			
-			<div  class="parameter-bg"> 
+			<div class="parameter-bg">
 				<div class="parameter-title">Advanced Model Settings <br> <br></div>
 
 
@@ -2370,8 +2371,7 @@ function closeNav() {
 			
 			
 			
-			
-
+		
 			
 
 		<div id="main">
@@ -2386,7 +2386,7 @@ function closeNav() {
 					<tr>
 						<td style="height:30px; width: 30%; vertical-align:bottom; ">
 							<div id="mfeOutput" style="font-family:'Courier New'; "> </div>
-							<span id="openNavBtn" style="text-align:right;  font-size:20px;cursor:pointer; font-color: #858280;" onclick="openNav(); ">&#9776; Parameters</span>
+							
 							
 						</td>
 
@@ -2432,9 +2432,15 @@ function closeNav() {
 			<div class="errorMsg" id="landscapeRequest" style="font-size: 25px;">
 				We recommend you view this page in landscape mode! </div>
 
+				
+				
+			<div id="paramsTab" style="transition:0.5s; position:fixed; left: -5px; top: 300px; transform: rotate(-90deg); transform-origin: left top 0; padding: 5 10; background-color:#008cba; color:white; border-radius: 0 0 20px 20px; z-index:3">
+				<span id="openNavBtn" style="text-align:right;  font-size:20px;cursor:pointer; font-color: #858280;" onclick="openNav(); ">&#9776; Parameters</span>
+			</div>
 
-			<div id="theToolbar" class="noselect" style="position:fixed; top:200px; left:14px; z-index:5;">
-				<table class="toolbar" cellpadding=3>
+			
+			<div id="theToolbar" class="noselect" style="position:fixed; top:320px; left:10px; z-index:5;">
+				<table class="toolbar" cellpadding=3 style="border-radius: 10px;">
 						
 
 					<tr style="height:20px">
@@ -2547,7 +2553,7 @@ function closeNav() {
 			<br><br>
 
 
-			<div id="navigationPanel"  class="parameter-bg " style="background-color:#ebe9e7; margin-left:130px;  ">
+			<div id="navigationPanel"  class="parameter-bg " style="background-color:#ebe9e7; margin-left:130px; border-radius:10px; ">
 
 				<span style="font-size:18px; font-family:Bookman;">
 					<input type=button id='showNavigationPanel' class='minimise' value='-' onClick=showNavigationPanel()> 
@@ -2748,7 +2754,7 @@ function closeNav() {
 
 
 
-			<div id="plots4"  class="parameter-bg" style="background-color:#ebe9e7; margin-left:130px">
+			<div id="plots4"  class="parameter-bg" style="background-color:#ebe9e7; margin-left:130px; border-radius:10px;">
 
 
 				<span class="noselect"  style="font-size:18px; font-family:Bookman;">
@@ -2787,7 +2793,7 @@ function closeNav() {
 			</div>
 
 			<br>
-			<div id="plots123"  class="parameter-bg" style="background-color:#ebe9e7;  margin-left:130px">
+			<div id="plots123"  class="parameter-bg" style="background-color:#ebe9e7;  margin-left:130px; border-radius:10px;">
 
 				
 				<span class="noselect"  style="font-size:18px; font-family:Bookman;">
@@ -2925,7 +2931,7 @@ function closeNav() {
 
 
 
-			<div id="ABCpanel"  class="parameter-bg" style="background-color:#ebe9e7;  margin-left:130px">
+			<div id="ABCpanel"  class="parameter-bg" style="background-color:#ebe9e7;  margin-left:130px; border-radius:10px;">
 
 
 				<span class="noselect"  style="font-size:18px; font-family:Bookman;">
@@ -2965,13 +2971,33 @@ function closeNav() {
 
 						<br><br>
 
-							Rejection ABC
-							<label class="switch" title="Perform rejection-ABC or MCMC-ABC? For more information please read the Parameter Inference section at www.polymerase.nz/about">
-						 		<input type="checkbox" id="ABC_useMCMC" OnChange="toggleMCMC()"> </input>
-						 	 	<span class="slider round notboolean"></span>
-							</label> MCMC-ABC
-
-						<br><br>
+						<div style="position:relative;">
+							
+							<b>Inference Method:</b><br>
+							<input type="range" min="1" max="3" value="1" class="rangeslider" style="width:100px" OnChange="toggleMCMC()" id="ABC_useMCMC" title="Use the R-ABC, MCMC-ABC, or NS-ABC algorithm to fit the data">
+							<table style="margin-left: 30px; height: 100px; margin-top: -26px;">
+								<tr>
+									<td>
+										Rejection ABC
+									</td>
+								</tr>
+								
+								<tr>
+									<td>
+										Markov-chain-Monte-Carlo ABC
+									</td>
+								</tr>
+								
+								<tr>
+									<td>
+										Nested-sampling ABC
+									</td>
+								</tr>
+							
+							
+							</table>
+							 
+						</div>
 
 						<div style="padding: 5 10">
 
@@ -3114,7 +3140,7 @@ function closeNav() {
 
 			<div style="margin-left:130px;">
 
-				<div id="sequences" class="parameter-bg" style="position:relative; width:99%; transition: 0s;">
+				<div id="sequences" class="parameter-bg" style="position:relative; width:99%; transition: 0s; border-radius:10px;">
 
 					<div class="noselect" style='font-size:16px; font-family:Bookman;'>
 						<input type=button class='minimise' id='hideSequences'  value='+' title='Hide/show the sequence window' onClick=toggleSequences()>
