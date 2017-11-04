@@ -103,7 +103,7 @@ function onABCStart(){
 	$("#uploadABC").hide(50);
 	
 	$("#ABCacceptancePercentage_span").show(50);
-	if (!$("#ABC_useMCMC").prop("checked")) $("#ABC_showRejectedParameters_span").show(50);
+	if ($("#ABC_useMCMC").val() == 1) $("#ABC_showRejectedParameters_span").show(50);
 	$("#ABCacceptancePercentage_val").html("0");
 	$("#ABCacceptance_span").show(50);
 	$("#nRowsToDisplayABC").show(50);
@@ -388,7 +388,7 @@ function getNewCurveButtonsTemplate(){
 
 			<td style="vertical-align:middle; font-size:20px; text-align:center;" colspan=3>
 				<br><br>
-				<div style="padding: 5 5; background-color:#b3b3b3; font-size:16px; width:300px; margin:auto">
+				<div style="padding: 5 5; background-color:#b3b3b3; font-size:16px; width:300px; margin:auto;">
 
 					Add experimental data <br><br>
 					<input type=button onClick='addNewABCData("forceVelocity")' value='+ Force-velocity curve' title="Add force-velocity experimental data" class="operation ABCbtn" style="background-color:#008CBA; width: 200px"> 
@@ -428,7 +428,7 @@ function addNewABCData(type = "forceVelocity"){
 	
 	// Add the curve template to the newly opened cell
 	$("#ABCPanelTable" + ABCtableToUse).append(HTMLtemplate);
-	if ($("#ABC_useMCMC").prop("checked")) $(".rejection_ABC_RSS").hide(0);
+	if ($("#ABC_useMCMC").val() != 1) $(".rejection_ABC_RSS").hide(0);
 	else $(".rejection_ABC_RSS").show(0);
 
 	// Switch to the other ABC table next time so we have 2 columns of curves
@@ -496,6 +496,8 @@ function getABCforceVelocityCurveTemplate(fitID){
 
 			<td class="` + fitID + `" style="text-align:center; vertical-align:top">
 
+					<input type=button id='deleteExperiment_` + fitID + `' class='minimise' style='float:right'  value='&times;' onClick=deleteExperiment("` + fitID + `") title='Delete this experiment'>
+			
 					<br><br>
 					<table style="width:250px; margin:auto">
 
@@ -619,7 +621,7 @@ function getABCntpVelocityCurveTemplate(fitID){
 
 			<td class="` + fitID + `" style="text-align:center; vertical-align:top">
 
-
+					<input type=button id='deleteExperiment_` + fitID + `' class='minimise' style='float:right'  value='&times;' onClick=deleteExperiment("` + fitID + `") title='Delete this experiment'>
 
 					<br><br>
 					Force:
@@ -711,6 +713,55 @@ function getABCntpVelocityCurveTemplate(fitID){
 
 
 
+function deleteExperiment(fitID){
+	
+	
+	// Delete the contents of this cell
+	var thisFitNum = parseFloat(fitID.substring(3));
+	var fitNum = 0;
+	
+	
+	// Move every cell after this cell back by one
+	for(fitNum = thisFitNum+1; fitNum <= nFits; fitNum++){
+		
+		var html = $("[fitid='fit" + fitNum + "']").html();
+		html = html.replace(new RegExp("fit" + fitNum, 'g'), "fit" + (fitNum-1));
+		$("[fitid='fit" + (fitNum-1) + "']").html(html);
+		
+		// Copy all the values over
+		$("#forceVelocityInputData_fit" + (fitNum-1)).val($("#forceVelocityInputData_fit" + (fitNum)).val());
+		$("#ntpVelocityInputData_fit" + (fitNum-1)).val($("#ntpVelocityInputData_fit" + (fitNum)).val());
+		$("#ATPconc_fit" + (fitNum-1)).val($("#ATPconc_fit" + (fitNum)).val());
+		$("#CTPconc_fit" + (fitNum-1)).val($("#CTPconc_fit" + (fitNum)).val());
+		$("#GTPconc_fit" + (fitNum-1)).val($("#GTPconc_fit" + (fitNum)).val());
+		$("#UTPconc_fit" + (fitNum-1)).val($("#UTPconc_fit" + (fitNum)).val());
+		$("#ABC_force_fit" + (fitNum-1)).val($("#ABC_force_fit" + (fitNum)).val());
+		$("#ABC_RSS_fit" + (fitNum-1)).val($("#ABC_RSS_fit" + (fitNum)).val());
+		
+		
+	}
+	
+	
+	ABCtableToUse ++;
+	if (ABCtableToUse > 2) ABCtableToUse = 1;
+	nFits--;
+	
+	
+	// Delete the final experiment cell
+	$("[fitid='fit" + (fitNum-1) + "']").remove();
+
+	
+	// Delete the cell which contains the add-new buttons and then add it back to the appropriate cell
+	$("#newABCcurve").remove();
+	addNewCurveButtons();
+	
+	
+	
+	
+	
+}
+
+
 
 function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
@@ -782,7 +833,7 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 
 			// If MCMC then account for the burn-in
-			var startingPosteriorNum = $("#ABC_useMCMC").prop("checked") ? Math.floor(parseFloat($("#MCMC_burnin").val()) / 100 * posterior.length) : 0;
+			var startingPosteriorNum = $("#ABC_useMCMC").val() == 2 ? Math.floor(parseFloat($("#MCMC_burnin").val()) / 100 * posterior.length) : 0;
 
 			for (var postNum = startingPosteriorNum; postNum < posterior.length; postNum++){
 
@@ -979,7 +1030,7 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 
 
 			// If MCMC then account for the burn-in
-			var startingPosteriorNum = $("#ABC_useMCMC").prop("checked") ? Math.floor(parseFloat($("#MCMC_burnin").val()) / 100 * posterior.length) : 0;
+			var startingPosteriorNum = $("#ABC_useMCMC").val() == 2 ? Math.floor(parseFloat($("#MCMC_burnin").val()) / 100 * posterior.length) : 0;
 
 			for (var postNum = startingPosteriorNum; postNum < posterior.length; postNum++){
 
@@ -1341,16 +1392,26 @@ function toggleAcceptedOrRejected(){
 function toggleMCMC(){
 
 
-
-	if ($("#ABC_useMCMC").prop("checked")){
-		$("#ABC_settings").hide(0);
-		$("#MCMC_settings").show(100);
-		$(".rejection_ABC_RSS").hide(0);
-
-	}else{
-		$("#ABC_settings").show(100);
+	// 1 = Rejection ABC
+	if ($("#ABC_useMCMC").val() == 1){
+		$("#ABC_settings").show(0);
 		$("#MCMC_settings").hide(0);
-		$(".rejection_ABC_RSS").show(100);
+		$(".rejection_ABC_RSS").show(0);
+	}
+	
+	// 2 = MCMC ABC
+	else if ($("#ABC_useMCMC").val() == 2){
+		$("#ABC_settings").hide(0);
+		$("#MCMC_settings").show(0);
+		$(".rejection_ABC_RSS").hide(0);
+	}
+	
+	
+	// 3 = NS ABC
+	else if ($("#ABC_useMCMC").val() == 3){
+		//$("#ABC_settings").show(100);
+		//$("#MCMC_settings").hide(0);
+		//$(".rejection_ABC_RSS").show(100);
 	}
 
 

@@ -75,6 +75,7 @@ canvas {
 	border-color:#f0c36d;  
 	margin: auto; 
 	font-size: 14px;
+	border-radius: 5px;
 }
 
 
@@ -217,13 +218,13 @@ div.vertical{
 	font-family:Arial;
 	margin:auto;
 	padding: 5 5;
-
+	border-radius:10px;
 
 }
 
 .main-block-inner{
 	background-color:white;
-	
+	border-radius:10px;
 
 }
 
@@ -260,6 +261,7 @@ div.vertical{
 	height:30px; 
 	font-size:20;
 	cursor:pointer;
+	
 }
 
 
@@ -362,6 +364,7 @@ div.vertical{
 	width:20px;
 	height:20px;
 	cursor:pointer;
+	border-radius:5px;
 }
 
 .spacer {
@@ -464,7 +467,7 @@ div.vertical{
 	padding: 5px 5px;
 	text-align: center;
 	font-family: "Arial";
-	
+	border-radius:5px;
 	
 }
 
@@ -677,5 +680,41 @@ input:checked + .slider:before {
 
 .slider.round:before {
 	border-radius: 50%;
+	
 } 
+
+
+.rangeslider {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    height: 26px; /* Specified height */
+    background: #008cba; 
+    outline: none; /* Remove outline */
+	border-radius: 20px;
+	transform: rotate(90deg);
+	padding: 5 5;
+	transform-origin: left top 0;
+	margin-left: 26px;
+	
+}
+
+
+/* The slider handle (use webkit (Chrome, Opera, Safari, Edge) and moz (Firefox) to override default look) */ 
+.rangeslider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 20px; /* Set a specific slider handle width */
+    height: 20px; /* Slider handle height */
+    background: white; 
+    cursor: pointer; /* Cursor on hover */
+	border-radius: 20px;
+}
+
+.rangeslider::-moz-range-thumb {
+    width: 20px; /* Set a specific slider handle width */
+    height: 20px; /* Slider handle height */
+    background: white; 
+    cursor: pointer; /* Cursor on hover */
+	border-radius: 20px;
+}
 

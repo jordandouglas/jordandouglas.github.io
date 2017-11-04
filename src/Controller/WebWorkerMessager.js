@@ -2081,7 +2081,7 @@ function loadSession_controller(XMLData){
 			if (experimentalData["testsPerData"] != null) $("#ABC_ntestsperdata").val(experimentalData["testsPerData"]);
 			if (experimentalData["burnin"] != null) $("#MCMC_burnin").val(experimentalData["burnin"]);
 			if (experimentalData["logEvery"] != null) $("#MCMC_logevery").val(experimentalData["logEvery"]);
-			$("#ABC_useMCMC").prop("checked", experimentalData["inferenceMethod"] == "MCMC");
+			$("#ABC_useMCMC").val(experimentalData["inferenceMethod"] == "ABC" ? 1 : experimentalData["inferenceMethod"] == "MCMC" ? 2 : 3);
 			toggleMCMC();
 
 
