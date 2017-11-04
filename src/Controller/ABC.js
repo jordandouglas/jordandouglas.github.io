@@ -132,7 +132,9 @@ function getAbcDataObject(which = "ABC"){
 		abcDataObjectForModel.testsPerData = $("#MCMC_ntestsperdata").val();
 		abcDataObjectForModel.burnin = $("#MCMC_burnin").val();
 		abcDataObjectForModel.logEvery = $("#MCMC_logevery").val();
-		abcDataObjectForModel.RSSthreshold = $("#MCMC_RSSthreshold").val();
+		abcDataObjectForModel.RSSthreshold_min = $("#MCMC_RSSthreshold_min").val();
+		abcDataObjectForModel.RSSthreshold_0 = $("#MCMC_RSSthreshold_0").val();
+		abcDataObjectForModel.RSSthreshold_gamma = $("#MCMC_RSSthreshold_gamma").val();
 		
 	}
 
@@ -194,6 +196,8 @@ function getAbcDataObject(which = "ABC"){
 
 
 function validateAllAbcDataInputs(){
+
+	
 
 	var textareas = $(".ABCinputData");
 	var valid = true;
@@ -756,7 +760,7 @@ function deleteExperiment(fitID){
 	addNewCurveButtons();
 	
 	
-	
+	validateAllAbcDataInputs();
 	
 	
 }

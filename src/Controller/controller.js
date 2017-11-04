@@ -952,13 +952,15 @@ function saveSession(){
 		// ABC settings
 		saveXML.writeStartElement('ABC');
 
-			var abcDataObjectForModel = getAbcDataObject($("#ABC_useMCMC").prop("checked") ? "MCMC" : "ABC");
+			var abcDataObjectForModel = getAbcDataObject($("#ABC_useMCMC").val() == 1 ? "ABC" : $("#ABC_useMCMC").val() == 2 ? "MCMC" : "NS-ABC");
 			
 			saveXML.writeAttributeString("inferenceMethod", abcDataObjectForModel["inferenceMethod"]);
 			saveXML.writeAttributeString("ntrials", abcDataObjectForModel["ntrials"]);
 			saveXML.writeAttributeString("testsPerData", abcDataObjectForModel["testsPerData"]);
 			if (abcDataObjectForModel["inferenceMethod"] == "MCMC"){
-				saveXML.writeAttributeString("RSSthreshold", abcDataObjectForModel["MCMC_RSSthreshold"]);
+				saveXML.writeAttributeString("RSSthreshold_min", abcDataObjectForModel["RSSthreshold_min"]);
+				saveXML.writeAttributeString("RSSthreshold_0", abcDataObjectForModel["RSSthreshold_0"]);
+				saveXML.writeAttributeString("RSSthreshold_gamma", abcDataObjectForModel["RSSthreshold_gamma"]);
 				saveXML.writeAttributeString("burnin", abcDataObjectForModel["burnin"]);
 				saveXML.writeAttributeString("logEvery", abcDataObjectForModel["logEvery"]);
 			}

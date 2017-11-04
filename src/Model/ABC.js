@@ -374,19 +374,32 @@ ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve
 
 		// Take the median velocity
 		ABC_JS.velocities_for_this_curve.sort();
-
+		var medianVelocity = 0;
 		if (ABC_JS.velocities_for_this_curve.length % 2 == 0){ // Even number, take mean of middle two
 			var middleLeft  = ABC_JS.velocities_for_this_curve[ABC_JS.velocities_for_this_curve.length/2-1];
 			var middleRight = ABC_JS.velocities_for_this_curve[ABC_JS.velocities_for_this_curve.length/2];
-			var median = (middleLeft + middleRight) / 2;
-			ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"].push(median);
-			//console.log("Taking median of", ABC_JS.velocities_for_this_curve, "got", median);
+			medianVelocity = (middleLeft + middleRight) / 2;
+			ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"].push(medianVelocity);
 		}
 
 		else{	// Odd number, take middle
-			var median = ABC_JS.velocities_for_this_curve[Math.floor(ABC_JS.velocities_for_this_curve.length/2)];
-			ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"].push(median);
-			//console.log("Taking median of", ABC_JS.velocities_for_this_curve, "got", median);
+			medianVelocity = ABC_JS.velocities_for_this_curve[Math.floor(ABC_JS.velocities_for_this_curve.length/2)];
+			ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"].push(medianVelocity);
+		}
+		
+		
+		
+		// Update the RSS
+		if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "MCMC"){
+			
+			MCMC_JS.RSS_this_trial += Math.pow(medianVelocity - ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum]["velocity"], 2);
+			
+			// If we have gone over the threshold then stop simulating
+			if (MCMC_JS.RSS_this_trial > MCMC_JS.currentRSSthreshold){
+				resolve();
+				return;
+			}
+
 		}
 
 

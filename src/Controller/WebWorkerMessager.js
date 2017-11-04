@@ -2081,6 +2081,12 @@ function loadSession_controller(XMLData){
 			if (experimentalData["testsPerData"] != null) $("#ABC_ntestsperdata").val(experimentalData["testsPerData"]);
 			if (experimentalData["burnin"] != null) $("#MCMC_burnin").val(experimentalData["burnin"]);
 			if (experimentalData["logEvery"] != null) $("#MCMC_logevery").val(experimentalData["logEvery"]);
+			
+			if (experimentalData["RSSthreshold_min"] != null) $("#MCMC_RSSthreshold_min").val(experimentalData["RSSthreshold_min"]);
+			if (experimentalData["RSSthreshold_0"] != null) $("#MCMC_RSSthreshold_0").val(experimentalData["RSSthreshold_0"]);
+			if (experimentalData["RSSthreshold_gamma"] != null) $("#MCMC_RSSthreshold_gamma").val(experimentalData["RSSthreshold_gamma"]);
+			
+			
 			$("#ABC_useMCMC").val(experimentalData["inferenceMethod"] == "ABC" ? 1 : experimentalData["inferenceMethod"] == "MCMC" ? 2 : 3);
 			toggleMCMC();
 

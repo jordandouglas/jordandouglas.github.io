@@ -25,6 +25,8 @@ MCMC_JS = {};
 MCMC_JS.parametersWithPriors = [];
 MCMC_JS.MCMC_parameters_and_metrics_previous_simulation = {};
 MCMC_JS.MCMC_SIMULATING = false;
+MCMC_JS.currentRSSthreshold = 0;
+MCMC_JS.RSS_this_trial = 0;
 
 
 MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
@@ -71,7 +73,6 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 	}
 
 
-	ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"] = 0;
 
 
 	var toDoAfterFirstSimulation = function(){
@@ -84,7 +85,8 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 
 
 		var logPrior = MCMC_JS.getLogPrior();
-		var logLikelihood = MCMC_JS.getLogLikelihood(fitNums);
+		//var logLikelihood = MCMC_JS.getLogLikelihood(fitNums);
+		var logLikelihood = -MCMC_JS.RSS_this_trial;
 		ABC_JS.ABC_parameters_and_metrics_this_simulation.logPrior = logPrior;
 		ABC_JS.ABC_parameters_and_metrics_this_simulation.logLikelihood = logLikelihood;
 
@@ -102,6 +104,10 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 		}
 		
 
+		// Set the RSS threshold to the initial value
+		MCMC_JS.currentRSSthreshold = ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_0;
+
+		
 		// Perform MCMC over N trials
 		var toCall = () => new Promise((resolve) => MCMC_JS.performMCMCtrial(fitNums, resolve));
 		toCall().then(() => exitMCMC());
@@ -109,8 +115,14 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 
 	}
 
+	
+	
+	ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"] = 0;
+	MCMC_JS.RSS_this_trial = 0;
 
-
+	
+	// Set the threshold to infinity so that the first simulation does not abort early
+	MCMC_JS.currentRSSthreshold = Number.POSITIVE_INFINITY;
 
 
 	// Evaluate the likelihood of the initial state
@@ -161,13 +173,14 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 		if (!WW_JS.stopRunning_WW){
 
 			// Calculate the log prior / likelihood of this state
-			var logLikelihood = MCMC_JS.getLogLikelihood(fitNums);
+			var logLikelihood = -MCMC_JS.RSS_this_trial;
 			ABC_JS.ABC_parameters_and_metrics_this_simulation.logPrior = logPrior;
 			ABC_JS.ABC_parameters_and_metrics_this_simulation.logLikelihood = logLikelihood;
+			
 
 
 			// Accept or reject the current state using Metropolis-Hastings formula. Accept the new state with probability min(1, alpha)
-			var alpha = -logLikelihood > ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold ? 0 : Math.exp(logPrior - MCMC_JS.MCMC_parameters_and_metrics_previous_simulation.logPrior);
+			var alpha = -logLikelihood > MCMC_JS.currentRSSthreshold ? 0 : Math.exp(logPrior - MCMC_JS.MCMC_parameters_and_metrics_previous_simulation.logPrior);
 
 			// Accept
 			if (alpha >= 1 || RAND_JS.uniform(0, 1) < alpha){
@@ -191,6 +204,13 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 				}
 
 			}
+			
+			
+			// Lower the RSS threshold by multiplying it by gamma
+			if (MCMC_JS.currentRSSthreshold > ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_min){
+				MCMC_JS.currentRSSthreshold = Math.max(ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_min, MCMC_JS.currentRSSthreshold * ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_gamma);
+			}
+			
 
 		}
 		
@@ -202,7 +222,7 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 
 	// Modify the parameters using the proposal function
 	MCMC_JS.makeProposal();
-
+	MCMC_JS.RSS_this_trial = 0;
 
 
 	// Reset the state
@@ -355,7 +375,9 @@ if (RUNNING_FROM_COMMAND_LINE){
 		makeProposal: MCMC_JS.makeProposal,
 		getLogLikelihood: MCMC_JS.getLogLikelihood,
 		performMCMCtrial: MCMC_JS.performMCMCtrial,
-		clearMCMCdata_WW: MCMC_JS.clearMCMCdata_WW
+		clearMCMCdata_WW: MCMC_JS.clearMCMCdata_WW,
+		currentRSSthreshold: MCMC_JS.currentRSSthreshold,
+		RSS_this_trial: MCMC_JS.RSS_this_trial
 
 	}
 

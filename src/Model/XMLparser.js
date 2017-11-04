@@ -162,8 +162,11 @@ function parseXML_ABCmain_WW(ABCnode){
 	XML_JS.ABC_EXPERIMENTAL_DATA["testsPerData"] = ABCnode["testsPerData"];
 	XML_JS.showRejectedParameters = ABCnode["showRejectedParameters"] == null ? false : ABCnode["showRejectedParameters"] == "true";
 	if (XML_JS.ABC_EXPERIMENTAL_DATA["inferenceMethod"] == "MCMC"){
-		XML_JS.ABC_EXPERIMENTAL_DATA["burnin"] = ABCnode["burnin"];
-		XML_JS.ABC_EXPERIMENTAL_DATA["logEvery"] = ABCnode["logEvery"];
+		XML_JS.ABC_EXPERIMENTAL_DATA["burnin"] = parseFloat(ABCnode["burnin"]);
+		XML_JS.ABC_EXPERIMENTAL_DATA["logEvery"] = parseFloat(ABCnode["logEvery"]);
+		XML_JS.ABC_EXPERIMENTAL_DATA["RSSthreshold_min"] = parseFloat(ABCnode["RSSthreshold_min"]);
+		XML_JS.ABC_EXPERIMENTAL_DATA["RSSthreshold_0"] = parseFloat(ABCnode["RSSthreshold_0"]);
+		XML_JS.ABC_EXPERIMENTAL_DATA["RSSthreshold_gamma"] = parseFloat(ABCnode["RSSthreshold_gamma"]);
 	}
 
 	XML_JS.ABC_EXPERIMENTAL_DATA["fits"] = {};
