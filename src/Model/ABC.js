@@ -275,9 +275,10 @@ ABC_JS.ABC_trial_for_curve_WW = function(currentFitNum, accepted, fitNums, resol
 
 
 	// After executing this rule, update the accepted variable and then move on to the next rule
-	var toDoAfterTrials = function(){
+	var toDoAfterTrials = function(acc){
 
-
+		accepted = accepted && acc;
+	
 		// If regular ABC (not MCMC) then reject now if the RSS is too high
 		if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "ABC"){
 
@@ -333,7 +334,7 @@ ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve
 
 
 	if (ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum] == null || WW_JS.stopRunning_WW){
-		resolve();
+		resolve(true);
 		return;
 	}
 
@@ -396,7 +397,7 @@ ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve
 			
 			// If we have gone over the threshold then stop simulating
 			if (MCMC_JS.RSS_this_trial > MCMC_JS.currentRSSthreshold){
-				resolve();
+				resolve(false);
 				return;
 			}
 
