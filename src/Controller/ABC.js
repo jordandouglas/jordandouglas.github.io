@@ -104,6 +104,8 @@ function onABCStart(){
 	
 	$("#ABCacceptancePercentage_span").show(50);
 	if ($("#ABC_useMCMC").val() == 1) $("#ABC_showRejectedParameters_span").show(50);
+	if ($("#ABC_useMCMC").val() == 2) $("#ABC_ESS_span").show(50);
+	
 	$("#ABCacceptancePercentage_val").html("0");
 	$("#ABCacceptance_span").show(50);
 	$("#nRowsToDisplayABC").show(50);

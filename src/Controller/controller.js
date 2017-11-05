@@ -1247,7 +1247,7 @@ function clearCache(){
 				$("#ABCacceptancePercentage_span").hide(50);
 				$("#ABCacceptance_span").hide(50);
 				$("#ABC_showRejectedParameters_span").hide(50);
-
+				$("#ABC_useMCMC").hide(50);
 			}
 
 

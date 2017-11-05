@@ -99,9 +99,9 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 
 		// Log the initial state and add it to the posterior
 		ABC_JS.update_ABCoutput_WW(fitNums);
-		if (!RUNNING_FROM_COMMAND_LINE) {
+		//if (!RUNNING_FROM_COMMAND_LINE) {
 			ABC_JS.ABC_POSTERIOR_DISTRIBUTION.push(JSON.parse(JSON.stringify(MCMC_JS.MCMC_parameters_and_metrics_previous_simulation)));
-		}
+		//}
 		
 
 		// Set the RSS threshold to the initial value
@@ -161,8 +161,9 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
  		var workerString = WW_JS.WORKER_ID == null ? "" : "Worker " + WW_JS.WORKER_ID + " | ";
  		var acceptanceNumber = ABC_JS.nAcceptedValues;
 		var acceptancePercentage = WW_JS.roundToSF_WW(100 * ABC_JS.nAcceptedValues / (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left));
+		var ESS = WW_JS.roundToSF_WW(MCMC_JS.calculateESS());
 		if (isNaN(acceptancePercentage)) acceptancePercentage = 0;
- 		console.log(workerString + "MCMC", (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1) + "/" + ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"], "| Accepted:", acceptanceNumber, "| Acceptance rate:", acceptancePercentage + "%");
+ 		console.log(workerString + "MCMC", (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1) + "/" + ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"], "| ESS:", ESS, "| Acceptance rate:", acceptancePercentage + "%");
  	}
 
 
@@ -199,9 +200,9 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 				ABC_JS.update_ABCoutput_WW(fitNums);
 
 
-				if (!RUNNING_FROM_COMMAND_LINE) {
+				//if (!RUNNING_FROM_COMMAND_LINE) {
 					ABC_JS.ABC_POSTERIOR_DISTRIBUTION.push(JSON.parse(JSON.stringify(MCMC_JS.MCMC_parameters_and_metrics_previous_simulation)));
-				}
+				//}
 
 			}
 			
@@ -363,6 +364,53 @@ MCMC_JS.wrapProposal = function(val, lower, upper){
 }
 
 
+// Calculate the effective sample size
+MCMC_JS.calculateESS = function(){
+	
+	
+	var trialStart = Math.floor(ABC_JS.ABC_EXPERIMENTAL_DATA.burnin/100 * ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length);
+	var n = ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length - trialStart;
+	
+	// Calculate the mean and variance of the RSS
+	var meanRSS = 0;
+	var varRSS = 0;
+	for (var trialNum = trialStart; trialNum < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; trialNum++) meanRSS += -ABC_JS.ABC_POSTERIOR_DISTRIBUTION[trialNum].logLikelihood;
+	meanRSS /= ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length;
+	for (var trialNum = trialStart; trialNum < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; trialNum++) varRSS += Math.pow(-ABC_JS.ABC_POSTERIOR_DISTRIBUTION[trialNum].logLikelihood - meanRSS, 2);
+	varRSS /= ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length;
+	
+	
+	//console.log(meanRSS, varRSS, trialStart, ABC_JS.ABC_POSTERIOR_DISTRIBUTION);
+	
+	// Calculate the autocorrelation at each lag value
+	var rhoSum = 0;
+	for (var lag = 1; lag <= n-1; lag++){
+	
+		var rho_k = 0;
+		for (var trialNum = trialStart; trialNum < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length-lag; trialNum++){
+			
+			var RSS_t = -ABC_JS.ABC_POSTERIOR_DISTRIBUTION[trialNum].logLikelihood;
+			var RSS_t_plus_lag = -ABC_JS.ABC_POSTERIOR_DISTRIBUTION[trialNum + lag].logLikelihood;
+			
+			if (RSS_t_plus_lag == null) break;
+			
+			// Take the absolute correlation. 0 = no correlation, 1 = strong (positive or negative) correlation
+			rho_k += Math.abs( (RSS_t - meanRSS) * (RSS_t_plus_lag - meanRSS) / varRSS ); 
+
+		}
+		
+		rho_k /= n - lag
+		rhoSum += rho_k;
+	
+	}
+	
+	//console.log(rhoSum);
+	var ESS = n / (1 + rhoSum);
+	return ESS;
+	
+}
+
+
 if (RUNNING_FROM_COMMAND_LINE){
 
 
@@ -377,7 +425,8 @@ if (RUNNING_FROM_COMMAND_LINE){
 		performMCMCtrial: MCMC_JS.performMCMCtrial,
 		clearMCMCdata_WW: MCMC_JS.clearMCMCdata_WW,
 		currentRSSthreshold: MCMC_JS.currentRSSthreshold,
-		RSS_this_trial: MCMC_JS.RSS_this_trial
+		RSS_this_trial: MCMC_JS.RSS_this_trial,
+		calculateESS: MCMC_JS.calculateESS
 
 	}
 

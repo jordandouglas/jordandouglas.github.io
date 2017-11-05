@@ -680,6 +680,13 @@ ABC_JS.get_unrendered_ABCoutput_WW = function(resolve = function() {}, msgID = n
 		var acceptancePercentage = ABC_JS.ABC_EXPERIMENTAL_DATA == null ? null : (100 * ABC_JS.nAcceptedValues / (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left));
 		toReturn = {newLines: ABC_JS.ABC_outputString_unrendered, nTrialsToGo: ABC_JS.n_ABC_trials_left, acceptanceNumber: acceptanceNumber, acceptancePercentage: acceptancePercentage};
 	}
+	
+	if ( ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "MCMC"){
+		var ESS = WW_JS.roundToSF_WW(MCMC_JS.calculateESS());
+		toReturn.ESS = ESS;
+	}
+	
+	
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
 	}else{

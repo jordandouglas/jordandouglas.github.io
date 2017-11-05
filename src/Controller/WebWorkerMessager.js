@@ -2465,6 +2465,11 @@ function get_unrendered_ABCoutput_controller(resolve = function() { }){
 			// Update the acceptance percentage
 			var acceptancePercentage = result["acceptancePercentage"];
 			if (acceptancePercentage != null) $("#ABCacceptancePercentage_val").html(roundToSF(acceptancePercentage));
+			
+			// Update ESS
+			var ESS = result["ESS"];
+			if (ESS != null) $("#ABC_ESS_val").html(roundToSF(ESS));
+			
 
 			// Update the ABC output
 			addNewABCRows(result["newLines"]);
