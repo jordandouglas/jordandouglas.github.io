@@ -394,12 +394,13 @@ MCMC_JS.calculateESS = function(){
 			
 			if (RSS_t_plus_lag == null) break;
 			
-			// Take the absolute correlation. 0 = no correlation, 1 = strong (positive or negative) correlation
-			rho_k += Math.abs( (RSS_t - meanRSS) * (RSS_t_plus_lag - meanRSS) / varRSS ); 
+			rho_k += (RSS_t - meanRSS) * (RSS_t_plus_lag - meanRSS); 
 
 		}
 		
-		rho_k /= n - lag
+		// Take the absolute correlation. 0 = no correlation, 1 = strong (positive or negative) correlation
+		rho_k /= (n - lag) * varRSS
+		rho_k = Math.abs(rho_k);
 		rhoSum += rho_k;
 	
 	}
