@@ -1794,34 +1794,9 @@ function saveSettings_controller(){
 			break;
 
 
-		case "custom": // Save the site(s) which are interested in
+	
 
-			values.push($("#customParam").val());
-			values.push($("#customMetric").val());
-
-
-			if ($('input[name="xRange"][value="automaticX"]').prop("checked")) values.push("automaticX");
-			else {
-				values.push([$("#xMin_textbox").val(), $("#xMax_textbox").val()]);
-			}
-
-			if ($('input[name="yRange"][value="automaticY"]').prop("checked")) values.push("automaticY");
-			else {
-				values.push([$("#yMin_textbox").val(), $("#yMax_textbox").val()]);
-			}
-
-			/* SITE CONSTRAINT PARSING -> keep code
-			if ($('input[name=sitesToRecord]:checked').val() == "allSites") values.push([]);
-			else values.push(convertCommaStringToList($("#sitesToRecord_textbox").val()));
-			*/
-
-			values.push($("#plotFromPosterior").prop("checked"));
-
-			functionToCallAfterSaving  = function() { plot_custom(plotNum); };
-			break;
-
-
-		case "parameterHeatmap": // Save the site(s) which are interested in
+		case "parameterHeatmap":
 
 			values.push($("#customParamX").val());
 			values.push($("#customParamY").val());
@@ -1850,6 +1825,29 @@ function saveSettings_controller(){
 
 			functionToCallAfterSaving  = function() { plot_parameter_heatmap(plotNum); };
 			break;
+			
+			
+			
+		case "tracePlot": 
+
+		
+			values.push($("#traceVariableY").val());
+		
+			if ($('input[name="xRange"][value="automaticX"]').prop("checked")) values.push("automaticX");
+			else {
+				values.push([$("#xMin_textbox").val(), $("#xMax_textbox").val()]);
+			}
+
+			if ($('input[name="yRange"][value="automaticY"]').prop("checked")) values.push("automaticY");
+			else {
+				values.push([$("#yMin_textbox").val(), $("#yMax_textbox").val()]);
+			}
+			
+			values.push($("#workerNumberInput").val());
+
+			functionToCallAfterSaving  = function() { plot_MCMC_trace(); };
+			break;
+			
 	}
 	
 	var updateDom = function(whichPlotInWhichCanvas){
@@ -2546,6 +2544,27 @@ function update_burnin_controller(){
 	}
 
 
+}
+
+
+function get_ParametersWithPriors_controller(resolve = function() { }){
+	
+	
+	if (WEB_WORKER == null) {
+		var toCall = () => new Promise((resolve) => MCMC_JS.get_ParametersWithPriors_WW(resolve));
+		toCall().then((params) => resolve(params));
+	}
+
+	else{
+		var res = stringifyFunction("MCMC_JS.get_ParametersWithPriors_WW", [null], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((params) => resolve(params));
+
+	}
+	
+	
 }
 
 

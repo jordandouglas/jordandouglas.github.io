@@ -519,7 +519,9 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 	else if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "tracePlot") {
 		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_MCMC_trace";
-		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["workerNum"] = 1;
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yVariable"] = "RSS";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["workerNum"] = null;
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["workerNumRange"] = [1,4];
 		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
 		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
 	}
@@ -714,6 +716,39 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 
 
+			break;
+			
+		case "tracePlot":
+		
+		
+			// Variable to display on y axis
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yVariable"] = values[0];
+		
+		
+			// Axis ranges
+			if (values[1] == "automaticX") PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+			else{
+				var xMin = parseFloat(values[1][0]);
+				var xMax = parseFloat(values[1][1]);
+				if (xMax <= xMin) xMax = xMin + 0.00001;
+				if (isNaN(xMin) || isNaN(xMax)) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+				else PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = [xMin, xMax];
+			}
+
+
+			if (values[2] == "automaticY") PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+			else{
+				var yMin = parseFloat(values[2][0]);
+				var yMax = parseFloat(values[2][1]);
+				if (yMax <= yMin) yMax = yMin + 0.00001;
+				if (isNaN(yMin) || isNaN(yMax)) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+				else PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = [yMin, yMax];
+			}
+			
+			// Worker number
+			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["workerNum"] = values[3];
+			
+		
 			break;
 
 	}

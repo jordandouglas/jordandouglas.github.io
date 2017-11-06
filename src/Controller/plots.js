@@ -1097,8 +1097,10 @@ function plot_MCMC_trace(){
 
 			// Get the trial number
 			var trialNum = "" + PLOT_DATA.POSTERIOR_DISTRIBUTION[postNum].trial;
-			if (trialNum.split(":").length == 2 && trialNum.split(":")[0] != "" + workerNum) continue; // Skip this entry if it is from the wrong thread
-			if (trialNum.split(":").length == 2) trialNum = trialNum.split(":")[1];
+			if (workerNum != null){
+				if (trialNum.split(":")[0] != "" + workerNum) continue; // Skip this entry if it is from the wrong thread
+				trialNum = trialNum.split(":")[1];
+			}
 			xVals.push(parseFloat(trialNum));
 
 
@@ -4484,6 +4486,16 @@ function windowSizeOptionsTemplate(){
 }
 
 
+function workerNumberTemplate(){
+	
+	return `
+		<b>Chain number:</b>  <input id="workerNumberInput" type="number" class="textboxBlue" title="Which MCMC chain do you want to show?" style="width:50px; text-align:right"></input>
+	`;
+	
+}
+
+
+
 
 function pauseSiteOptionsTemplate(){
 
@@ -4565,6 +4577,23 @@ function parameterHeatmapZAxisTemplate(){
 	`;
 
 
+}
+
+
+
+function getTracePlotDropdownTemplate(){
+	
+	return `
+
+		<legend><b>Y-axis variable</b></legend>
+		<select class="dropdown" title="What do you want to show on the y-axis?" id = "traceVariableY" style="vertical-align: middle; text-align:right;">
+			<option value="RSS">-RSS</option>
+			<option value="prior">log prior</option>
+		</select><br>
+		Calculated per trial.
+
+	`;
+	
 }
 
 
@@ -4849,6 +4878,56 @@ function plotOptions(plotNum){
 				//$("#plotFromPosterior").attr("disabled", "disabled");
 			//}
 			$("#plotFromPosterior").prop("checked", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFromPosterior"]);
+
+			break;
+			
+			
+			
+		case "tracePlot":
+		
+		
+			// Create a dropdown list which contains all the parameters sampled in the prior
+			$("#settingCell4").html(getTracePlotDropdownTemplate().replace("Calculated per trial.", ""));
+			get_ParametersWithPriors_controller(function(params){
+				console.log("params", params);
+				
+				for (var paramID in params){
+					$("#traceVariableY").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
+				}
+				$("#traceVariableY").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum].yVariable);
+
+			});
+			
+		
+			$("#settingCell1").html(distanceVsTimeOptionsTemplate1().replace("Time range", "Trace range").replace("XUNITS", "").replace("XUNITS", "").replace('value="1"', 'value="1000"'));
+			$("#pauseXRow").remove();
+			$("#shortPauseXRow").remove();
+			$("#settingCell2").html(distanceVsTimeOptionsTemplate2().replace("Distance range", "Y-axis range").replace("YUNITS", "").replace("YUNITS", "").replace("YMINDEFAULT", 0).replace("YMAXDEFAULT", 100));
+
+			// Set xmax and xmin
+			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"] == "automaticX") $('input[name="xRange"][value="automaticX"]').click()
+			else {
+				$('input[name="xRange"][value="specifyX"]').click()
+				$("#xMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][0]);
+				$("#xMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][1]);
+			}
+
+			// Set ymax and ymin
+			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"] == "automaticY") $('input[name="yRange"][value="automaticY"]').click()
+			else {
+				$('input[name="yRange"][value="specifyY"]').click()
+				$("#yMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][0]);
+				$("#yMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][1]);
+			}
+			
+			
+			// Worker number
+			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum].workerNum != null){
+				$("#settingCell3").html("<br>" + workerNumberTemplate());
+				$("#workerNumberInput").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum].workerNum);
+				$("#workerNumberInput").attr("min", PLOT_DATA["whichPlotInWhichCanvas"][plotNum].workerNumRange[0]);
+				$("#workerNumberInput").attr("max", PLOT_DATA["whichPlotInWhichCanvas"][plotNum].workerNumRange[1]);
+			}
 
 			break;
 

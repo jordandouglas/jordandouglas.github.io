@@ -29,6 +29,7 @@ MCMC_JS.currentRSSthreshold = 0;
 MCMC_JS.RSS_this_trial = 0;
 
 
+
 MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 
 
@@ -477,7 +478,20 @@ MCMC_JS.calculateESS = function(){
 }
 
 
-
+MCMC_JS.get_ParametersWithPriors_WW = function(resolve = function() { }, msgID = null){
+	
+	
+	var paramsWithPriorsFull = {};
+	for (var i = 0; i < MCMC_JS.parametersWithPriors.length; i ++){
+		var paramID = MCMC_JS.parametersWithPriors[i];
+		paramsWithPriorsFull[paramID] = PARAMS_JS.PHYSICAL_PARAMETERS[paramID];
+	}
+	if (msgID != null){
+		postMessage(msgID + "~X~" + JSON.stringify(paramsWithPriorsFull));
+	}
+	else resolve(paramsWithPriorsFull);
+	
+}
 
 
 MCMC_JS.update_burnin_WW = function(burnin){
@@ -507,7 +521,8 @@ if (RUNNING_FROM_COMMAND_LINE){
 		currentRSSthreshold: MCMC_JS.currentRSSthreshold,
 		RSS_this_trial: MCMC_JS.RSS_this_trial,
 		calculateESS: MCMC_JS.calculateESS,
-		update_burnin_WW: MCMC_JS.update_burnin_WW
+		update_burnin_WW: MCMC_JS.update_burnin_WW,
+		get_ParametersWithPriors_WW: MCMC_JS.get_ParametersWithPriors_WW
 
 	}
 
