@@ -44,10 +44,11 @@ function initABCpanel(){
 
 // Loads all the settings from the DOM and sends them through to the model so ABC can begin
 // Assumes that all force-velocity input textareas have already been validated
-function beginABC(which = "ABC"){
+function beginABC(){
 
 
 	// Load the force-velocity values
+	var which = $("#ABC_useMCMC").val() == 1 ? "ABC" : $("#ABC_useMCMC").val() == 2 ? "MCMC" : "NS-ABC"
 	var abcDataObjectForModel = getAbcDataObject(which)
 
 	console.log("Sending object", abcDataObjectForModel);
@@ -80,6 +81,9 @@ function beginABC(which = "ABC"){
 	$("#MCMCntrials").attr("disabled", "disabled");
 
 
+	$("#ABC_useMCMC").css("cursor", "auto");
+	$("#ABC_useMCMC").css("background-color", "#858280");
+	$("#ABC_useMCMC").attr("disabled", "disabled");
 
 
 	//$("#ABC_RSS").css("cursor", "auto");
@@ -87,7 +91,7 @@ function beginABC(which = "ABC"){
 	//$("#ABC_RSS").attr("disabled", "disabled");
 
 
-	onABCStart();
+	onABCStart(which);
 
 
 
@@ -95,21 +99,43 @@ function beginABC(which = "ABC"){
 
 
 
-function onABCStart(){
+function onABCStart(which){
 
 
 
 	$("#downloadABC").show(50);
 	$("#uploadABC").hide(50);
 	
-	$("#ABCacceptancePercentage_span").show(50);
-	if ($("#ABC_useMCMC").val() == 1) $("#ABC_showRejectedParameters_span").show(50);
-	if ($("#ABC_useMCMC").val() == 2) $("#ABC_ESS_span").show(50);
+	$(".ABC_display").show(50);
+	if ($("#ABC_useMCMC").val() == 1) $(".RABC_display").show(50);
+	if ($("#ABC_useMCMC").val() == 2) $(".MCMC_display").show(50);
 	
 	$("#ABCacceptancePercentage_val").html("0");
-	$("#ABCacceptance_span").show(50);
 	$("#nRowsToDisplayABC").show(50);
 	$("#ABCacceptance_val").html("0");
+
+
+
+	// Add the trace plots if MCMC
+	if (which == "MCMC"){
+
+		var option = `<option value="tracePlot">MCMC trace</option>`;
+		$("#selectPlot1").append(option);
+		$("#selectPlot2").append(option);
+		$("#selectPlot3").append(option);
+
+		// Open a trace plot
+		for (var i = 1; i <=3; i ++){
+			if ($("#selectPlot" + i).val() == "none"){
+				$("#selectPlot" + i).val("tracePlot");
+				selectPlot(i);
+				break;
+			}
+		}
+
+	}
+
+
 
 
 
@@ -1400,15 +1426,15 @@ function toggleMCMC(){
 
 	// 1 = Rejection ABC
 	if ($("#ABC_useMCMC").val() == 1){
-		$("#ABC_settings").show(0);
-		$("#MCMC_settings").hide(0);
+		$(".ABC_settings").show(0);
+		$(".MCMC_settings").hide(0);
 		$(".rejection_ABC_RSS").show(0);
 	}
 	
 	// 2 = MCMC ABC
 	else if ($("#ABC_useMCMC").val() == 2){
-		$("#ABC_settings").hide(0);
-		$("#MCMC_settings").show(0);
+		$(".ABC_settings").hide(0);
+		$(".MCMC_settings").show(0);
 		$(".rejection_ABC_RSS").hide(0);
 	}
 	

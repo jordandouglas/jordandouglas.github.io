@@ -818,6 +818,9 @@ function pruneStepPlotData(xvals, yvals){
 }
 
 
+
+
+
 // Produce a line plot where the y axis takes discrete values
 function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xlab = "", ylab = "", canvasSizeMultiplier = 1) {
 
@@ -1070,38 +1073,344 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 
 
 
+function plot_MCMC_trace(){
 
 
-function plotFoldingBarrier(){
-
-
+	// Find the canvas to print onto
 	var canvasesToPrintTo = [];
 	for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
-		if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "plotFunction") canvasesToPrintTo.push(plt);
-	}
-	
-	if (canvasesToPrintTo.length == 0) return; 
-
-	for (var i = 0; i < canvasesToPrintTo.length; i++){
-
-		if ($("#plotDIV" + canvasesToPrintTo[i]).is( ":hidden" )) continue;
-
-
-
-
-
-
-
-
-
-
-
-
+		if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "tracePlot") canvasesToPrintTo.push(plt);
 	}
 
+
+	for (var j = 0; j < canvasesToPrintTo.length; j ++){
+
+
+		var yVar = "logLikelihood";
+		var pltNum = canvasesToPrintTo[j];
+
+		var xVals = [];
+		var yVals = [];
+		var workerNum = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].workerNum;
+		for (var postNum = 0; postNum < PLOT_DATA.POSTERIOR_DISTRIBUTION.length; postNum++){
+
+
+			// Get the trial number
+			var trialNum = "" + PLOT_DATA.POSTERIOR_DISTRIBUTION[postNum].trial;
+			if (trialNum.split(":").length == 2 && trialNum.split(":")[0] != "" + workerNum) continue; // Skip this entry if it is from the wrong thread
+			if (trialNum.split(":").length == 2) trialNum = trialNum.split(":")[1];
+			xVals.push(parseFloat(trialNum));
+
+
+			// Get the y-axis value
+			yVals.push(PLOT_DATA.POSTERIOR_DISTRIBUTION[postNum][yVar]);
+
+
+		}
+
+
+
+		// Xmax and xmin
+		var xmax = 1;
+		var xmin = 0;
+		if (PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["xRange"] == "automaticX"){
+
+			xmin = xVals[0];
+			xmax = xVals[xVals.length-1];
+
+
+		}else{
+
+			xmin = PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["xRange"][0];
+			xmax = PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["xRange"][1];
+		}
+
+
+
+		// Ymax and ymin
+		var ymax = 1;
+		var ymin = 0;
+		if (PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["yRange"] == "automaticY"){
+
+			ymin = minimumFromList(yVals);
+			ymax = maximumFromList(yVals);
+
+			ymin = roundToSF(ymin, 3, "floor");
+			ymax = roundToSF(ymax, 3, "ceil");
+
+
+		}else{
+
+			ymin = PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["yRange"][0];
+			ymax = PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["yRange"][1];
+		}
+
+
+		// Epsilon decrease over time
+		var epsilon = null;
+		if (PLOT_DATA.ABC_EXPERIMENTAL_DATA !=null && yVar == "logLikelihood"){
+			var epsilon_min = -PLOT_DATA.ABC_EXPERIMENTAL_DATA.RSSthreshold_min;
+			var epsilon_0 = -PLOT_DATA.ABC_EXPERIMENTAL_DATA.RSSthreshold_0;
+			var epsilon_gamma = PLOT_DATA.ABC_EXPERIMENTAL_DATA.RSSthreshold_gamma;
+			epsilon = {emin: epsilon_min, e0: epsilon_0, gamma: epsilon_gamma};
+		}
+
+
+		var range = [xmin, xmax, ymin, ymax];
+		trace_plot(xVals, yVals, range, epsilon, "plotCanvas" + pltNum, "plotCanvasContainer" + pltNum, "State", "-RSS", PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["canvasSizeMultiplier"]);
+
+	}
 
 
 }
+
+
+
+
+
+// Produce a line plot where the y axis takes discrete values
+function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, xlab = "", ylab = "", canvasSizeMultiplier = 1) {
+
+
+	if ($("#" + canvasDivID).is( ":hidden" )) return;
+	
+	if (canvasSizeMultiplier == null) canvasSizeMultiplier = 1;
+
+	var axisGap = 45 * canvasSizeMultiplier;
+	var outerMargin = 5 * canvasSizeMultiplier;
+	
+	
+	if (canvasDivID != null) {
+		$("#" + id).remove();
+		var canvasWidth = canvasSizeMultiplier * 500;
+		var canvasHeight = canvasSizeMultiplier * 300;
+		$("#" + canvasDivID).html('<canvas id="' + id + '" height=' + canvasHeight + ' width=' + canvasWidth + '></canvas>');
+	}
+
+	
+	var canvas = $('#' + id)[0];
+	if (canvas == null) return;
+	
+	var ctx = canvas.getContext('2d');
+
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	
+	var plotWidth = canvas.width - axisGap - outerMargin;
+	var plotHeight = canvas.height - axisGap - outerMargin;
+	
+	var widthScale = (plotWidth / (range[1] - range[0]));
+	var heightScale = (plotHeight / (range[3] - range[2]));
+	var col = "#008cba";
+
+
+	
+	if (xVals.length > 1) {
+		ctx.lineWidth = 2 * canvasSizeMultiplier;
+	
+		// X min and max
+		var axisPointMargin = 10 * canvasSizeMultiplier;
+		ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+		ctx.textBaseline="top"; 
+		ctx.textAlign="left"; 
+		ctx.fillText(roundToSF(range[0], 1), axisGap, canvas.height - axisGap + axisPointMargin);
+		ctx.textAlign="right"; 
+		ctx.fillText(roundToSF(range[1], 1), canvas.width - outerMargin, canvas.height - axisGap + axisPointMargin);
+	
+
+		
+		// Y min and max
+		ctx.save()
+		ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+		ctx.textBaseline="bottom"; 
+		ctx.textAlign="right"; 
+		ctx.translate(axisGap - axisPointMargin, canvas.height - heightScale * (range[2] - range[2]) - axisGap);
+		ctx.rotate(-Math.PI/2);
+		ctx.fillText(Math.ceil(range[2]), 0, 0);
+		ctx.restore();
+		
+		ctx.save()
+		ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+		ctx.textAlign="right"; 
+		ctx.textBaseline="bottom"; 
+		ctx.translate(axisGap - axisPointMargin, outerMargin);
+		ctx.rotate(-Math.PI/2);
+		ctx.fillText(Math.floor(range[3]), 0, 0);
+		ctx.restore();
+		
+
+		ctx.lineWidth = 3 * canvasSizeMultiplier;
+		
+		
+		//var pixelsPerSecond = (canvas.width - axisGap) / (range[1] - range[0]);
+		//var pixelsPerNucleotide = (canvas.height - axisGap) / (range[3] - range[2]);
+
+
+
+		ctx.beginPath();
+		var first = true;
+
+
+
+		var burnin = Math.floor(parseFloat($("#MCMC_burnin").val()) / 100 * xVals.length);
+
+		//var currentTimePixel = 0; 		// We do not want to plot every single value because it is wasteful (and crashes the program). 
+		//var currentDistancePixel = 0; 	// So only plot values which will occupy a new pixel
+
+		/*
+		// Show the threshold epsilon decrease
+		if (epsilon != null){
+
+			var pixelY = epsilon.e0;
+			var converged = false;
+			for (var pixelX = axisGap; pixelX <= canvas.width - outerMargin; pixelX++){
+
+
+				var trueX = range[0] + xVals[pixelX - axisGap]
+
+				if (!converged){
+					pixelY *= epsilon.gamma;
+					if (pixelY > epsilon.emin){
+						pixelY = epsilon.emin;
+						converged = true;
+					}
+				}
+
+			}
+
+		}
+
+		*/
+
+
+
+
+
+		// Burnin line in grey, main line in col
+		ctx.strokeStyle = "#b20000";
+		for (var valIndex = 0; valIndex < xVals.length; valIndex ++){
+
+
+			var xval = xVals[valIndex];
+			var yval = yVals[valIndex];
+
+
+			//if (acumTime * pixelsPerSecond < currentTimePixel && Math.ceil(yvalsSim[valIndex] * pixelsPerNucleotide) == currentDistancePixel) continue; // Do not plot if it will not generate a new pixel
+			//currentTimePixel = Math.ceil(acumTime * pixelsPerSecond);
+			//currentDistancePixel = Math.ceil(yvalsSim[valIndex] * pixelsPerNucleotide);
+			
+
+			// If this point is in the future then all the remaining points in this list will be too. Break
+			if (xval > range[1]){
+				break;
+			}
+
+			// If this point is too early in time then do not plot it
+			if (first && xval < range[0]){
+				continue;
+			}
+
+
+			var xval = Math.max(xval, range[0]); // If the value is too low then set its val to the minimum
+			var yval = Math.max(yval, range[2]);
+			//var yvalPrev = Math.max(yVals[valIndex-1], range[2]); // If the value is too low then set its val to the minimum
+			
+			
+			var xPrime = widthScale * (xval - range[0]) + axisGap;
+			var yPrime = plotHeight - heightScale * (yval - range[2]) + outerMargin;
+
+
+			if (first){
+				ctx.moveTo(xPrime, yPrime);
+				first = false;
+			}
+
+
+
+			// Plot this xval with the previous yval
+			//var yPrimePrev = canvas.height - heightScale * (yvalPrev - range[2]) - axisGap; // (0,0) is top left
+			//ctx.lineTo(xPrime, yPrimePrev);
+			
+			// Plot this xval with this yval
+			ctx.lineTo(xPrime, yPrime);
+
+
+
+			// Switch colour and start a new stroke
+			if (valIndex == burnin){
+				ctx.stroke(); 
+				ctx.beginPath();
+				ctx.strokeStyle = col;
+				ctx.moveTo(xPrime, yPrime);
+			}
+
+		
+		
+		}
+		
+
+		ctx.stroke(); 
+		
+		
+		ctx.globalAlpha = 1;
+
+
+		// Add circle to last x,y value in plot
+		var lastIndex = xVals.length-1;
+		if (lastIndex >= 0){
+
+			if (xVals[lastIndex] - range[0] >= 0 && yVals[lastIndex] - range[2] >= 0) {
+				ctx.beginPath();
+				ctx.fillStyle = "#008CBA";
+				xPrime = widthScale * (xVals[lastIndex] - range[0]) + axisGap;
+				yPrime =  plotHeight - heightScale * (yVals[lastIndex] - range[2]) + outerMargin;
+				ctx_ellipse(ctx, xPrime, yPrime, 5 * canvasSizeMultiplier, 5 * canvasSizeMultiplier, 0, 0, 2 * Math.PI);
+				ctx.fill();
+			}
+		}
+		
+	
+	
+	}
+
+
+	ctx.lineWidth = 3 * canvasSizeMultiplier;
+	ctx.globalAlpha = 1;
+
+	// Axes
+	ctx.strokeStyle = "black";
+	ctx.beginPath();
+	ctx.moveTo(axisGap, outerMargin);
+	ctx.lineTo(axisGap, canvas.height - axisGap);
+	ctx.lineTo(canvas.width - outerMargin, canvas.height - axisGap);
+	ctx.stroke();
+	
+
+	// X label
+	ctx.fillStyle = "black";
+	ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+	ctx.textAlign="center"; 
+	ctx.textBaseline="top"; 
+	var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
+	var xlabYPos = canvas.height - axisGap / 2;
+	ctx.fillText(xlab, xlabXPos, xlabYPos);
+	
+	// Y label
+	ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+	ctx.textAlign="center"; 
+	ctx.textBaseline="bottom"; 
+	ctx.save()
+	var ylabXPos = 2 * axisGap / 3;
+	var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
+	ctx.translate(ylabXPos, ylabYPos);
+	ctx.rotate(-Math.PI/2);
+	ctx.fillText(ylab, 0 ,0);
+	ctx.restore();
+	
+	
+
+}
+
+
 
 
 
@@ -3822,6 +4131,9 @@ function plot_probability_distribution(distn_fn, xmin, xmax, canvasID, xlab = ""
 function roundToSF(val, sf=2, ceilOrFloor = "none"){
 	
 	var magnitude = Math.floor(log(val, 10));
+
+	if (val < 0 && ceilOrFloor == "ceil") ceilOrFloor = "floor";
+	else if (val < 0 && ceilOrFloor == "floor") ceilOrFloor = "ceil";
 
 	var num = val * Math.pow(10, sf-magnitude);
 	if (ceilOrFloor == "ceil") num = Math.ceil(num)

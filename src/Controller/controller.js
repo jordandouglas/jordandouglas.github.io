@@ -1244,10 +1244,10 @@ function clearCache(){
 				$("#ABCoutput").html("");
 				$("#downloadABC").hide(50);
 				$("#uploadABC").show(50);
-				$("#ABCacceptancePercentage_span").hide(50);
-				$("#ABCacceptance_span").hide(50);
-				$("#ABC_showRejectedParameters_span").hide(50);
-				$("#ABC_useMCMC").hide(50);
+				$(".ABC_display").hide(50);
+				$(".RABC_display").hide(50);
+				$(".MCMC_display").hide(50);
+
 			}
 
 
@@ -1272,6 +1272,16 @@ function clearCache(){
 					ABClines = [];
 					ABClinesAcceptedOnly = [];
 					validateAllAbcDataInputs();
+
+					// Delete and reset any trace plots
+					for (var i = 1; i <=3; i ++){
+						if ($("#selectPlot" + i).val() == "tracePlot"){
+							$("#selectPlot" + i).val("none");
+							selectPlot(i);
+						}
+					}
+
+					$("option[value='tracePlot']").remove();
 				}
 
 				

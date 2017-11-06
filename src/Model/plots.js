@@ -154,10 +154,6 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 	
 	for (var plotNum = 1; plotNum <= 3; plotNum++){
-		if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
-			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParam"]];
-			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customMetric"]];
-		}
 		
 		if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
 			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamX"]];
@@ -236,7 +232,13 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 			 						 	 (PLOTS_JS.whichPlotInWhichCanvas[2] != null && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "velocityHistogram") || 
 										 (PLOTS_JS.whichPlotInWhichCanvas[3] != null && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "velocityHistogram"));
 	
-	
+
+	var tracePlot_needsData = 		!PLOTS_JS.plotsAreHidden &&
+									((PLOTS_JS.whichPlotInWhichCanvas[1] != null && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "tracePlot") || 
+		 						 	 (PLOTS_JS.whichPlotInWhichCanvas[2] != null && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "tracePlot") || 
+									 (PLOTS_JS.whichPlotInWhichCanvas[3] != null && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "tracePlot"));
+
+
 	if (distanceVsTime_needsData || velocityHistogram_needsData){
 
 
@@ -266,6 +268,12 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 	}
 
 
+	if (tracePlot_needsData){
+		plotData["POSTERIOR_DISTRIBUTION"] = ABC_JS.ABC_POSTERIOR_DISTRIBUTION;
+		plotData["ABC_EXPERIMENTAL_DATA"] = ABC_JS.ABC_EXPERIMENTAL_DATA;
+	}
+
+
 	if (pauseHistogram_needsData){
 		//plotData["elongationDurations"] = elongationDurations;
 	}
@@ -277,10 +285,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 	
 	var thereExistsAParameterPlot = !PLOTS_JS.plotsAreHidden &&
-								 ((PLOTS_JS.whichPlotInWhichCanvas[1] != null && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "custom") || 
-			 					  (PLOTS_JS.whichPlotInWhichCanvas[2] != null && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "custom") || 
-			 				      (PLOTS_JS.whichPlotInWhichCanvas[3] != null && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "custom") ||
-			 				      (PLOTS_JS.whichPlotInWhichCanvas[1] != null && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "parameterHeatmap") || 
+			 				      ((PLOTS_JS.whichPlotInWhichCanvas[1] != null && PLOTS_JS.whichPlotInWhichCanvas[1]["name"] == "parameterHeatmap") || 
 			 					  (PLOTS_JS.whichPlotInWhichCanvas[2] != null && PLOTS_JS.whichPlotInWhichCanvas[2]["name"] == "parameterHeatmap") || 
 			 				      (PLOTS_JS.whichPlotInWhichCanvas[3] != null && PLOTS_JS.whichPlotInWhichCanvas[3]["name"] == "parameterHeatmap"));
 
@@ -291,22 +296,6 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 	if (ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length > 0){
 
 		
-		
-		for (var plotNum = 1; plotNum <= 3; plotNum++){
-			if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && !PLOTS_JS.plotsAreHidden && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
-
-				var valuesX = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParam"]);
-				var valuesY = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customMetric"]);
-
-
-				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
-				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY}; // WILL NOT WORK IF THIS METRIC WAS NOT SAMPLED
-
-			}
-		}
-
-
-
 		for (var plotNum = 1; plotNum <= 3; plotNum++){
 
 			if (!PLOTS_JS.plotsAreHidden && PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
@@ -527,6 +516,14 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["timeSpaceY"] = "linearSpace";
 
 	}
+
+	else if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "tracePlot") {
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_MCMC_trace";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["workerNum"] = 1;
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+	}
+
 	
 	else if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "pauseSite") {
 		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_time_vs_site";
@@ -541,16 +538,6 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_misincorporation_vs_site";
 	}
 	
-	
-	else if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
-		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_custom";
-		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["sitesToRecord"] = [];
-		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParam"] = "none";
-		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customMetric"] = "probability";
-		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
-		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
-		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] = false;
-	}
 
 
 	else if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {
@@ -567,11 +554,6 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 	}
 
-
-
-	else if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"]  =="foldingBarrierPlot"){
-		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plotFoldingBarrier";
-	}
 
 
 
@@ -671,45 +653,6 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 			break;
 
 
-		case "custom":
-
-			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParam"] = values[0];
-			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customMetric"] = values[1];
-			//PLOTS_JS.whichPlotInWhichCanvas[plotNum]["sitesToRecord"] = values[2];
-			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[values[0]];
-			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[values[1]];
-			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"] = values[4];
-
-			// If sample from posterior use the correct points
-			if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"]){
-				var valuesX = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParam"]);
-				var valuesY = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customMetric"]);
-				PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
-				PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY}; // WILL NOT WORK IF THIS METRIC WAS NOT SAMPLED
-			}
-
-
-			if (values[2] == "automaticX") PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
-			else{
-				var xMin = parseFloat(values[2][0]);
-				var xMax = parseFloat(values[2][1]);
-				if (xMax <= xMin) xMax = xMin + 0.1;
-				if (isNaN(xMin) || isNaN(xMax)) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
-				else PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = [xMin, xMax];
-			}
-
-
-			if (values[3] == "automaticY") PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
-			else{
-				var yMin = parseFloat(values[3][0]);
-				var yMax = Math.max(parseFloat(values[3][1]), yMin+1);
-				if (isNaN(yMin) || isNaN(yMax)) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
-				else PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = [yMin, yMax];
-			}
-
-
-
-			break;
 
 
 		case "parameterHeatmap":
@@ -823,9 +766,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 				PLOTS_JS.misincorporationCounts[i] = {"A": 0, "C": 0, "G": 0, "T": 0, "U": 0};
 			}
 			break;
-			
-		case "custom":
-			break;
+
 		
 	}
 	
@@ -884,18 +825,8 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 	// Update the parameters on the list
 	for (var canvasNum = 1; canvasNum <=3; canvasNum++){
-		if (PLOTS_JS.whichPlotInWhichCanvas[canvasNum] != null && !PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["plotFromPosterior"] && PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["name"] == "custom"){
-
-			var paramID = PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["customParam"];
-			var metricID = PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["customMetric"];
-
-			PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["xData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[paramID];
-			PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["yData"] = PLOTS_JS.PARAMETERS_PLOT_DATA[metricID];
-
-
-		}
-
-		else if (PLOTS_JS.whichPlotInWhichCanvas[canvasNum] != null && !PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["plotFromPosterior"] && PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["name"] == "parameterHeatmap") {
+		
+		if (PLOTS_JS.whichPlotInWhichCanvas[canvasNum] != null && !PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["plotFromPosterior"] && PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["name"] == "parameterHeatmap") {
 
 			var paramIDx = PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["customParamX"];
 			var paramIDy = PLOTS_JS.whichPlotInWhichCanvas[canvasNum]["customParamY"];
@@ -982,12 +913,6 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 
 
-		for (var plotNum = 1; plotNum <= 3; plotNum++){
-			if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "custom") {
-				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["vals"] = [];
-				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["vals"] = [];
-			}
-		}
 
 		for (var plotNum = 1; plotNum <= 3; plotNum++){
 			if (PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "parameterHeatmap") {

@@ -2394,6 +2394,9 @@ function beginABC_controller(abcDataObjectForModel){
 		$("#PreExp").attr("disabled", false);
 		$("#PreExp").css("cursor", "");
 		$("#PreExp").css("background-color", "#008CBA");
+		$("#ABC_useMCMC").css("cursor", "pointer");
+		$("#ABC_useMCMC").css("background-color", "#008cba");
+		$("#ABC_useMCMC").attr("disabled", false);
 		running_ABC = false;
 		simulationRenderingController = false;
 
@@ -2511,10 +2514,6 @@ function get_unrendered_ABCoutput_controller(resolve = function() { }){
 
 
 
-
-
-
-
 function get_ABCoutput_controller(resolve = function(lines) { }){
 
 
@@ -2535,6 +2534,19 @@ function get_ABCoutput_controller(resolve = function(lines) { }){
 
 }
 
+
+function update_burnin_controller(){
+
+	var burnin = $("#MCMC_burnin").val();
+	if (WEB_WORKER == null) {
+		MCMC_JS.update_burnin_WW(burnin);
+	}else{
+		var fnStr = stringifyFunction("MCMC_JS.update_burnin_WW", [burnin]);
+		callWebWorkerFunction(fnStr);
+	}
+
+
+}
 
 
 function getPosteriorDistribution_controller(resolve = function(posterior) { }){
