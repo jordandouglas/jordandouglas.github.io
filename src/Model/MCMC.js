@@ -91,7 +91,9 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 		ABC_JS.ABC_parameters_and_metrics_this_simulation.logPrior = logPrior;
 		ABC_JS.ABC_parameters_and_metrics_this_simulation.logLikelihood = logLikelihood;
 
-
+		ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_min = parseFloat(ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_min);
+		ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_gamma = parseFloat(ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_gamma);
+		ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_0 = parseFloat(ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_0);
 
 
 		// Copy this current state and save it as the previous state
@@ -213,6 +215,7 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 				MCMC_JS.currentRSSthreshold = Math.max(ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_min, MCMC_JS.currentRSSthreshold * ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_gamma);
 			}
 			
+
 
 		}
 		
