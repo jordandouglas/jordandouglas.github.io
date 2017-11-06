@@ -102,7 +102,7 @@ BIBLIOGRAPHY["csillery2010approximate"] = {name: `Csilléry, Katalin, et al. "Ap
 BIBLIOGRAPHY["beaumont2010approximate"] = {name: `Beaumont, Mark A. "Approximate Bayesian computation in evolution and ecology." Annual review of ecology, evolution, and systematics 41 (2010): 379-406.`, DOI: "10.1146/annurev-ecolsys-102209-144621"};
 
 
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
+BIBLIOGRAPHY["rambaut2015tracer"] = {name: `Rambaut, A., Suchard, M.A., Xie, D. and Drummond, A.J., 2015. Tracer v1. 6. 2014.`, DOI: "XXXX"}; // No DOI?
 
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 
