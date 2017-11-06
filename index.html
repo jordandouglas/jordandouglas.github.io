@@ -2971,163 +2971,231 @@ function closeNav() {
 
 						<br><br>
 
-						<div style="position:relative;">
+
+
+						<table padding=5 cellpadding=10 style="vertical-align:top">
+
+							<tr>
+								<td>
+									<div style="position:relative; vertical-align:top;">
+										
+										<b>Inference Method:</b><br>
+										<input type="range" min="1" max="3" value="1" class="rangeslider noselect" style="width:100px" OnChange="toggleMCMC()" id="ABC_useMCMC" title="Use the R-ABC, MCMC-ABC, or NS-ABC algorithm to fit the data">
+										<table style="margin-left: 30px; height: 100px; margin-top: -26px;">
+											<tr>
+												<td>
+													Rejection ABC
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													Markov-chain-Monte-Carlo ABC
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													Nested-sampling ABC
+												</td>
+											</tr>
+										
+										
+										</table>
+										 
+									</div>
+								</td>
 							
-							<b>Inference Method:</b><br>
-							<input type="range" min="1" max="3" value="1" class="rangeslider" style="width:100px" OnChange="toggleMCMC()" id="ABC_useMCMC" title="Use the R-ABC, MCMC-ABC, or NS-ABC algorithm to fit the data">
-							<table style="margin-left: 30px; height: 100px; margin-top: -26px;">
-								<tr>
-									<td>
-										Rejection ABC
-									</td>
-								</tr>
-								
-								<tr>
-									<td>
-										Markov-chain-Monte-Carlo ABC
-									</td>
-								</tr>
-								
-								<tr>
-									<td>
-										Nested-sampling ABC
-									</td>
-								</tr>
-							
-							
-							</table>
-							 
-						</div>
+
+								<td style="vertical-align:top; text-align:right">
+
+									<b>Length settings</b><br>
+									<table style="text-align:right">
+										<tr class="ABC_settings">
+											<td>
+												Number of iterations:
+												<input type="number" id="ABCntrials" min=0 value=1000 title="Number of iterations to run the ABC for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
+											</td>
+										</tr>
+										
+										<tr class="ABC_settings">
+											<td>
+												Number of trials per data point:
+												<input type="number" id="ABC_ntestsperdata" min=1 value=20 title="Number of tests to perform at each force/NTP setting. The median velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
+											</td>
+										</tr>
+										
+										<tr class="MCMC_settings" style="display:none">
+											<td>
+												Number of MCMC iterations:
+												<input type="number" id="MCMCntrials" min=0 value=10000 title="Number of iterations to run the MCMC chain for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
+											</td>
+										</tr>
+
+
+
+										<tr class="MCMC_settings" style="display:none">
+											<td>
+												Number of trials per data point:
+												<input type="number" id="MCMC_ntestsperdata" min=1 value=5 title="Number of tests to perform at each force/NTP setting. The median velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 40px;  font-size:14px; background-color:#663399">
+											</td>
+										</tr>
+									
+									
+									</table>
+
+								</td>
+
+
+
+								<td class="MCMC_settings" style="display:none; vertical-align:top; text-align:right">
+
+									<b>Threshold settings</b><br>
+									<table style="text-align:right">
+										<tr>
+											<td>
+												&isin;<sub>min</sub> =
+												<input type="number" id="MCMC_RSSthreshold_min" min=0 value=100 title="RSS threshold which must be met to accept a point into the posterior" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">
+											</td>
+										</tr>
+										
+										<tr>
+											<td>
+												&isin;<sub>0</sub> =
+												<input type="number" id="MCMC_RSSthreshold_0" min=0 value=10000 title="Initial RSS threshold. This will be decreased every iteration until reaching the minimum threshold" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">
+											</td>
+										</tr>
+										
+										<tr>
+											<td>
+												&gamma; =
+												<input type="number" id="MCMC_RSSthreshold_gamma" min=0 max=1 value=0.98 title="Exponential decrease in RSS threshold" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">
+											</td>
+										</tr>
+
+									
+									</table>
+
+								</td>
+
+
+
+								<td class="MCMC_settings" style="display:none; vertical-align:top; text-align:right">
+
+									<b>Chain settings</b><br>
+									<table style="text-align:right">
+										<tr>
+											<td>
+												Burn-in:
+												<input type="number" id="MCMC_burnin" onChange="validateAllAbcDataInputs(); update_burnin_controller()" min=0 max=100 value=10 title="Percentage of points to throw away before reaching the posterior distribution" class="variable" style="vertical-align: middle; text-align:left; width: 40px;  font-size:14px; background-color:#663399">%
+											</td>
+										</tr>
+										
+										<tr>
+											<td>
+												Log every
+												<input type="number" id="MCMC_logevery" min=1 value=20 title="How often do you want to log the current position" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">states
+											</td>
+										</tr>
+										
+									</table>
+
+								</td>
+
+
+
+
+
+								<td style="vertical-align:middle; text-align:right">
+
+									
+									<table style="text-align:right">
+										<tr>
+											<td class="ABC_settings">
+												<input type=button id="beginABC_btn" onClick=beginABC() value='Begin ABC' title="Begin the approximate Bayesian computation with the current settings" class="operation beginABC_btn" style="background-color:#663399"> 
+
+											</td>
+
+											<td class="MCMC_settings" style="display:none">
+												<input type=button id="beginMCMC_btn" onClick="beginABC()" value='Begin MCMC-ABC' title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="operation beginABC_btn" style="background-color:#663399; width: 150px"> 
+
+											</td>
+
+
+											<td>
+												<input type=image id="uploadABC" class="rotate180" title="Upload an ABC output in .tsv format" onClick=uploadABC() src="src/Images/download.png" style="vertical-align: middle; height:20px; ">  
+													<input style="display:none" type="file" id="uploadABCinput" accept=".tsv"> 
+												<input type=image id="downloadABC" title="Download the ABC output (displayed below) in .tsv format" onClick=downloadABC() src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px; ">  
+											</td>
+										</tr>
+
+										
+									</table>
+
+								</td>
+
+
+
+
+								<td class="ABC_display" style="vertical-align:top; display:none; text-align:right">
+
+									<table style="text-align:right">
+										<tr class="ABC_display" style="display:none; vertical-align: middle;"  title="Number of sampled parameters which have been added to the posterior distribution" >
+
+											<td>
+												Accepted:
+												<span id="ABCacceptance_val">
+													0
+												</span>.
+											</td>
+										</tr>
+
+
+										<tr class="ABC_display" style="display:none; vertical-align: middle;"  title="Percentage of sampled parameters which are accepted by the posterior distribution" >
+
+											<td>
+												Acceptance rate:
+												<span id="ABCacceptancePercentage_val">
+													0
+												</span>%
+											</td>
+										</tr>
+
+
+
+										<tr class="MCMC_display" style="display:none; vertical-align: middle;"  title="Effective sample size" >
+
+											<td>
+												ESS:
+												<span id="ABC_ESS_val">
+													0
+												</span>
+											</td>
+										</tr>
+
+
+										<tr class="RABC_display" style="display:none; vertical-align: middle;"  title="Percentage of sampled parameters which are accepted by the posterior distribution" >
+
+											<td>
+												<label class="switch">
+											 		<input type="checkbox" id="ABC_showRejectedParameters" OnChange="toggleAcceptedOrRejected()"> </input>
+											 	 	<span class="slider round"></span>
+
+												</label> 
+												Show rejected parameters</span>
+											</td>
+										</tr>
+
+										
+									</table>
+
+								</td>
+
+							<tr>
+						</table>
+						<br>
 
 						<div style="padding: 5 10">
-
-
-
-							<span id="ABC_settings">
-								Number of ABC iterations:
-								<input type="number" id="ABCntrials" min=0 value=1000 title="Number of iterations to run the ABC for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
-
-								&nbsp;&nbsp;&nbsp;&nbsp;
-
-
-
-
-								Number of trials per data point:
-								<input type="number" id="ABC_ntestsperdata" min=1 value=20 title="Number of tests to perform at each force/NTP setting. The median velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
-
-								&nbsp;&nbsp;&nbsp;&nbsp;
-
-
-
-
-								<input type=button id="beginABC_btn" onClick=beginABC("ABC") value='Begin ABC' title="Begin the approximate Bayesian computation with the current settings" class="operation beginABC_btn" style="background-color:#663399"> 
-								
-	
-
-							</span>
-
-							<span id="MCMC_settings" style="display:none">
-
-
-								Number of MCMC iterations:
-								<input type="number" id="MCMCntrials" min=0 value=10000 title="Number of iterations to run the MCMC chain for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
-
-								&nbsp;&nbsp;&nbsp;&nbsp;
-
-
-								Number of trials per data point:
-								<input type="number" id="MCMC_ntestsperdata" min=1 value=5 title="Number of tests to perform at each force/NTP setting. The median velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 40px;  font-size:14px; background-color:#663399">
-
-								&nbsp;&nbsp;&nbsp;&nbsp;
-
-								
-								&isin;<sub>min</sub> =
-								<input type="number" id="MCMC_RSSthreshold_min" min=0 value=100 title="RSS threshold which must be met to accept a point into the posterior" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">
-
-								&nbsp;&nbsp;
-								
-								
-								&isin;<sub>0</sub> =
-								<input type="number" id="MCMC_RSSthreshold_0" min=0 value=10000 title="Initial RSS threshold. This will be decreased every iteration until reaching the minimum threshold" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">
-
-								&nbsp;&nbsp;
-								
-								
-								&gamma; =
-								<input type="number" id="MCMC_RSSthreshold_gamma" min=0 max=1 value=0.98 title="Exponential decrease in RSS threshold" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">
-
-								&nbsp;&nbsp;&nbsp;&nbsp;
-								
-
-								Burn-in:
-								<input type="number" id="MCMC_burnin" onChange="validateAllAbcDataInputs()" min=0 max=100 value=10 title="Percentage of points to throw away before reaching the posterior distribution" class="variable" style="vertical-align: middle; text-align:left; width: 40px;  font-size:14px; background-color:#663399">%
-
-								&nbsp;&nbsp;&nbsp;&nbsp;
-
-
-								Log every
-								<input type="number" id="MCMC_logevery" min=1 value=20 title="How often do you want to log the current position" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">states
-
-								&nbsp;&nbsp;&nbsp;&nbsp;
-
-
-
-								<input type=button id="beginMCMC_btn" onClick='beginABC("MCMC")' value='Begin MCMC-ABC' title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="operation beginABC_btn" style="background-color:#663399; width: 150px"> 
-								
-			
-							
-
-
-							</span>
-
-							&nbsp;&nbsp;&nbsp;
-							<input type=image id="uploadABC" class="rotate180" title="Upload an ABC output in .tsv format" onClick=uploadABC() src="src/Images/download.png" style="vertical-align: middle; height:20px; ">  
-								<input style="display:none" type="file" id="uploadABCinput" accept=".tsv"> 
-							<input type=image id="downloadABC" title="Download the ABC output (displayed below) in .tsv format" onClick=downloadABC() src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px; ">  
-					
-
-							
-							&nbsp;&nbsp;&nbsp;
-							
-							<span id="ABCacceptance_span" title="Number of sampled parameters which have been added to the posterior distribution" style="display:none; vertical-align: middle; height:20px;"> 
-									&nbsp; Accepted:
-									<span id="ABCacceptance_val">
-										0
-									</span>.
-							</span>		
-
-							&nbsp;&nbsp;&nbsp;&nbsp;
-							<span id="ABCacceptancePercentage_span" title="Percentage of sampled parameters which are accepted by the posterior distribution" style="display:none; vertical-align: middle; height:20px;"> 
-									&nbsp;&nbsp; Acceptance rate:
-									<span id="ABCacceptancePercentage_val">
-										0
-									</span>%
-							</span>		
-
-
-							&nbsp;&nbsp;
-							<span id="ABC_ESS_span" title="Effective sample size" style="display:none; vertical-align: middle; height:20px;"> 
-									&nbsp; ESS:
-									<span id="ABC_ESS_val">
-										0
-									</span>
-							</span>									
-
-							&nbsp;&nbsp;
-							<span id="ABC_showRejectedParameters_span" style="font-size:15px; vertical-align:middle">
-							<label class="switch">
-						 		<input type="checkbox" id="ABC_showRejectedParameters" OnChange="toggleAcceptedOrRejected()"> </input>
-						 	 	<span class="slider round"></span>
-
-							</label> 
-							Show rejected parameters</span>
-							
-							
-							
-
-
-							<br><br>
-
 
 							<div id="nRowsToDisplayABC" style="margin-left:10px;">
 								<input type=button id='minusABCrows' class='minimise dropdown-disabled' style='width:40px'  value='&larr;30' onClick=minusABCrows() title='See previous 30 rows'>
@@ -3139,8 +3207,6 @@ function closeNav() {
 							<div id="ABCoutput" style="width:95%; font-family:'Courier New'; background-color:white; color: black; font-size: 14px; padding: 10 20; max-height: 300px; overflow-y:scroll; overflow-x:scroll">
 
 							</div>
-
-						
 			
 						</div>
 
