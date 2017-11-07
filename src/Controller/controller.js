@@ -866,7 +866,7 @@ function saveSession(){
 				saveXML.writeStartElement('plots');
 					saveXML.writeAttributeString("hidden", $("#showPlots").val() == "+");
 					for (var i = 1; i <=4; i ++){
-						if (PLOT_DATA["whichPlotInWhichCanvas"][i] == null) continue;
+						if (PLOT_DATA["whichPlotInWhichCanvas"][i] == null || PLOT_DATA["whichPlotInWhichCanvas"][i].name == "none") continue;
 						
 						saveXML.writeStartElement("plot" + i);
 						for (pltData in PLOT_DATA["whichPlotInWhichCanvas"][i]){

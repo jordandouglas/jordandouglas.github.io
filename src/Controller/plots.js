@@ -1103,7 +1103,7 @@ function plot_MCMC_trace(){
 
 
 			// Get the trial number
-			var trialNum = "" + PLOT_DATA.POSTERIOR_DISTRIBUTION[postNum].trial;
+			var trialNum = "" + PLOT_DATA.POSTERIOR_DISTRIBUTION[postNum].sample;
 			if (workerNum != null){
 				if (trialNum.split(":")[0] != "" + workerNum) continue; // Skip this entry if it is from the wrong thread
 				trialNum = trialNum.split(":")[1];
@@ -1178,7 +1178,7 @@ function plot_MCMC_trace(){
 		//console.log("Values", xVals, yVals);
 
 		var ylab = PLOT_DATA.POSTERIOR_DISTRIBUTION.length > 0 ? PLOT_DATA.POSTERIOR_DISTRIBUTION[0][yVar].name : "RSS";
-		trace_plot(xVals, yVals, range, epsilon, "plotCanvas" + pltNum, "plotCanvasContainer" + pltNum, "State", ylab, PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["canvasSizeMultiplier"]);
+		trace_plot(xVals, yVals, range, epsilon, "plotCanvas" + pltNum, "plotCanvasContainer" + pltNum, "Sample", ylab, PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["canvasSizeMultiplier"]);
 
 	}
 

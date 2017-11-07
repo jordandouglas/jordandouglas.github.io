@@ -190,11 +190,12 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 			// Accept
 			if (alpha >= 1 || RAND_JS.uniform(0, 1) < alpha){
 				MCMC_JS.MCMC_parameters_and_metrics_previous_simulation = JSON.parse(JSON.stringify(ABC_JS.ABC_parameters_and_metrics_this_simulation));
-				MCMC_JS.MCMC_parameters_and_metrics_previous_simulation["trial"] = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
+				//MCMC_JS.MCMC_parameters_and_metrics_previous_simulation["trial"] = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
 				ABC_JS.nAcceptedValues++;
 			}else{
+				MCMC_JS.MCMC_parameters_and_metrics_previous_simulation["trial"] = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left;
 				ABC_JS.ABC_parameters_and_metrics_this_simulation = JSON.parse(JSON.stringify(MCMC_JS.MCMC_parameters_and_metrics_previous_simulation));
-				ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"] = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
+				//ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"] = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
 				//console.log("Rejected with alpha=", alpha);
 			}
 
@@ -380,7 +381,7 @@ MCMC_JS.cache_effective_sample_sizes = function(){
 	for (var colID in ABC_JS.ABC_POSTERIOR_DISTRIBUTION[0]){
 
 		if (colID == "NTPeq" || colID == "FAssist" || colID == "trial" || colID == "velocity" || colID == "accepted") continue;
-		MCMC_JS.cached_effective_sample_sizes[colID] = MCMC_JS.calculateESS(colID);
+		MCMC_JS.cached_effective_sample_sizes[colID] = 0;// MCMC_JS.calculateESS(colID);
 	}
 
 
@@ -438,8 +439,6 @@ MCMC_JS.calculateESS = function(toTrace = "logLikelihood", workerNum = null){
 	*/
 
 
-	console.log("Calculating ESS for", toTrace);
-
 
 	// Code adapted from beast2/tracer
 	var MAX_LAG = 2000;
@@ -448,7 +447,7 @@ MCMC_JS.calculateESS = function(toTrace = "logLikelihood", workerNum = null){
 	var autoCorrelation = Array.apply(null, Array(MAX_LAG)).map(Number.prototype.valueOf,0);
 	var trialStart = Math.floor(ABC_JS.ABC_EXPERIMENTAL_DATA.burnin/100 * ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length);
 	var n = ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length - trialStart;
-
+	if (isNaN(n) || n < 0) n = 0;
 
 
 
@@ -505,6 +504,7 @@ MCMC_JS.calculateESS = function(toTrace = "logLikelihood", workerNum = null){
 	var ESS = n / ACT;
 
 
+	//console.log("Calculated ESS for", toTrace, ESS);
 	return ESS;
 
 

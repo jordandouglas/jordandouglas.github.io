@@ -2076,7 +2076,10 @@ function loadSession_controller(XMLData){
 				if (experimentalData["inferenceMethod"] == "ABC") $("#ABCntrials").val(experimentalData["ntrials"]);
 				else if (experimentalData["inferenceMethod"] == "MCMC") $("#MCMCntrials").val(experimentalData["ntrials"]);
 			}
-			if (experimentalData["testsPerData"] != null) $("#ABC_ntestsperdata").val(experimentalData["testsPerData"]);
+			if (experimentalData["testsPerData"] != null) {
+				if (experimentalData["inferenceMethod"] == "ABC") $("#ABC_ntestsperdata").val(experimentalData["testsPerData"]);
+				else if (experimentalData["inferenceMethod"] == "MCMC") $("#MCMC_ntestsperdata").val(experimentalData["testsPerData"]);
+			}
 			if (experimentalData["burnin"] != null) $("#MCMC_burnin").val(experimentalData["burnin"]);
 			if (experimentalData["logEvery"] != null) $("#MCMC_logevery").val(experimentalData["logEvery"]);
 			
@@ -2451,8 +2454,8 @@ function get_unrendered_ABCoutput_controller(resolve = function() { }){
 	var updateDOM = function(result){
 
 		// Update the counter
-		var nTrialsToGo = result["nTrialsToGo"];
-		if (nTrialsToGo != parseFloat($("#ABCntrials").val())) {
+		var nTrialsToGo = parseFloat(result["nTrialsToGo"]);
+		if (nTrialsToGo != parseFloat($("#ABCntrials").val()) && !isNaN(nTrialsToGo)) {
 			$("#ABCntrials").val(nTrialsToGo);
 			$("#MCMCntrials").val(nTrialsToGo);
 		}

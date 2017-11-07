@@ -1289,7 +1289,7 @@ function downloadABC(){
 		}
 
 
-		download("ABC_output.tsv", stringToPrint);
+		download("posterior.log", stringToPrint);
 		
 
 	});

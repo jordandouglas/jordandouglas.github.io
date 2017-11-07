@@ -1343,9 +1343,9 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 
 		 
 		PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW();
+
 		WW_JS.WORKER_ID = workerID;
 		initialising_node = false;
-
 
 	
 
@@ -1396,6 +1396,10 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 		else{
 
 			
+			// Initialise the .log file (one for each worker)
+			ABC_JS.initialiseFileNames_CommandLine();
+			ABC_JS.initialiseSaveFiles_CommandLine(startingTime);
+
 
 			// Split the number of iterations evenly among the number of workers
 			if (nthreads > 1){

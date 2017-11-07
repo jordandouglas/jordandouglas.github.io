@@ -158,8 +158,8 @@ function parseXML_ABCmain_WW(ABCnode){
 
 	XML_JS.ABC_EXPERIMENTAL_DATA = {};
 	XML_JS.ABC_EXPERIMENTAL_DATA["inferenceMethod"] = ABCnode["inferenceMethod"];
-	XML_JS.ABC_EXPERIMENTAL_DATA["ntrials"] = ABCnode["ntrials"];
-	XML_JS.ABC_EXPERIMENTAL_DATA["testsPerData"] = ABCnode["testsPerData"];
+	XML_JS.ABC_EXPERIMENTAL_DATA["ntrials"] = parseFloat(ABCnode["ntrials"]);
+	XML_JS.ABC_EXPERIMENTAL_DATA["testsPerData"] = parseFloat(ABCnode["testsPerData"]);
 	XML_JS.showRejectedParameters = ABCnode["showRejectedParameters"] == null ? false : ABCnode["showRejectedParameters"] == "true";
 	if (XML_JS.ABC_EXPERIMENTAL_DATA["inferenceMethod"] == "MCMC"){
 		XML_JS.ABC_EXPERIMENTAL_DATA["burnin"] = parseFloat(ABCnode["burnin"]);
