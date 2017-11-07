@@ -1209,6 +1209,30 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 
 
 
+// Loads a session from the XML file stored at url
+function uploadABCFromURL(url){
+	
+	console.log("Trying to open", url);
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+		  
+		   if (xhttp == null || xhttp.responseXML == "") return;
+		   
+		   //console.log("xhttp.responseText", xhttp.responseText);
+			var TSVstring = xhttp.responseText.replace(/(\r\n|\n|\r)/gm,"|");
+			
+		   uploadABC_controller(TSVstring);
+		   
+		}
+	};
+	xhttp.open("GET", url, true);
+	xhttp.send();
+	
+	
+}
+
+
 function uploadABC(){
 	
 	

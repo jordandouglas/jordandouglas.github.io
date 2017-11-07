@@ -1028,7 +1028,7 @@ function saveSession(){
 
 
 // Loads a session from the XML file stored at url
-function loadSessionFromURL(url){
+function loadSessionFromURL(url, resolve = function() { }){
 	
 	console.log("Trying to open", url);
 	var xhttp = new XMLHttpRequest();
@@ -1039,7 +1039,7 @@ function loadSessionFromURL(url){
 		   
 		   //console.log("xhttp.responseText", xhttp.responseText);
 		   var XMLstring = xhttp.responseText.replace(/(\r\n|\n|\r)/gm,"");
-		   loadSession_controller(XMLstring);
+		   loadSession_controller(XMLstring, resolve);
 		   
 		}
 	};

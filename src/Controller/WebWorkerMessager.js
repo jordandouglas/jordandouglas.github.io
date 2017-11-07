@@ -2003,7 +2003,7 @@ function getMFESequenceBonds_controller(){
 
 
 
-function loadSession_controller(XMLData){
+function loadSession_controller(XMLData, resolve = function() { }){
 	
 
 	var updateDom = function(result){
@@ -2040,6 +2040,8 @@ function loadSession_controller(XMLData){
 			}
 			
 			//drawPlots();
+			
+			resolve();
 			
 		}
 		
@@ -2136,7 +2138,7 @@ function loadSession_controller(XMLData){
 			}
 
 			validateAllAbcDataInputs();
-
+		
 			
 		}
 
