@@ -442,7 +442,7 @@ MCMC_JS.calculateESS = function(toTrace = "logLikelihood", workerNum = null){
 
 
 	// Code adapted from beast2/tracer
-	var MAX_LAG = 500;
+	var MAX_LAG = 2000;
 	var sum = 0;
 	var squareLaggedSums = Array.apply(null, Array(MAX_LAG)).map(Number.prototype.valueOf,0);
 	var autoCorrelation = Array.apply(null, Array(MAX_LAG)).map(Number.prototype.valueOf,0);
