@@ -166,9 +166,22 @@ function init(){
 				var search = location.search.substring(1);
 				var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
 				
+				console.log("XXX", JSONurl);
+				
 				if (JSONurl.s != null){
 					var sessionFileLocation = "http://www.polymerase.nz/about/Examples/" + JSONurl.s;
-					loadSessionFromURL(sessionFileLocation);
+					var toDoAfterLoadSession = function() {
+						
+						if (JSONurl.p != null){
+							
+							var posteriorFileLocation = "http://www.polymerase.nz/about/Examples/" + JSONurl.p;
+							uploadABCFromURL(posteriorFileLocation);
+							
+						}
+						
+						
+					};
+					loadSessionFromURL(sessionFileLocation, toDoAfterLoadSession);
 				}
 				
 				
