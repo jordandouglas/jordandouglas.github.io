@@ -3087,7 +3087,7 @@ function closeNav() {
 										<tr>
 											<td>
 												Burn-in:
-												<input type="number" id="MCMC_burnin" onChange="validateAllAbcDataInputs(); update_burnin_controller()" min=0 max=100 value=10 title="Percentage of points to throw away before reaching the posterior distribution" class="variable" style="vertical-align: middle; text-align:left; width: 40px;  font-size:14px; background-color:#663399">%
+												<input type="number" id="MCMC_burnin" onChange="validateAllAbcDataInputs(); update_burnin_controller(); drawPlots()" min=0 max=100 value=10 title="Percentage of points to throw away before reaching the posterior distribution" class="variable" style="vertical-align: middle; text-align:left; width: 40px;  font-size:14px; background-color:#663399">%
 											</td>
 										</tr>
 										
