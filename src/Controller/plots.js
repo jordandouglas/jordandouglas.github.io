@@ -1226,7 +1226,7 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, xlab =
 	var widthScale = 1;
 	var xlabPos = [];
 	if (xVals != null && xVals.length > 0){
-		var xResult = getNiceAxesNumbers(range[0], range[1], plotWidth, true);
+		var xResult = getNiceAxesNumbers(range[0], range[1], plotWidth, range[0] == 0);
 		range[0] = xResult["min"]
 		range[1] = xResult["max"]
 		widthScale = xResult["widthOrHeightScale"]
@@ -1240,7 +1240,7 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, xlab =
 	var heightScale = 1;
 	var ylabPos = [];
 	if (yVals != null && yVals.length > 0){
-		var yResult = getNiceAxesNumbers(range[2], range[3], plotHeight, true);
+		var yResult = getNiceAxesNumbers(range[2], range[3], plotHeight, range[2] == 0);
 		range[2] = yResult["min"]
 		range[3] = yResult["max"]
 		heightScale = yResult["widthOrHeightScale"]
