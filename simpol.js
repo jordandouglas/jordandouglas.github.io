@@ -121,7 +121,7 @@ function initNodeCompilation(){
 	WW_JS.setOutputFolder(outputFolder);
 
 	if (!runABC && outputFolder != null) PLOTS_JS.initialiseFileNames_CommandLine(); // Initialise the save file names
-	else if (runABC && outputFolder != null) ABC_JS.initialiseFileNames_CommandLine(); // Initialise the save file names
+	//else if (runABC && outputFolder != null) ABC_JS.initialiseFileNames_CommandLine(); // Initialise the save file names
 
 
 	// Print the welcome message
@@ -132,7 +132,7 @@ function initNodeCompilation(){
 
 
 		if (!runABC && outputFolder != null) PLOTS_JS.initialiseSaveFiles_CommandLine(startingTime); // Initialise the plots.js save files
-		else if (runABC && outputFolder != null) ABC_JS.initialiseSaveFiles_CommandLine(startingTime); // Initialise the ABC posterior save file
+		//else if (runABC && outputFolder != null) ABC_JS.initialiseSaveFiles_CommandLine(startingTime); // Initialise the ABC posterior save file
 
 		console.log("--------------------------------------");
 
