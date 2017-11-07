@@ -161,10 +161,17 @@ function init(){
 			
 
 			// Load a session specified in the url
-			if (location.href.indexOf("?") != -1){
-				var urlContent = location.href.substring(location.href.indexOf("?")+1);
-				var sessionFileLocation = "http://www.polymerase.nz/about/Examples/" + urlContent;
-				loadSessionFromURL(sessionFileLocation);
+			if (true || location.href.indexOf("?") != -1){
+				
+				var search = location.search.substring(1);
+				var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
+				
+				if (JSONurl.s != null){
+					var sessionFileLocation = "http://www.polymerase.nz/about/Examples/" + JSONurl.s;
+					loadSessionFromURL(sessionFileLocation);
+				}
+				
+				
 				
 			}else{
 				userChangeSequence();
