@@ -27,6 +27,7 @@ MCMC_JS.MCMC_parameters_and_metrics_previous_simulation = {};
 MCMC_JS.MCMC_SIMULATING = false;
 MCMC_JS.currentRSSthreshold = 0;
 MCMC_JS.RSS_this_trial = 0;
+MCMC_JS.cached_effective_sample_sizes = {};
 
 
 
@@ -291,6 +292,8 @@ MCMC_JS.getLogPrior = function(){
 }
 
 
+
+
 MCMC_JS.getLogLikelihood = function(fitNums){
 
 
@@ -368,8 +371,26 @@ MCMC_JS.wrapProposal = function(val, lower, upper){
 }
 
 
+
+
+MCMC_JS.cache_effective_sample_sizes = function(){
+
+	MCMC_JS.cached_effective_sample_sizes = {};
+
+	for (var colID in ABC_JS.ABC_POSTERIOR_DISTRIBUTION[0]){
+
+		if (colID == "NTPeq" || colID == "FAssist" || colID == "trial" || colID == "velocity" || colID == "accepted") continue;
+		MCMC_JS.cached_effective_sample_sizes[colID] = MCMC_JS.calculateESS(colID);
+	}
+
+
+
+}
+
+
+
 // Calculate the effective sample size
-MCMC_JS.calculateESS = function(){
+MCMC_JS.calculateESS = function(toTrace = "logLikelihood", workerNum = null){
 
 /*
 	console.log("burnin", ABC_JS.ABC_EXPERIMENTAL_DATA.burnin);
@@ -417,10 +438,11 @@ MCMC_JS.calculateESS = function(){
 	*/
 
 
+	console.log("Calculating ESS for", toTrace);
+
 
 	// Code adapted from beast2/tracer
-	var toTrace = "logLikelihood";
-	var MAX_LAG = 2000;
+	var MAX_LAG = 500;
 	var sum = 0;
 	var squareLaggedSums = Array.apply(null, Array(MAX_LAG)).map(Number.prototype.valueOf,0);
 	var autoCorrelation = Array.apply(null, Array(MAX_LAG)).map(Number.prototype.valueOf,0);
@@ -428,22 +450,30 @@ MCMC_JS.calculateESS = function(){
 	var n = ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length - trialStart;
 
 
-	// Keep track of sums of trace(i)*trace(i_+ lag) for all lags, excluding burn-in
 
+
+	// Create a list of values to calculate ESS over
+	var trace = Array.apply(null, Array(n)).map(Number.prototype.valueOf,0);
 	for (var i = trialStart; i < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; i++) {
+		trace[i] =  ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][toTrace];
+	}
+
+
+	// Keep track of sums of trace(i)*trace(i_+ lag) for all lags, excluding burn-in
+	for (var i = 0; i < trace.length; i++) {
 
 		// Calculate sum
-		sum += ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][toTrace];
+		sum += trace[i];
 
 		// Calculate the sum of the square of the values at each lag
 		for (var lagIndex = 0; lagIndex < Math.min(i + 1, MAX_LAG); lagIndex++) {
-			squareLaggedSums[lagIndex] = squareLaggedSums[lagIndex] + ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i - lagIndex][toTrace] * ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][toTrace];
+			squareLaggedSums[lagIndex] = squareLaggedSums[lagIndex] + trace[i - lagIndex] * trace[i];
 		}
 	}
 
 
 	// Calculate the auto correlation
-	var i = ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length-1;
+	var i = trace.length-1;
 	var mean = sum / (i+1);
 	var sum1 = sum;
 	var sum2 = sum;
@@ -451,8 +481,8 @@ MCMC_JS.calculateESS = function(){
 	for (var lagIndex = 0; lagIndex < Math.min(i + 1, MAX_LAG); lagIndex++) {
 		autoCorrelation[lagIndex] = squareLaggedSums[lagIndex] - (sum1 + sum2) * mean + mean * mean * (i + 1 - lagIndex);
         autoCorrelation[lagIndex] /= (i + 1 - lagIndex);
-        sum1 -= ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i - lagIndex][toTrace];
-        sum2 -= ABC_JS.ABC_POSTERIOR_DISTRIBUTION[lagIndex][toTrace];
+        sum1 -= trace[i - lagIndex];
+        sum2 -= trace[lagIndex];
 	}
 
 
@@ -500,7 +530,7 @@ MCMC_JS.get_ParametersWithPriors_WW = function(resolve = function() { }, msgID =
 MCMC_JS.update_burnin_WW = function(burnin){
 
 
-	if (!ABC_JS.ABC_simulating) return;
+	if (ABC_JS.ABC_EXPERIMENTAL_DATA == null) return;
 	ABC_JS.ABC_EXPERIMENTAL_DATA.burnin = burnin;
 
 
@@ -525,7 +555,9 @@ if (RUNNING_FROM_COMMAND_LINE){
 		RSS_this_trial: MCMC_JS.RSS_this_trial,
 		calculateESS: MCMC_JS.calculateESS,
 		update_burnin_WW: MCMC_JS.update_burnin_WW,
-		get_ParametersWithPriors_WW: MCMC_JS.get_ParametersWithPriors_WW
+		get_ParametersWithPriors_WW: MCMC_JS.get_ParametersWithPriors_WW,
+		cache_effective_sample_sizes: MCMC_JS.cache_effective_sample_sizes,
+		cached_effective_sample_sizes: MCMC_JS.cached_effective_sample_sizes
 
 	}
 

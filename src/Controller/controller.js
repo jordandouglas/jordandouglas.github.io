@@ -1272,16 +1272,7 @@ function clearCache(){
 					ABClines = [];
 					ABClinesAcceptedOnly = [];
 					validateAllAbcDataInputs();
-
-					// Delete and reset any trace plots
-					for (var i = 1; i <=3; i ++){
-						if ($("#selectPlot" + i).val() == "tracePlot"){
-							$("#selectPlot" + i).val("none");
-							selectPlot(i);
-						}
-					}
-
-					$("option[value='tracePlot']").remove();
+					removeTracePlots();
 				}
 
 				

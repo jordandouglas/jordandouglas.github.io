@@ -30,8 +30,25 @@ ABC_JS.ABC_outputString = [];
 ABC_JS.ABC_outputString_unrendered = [];
 ABC_JS.n_ABC_trials_left = null;
 ABC_JS.nAcceptedValues = 0;
+ABC_JS.workerNumberRange = null;
 
 
+
+
+ABC_JS.updateABCExperimentalData_WW = function(experimentalData){
+
+	ABC_JS.ABC_EXPERIMENTAL_DATA = experimentalData;
+
+	// Build a list of parameters which have prior distributions
+	MCMC_JS.parametersWithPriors = [];
+	for (var paramID in PARAMS_JS.PHYSICAL_PARAMETERS){
+		if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["binary"] && !PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["hidden"] && paramID != "FAssist" && PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["distribution"] != "Fixed") {
+			MCMC_JS.parametersWithPriors.push(paramID);
+		}
+				
+	}
+
+}
 
 
 
@@ -157,6 +174,7 @@ ABC_JS.clearABCdata_WW = function(){
 	ABC_JS.ABC_outputString_unrendered = [];
 	ABC_JS.n_ABC_trials_left = null;
 	ABC_JS.nAcceptedValues = 0;
+	ABC_JS.workerNumberRange = null;
 
 	MCMC_JS.clearMCMCdata_WW();
 
@@ -575,12 +593,12 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 
 
 	var printVals = true; // When this is false, the curve was not executed because the RSS for a previous curve went too high, so leave some space but don't print any numbers
-	
+
 
 	// Get the force and velocity values
 	var experimentalSettingNumber = 0;
-	var forceNumber = 0;
-	var concentrationNumber = 0;
+	//var forceNumber = 0;
+	//var concentrationNumber = 0;
 	for (var fitIndex = 0; fitIndex < fitNums.length; fitIndex++){
 
 		var fitID = fitNums[fitIndex];
@@ -592,8 +610,8 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 		for (var obsNum = 0; obsNum < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].length; obsNum++){
 
 			var X_axis_value = "-";
-			if (printVals && dataType == "forceVelocity") X_axis_value = WW_JS.roundToSF_WW(stateToLog["FAssist"]["vals"][forceNumber]);
-			else if(printVals && dataType == "ntpVelocity") X_axis_value = WW_JS.roundToSF_WW(stateToLog["NTPeq"]["vals"][concentrationNumber]);
+			if (printVals && dataType == "forceVelocity") X_axis_value = WW_JS.roundToSF_WW(stateToLog["FAssist"]["vals"][experimentalSettingNumber]);
+			else if(printVals && dataType == "ntpVelocity") X_axis_value = WW_JS.roundToSF_WW(stateToLog["NTPeq"]["vals"][experimentalSettingNumber]);
 
 			var velocity = printVals ? WW_JS.roundToSF_WW(stateToLog["velocity"]["vals"][experimentalSettingNumber], 3) : "-";
 
@@ -608,8 +626,10 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 			line += (paddingString + X_axis_value).slice(-paddingString.length);
 			line += (paddingString + velocity).slice(-paddingString.length);
 
-			if (dataType == "forceVelocity") forceNumber ++;
-			if (dataType == "ntpVelocity") concentrationNumber ++;
+			//if (dataType == "forceVelocity")
+			//forceNumber ++;
+			//if (dataType == "ntpVelocity") 
+			//concentrationNumber ++;
 			experimentalSettingNumber++;
 
 		}
@@ -682,7 +702,7 @@ ABC_JS.get_unrendered_ABCoutput_WW = function(resolve = function() {}, msgID = n
 		toReturn = {newLines: ABC_JS.ABC_outputString_unrendered, nTrialsToGo: ABC_JS.n_ABC_trials_left, acceptanceNumber: acceptanceNumber, acceptancePercentage: acceptancePercentage};
 	}
 	
-	if ( ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "MCMC"){
+	if (ABC_JS.ABC_EXPERIMENTAL_DATA != null && ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "MCMC"){
 		var ESS = WW_JS.roundToSF_WW(MCMC_JS.calculateESS());
 		toReturn.ESS = ESS;
 	}
@@ -730,7 +750,8 @@ ABC_JS.getListOfValuesFromPosterior_WW = function(paramOrMetricID){
 
 
 	var posteriorValues = [];
-	for (var i = 0; i < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; i ++){
+	var trialStart = ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod != "MCMC" ? 0 : Math.floor(ABC_JS.ABC_EXPERIMENTAL_DATA.burnin/100 * ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length);
+	for (var i = trialStart; i < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; i ++){
 
 
 		// The length of the list returned should be the same number of forces sampled in this entry
@@ -755,7 +776,6 @@ ABC_JS.getListOfValuesFromPosterior_WW = function(paramOrMetricID){
 
 	}
 
-	console.log("Returning posterior", ABC_JS.ABC_POSTERIOR_DISTRIBUTION, "for", paramOrMetricID);
 	return posteriorValues;
 
 
@@ -789,7 +809,7 @@ ABC_JS.initialiseSaveFiles_CommandLine = function(startingTime){
 
 
 	// Create the data files
-	WW_JS.writeLinesToFile(ABC_JS.posterior_fileName, "Posterior distribution. " + startingTime + "\n");
+	WW_JS.writeLinesToFile(ABC_JS.posterior_fileName, "# Posterior distribution. " + startingTime + "\n");
 
 
 }
@@ -851,7 +871,7 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 
 	var lines = TSVstring.split("|");
 	var success = true;
-
+	var inferenceMethod = null;
 	//console.log("lines", lines[0], lines[0].includes("Posterior distribution."));
 	//ABC_JS.ABC_POSTERIOR_DISTRIBUTION = [];
 
@@ -864,10 +884,14 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 
 	// Check that this is indeed a posterior file
 	if (lines[0].includes("Posterior distribution.")){
+		
+		
+		var columnNamesLine = 1;
+		while (lines[columnNamesLine].trim()[0] == "#") columnNamesLine++;
 
 
 		// Build the first row
-		var colNames = lines[1].split("\t");
+		var colNames = lines[columnNamesLine].split("\t");
 		var posteriorObjectEmptyTemplate = {trial: null, accepted: null}; // The template for a single row in the posterior or rejected distribution
 		posteriorObjectEmptyTemplate["FAssist"] = {name: PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["name"], vals: []}; 
 		posteriorObjectEmptyTemplate["NTPeq"] = {name: "NTP concentration divided by [NTP]eq", vals: []}; 
@@ -876,8 +900,9 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 
 		var nfits = 0; // Total number of graphs which have been fit to
 		var columnNumTSV_to_columnNameObj = {};
-		var fitNums = []; // Build a list of fit numbers
 		var acceptedCol = -1;
+	
+
 		for (var colNum = 1; colNum <= colNames.length; colNum++){
 
 
@@ -886,13 +911,21 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 			if (col.trim() == "") continue;
 
 
+			// R-ABC only
 			if (col.includes("Accepted")) {
 				firstConsoleLine += (paddingString + "|Accepted|").slice(-12) + "&&&";
 				columnNumTSV_to_columnNameObj[colNum] = "accepted";
 				acceptedCol = colNum;
+				if (inferenceMethod != null && inferenceMethod != "ABC") {
+					success = false;
+					break;
+				}
+				inferenceMethod = "ABC";
 				continue;
 			}
 
+
+		
 
 			if (col.includes("Trial")) {
 				firstConsoleLine += (paddingString + col).slice(-9);
@@ -908,14 +941,31 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 			if (col.match(/v\(F[0-9]*\)$/gi) != null || col.match(/v\(NTP[0-9]*\)$/gi) != null) columnNumTSV_to_columnNameObj[colNum] = "velocity";	// Matches to velocity ( v(F1), v(F2), etc ) or ( v(NTP1), v(NTP2), etc )
 
 
-			// Increment the number of graphs being fitted to
+			// Increment the number of graphs being fitted to. R-ABC only
 			if (col.includes("MeanRSS")){
 				nfits ++;
 				posteriorObjectEmptyTemplate["meanRSS" + nfits] = null;
 				posteriorObjectEmptyTemplate["Passed" + nfits] = null;
 				columnNumTSV_to_columnNameObj[colNum] = "meanRSS" + nfits;
 				columnNumTSV_to_columnNameObj[colNum+1] = "Passed" + nfits;
-				fitNums.push("fit" + nfits);
+
+			}
+
+
+			// MCMC only
+			if (col.includes("logPrior")){
+				posteriorObjectEmptyTemplate["logLikelihood"] = {name: "RSS", val: false};;
+				posteriorObjectEmptyTemplate["logPrior"] = {name: "logPrior", val: false};;
+				columnNumTSV_to_columnNameObj[colNum+1] = "logLikelihood";
+				columnNumTSV_to_columnNameObj[colNum] = "logPrior";
+				
+
+				if (inferenceMethod != null && inferenceMethod != "MCMC") {
+					success = false;
+					break;
+				}
+				inferenceMethod = "MCMC";
+
 
 			}
 
@@ -927,88 +977,106 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 
 		}
 
-		// Add this line to the console output
-		ABC_JS.ABC_outputString.push("");
-		ABC_JS.ABC_outputString.push("");
-		ABC_JS.ABC_outputString.push(firstConsoleLine);
-		ABC_JS.ABC_outputString_unrendered.push("");
-		ABC_JS.ABC_outputString_unrendered.push("");
-		ABC_JS.ABC_outputString_unrendered.push(firstConsoleLine);
+		if (success) {
+
+			// Add this line to the console output
+			ABC_JS.ABC_outputString.push("");
+			ABC_JS.ABC_outputString.push("");
+			ABC_JS.ABC_outputString.push(firstConsoleLine);
+			ABC_JS.ABC_outputString_unrendered.push("");
+			ABC_JS.ABC_outputString_unrendered.push("");
+			ABC_JS.ABC_outputString_unrendered.push(firstConsoleLine);
 
 
 
-		// Populate the remaining rows with numbers
-		for (var lineNum = 2; lineNum < lines.length; lineNum++){
+			// Populate the remaining rows with numbers
+			var workerNums = []; // Workers which the experiment was split over via multithreading
+			for (var lineNum = columnNamesLine+1; lineNum < lines.length; lineNum++){
 
-			if (lines[lineNum].trim() == "") continue;
+				if (lines[lineNum].trim() == "") continue;
 
-			var rowTemplateCopy = JSON.parse(JSON.stringify(posteriorObjectEmptyTemplate));
+				var rowTemplateCopy = JSON.parse(JSON.stringify(posteriorObjectEmptyTemplate));
 
-			var splitLine = lines[lineNum].split("\t");
-
-
-
-
-			var consoleLine = "";
+				var splitLine = lines[lineNum].split("\t");
 
 
-			for (var colNum = 2; colNum <= splitLine.length; colNum++){
-
-				
-				var colName = columnNumTSV_to_columnNameObj[colNum];
-				if (colName == null) continue;
-
-				var value = splitLine[colNum-1];
 
 
-				if (value.match(/[0-9]\:[0-9]/gi)) value = value; // Don't parse as float if it contains a : (which the trial numbers do if it was multithreaded)
-				else if (!isNaN(parseFloat(value))) value = parseFloat(value);
-				else if (value == "true") value = true;
-				else if (value == "false") value = false;
+				var consoleLine = "";
 
 
-				if (colNames[colNum-1] == "Accepted") consoleLine += (paddingString + "|" + value + "|").slice(-12) + "&&&";
-				else if (colNames[colNum-1] == "Trial") consoleLine += (paddingString + value).slice(-9);
-				else consoleLine += (paddingString + value).slice(-paddingString.length);
+				for (var colNum = 2; colNum <= splitLine.length; colNum++){
+
+					
+					var colName = columnNumTSV_to_columnNameObj[colNum];
+					if (colName == null) continue;
+
+					var value = splitLine[colNum-1];
 
 
-				if (value == "-") continue;
-
-				// Add the value to the list or set it as the value 
-				if (rowTemplateCopy[colName] == null) rowTemplateCopy[colName] = value;
-				else if (rowTemplateCopy[colName]["vals"] != null) rowTemplateCopy[colName]["vals"].push(value);
-				else if (rowTemplateCopy[colName]["val"] != null) rowTemplateCopy[colName]["val"] = value;
-				else if (rowTemplateCopy[colName]["priorVal"] != null) rowTemplateCopy[colName]["priorVal"] = value;
+					if (value.match(/[0-9]\:[0-9]/gi)) value = value; // Don't parse as float if it contains a : (which the trial numbers do if it was multithreaded)
+					else if (!isNaN(parseFloat(value))) value = parseFloat(value);
+					else if (value == "true") value = true;
+					else if (value == "false") value = false;
 
 
-				//console.log(colNum, colNames[colNum-1], value);
+					if (colNames[colNum-1] == "Accepted") consoleLine += (paddingString + "|" + value + "|").slice(-12) + "&&&";
+					else if (colNames[colNum-1] == "Trial") consoleLine += (paddingString + value).slice(-9);
+					else consoleLine += (paddingString + value).slice(-paddingString.length);
 
 
+					if (value == "-") continue;
+
+
+					// Add the value to the list or set it as the value 
+					if (rowTemplateCopy[colName] == null) rowTemplateCopy[colName] = value;
+					else if (rowTemplateCopy[colName]["vals"] != null) rowTemplateCopy[colName]["vals"].push(value);
+					else if (rowTemplateCopy[colName]["val"] != null) rowTemplateCopy[colName]["val"] = value;
+					else if (rowTemplateCopy[colName]["priorVal"] != null) rowTemplateCopy[colName]["priorVal"] = value;
+
+
+					//console.log(colNum, colNames[colNum-1], value);
+
+
+					// Worker number
+					if (colNames[colNum-1] == "Trial"){
+						var workerNum = parseFloat(value.split(":")[0]);
+						if (workerNums.indexOf(workerNum) == -1) workerNums.push(workerNum);
+					}
+
+
+
+
+				}
+
+				// Add to the posterior distribution if applicable
+				if (inferenceMethod == "MCMC" || rowTemplateCopy["accepted"]) ABC_JS.ABC_POSTERIOR_DISTRIBUTION.push(rowTemplateCopy);
+
+
+				//console.log("Created rowTemplateCopy", rowTemplateCopy);
+
+				// Add to the list of lines to print
+				ABC_JS.ABC_outputString.push(consoleLine);
+				ABC_JS.ABC_outputString_unrendered.push(consoleLine);
 
 			}
 
-			// Add to the posterior distribution if applicable
-			if (rowTemplateCopy["accepted"]) ABC_JS.ABC_POSTERIOR_DISTRIBUTION.push(rowTemplateCopy);
+			// Save the minimum and maximum worker number
+			workerNums.sort();
+			ABC_JS.workerNumberRange = [workerNums[0], workerNums[workerNums.length-1]];
 
+			// Calculate the ESS's
+			if (inferenceMethod == "MCMC") MCMC_JS.cache_effective_sample_sizes();
 
-			//console.log("Created rowTemplateCopy", rowTemplateCopy);
-
-			// Add to the list of lines to print
-			ABC_JS.ABC_outputString.push(consoleLine);
-			ABC_JS.ABC_outputString_unrendered.push(consoleLine);
-
-
+			//console.log("Created objects", ABC_JS.ABC_POSTERIOR_DISTRIBUTION);
 		}
-
-		//console.log("Created objects", ABC_JS.ABC_POSTERIOR_DISTRIBUTION);
-
 
 	}
 
 	else success = false;
 
 
-	var toReturn = {success: success};
+	var toReturn = {success: success, inferenceMethod: inferenceMethod};
 
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
@@ -1048,7 +1116,9 @@ if (RUNNING_FROM_COMMAND_LINE){
 	  	velocities_for_this_curve: ABC_JS.velocities_for_this_curve,
 	  	ABC_K_trials_for_observation_WW: ABC_JS.ABC_K_trials_for_observation_WW,
 	  	getPosteriorDistribution_WW: ABC_JS.getPosteriorDistribution_WW,
-	  	initialiseFileNames_CommandLine: ABC_JS.initialiseFileNames_CommandLine 
+	  	initialiseFileNames_CommandLine: ABC_JS.initialiseFileNames_CommandLine,
+	  	updateABCExperimentalData_WW: ABC_JS.updateABCExperimentalData_WW,
+	  	workerNumberRange: ABC_JS.workerNumberRange
 	}
 
 }

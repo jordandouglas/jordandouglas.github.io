@@ -117,29 +117,49 @@ function onABCStart(which){
 
 
 	// Add the trace plots if MCMC
-	if (which == "MCMC"){
-
-		var option = `<option value="tracePlot">MCMC trace</option>`;
-		$("#selectPlot1").append(option);
-		$("#selectPlot2").append(option);
-		$("#selectPlot3").append(option);
-
-		// Open a trace plot
-		for (var i = 1; i <=3; i ++){
-			if ($("#selectPlot" + i).val() == "none"){
-				$("#selectPlot" + i).val("tracePlot");
-				selectPlot(i);
-				break;
-			}
-		}
-
-	}
-
-
-
+	if (which == "MCMC") addTracePlots();
 
 
 }
+
+
+function addTracePlots(){
+
+	var option = `<option value="tracePlot">MCMC trace</option>`;
+	$("#selectPlot1").append(option);
+	$("#selectPlot2").append(option);
+	$("#selectPlot3").append(option);
+
+	// Open a trace plot
+	for (var i = 1; i <=3; i ++){
+		if ($("#selectPlot" + i).val() == "none"){
+			$("#selectPlot" + i).val("tracePlot");
+			selectPlot(i);
+			break;
+		}
+	}
+
+
+}
+
+
+
+function removeTracePlots(){
+
+
+	// Delete and reset any trace plots
+	for (var i = 1; i <=3; i ++){
+		if ($("#selectPlot" + i).val() == "tracePlot"){
+			$("#selectPlot" + i).val("none");
+			selectPlot(i);
+		}
+	}
+
+	$("option[value='tracePlot']").remove();
+
+
+}
+
 
 
 function getAbcDataObject(which = "ABC"){
@@ -816,6 +836,7 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 		
 		var abcDataObjectForModel = getAbcDataObject();
 
+
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 		if (forces != null && velocities != null){
@@ -849,7 +870,7 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 			ctx.globalAlpha = 0.4;
 			ctx.strokeStyle = "#008CBA";
-			ctx.lineWidth = 2 * canvasSizeMultiplier;
+			ctx.lineWidth = 1 * canvasSizeMultiplier;
 
 
 			// Find the starting and stopping index of these posterior velocities in the list
@@ -1043,7 +1064,7 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 
 			ctx.globalAlpha = 0.4;
 			ctx.strokeStyle = "#008CBA";
-			ctx.lineWidth = 2 * canvasSizeMultiplier;
+			ctx.lineWidth = 1 * canvasSizeMultiplier;
 
 
 
@@ -1241,7 +1262,7 @@ function downloadABC(){
 
 		var lines = result["lines"];
 		if (lines.length == 0) return;
-		var stringToPrint = "";
+		var stringToPrint = "# Posterior distribution\n";
 		for (var i = 0; i < lines.length; i++){
 
 			

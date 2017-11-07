@@ -250,6 +250,11 @@ function selectPlot(plotNum, deleteData = null){
 		}
 
 
+		else if (value == "tracePlot") {
+			$("#plotLabel" + plotNum).html(`ESS: <span id='plotLabelVariable` + plotNum + `'>0</span>`);
+		}
+
+
 
 		if ( value != "none") {
 
@@ -1086,8 +1091,10 @@ function plot_MCMC_trace(){
 	for (var j = 0; j < canvasesToPrintTo.length; j ++){
 
 
-		var yVar = "logLikelihood";
 		var pltNum = canvasesToPrintTo[j];
+
+		var yVar = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].yVariable; //"logLikelihood";
+		
 
 		var xVals = [];
 		var yVals = [];
@@ -1105,7 +1112,11 @@ function plot_MCMC_trace(){
 
 
 			// Get the y-axis value
-			yVals.push(PLOT_DATA.POSTERIOR_DISTRIBUTION[postNum][yVar]);
+			var yVal = PLOT_DATA.POSTERIOR_DISTRIBUTION[postNum][yVar];
+			if (yVal.val != null) yVal = yVal.val;
+			else if (yVal.priorVal != null) yVal = yVal.priorVal;
+
+			yVals.push(yVal);
 
 
 		}
@@ -1159,7 +1170,15 @@ function plot_MCMC_trace(){
 
 
 		var range = [xmin, xmax, ymin, ymax];
-		trace_plot(xVals, yVals, range, epsilon, "plotCanvas" + pltNum, "plotCanvasContainer" + pltNum, "State", "-RSS", PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["canvasSizeMultiplier"]);
+
+
+		// Print ESS
+		$("#plotLabelVariable" + pltNum).html(roundToSF(PLOT_DATA["whichPlotInWhichCanvas"][pltNum].ESS));
+
+		//console.log("Values", xVals, yVals);
+
+		var ylab = PLOT_DATA.POSTERIOR_DISTRIBUTION.length > 0 ? PLOT_DATA.POSTERIOR_DISTRIBUTION[0][yVar].name : "RSS";
+		trace_plot(xVals, yVals, range, epsilon, "plotCanvas" + pltNum, "plotCanvasContainer" + pltNum, "State", ylab, PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["canvasSizeMultiplier"]);
 
 	}
 
@@ -1240,7 +1259,7 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, xlab =
 		ctx.restore();
 		
 
-		ctx.lineWidth = 3 * canvasSizeMultiplier;
+		ctx.lineWidth = 1 * canvasSizeMultiplier;
 		
 		
 		//var pixelsPerSecond = (canvas.width - axisGap) / (range[1] - range[0]);
@@ -1365,7 +1384,7 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, xlab =
 				ctx.fillStyle = "#008CBA";
 				xPrime = widthScale * (xVals[lastIndex] - range[0]) + axisGap;
 				yPrime =  plotHeight - heightScale * (yVals[lastIndex] - range[2]) + outerMargin;
-				ctx_ellipse(ctx, xPrime, yPrime, 5 * canvasSizeMultiplier, 5 * canvasSizeMultiplier, 0, 0, 2 * Math.PI);
+				ctx_ellipse(ctx, xPrime, yPrime, 3 * canvasSizeMultiplier, 3 * canvasSizeMultiplier, 0, 0, 2 * Math.PI);
 				ctx.fill();
 			}
 		}
@@ -4587,8 +4606,8 @@ function getTracePlotDropdownTemplate(){
 
 		<legend><b>Y-axis variable</b></legend>
 		<select class="dropdown" title="What do you want to show on the y-axis?" id = "traceVariableY" style="vertical-align: middle; text-align:right;">
-			<option value="RSS">-RSS</option>
-			<option value="prior">log prior</option>
+			<option value="logLikelihood">RSS</option>
+			<option value="logPrior">log prior</option>
 		</select><br>
 		Calculated per trial.
 
@@ -4889,7 +4908,6 @@ function plotOptions(plotNum){
 			// Create a dropdown list which contains all the parameters sampled in the prior
 			$("#settingCell4").html(getTracePlotDropdownTemplate().replace("Calculated per trial.", ""));
 			get_ParametersWithPriors_controller(function(params){
-				console.log("params", params);
 				
 				for (var paramID in params){
 					$("#traceVariableY").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);

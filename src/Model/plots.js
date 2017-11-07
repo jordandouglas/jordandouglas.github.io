@@ -271,6 +271,15 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 	if (tracePlot_needsData){
 		plotData["POSTERIOR_DISTRIBUTION"] = ABC_JS.ABC_POSTERIOR_DISTRIBUTION;
 		plotData["ABC_EXPERIMENTAL_DATA"] = ABC_JS.ABC_EXPERIMENTAL_DATA;
+
+		for (var plotNum = 1; plotNum <= 3; plotNum++){
+
+			if (!PLOTS_JS.plotsAreHidden && PLOTS_JS.whichPlotInWhichCanvas[plotNum] != null && PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "tracePlot") {
+				PLOTS_JS.whichPlotInWhichCanvas[plotNum].ESS = MCMC_JS.cached_effective_sample_sizes[PLOTS_JS.whichPlotInWhichCanvas[plotNum].yVariable];
+			}
+		}
+
+
 	}
 
 
@@ -306,12 +315,10 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 				var valuesY = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamY"]);
 				var valuesZ = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["metricZ"]);
 
-				//console.log("posterior", valuesX, valuesY, valuesZ, "PP", ABC_JS.ABC_POSTERIOR_DISTRIBUTION);
-
 
 				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
 				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY};
-				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"]["name"], vals:valuesZ};
+				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"]["name"], vals:valuesZ};
 
 			}
 		}
@@ -519,11 +526,14 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 	else if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["name"] == "tracePlot") {
 		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFunction"] = "plot_MCMC_trace";
-		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yVariable"] = "RSS";
-		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["workerNum"] = null;
-		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["workerNumRange"] = [1,4];
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yVariable"] = "logLikelihood";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["workerNum"] = ABC_JS.workerNumberRange == null ? null : ABC_JS.workerNumberRange[0];
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["workerNumRange"] = ABC_JS.workerNumberRange;
 		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xRange"] = "automaticX";
 		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+		PLOTS_JS.whichPlotInWhichCanvas[plotNum]["ESS"] = 0;
+
+
 	}
 
 	
@@ -576,9 +586,6 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 
  PLOTS_JS.saveSettings_WW = function(plotNum, plotType, values, resolve = function() { }, msgID = null ){
-
-
-	console.log("Saving values", values);
 
 
 	switch(plotType){

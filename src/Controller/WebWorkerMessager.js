@@ -2133,6 +2133,7 @@ function loadSession_controller(XMLData){
 			}
 
 			validateAllAbcDataInputs();
+
 			
 		}
 
@@ -2322,6 +2323,7 @@ function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardat
 function uploadABC_controller(TSVstring){
 
 
+	updateABCExperimentalData_controller();
 	var updateDOM = function(result){
 
 
@@ -2334,6 +2336,8 @@ function uploadABC_controller(TSVstring){
 			get_unrendered_ABCoutput_controller();
 			validateAllAbcDataInputs();
 			drawPlots(true);
+
+			if (result.inferenceMethod == "MCMC") addTracePlots();
 
 
 		}else{
@@ -2533,7 +2537,23 @@ function get_ABCoutput_controller(resolve = function(lines) { }){
 }
 
 
+function updateABCExperimentalData_controller(){
+
+	var which = $("#ABC_useMCMC").val() == 1 ? "ABC" : $("#ABC_useMCMC").val() == 2 ? "MCMC" : "NS-ABC"
+	var abcDataObjectForModel = getAbcDataObject(which)
+	if (WEB_WORKER == null) {
+		ABC_JS.updateABCExperimentalData_WW(abcDataObjectForModel);
+	}else{
+		var fnStr = stringifyFunction("ABC_JS.updateABCExperimentalData_WW", [abcDataObjectForModel]);
+		callWebWorkerFunction(fnStr);
+	}
+
+}
+
+
 function update_burnin_controller(){
+
+
 
 	var burnin = $("#MCMC_burnin").val();
 	if (WEB_WORKER == null) {
@@ -2545,6 +2565,8 @@ function update_burnin_controller(){
 
 
 }
+
+
 
 
 function get_ParametersWithPriors_controller(resolve = function() { }){
