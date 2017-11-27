@@ -28,15 +28,16 @@ FE_JS.ELONGATION_MODELS = {};
 FE_JS.ELONGATION_MODELS["simpleBrownian"] = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: false, allowHypertranslocation: false, 
 										allowInactivation:false, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: false, 
 										allowGeometricCatalysis: false, allowmRNAfolding:false, allowMisincorporation:false, useFourNTPconcentrations:false,
-										NTPbindingNParams: 2, assumeBindingEquilibrium: true, currentTranslocationModel: "meltingBarriers",
+										NTPbindingNParams: 2, assumeBindingEquilibrium: true, currentTranslocationModel: "sealingBarriers",
 										assumeTranslocationEquilibrium: false};
 //FE_JS.ELONGATION_MODELS["twoSiteBrownian"] = {id: "twoSiteBrownian",name: "Brownian ratchet model with 2 NTP binding sites", allowBacktracking: true, allowHypertranslocation: false, allowInactivation:true, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation:false, allowGeometricCatalysis: false, allowmRNAfolding:true, allowMisincorporation:false};
 FE_JS.currentElongationModel = "simpleBrownian";
 
 
 FE_JS.TRANSLOCATION_MODELS = {};
-FE_JS.TRANSLOCATION_MODELS["midpointBarriers"] = {id: "midpointBarriers", name: "Midpoint"};
-FE_JS.TRANSLOCATION_MODELS["meltingBarriers"] = {id: "meltingBarriers", name: "Melting"};
+FE_JS.TRANSLOCATION_MODELS["midpointBarriers"] = {id: "midpointBarriers", name: "Midpoint model"};
+FE_JS.TRANSLOCATION_MODELS["meltingBarriers"] = {id: "meltingBarriers", name: "Melting bubble"};
+FE_JS.TRANSLOCATION_MODELS["sealingBarriers"] = {id: "sealingBarriers", name: "Sealing bubble"};
 
 
 
@@ -191,7 +192,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 
 
- FE_JS.getSlidingHeights_WW = function(sampleAll, ignoreModelOptions, resolve, msgID){
+FE_JS.getSlidingHeights_WW = function(sampleAll, ignoreModelOptions, resolve, msgID){
 
 	if (sampleAll === undefined) sampleAll = true;
 	if (ignoreModelOptions === undefined) ignoreModelOptions = false;
@@ -322,7 +323,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 			}
 
-			else if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] == "meltingBarriers"){
+			else if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] == "meltingBarriers" || FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] == "sealingBarriers"){
 
 				slidingPeakHeightsTemp[pos] += getFreeEnergyOfIntermediateState_WW(statePreOperation, state);
 				slidingPeakHeightsTemp[pos] -= getFreeEnergyOfTranscriptionBubbleIntermediate_WW(statePreOperation, state); // Subtract the free energy which we would gain if the intermediate transcription bubble was sealed
@@ -400,7 +401,7 @@ FE_JS.initFreeEnergy_WW = function(){
 			}
 
 			// Calculate the free energy of the intermediate state
-			else if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] == "meltingBarriers"){
+			else if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] == "meltingBarriers" || FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] == "sealingBarriers"){
 
 				slidingPeakHeightsTemp[pos-1] += getFreeEnergyOfIntermediateState_WW(statePreOperation, state);
 				slidingPeakHeightsTemp[pos-1] -= getFreeEnergyOfTranscriptionBubbleIntermediate_WW(statePreOperation, state); // Subtract the free energy which we would gain if the intermediate transcription bubble was sealed
@@ -651,6 +652,16 @@ function getFreeEnergyOfTranscriptionBubbleIntermediate_WW(state1, state2){
 	var leftmostComplementPos = leftmostTemplatePos;
 	var rightmostTemplatePos = Math.max(state1["rightGBase"], state2["rightGBase"]) + PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"] + 1;
 	var rightmostComplementPos = rightmostTemplatePos;
+
+
+	// Take the intersection of missing basepairs if going for the sealing model
+	if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["currentTranslocationModel"] == "sealingBarriers"){
+		leftmostTemplatePos ++;
+		leftmostComplementPos ++;
+		rightmostTemplatePos --;
+		rightmostComplementPos --;
+	}
+
 	
 	var hybridStrings = getHybridStringOfTranscriptionBubble_WW(leftmostTemplatePos, rightmostTemplatePos, leftmostComplementPos, rightmostComplementPos);
 	return getFreeEnergyOfTranscriptionBubbleHybridString_WW(hybridStrings[0], hybridStrings[1], SEQS_JS.all_sequences[sequenceID]["template"].substring(2,5));

@@ -86,9 +86,9 @@ function beginABC(){
 	$("#ABC_useMCMC").attr("disabled", "disabled");
 
 
-	//$("#ABC_RSS").css("cursor", "auto");
-	//$("#ABC_RSS").css("background-color", "#858280");
-	//$("#ABC_RSS").attr("disabled", "disabled");
+	//$("#ABC_chiSq").css("cursor", "auto");
+	//$("#ABC_chiSq").css("background-color", "#858280");
+	//$("#ABC_chiSq").attr("disabled", "disabled");
 
 
 	onABCStart(which);
@@ -180,9 +180,9 @@ function getAbcDataObject(which = "ABC"){
 		abcDataObjectForModel.testsPerData = $("#MCMC_ntestsperdata").val();
 		abcDataObjectForModel.burnin = $("#MCMC_burnin").val();
 		abcDataObjectForModel.logEvery = $("#MCMC_logevery").val();
-		abcDataObjectForModel.RSSthreshold_min = $("#MCMC_RSSthreshold_min").val();
-		abcDataObjectForModel.RSSthreshold_0 = $("#MCMC_RSSthreshold_0").val();
-		abcDataObjectForModel.RSSthreshold_gamma = $("#MCMC_RSSthreshold_gamma").val();
+		abcDataObjectForModel.chiSqthreshold_min = $("#MCMC_chiSqthreshold_min").val();
+		abcDataObjectForModel.chiSqthreshold_0 = $("#MCMC_chiSqthreshold_0").val();
+		abcDataObjectForModel.chiSqthreshold_gamma = $("#MCMC_chiSqthreshold_gamma").val();
 		
 	}
 
@@ -203,7 +203,7 @@ function getAbcDataObject(which = "ABC"){
 		var dataValues = $("#" + dataType + "InputData_" + fitID).val();
 		abcDataObjectForModel["fits"][fitID] = {vals: []};
 		abcDataObjectForModel["fits"][fitID]["dataType"] = dataType;
-		abcDataObjectForModel["fits"][fitID]["RSSthreshold"] = parseFloat($("#ABC_RSS_" + fitID).val());
+		abcDataObjectForModel["fits"][fitID]["chiSqthreshold"] = parseFloat($("#ABC_chiSq_" + fitID).val());
 		abcDataObjectForModel["fits"][fitID]["ATPconc"] = parseFloat($("#ATPconc_" + fitID).val());
 		abcDataObjectForModel["fits"][fitID]["CTPconc"] = parseFloat($("#CTPconc_" + fitID).val());
 		abcDataObjectForModel["fits"][fitID]["GTPconc"] = parseFloat($("#GTPconc_" + fitID).val());
@@ -480,8 +480,8 @@ function addNewABCData(type = "forceVelocity"){
 	
 	// Add the curve template to the newly opened cell
 	$("#ABCPanelTable" + ABCtableToUse).append(HTMLtemplate);
-	if ($("#ABC_useMCMC").val() != 1) $(".rejection_ABC_RSS").hide(0);
-	else $(".rejection_ABC_RSS").show(0);
+	if ($("#ABC_useMCMC").val() != 1) $(".rejection_ABC_chiSq").hide(0);
+	else $(".rejection_ABC_chiSq").show(0);
 
 	// Switch to the other ABC table next time so we have 2 columns of curves
 	ABCtableToUse ++;
@@ -618,9 +618,9 @@ function getABCforceVelocityCurveTemplate(fitID){
 					</div> <br> <br>
 
 
-					<div class="rejection_ABC_RSS">
-						Mean RSS threshold:
-							<input type="number" id="ABC_RSS_` + fitID + `" value=3 title="Accept parameters into the posterior distribution only if the mean residual sum of squares (RSS) for this dataset is less than this threshold"
+					<div class="rejection_ABC_chiSq">
+						Mean chiSq threshold:
+							<input type="number" id="ABC_chiSq_` + fitID + `" value=3 title="Accept parameters into the posterior distribution only if the mean residual sum of squares (chiSq) for this dataset is less than this threshold"
 								 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA">
 					</div>
 			</td>
@@ -750,8 +750,8 @@ function getABCntpVelocityCurveTemplate(fitID){
 
 
 
-					Mean RSS threshold:
-						<input type="number" id="ABC_RSS_` + fitID + `" value=3 title="Accept parameters into the posterior distribution only if the mean residual sum of squares (RSS) for this dataset is less than this threshold"
+					Mean chiSq threshold:
+						<input type="number" id="ABC_chiSq_` + fitID + `" value=3 title="Accept parameters into the posterior distribution only if the mean residual sum of squares (chiSq) for this dataset is less than this threshold"
 							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA">
 
 			</td>
@@ -788,7 +788,7 @@ function deleteExperiment(fitID){
 		$("#GTPconc_fit" + (fitNum-1)).val($("#GTPconc_fit" + (fitNum)).val());
 		$("#UTPconc_fit" + (fitNum-1)).val($("#UTPconc_fit" + (fitNum)).val());
 		$("#ABC_force_fit" + (fitNum-1)).val($("#ABC_force_fit" + (fitNum)).val());
-		$("#ABC_RSS_fit" + (fitNum-1)).val($("#ABC_RSS_fit" + (fitNum)).val());
+		$("#ABC_chiSq_fit" + (fitNum-1)).val($("#ABC_chiSq_fit" + (fitNum)).val());
 		
 		
 	}
@@ -1473,14 +1473,14 @@ function toggleMCMC(){
 	if ($("#ABC_useMCMC").val() == 1){
 		$(".ABC_settings").show(0);
 		$(".MCMC_settings").hide(0);
-		$(".rejection_ABC_RSS").show(0);
+		$(".rejection_ABC_chiSq").show(0);
 	}
 	
 	// 2 = MCMC ABC
 	else if ($("#ABC_useMCMC").val() == 2){
 		$(".ABC_settings").hide(0);
 		$(".MCMC_settings").show(0);
-		$(".rejection_ABC_RSS").hide(0);
+		$(".rejection_ABC_chiSq").hide(0);
 	}
 	
 	
@@ -1488,7 +1488,7 @@ function toggleMCMC(){
 	else if ($("#ABC_useMCMC").val() == 3){
 		//$("#ABC_settings").show(100);
 		//$("#MCMC_settings").hide(0);
-		//$(".rejection_ABC_RSS").show(100);
+		//$(".rejection_ABC_chiSq").show(100);
 	}
 
 

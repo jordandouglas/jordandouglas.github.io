@@ -90,7 +90,7 @@ ABC_JS.beginABC_WW = function(experimentalData, resolve = function() {}, msgID =
 	if (experimentalData.inferenceMethod == "ABC"){
 		for (var fitNum in fitNums) {
 			ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitNums[fitNum]] = null;
-			ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitNums[fitNum]] = null;
+			ABC_JS.ABC_parameters_and_metrics_this_simulation["meanchiSq" + fitNums[fitNum]] = null;
 		}
 		ABC_JS.ABC_parameters_and_metrics_this_simulation["sample"] = null;
 		ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"] = null;
@@ -129,8 +129,8 @@ ABC_JS.beginABC_WW = function(experimentalData, resolve = function() {}, msgID =
 	//if(RHS_params.indexOf("nascentLen") != -1) ABC_JS.ABC_parameters_and_metrics_this_simulation["nascentLen"] = {name: "Final nascent length (nt)", vals: []};
 
 
-	ABC_JS.n_ABC_trials_left = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"];
 
+	ABC_JS.n_ABC_trials_left = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"];
 
 
 	// Make sure that 4 NTPs are being used, not 1
@@ -140,8 +140,7 @@ ABC_JS.beginABC_WW = function(experimentalData, resolve = function() {}, msgID =
 
 	ABC_JS.initialise_ABCoutput_WW(fitNums);
 
-
-
+	
 
 	if (ANIMATION_TIME_TEMP == 0) SIM_JS.renderPlotsHidden(50); // Set up the DOM rendering loop, which will render plots, parameters, and ABC output every few seconds
 
@@ -222,7 +221,7 @@ ABC_JS.ABC_trials_WW = function(fitNums, resolve = function() {}, msgID = null){
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["sample"] = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
 	for (var fitNum in fitNums) {
 		ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitNums[fitNum]] = null;
-		ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitNums[fitNum]] = null;
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["meanchiSq" + fitNums[fitNum]] = null;
 	}
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["accepted"] = null;
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"]["vals"] = []; 
@@ -298,7 +297,7 @@ ABC_JS.ABC_trial_for_curve_WW = function(currentFitNum, accepted, fitNums, resol
 
 		accepted = accepted && acc;
 	
-		// If regular ABC (not MCMC) then reject now if the RSS is too high
+		// If regular ABC (not MCMC) then reject now if the chiSq is too high
 		if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "ABC"){
 
 
@@ -309,8 +308,8 @@ ABC_JS.ABC_trial_for_curve_WW = function(currentFitNum, accepted, fitNums, resol
 			}
 
 
-			// Calculate the mean RSS
-			var meanRSS = 0;
+			// Calculate the mean chiSq
+			var meanchiSq = 0;
 			var fitID = fitNums[currentFitNum];
 			for (var observationNum = 0; observationNum < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].length; observationNum++){
 
@@ -318,13 +317,13 @@ ABC_JS.ABC_trial_for_curve_WW = function(currentFitNum, accepted, fitNums, resol
 				var observedVelocity = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum]["velocity"];
 				var simulatedVelocity = ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][force_velocity_num];
 				var residualSquared =  Math.pow(observedVelocity - simulatedVelocity, 2);
-				meanRSS += residualSquared / ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].length;
+				meanchiSq += residualSquared / ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"].length;
 
 			}
 
-			ABC_JS.ABC_parameters_and_metrics_this_simulation["meanRSS" + fitID] = meanRSS;
-			ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitID] = meanRSS < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["RSSthreshold"];
-			accepted = accepted && meanRSS < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["RSSthreshold"];
+			ABC_JS.ABC_parameters_and_metrics_this_simulation["meanchiSq" + fitID] = meanchiSq;
+			ABC_JS.ABC_parameters_and_metrics_this_simulation["Passed" + fitID] = meanchiSq < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["chiSqthreshold"];
+			accepted = accepted && meanchiSq < ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["chiSqthreshold"];
 
 		}
 
@@ -409,13 +408,13 @@ ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve
 		
 		
 		
-		// Update the RSS
+		// Update the chi squared
 		if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "MCMC"){
 			
-			MCMC_JS.RSS_this_trial += Math.pow(medianVelocity - ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum]["velocity"], 2);
+			MCMC_JS.chiSq_this_trial += Math.pow(medianVelocity - ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum]["velocity"], 2) / medianVelocity;
 			
 			// If we have gone over the threshold then stop simulating
-			if (MCMC_JS.RSS_this_trial > MCMC_JS.currentRSSthreshold){
+			if (MCMC_JS.chiSq_this_trial > MCMC_JS.currentchiSqthreshold){
 				resolve(false);
 				return;
 			}
@@ -470,14 +469,120 @@ ABC_JS.ABC_trial_for_observation_WW = function(K, fitID, observationNum, resolve
 
 
 
+ABC_JS.initialiseMCMCfromLogFile = function(){
+
+
+
+	// Resume a previous MCMC session?
+	if (!RUNNING_FROM_COMMAND_LINE || WW_JS.ABCinputFolder == null) return;
+	var fs = require('fs');
+	
+
+	// The name of the input log file
+	var inputFileName = "";
+	if (WW_JS.WORKER_ID == null) inputFileName = WW_JS.ABCinputFolder + "posterior.log";
+	else inputFileName = WW_JS.ABCinputFolder + "posterior" + WW_JS.WORKER_ID + ".log";
+
+
+	// Throw error if the file does not exist
+	if (!fs.existsSync(inputFileName)) {
+
+		var cluster = require('cluster');
+		if (!cluster.isWorker){
+			throw new Error("Unable to locate file " + inputFileName + ". Aborting.");
+		}
+
+		else{
+			console.log("Unable to locate file " + inputFileName + ". Aborting.");
+			cluster.worker.kill();
+		}
+
+		return;
+
+	}
+
+
+	// Copy the posterior file into the output folder (if applicable) 
+	if (WW_JS.outputFolder != null){
+		fs.unlink(ABC_JS.posterior_fileName, function() { // Overwrite if it exists
+
+			fs.createReadStream(inputFileName).pipe(fs.createWriteStream(ABC_JS.posterior_fileName));
+			console.log("Copying", inputFileName, "to", ABC_JS.posterior_fileName); 
+
+		}); 
+
+	}
+
+
+	
+	// Open the posterior log file
+
+	var data = fs.readFileSync(inputFileName, 'utf8').toString();  
+
+    var lines = data.split("\n");
+
+
+    // Get the column header row
+    var headerLineNumber = 0;
+    while (lines[headerLineNumber].trim()[0] == "#") headerLineNumber++;
+    var headerLine = lines[headerLineNumber].split("\t");
+
+    // Get the last row
+    var lastLineNumber = lines.length-1;
+    while (lines[lastLineNumber] == "") lastLineNumber--;
+    var lastLine = lines[lastLineNumber].split("\t");
+
+   // console.log("I have lastLine", headerLine, lastLine);
+
+
+
+   	MCMC_JS.MCMC_parameters_and_metrics_from_input_file = {};
+	for (var col = 0; col < headerLine.length; col++){
+
+   		// Get the trial number from the most recent simulation
+   		if (headerLine[col] == "Sample") {
+   			ABC_JS.ABC_EXPERIMENTAL_DATA.n_ABC_trials_left = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - parseFloat(lastLine[col]) + 1;
+   			MCMC_JS.MCMC_parameters_and_metrics_from_input_file.trial = parseFloat(lastLine[col]);
+   		}
+
+
+   		else if (headerLine[col] == "logPrior") MCMC_JS.MCMC_parameters_and_metrics_from_input_file.logPrior = parseFloat(lastLine[col]);
+   		else if (headerLine[col] == "chiSq" || headerLine[col] == "RSS") MCMC_JS.MCMC_parameters_and_metrics_from_input_file.logLikelihood = -parseFloat(lastLine[col]);
+
+
+   		// Get the parameter values from the most recent simulation
+   		else if (PARAMS_JS.PHYSICAL_PARAMETERS[headerLine[col]] != null){
+   			var paramVal = parseFloat(lastLine[col]);
+   			PARAMS_JS.PHYSICAL_PARAMETERS[headerLine[col]].val = paramVal;
+   			PARAMS_JS.PHYSICAL_PARAMETERS[headerLine[col]].priorVal = paramVal;
+   			MCMC_JS.MCMC_parameters_and_metrics_from_input_file[headerLine[col]] = {name: PARAMS_JS.PHYSICAL_PARAMETERS[headerLine[col]]["name"], priorVal: paramVal};
+   			//console.log(WW_JS.WORKER_ID, "Setting", headerLine[col], "to", paramVal);
+   		}
+
+    }
+
+
+}
+
+
+
 ABC_JS.initialise_ABCoutput_WW = function(fitNums){
+
+
+
+
+	// If we are resuming a previous session then copy the existing log files and append to them
+	if (WW_JS.ABCinputFolder != null) {
+		ABC_JS.initialiseMCMCfromLogFile();
+		return;
+	}
 
 
 
 	// Initialise the ABC output string
 	// The first 2 lines are in the following format:	
 	//												|						Force-velocity curve 1						 		 			|	  							 
-	// Number		PriorParam1		PriorParam2	...	Force1	Velocity1	Force2	Velocity2	Force3	Velocity3		RSS		Passed	Accepted	 
+	// Number		PriorParam1		PriorParam2	...	Force1	Velocity1	Force2	Velocity2	Force3	Velocity3		chiSq		Passed	Accepted	 
 	// Each column will have total width of a fixed number of spaces
 
 
@@ -525,7 +630,7 @@ ABC_JS.initialise_ABCoutput_WW = function(fitNums){
 
 		if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "ABC"){
 			passNumber ++;
-			secondLine += (ABC_JS.paddingString + "MeanRSS" + passNumber).slice(-ABC_JS.paddingString.length);
+			secondLine += (ABC_JS.paddingString + "MeanchiSq" + passNumber).slice(-ABC_JS.paddingString.length);
 			secondLine += (ABC_JS.paddingString + "Passed" + passNumber).slice(-ABC_JS.paddingString.length);
 		}
 
@@ -539,7 +644,7 @@ ABC_JS.initialise_ABCoutput_WW = function(fitNums){
 	else if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "MCMC"){
 
 		secondLine += (ABC_JS.paddingString + "logPrior").slice(-ABC_JS.paddingString.length);
-		secondLine += (ABC_JS.paddingString + "RSS").slice(-ABC_JS.paddingString.length);
+		secondLine += (ABC_JS.paddingString + "chiSq").slice(-ABC_JS.paddingString.length);
 
 	}
 
@@ -594,7 +699,7 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 	}
 
 
-	var printVals = true; // When this is false, the curve was not executed because the RSS for a previous curve went too high, so leave some space but don't print any numbers
+	var printVals = true; // When this is false, the curve was not executed because the chiSq for a previous curve went too high, so leave some space but don't print any numbers
 
 
 	// Get the force and velocity values
@@ -639,10 +744,10 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 
 		if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "ABC"){
 
-			// RSS
-			var RSS = printVals ? WW_JS.roundToSF_WW(stateToLog["meanRSS" + fitID], 5) : "-";
-			if ((RSS + "").length > ABC_JS.paddingString.length-1) RSS = RSS.toExponential();
-			line += (ABC_JS.paddingString + RSS).slice(-ABC_JS.paddingString.length);
+			// chiSq
+			var chiSq = printVals ? WW_JS.roundToSF_WW(stateToLog["meanchiSq" + fitID], 5) : "-";
+			if ((chiSq + "").length > ABC_JS.paddingString.length-1) chiSq = chiSq.toExponential();
+			line += (ABC_JS.paddingString + chiSq).slice(-ABC_JS.paddingString.length);
 
 
 			// Pass or fail
@@ -947,11 +1052,11 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 
 
 			// Increment the number of graphs being fitted to. R-ABC only
-			if (col.includes("MeanRSS")){
+			if (col.includes("MeanchiSq")){
 				nfits ++;
-				posteriorObjectEmptyTemplate["meanRSS" + nfits] = null;
+				posteriorObjectEmptyTemplate["meanchiSq" + nfits] = null;
 				posteriorObjectEmptyTemplate["Passed" + nfits] = null;
-				columnNumTSV_to_columnNameObj[colNum] = "meanRSS" + nfits;
+				columnNumTSV_to_columnNameObj[colNum] = "meanchiSq" + nfits;
 				columnNumTSV_to_columnNameObj[colNum+1] = "Passed" + nfits;
 
 			}
@@ -959,7 +1064,7 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 
 			// MCMC only
 			if (col.includes("logPrior")){
-				posteriorObjectEmptyTemplate["logLikelihood"] = {name: "RSS", val: false};;
+				posteriorObjectEmptyTemplate["logLikelihood"] = {name: "chiSq", val: false};;
 				posteriorObjectEmptyTemplate["logPrior"] = {name: "logPrior", val: false};;
 				columnNumTSV_to_columnNameObj[colNum+1] = "logLikelihood";
 				columnNumTSV_to_columnNameObj[colNum] = "logPrior";
@@ -1125,7 +1230,8 @@ if (RUNNING_FROM_COMMAND_LINE){
 	  	initialiseFileNames_CommandLine: ABC_JS.initialiseFileNames_CommandLine,
 	  	updateABCExperimentalData_WW: ABC_JS.updateABCExperimentalData_WW,
 	  	workerNumberRange: ABC_JS.workerNumberRange,
-	    paddingString: ABC_JS.paddingString
+	    paddingString: ABC_JS.paddingString,
+	    initialiseMCMCfromLogFile: ABC_JS.initialiseMCMCfromLogFile
 	}
 
 }

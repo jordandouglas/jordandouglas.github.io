@@ -1321,6 +1321,13 @@ WW_JS.setOutputFolder = function(folderName){
 	if (folderName != null && folderName[folderName.length-1] != "/") folderName += "/";
 	WW_JS.outputFolder = folderName;
 
+}
+
+WW_JS.setInputFolder = function(folderName){
+
+	if (!RUNNING_FROM_COMMAND_LINE) return;
+	if (folderName != null && folderName[folderName.length-1] != "/") folderName += "/";
+	WW_JS.ABCinputFolder = folderName;
 
 }
 
@@ -1337,6 +1344,7 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 	// Initialise the mersenne-twister using the current time and the worker number as the random seed.
 	// If you only use the time there is a decent chance of two threads having the same random seed
 	MER_JS.init(new Date().getTime() * (workerID == null ? 1 : workerID * workerID));
+
 
 
 	var toDoAfterRefr = function(){
@@ -1367,7 +1375,7 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 		// Start the simulations
 		if (!runABC) {
 
-			
+			PLOTS_JS.DISTANCE_VS_TIME_SIZE_MAX = 1;
 
 			// Split the number of trials evenly among the number of workers
 			var nTrialsThisWorker = XML_JS.N;
@@ -1474,7 +1482,9 @@ if (RUNNING_FROM_COMMAND_LINE){
 	  	loadSessionFromCommandLine: WW_JS.loadSessionFromCommandLine,
 	  	getDateAndTime: WW_JS.getDateAndTime,
 	  	setOutputFolder: WW_JS.setOutputFolder,
-	  	WORKER_ID: WW_JS.WORKER_ID
+	  	WORKER_ID: WW_JS.WORKER_ID,
+	  	ABCinputFolder: WW_JS.ABCinputFolder,
+	  	setInputFolder: WW_JS.setInputFolder
 
 	}
 }

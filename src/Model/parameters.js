@@ -36,7 +36,7 @@ PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"] = {distribution:"Fixed", refreshOnCha
 PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 2, name: "Bubble length left (bp)",  title: "Number of unpaired template bases 3' of the hybrid", zeroTruncated: "exclusive", integer: true, hidden:true};
 PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"] = {distribution:"Fixed", refreshOnChange:true, fixedDistnVal: 1, name: "Bubble length right (bp)", title: "Number of unpaired template bases 5' of the hybrid", zeroTruncated: "exclusive", integer: true, hidden:true};
 
-PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"] = {distribution:"Fixed", fixedDistnVal: 4.5, uniformDistnLowerVal: 2, uniformDistnUpperVal: 6, name: "\u0394G\u2020slide", title: "Free energy barrier height of translocation", zeroTruncated: false, integer: false};
+PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"] = {distribution:"Fixed", fixedDistnVal: 11, uniformDistnLowerVal: 9, uniformDistnUpperVal: 15, name: "\u0394G\u2020slide", title: "Free energy barrier height of translocation", zeroTruncated: false, integer: false};
 PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"] = {distribution:"Fixed", fixedDistnVal: 0, uniformDistnLowerVal: -4, uniformDistnUpperVal: 4, name: "\u0394Gpost", title: "Free energy added on to posttranslocated ground state", zeroTruncated: false, integer: false};
 PARAMS_JS.PHYSICAL_PARAMETERS["DGHyperDag"] = {distribution:"Fixed", fixedDistnVal: 0, name: "\u0394DGHyperDag", title: "Free energy penalty height of hypertranslocation", zeroTruncated: false, integer: false, hidden: false};
 PARAMS_JS.PHYSICAL_PARAMETERS["GsecondarySitePenalty"] = {distribution:"Fixed", fixedDistnVal: 1.336, name: "\u0394G\u2020NTP2", title: "Free energy penalty of binding NTP in the secondary binding site", zeroTruncated: false, integer: false};
@@ -57,7 +57,7 @@ PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_GTP"] = {distribution:"Fixed", fixedDistnVa
 PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_UTP"] = {distribution:"Fixed", fixedDistnVal: 18, name: "KD of UTP (\u03bcM)", title: "Dissociation constant of UTP", zeroTruncated: "exclusive", integer: false, hidden:true};
 
 
-PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"] = {distribution:"Fixed", fixedDistnVal: 250, name: "Rate bind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of binding the correct NTP", zeroTruncated: "inclusive", integer: false, hidden: true};
+PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"] = {distribution:"Fixed", fixedDistnVal: 250, name: "Rate bind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of binding the correct NTP", zeroTruncated: "inclusive", integer: false, hidden: false};
 PARAMS_JS.PHYSICAL_PARAMETERS["RateMisbind"] = {distribution:"Fixed", fixedDistnVal: 1, name: "Rate misbind (\u03bcM\u207B\u00B9 s\u207B\u00B9)", title: "Second order rate constant of NTP mis-binding which can lead to transition/transversion mutations", zeroTruncated: "inclusive", integer: false, hidden:true};
 PARAMS_JS.PHYSICAL_PARAMETERS["TransitionTransversionRatio"] = {distribution:"Fixed", fixedDistnVal: 4, name: "Transition:transversion", title: "How much more likely is a transition mis-binding event than a transversion mis-binding event", zeroTruncated: "exclusive", integer: false, hidden:true};
 

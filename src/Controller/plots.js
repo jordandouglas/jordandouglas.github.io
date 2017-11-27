@@ -1162,9 +1162,9 @@ function plot_MCMC_trace(){
 		// Epsilon decrease over time
 		var epsilon = null;
 		if (PLOT_DATA.ABC_EXPERIMENTAL_DATA !=null && yVar == "logLikelihood"){
-			var epsilon_min = -PLOT_DATA.ABC_EXPERIMENTAL_DATA.RSSthreshold_min;
-			var epsilon_0 = -PLOT_DATA.ABC_EXPERIMENTAL_DATA.RSSthreshold_0;
-			var epsilon_gamma = PLOT_DATA.ABC_EXPERIMENTAL_DATA.RSSthreshold_gamma;
+			var epsilon_min = -PLOT_DATA.ABC_EXPERIMENTAL_DATA.chiSqthreshold_min;
+			var epsilon_0 = -PLOT_DATA.ABC_EXPERIMENTAL_DATA.chiSqthreshold_0;
+			var epsilon_gamma = PLOT_DATA.ABC_EXPERIMENTAL_DATA.chiSqthreshold_gamma;
 			epsilon = {emin: epsilon_min, e0: epsilon_0, gamma: epsilon_gamma};
 		}
 
@@ -1177,7 +1177,7 @@ function plot_MCMC_trace(){
 
 		//console.log("Values", xVals, yVals);
 
-		var ylab = PLOT_DATA.POSTERIOR_DISTRIBUTION.length > 0 ? PLOT_DATA.POSTERIOR_DISTRIBUTION[0][yVar].name : "RSS";
+		var ylab = PLOT_DATA.POSTERIOR_DISTRIBUTION.length > 0 ? PLOT_DATA.POSTERIOR_DISTRIBUTION[0][yVar].name : "chiSq";
 		trace_plot(xVals, yVals, range, epsilon, "plotCanvas" + pltNum, "plotCanvasContainer" + pltNum, "State", ylab, PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["canvasSizeMultiplier"]);
 
 	}
@@ -4656,7 +4656,7 @@ function getTracePlotDropdownTemplate(){
 
 		<legend><b>Y-axis variable</b></legend>
 		<select class="dropdown" title="What do you want to show on the y-axis?" id = "traceVariableY" style="vertical-align: middle; text-align:right;">
-			<option value="logLikelihood">RSS</option>
+			<option value="logLikelihood">chiSq</option>
 			<option value="logPrior">log prior</option>
 		</select><br>
 		Calculated per trial.

@@ -2085,9 +2085,9 @@ function loadSession_controller(XMLData, resolve = function() { }){
 			if (experimentalData["burnin"] != null) $("#MCMC_burnin").val(experimentalData["burnin"]);
 			if (experimentalData["logEvery"] != null) $("#MCMC_logevery").val(experimentalData["logEvery"]);
 			
-			if (experimentalData["RSSthreshold_min"] != null) $("#MCMC_RSSthreshold_min").val(experimentalData["RSSthreshold_min"]);
-			if (experimentalData["RSSthreshold_0"] != null) $("#MCMC_RSSthreshold_0").val(experimentalData["RSSthreshold_0"]);
-			if (experimentalData["RSSthreshold_gamma"] != null) $("#MCMC_RSSthreshold_gamma").val(experimentalData["RSSthreshold_gamma"]);
+			if (experimentalData["chiSqthreshold_min"] != null) $("#MCMC_chiSqthreshold_min").val(experimentalData["chiSqthreshold_min"]);
+			if (experimentalData["chiSqthreshold_0"] != null) $("#MCMC_chiSqthreshold_0").val(experimentalData["chiSqthreshold_0"]);
+			if (experimentalData["chiSqthreshold_gamma"] != null) $("#MCMC_chiSqthreshold_gamma").val(experimentalData["chiSqthreshold_gamma"]);
 			
 			
 			$("#ABC_useMCMC").val(experimentalData["inferenceMethod"] == "ABC" ? 1 : experimentalData["inferenceMethod"] == "MCMC" ? 2 : 3);
@@ -2124,12 +2124,12 @@ function loadSession_controller(XMLData, resolve = function() { }){
 				}
 
 
-				// Add the NTP concentrations and RSS threshold to the DOM
+				// Add the NTP concentrations and chiSq threshold to the DOM
 				$("#ATPconc_" + fitID).val(experimentalData["fits"][fitID]["ATPconc"]);
 				$("#CTPconc_" + fitID).val(experimentalData["fits"][fitID]["CTPconc"]);
 				$("#GTPconc_" + fitID).val(experimentalData["fits"][fitID]["GTPconc"]);
 				$("#UTPconc_" + fitID).val(experimentalData["fits"][fitID]["UTPconc"]);
-				$("#ABC_RSS_" + fitID).val(experimentalData["fits"][fitID]["RSSthreshold"]);
+				$("#ABC_chiSq_" + fitID).val(experimentalData["fits"][fitID]["chiSqthreshold"]);
 				if (dataType == "ntpVelocity") $("#ABC_force_" + fitID).val(experimentalData["fits"][fitID]["force"]);
 
 

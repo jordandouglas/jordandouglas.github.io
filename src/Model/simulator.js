@@ -115,7 +115,7 @@ SIM_JS.renderPlotsEveryMS = 5000; // If in hidden mode, render the plots every f
 
 
  	// Print out every 20th simulation when calling from command line
- 	if (!ABC_JS.ABC_simulating && RUNNING_FROM_COMMAND_LINE && (n == 1 || n == XML_JS.N || (XML_JS.N - n + 1) % 20 == 0)){
+ 	if (!ABC_JS.ABC_simulating && RUNNING_FROM_COMMAND_LINE && (n == 1 || n == XML_JS.N || (XML_JS.N - n + 1) % 1 == 0)){
 
  		if (WW_JS.WORKER_ID == null) console.log("Sim", (XML_JS.N - n + 1), "/", XML_JS.N);
 

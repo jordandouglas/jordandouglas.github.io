@@ -958,9 +958,9 @@ function saveSession(){
 			saveXML.writeAttributeString("ntrials", abcDataObjectForModel["ntrials"]);
 			saveXML.writeAttributeString("testsPerData", abcDataObjectForModel["testsPerData"]);
 			if (abcDataObjectForModel["inferenceMethod"] == "MCMC"){
-				saveXML.writeAttributeString("RSSthreshold_min", abcDataObjectForModel["RSSthreshold_min"]);
-				saveXML.writeAttributeString("RSSthreshold_0", abcDataObjectForModel["RSSthreshold_0"]);
-				saveXML.writeAttributeString("RSSthreshold_gamma", abcDataObjectForModel["RSSthreshold_gamma"]);
+				saveXML.writeAttributeString("chiSqthreshold_min", abcDataObjectForModel["chiSqthreshold_min"]);
+				saveXML.writeAttributeString("chiSqthreshold_0", abcDataObjectForModel["chiSqthreshold_0"]);
+				saveXML.writeAttributeString("chiSqthreshold_gamma", abcDataObjectForModel["chiSqthreshold_gamma"]);
 				saveXML.writeAttributeString("burnin", abcDataObjectForModel["burnin"]);
 				saveXML.writeAttributeString("logEvery", abcDataObjectForModel["logEvery"]);
 			}
@@ -982,7 +982,7 @@ function saveSession(){
 
 
 					saveXML.writeAttributeString("dataType", dataType);
-					saveXML.writeAttributeString("RSSthreshold", abcDataObjectForModel["fits"][fitID]["RSSthreshold"]);
+					saveXML.writeAttributeString("chiSqthreshold", abcDataObjectForModel["fits"][fitID]["chiSqthreshold"]);
 					saveXML.writeAttributeString("ATPconc", abcDataObjectForModel["fits"][fitID]["ATPconc"]);
 					saveXML.writeAttributeString("CTPconc", abcDataObjectForModel["fits"][fitID]["CTPconc"]);
 					saveXML.writeAttributeString("GTPconc", abcDataObjectForModel["fits"][fitID]["GTPconc"]);

@@ -25,8 +25,8 @@ MCMC_JS = {};
 MCMC_JS.parametersWithPriors = [];
 MCMC_JS.MCMC_parameters_and_metrics_previous_simulation = {};
 MCMC_JS.MCMC_SIMULATING = false;
-MCMC_JS.currentRSSthreshold = 0;
-MCMC_JS.RSS_this_trial = 0;
+MCMC_JS.currentchiSqthreshold = 0;
+MCMC_JS.chiSq_this_trial = 0;
 MCMC_JS.cached_effective_sample_sizes = {};
 
 
@@ -54,8 +54,11 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 
 
 	// Sample parameters from their priors and log this initial state
-	PARAMS_JS.sample_parameters_WW();
+	if (WW_JS.ABCinputFolder == null) PARAMS_JS.sample_parameters_WW();
 	MCMC_JS.MCMC_SIMULATING = true;
+
+
+
 
 	// Build a list of parameters which have prior distributions
 	MCMC_JS.parametersWithPriors = [];
@@ -66,6 +69,8 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 		}
 
 	}
+
+	//console.log("MCMC_JS.parametersWithPriors", MCMC_JS.parametersWithPriors);
 
 
 
@@ -86,30 +91,54 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 		}
 
 
-		var logPrior = MCMC_JS.getLogPrior();
-		//var logLikelihood = MCMC_JS.getLogLikelihood(fitNums);
-		var logLikelihood = -MCMC_JS.RSS_this_trial;
-		ABC_JS.ABC_parameters_and_metrics_this_simulation.logPrior = logPrior;
-		ABC_JS.ABC_parameters_and_metrics_this_simulation.logLikelihood = logLikelihood;
 
-		ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_min = parseFloat(ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_min);
-		ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_gamma = parseFloat(ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_gamma);
-		ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_0 = parseFloat(ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_0);
+		ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_min = parseFloat(ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_min);
+		ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_gamma = parseFloat(ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_gamma);
+		ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_0 = parseFloat(ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_0);
 
 
-		// Copy this current state and save it as the previous state
-		MCMC_JS.MCMC_parameters_and_metrics_previous_simulation = JSON.parse(JSON.stringify(ABC_JS.ABC_parameters_and_metrics_this_simulation));
+		// Resume MCMC from previously saved file
+		if (WW_JS.ABCinputFolder != null){
 
 
-		// Log the initial state and add it to the posterior
-		ABC_JS.update_ABCoutput_WW(fitNums);
-		//if (!RUNNING_FROM_COMMAND_LINE) {
+			for (var propertyID in MCMC_JS.MCMC_parameters_and_metrics_from_input_file){
+				ABC_JS.ABC_parameters_and_metrics_this_simulation[propertyID] = MCMC_JS.MCMC_parameters_and_metrics_from_input_file[propertyID];
+			}
+
+
+			// Add to the posterior
+			MCMC_JS.MCMC_parameters_and_metrics_previous_simulation = JSON.parse(JSON.stringify(ABC_JS.ABC_parameters_and_metrics_this_simulation));
 			ABC_JS.ABC_POSTERIOR_DISTRIBUTION.push(JSON.parse(JSON.stringify(MCMC_JS.MCMC_parameters_and_metrics_previous_simulation)));
-		//}
-		
 
-		// Set the RSS threshold to the initial value
-		MCMC_JS.currentRSSthreshold = ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_0;
+
+			// Set the chiSq threshold to the current value
+			MCMC_JS.currentchiSqthreshold = ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_0 * Math.pow(ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_gamma, ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"]);
+			MCMC_JS.currentchiSqthreshold = Math.max(MCMC_JS.currentchiSqthreshold, ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_min);
+			//console.log("chiSq threshold", MCMC_JS.currentchiSqthreshold, ABC_JS.ABC_parameters_and_metrics_this_simulation);
+
+		}
+
+		else{
+
+
+			var logPrior = MCMC_JS.getLogPrior();
+			var logLikelihood = -MCMC_JS.chiSq_this_trial;
+			ABC_JS.ABC_parameters_and_metrics_this_simulation.logPrior = logPrior;
+			ABC_JS.ABC_parameters_and_metrics_this_simulation.logLikelihood = logLikelihood;
+
+			// Copy this current state and save it as the previous state
+			MCMC_JS.MCMC_parameters_and_metrics_previous_simulation = JSON.parse(JSON.stringify(ABC_JS.ABC_parameters_and_metrics_this_simulation));
+
+
+			// Log the initial state and add it to the posterior
+			ABC_JS.update_ABCoutput_WW(fitNums);
+			ABC_JS.ABC_POSTERIOR_DISTRIBUTION.push(JSON.parse(JSON.stringify(MCMC_JS.MCMC_parameters_and_metrics_previous_simulation)));
+			
+
+			// Set the chiSq threshold to the initial value
+			MCMC_JS.currentchiSqthreshold = ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_0;
+
+		}
 
 		
 		// Perform MCMC over N trials
@@ -122,18 +151,19 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 	
 	
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"] = 0;
-	MCMC_JS.RSS_this_trial = 0;
+	MCMC_JS.chiSq_this_trial = 0;
 
 	
 	// Set the threshold to infinity so that the first simulation does not abort early
-	MCMC_JS.currentRSSthreshold = Number.POSITIVE_INFINITY;
+	MCMC_JS.currentchiSqthreshold = Number.POSITIVE_INFINITY;
 
 
 	// Evaluate the likelihood of the initial state
-	var toCall = () => new Promise((resolve) => ABC_JS.ABC_trial_for_curve_WW(0, true, fitNums, resolve));
-	toCall().then(() => toDoAfterFirstSimulation());
-
-
+	if (WW_JS.ABCinputFolder != null) toDoAfterFirstSimulation();
+	else {
+		var toCall = () => new Promise((resolve) => ABC_JS.ABC_trial_for_curve_WW(0, true, fitNums, resolve));
+		toCall().then(() => toDoAfterFirstSimulation());
+	}
 
 
 
@@ -148,6 +178,7 @@ MCMC_JS.clearMCMCdata_WW = function(){
 }
 
 
+
 MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 
 	//console.log("Performing MCMC trial", ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1);
@@ -159,7 +190,7 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 	}
 
 
-		// Print out every 20th simulation when calling from command line
+	// Print out every 100th simulation when calling from command line
  	if (RUNNING_FROM_COMMAND_LINE && (ABC_JS.n_ABC_trials_left == 1 || ABC_JS.n_ABC_trials_left == ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] || (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1) % 100 == 0)){
 
  		var workerString = WW_JS.WORKER_ID == null ? "" : "Worker " + WW_JS.WORKER_ID + " | ";
@@ -178,14 +209,16 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 		if (!WW_JS.stopRunning_WW){
 
 			// Calculate the log prior / likelihood of this state
-			var logLikelihood = -MCMC_JS.RSS_this_trial;
+			var logLikelihood = -MCMC_JS.chiSq_this_trial;
 			ABC_JS.ABC_parameters_and_metrics_this_simulation.logPrior = logPrior;
 			ABC_JS.ABC_parameters_and_metrics_this_simulation.logLikelihood = logLikelihood;
-			
+
+
+
 
 
 			// Accept or reject the current state using Metropolis-Hastings formula. Accept the new state with probability min(1, alpha)
-			var alpha = -logLikelihood > MCMC_JS.currentRSSthreshold ? 0 : Math.exp(logPrior - MCMC_JS.MCMC_parameters_and_metrics_previous_simulation.logPrior);
+			var alpha = -logLikelihood > MCMC_JS.currentchiSqthreshold ? 0 : Math.exp(logPrior - MCMC_JS.MCMC_parameters_and_metrics_previous_simulation.logPrior);
 
 			// Accept
 			if (alpha >= 1 || RAND_JS.uniform(0, 1) < alpha){
@@ -212,9 +245,9 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 			}
 			
 			
-			// Lower the RSS threshold by multiplying it by gamma
-			if (MCMC_JS.currentRSSthreshold > ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_min){
-				MCMC_JS.currentRSSthreshold = Math.max(ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_min, MCMC_JS.currentRSSthreshold * ABC_JS.ABC_EXPERIMENTAL_DATA.RSSthreshold_gamma);
+			// Lower the chiSq threshold by multiplying it by gamma
+			if (MCMC_JS.currentchiSqthreshold > ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_min){
+				MCMC_JS.currentchiSqthreshold = Math.max(ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_min, MCMC_JS.currentchiSqthreshold * ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_gamma);
 			}
 			
 
@@ -229,7 +262,7 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 
 	// Modify the parameters using the proposal function
 	MCMC_JS.makeProposal();
-	MCMC_JS.RSS_this_trial = 0;
+	MCMC_JS.chiSq_this_trial = 0;
 
 
 	// Reset the state
@@ -299,7 +332,7 @@ MCMC_JS.getLogLikelihood = function(fitNums){
 
 
 	var force_velocity_num = -1
-	var RSS = 0;
+	var chiSq = 0;
 	for (var fitNum = 0; fitNum < fitNums.length; fitNum++){
 
 		var fitID = fitNums[fitNum];
@@ -309,13 +342,13 @@ MCMC_JS.getLogLikelihood = function(fitNums){
 			var observedVelocity = ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum]["velocity"];
 			var simulatedVelocity = ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"][force_velocity_num];
 			var residualSquared =  Math.pow(observedVelocity - simulatedVelocity, 2);
-			RSS += residualSquared;
+			chiSq += residualSquared;
 
 		}
 
 	}
 
-	return -RSS; // -RSS is our approximation of the log-likelihood
+	return -chiSq; // -chiSq is our approximation of the log-likelihood
 
 }
 
@@ -399,16 +432,16 @@ MCMC_JS.calculateESS = function(toTrace = "logLikelihood", workerNum = null){
 	var trialStart = Math.floor(ABC_JS.ABC_EXPERIMENTAL_DATA.burnin/100 * ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length);
 	var n = ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length - trialStart;
 	
-	// Calculate the mean and variance of the RSS
-	var meanRSS = 0;
-	var varRSS = 0;
-	for (var trialNum = trialStart; trialNum < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; trialNum++) meanRSS += -ABC_JS.ABC_POSTERIOR_DISTRIBUTION[trialNum].logLikelihood;
-	meanRSS /= ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length;
-	for (var trialNum = trialStart; trialNum < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; trialNum++) varRSS += Math.pow(-ABC_JS.ABC_POSTERIOR_DISTRIBUTION[trialNum].logLikelihood - meanRSS, 2);
-	varRSS /= ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length;
+	// Calculate the mean and variance of the chiSq
+	var meanchiSq = 0;
+	var varchiSq = 0;
+	for (var trialNum = trialStart; trialNum < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; trialNum++) meanchiSq += -ABC_JS.ABC_POSTERIOR_DISTRIBUTION[trialNum].logLikelihood;
+	meanchiSq /= ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length;
+	for (var trialNum = trialStart; trialNum < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; trialNum++) varchiSq += Math.pow(-ABC_JS.ABC_POSTERIOR_DISTRIBUTION[trialNum].logLikelihood - meanchiSq, 2);
+	varchiSq /= ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length;
 	
 	
-	//console.log(meanRSS, varRSS, trialStart, ABC_JS.ABC_POSTERIOR_DISTRIBUTION);
+	//console.log(meanchiSq, varchiSq, trialStart, ABC_JS.ABC_POSTERIOR_DISTRIBUTION);
 	
 	// Calculate the autocorrelation at each lag value
 	var rhoSum = 0;
@@ -417,17 +450,17 @@ MCMC_JS.calculateESS = function(toTrace = "logLikelihood", workerNum = null){
 		var rho_k = 0;
 		for (var trialNum = trialStart; trialNum < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length-lag; trialNum++){
 			
-			var RSS_t = -ABC_JS.ABC_POSTERIOR_DISTRIBUTION[trialNum].logLikelihood;
-			var RSS_t_plus_lag = -ABC_JS.ABC_POSTERIOR_DISTRIBUTION[trialNum + lag].logLikelihood;
+			var chiSq_t = -ABC_JS.ABC_POSTERIOR_DISTRIBUTION[trialNum].logLikelihood;
+			var chiSq_t_plus_lag = -ABC_JS.ABC_POSTERIOR_DISTRIBUTION[trialNum + lag].logLikelihood;
 			
-			if (RSS_t_plus_lag == null) break;
+			if (chiSq_t_plus_lag == null) break;
 			
-			rho_k += (RSS_t - meanRSS) * (RSS_t_plus_lag - meanRSS); 
+			rho_k += (chiSq_t - meanchiSq) * (chiSq_t_plus_lag - meanchiSq); 
 
 		}
 		
 
-		rho_k /= (n - lag) * varRSS
+		rho_k /= (n - lag) * varchiSq
 		//rho_k = Math.abs(rho_k);
 		rhoSum += rho_k;
 	
@@ -551,14 +584,14 @@ if (RUNNING_FROM_COMMAND_LINE){
 		getLogLikelihood: MCMC_JS.getLogLikelihood,
 		performMCMCtrial: MCMC_JS.performMCMCtrial,
 		clearMCMCdata_WW: MCMC_JS.clearMCMCdata_WW,
-		currentRSSthreshold: MCMC_JS.currentRSSthreshold,
-		RSS_this_trial: MCMC_JS.RSS_this_trial,
+		currentchiSqthreshold: MCMC_JS.currentchiSqthreshold,
+		chiSq_this_trial: MCMC_JS.chiSq_this_trial,
 		calculateESS: MCMC_JS.calculateESS,
 		update_burnin_WW: MCMC_JS.update_burnin_WW,
 		get_ParametersWithPriors_WW: MCMC_JS.get_ParametersWithPriors_WW,
 		cache_effective_sample_sizes: MCMC_JS.cache_effective_sample_sizes,
-		cached_effective_sample_sizes: MCMC_JS.cached_effective_sample_sizes
-
+		cached_effective_sample_sizes: MCMC_JS.cached_effective_sample_sizes,
+		MCMC_parameters_and_metrics_from_input_file: MCMC_JS.MCMC_parameters_and_metrics_from_input_file
 	}
 
 }
