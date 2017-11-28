@@ -309,6 +309,7 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 		
 		// Command line mode, call asynchronously to avoid stack overflow
 		else if (RUNNING_FROM_COMMAND_LINE){
+			console.log("X");
 			setTimeout(function(){
 				SIM_JS.trial_WW(stateC, resolve, msgID);
 			}, 0);
