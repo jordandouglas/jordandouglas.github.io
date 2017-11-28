@@ -422,7 +422,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 	// If there has been a translocation action, add it to the distance~time chart, and update the time spent at this site
 	if (actionsToDo.indexOf(0) != -1 || actionsToDo.indexOf(1) != -1) {
 
-		console.log("move");
+		//console.log("move");
 		//console.log("Updating plot data", actionsToDo, reactionTime);
 		if (PLOTS_JS.DISTANCE_VS_TIME_SIZE < PLOTS_JS.DISTANCE_VS_TIME_SIZE_MAX){ // Maximum size of the distance vs time object
 			var index = PLOTS_JS.DISTANCE_VS_TIME.length-1;

@@ -306,16 +306,18 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 		}
 
 
-		// Ultrafast mode (instantaneous for the WebWorker), or command line mode. Running this way without a WebWorker will crash the browser
-		// Call asynchronously to avoid stack overflow
-		else{
-			SIM_JS.trial_WW(stateC, resolve, msgID);
-			//setTimeout(function(){
-				//SIM_JS.trial_WW(stateC, resolve, msgID);
-			//}, 0);
+		
+		// Command line mode, call asynchronously to avoid stack overflow
+		else if (RUNNING_FROM_COMMAND_LINE){
+			setTimeout(function(){
+				SIM_JS.trial_WW(stateC, resolve, msgID);
+			}, 0);
 		}
 
-
+		// Ultrafast mode (instantaneous for the WebWorker). Running this way without a WebWorker will crash the browser
+		else {
+			SIM_JS.trial_WW(stateC, resolve, msgID);
+		}
 
 	};
 
