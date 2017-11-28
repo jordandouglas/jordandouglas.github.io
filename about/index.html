@@ -1496,7 +1496,8 @@ function addCitations(){
 										
 										
 										This translocation model assumes that the intermediate translocation state is a nucleic acid complex which contains only the basepairs which exist in both $x$ and $y$ 
-										(ie. the intersection between the two sets of basepairs). Let $\Delta G^\dagger_{x \cap y}$ be the free energy of basepairing of this intermediate state, 
+										(ie. the intersection between the two sets of basepairs). The melting model describes a physical mechanism where the transcription bubble spontaneously melts on one side, and then 
+										closes up again on the other side, thus translocating the polymerase by one basepair. Let $\Delta G^\dagger_{x \cap y}$ be the free energy of basepairing of this intermediate state, 
 										which can easily be calculated from experimental parameters. Then, 
 										the total barrier height of translocation is.
 										
@@ -1508,7 +1509,33 @@ function addCitations(){
 									
 										
 										again where the value of parameter $\Delta G^\dagger_{slide}$ (units $k_B T$) can be manually tweaked. This parameter therefore has a different meaning across 
-										the two translocation models. The melting model is the default model in SimPol.
+										the three translocation models.
+									</div>
+									
+									<br><br><br>
+									
+									
+									
+									<div style="padding: 10 10; background-color:#ebe9e7">
+										<div id="translocation_ModelHelp" class="block-subtitle" style="font-size:30px; text-align:left"> 3. Sealing model</div> 
+										
+										
+										
+										This model assumes that the intermediate translocation state is a nucleic acid complex which contains the basepairs which exist in either $x$ or $y$ 
+										(ie. the union between the two sets of basepairs). The sealing model describes a physical mechanism where two opposite bases on one side of the transcription bubble spontaneously form
+										thus sealing the transcription bubble and forcing the other side to melt. Thus the polymerase is thermally powered translocated along by the width of one basepair. 
+										Let $\Delta G^\dagger_{x \cup y}$ be the free energy of basepairing of this intermediate state, 
+										which can easily be calculated from experimental parameters. Then, 
+										the total barrier height of translocation is.
+										
+										<h3>
+										$$
+											\Delta G^\dagger_{x,y} = \Delta G^\dagger_{x \cup y} + \Delta G^\dagger_{slide},
+										$$
+										</h3>
+									
+										
+										again where the value of parameter $\Delta G^\dagger_{slide}$ (units $k_B T$) can be manually tweaked. The sealing model is the default model in SimPol.
 									</div>
 									
 									<br><br><br>
