@@ -306,19 +306,15 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 		}
 
 
-		
+		// Ultrafast mode (instantaneous for the WebWorker). Running this way without a WebWorker will crash the browser
 		// Command line mode, call asynchronously to avoid stack overflow
-		else if (RUNNING_FROM_COMMAND_LINE){
-			console.log("X");
+		else {
+			//console.log("X");
 			setTimeout(function(){
 				SIM_JS.trial_WW(stateC, resolve, msgID);
 			}, 0);
 		}
 
-		// Ultrafast mode (instantaneous for the WebWorker). Running this way without a WebWorker will crash the browser
-		else {
-			SIM_JS.trial_WW(stateC, resolve, msgID);
-		}
 
 	};
 
@@ -425,7 +421,7 @@ SIM_JS.sampleAction_WW = function(stateC){
 
 	// If ready to bind and the model settings are right, then use the geometric boost where we simulate NTP binding/release by sampling from the geometric distribution instead
 	// of a full simulation where we change states every upon each reaction. This is exact and not an approximation.
-	if (false && !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeBindingEquilibrium"] && 
+	if (!FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeBindingEquilibrium"] && 
 		((!FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeTranslocationEquilibrium"] && stateC[1] == 1) ||  // If no translocation equilibrium and posttranslocated
 		(FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeTranslocationEquilibrium"] && (stateC[1] == 0 || stateC[1] == 1))) && // OR equilibrium assumed and post/pretranslocated
 		!stateC[2] && stateC[3] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] && 
