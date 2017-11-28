@@ -447,6 +447,8 @@ function getNewCurveButtonsTemplate(){
 					<br><br>
 					<input type=button onClick='addNewABCData("ntpVelocity")' value='+ [NTP]-velocity curve' title="Add [NTP]-velocity experimental data" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
 					<br><br>
+					<input type=button onClick='addNewABCData("ntpVelocity")' value='+ Pause time histogram' title="Add pause time experimental data" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
+					<br><br>
 				</div>
 
 			</td>

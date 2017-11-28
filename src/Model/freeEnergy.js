@@ -1109,7 +1109,7 @@ function getBaseComplement_WW(templateBaseType){
 
 
 
- FE_JS.getStateDiagramInfo_WW = function(resolve, msgID){
+FE_JS.getStateDiagramInfo_WW = function(resolve, msgID){
 
 
 	if (resolve === undefined) resolve = function() {};
@@ -1185,7 +1185,7 @@ function getBaseComplement_WW(templateBaseType){
 
 }
 
- FE_JS.getTranslocationCanvasData_WW = function(resolve, msgID){
+FE_JS.getTranslocationCanvasData_WW = function(resolve, msgID){
 
 
 	if (resolve === undefined) resolve = function() {};

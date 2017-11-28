@@ -106,17 +106,17 @@ ABC_JS.beginABC_WW = function(experimentalData, resolve = function() {}, msgID =
 
 
 	for (var paramID in PARAMS_JS.PHYSICAL_PARAMETERS){
-		if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["binary"] && !PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["hidden"]) {
+		if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["binary"]) {
 
 
 			if (paramID == "FAssist") continue;
 
 			// If a fixed distribution and not used by ABC then only store 1 number
-			if (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["distribution"] == "Fixed") 
+			if (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["distribution"] == "Fixed" && !PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["hidden"]) 
 				ABC_JS.ABC_parameters_and_metrics_this_simulation[paramID] = {name: PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["name"], val: PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"]};
 
 			// Otherwise keep updating the list every trial
-			else ABC_JS.ABC_parameters_and_metrics_this_simulation[paramID] = {name: PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["name"], priorVal: null}; 
+			else if (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["distribution"] != "Fixed") ABC_JS.ABC_parameters_and_metrics_this_simulation[paramID] = {name: PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["name"], priorVal: null}; 
 		}
 				
 	}
@@ -908,14 +908,6 @@ ABC_JS.initialiseSaveFiles_CommandLine = function(startingTime){
 
 
 	if (!RUNNING_FROM_COMMAND_LINE || WW_JS.outputFolder == null) return;
-
-
-	// Create the output folder if it does not already exist
-	var fs = require('fs');
-	if (!fs.existsSync(WW_JS.outputFolder)){
-		console.log("Creating directory", WW_JS.outputFolder);
-	    fs.mkdirSync(WW_JS.outputFolder);
-	}
 
 
 	// Create the data files
