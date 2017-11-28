@@ -48,6 +48,7 @@
 			-o <folder> 	: Saves all sequence and plot data into the specified folder. Creates the folder if it does not exist
 			-ABC			: Performs an ABC analysis instead of just simulations
 			-nthreads	n	: Runs an ABC analysis over n workers (and 1 worker is required to be the master worker)
+			-i <folder>		: Resumes the MCMC from the specified folder (will not overwrite these log files). This is in the event of the simulation stopping prematurely
 
 
 			Example: simpol.js session.xml -o path/to/OutputFolder -ABC
@@ -71,6 +72,7 @@ function initNodeCompilation(){
 	var fs = require('fs');
 	var XMLfileDirectory = args[2];
 	var outputFolder = null;
+	var inputFolder = null;
 	var runABC = false;
 	var nthreads = 1;
 
@@ -84,6 +86,11 @@ function initNodeCompilation(){
 
 		if (arg == "-o"){
 			outputFolder = args[i+1];
+			i++;
+		}
+
+		else if (arg == "-i"){
+			inputFolder = args[i+1];
 			i++;
 		}
 
@@ -119,6 +126,7 @@ function initNodeCompilation(){
 	var WW_JS = require('./src/Model/WebWorker.js');
 	WW_JS.init_WW(false);
 	WW_JS.setOutputFolder(outputFolder);
+	WW_JS.setInputFolder(inputFolder);
 
 	if (!runABC && outputFolder != null) PLOTS_JS.initialiseFileNames_CommandLine(); // Initialise the save file names
 	//else if (runABC && outputFolder != null) ABC_JS.initialiseFileNames_CommandLine(); // Initialise the save file names
@@ -133,6 +141,18 @@ function initNodeCompilation(){
 
 		if (!runABC && outputFolder != null) PLOTS_JS.initialiseSaveFiles_CommandLine(startingTime); // Initialise the plots.js save files
 		//else if (runABC && outputFolder != null) ABC_JS.initialiseSaveFiles_CommandLine(startingTime); // Initialise the ABC posterior save file
+
+
+		else if (runABC && outputFolder != null) {
+
+			// Create the output folder if it does not already exist
+			var fs = require('fs');
+			if (!fs.existsSync(outputFolder)){
+				console.log("Creating directory", outputFolder);
+			    fs.mkdirSync(outputFolder);
+			}
+		}
+
 
 		console.log("--------------------------------------");
 
