@@ -307,15 +307,7 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 
 
 		
-		// Command line mode, call asynchronously to avoid stack overflow
-		else if (RUNNING_FROM_COMMAND_LINE){
-			//console.log("X");
-			setTimeout(function(){
-				SIM_JS.trial_WW(stateC, resolve, msgID);
-			}, 0);
-		}
-
-		// Ultrafast mode (instantaneous for the WebWorker). Running this way without a WebWorker will crash the browser
+		// Ultrafast mode (instantaneous for the WebWorker) or Command line mode. Running this way without a WebWorker will crash the browser
 		else {
 			SIM_JS.trial_WW(stateC, resolve, msgID);
 		}
@@ -358,9 +350,15 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 
 		// Hidden mode
 		else{
-			if (!RUNNING_FROM_COMMAND_LINE) WW_JS.currentState = STATE_JS.convertCompactStateToFullState(stateC);
-			var toCall = (state) => new Promise((resolve) => actionToDo(state, resolve));
-			toCall(stateC).then(() => prepareForNextTrial());
+		
+			
+			
+			
+			setTimeout(function(){
+				if (!RUNNING_FROM_COMMAND_LINE) WW_JS.currentState = STATE_JS.convertCompactStateToFullState(stateC);
+				var toCall = (state) => new Promise((resolve) => actionToDo(state, resolve));
+				toCall(stateC).then(() => prepareForNextTrial());
+			}, 0); // Call asynchronously to avoid memory problems
 
 		}
 
@@ -546,7 +544,7 @@ SIM_JS.sampleAction_WW = function(stateC){
 		//console.log("x =", x);
 		// Choose next action uniformly
 		kRelease = 0;
-		var rateBindCat =     kBind * kcat / rateRelCat;
+		var rateBindCat =   assumeTranslocationEquilibrium ? kBind : kBind * kcat / rateRelCat;
 		var rates = [kBck, kFwd, kRelease, rateBindCat, kAct, kDeact];
 		var sum = kBck + kFwd + kRelease + rateBindCat + kAct + kDeact;
 		runif = MER_JS.random() * sum;
