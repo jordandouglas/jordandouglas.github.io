@@ -198,7 +198,7 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 		var acceptancePercentage = WW_JS.roundToSF_WW(100 * ABC_JS.nAcceptedValues / (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left));
 		var ESS = WW_JS.roundToSF_WW(MCMC_JS.calculateESS());
 		if (isNaN(acceptancePercentage)) acceptancePercentage = 0;
- 		console.log(workerString + "MCMC", (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1) + "/" + ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"], "| ESS:", ESS, "| Acceptance rate:", acceptancePercentage + "%");
+ 		console.log(workerString + "MCMC", (ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1) + "/" + ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"], "| ESS:", ESS, "| chiSq:", MCMC_JS.currentchiSqthreshold ,"| Acceptance rate:", acceptancePercentage + "%");
  	}
 
 
