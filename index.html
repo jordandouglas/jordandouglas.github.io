@@ -3138,6 +3138,7 @@ function closeNav() {
 
 											<td class="MCMC_settings" style="display:none">
 												<input type=button id="beginMCMC_btn" onClick="beginABC()" value='Begin MCMC-ABC' title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="operation beginABC_btn" style="background-color:#663399; width: 150px"> 
+												
 
 											</td>
 
@@ -3192,6 +3193,19 @@ function closeNav() {
 												</span>
 											</td>
 										</tr>
+										
+										
+										
+										<tr class="MCMC_display" style="display:none; vertical-align: middle;"  >
+
+											<td>
+													<input type=button id="posteriorSummary_btn" onClick="posteriorSummary()" value='Posterior Summary' title="Extract values from the posterior distribution" class="operation beginABC_btn" style="background-color:#663399; width: 200px"> 
+											</td>
+										</tr>
+										
+										
+										
+									
 
 
 										<tr class="RABC_display" style="display:none; vertical-align: middle;"  title="Percentage of sampled parameters which are accepted by the posterior distribution" >
