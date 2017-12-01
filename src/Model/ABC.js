@@ -965,6 +965,131 @@ ABC_JS.getPosteriorDistribution_WW = function(resolve = function() { }, msgID = 
 }
 
 
+// Returns the list of parameters which are being estimated as well as the geometric median estimate
+ABC_JS.getPosteriorSummaryData_WW = function(resolve = function() { },msgID = null){
+	
+	
+
+	
+    var geometricMedians = ABC_JS.getGeometricMedianOfPosterior();
+	var paramNamesAndMedians = {};
+	for (var paramNum = 0; paramNum < MCMC_JS.parametersWithPriors.length; paramNum++){
+		var paramID = MCMC_JS.parametersWithPriors[paramNum];
+		paramNamesAndMedians[paramID] = {name: PARAMS_JS.PHYSICAL_PARAMETERS[paramID].name, estimate: geometricMedians[paramID]};	
+	}
+	
+	var toReturn = {paramNamesAndMedians: paramNamesAndMedians};
+	if (msgID != null){
+		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+	}else{
+		resolve(toReturn);
+	}
+	
+	
+}
+
+
+ABC_JS.getGeometricMedianOfPosterior = function(){
+	
+	
+	console.log("calculating z scores with burnin", ABC_JS.ABC_EXPERIMENTAL_DATA.burnin);
+	
+	// Normalise the parameters by computing their z-scores
+	var normalisedParameters = {};
+	var trialStart = Math.floor(ABC_JS.ABC_EXPERIMENTAL_DATA.burnin/100 * ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length);
+	var nSamples = ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length - trialStart;
+	for (var paramNum = 0; paramNum < MCMC_JS.parametersWithPriors.length; paramNum++){
+		var paramID = MCMC_JS.parametersWithPriors[paramNum];
+	
+	
+		// Calculate mean parameter value
+		var mean = 0;
+		for (var i = trialStart; i < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; i++)	mean +=  ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramID].priorVal;
+		mean = mean / nSamples;
+		
+		//console.log("mean", mean);
+		
+		// Calculate standard deviation parameter value
+		var sd = 0;
+		for (var i = trialStart; i < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; i++) sd += Math.pow(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramID].priorVal - mean, 2);
+		sd /= nSamples;
+		sd = Math.sqrt(sd);
+		if (sd == 0) sd = 1;
+		
+		//console.log("sd", sd);
+		
+		// Calculate z-scores
+		var zScoresThisParameter = [];
+		for (var i = trialStart; i < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; i++) zScoresThisParameter.push((ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i][paramID].priorVal - mean) / sd);
+		normalisedParameters[paramID] = zScoresThisParameter;	
+		
+	}
+	
+	//console.log("zscores", nSamples, normalisedParameters);
+	
+	
+	
+	// Calculate the Euclidean distance between all pairs of samples
+	var distanceMatrix = new Array(nSamples);
+	for (var i = 0; i < distanceMatrix.length; i++) {
+	  	distanceMatrix[i] = new Array(nSamples);
+		distanceMatrix[i][i] = 0;
+	}
+	
+	for (var i = 0; i < distanceMatrix.length-1; i++){
+		for (var j = i+1; j < distanceMatrix.length; j++){		
+			
+			var distance = 0;
+			for (var paramNum = 0; paramNum < MCMC_JS.parametersWithPriors.length; paramNum++){
+				var paramID = MCMC_JS.parametersWithPriors[paramNum];
+				//console.log("distance", i, j, paramID, normalisedParameters[paramID][i], normalisedParameters[paramID][j]);
+				distance += Math.pow(normalisedParameters[paramID][i] - normalisedParameters[paramID][j], 2);
+			}
+			//console.log("distance", distance);
+			distance = Math.sqrt(distance);
+			
+			distanceMatrix[i][j] = distance;
+			distanceMatrix[j][i] = distance;
+			
+		}		
+	}
+	
+	//console.log("distanceMatrix", distanceMatrix);
+	
+	
+	// Find the geometric median
+	var shortestDistance = 1000000000;
+	var bestSample = -1;
+	for (var i = 0; i < distanceMatrix.length; i++){
+		
+		var distanceSum = 0;
+		for (var j = 0; j < distanceMatrix.length; j++){
+			distanceSum += distanceMatrix[i][j];
+			if (distanceSum > shortestDistance) break;
+		}
+		
+		if (distanceSum < shortestDistance) {
+			shortestDistance = distanceSum;
+			bestSample = i;
+		}
+			
+	}
+	
+	
+	var trialNumberOfMedian = trialStart + bestSample;
+	var geometricMedians = {};
+	for (var paramNum = 0; paramNum < MCMC_JS.parametersWithPriors.length; paramNum++){
+		var paramID = MCMC_JS.parametersWithPriors[paramNum];
+		geometricMedians[paramID] = ABC_JS.ABC_POSTERIOR_DISTRIBUTION[trialNumberOfMedian][paramID].priorVal;
+	}
+	
+	
+	console.log(trialNumberOfMedian, "geometricMedians", geometricMedians)
+	return geometricMedians;
+	
+}
+
+
 
 
 ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null){
@@ -1223,7 +1348,9 @@ if (RUNNING_FROM_COMMAND_LINE){
 	  	updateABCExperimentalData_WW: ABC_JS.updateABCExperimentalData_WW,
 	  	workerNumberRange: ABC_JS.workerNumberRange,
 	    paddingString: ABC_JS.paddingString,
-	    initialiseMCMCfromLogFile: ABC_JS.initialiseMCMCfromLogFile
+	    initialiseMCMCfromLogFile: ABC_JS.initialiseMCMCfromLogFile,
+	 	getPosteriorSummaryData_WW: ABC_JS.getPosteriorSummaryData_WW,
+	    getGeometricMedianOfPosterior: ABC_JS.getGeometricMedianOfPosterior
 	}
 
 }

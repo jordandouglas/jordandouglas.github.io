@@ -447,8 +447,7 @@ function getNewCurveButtonsTemplate(){
 					<br><br>
 					<input type=button onClick='addNewABCData("ntpVelocity")' value='+ [NTP]-velocity curve' title="Add [NTP]-velocity experimental data" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
 					<br><br>
-					<input type=button onClick='addNewABCData("ntpVelocity")' value='+ Pause time histogram' title="Add pause time experimental data" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
-					<br><br>
+					
 				</div>
 
 			</td>
@@ -1276,6 +1275,138 @@ function uploadABC(){
 	}
 
 
+	
+}
+
+
+
+function closePosteriorSummaryPopup(){
+	
+	$("#mySidenav").unbind('click');
+	$("#main").unbind('click');
+	$("#posteriorSummaryPopup").remove();
+	$("#main").css("opacity", 1);
+	$("#mySidenav").css("opacity", 1);
+
+	
+	
+}
+
+function getPosteriorSummaryTemplate(){
+
+
+	return `
+		<div id='posteriorSummaryPopup' style='background-color:adadad; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:20vh; z-index:5'>
+			<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+				<span style='font-size: 22px'> Posterior Distribution Summary </span>
+
+
+				<span style='font-size: 30px; cursor:pointer; position:fixed; left:64.5vw; top:20.5vh' onclick='closePosteriorSummaryPopup()'>&times;</span>
+				<div style='padding:2; font-size:18px;'> Sample parameters from the posterior and summarise the posterior into a single value </div>
+				<table cellpadding=10 style='width:90%; margin:auto;'>
+				
+					<tr>
+						<td style="vertical-align:top" title="The geometric median is the posterior sample which is closest in Euclidean space to all other posterior samples. The parameters are first normalised into z-scores."> 
+							<b>Geometric median:</b>
+							<table id="geometricMedianTable" style="width:100%" cellpadding=2 cellspacing=2>
+							
+								<tr style="background-color:#b3b3b3">
+									<td style="width:100%">
+										Parameter
+									</td>
+									
+									<td style="width:100%">
+										Estimate
+									</td>
+								
+								</tr>
+							
+							</table>
+							
+						</td>
+						
+						<td  style="vertical-align:top"> 
+							<b>Sample from posterior:</b>
+							
+							
+						</td>
+					</tr>
+
+					
+
+				</table>
+				
+				
+
+			</div>
+		</div>
+	`;
+
+}
+
+
+function posteriorSummary(){
+	
+	
+	
+	closeAllDialogs();
+	
+	$("#main").css("opacity", 0.5);
+	$("#mySidenav").css("opacity", 0.5);
+	
+	var popupHTML = getPosteriorSummaryTemplate();
+	//popupHTML = popupHTML.replace("XX_plotNum_XX", plotNum);
+	//popupHTML = popupHTML.replace("XX_plotName_XX", $("#selectPlot" + plotNum + " :selected").text());
+	$(popupHTML).appendTo('body');
+
+
+
+	getPosteriorSummaryData_controller(function(result){
+		
+		var paramNamesAndMedians = result.paramNamesAndMedians;
+		for (var paramID in paramNamesAndMedians){
+			
+			var name = paramNamesAndMedians[paramID].name;
+			var estimate = roundToSF(paramNamesAndMedians[paramID].estimate);
+			$("#geometricMedianTable").append(`
+
+				<tr style="background-color:white">
+					<td>
+						` + name + `
+					</td>
+
+					<td>
+						` + estimate + `
+					</td>
+				</tr>
+			`);
+			
+			
+		}
+		
+		
+		
+		
+		
+	});
+
+
+
+
+
+	
+	window.setTimeout(function(){
+		
+		$("#main").click(function(){
+			closePosteriorSummaryPopup();
+		});
+		
+		$("#mySidenav").click(function(){
+			closePosteriorSummaryPopup();
+		});
+		
+	}, 50);
+	
 	
 }
 

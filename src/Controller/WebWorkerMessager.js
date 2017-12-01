@@ -2595,6 +2595,25 @@ function get_ParametersWithPriors_controller(resolve = function() { }){
 }
 
 
+function getPosteriorSummaryData_controller(resolve = function() { }){
+	
+	if (WEB_WORKER == null) {
+		var toCall = () => new Promise((resolve) => ABC_JS.getPosteriorSummaryData_WW(resolve));
+		toCall().then((posterior) => resolve(posterior));
+	}
+
+	else{
+		var res = stringifyFunction("ABC_JS.getPosteriorSummaryData_WW", [null], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((posterior) => resolve(posterior));
+
+	}
+	
+	
+}
+
 function getPosteriorDistribution_controller(resolve = function(posterior) { }){
 
 
