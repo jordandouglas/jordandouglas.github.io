@@ -1367,7 +1367,7 @@ function posteriorSummary(){
 		for (var paramID in paramNamesAndMedians){
 			
 			var name = paramNamesAndMedians[paramID].name;
-			var estimate = roundToSF(paramNamesAndMedians[paramID].estimate);
+			var estimate = roundToSF(paramNamesAndMedians[paramID].estimate, 4);
 			$("#geometricMedianTable").append(`
 
 				<tr style="background-color:white">
