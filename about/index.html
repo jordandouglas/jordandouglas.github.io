@@ -767,7 +767,7 @@ function addCitations(){
 										<img src="../src/TutorialImages/parameterHeatmap2.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
 										
 										Points can be coloured to represent a third variable, such as velocity. The first image
-										shows the relationship between two parameters - $k_{cat}$ and $\Delta G^\dagger_{t}$ -  required to achieve a velocity of 20-30bp/s. As the rate of catalysis increases, 
+										shows the relationship between two parameters - $k_{cat}$ and $\Delta\Delta G^\dagger_{t}$ -  required to achieve a velocity of 20-30bp/s. As the rate of catalysis increases, 
 										the free energy barrier of translocation must increase with it in order to achieve the same velocity. 
 										
 										
@@ -955,7 +955,7 @@ function addCitations(){
 
 
 														<div class="paramHelp" id="GDagSlide_ParamHelp">
-															<b style="font-size:20px">$\Delta G^\dagger_{t}$</b> - free energy barrier height of translocation. To translocate forwards or backwards, several
+															<b style="font-size:20px">$\Delta\Delta G^\dagger_{t}$</b> - free energy barrier height of translocation. To translocate forwards or backwards, several
 																	basepairs may need to be broken. The energy barrier which must be overcome in order to translocate is estimated as the energy needed to break these basepairs
 																	plus the value of this parameter. Increasing this value will make translocation slower. Default: 4.5k<sub>B</sub>T
 														</div><br>	
@@ -1476,13 +1476,13 @@ function addCitations(){
 										
 										<h3>
 										$$
-											\Delta G^\dagger_{x,y} = \frac{\Delta G_x + \Delta G_y}{2} + \Delta G^\dagger_{t},
+											\Delta G^\dagger_{x,y} = \frac{\Delta G_x + \Delta G_y}{2} + \Delta\Delta G^\dagger_{t},
 										$$
 										</h3>
 									
 										
-										where the value of parameter $\Delta G^\dagger_{t}$ (units $k_B T$) can be manually tweaked. While this estimation is simplistic, it has the desirable property of
-										$\Delta G^\dagger_{t}$ being equal to the mean translocation barrier across the whole sequence.
+										where the value of parameter $\Delta\Delta G^\dagger_{t}$ (units $k_B T$) can be manually tweaked. While this estimation is simplistic, it has the desirable property of
+										$\Delta\Delta G^\dagger_{t}$ being equal to the mean translocation barrier across the whole sequence.
 										The midpoint model was introduced by Tadigotla et al.<cite val="maoileidigh2011unified,tadigotla2006thermodynamic"></cite>
 										
 									</div>
@@ -1503,12 +1503,12 @@ function addCitations(){
 										
 										<h3>
 										$$
-											\Delta G^\dagger_{x,y} = \Delta G^\dagger_{x \cap y} + \Delta G^\dagger_{t},
+											\Delta G^\dagger_{x,y} = \Delta G^\dagger_{x \cap y} + \Delta\Delta G^\dagger_{t},
 										$$
 										</h3>
 									
 										
-										again where the value of parameter $\Delta G^\dagger_{t}$ (units $k_B T$) can be manually tweaked. This parameter therefore has a different meaning across 
+										again where the value of parameter $\Delta\Delta G^\dagger_{t}$ (units $k_B T$) can be manually tweaked. This parameter therefore has a different meaning across 
 										the three translocation models.
 									</div>
 									
@@ -1530,12 +1530,12 @@ function addCitations(){
 										
 										<h3>
 										$$
-											\Delta G^\dagger_{x,y} = \Delta G^\dagger_{x \cup y} + \Delta G^\dagger_{t},
+											\Delta G^\dagger_{x,y} = \Delta G^\dagger_{x \cup y} + \Delta\Delta G^\dagger_{t},
 										$$
 										</h3>
 									
 										
-										again where the value of parameter $\Delta G^\dagger_{t}$ (units $k_B T$) can be manually tweaked. The sealing model is the default model in SimPol.
+										again where the value of parameter $\Delta\Delta G^\dagger_{t}$ (units $k_B T$) can be manually tweaked. The sealing model is the default model in SimPol.
 									</div>
 									
 									<br><br><br>
