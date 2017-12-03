@@ -1934,7 +1934,7 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 				
 				histogram_mouse_over(x, y, canvas, ctx, binID, nbins, heightScale, widthScale, barHeights, minVal, ymax, col, binGap, axisGap, binSize, canvasSizeMultiplier); 
 				add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbins, widthScale, heightScale, binGap, ymax, canvasSizeMultiplier);
-				add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLabels, canvasSizeMultiplier * 20 + "px Arial", canvasSizeMultiplier * 3);
+				add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLabels, canvasSizeMultiplier * 20, canvasSizeMultiplier * 3);
 				
 			};
 
@@ -1951,7 +1951,7 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 	
 	
 
-	var newMouseMoveEvent = add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLabels, canvasSizeMultiplier * 20 + "px Arial", canvasSizeMultiplier * 3);
+	var newMouseMoveEvent = add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLabels, canvasSizeMultiplier * 20, canvasSizeMultiplier * 3);
 	
 	// Add xy label hover events
 	if (newMouseMoveEvent != null) {
@@ -1969,7 +1969,7 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 					histogram_mouse_over(x, y, canvas, ctx, binID, nbins, heightScale, widthScale, barHeights, minVal, ymax, col, binGap, axisGap, binSize, canvasSizeMultiplier); 
 					add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbins, widthScale, heightScale, binGap, ymax, canvasSizeMultiplier);
 			}
-			newMouseMoveEvent = add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLabels, canvasSizeMultiplier * 20 + "px Arial", canvasSizeMultiplier * 3);
+			newMouseMoveEvent = add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLabels, canvasSizeMultiplier * 20, canvasSizeMultiplier * 3);
 			newMouseMoveEvent(x, y);
 		};
 			
@@ -2143,8 +2143,10 @@ function add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbi
 
 
 
-function add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLabels = false, font = "20px Arial", linewidth = 3){
-	
+function add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLabels = false, fontSize = 20, linewidth = 3){
+
+
+	ctx.font = fontSize + "px Arial";
 	ctx.lineWidth = 3;
 	ctx.globalAlpha = 1;
 	
@@ -2163,17 +2165,16 @@ function add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLab
 	if (!hoverLabels){
 	// X title
 	ctx.fillStyle = "black";
-	ctx.font = font;
-	ctx.textAlign="center"; 
 	ctx.textBaseline="top"; 
 	var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
 	var xlabYPos = canvas.height - axisGap / 2;
-	ctx.fillText(xlab, xlabXPos, xlabYPos);
+	writeLatexLabelOnCanvas(ctx, xlab, xlabXPos, xlabYPos, fontSize);
+	//ctx.fillText(xlab, xlabXPos, xlabYPos);
 	
 	// Y title
-	ctx.font = font;
 	ctx.textAlign="center"; 
 	ctx.textBaseline="bottom"; 
+	ctx.font = fontSize + "px Arial";
 	ctx.save()
 	var ylabXPos = 2 * axisGap / 3;
 	var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
@@ -2187,7 +2188,6 @@ function add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLab
 	}
 	
 	// Allow user to change labels
-	ctx.font = font;
 	ctx.textAlign="center"; 
 	ctx.textBaseline="top";
 	var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
@@ -2655,7 +2655,7 @@ function sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab = "
 	}
 	
 	// Axes
-	add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, false, font = canvasSizeMultiplier * 20 + "px Arial", canvasSizeMultiplier * 3);
+	add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, false, font = canvasSizeMultiplier * 20, canvasSizeMultiplier * 3);
 	
 	// Add the hover label
 	if (hoverOver!= -1 && textbox != "" && mouseY != null && mouseX != null){
@@ -2897,7 +2897,7 @@ function misincorporation_plot(canvasID, canvasDivID, yvals, ntrials, ylab = "",
 	}
 	
 	// Axes
-	add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, false, font = "20px Arial", canvasSizeMultiplier * 3);
+	add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, false, 20 * canvasSizeMultiplier, canvasSizeMultiplier * 3);
 	
 	// Add the hover label
 	if (hoverOver!= -1 && textbox != "" && mouseY != null && mouseX != null){
@@ -3103,9 +3103,9 @@ function plot_parameter_heatmap(plotNumCustom = null){
 		
 
 
-		var xLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xData"]["name"];
-		var yLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["name"];
-		var zLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"] == null ? null : PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["name"];
+		var xLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xData"]["latexName"] != null ? PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xData"]["latexName"] : PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xData"]["name"];
+		var yLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["latexName"] != null ? PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["latexName"] : PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["name"];
+		var zLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"] == null ? null : PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["latexName"] != null ? PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["latexName"] : PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["name"];
 		var xvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xData"]["vals"];
 		var yvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["vals"];
 		var zvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"] == null ? null : PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["vals"];
@@ -3248,7 +3248,7 @@ function plot_custom(plotNumCustom = null){
 		
 
 
-		var xLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xData"]["name"];
+		var xLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xData"]["latexName"] != null ? PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xData"]["latexName"] : PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xData"]["name"];
 		var yLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["name"];
 		var xvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xData"]["vals"];
 		var yvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["vals"];
@@ -3302,7 +3302,7 @@ function plot_custom(plotNumCustom = null){
 
 
 
-function getNiceAxesNumbers(min, max, plotWidthOrHeight, minAtZero = false, axisGap = 45, niceBinSizes = [1, 2, 5]){
+function getNiceAxesNumbers(min, max, plotWidthOrHeight, minAtZero = min == 0, axisGap = 45, niceBinSizes = [1, 2, 5]){
 
 	if (min > max) max = min+1;
 
@@ -3527,13 +3527,12 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	
 	// X label
 	ctx.globalAlpha = 1;
-	ctx.font = 20 * canvasSizeMultiplier + "px Arial";
-	ctx.textAlign="center"; 
 	ctx.textBaseline="top";
 	var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
 	var xlabYPos = canvas.height - axisGap / 3 - 7*canvasSizeMultiplier;
 	ctx.fillStyle = "black";
-	ctx.fillText(xlab, xlabXPos, xlabYPos);
+	//ctx.fillText(xlab, xlabXPos, xlabYPos);
+	writeLatexLabelOnCanvas(ctx, xlab, xlabXPos, xlabYPos, 20 * canvasSizeMultiplier);
 
 	
 	// Y label
@@ -3544,7 +3543,8 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	ctx.translate(ylabXPos, ylabYPos);
 	ctx.rotate(-Math.PI/2);
 	ctx.fillStyle = "black";
-	ctx.fillText(ylab, 0 ,0);
+	//ctx.fillText(ylab, 0 ,0);
+	writeLatexLabelOnCanvas(ctx, ylab, 0, 0, 20 * canvasSizeMultiplier);
 	ctx.restore();
 
 
@@ -3552,16 +3552,15 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	if (zlab != null){
 
 		// Add the z-axis label name
-		ctx.font = 14 * canvasSizeMultiplier + "px Arial";
 		ctx.textBaseline="bottom"; 
-		ctx.textAlign="center"; 
 		var zlabXPos = axisGap + plotWidth + legendGap;
 		var zlabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
 		ctx.save()
 		ctx.translate(zlabXPos, zlabYPos);
 		ctx.rotate(-Math.PI/2);
 		ctx.fillStyle = "black";
-		ctx.fillText(zlab, 0 ,0);
+		writeLatexLabelOnCanvas(ctx, zlab, 0, 0, 14 * canvasSizeMultiplier);
+		//ctx.fillText(zlab, 0 ,0);
 		ctx.restore();
 
 
@@ -3644,6 +3643,99 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	
 	
 	
+
+}
+
+
+// Adds superscripts (^) and subscripts (_) to an xxis label. Does not handle nested super/subscripts. Does not handle latex math environment
+function writeLatexLabelOnCanvas(ctx, label, xPos, yPos, fontSize){
+
+	ctx.textAlign="center"; 
+	ctx.font = fontSize + "px Arial";
+
+
+	//console.log("label", label);
+
+	// Go through string and add 1 thin space for each super/subscript
+	var spaceFreeLabel = "";
+	var lengthOfCurrentSubscript = 0;
+	var lengthOfCurrentSuperscript = 0;
+	var isSuperscript = false;
+	var isSubscript = false;
+	var scripts = []; // Record the text of each super/subscript and all the base level text before it
+	for (var i = 0; i < label.length; i ++){
+
+
+		
+
+		if (label[i] == "^") {
+			isSuperscript = true;
+			scripts.push({pretext: spaceFreeLabel, scripttext: "", super: true});
+		}
+
+		else if (label[i] == "_") {
+			isSubscript = true;
+			scripts.push({pretext: spaceFreeLabel, scripttext: "", super: false});
+		}
+
+		else if (label[i] == "{") continue;
+
+		else if (label[i] == "}"){
+			isSuperscript = false;
+			isSubscript = false;
+		}
+
+
+		else if (isSuperscript || isSubscript) {
+			scripts[scripts.length-1].scripttext += label[i];
+			if (isSuperscript) lengthOfCurrentSuperscript ++;
+			if (isSubscript) lengthOfCurrentSubscript ++;
+		}
+
+		else {
+
+			// Add one thin space for each super/subscript character (take max of 2 lengths)
+			var nSpaces = Math.max(lengthOfCurrentSuperscript, lengthOfCurrentSubscript);
+			for (var j = 0; j < nSpaces; j ++) spaceFreeLabel += "\u2009";
+			lengthOfCurrentSuperscript = 0;
+			lengthOfCurrentSubscript = 0;
+
+			// Add on the current character
+			spaceFreeLabel += label[i];
+		}
+
+	}
+
+
+	// Calculate position of left side of text given that the label is centred
+	var leftPos = xPos - ctx.measureText(spaceFreeLabel).width / 2;
+
+
+	// Print the main text
+	ctx.fillText(spaceFreeLabel, xPos, yPos);
+
+
+
+	// Print the superscripts and subscripts
+	ctx.textAlign="left";
+	var dySuperscript = 0;
+	var dySubscript = 0;
+	if (ctx.textBaseline == "top") dySubscript = fontSize/2;
+	else if (ctx.textBaseline == "bottom") dySuperscript = -fontSize/2;
+	else if (ctx.textBaseline == "middle") {
+		dySubscript = fontSize/4;
+		dySuperscript = -fontSize/4;
+	}
+
+	for (var i = 0; i < scripts.length; i ++){
+
+		ctx.font = fontSize + "px Arial";
+		var leftPosOfScript = leftPos + ctx.measureText(scripts[i].pretext).width;
+		ctx.font = Math.floor(fontSize/2) + "px Arial";
+		if (scripts[i].super) ctx.fillText(scripts[i].scripttext, leftPosOfScript, yPos + dySuperscript);
+		else ctx.fillText(scripts[i].scripttext, leftPosOfScript, yPos + dySubscript);
+
+	}
 
 }
 
@@ -4602,6 +4694,7 @@ function customPlotSelectParameterTemplate(){
 			<option value="catalyTime">Mean catalysis time (s)</option>
 			<option value="totalTime">Mean transcription time (s)</option>
 			<option value="nascentLen">Nascent strand length (nt)</option>
+			<option value="logLikelihood">Chi-squared test statistic</option>
 		</select><br>
 		Calculated per trial.
 
@@ -4621,6 +4714,7 @@ function customPlotSelectPropertyTemplate(){
 			<option value="catalyTime">Mean catalysis time (s)</option>
 			<option value="totalTime">Total transcription time (s)</option>
 			<option value="nascentLen">Nascent strand length (nt)</option>
+			<option value="logLikelihood">Chi-squared test statistic</option>
 		</select><br>
 		Calculated per trial.
 
@@ -4640,6 +4734,7 @@ function parameterHeatmapZAxisTemplate(){
 			<option value="catalyTime">Mean catalysis time (s)</option>
 			<option value="totalTime">Mean transcription time (s)</option>
 			<option value="nascentLen">Nascent strand length (nt)</option>
+			<option value="logLikelihood">Chi-squared test statistic</option>
 		</select><br>
 		Calculated per trial.
 

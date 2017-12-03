@@ -857,7 +857,6 @@ ABC_JS.getListOfValuesFromPosterior_WW = function(paramOrMetricID){
 
 	if (paramOrMetricID == "probability" || paramOrMetricID ==  "catalyTime" || paramOrMetricID ==  "none" || paramOrMetricID ==  "totalTime" || paramOrMetricID ==  "nascentLen") return null;
 
-
 	var posteriorValues = [];
 	var trialStart = ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod != "MCMC" ? 0 : Math.floor(ABC_JS.ABC_EXPERIMENTAL_DATA.burnin/100 * ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length);
 	for (var i = trialStart; i < ABC_JS.ABC_POSTERIOR_DISTRIBUTION.length; i ++){
@@ -867,7 +866,7 @@ ABC_JS.getListOfValuesFromPosterior_WW = function(paramOrMetricID){
 		var nVals = ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["FAssist"]["vals"].length + ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["NTPeq"]["vals"].length;
 
 		if (paramOrMetricID == "FAssist") for (var j = 0; j < nVals; j ++) posteriorValues.push(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["FAssist"]["vals"][j]);
-		if (paramOrMetricID == "NTPeq") for (var j = 0; j < nVals; j ++) posteriorValues.push(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["NTPeq"]["vals"][j]);
+		else if (paramOrMetricID == "NTPeq") for (var j = 0; j < nVals; j ++) posteriorValues.push(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["NTPeq"]["vals"][j]);
 		else if (paramOrMetricID == "velocity") for (var j = 0; j < nVals; j ++) posteriorValues.push(ABC_JS.ABC_POSTERIOR_DISTRIBUTION[i]["velocity"]["vals"][j]);
 
 		else{

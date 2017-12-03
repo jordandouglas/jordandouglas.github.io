@@ -123,13 +123,14 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 	// Create a series of lists corresponding to the value of each parameter and each metric
 	PLOTS_JS.PARAMETERS_PLOT_DATA = {};
 	for (var paramID in PARAMS_JS.PHYSICAL_PARAMETERS){
-		if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["binary"]) PLOTS_JS.PARAMETERS_PLOT_DATA[paramID] = {name: PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["name"], vals: []};
+		if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["binary"]) PLOTS_JS.PARAMETERS_PLOT_DATA[paramID] = {name: PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["name"], latexName: PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["latexName"], vals: []};
 	}
 	PLOTS_JS.PARAMETERS_PLOT_DATA["probability"] = {name: "Probability density", vals: null};
 	PLOTS_JS.PARAMETERS_PLOT_DATA["velocity"] = {name: "Mean velocity (bp/s)", vals: []};
 	PLOTS_JS.PARAMETERS_PLOT_DATA["catalyTime"] = {name: "Mean catalysis time (s)", vals: []};
 	PLOTS_JS.PARAMETERS_PLOT_DATA["totalTime"] = {name: "Total transcription time (s)", vals: []};
 	PLOTS_JS.PARAMETERS_PLOT_DATA["nascentLen"] = {name: "Final nascent length (nt)", vals: []};
+	PLOTS_JS.PARAMETERS_PLOT_DATA["logLikelihood"] = {name: "Chi-squared test statistic", latexName: "X^2", vals: []};
 
 
 	PLOTS_JS.timesSpentOnEachTemplate = [0];
@@ -962,6 +963,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 		PLOTS_JS.PARAMETERS_PLOT_DATA["catalyTime"] = {name: "Mean dwell time (s)", vals: []};
 		PLOTS_JS.PARAMETERS_PLOT_DATA["totalTime"] = {name: "Total transcription time (s)", vals: []};
 		PLOTS_JS.PARAMETERS_PLOT_DATA["nascentLen"] = {name: "Final nascent length (nt)", vals: []};
+		PLOTS_JS.PARAMETERS_PLOT_DATA["logLikelihood"] = {name: "Chi-squared test statistic", latexName: "X^2", vals: []};
 
 
 
