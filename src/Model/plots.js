@@ -321,6 +321,8 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["name"], latexName:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["latexName"], vals:valuesY};
 				if(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"] != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"]["name"], latexName:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"]["latexName"], vals:valuesZ};
 
+
+
 			}
 		}
 
@@ -349,7 +351,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 		postMessage(msgID + "~X~" + JSON.stringify(plotData));
 	}
 	else resolve(plotData);
-	
+
 	return plotData;
 	
 	
@@ -695,9 +697,9 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 				var valuesX = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamX"]);
 				var valuesY = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamY"]);
 				var valuesZ = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["metricZ"]);
-				if (valuesX != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["name"], vals:valuesX};
-				if (valuesY != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["name"], vals:valuesY};
-				if (valuesZ != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"]["name"], vals:valuesZ};
+				if (valuesX != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["name"], latexName:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["latexName"], vals:valuesX};
+				if (valuesY != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["name"], latexName:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["latexName"], vals:valuesY};
+				if (valuesZ != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"]["name"], latexName:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"]["latexName"], vals:valuesZ};
 			}
 
 				
