@@ -41,6 +41,7 @@ PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"] = {distribution:"Fixed", fixedDistnVal: 
 PARAMS_JS.PHYSICAL_PARAMETERS["DGHyperDag"] = {distribution:"Fixed", fixedDistnVal: 0, name: "\u0394DGHyperDag", title: "Free energy penalty height of hypertranslocation", zeroTruncated: false, integer: false, hidden: false};
 PARAMS_JS.PHYSICAL_PARAMETERS["GsecondarySitePenalty"] = {distribution:"Fixed", fixedDistnVal: 1.336, name: "\u0394G\u2020NTP2", title: "Free energy penalty of binding NTP in the secondary binding site", zeroTruncated: false, integer: false};
 PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"] = {distribution:"Fixed", fixedDistnVal: 0, uniformDistnLowerVal: -10, uniformDistnUpperVal: 30, name: "Force  (pN)", title: "Assisting force applied to the polymerase during single-molecule experiments.", zeroTruncated: false, integer: false};
+PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"] = {distribution:"Fixed", fixedDistnVal: 1.7, uniformDistnLowerVal: 0, uniformDistnUpperVal: 3.4, normalSdVal: 0.4, name: "Barrier height position  (\u212B)", title: "Position of translocation intermediate state", zeroTruncated: "exclusive", integer: false};
 PARAMS_JS.PHYSICAL_PARAMETERS["arrestTime"] = {distribution:"Fixed", fixedDistnVal: 60, name: "Arrest timeout  (s)", title: "Maximum pause duration before the simulation is arrested. Set to zero to prevent arrests.", zeroTruncated: "inclusive", integer: false};
 
 
@@ -270,7 +271,7 @@ PARAMS_JS.update_this_parameter_WW = function(paramID, fixedVal, resolve = funct
 	
 	
 	// If the parameter has been changed and it will affect translocation rates then we calculate everything again
-	if (initialVal != PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "hybridLen" || paramID == "bubbleLeft" || paramID == "bubbleRight" || paramID == "nbpToFold")){
+	if (initialVal != PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "barrierPos" || paramID == "hybridLen" || paramID == "bubbleLeft" || paramID == "bubbleRight" || paramID == "nbpToFold")){
 		STATE_JS.translocationCacheNeedsUpdating = true; // Recalculate the translocation rate cache
 		STATE_JS.initTranslocationRateCache();
 	}

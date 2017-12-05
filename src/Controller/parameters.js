@@ -176,7 +176,6 @@ function refreshNTP(){
 		document.getElementById("CTPname").innerHTML = "[CTP]";
 		document.getElementById("GTPname").innerHTML = "[GTP]";
 		document.getElementById("UTPname").innerHTML = "[UTP]";	
-		document.getElementById("NTPtitle").innerHTML = "NTP concentrations";	
 		$("#refreshNTP").attr("title", "Reset NTP concentrations to standard cellular levels");
 		
 	}else{
@@ -186,7 +185,6 @@ function refreshNTP(){
 		document.getElementById("CTPname").innerHTML = "[dCTP]";
 		document.getElementById("GTPname").innerHTML = "[dGTP]";
 		document.getElementById("UTPname").innerHTML = "[dTTP]";	
-		document.getElementById("NTPtitle").innerHTML = "dNTP concentrations";	
 		$("#refreshNTP").attr("title", "Reset dNTP concentrations to standard cellular levels");
 	}
 	

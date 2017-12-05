@@ -425,10 +425,10 @@ FE_JS.getSlidingHeights_WW = function(sampleAll, ignoreModelOptions, resolve, ms
 	if (addParamsToPeaks){
 		if (PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] != 0){
 			var gradient = (PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * 3.4e-10) / (1.380649e-23 * 310) // Force x distance / kB T
+			var dx = 2 + PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"]["val"] / 3.4;
 
-			
 			for (var i = 0; i < 6; i ++){
-				if(slidingPeakHeightsTemp[i] != maxHeight) slidingPeakHeightsTemp[i] += gradient*(2.5-i);
+				if(slidingPeakHeightsTemp[i] != maxHeight) slidingPeakHeightsTemp[i] += gradient*(dx-i);
 			}
 			
 			
@@ -548,6 +548,7 @@ FE_JS.getSlidingHeights_WW = function(sampleAll, ignoreModelOptions, resolve, ms
 	// Assisting force
 	if (addParamsToTroughs){
 		if (PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] != 0){
+			
 			var gradient = (PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"]* 1e-12 * 3.4e-10) / (1.380649e-23 * 310) // Force x distance (3.4A)
 			
 			for (var i = 0; i < 7; i ++){

@@ -148,7 +148,7 @@ SIM_JS.renderPlotsEveryMS = 5000; // If in hidden mode, render the plots every f
 
 	var initialiseNextSimulation = function(aborted = false){
 
-
+		
 
 
 		// Return
@@ -209,7 +209,7 @@ SIM_JS.renderPlotsEveryMS = 5000; // If in hidden mode, render the plots every f
 	};
 
 
-	//console.log("GO");
+
 	var toCall = () => new Promise((resolve) => SIM_JS.trial_WW(stateC, resolve, msgID));
 	toCall().then((aborted) => initialiseNextSimulation(aborted));
 

@@ -149,7 +149,6 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 	}
 
 	
-	
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"] = 0;
 	MCMC_JS.chiSq_this_trial = 0;
 

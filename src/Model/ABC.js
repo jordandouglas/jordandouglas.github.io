@@ -348,7 +348,7 @@ ABC_JS.ABC_trial_for_curve_WW = function(currentFitNum, accepted, fitNums, resol
 ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve = function() {}){
 
 
-	//console.log("Starting observation", observationNum, "for curve", fitID, ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID][observationNum]);
+	//console.log("Starting observation", observationNum, "for curve", fitID, ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum]);
 
 
 	if (ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum] == null || WW_JS.stopRunning_WW){
@@ -390,6 +390,9 @@ ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve
 
 	
 	var toDoAfterTrial = function(){
+
+
+		//console.log("Finished trial");
 
 		// Take the median velocity
 		ABC_JS.velocities_for_this_curve.sort();

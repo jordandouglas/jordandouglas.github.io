@@ -540,6 +540,7 @@ function refreshPlotDataSequenceChangeOnly_controller(resolve = function() { }){
 
 function getPlotData_controller(forceUpdate = false, resolve){
 
+
 	if (WEB_WORKER == null) {
 		var toCall = () => new Promise((resolve) => PLOTS_JS.getPlotData_WW(forceUpdate, resolve, null));
 		toCall().then((dict) => resolve(dict));
