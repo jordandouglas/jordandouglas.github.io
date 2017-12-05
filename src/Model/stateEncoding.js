@@ -198,7 +198,7 @@ STATE_JS.getTranslocationRates = function(compactState){
 		var GDagRateModifier = Math.exp(-PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"]);
 		var forceGradient = Math.exp((-PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * (3.4-PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"]["val"]) * 1e-10) / (1.380649e-23 * 310));
 		var dx = 2 + PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"]["val"] / 3.4;
-		var DGPostModifier = compactState[1] == 1 ? Math.exp(-PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val) : 1;
+		var DGPostModifier = compactState[1] == 1 ? Math.exp(PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val) : 1;
 
 		var hypertranslocationGradientForward = 1; // Modify the rate of hypertranslocating forwards
 		var hypertranslocationGradientBackwards = 1; // Modify the rate of translocating backwards when in a hypertranslocated state
