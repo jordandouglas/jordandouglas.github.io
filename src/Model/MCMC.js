@@ -345,6 +345,9 @@ MCMC_JS.getLogPrior = function(){
 
 
 
+	// Restore parameters to the ones cached (not the currently used values)
+	if (XML_MODELS_JS.SAMPLING_MODELS) XML_MODELS_JS.decache();
+
 
 	var logPriorProbability = 0;
 	for (var i = 0; i < MCMC_JS.parametersWithPriors.length; i ++){
@@ -366,6 +369,7 @@ MCMC_JS.getLogPrior = function(){
 			case "Normal":
 				var mu = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].normalMeanVal;
 				var sd = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].normalSdVal;
+				//console.log(paramID, "log dnorm(", val, ",", mu, ",", sd, ") = ", Math.log( 1 / (Math.sqrt(2 * Math.PI * sd * sd)) * Math.exp(-(val-mu) * (val-mu) / (2 * sd * sd)) ));
 				logPriorProbability += Math.log( 1 / (Math.sqrt(2 * Math.PI * sd * sd)) * Math.exp(-(val-mu) * (val-mu) / (2 * sd * sd)) );
 				break;
 
@@ -390,8 +394,8 @@ MCMC_JS.getLogPrior = function(){
 		}
 
 
-		if (  (PARAMS_JS.PHYSICAL_PARAMETERS[paramID].zeroTruncated == "exclusive" && val <  0) &&
-			  (PARAMS_JS.PHYSICAL_PARAMETERS[paramID].zeroTruncated == "inclusive" && val <= 0)) logPriorProbability = Number.NEGATIVE_INFINITY;
+		if (  (PARAMS_JS.PHYSICAL_PARAMETERS[paramID].zeroTruncated == "exclusive" && val <= 0) ||
+			  (PARAMS_JS.PHYSICAL_PARAMETERS[paramID].zeroTruncated == "inclusive" && val <  0)) logPriorProbability = Number.NEGATIVE_INFINITY;
 
 	}
 
@@ -404,6 +408,11 @@ MCMC_JS.getLogPrior = function(){
 	//console.log("GDagSlide", PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"].val, "RateBind", PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"].val);
 
 	//console.log("\n\nCalculating prior for", MCMC_JS.parametersWithPriors, logPriorProbability);
+
+
+	// Restore parameters to the ones used by the physical model
+	if (XML_MODELS_JS.SAMPLING_MODELS) XML_MODELS_JS.setGlobalsToCurrentModel();
+
 
 	return logPriorProbability;
 
