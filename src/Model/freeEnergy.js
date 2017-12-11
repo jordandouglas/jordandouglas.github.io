@@ -121,7 +121,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 
 
-	if(modelSettings.NTPbindingNParams != null){
+	if (modelSettings.NTPbindingNParams != null){
 		PARAMS_JS.PHYSICAL_PARAMETERS["kCat"]["hidden"] = modelSettings.NTPbindingNParams == 8;
 		PARAMS_JS.PHYSICAL_PARAMETERS["kCat_ATP"]["hidden"] = modelSettings.NTPbindingNParams != 8;
 		PARAMS_JS.PHYSICAL_PARAMETERS["kCat_CTP"]["hidden"] = modelSettings.NTPbindingNParams != 8;
@@ -133,6 +133,11 @@ FE_JS.initFreeEnergy_WW = function(){
 		PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_CTP"]["hidden"] = modelSettings.NTPbindingNParams != 8;
 		PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_GTP"]["hidden"] = modelSettings.NTPbindingNParams != 8;
 		PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_UTP"]["hidden"] = modelSettings.NTPbindingNParams != 8;
+	}
+
+
+	if (modelSettings.assumeTranslocationEquilibrium != null){
+		PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"]["hidden"] = modelSettings.assumeTranslocationEquilibrium;
 	}
 
 
@@ -502,12 +507,16 @@ FE_JS.getSlidingHeights_WW = function(sampleAll, ignoreModelOptions, resolve, ms
 
 
 				// Bonus free energy for being in the posttranslocated state
-				if (addParamsToTroughs && state["mRNAPosInActiveSite"] == 1) slidingTroughHeightsTemp[pos] += PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val;
+				if (addParamsToTroughs && state["mRNAPosInActiveSite"] == 1) {
+					slidingTroughHeightsTemp[pos] += PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val;
+				}
 
 
 
 		}
 	}
+
+
 	
 	
 	// Slide forward
@@ -534,7 +543,9 @@ FE_JS.getSlidingHeights_WW = function(sampleAll, ignoreModelOptions, resolve, ms
 
 
 				// Bonus free energy for being in the posttranslocated state
-				if (addParamsToTroughs && state["mRNAPosInActiveSite"] == 1) slidingTroughHeightsTemp[pos] += PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val;
+				if (addParamsToTroughs && state["mRNAPosInActiveSite"] == 1) {
+					slidingTroughHeightsTemp[pos] += PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val;
+				}
 
 
 		}

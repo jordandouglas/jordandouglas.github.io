@@ -52,10 +52,16 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 
 
 
-
 	// Sample parameters from their priors and log this initial state
 	if (WW_JS.ABCinputFolder == null) PARAMS_JS.sample_parameters_WW();
 	MCMC_JS.MCMC_SIMULATING = true;
+
+
+
+	// Sample the model (if performing model search)
+	if (XML_MODELS_JS.SAMPLING_MODELS) {
+		XML_MODELS_JS.sampleNewModel();
+	}
 
 
 
@@ -67,14 +73,14 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 			ABC_JS.ABC_parameters_and_metrics_this_simulation[paramID]["priorVal"] = PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"];
 			MCMC_JS.parametersWithPriors.push(paramID);
 		}
-
 	}
 
 	//console.log("MCMC_JS.parametersWithPriors", MCMC_JS.parametersWithPriors);
 
 
 
-	if (MCMC_JS.parametersWithPriors.length == 0){
+
+	if (MCMC_JS.parametersWithPriors.length == 0 && XML_MODELS_JS.XML_MODELS == 0){
 		exitMCMC();
 		return;
 	}
@@ -140,6 +146,8 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 
 		}
 
+
+
 		
 		// Perform MCMC over N trials
 		var toCall = () => new Promise((resolve) => MCMC_JS.performMCMCtrial(fitNums, resolve));
@@ -148,7 +156,8 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 
 	}
 
-	
+
+
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"] = 0;
 	MCMC_JS.chiSq_this_trial = 0;
 
@@ -204,7 +213,6 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 	var toDoAfterTrial = function(){
 
 
-
 		if (!WW_JS.stopRunning_WW){
 
 			// Calculate the log prior / likelihood of this state
@@ -214,22 +222,60 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 
 
 
-
-
 			// Accept or reject the current state using Metropolis-Hastings formula. Accept the new state with probability min(1, alpha)
 			var alpha = -logLikelihood > MCMC_JS.currentchiSqthreshold ? 0 : Math.exp(logPrior - MCMC_JS.MCMC_parameters_and_metrics_previous_simulation.logPrior);
 
+
 			// Accept
 			if (alpha >= 1 || RAND_JS.uniform(0, 1) < alpha){
+
+				
+				//console.log("accept", -logLikelihood, alpha, logPrior);
+
 				MCMC_JS.MCMC_parameters_and_metrics_previous_simulation = JSON.parse(JSON.stringify(ABC_JS.ABC_parameters_and_metrics_this_simulation));
 				//MCMC_JS.MCMC_parameters_and_metrics_previous_simulation["trial"] = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
 				ABC_JS.nAcceptedValues++;
+
+
+				if (XML_MODELS_JS.SAMPLING_MODELS) {
+					XML_MODELS_JS.previousModel = XML_MODELS_JS.currentModel;
+				}
+
+
 			}else{
+				
+
+				//console.log("reject", -logLikelihood, alpha, logPrior);
+
+
 				MCMC_JS.MCMC_parameters_and_metrics_previous_simulation["trial"] = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left;
 				ABC_JS.ABC_parameters_and_metrics_this_simulation = JSON.parse(JSON.stringify(MCMC_JS.MCMC_parameters_and_metrics_previous_simulation));
 				//ABC_JS.ABC_parameters_and_metrics_this_simulation["trial"] = ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
 				//console.log("Rejected with alpha=", alpha);
+
+
+				for (var paramID in ABC_JS.ABC_parameters_and_metrics_this_simulation){
+					if (ABC_JS.ABC_parameters_and_metrics_this_simulation[paramID]["priorVal"] != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] = ABC_JS.ABC_parameters_and_metrics_this_simulation[paramID]["priorVal"];
+				}
+
+
+				// Go back to the previous model
+				if (XML_MODELS_JS.SAMPLING_MODELS) {
+					XML_MODELS_JS.currentModel = XML_MODELS_JS.previousModel;
+					XML_MODELS_JS.decache();
+					XML_MODELS_JS.cacheGlobals();
+					XML_MODELS_JS.setGlobalsToCurrentModel();
+
+					ABC_JS.ABC_parameters_and_metrics_this_simulation.model = {name: "Model", val: XML_MODELS_JS.currentModel.name};
+				}
+
+
 			}
+
+
+			//console.log("Completed trial, DGpost_obs =", MCMC_JS.MCMC_parameters_and_metrics_previous_simulation["DGPost"].priorVal, "| DGpost_actual =", PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val);
+			//console.log("Completed trial, barrierPos_obs =", MCMC_JS.MCMC_parameters_and_metrics_previous_simulation["barrierPos"].priorVal, "| barrierPos_actual =", PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"].val, "\n\n");
+
 
 
 			// Log the current state if appropriate
@@ -242,7 +288,7 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 				//}
 
 			}
-			
+
 			
 			// Lower the chiSq threshold by multiplying it by gamma
 			if (MCMC_JS.currentchiSqthreshold > ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_min){
@@ -278,7 +324,11 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 	// Simulate data for the entire set of experimental data. Do not stop early even if the fit is bad (less efficient than regular ABC in this sense)
 	// But do not simulate if the prior probability is negative infinity
 	var logPrior = MCMC_JS.getLogPrior();
-	if (logPrior == Number.NEGATIVE_INFINITY) toDoAfterTrial();
+	if (logPrior == Number.NEGATIVE_INFINITY) {
+		setTimeout(function(){
+			toDoAfterTrial();
+		}, 0);
+	}
 	else {
 		var toCall = () => new Promise((resolve) => ABC_JS.ABC_trial_for_curve_WW(0, true, fitNums, resolve));
 		toCall().then(() => toDoAfterTrial());
@@ -293,15 +343,20 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 MCMC_JS.getLogPrior = function(){
 
 
+
+
 	var logPriorProbability = 0;
 	for (var i = 0; i < MCMC_JS.parametersWithPriors.length; i ++){
 		var paramID = MCMC_JS.parametersWithPriors[i];
+		var val = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].val;
+		
+		//console.log(paramID, val);
+
 		switch (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["distribution"]){
 
 			case "Uniform":
 				var lower = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].uniformDistnLowerVal;
 				var upper = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].uniformDistnUpperVal;
-				var val = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].val;
 				if (val < lower || val > upper) logPriorProbability = Number.NEGATIVE_INFINITY;
 				else logPriorProbability += Math.log( 1 / (upper - lower) );
 				break;
@@ -310,15 +365,44 @@ MCMC_JS.getLogPrior = function(){
 			case "Normal":
 				var mu = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].normalMeanVal;
 				var sd = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].normalSdVal;
-				var val = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].val;
 				logPriorProbability += Math.log( 1 / (Math.sqrt(2 * Math.PI * sd * sd)) * Math.exp(-(val-mu) * (val-mu) / (2 * sd * sd)) );
 				break;
 
 
-			// TODO: the rest of the distributions
+			case "Lognormal":
+				var mu = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].lognormalMeanVal;
+				var sd = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].lognormalSdVal;
+				if (val <= 0) logPriorProbability = Number.NEGATIVE_INFINITY;
+				else logPriorProbability += Math.log(1 / (val * sd * Math.sqrt(2 * Math.PI)) * Math.exp(-(Math.log(val)-mu) * (Math.log(val)-mu) / (2 * sd * sd)));
+				break;
+
+
+			case "Exponential":
+				var rate = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].ExponentialDistnVal;
+				if (val <= 0) logPriorProbability = Number.NEGATIVE_INFINITY;
+				else logPriorProbability += rate * Math.exp(-rate * val);
+				break;
+
+
+			// TODO: gamma, poisson
 
 		}
+
+
+		if (  (PARAMS_JS.PHYSICAL_PARAMETERS[paramID].zeroTruncated == "exclusive" && val <  0) &&
+			  (PARAMS_JS.PHYSICAL_PARAMETERS[paramID].zeroTruncated == "inclusive" && val <= 0)) logPriorProbability = Number.NEGATIVE_INFINITY;
+
 	}
+
+	// Temporary hardcodings: set limits for some parameters
+	if (PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"].val < 6) logPriorProbability = Number.NEGATIVE_INFINITY;
+	if (PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"].val > 1000) logPriorProbability = Number.NEGATIVE_INFINITY;
+	if (PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"].val > 3.4) logPriorProbability = Number.NEGATIVE_INFINITY;
+
+
+	//console.log("GDagSlide", PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"].val, "RateBind", PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"].val);
+
+	//console.log("\n\nCalculating prior for", MCMC_JS.parametersWithPriors, logPriorProbability);
 
 	return logPriorProbability;
 
@@ -352,38 +436,106 @@ MCMC_JS.getLogLikelihood = function(fitNums){
 }
 
 
+
+
+
 // Select new parameters based off the current parameters. Will mutate the current parameters
 MCMC_JS.makeProposal = function(){
 
 
-
 	// Uniformly at random select a parameter to change
-	var randNum = Math.floor(MER_JS.random() * MCMC_JS.parametersWithPriors.length);
-	var paramIDToChange = MCMC_JS.parametersWithPriors[randNum];
+	var numParams = XML_MODELS_JS.SAMPLING_MODELS ? MCMC_JS.parametersWithPriors.length + 1 : MCMC_JS.parametersWithPriors.length;
+	var randNum = Math.floor(MER_JS.random() * numParams);
 
+
+	// If randNum is equal to numParams-1 then this corresponds to changing the model
+	if (XML_MODELS_JS.SAMPLING_MODELS && randNum == numParams-1){
+		XML_MODELS_JS.sampleNewModel();
+		//numParams = MCMC_JS.parametersWithPriors.length; // Change a parameter as well as the model
+		//randNum = Math.floor(MER_JS.random() * numParams);
+		return;
+	}
 
 
 	// Generate a heavy tailed distribution random variable.
 	// Using the algorithm in section 8.3 of https://arxiv.org/pdf/1606.03757.pdf
+	var paramIDToChange = MCMC_JS.parametersWithPriors[randNum];
 	var a = RAND_JS.normal(0, 1);
 	var b = RAND_JS.uniform(0, 1);
 	var t = a / Math.sqrt(-Math.log(b));
 	var n = RAND_JS.normal(0, 1);
 	var x = Math.pow(10, 1.5 - 3*Math.abs(t)) * n;
 
+	//console.log("Changing parameter", paramIDToChange, "out of", MCMC_JS.parametersWithPriors);
 
 
-	// Wrap the value so that it bounces back into the right range
-	var stepSize = PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange].uniformDistnUpperVal - PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange].uniformDistnLowerVal;
-	var newVal = ABC_JS.ABC_parameters_and_metrics_this_simulation[paramIDToChange]["priorVal"] + x * stepSize;
-	if (PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange]["distribution"] == "Uniform") {
-		newVal = MCMC_JS.wrapProposal(newVal, PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange].uniformDistnLowerVal, PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange].uniformDistnUpperVal);
+	// Restore the model-free parameters from the cached values. This is so that if eg. the current model has set this parameter to 0, then
+	// we should apply the proposal to the 'true' current value and not 0 
+	if (XML_MODELS_JS.SAMPLING_MODELS) XML_MODELS_JS.decache();
+
+	var currentVal = PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange]["val"];
+	var newVal = ABC_JS.ABC_parameters_and_metrics_this_simulation[paramIDToChange]["priorVal"];
+
+
+	switch (PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange]["distribution"]){
+
+
+		case "Uniform":
+
+			// Wrap the value so that it bounces back into the right range
+			var stepSize = PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange].uniformDistnUpperVal - PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange].uniformDistnLowerVal;
+			newVal = currentVal + x * stepSize;
+			newVal = MCMC_JS.wrapProposal(newVal, PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange].uniformDistnLowerVal, PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange].uniformDistnUpperVal);
+			break;
+
+
+		case "Normal":
+
+			// Use the standard deviation as the step size
+			var stepSize = PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange].normalSdVal;
+			newVal = currentVal + x * stepSize;
+			break;
+
+
+		case "Lognormal":
+
+			// Use the standard deviation of the normal as the step size, and perform the step in normal space then transform back into a lognormal
+			var stepSize = PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange].lognormalSdVal;
+			newVal = Math.log(Math.exp(currentVal) + x * stepSize);
+			break;
+
+
+		// TODO: exponential, gamma, poisson
+
+
 	}
 
 
+	//console.log("changing", paramIDToChange, "from", WW_JS.roundToSF_WW(PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange]["val"], 5), "to", WW_JS.roundToSF_WW(newVal, 5), "x = ", x);
+
 	//console.log("randh", x);
+
+
+
+	if (XML_MODELS_JS.SAMPLING_MODELS){
+
+		// Change the parameters as specified by the proposal
+		PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange]["val"] = newVal;
+
+		// Cache the new state
+		XML_MODELS_JS.cacheGlobals();
+
+		// Restore to the state specified by the current model
+		XML_MODELS_JS.setGlobalsToCurrentModel();
+
+	} 
+
+
+	else PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange]["val"] = newVal;
+
+
 	ABC_JS.ABC_parameters_and_metrics_this_simulation[paramIDToChange]["priorVal"] = newVal;
-	PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange]["val"] = newVal;
+	
 
 }
 

@@ -45,6 +45,7 @@ WW_JS.init_WW = function(isWW = false){
 		self.importScripts('MFE.js');
 		self.importScripts('stateEncoding.js');
 		self.importScripts('XMLparser.js');
+		self.importScripts('XMLmodels.js');
 		self.importScripts('../Resources/random.js');
 		self.importScripts('../Resources/mersenne-twister.js');
 		self.importScripts('../Resources/xml_for_script-3.1/jsXMLParser/xmlsax.js');
@@ -66,6 +67,7 @@ WW_JS.init_WW = function(isWW = false){
 		MFE_JS = require('./MFE.js');
 		STATE_JS = require('./stateEncoding.js');
 		XML_JS = require('./XMLparser.js');
+		XML_MODELS_JS = require('./XMLmodels.js');
 		RAND_JS = require('../Resources/random.js');
 		MER_JS = require('../Resources/mersenne-twister.js');
 		require('../Resources/xml_for_script-3.1/jsXMLParser/xmlsax.js');
@@ -1403,7 +1405,7 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 		// Start the ABC
 		else{
 
-			
+
 			// Initialise the .log file (one for each worker)
 			ABC_JS.initialiseFileNames_CommandLine();
 			ABC_JS.initialiseSaveFiles_CommandLine(startingTime);

@@ -198,7 +198,6 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
  PLOTS_JS.getPlotData_WW = function(forceUpdate = false, resolve = function(plotData) { }, msgID = null){
 	
-	console.log("PLOTS_JS.getPlotData_WW");
 
 	var plotData = {};
 

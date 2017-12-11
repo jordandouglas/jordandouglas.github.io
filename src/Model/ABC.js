@@ -105,6 +105,11 @@ ABC_JS.beginABC_WW = function(experimentalData, resolve = function() {}, msgID =
 	}
 
 
+
+
+
+	
+
 	for (var paramID in PARAMS_JS.PHYSICAL_PARAMETERS){
 		if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["binary"]) {
 
@@ -120,6 +125,7 @@ ABC_JS.beginABC_WW = function(experimentalData, resolve = function() {}, msgID =
 		}
 				
 	}
+
 
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["FAssist"] = {name: PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["name"], vals: []}; 
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["NTPeq"] = {name: "NTP concentration divided by [NTP]eq", vals: []}; 
@@ -232,7 +238,11 @@ ABC_JS.ABC_trials_WW = function(fitNums, resolve = function() {}, msgID = null){
 
 	// Sample all the parameters now. There will be no more random sampling between simulation trials, only in between ABC trials
 	PARAMS_JS.sample_parameters_WW();
-	
+
+	// If sampling models then add the model column
+	if (XML_MODELS_JS.SAMPLING_MODELS) {
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["model"] = {name: "Model", val: XML_MODELS_JS.currentModel.name};
+	}
 	
 	// Add the sampled priors to the list
 	for (var paramID in ABC_JS.ABC_parameters_and_metrics_this_simulation) {
@@ -394,6 +404,18 @@ ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve
 
 		//console.log("Finished trial");
 
+
+
+
+		// Take the mean velocity
+		var meanVelocity = 0;
+		for (var i = 0; i < ABC_JS.velocities_for_this_curve.length; i ++){
+			meanVelocity += ABC_JS.velocities_for_this_curve[i] / ABC_JS.velocities_for_this_curve.length;
+		}
+		ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"].push(meanVelocity);
+		
+
+		/*
 		// Take the median velocity
 		ABC_JS.velocities_for_this_curve.sort();
 		var medianVelocity = 0;
@@ -408,13 +430,13 @@ ABC_JS.ABC_K_trials_for_observation_WW = function(fitID, observationNum, resolve
 			medianVelocity = ABC_JS.velocities_for_this_curve[Math.floor(ABC_JS.velocities_for_this_curve.length/2)];
 			ABC_JS.ABC_parameters_and_metrics_this_simulation["velocity"]["vals"].push(medianVelocity);
 		}
-		
+		*/
 		
 		
 		// Update the chi squared
 		if (ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "MCMC"){
 			
-			MCMC_JS.chiSq_this_trial += Math.pow(medianVelocity - ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum]["velocity"], 2) / medianVelocity;
+			MCMC_JS.chiSq_this_trial += Math.pow(meanVelocity - ABC_JS.ABC_EXPERIMENTAL_DATA["fits"][fitID]["vals"][observationNum]["velocity"], 2) / meanVelocity;
 			
 			// If we have gone over the threshold then stop simulating
 			if (MCMC_JS.chiSq_this_trial > MCMC_JS.currentchiSqthreshold){
@@ -592,6 +614,12 @@ ABC_JS.initialise_ABCoutput_WW = function(fitNums){
 	//for (var i = 0; i < 20; i ++) ABC_JS.paddingString += 
 	var secondLine = (ABC_JS.paddingString + "Sample").slice(-9);
 
+
+	// Add model column (if sampling models)
+	if (XML_MODELS_JS.SAMPLING_MODELS)  secondLine +=  (ABC_JS.paddingString + "Model").slice(-ABC_JS.paddingString.length);
+
+
+
 	// Add all the prior-sampled variable names to the row. These variables will occur one time for each rule
 	for (var objID in ABC_JS.ABC_parameters_and_metrics_this_simulation){
 		if (ABC_JS.ABC_parameters_and_metrics_this_simulation[objID] != null && ABC_JS.ABC_parameters_and_metrics_this_simulation[objID]["priorVal"] !== undefined) secondLine +=  (ABC_JS.paddingString + objID).slice(-ABC_JS.paddingString.length);
@@ -683,11 +711,17 @@ ABC_JS.update_ABCoutput_WW = function(fitNums){
 	// In ABC we log the current state, in MCMC we log the previous state
 	var stateToLog = ABC_JS.ABC_EXPERIMENTAL_DATA.inferenceMethod == "MCMC" ? MCMC_JS.MCMC_parameters_and_metrics_previous_simulation : ABC_JS.ABC_parameters_and_metrics_this_simulation;
 
+	//console.log("Logging state", stateToLog);
 
 	// Add the trial number
 	var workerNum = "";// RUNNING_FROM_COMMAND_LINE && WW_JS.WORKER_ID != null ? WW_JS.WORKER_ID + ":" : "";// Print the worker number if multithreading from the command line
 	var trialNum = 	stateToLog["trial"]; //ABC_JS.ABC_EXPERIMENTAL_DATA["ntrials"] - ABC_JS.n_ABC_trials_left + 1;
 	var line = (ABC_JS.paddingString + workerNum + trialNum).slice(-9);
+
+
+
+	// Add model column (if sampling models)
+	if (stateToLog.model != null)  line += (ABC_JS.paddingString + stateToLog.model.val).slice(-ABC_JS.paddingString.length);
 
 
 	// All the prior-sampled parameters
@@ -1139,7 +1173,6 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 			if (col.trim() == "") continue;
 
 
-
 			// R-ABC only
 			if (col.includes("Accepted")) {
 				firstConsoleLine += (ABC_JS.paddingString + "|Accepted|").slice(-12) + "&&&";
@@ -1154,7 +1187,7 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 			}
 
 
-		
+
 
 			if (col.includes("Sample")) {
 				firstConsoleLine += (ABC_JS.paddingString + col).slice(-9);
@@ -1241,6 +1274,9 @@ ABC_JS.uploadABC_WW = function(TSVstring, resolve = function() { }, msgID = null
 					if (colName == null) continue;
 
 					var value = splitLine[colNum-1];
+
+
+					if (value.match(/model/gi)) continue;
 
 
 					if (value.match(/[0-9]\:[0-9]/gi)) value = value; // Don't parse as float if it contains a : (which the trial numbers do if it was multithreaded)

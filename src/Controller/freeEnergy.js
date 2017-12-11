@@ -1,4 +1,4 @@
-﻿﻿
+﻿
 /* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
@@ -190,6 +190,10 @@ function updateModelDOM(elongation_model_temp){
 
 	}
 	
+
+
+	if (elongation_model_temp.assumeTranslocationEquilibrium) $("#barrierPos_container").hide(100);
+	else $("#barrierPos_container").show(100);
 
 
 	if (elongation_model_temp["allowBacktracking"] && elongation_model_temp["allowInactivation"]) $("#allowBacktrackWithoutInactivation_container").show(100);

@@ -27,7 +27,7 @@ XML_JS.ABC_EXPERIMENTAL_DATA = {};
 
 
 // Modified from http://xmljs.sourceforge.net/website/sampleApplications-sax.html
- XML_JS.loadSession_WW = function(XMLstring, resolve = function() {}, msgID = null){
+XML_JS.loadSession_WW = function(XMLstring, resolve = function() {}, msgID = null){
 
 
 
@@ -55,8 +55,6 @@ XML_JS.ABC_EXPERIMENTAL_DATA = {};
 	XML_JS.N = xmlAttrArray[arr[0]]["N"];
 	var speedVal = xmlAttrArray[arr[0]]["speed"];
 	nABCfits = 0;
-
-
 	
 	for (var i=0;i<arr.length;i++){
 		
@@ -65,6 +63,7 @@ XML_JS.ABC_EXPERIMENTAL_DATA = {};
 		else if (splitArr[2] == "parameters" && splitArr.length == 4) parseXML_param_WW(splitArr[3], xmlAttrArray[arr[i]]);
 		else if (splitArr[2] == "elongation-model" && splitArr.length == 3) FE_JS.currentElongationModel = xmlAttrArray[arr[i]]["id"]; // Model id
 		else if (splitArr[2] == "elongation-model" && splitArr.length == 4) parseXML_model_WW(splitArr[3], xmlAttrArray[arr[i]]["val"]); // Model property
+		else if (splitArr[2] == "estimated-models" && splitArr.length == 4) parseXML_estimated_model_WW(splitArr[3], xmlAttrArray[arr[i]]); // ABC over model space
 		//else if (splitArr[2] == "state") compactState = parseXML_state_WW(xmlAttrArray[arr[i]]); // Current state
 		else if (splitArr[2] == "plots" && splitArr.length == 3) parseXML_plot_main_WW(xmlAttrArray[arr[i]]); 
 		else if (splitArr[2] == "plots" && splitArr.length == 4) parseXML_plots_WW(splitArr[3], xmlAttrArray[arr[i]]); 
@@ -116,10 +115,18 @@ function parseXML_plots_WW(attr, values){
 	
 }
 
+function parseXML_estimated_model_WW(modelName, modelSettings){
+
+	XML_MODELS_JS.addNewModel(modelName, modelSettings);
+
+}
+
+
 function parseXML_model_WW(attr, val){
 
 	var val = val == "true" ? true : val == "false" ? false : val;
-	FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel][attr] = val; 
+	var elongationModel = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel];
+	elongationModel[attr] = val; 
 }
 
 
@@ -224,22 +231,25 @@ function parseXML_param_WW(paramID, paramNode){
 	var poissonRateVal = paramNode["poissonRateVal"]; 
 
 
-	PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] = val;
-	PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["distribution"] = distribution;
-
-	if (fixedDistnVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["fixedDistnVal"] = parseFloat(fixedDistnVal);
-	if (uniformDistnLowerVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["uniformDistnLowerVal"] = parseFloat(uniformDistnLowerVal);
-	if (uniformDistnUpperVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["uniformDistnUpperVal"] = parseFloat(uniformDistnUpperVal);
-	if (ExponentialDistnVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["ExponentialDistnVal"] = parseFloat(ExponentialDistnVal);
-	if (normalMeanVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["normalMeanVal"] = parseFloat(normalMeanVal);
-	if (normalSdVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["normalSdVal"] = parseFloat(normalSdVal);
-	if (lognormalMeanVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["lognormalMeanVal"] = parseFloat(lognormalMeanVal);
-	if (lognormalSdVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["lognormalSdVal"] = parseFloat(lognormalSdVal);
-	if (gammaShapeVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["gammaShapeVal"] = parseFloat(gammaShapeVal);
-	if (gammaRateVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["gammaRateVal"] = parseFloat(gammaRateVal);
-	if (poissonRateVal != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["poissonRateVal"] = parseFloat(poissonRateVal);
+	var parameterObject = PARAMS_JS.PHYSICAL_PARAMETERS[paramID];
 
 
+	//console.log("Saving", paramID, "to", parameterObject.priorVal);
+
+	parameterObject["val"] = val;
+	parameterObject["distribution"] = distribution;
+
+	if (fixedDistnVal != null) parameterObject["fixedDistnVal"] = parseFloat(fixedDistnVal);
+	if (uniformDistnLowerVal != null) parameterObject["uniformDistnLowerVal"] = parseFloat(uniformDistnLowerVal);
+	if (uniformDistnUpperVal != null) parameterObject["uniformDistnUpperVal"] = parseFloat(uniformDistnUpperVal);
+	if (ExponentialDistnVal != null) parameterObject["ExponentialDistnVal"] = parseFloat(ExponentialDistnVal);
+	if (normalMeanVal != null) parameterObject["normalMeanVal"] = parseFloat(normalMeanVal);
+	if (normalSdVal != null) parameterObject["normalSdVal"] = parseFloat(normalSdVal);
+	if (lognormalMeanVal != null) parameterObject["lognormalMeanVal"] = parseFloat(lognormalMeanVal);
+	if (lognormalSdVal != null) parameterObject["lognormalSdVal"] = parseFloat(lognormalSdVal);
+	if (gammaShapeVal != null) parameterObject["gammaShapeVal"] = parseFloat(gammaShapeVal);
+	if (gammaRateVal != null) parameterObject["gammaRateVal"] = parseFloat(gammaRateVal);
+	if (poissonRateVal != null) parameterObject["poissonRateVal"] = parseFloat(poissonRateVal);
 
 
 }

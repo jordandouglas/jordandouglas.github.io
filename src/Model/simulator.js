@@ -397,6 +397,9 @@ SIM_JS.sampleAction_WW = function(stateC){
 		var rateFwdAndBack = STATE_JS.getTranslocationRates(stateC);
 		kFwd = rateFwdAndBack[1];
 		kBck = rateFwdAndBack[0];
+
+
+		//console.log(stateC[1], "kFwd", kFwd, "kBck", kBck);
 		
 		if (stateC[3] && stateC[1] == 0 && !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowBacktrackWithoutInactivation"]) kBck = 0; // If state is active but we don't allow backtracking while active then set rate to zero
 		
@@ -786,6 +789,8 @@ SIM_JS.sampleAction_WW = function(stateC){
 			var probabilityPretranslocated = boltzmannG0 / normalisationZ;
 			var probabilityPosttranslocated = boltzmannG1 / normalisationZ;
 			var probabilityBound = boltzmannGN / normalisationZ;
+
+			//console.log("probabilityPretranslocated", probabilityPretranslocated, "probabilityPosttranslocated", probabilityPosttranslocated, "probabilityBound", probabilityBound);
 
 
 			// Can only catalyse if not beyond the end of the sequence, go forward to terminate
