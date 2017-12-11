@@ -59,7 +59,22 @@
 
 initNodeCompilation();
 
+
+process.on('uncaughtException', function (error) {
+	console.log(error.stack);
+});
+
+
+process.on('unhandledRejection', (reason, p) => {
+  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
+  // application specific logging, throwing an error, or other logic here
+});
+
+
 function initNodeCompilation(){
+
+
+
 
 
 	var cluster = require('cluster'); // If more than 1 core then multithread
