@@ -61,6 +61,7 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 	// Sample the model (if performing model search)
 	if (XML_MODELS_JS.SAMPLING_MODELS) {
 		XML_MODELS_JS.sampleNewModel();
+		XML_MODELS_JS.previousModel = XML_MODELS_JS.currentModel;
 	}
 
 

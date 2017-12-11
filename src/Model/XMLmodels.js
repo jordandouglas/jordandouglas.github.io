@@ -44,6 +44,7 @@ XML_MODELS_JS.sampleNewModel = function(){
 	XML_MODELS_JS.previousModel = XML_MODELS_JS.currentModel;
 	XML_MODELS_JS.currentModel = XML_MODELS_JS.XML_MODELS[runif];
 
+
 	ABC_JS.ABC_parameters_and_metrics_this_simulation["model"] = {name: "Model", val: XML_MODELS_JS.currentModel.name};
 	//console.log("Choosing model", XML_MODELS_JS.currentModel.name); 
 
@@ -67,7 +68,7 @@ XML_MODELS_JS.sampleNewModel = function(){
 XML_MODELS_JS.setGlobalsToCurrentModel = function(){
 
 
-	if (!XML_MODELS_JS.SAMPLING_MODELS) return;
+	if (!XML_MODELS_JS.SAMPLING_MODELS || XML_MODELS_JS.currentModel == null) return;
 
 	// Change the model settings and/or parameters to that of the current model
 	for (var modelSetting in XML_MODELS_JS.currentModel.model){
@@ -105,7 +106,7 @@ XML_MODELS_JS.decache = function(){
 XML_MODELS_JS.cacheGlobals = function(){
 
 
-	if (!XML_MODELS_JS.SAMPLING_MODELS) return;
+	if (!XML_MODELS_JS.SAMPLING_MODELS || XML_MODELS_JS.currentModel == null) return;
 
 	cachedModel = {};
 	cachedParams = {};
