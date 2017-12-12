@@ -511,7 +511,7 @@ MCMC_JS.makeProposal = function(){
 
 			// Use the standard deviation of the normal as the step size, and perform the step in normal space then transform back into a lognormal
 			var stepSize = PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange].lognormalSdVal;
-			newVal = Math.log(Math.exp(currentVal) + x * stepSize);
+			newVal = Math.exp(Math.log(currentVal) + x * stepSize);
 			break;
 
 
