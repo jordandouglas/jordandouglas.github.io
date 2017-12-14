@@ -58,7 +58,7 @@ PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_GTP"] = {distribution:"Fixed", fixedDistnVa
 PARAMS_JS.PHYSICAL_PARAMETERS["Kdiss_UTP"] = {distribution:"Fixed", fixedDistnVal: 18, name: "KD of UTP (\u03bcM)", latexName: "K_{D}^{UTP}  (\u03bcM)", title: "Dissociation constant of UTP", zeroTruncated: "exclusive", integer: false, hidden:true};
 
 
-PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"] = {distribution:"Fixed", fixedDistnVal: 1, lognormalMeanVal: 2.047, lognormalSdVal: 1.045, name: "Rate of binding  (\u03bcM\u207B\u00B9 s\u207B\u00B9)", latexName: "k_{bind} (\u03bcM^{\u22121} s^{\u22121\u2009})", title: "Second order rate constant of binding the correct NTP", zeroTruncated: "inclusive", integer: false, hidden: true};
+PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"] = {distribution:"Fixed", fixedDistnVal: 1, lognormalMeanVal: 2.303, lognormalSdVal: 1.175, name: "Rate of binding  (\u03bcM\u207B\u00B9 s\u207B\u00B9)", latexName: "k_{bind} (\u03bcM^{\u22121} s^{\u22121\u2009})", title: "Second order rate constant of binding the correct NTP", zeroTruncated: "inclusive", integer: false, hidden: true};
 PARAMS_JS.PHYSICAL_PARAMETERS["RateMisbind"] = {distribution:"Fixed", fixedDistnVal: 1, name: "Rate of misbinding  (\u03bcM\u207B\u00B9 s\u207B\u00B9)", latexName: "K_{D}^{A} (\u03bcM)", title: "Second order rate constant of NTP mis-binding which can lead to transition/transversion mutations", zeroTruncated: "inclusive", integer: false, hidden:true};
 PARAMS_JS.PHYSICAL_PARAMETERS["TransitionTransversionRatio"] = {distribution:"Fixed", fixedDistnVal: 4, name: "Transition:transversion", title: "How much more likely is a transition mis-binding event than a transversion mis-binding event", zeroTruncated: "exclusive", integer: false, hidden:true};
 
