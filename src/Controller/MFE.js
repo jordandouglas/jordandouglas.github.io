@@ -73,7 +73,7 @@ function renderSecondaryStructure(data){
 		
 
 		var dist = function(d){
-			return d.bp ? 25 : 20;
+			return d.bp ? 25 : d.terminal ? 50 : 20;
 		}
 		
 		var gravity = function(alpha) {
@@ -114,7 +114,7 @@ function renderSecondaryStructure(data){
 		 var nodeImage = node.append("image")
 		     .attr("xlink:href", d => "src/Images/" + d.src + ".png")
 		     .attr("height", "22px")
-		     .attr("width", d => d.fixed ? 0 : "22px" )
+		     .attr("width", d => d.fixed ? 0 : d.src == "5RNA" ? "77px" : "22px" )
 		     .attr("x", d => d.fixed ? d.fx - $("#bases").scrollLeft() : d.startX)
 		     .attr("y", d => d.fixed ? d.fy : d.startY);
 
@@ -134,7 +134,7 @@ function renderSecondaryStructure(data){
 
 		var dx = function(d) {
 			if (d.fixed) return d.x = d.fx;
-			return d.x = Math.max(11 - d.startX, Math.min(width  - 22 - d.startX, d.x)); 
+			return d.x = Math.max((d.src == "5RNA" ? 38 : 11) - d.startX, Math.min(width  - (d.src == "5RNA" ? 77 : 22) - d.startX, d.x)); 
 		};
 		var dy = function(d) {
 			if (d.fixed) return d.y = d.fy;
@@ -160,24 +160,21 @@ function renderSecondaryStructure(data){
 			
 			
 		     links.attr("x1", function(d) {
-		            return d.source.x + 11 + d.source.startX;
+		            return d.source.x + (d.src == "5RNA" ? 38 : 11) + d.source.startX;
 					//return Math.max(10, Math.min(width - 10, d.source.x));
 		         })
 		         .attr("y1", function(d) {
-		            return d.source.y + 11 + d.source.startY;
+		            return d.source.y + (d.src == "5RNA" ? 38 : 11) + d.source.startY;
 					//return Math.max(10, Math.min(height - 10, d.source.y));
 		         })
 		         .attr("x2", function(d) {
-		            return d.target.x + (11 + d.target.startX);
+		            return d.target.x + (d.src == "5RNA" ? 38 : 11) + d.target.startX;
 					//return Math.max(10, Math.min(width - 10, d.target.x));
 		         })
 		         .attr("y2", function(d) {
-		            return d.target.y + (11 + d.target.startY);
+		            return d.target.y + (d.src == "5RNA" ? 38 : 11) + d.target.startY;
 					//return Math.max(10, Math.min(height - 10, d.target.y));
 		         })
-
-
-		    
 
 
 		 };
