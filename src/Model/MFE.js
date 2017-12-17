@@ -60,7 +60,7 @@ MFE_JS.MFE_V = {};
 
 
 
- MFE_JS.calculateMFESequence_WW = function(state){
+MFE_JS.calculateMFESequence_WW = function(state){
 	
 
 	// Calculate secondary structure for previous nbpToFold only
@@ -118,8 +118,8 @@ MFE_JS.MFE_V = {};
 	var vertices = [];
 	var startX = 3 * HTMLobjects["pol"]["x"] / 4;
 	var startY = 300;
-	vertices.push({src: "5", startX: startX, startY: startY});//, fx: primerSequence[0]["x"], fy: primerSequence[0]["y"]});
-	bonds.push({ source: 0, target: 1 });
+	vertices.push({src: "5RNA", startX: startX, startY: startY});//, fx: primerSequence[0]["x"], fy: primerSequence[0]["y"]});
+	bonds.push({ source: 0, target: 1, terminal:true });
 
 	var toHide = ["#m0"];
 	

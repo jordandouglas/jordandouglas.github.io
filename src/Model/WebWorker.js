@@ -674,7 +674,7 @@ function tagAllObjectsForGeneration(){
 	if (hasTP === undefined) hasTP = false;
 
 	var labelBase = base == "3" || base == "5";
-	var width = (labelBase ? 70 : 20);
+	var width = (labelBase ? 76 : 20);
 	var height = 20;
 	var nt = {id:id, seq:seq, pos:pos, x:x, y:y, width:width, height:height, base:base, src:src, hasTP:hasTP, needsGenerating:true, needsAnimating:false, needsDeleting:false, needsSourceUpdate: false, dx: 0, dy: 0, animationTime:ANIMATION_TIME, zIndex:3};
 
