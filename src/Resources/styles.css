@@ -395,6 +395,7 @@ div.vertical{
 
 .helpIcon {
 	width:15px;
+	cursor: pointer;
 }
 
 .sidenav a {
@@ -467,8 +468,6 @@ div.vertical{
 	padding: 5px 5px;
 	text-align: center;
 	font-family: "Arial";
-	border-radius:5px;
-	
 }
 
 .plot-dropdown {
@@ -601,6 +600,7 @@ input {
 	width:38px; 
 	height:12px;
 	float:right;
+	cursor:pointer;
 }
 
 
