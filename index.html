@@ -1866,7 +1866,7 @@ function closeNav() {
 					Translocation Parameters 
 					
 					
-					<input type=image id="calculateTranslocationBtn" title="Calculate translocation summary" onClick="translocationCalculationSummary()" src="src/Images/calculator.png" style="padding: 3 3; vertical-align:middle; height:25px;"> 
+					<input type=image id="calculateTranslocationBtn" title="Calculate translocation summary" onClick="translocationCalculationSummary()" src="src/Images/calculator.png" style="padding: 3 3; vertical-align:middle; height:25px; cursor:pointer;"> 
 				</div>
 
 
@@ -2907,8 +2907,8 @@ function closeNav() {
 											</select>
 										
 
-										<input type=image id='plotOptions1' title="Change the settings of this plot" onClick=plotOptions(1) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
-										<input type=image id='downloadPlot1' title="Download the data displayed in this plot" onClick=downloadPlot(1) src="src/Images/download.png" style="vertical-align: middle; height:20px; display:none">  
+										<input type=image id='plotOptions1' title="Change the settings of this plot" onClick=plotOptions(1) src="src/Images/gear.png" style="cursor: pointer; vertical-align: middle; width:20px; height:20px; display:none">  
+										<input type=image id='downloadPlot1' title="Download the data displayed in this plot" onClick=downloadPlot(1) src="src/Images/download.png" style="vertical-align: middle; cursor: pointer; height:20px; display:none">  
 										<a id="helpPlot1" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="src/Images/help.png"></a>
 						
 
@@ -2938,8 +2938,8 @@ function closeNav() {
 														  <option value="parameterHeatmap">Parameter plot</option>
 										</select>
 									
-									<input type=image id='plotOptions2' title="Change the settings of this plot" onClick=plotOptions(2) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
-									<input type=image id='downloadPlot2' title="Download the data displayed in this plot" onClick=downloadPlot(2) src="src/Images/download.png" style="vertical-align: middle;  height:20px; display:none ">  
+									<input type=image id='plotOptions2' title="Change the settings of this plot" onClick=plotOptions(2) src="src/Images/gear.png" style="cursor: pointer;vertical-align: middle; width:20px; height:20px; display:none">  
+									<input type=image id='downloadPlot2' title="Download the data displayed in this plot" onClick=downloadPlot(2) src="src/Images/download.png" style="cursor: pointer;vertical-align: middle;  height:20px; display:none ">  
 									<a id="helpPlot2" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="src/Images/help.png"></a>
 						
 									
@@ -2973,8 +2973,8 @@ function closeNav() {
 												
 									</select>
 								
-								<input type=image id='plotOptions3' title="Change the settings of this plot" onClick=plotOptions(3) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px; display:none">  
-								<input type=image id='downloadPlot3' title="Download the data displayed in this plot" onClick=downloadPlot(3) src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px; ">  
+								<input type=image id='plotOptions3' title="Change the settings of this plot" onClick=plotOptions(3) src="src/Images/gear.png" style="cursor: pointer;vertical-align: middle; width:20px; height:20px; display:none">  
+								<input type=image id='downloadPlot3' title="Download the data displayed in this plot" onClick=downloadPlot(3) src="src/Images/download.png" style="cursor: pointer;display:none; vertical-align: middle; height:20px; ">  
 								<a id="helpPlot3" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="src/Images/help.png"></a>
 						
 								
@@ -3197,9 +3197,9 @@ function closeNav() {
 
 
 											<td>
-												<input type=image id="uploadABC" class="rotate180" title="Upload an ABC output in .log format" onClick=uploadABC() src="src/Images/download.png" style="vertical-align: middle; height:20px; ">  
+												<input type=image id="uploadABC" class="rotate180" title="Upload an ABC output in .log format" onClick=uploadABC() src="src/Images/download.png" style="cursor: pointer; vertical-align: middle; height:20px; ">  
 													<input style="display:none" type="file" id="uploadABCinput" accept=".log"> 
-												<input type=image id="downloadABC" title="Download the ABC output (displayed below) in .log format" onClick=downloadABC() src="src/Images/download.png" style="display:none; vertical-align: middle; height:20px; ">  
+												<input type=image id="downloadABC" title="Download the ABC output (displayed below) in .log format" onClick=downloadABC() src="src/Images/download.png" style="cursor: pointer; display:none; vertical-align: middle; height:20px; ">  
 											</td>
 										</tr>
 
@@ -3323,7 +3323,7 @@ function closeNav() {
 						&nbsp;Displaying seqs <span id='numSeqsDisplayed'>0</span> out of <span id='numSeqsSimulated'>0</span>&nbsp;
 						<input type=button id='plus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='20&rarr;' onClick=plusSequences() title='See next 20 sequences'>
 						&nbsp;&nbsp;&nbsp;
-						<input type="image" style="vertical-align: middle; height:20px;  padding: 5 0; display:none" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="src/Images/download.png"> </input>
+						<input type="image" style="vertical-align: middle; height:20px;  padding: 5 0; display:none; cursor: pointer" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="src/Images/download.png"> </input>
 					</div>
 
 					<div id='sequencesTableDIV' class='scrollbar' style='overflow-x: scroll; position:relative; width:100%;'></div>
