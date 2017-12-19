@@ -120,7 +120,7 @@ WW_JS.init_WW = function(isWW = false){
 
 
 
- WW_JS.refresh_WW = function(resolve, msgID){
+WW_JS.refresh_WW = function(resolve, msgID){
 
 	if (resolve === undefined) resolve = function() {};
 	if (msgID === undefined) msgID = null;
@@ -160,6 +160,9 @@ WW_JS.init_WW = function(isWW = false){
 
 	STATE_JS.initTranslocationRateCache();
 	OPS_JS.deterministic_mode = false;
+	
+	
+
 
 	if (msgID != null){
 		postMessage(msgID + "~X~" + "done");
@@ -669,7 +672,7 @@ function tagAllObjectsForGeneration(){
 }
 
 
- WW_JS.create_nucleotide_WW = function(id, seq, pos, x, y, base, src, hasTP){
+WW_JS.create_nucleotide_WW = function(id, seq, pos, x, y, base, src, hasTP, render = true){
 
 	if (hasTP === undefined) hasTP = false;
 
@@ -683,12 +686,12 @@ function tagAllObjectsForGeneration(){
 	else if (seq == "o") complementSequence[pos] = nt;
 
 
-	unrenderedObjects.push(nt);
+	if (render) unrenderedObjects.push(nt);
 
 
 }
 
- WW_JS.delete_HTMLobj_WW = function(id){
+WW_JS.delete_HTMLobj_WW = function(id){
 
 	var obj = HTMLobjects[id];
 	if (obj == null) return;
@@ -699,7 +702,7 @@ function tagAllObjectsForGeneration(){
 
 
 // Remove the nucleotide from the sequence list, and tag it for destruction
- delete_nt_WW = function(pos, seq){
+ delete_nt_WW = function(pos, seq, render = true){
 
 	var nt = null;
 	if (seq == "m"){
@@ -717,7 +720,7 @@ function tagAllObjectsForGeneration(){
 	if (nt == null) return;
 
 
-	if (!nt["needsGenerating"] && !nt["needsAnimating"] && !nt["needsSourceUpdate"] && !nt["needsDeleting"]) unrenderedObjects.push(nt);
+	if (render && !nt["needsGenerating"] && !nt["needsAnimating"] && !nt["needsSourceUpdate"] && !nt["needsDeleting"]) unrenderedObjects.push(nt);
 	nt["needsDeleting"] = true;
 
 
@@ -925,7 +928,7 @@ function getComplementSequence_WW(seq, toRNA){
 
 
 
- WW_JS.getBaseInSequenceAtPosition_WW = function(baseID){
+WW_JS.getBaseInSequenceAtPosition_WW = function(baseID){
 	
 	var seq = baseID[0];
 	var pos = parseFloat(baseID.substring(1));

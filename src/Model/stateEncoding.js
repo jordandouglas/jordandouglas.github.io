@@ -139,7 +139,7 @@ STATE_JS.initTranslocationRateCache = function(){
 
 
 // Slippage states reset
- STATE_JS.convertCompactStateToFullState = function(compactState){
+STATE_JS.convertCompactStateToFullState = function(compactState){
 	
 	//console.log("Input compact", compactState);
 	
@@ -164,7 +164,7 @@ STATE_JS.initTranslocationRateCache = function(){
 
 
 // Slippage states will not be encoded
- STATE_JS.convertFullStateToCompactState = function(fullState){
+STATE_JS.convertFullStateToCompactState = function(fullState){
 	
 	//console.log("Input full", fullState);
 	
@@ -370,21 +370,21 @@ STATE_JS.getTranslocationRates = function(compactState){
 }
 
 
- STATE_JS.forward_cWW = function(state, resolve = function() { }){
+STATE_JS.forward_cWW = function(state, resolve = function() { }){
 	if (!state[2]) state[1]++;
 	if (state[1] > PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1) SIM_JS.SIMULATION_VARIABLES["terminated"] = true; // Terminate if too hypertranslocated
 	resolve();
 }
 
- STATE_JS.backward_cWW = function(state, resolve = function() { }){
+STATE_JS.backward_cWW = function(state, resolve = function() { }){
 	if (!state[2]) state[1]--;
 	resolve();
 }
 
- STATE_JS.bindNTP_cWW = function(state, resolve = function() { }){
+STATE_JS.bindNTP_cWW = function(state, resolve = function() { }, render = true){
 	if (state[3] && !state[2] && state[1] == 1) {
 		state[2] = true; // Bind NTP
-		WW_JS.create_nucleotide_WW("m" + (state[0]+1), "m", state[0]+1, 0, 0, SIM_JS.SIMULATION_VARIABLES["baseToAdd"] , SIM_JS.SIMULATION_VARIABLES["baseToAdd"]  + "m", true);
+		WW_JS.create_nucleotide_WW("m" + (state[0]+1), "m", state[0]+1, 0, 0, SIM_JS.SIMULATION_VARIABLES["baseToAdd"] , SIM_JS.SIMULATION_VARIABLES["baseToAdd"]  + "m", true, render);
 	}
 	else if (state[3] && state[2] && state[1] == 1) { // Elongate
 		state[2] = false;
@@ -394,20 +394,30 @@ STATE_JS.getTranslocationRates = function(compactState){
 	resolve();
 }
 
- STATE_JS.releaseNTP_cWW = function(state, resolve = function() { }){
+STATE_JS.releaseNTP_cWW = function(state, resolve = function() { }, render = true){
 	if (state[2]) {
-		delete_nt_WW(state[0]+1, "m");
+		delete_nt_WW(state[0]+1, "m", render);
 		state[2] = false;
 	}
 	resolve();
 }
 
- STATE_JS.activate_cWW = function(state, resolve = function() { }){
+
+STATE_JS.pyrophosphorolysis_cWW = function(state, resolve = function() { }){
+	if (state[3] && !state[2] && state[1] == 0) { // Elongate
+			state[2] = true;
+			state[0]--;
+			state[1] = 1;
+	}
+	resolve();
+}
+
+STATE_JS.activate_cWW = function(state, resolve = function() { }){
 	if (!state[3]) state[3] = true;
 	resolve();
 }
 
- STATE_JS.deactivate_cWW = function(state, resolve = function() { }){
+STATE_JS.deactivate_cWW = function(state, resolve = function() { }){
 	if (state[3] && !state[2]) state[3] = false;
 	resolve();
 }
@@ -437,6 +447,7 @@ if (RUNNING_FROM_COMMAND_LINE){
 		backward_cWW: STATE_JS.backward_cWW,
 		bindNTP_cWW: STATE_JS.bindNTP_cWW,
 		releaseNTP_cWW: STATE_JS.releaseNTP_cWW,
+		pyrophosphorolysis_cWW: STATE_JS.pyrophosphorolysis_cWW,
 		activate_cWW: STATE_JS.activate_cWW,
 		deactivate_cWW: STATE_JS.deactivate_cWW
 	}

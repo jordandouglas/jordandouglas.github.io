@@ -186,7 +186,108 @@ FE_JS.initFreeEnergy_WW = function(){
 }
 
 
- FE_JS.calculateAllBarrierHeights_WW = function(sampleAll){
+
+// Calculates the mean pre-posttranslocated equilibrium constant (kfwd / kbck) across the whole sequence
+FE_JS.calculateMeanTranslocationEquilibriumConstant_WW = function(resolve = function() { }, msgID = null){
+
+	
+	var initialState_C = STATE_JS.convertFullStateToCompactState(WW_JS.currentState);
+	var primerSequenceCopy = JSON.parse(JSON.stringify({ primerSeq: primerSequence })).primerSeq;
+	STATE_JS.releaseNTP_cWW(initialState_C);
+
+	
+	// Ensure polymerase is pretranslocated
+	while (initialState_C[1] < 0) STATE_JS.forward_cWW(initialState_C);
+	while (initialState_C[1] > 0) STATE_JS.backward_cWW(initialState_C);
+	
+	
+	
+	// Go back to the initial state
+	while (initialState_C[0] > PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] + 1 + Math.max(2, PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+2)){
+		STATE_JS.pyrophosphorolysis_cWW(initialState_C);
+		STATE_JS.releaseNTP_cWW(initialState_C, function() { }, false);
+		STATE_JS.backward_cWW(initialState_C);
+	}
+	
+	
+	
+	// Iterate until the end of the sequence
+	var equilibriumConstants = [];
+	var forwardRates = [];
+	var backwardsRates = [];
+	
+	while (initialState_C[1] + initialState_C[0] + 1 <= WW_JS.currentState["nbases"]){
+		
+
+		
+		// Get rate of pre -> post
+		var rateFwdAndBack = STATE_JS.getTranslocationRates(initialState_C);
+		var kPreToPost = rateFwdAndBack[1];
+
+		
+		
+		// Get rate of post -> pre
+		STATE_JS.forward_cWW(initialState_C);
+		rateFwdAndBack = STATE_JS.getTranslocationRates(initialState_C);
+		var kPostToPre = rateFwdAndBack[0];
+		
+		
+		// Calculate equilibrium constant
+		equilibriumConstants.push(kPreToPost / kPostToPre);
+		forwardRates.push(kPreToPost);
+		backwardsRates.push(kPostToPre);
+		
+		
+		// Bind NTP and catalyse to get next state
+		// Sample a base to add
+		if (initialState_C[1] + initialState_C[0] + 1 <= WW_JS.currentState["nbases"]){
+			var baseToTranscribe = WW_JS.getBaseInSequenceAtPosition_WW("g" + (1 + initialState_C[0]));
+			sampledBaseToAdd = WW_JS.sampleBaseToAdd(baseToTranscribe);
+			SIM_JS.SIMULATION_VARIABLES["baseToAdd"] = sampledBaseToAdd["base"];
+			STATE_JS.bindNTP_cWW(initialState_C, function() { }, false);
+			STATE_JS.bindNTP_cWW(initialState_C, function() { }, false);
+		}
+		
+		
+	}
+	
+	
+	
+	// Restore to original state
+	primerSequence =  primerSequenceCopy;
+	
+	
+	// Calculate mean equilibrium constant
+	var meanEquilibriumConstant = 0;
+	var meanForwardRate = 0;
+	var meanBackwardsRate = 0;
+	for (var i = 0; i < equilibriumConstants.length; i ++) {
+		meanEquilibriumConstant += equilibriumConstants[i] / equilibriumConstants.length;
+		meanForwardRate += forwardRates[i] / equilibriumConstants.length;
+		meanBackwardsRate += backwardsRates[i] / equilibriumConstants.length;
+	}
+	
+	
+	var toReturn = {meanEquilibriumConstant: meanEquilibriumConstant, meanForwardRate: meanForwardRate, meanBackwardsRate: meanBackwardsRate};
+	if (msgID != null){
+		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+	}
+	else{
+		resolve(toReturn);
+	}
+	
+	
+
+}
+
+
+
+
+
+
+
+
+FE_JS.calculateAllBarrierHeights_WW = function(sampleAll){
 
 	if (sampleAll === undefined) sampleAll = true;
 
@@ -2036,6 +2137,7 @@ if (RUNNING_FROM_COMMAND_LINE){
 		LoopParams2x2: FE_JS.LoopParams2x2,
 		SpecialHairpinParams: FE_JS.SpecialHairpinParams,
 		TerminalMismatchParams: FE_JS.TerminalMismatchParams,
+		calculateMeanTranslocationEquilibriumConstant_WW: FE_JS.calculateMeanTranslocationEquilibriumConstant_WW
 
 	}
 
