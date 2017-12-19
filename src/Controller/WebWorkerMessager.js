@@ -504,26 +504,23 @@ function calculateMeanTranslocationEquilibriumConstant_controller(resolve = func
 
 
 
-function userSelectSequence_controller(newSequenceID, newTemplateType, newPrimerType, resolve){
+function userInputSequence_controller(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent, resolve){
 
 
-
+	
 
 	if (WEB_WORKER == null) {
-		resolve(WW_JS.userSelectSequence_WW(newSequenceID, newTemplateType, newPrimerType));
+		resolve(WW_JS.userInputSequence_WW(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent));
 
 	}else{
-		var res = stringifyFunction("WW_JS.userSelectSequence_WW", [newSequenceID, newTemplateType, newPrimerType], true);
+		var res = stringifyFunction("WW_JS.userInputSequence_WW", [newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent], true);
 		var fnStr = res[0];
 		var msgID = res[1];
-		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall(fnStr).then((goodLength) => resolve(goodLength));
-		
+		callWebWorkerFunction(fnStr, resolve, msgID);
 	}
 
 
 }
-
 
 function userSelectSequence_controller(newSequenceID, newTemplateType, newPrimerType, resolve){
 
