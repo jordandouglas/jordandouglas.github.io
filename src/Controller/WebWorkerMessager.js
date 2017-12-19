@@ -480,23 +480,50 @@ function add_pairs_controller(resolve){
 }
 
 
-function userInputSequence_controller(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent, resolve){
+function calculateMeanTranslocationEquilibriumConstant_controller(resolve = function() { }){
 
+
+	var toDoAfter = function(toReturn){
+		resolve(toReturn);
+	}
 
 	
 
 	if (WEB_WORKER == null) {
-		resolve(WW_JS.userInputSequence_WW(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent));
+		toDoAfter(FE_JS.calculateMeanTranslocationEquilibriumConstant_WW());
 
 	}else{
-		var res = stringifyFunction("WW_JS.userInputSequence_WW", [newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent], true);
+		var res = stringifyFunction("FE_JS.calculateMeanTranslocationEquilibriumConstant_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
-		callWebWorkerFunction(fnStr, resolve, msgID);
+		callWebWorkerFunction(fnStr, toDoAfter, msgID);
 	}
 
 
 }
+
+
+
+function userSelectSequence_controller(newSequenceID, newTemplateType, newPrimerType, resolve){
+
+
+
+
+	if (WEB_WORKER == null) {
+		resolve(WW_JS.userSelectSequence_WW(newSequenceID, newTemplateType, newPrimerType));
+
+	}else{
+		var res = stringifyFunction("WW_JS.userSelectSequence_WW", [newSequenceID, newTemplateType, newPrimerType], true);
+		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall(fnStr).then((goodLength) => resolve(goodLength));
+		
+	}
+
+
+}
+
 
 function userSelectSequence_controller(newSequenceID, newTemplateType, newPrimerType, resolve){
 

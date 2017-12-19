@@ -53,6 +53,26 @@ function showNavigationPanel(){
 }
 
 
+// Makes various sequence and parameter specific translocation calculations and displays them on screen
+function translocationCalculationSummary(){
+	
+	
+
+	
+	calculateMeanTranslocationEquilibriumConstant_controller(function(toReturn) {
+		
+		$("#meanEquilibriumConstant").html(roundToSF(toReturn.meanEquilibriumConstant, 3));
+		$("#meanForwardRate").html(roundToSF(toReturn.meanForwardRate, 3));
+		$("#meanBackwardsRate").html(roundToSF(toReturn.meanBackwardsRate, 3));
+		$("#translocationSummaryContainer").show(100);
+
+		
+		
+	});
+	
+	
+}
+
 
 
 
