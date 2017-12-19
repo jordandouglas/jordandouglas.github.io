@@ -116,6 +116,7 @@ function init(){
 		simulating = false;
 		running_ABC = false;
 		$("#nbasesToSimulate").val(30);
+		$("#translocationSummaryContainer").hide(100);
 		maxHeight = 10000;
 		nTimes20SequencesToDisplay = 1;
 		addWebworkerRegistrationHTML();
@@ -374,6 +375,7 @@ function submitCustomSequence(resolveAfterRefresh = function() { }){
 			sequenceChangeRefresh();
 			refreshPlotDataSequenceChangeOnly_controller(function(){
 
+				$("#translocationSummaryContainer").hide(100);
 				$("#ABCoutput").html("");
 				$("#downloadABC").hide(50);
 				$("#uploadABC").show(50);
@@ -443,6 +445,7 @@ function userChangeSequence(resolveAfterRefresh = function() { }){
 			var sequenceChangeRefreshTemp = function(){
 				sequenceChangeRefresh();
 				refreshPlotDataSequenceChangeOnly_controller(function(){
+					$("#translocationSummaryContainer").hide(100);
 					$("#ABCoutput").html("");
 					$("#downloadABC").hide(50);
 					$("#uploadABC").show(50);
@@ -745,7 +748,7 @@ window.onkeyup = function(e) {
 		$("#nbasesToSimulate").select();
 	}else if (key == 27 && !e.ctrlKey && !e.shiftKey) { // Escape
 		stop_controller();
-
+		
 		//getSlidingHeights_controller(function(result){ console.log(result)});
 		//addNotificationMessage("Hello there", 100, 100);
 
@@ -1861,6 +1864,9 @@ function closeNav() {
 				<div class="parameter-title">
 					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#translocation_ModelHelp"><img class="helpIcon" src="src/Images/help.png"></a>
 					Translocation Parameters 
+					
+					
+					<input type=image id="calculateTranslocationBtn" title="Calculate translocation summary" onClick="translocationCalculationSummary()" src="src/Images/calculator.png" style="padding: 3 3; vertical-align:middle; height:25px;"> 
 				</div>
 
 
@@ -1869,6 +1875,21 @@ function closeNav() {
 				<table style="width:100%">
 
 
+
+	
+		
+					<tr id="translocationSummaryContainer" style="display:none">
+
+						<td colspan = 4 style="text-align:left; font-size:14px; padding: 10 10; background-color:white; width:100%">
+				 			<div style='font-size: 30px; color:#008cba; vertical-align:top; cursor:pointer; float:right;' onclick='$("#translocationSummaryContainer").hide(100);'>&times;</div>
+							<div title = "Free energy of the pretranslocated state divided by that of the posttranslocated state, averaged across the whole sequence"> Mean translocation equilibrium constant: <span id="meanEquilibriumConstant"></span> </div> 
+							<div title = "Rate of translocation from the pretranslocated into the posttranslocated state, averaged across the whole sequence"> Mean forward translocation rate: <span id="meanForwardRate"></span> s<sup>-1</sup> </div> 
+							<div title = "Rate of translocation from the posttranslocated into the pretranslocated state, averaged across the whole sequence"> Mean backward translocation rate: <span id="meanBackwardsRate"></span> s<sup>-1</sup> </div>
+				 		</td>
+
+
+				 	</tr>
+		
 
 
 					<tr id="GDagSlide_container">
@@ -1972,7 +1993,7 @@ function closeNav() {
 				 		</td>
 
 						<td style="text-align:right; width:110px">
-				 			&alpha; = 
+				 			&delta;<sub>1</sub> = 
 				 		</td>
 
 				 		<td>
