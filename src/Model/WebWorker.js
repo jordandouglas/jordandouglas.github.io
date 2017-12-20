@@ -1336,7 +1336,6 @@ WW_JS.setInputFolder = function(folderName){
 
 }
 
-
 WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthreads, workerID, resolve = function() { }){
 
 
@@ -1449,6 +1448,7 @@ WW_JS.loadSessionFromCommandLine = function(XMLdata, runABC, startingTime, nthre
 
 
 }
+
 
 
 

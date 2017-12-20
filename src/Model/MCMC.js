@@ -1,4 +1,4 @@
-﻿/* 
+﻿﻿/* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
 	This file is part of SimPol.
@@ -128,7 +128,7 @@ MCMC_JS.beginMCMC = function(fitNums, resolve = function() {}, msgID = null){
 		else{
 
 
-			var logPrior = MCMC_JS.getLogPrior();
+			var logPrior = MCMC_JS.getLogPrior(false);
 			var logLikelihood = -MCMC_JS.chiSq_this_trial;
 			ABC_JS.ABC_parameters_and_metrics_this_simulation.logPrior = logPrior;
 			ABC_JS.ABC_parameters_and_metrics_this_simulation.logLikelihood = logLikelihood;
@@ -222,7 +222,6 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 			ABC_JS.ABC_parameters_and_metrics_this_simulation.logLikelihood = logLikelihood;
 
 
-
 			// Accept or reject the current state using Metropolis-Hastings formula. Accept the new state with probability min(1, alpha)
 			var alpha = -logLikelihood > MCMC_JS.currentchiSqthreshold ? 0 : Math.exp(logPrior - MCMC_JS.MCMC_parameters_and_metrics_previous_simulation.logPrior);
 
@@ -255,6 +254,7 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 				//console.log("Rejected with alpha=", alpha);
 
 
+				//console.log("ABC_parameters_and_metrics_this_simulation", ABC_JS.ABC_parameters_and_metrics_this_simulation);
 				for (var paramID in ABC_JS.ABC_parameters_and_metrics_this_simulation){
 					if (ABC_JS.ABC_parameters_and_metrics_this_simulation[paramID]["priorVal"] != null) PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] = ABC_JS.ABC_parameters_and_metrics_this_simulation[paramID]["priorVal"];
 				}
@@ -290,11 +290,15 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 
 			}
 
+
+
 			
 			// Lower the chiSq threshold by multiplying it by gamma
 			if (MCMC_JS.currentchiSqthreshold > ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_min){
+
 				MCMC_JS.currentchiSqthreshold = Math.max(ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_min, MCMC_JS.currentchiSqthreshold * ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_gamma);
 			}
+
 
 			// HACK
 			if (MCMC_JS.currentchiSqthreshold * ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_gamma <= ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_min && -logLikelihood < MCMC_JS.currentchiSqthreshold && ABC_JS.ABC_EXPERIMENTAL_DATA["testsPerData"] != 32){
@@ -347,7 +351,7 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 
 
 
-MCMC_JS.getLogPrior = function(){
+MCMC_JS.getLogPrior = function(hackLimits = true){
 
 
 
@@ -360,7 +364,7 @@ MCMC_JS.getLogPrior = function(){
 		var paramID = MCMC_JS.parametersWithPriors[i];
 		var val = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].val;
 		
-		//console.log(paramID, val);
+
 
 		switch (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["distribution"]){
 
@@ -383,8 +387,13 @@ MCMC_JS.getLogPrior = function(){
 			case "Lognormal":
 				var mu = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].lognormalMeanVal;
 				var sd = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].lognormalSdVal;
-				if (val <= 0) logPriorProbability = Number.NEGATIVE_INFINITY;
-				else logPriorProbability += Math.log(1 / (val * sd * Math.sqrt(2 * Math.PI)) * Math.exp(-(Math.log(val)-mu) * (Math.log(val)-mu) / (2 * sd * sd)));
+				var logval = Math.log(val); // Convert into normal space to calculate prior
+				logPriorProbability += Math.log( 1 / (Math.sqrt(2 * Math.PI * sd * sd)) * Math.exp(-(logval-mu) * (logval-mu) / (2 * sd * sd)) );
+
+
+
+				//if (val <= 0) logPriorProbability = Number.NEGATIVE_INFINITY;
+				//else logPriorProbability += Math.log(1 / (val * sd * Math.sqrt(2 * Math.PI)) * Math.exp(-(Math.log(val)-mu) * (Math.log(val)-mu) / (2 * sd * sd)));
 				break;
 
 
@@ -405,10 +414,12 @@ MCMC_JS.getLogPrior = function(){
 
 	}
 
+
+
 	// Temporary hardcodings: set limits for some parameters
-	if (PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"].val < 6) logPriorProbability = Number.NEGATIVE_INFINITY;
-	if (PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"].val > 1000) logPriorProbability = Number.NEGATIVE_INFINITY;
-	if (PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"].val > 3.4) logPriorProbability = Number.NEGATIVE_INFINITY;
+	if (hackLimits && PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"].val < 6) logPriorProbability = Number.NEGATIVE_INFINITY;
+	if (hackLimits && PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"].val > 500) logPriorProbability = Number.NEGATIVE_INFINITY;
+	if (hackLimits && PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"].val > 3.4) logPriorProbability = Number.NEGATIVE_INFINITY;
 
 
 	//console.log("GDagSlide", PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"].val, "RateBind", PARAMS_JS.PHYSICAL_PARAMETERS["RateBind"].val);
@@ -513,11 +524,10 @@ MCMC_JS.makeProposal = function(){
 			break;
 
 
-		case "Lognormal":
+		case "Lognormal": // Re-parameterised in normal space
 
 			// Use the standard deviation of the normal as the step size, and perform the step in normal space then transform back into a lognormal
 			var stepSize = PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange].lognormalSdVal;
-			if (PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange].lognormalSdVal > 1) stepSize = Math.sqrt(stepSize);
 			newVal = Math.exp(Math.log(currentVal) + x * stepSize);
 			break;
 

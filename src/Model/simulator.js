@@ -319,7 +319,7 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 	// If we are running on ultrafast mode then this fills up the thread. So we should pause every now and then
 	// in case the user has another request (eg. stop).
 	actionsSinceLastPause--;
-	if (WW_JS.isWebWorker && (ANIMATION_TIME == 1 || ANIMATION_TIME == 0) && actionsSinceLastPause <= 0){
+	if (WW_JS.isWebWorker && (ANIMATION_TIME == 1 || ANIMATION_TIME == 0) && actionsSinceLastPause <= 0 ){
 		actionsSinceLastPause = pauseEveryNActions;
 
 		//console.log("Pausing");

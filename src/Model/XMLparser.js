@@ -1,4 +1,4 @@
-﻿
+﻿﻿
 /* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
@@ -63,7 +63,7 @@ XML_JS.loadSession_WW = function(XMLstring, resolve = function() {}, msgID = nul
 		else if (splitArr[2] == "parameters" && splitArr.length == 4) parseXML_param_WW(splitArr[3], xmlAttrArray[arr[i]]);
 		else if (splitArr[2] == "elongation-model" && splitArr.length == 3) FE_JS.currentElongationModel = xmlAttrArray[arr[i]]["id"]; // Model id
 		else if (splitArr[2] == "elongation-model" && splitArr.length == 4) parseXML_model_WW(splitArr[3], xmlAttrArray[arr[i]]["val"]); // Model property
-		else if (splitArr[2] == "estimated-models" && splitArr.length == 4) parseXML_estimated_model_WW(splitArr[3], xmlAttrArray[arr[i]]); // ABC over model space
+		else if (splitArr[2] == "estimated-models" && splitArr.length == 4) parseXML_estimated_model_WW(xmlAttrArray[arr[i]]); // ABC over model space
 		//else if (splitArr[2] == "state") compactState = parseXML_state_WW(xmlAttrArray[arr[i]]); // Current state
 		else if (splitArr[2] == "plots" && splitArr.length == 3) parseXML_plot_main_WW(xmlAttrArray[arr[i]]); 
 		else if (splitArr[2] == "plots" && splitArr.length == 4) parseXML_plots_WW(splitArr[3], xmlAttrArray[arr[i]]); 
@@ -115,9 +115,9 @@ function parseXML_plots_WW(attr, values){
 	
 }
 
-function parseXML_estimated_model_WW(modelName, modelSettings){
+function parseXML_estimated_model_WW(modelSettings){
 
-	XML_MODELS_JS.addNewModel(modelName, modelSettings);
+	XML_MODELS_JS.addNewModel(parseFloat(modelSettings.id), modelSettings);
 
 }
 
@@ -596,7 +596,6 @@ xmlHandler = function() {
 	this.m_strError+='Warning:'+exception.getMessage()+'\n'
 
 } // end function warning
-
 
 
 
