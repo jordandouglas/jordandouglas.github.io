@@ -196,8 +196,8 @@ STATE_JS.getTranslocationRates = function(compactState){
 		
 		var rates = STATE_JS.TRANSLOCATION_RATES[rowNum][colNum];
 		var GDagRateModifier = Math.exp(-PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"]);
-		var forceGradient = Math.exp((-PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * (3.4-PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"]["val"]) * 1e-10) / (1.380649e-23 * 310));
-		var dx = 2 + PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"]["val"] / 3.4;
+		var forceGradientFwd = Math.exp(( PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * (PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"]["val"]) * 1e-10) / (1.380649e-23 * 310));
+		var forceGradientBck = Math.exp((-PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * (3.4-PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"]["val"]) * 1e-10) / (1.380649e-23 * 310));
 		var DGPostModifier = compactState[1] == 1 ? Math.exp(PARAMS_JS.PHYSICAL_PARAMETERS["DGPost"].val) : 1;
 
 		var hypertranslocationGradientForward = 1; // Modify the rate of hypertranslocating forwards
@@ -209,7 +209,7 @@ STATE_JS.getTranslocationRates = function(compactState){
 
 
 		if (rates != false) {
-			return [rates[0] * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradient, rates[1] * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward / forceGradient];
+			return [rates[0] * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck, rates[1] * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd];
 		}
 
 		
@@ -239,7 +239,7 @@ STATE_JS.getTranslocationRates = function(compactState){
 	
 		
 
-		return [kbck * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradient, kfwd * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward / forceGradient];
+		return [kbck * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck, kfwd * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd];
 		
 		
 		
@@ -257,11 +257,12 @@ STATE_JS.getTranslocationRates = function(compactState){
 		var indexNum = leftHybridBase - 1;
 
 		var rates = STATE_JS.BACKTRACKING_RATES[indexNum];
-		var forceGradient = Math.exp((-PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * (3.4-PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"]["val"]) * 1e-10) / (1.380649e-23 * 310));
+		var forceGradientFwd = Math.exp(( PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * (PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"]["val"]) * 1e-10) / (1.380649e-23 * 310));
+		var forceGradientBck = Math.exp((-PARAMS_JS.PHYSICAL_PARAMETERS["FAssist"]["val"] * 1e-12 * (3.4-PARAMS_JS.PHYSICAL_PARAMETERS["barrierPos"]["val"]) * 1e-10) / (1.380649e-23 * 310));
 		var GDagRateModifier = Math.exp(-PARAMS_JS.PHYSICAL_PARAMETERS["GDagSlide"]["val"]);
 
 		if (rates != false) {
-			return [rates[0] * GDagRateModifier * forceGradient, rates[1] * GDagRateModifier / forceGradient];
+			return [rates[0] * GDagRateModifier * forceGradientBck, rates[1] * GDagRateModifier * forceGradientFwd];
 		}
 		
 		
@@ -279,7 +280,7 @@ STATE_JS.getTranslocationRates = function(compactState){
 
 		STATE_JS.BACKTRACKING_RATES[indexNum] = [kbck, kfwd];
 
-		return [kbck * GDagRateModifier * forceGradient, kfwd * GDagRateModifier / forceGradient];
+		return [kbck * GDagRateModifier * forceGradientBck, kfwd * GDagRateModifier * forceGradientFwd];
 	
 		
 		

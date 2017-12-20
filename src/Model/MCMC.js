@@ -295,6 +295,12 @@ MCMC_JS.performMCMCtrial = function(fitNums, resolve){
 			if (MCMC_JS.currentchiSqthreshold > ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_min){
 				MCMC_JS.currentchiSqthreshold = Math.max(ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_min, MCMC_JS.currentchiSqthreshold * ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_gamma);
 			}
+
+			// HACK
+			if (MCMC_JS.currentchiSqthreshold * ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_gamma <= ABC_JS.ABC_EXPERIMENTAL_DATA.chiSqthreshold_min && -logLikelihood < MCMC_JS.currentchiSqthreshold && ABC_JS.ABC_EXPERIMENTAL_DATA["testsPerData"] != 32){
+				console.log("----------------Setting to 32----------------");
+				ABC_JS.ABC_EXPERIMENTAL_DATA["testsPerData"] = 32;
+			}
 			
 
 
@@ -511,6 +517,7 @@ MCMC_JS.makeProposal = function(){
 
 			// Use the standard deviation of the normal as the step size, and perform the step in normal space then transform back into a lognormal
 			var stepSize = PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange].lognormalSdVal;
+			if (PARAMS_JS.PHYSICAL_PARAMETERS[paramIDToChange].lognormalSdVal > 1) stepSize = Math.sqrt(stepSize);
 			newVal = Math.exp(Math.log(currentVal) + x * stepSize);
 			break;
 
