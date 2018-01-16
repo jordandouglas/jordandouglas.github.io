@@ -48,7 +48,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 
 
-	FE_JS.RT = 0.63;
+	FE_JS.RT = 0.6156;
 	FE_JS.BasePairParams = init_BP_parameters_WW();
 	FE_JS.LoopParams1x1 = init_1x1_loop_parameters_WW();
 	FE_JS.LoopParams2x1 = init_2x1_loop_parameters_WW();
@@ -819,7 +819,6 @@ function getFreeEnergyOfTranscriptionBubbleHybridString_WW(templateString, compl
 		var nextComplementBase = d + complementString[i+1];
 		
 		var dictKey = thisComplementBase + nextComplementBase + thisTemplateBase + nextTemplateBase;
-		//var dictKey = thisMBase + nextMBase + thisGBase + nextGBase;
 		
 		if(FE_JS.BasePairParams[dictKey] == null) freeEnergy += -2; // TODO: need to find dGU base pairing parameters
 		else freeEnergy += FE_JS.BasePairParams[dictKey];
@@ -846,7 +845,7 @@ function getHybridFreeEnergy_WW(templateString, primerString, templateType, prim
 	var templateIncr = 0;
 	var primerIncr = 0;
 	
-	// Find base pairing (there will be a sequential bipartite between all uppercase letters)
+	// Find base pairing (there will be a sequential bijection between all uppercase letters)
 	for (var hybridPos = 0; hybridPos < PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]-1; hybridPos ++){
 		
 
@@ -1598,7 +1597,7 @@ function init_BP_parameters_WW(){
 	dict["dAdTdTdA"] = -0.88;
 	dict["dTdAdAdT"] = -0.58;
 	dict["dCdTdGdA"] = -1.28;
-	dict["dAdGdTdC"] = -1.28
+	dict["dAdGdTdC"] = -1.28;
 	dict["dCdAdGdT"] = -1.45;
 	dict["dTdGdAdC"] = -1.45;
 	dict["dGdTdCdA"] = -1.44;
@@ -1606,7 +1605,7 @@ function init_BP_parameters_WW(){
 	dict["dGdAdCdT"] = -1.30;
 	dict["dTdCdAdG"] = -1.30;
 	dict["dCdGdGdC"] = -2.17;
-	dict["dGdGdCdC"] = -1.84
+	dict["dGdGdCdC"] = -1.84;
 	dict["dCdCdGdG"] = -1.84;
 	dict["dGdCdCdG"] = -2.24;
 

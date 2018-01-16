@@ -1,4 +1,4 @@
-﻿﻿/* 
+﻿/* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
 	This file is part of SimPol.
@@ -400,7 +400,7 @@ MCMC_JS.getLogPrior = function(hackLimits = true){
 			case "Exponential":
 				var rate = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].ExponentialDistnVal;
 				if (val <= 0) logPriorProbability = Number.NEGATIVE_INFINITY;
-				else logPriorProbability += rate * Math.exp(-rate * val);
+				else logPriorProbability += Math.log(rate * Math.exp(-rate * val));
 				break;
 
 

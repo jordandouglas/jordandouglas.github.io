@@ -1,39 +1,4 @@
-﻿
-/* 
-	--------------------------------------------------------------------
-	--------------------------------------------------------------------
-	This file is part of SimPol.
-
-    SimPol is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    SimPol is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with SimPol.  If not, see <http://www.gnu.org/licenses/>. 
-    --------------------------------------------------------------------
-    --------------------------------------------------------------------
--*/
-
-
-
-
-
-
-
-
-
-/* Contains all functions which communicate between the controller and the WebWorker
-	Note that if the WebWorker is not registered then the functions in WebWorker.js will be called from this page directly
-*/
-
-
-MESSAGE_LISTENER = {};
+﻿MESSAGE_LISTENER = {};
 
 function register_WebWorker(resolve = function() { }){
 
