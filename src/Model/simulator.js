@@ -50,7 +50,7 @@ SIM_JS.renderPlotsEveryMS = 5000; // If in hidden mode, render the plots every f
 		toCall().then(() => {
 			
 
-			pauseEveryNActions = 300;
+			pauseEveryNActions = 500;
 			actionsSinceLastPause = pauseEveryNActions;
 
 
@@ -76,7 +76,7 @@ SIM_JS.renderPlotsEveryMS = 5000; // If in hidden mode, render the plots every f
 			if (ANIMATION_TIME == 0 && !ABC_JS.ABC_simulating) SIM_JS.renderPlotsHidden(1000);
 
 			// Use the geometric sampling speed up only if the speed is not set to slow/medium
-			FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] = ANIMATION_TIME < 60; 
+			FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] = ANIMATION_TIME < 60 || RUNNING_FROM_COMMAND_LINE; 
 
 			SIM_JS.n_simulations_WW(n, stateC, resolve, msgID);
 			
@@ -115,7 +115,7 @@ SIM_JS.renderPlotsEveryMS = 5000; // If in hidden mode, render the plots every f
 
 
  	// Print out every 20th simulation when calling from command line
- 	if (!ABC_JS.ABC_simulating && RUNNING_FROM_COMMAND_LINE && (n == 1 || n == XML_JS.N || (XML_JS.N - n + 1) % 1 == 0)){
+ 	if (!ABC_JS.ABC_simulating && RUNNING_FROM_COMMAND_LINE && (n == 1 || n == XML_JS.N || (XML_JS.N - n + 1) % 20 == 0)){
 
  		if (WW_JS.WORKER_ID == null) console.log("Sim", (XML_JS.N - n + 1), "/", XML_JS.N);
 
@@ -270,7 +270,6 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 
 	var prepareForNextTrial = function(){
 
-
 		printDateAndTime("Perparing for next trial");
 		// If this is in animation mode, then this process is synchronous with rendering so we return in between operators
 		// THIS BLOCK OF CODE WILL ONLY WORK IF NOT RUNNING AS A WEBWORKER
@@ -351,9 +350,6 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 		// Hidden mode
 		else{
 		
-			
-			
-			
 			setTimeout(function(){
 				if (!RUNNING_FROM_COMMAND_LINE) WW_JS.currentState = STATE_JS.convertCompactStateToFullState(stateC);
 				var toCall = (state) => new Promise((resolve) => actionToDo(state, resolve));
@@ -365,7 +361,6 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 
 
 	}else{
-
 
 
 		var toCall = (state) => new Promise((resolve) => actionToDo(state, resolve));
@@ -431,7 +426,6 @@ SIM_JS.sampleAction_WW = function(stateC){
 		(FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeTranslocationEquilibrium"] && (stateC[1] == 0 || stateC[1] == 1))) && // OR equilibrium assumed and post/pretranslocated
 		!stateC[2] && stateC[3] && FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["allowGeometricCatalysis"] && 
 		FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["id"] == "simpleBrownian"){
-
 
 
 		// Can only bind NTP if not beyond the end of the sequence, go forward to terminate
@@ -518,9 +512,9 @@ SIM_JS.sampleAction_WW = function(stateC){
 		// Keep sampling until it is NOT bind release
 		var runif = MER_JS.random() * rate;
 		minReactionTime = 0;
-		var x = 0;
+		//var x = 0;
 		while(runif < rateBindRelease){
-			x++;
+			//x++;
 			
 			// This block must be resampled every time if we are using 4 different catalysis rates and 4 different dissociation constants
 			if (FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["NTPbindingNParams"] == 8){
