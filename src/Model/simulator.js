@@ -428,6 +428,7 @@ SIM_JS.sampleAction_WW = function(stateC){
 		FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["id"] == "simpleBrownian"){
 
 
+
 		// Can only bind NTP if not beyond the end of the sequence, go forward to terminate
 		var baseToTranscribe = null;
 		var kBind = 0;
@@ -443,6 +444,7 @@ SIM_JS.sampleAction_WW = function(stateC){
 
 		}
 
+
 		//var baseToTranscribe = WW_JS.getBaseInSequenceAtPosition_WW("g" + (stateC[1] + stateC[0]));
 
 
@@ -450,7 +452,6 @@ SIM_JS.sampleAction_WW = function(stateC){
 		var assumeTranslocationEquilibrium =  !FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeBindingEquilibrium"]
 											&&  FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["assumeTranslocationEquilibrium"] 
 											&& (stateC[1] == 0 || stateC[1] == 1) && !stateC[2] && stateC[3];
-
 
 
 		// Modify these rates if equilibrium between pre and post translocated is assumed
@@ -463,7 +464,7 @@ SIM_JS.sampleAction_WW = function(stateC){
 			var currentActiveSitePosition = stateC[0];
 			var currentTranslocationPosition = stateC[1];
 
-			if (stateC[1] = 1)  STATE_JS.backward_cWW(stateC); 
+			if (stateC[1] == 1)  STATE_JS.backward_cWW(stateC); 
 			var k0_1 = STATE_JS.getTranslocationRates(stateC)[1];
 			var k0_minus1 = STATE_JS.getTranslocationRates(stateC)[0];
 
@@ -478,12 +479,16 @@ SIM_JS.sampleAction_WW = function(stateC){
 
 
 
+
+
 			// Percentage of time spent in either state
 			var eqConstantFwdTranslocation = k0_1 / k1_0;
 			probabilityPosttranslocated = eqConstantFwdTranslocation / (eqConstantFwdTranslocation + 1);
 			var probabilityPretranslocated = 1 - probabilityPosttranslocated;
 
 			//console.log("k0_1", k0_1, "k1_0", k1_0, "probabilityPosttranslocated", probabilityPosttranslocated);
+
+			//console.log("k0_1", k0_1, "k0_minus1", k0_minus1, "k1_0", k1_0, "k1_2", k1_2, "eqConstantFwdTranslocation", eqConstantFwdTranslocation);
 
 
 			kFwd = k1_2 * probabilityPosttranslocated; // Can only enter hypertranslocated state from posttranslocated
@@ -499,7 +504,7 @@ SIM_JS.sampleAction_WW = function(stateC){
 		var rateRelCat = kRelease + kcat;
 		var rateBindRelease = kBind * kRelease / rateRelCat;
 
-		//console.log("rateBindRelease", rateBindRelease);
+		//console.log("assumeTranslocationEquilibrium", assumeTranslocationEquilibrium);
 
 		if (isNaN(rateBindRelease)) rateBindRelease = 0;
 		if (isNaN(kRelease)) kRelease = 0;
@@ -507,6 +512,11 @@ SIM_JS.sampleAction_WW = function(stateC){
 
 
 		var rate = kBck + kFwd + kBind + kAct + kDeact; // + kRelease
+
+
+
+		//console.log("kBck = " + kBck + " kFwd = " + kFwd + " kRelease = " + kRelease + " kBind = " + kBind + " kcat = " + kcat + " rateRelCat = " + rateRelCat + " rateBindRelease = " + rateBindRelease + " rate = " + rate);
+
 
 
 		// Keep sampling until it is NOT bind release
@@ -538,6 +548,7 @@ SIM_JS.sampleAction_WW = function(stateC){
 		}
 
 
+
 		//console.log("x =", x);
 		// Choose next action uniformly
 		kRelease = 0;
@@ -552,9 +563,11 @@ SIM_JS.sampleAction_WW = function(stateC){
 				toDo = i;
 				break;
 			}
-
 		}
 		minReactionTime += WW_JS.rexp(sum);
+
+
+		//console.log("rateBindCat", rateBindCat, "sum", sum, "toDo", toDo);
 
 
 		// If next action is bindcat then add the time for catalysis
@@ -812,6 +825,8 @@ SIM_JS.sampleAction_WW = function(stateC){
 		for (var i = 0; i < rates.length; i++) rateSum += rates[i];
 		minReactionTime =  WW_JS.rexp(rateSum);
 
+
+		//console.log(rates);
 
 
 		// Select which reaction just occurred by sampling proportional to their rates

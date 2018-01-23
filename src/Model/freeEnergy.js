@@ -718,10 +718,9 @@ function getFreeEnergyOfIntermediateState_WW(state1, state2){
 	var intermediateString = getHybridIntermediateString_WW(hybridStrings1, hybridStrings2, state1["leftGBase"], state1["leftMBase"], state2["leftGBase"], state2["leftMBase"]);
 	
 	//console.log("Free energy of\n", state1["leftGBase"], "-", hybridStrings1[0], "\n", state1["leftMBase"], "-",  hybridStrings1[1], "\n + \n", state2["leftGBase"], "-", hybridStrings2[0], "\n", state2["leftMBase"], "-", hybridStrings2[1], "\n = \n", intermediateString[0], "\n", intermediateString[1], "\n\n");
-	
-	
-	return getHybridFreeEnergy_WW(intermediateString[0], intermediateString[1], SEQS_JS.all_sequences[sequenceID]["template"].substring(2,5), SEQS_JS.all_sequences[sequenceID]["primer"].substring(2));
-	
+	var freeEnergy = getHybridFreeEnergy_WW(intermediateString[0], intermediateString[1], SEQS_JS.all_sequences[sequenceID]["template"].substring(2,5), SEQS_JS.all_sequences[sequenceID]["primer"].substring(2));
+	return freeEnergy;
+
 }
 
 
@@ -746,6 +745,7 @@ function getFreeEnergyOfTranscriptionBubble_WW(state, p){
 	
 	
 	var hybridStrings = getHybridStringOfTranscriptionBubble_WW(leftmostTemplatePos, rightmostTemplatePos, leftmostComplementPos, rightmostComplementPos);
+
 	
 	if (p) console.log(leftmostTemplatePos, leftmostComplementPos, rightmostTemplatePos, rightmostComplementPos, hybridStrings);
 	
@@ -777,7 +777,13 @@ function getFreeEnergyOfTranscriptionBubbleIntermediate_WW(state1, state2){
 
 	
 	var hybridStrings = getHybridStringOfTranscriptionBubble_WW(leftmostTemplatePos, rightmostTemplatePos, leftmostComplementPos, rightmostComplementPos);
-	return getFreeEnergyOfTranscriptionBubbleHybridString_WW(hybridStrings[0], hybridStrings[1], SEQS_JS.all_sequences[sequenceID]["template"].substring(2,5));
+	var freeEnergy = getFreeEnergyOfTranscriptionBubbleHybridString_WW(hybridStrings[0], hybridStrings[1], SEQS_JS.all_sequences[sequenceID]["template"].substring(2,5));
+
+
+	//console.log(state1, state2, "energy", freeEnergy, "strings", hybridStrings);
+
+	return freeEnergy;
+
 	
 }
 

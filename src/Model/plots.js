@@ -443,6 +443,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 		for (var actionNum = 0; actionNum < actionsToDo.length; actionNum++) {
 			if (actionsToDo[actionNum] < 2) PLOTS_JS.totalDisplacement += actionsToDo[actionNum] == 0 ? -1 : 1;
 		}
+		//console.log("totalDisplacement", PLOTS_JS.totalDisplacement);
 		PLOTS_JS.velocity = PLOTS_JS.totalDisplacement / PLOTS_JS.totaltimeElapsed;
 
 
