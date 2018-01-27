@@ -558,10 +558,10 @@ function getModelDiagramTemplate(){
 	
 	
 	return `
-		<div id='popup_model' style='background-color:adadad; padding: 10 10; position:absolute; width: 1200px; left:380; top:20vh; z-index:5;'>
-			<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+		<div id='popup_model' style='background-color:#008cba; padding: 10 10; position:absolute; width: 1200px; left:380; top:20vh; z-index:5;'>
+			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 30px'> Kinetic diagram for XX_NAME_XX </span>
-				<span style='font-size: 30px; cursor:pointer; position:absolute; vertical-align:top; left:1190px; top:5px' onclick='closeModelDiagramPopup()'>&times;</span>
+				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeModelDiagramPopup()'>&times;</span>
 				<div style='padding:2; font-size:22px;'> XX_DESC_XX </div>
 
 				<div id="modelDiagramDiv">
@@ -587,10 +587,10 @@ function getModelDiagramTemplate(){
 function getNTPModelDiagramTemplate(){
 
 	return `
-		<div id='popup_NTPmodel' style='background-color:adadad; padding: 10 10; position:fixed; width: 600px; left:380; top:20vh; z-index:5;'>
-			<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+		<div id='popup_NTPmodel' style='background-color:#008cba; padding: 10 10; position:fixed; width: 600px; left:380; top:20vh; z-index:5;'>
+			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 30px'> NTP binding rates </span>
-				<span style='font-size: 30px; cursor:pointer; position:absolute; vertical-align:top; left:590px; top:5px' onclick='closeNTPModelDiagramPopup()'>&times;</span>
+				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeNTPModelDiagramPopup()'>&times;</span>
 				<div style='padding:2; font-size:22px;'> Model for NTP binding which can lead to misincorporations</div>
 
 				<br>
@@ -647,14 +647,14 @@ function getNTPModelSettingsTemplate(){
 	
 	
 	return `
-		<div id='popup_NTPmodel' style='background-color:adadad; padding: 10 10; position:fixed; width: 800px; left:380; top:30vh; z-index:5;'>
-			<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+		<div id='popup_NTPmodel' style='background-color:008cba; padding: 10 10; position:fixed; width: 800px; left:380; top:30vh; z-index:5;'>
+			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 30px'> NTP parameters</span>
 
 				<span style='font-size: 30px; cursor:pointer; position:absolute; left:770px; top:10px'>
 					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:right" href="about/#polymerisation_ModelHelp"><img class="helpIcon" src="src/Images/help.png"></a>
 				</span>
-				<span style='font-size: 30px; cursor:pointer; position:absolute; vertical-align:top; left:793px; top:2px' onclick='closeNTPModelPopup()'>&times;</span>
+				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeNTPModelPopup()'>&times;</span>
 				<div style='padding:2; font-size:22px;'> Select the parameters for nucleotide incorporation</div>
 
 				<div id="ntpmodelDiagramDiv" style="width:90%; margin:auto; vertical-align:middle; display:block">
@@ -715,13 +715,13 @@ function getNTPModelSettingsTemplate(){
 											[NTP]:
 										</td>
 
-										<td id="Kdiss_container" style="vertical-align:bottom; background-color:white;">
+										<td id="Kdiss_container" style="vertical-align:bottom; background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto;">
 											<input class="variable"  type="number" id="Kdiss" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  
 										 	<input type=image id='Kdiss_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
 
 
-										<td id="kCat_container" style="vertical-align:bottom; background-color:white;">
+										<td id="kCat_container" style="vertical-align:bottom; background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto;">
 											<input class="variable"  type="number"id="kCat" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
 					 						<input type=image id='kCat_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
@@ -736,12 +736,12 @@ function getNTPModelSettingsTemplate(){
 										</td>
 
 
-										<td id="Kdiss_ATP_container" style="vertical-align:bottom; background-color:white;">
+										<td id="Kdiss_ATP_container" style="vertical-align:bottom; background-color:ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto;">
 											<input class="variable"  type="number"id="Kdiss_ATP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
 					 						<input type=image id='Kdiss_ATP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
 
-										<td id="kCat_ATP_container" style="vertical-align:bottom; background-color:white;">
+										<td id="kCat_ATP_container" style="vertical-align:bottom; background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto;">
 											<input class="variable"  type="number" id="kCat_ATP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
 										 	<input type=image id='kCat_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
@@ -759,12 +759,12 @@ function getNTPModelSettingsTemplate(){
 										</td>
 
 
-										<td id="Kdiss_CTP_container" style="vertical-align:bottom; background-color:white;">
+										<td id="Kdiss_CTP_container" style="vertical-align:bottom; background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto;">
 											<input class="variable"  type="number"id="Kdiss_CTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
 					 						<input type=image id='Kdiss_CTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
 
-										<td id="kCat_CTP_container" style="vertical-align:bottom; background-color:white;">
+										<td id="kCat_CTP_container" style="vertical-align:bottom; background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto;">
 											<input class="variable"  type="number" id="kCat_CTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  
 										 	<input type=image id='kCat_CTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
@@ -783,12 +783,12 @@ function getNTPModelSettingsTemplate(){
 
 
 
-										<td id="Kdiss_GTP_container" style="vertical-align:bottom; background-color:white;">
+										<td id="Kdiss_GTP_container" style="vertical-align:bottom; background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto;">
 											<input class="variable"  type="number"id="Kdiss_GTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">
 					 						<input type=image id='Kdiss_GTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
 
-										<td id="kCat_GTP_container" style="vertical-align:bottom; background-color:white;">
+										<td id="kCat_GTP_container" style="vertical-align:bottom; background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto;">
 											<input class="variable"  type="number" id="kCat_GTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  
 										 	<input type=image id='kCat_GTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
@@ -807,12 +807,12 @@ function getNTPModelSettingsTemplate(){
 
 
 
-										<td id="Kdiss_UTP_container" style="vertical-align:bottom; background-color:white;">
+										<td id="Kdiss_UTP_container" style="vertical-align:bottom; background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto;">
 											<input class="variable"  type="number"id="Kdiss_UTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
 					 						<input type=image id='Kdiss_UTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>
 
-										<td id="kCat_UTP_container" style="vertical-align:bottom; background-color:white;">
+										<td id="kCat_UTP_container" style="vertical-align:bottom; background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto;">
 											<input class="variable"  type="number" id="kCat_UTP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> 
 										 	<input type=image id='kCat_UTP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn_inline">  
 										</td>

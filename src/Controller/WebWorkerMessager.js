@@ -112,11 +112,18 @@ function register_WebWorker(resolve = function() { }){
 
 function callWebWorkerFunction(fn, resolve = null, msgID = null){
 
-	fnStr = "(" + fn + ")";
+
+	WorkerToUse = WEB_WORKER;
+	var fnStr = "" + fn;
+	if (fnStr.substring(0, 5) == "wasm_"){
+		WorkerToUse = WEB_WORKER_WASM;
+		fnStr = fnStr.substring(5, fnStr.length);
+	}
+
+    fnStr = "(" + fnStr + ")";
 
 	// No WebWorker, call function directly
-	//console.log("Calling", fn);
-	if(WEB_WORKER == null) {
+	if(WorkerToUse == null) {
 		var result = eval(fnStr)();
 		console.log("Resolving", result);
 		if (resolve != null) resolve(result);
@@ -127,12 +134,12 @@ function callWebWorkerFunction(fn, resolve = null, msgID = null){
 		//console.log("Posting msg " + fnStr);
 
 		// If we do not require a response then just send the message
-		if (msgID == null) WEB_WORKER.postMessage("~X~" + fnStr);
+		if (msgID == null) WorkerToUse.postMessage("~X~" + fnStr);
 
 		// Otherwise add this to MESSAGE_LISTENER with a unique id and send the message along with the id
 		else{
 			MESSAGE_LISTENER[msgID] = {resolve: resolve};
-			WEB_WORKER.postMessage(msgID + "~X~" + fnStr);
+			WorkerToUse.postMessage(msgID + "~X~" + fnStr);
 
 		}
 
@@ -2079,10 +2086,6 @@ function loadSession_controller(XMLData, resolve = function() { }){
 			if (experimentalData["chiSqthreshold_0"] != null) $("#MCMC_chiSqthreshold_0").val(experimentalData["chiSqthreshold_0"]);
 			if (experimentalData["chiSqthreshold_gamma"] != null) $("#MCMC_chiSqthreshold_gamma").val(experimentalData["chiSqthreshold_gamma"]);
 			
-			
-			$("#ABC_useMCMC").val(experimentalData["inferenceMethod"] == "ABC" ? 1 : experimentalData["inferenceMethod"] == "MCMC" ? 2 : 3);
-			toggleMCMC();
-
 
 			for (var fitID in experimentalData["fits"]){
 
@@ -2391,9 +2394,6 @@ function beginABC_controller(abcDataObjectForModel){
 		$("#PreExp").attr("disabled", false);
 		$("#PreExp").css("cursor", "");
 		$("#PreExp").css("background-color", "#008CBA");
-		$("#ABC_useMCMC").css("cursor", "pointer");
-		$("#ABC_useMCMC").css("background-color", "#008cba");
-		$("#ABC_useMCMC").attr("disabled", false);
 		running_ABC = false;
 		simulationRenderingController = false;
 
@@ -2534,7 +2534,7 @@ function get_ABCoutput_controller(resolve = function(lines) { }){
 
 function updateABCExperimentalData_controller(){
 
-	var which = $("#ABC_useMCMC").val() == 1 ? "ABC" : $("#ABC_useMCMC").val() == 2 ? "MCMC" : "NS-ABC"
+	var which = "MCMC";
 	var abcDataObjectForModel = getAbcDataObject(which)
 	if (WEB_WORKER == null) {
 		ABC_JS.updateABCExperimentalData_WW(abcDataObjectForModel);
@@ -2623,3 +2623,42 @@ function getPosteriorDistribution_controller(resolve = function(posterior) { }){
 
 
 }
+
+
+
+
+function loadWebAssembly_controller(){
+
+	if (WEB_WORKER == null) {
+		WW_JS.loadWebAssembly_WW();
+	}else{
+		var fnStr = stringifyFunction("WW_JS.loadWebAssembly_WW", []);
+		callWebWorkerFunction(fnStr);
+	}
+
+
+}
+
+
+function startWebAssembly_controller(){
+	if (WEB_WORKER == null) {
+		WW_JS.startWebAssembly_WW();
+	}else{
+		var fnStr = stringifyFunction("WW_JS.startWebAssembly_WW", []);
+		callWebWorkerFunction(fnStr);
+	}
+
+}
+
+
+
+
+function myFunction_wasm(argc){
+	
+	var fnStr = "wasm_" + stringifyFunction("myFunction", [argc]);
+	callWebWorkerFunction(fnStr);
+	
+}
+
+
+

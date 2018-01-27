@@ -218,14 +218,14 @@ function getDistributionChangeTemplate(){
 	
 	
 	return `
-		<div id='popup_distn' style='background-color:adadad; padding: 10 10; position:fixed; width: 600px; left:380; top:30vh; z-index:5' paramName="XX_NAME_XX" paramID="XX_ID_XX">
-			<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+		<div id='popup_distn' style='background-color:#008cba; padding: 10 10; position:fixed; width: 600px; left:380; top:30vh; z-index:5' paramName="XX_NAME_XX" paramID="XX_ID_XX">
+			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> Background distribution of XX_ID_XX </span>
 
-				<span style='font-size: 30px; cursor:pointer; position:absolute; left:565px; top:10px'>
+				<span style='font-size: 30px; cursor:pointer; position:absolute; right:35px; top:10px'>
 					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:right" href="about/#priorDistribution_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
 				</span>
-				<span style='font-size: 30px; cursor:pointer; position:absolute; left:590px; top:5px' onclick='closePriorDistributionPopup()'>&times;</span>
+				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closePriorDistributionPopup()'>&times;</span>
 				<div style='padding:2; font-size:18px;'> XX_NAME_XX: XX_TITLE_XX </div>
 				<table cellpadding=10 style='width:90%; margin:auto;'>
 				
@@ -349,7 +349,7 @@ function addFixedPrior(){
 	
 	var paramID = $("#popup_distn").attr("paramID")
 	var currentVal = PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"];
-	var inputBox = $("#popup_distn").attr("paramName") + " = <input type='number' title='Select the fixed value for this parameter' id='fixedDistnVal' value=" + currentVal + " style='vertical-align: middle; text-align:right; width: 70px'></input>";
+	var inputBox = $("#popup_distn").attr("paramName") + " = <input type='number' title='Select the fixed value for this parameter' id='fixedDistnVal' value=" + currentVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px'></input>";
 	
 	$("#parameterDistnCell").append(inputBox);
 
@@ -407,8 +407,8 @@ function addUniformPrior(){
 	
 	
 
-	var lowerLimitTextBox = "Lower: <input type='number' title='Select the lower limit for this parameter' id='uniformDistnLowerVal' value=" + lowerLimitVal + " style='vertical-align: middle; text-align:right; width: 70px' onChange=plotUniformDistrbutionCanvas()></input>";
-	var upperLimitTextBox = "Upper: <input type='number' title='Select the upper limit for this parameter' id='uniformDistnUpperVal' value=" + upperLimitVal + " style='vertical-align: middle; text-align:right; width: 70px' onChange=plotUniformDistrbutionCanvas()></input>";
+	var lowerLimitTextBox = "Lower: <input type='number' title='Select the lower limit for this parameter' id='uniformDistnLowerVal' value=" + lowerLimitVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px' onChange=plotUniformDistrbutionCanvas()></input>";
+	var upperLimitTextBox = "Upper: <input type='number' title='Select the upper limit for this parameter' id='uniformDistnUpperVal' value=" + upperLimitVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px' onChange=plotUniformDistrbutionCanvas()></input>";
 	
 	$("#parameterDistnCell").append(lowerLimitTextBox + "&nbsp;" + upperLimitTextBox);
 
@@ -468,7 +468,7 @@ function addExponentialPrior(){
 	if (expRate == null) expRate = roundToSF(1/currentVal);
 	if (currentVal <= 0) expRate = 1; // We don't want infinite or negative rates
 	
-	var textBox = "&lambda;: <input type='number' title='Select the rate for this parameter. The rate is the inverse of the mean' id='ExponentialDistnVal' value=" + expRate + " style='vertical-align: middle; text-align:right; width: 70px' onChange=plotExponentialDistrbutionCanvas()></input>";
+	var textBox = "&lambda;: <input type='number' title='Select the rate for this parameter. The rate is the inverse of the mean' id='ExponentialDistnVal' value=" + expRate + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px' onChange=plotExponentialDistrbutionCanvas()></input>";
 	
 	$("#parameterDistnCell").append(textBox);
 	
@@ -515,8 +515,8 @@ function addNormalPrior(){
 	if (sd == 0) sd = 1;
 
 	
-	var meanTextBox = "&mu;: <input type='number' title='Select the mean value of this parameter' id='normalMeanVal' value=" + meanVal + " style='vertical-align: middle; text-align:right; width: 70px' onChange=plotNormalDistrbutionCanvas()></input>";
-	var sdLimitTextBox = "&sigma;: <input type='number' title='Select the standard deviation of this parameter' id='normalSdVal' value=" + sd + " style='vertical-align: middle; text-align:right; width: 70px' onChange=plotNormalDistrbutionCanvas()></input>";
+	var meanTextBox = "&mu;: <input type='number' title='Select the mean value of this parameter' id='normalMeanVal' value=" + meanVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px' onChange=plotNormalDistrbutionCanvas()></input>";
+	var sdLimitTextBox = "&sigma;: <input type='number' title='Select the standard deviation of this parameter' id='normalSdVal' value=" + sd + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px' onChange=plotNormalDistrbutionCanvas()></input>";
 	$("#parameterDistnCell").append(meanTextBox + "&nbsp;" + sdLimitTextBox);
 
 	
@@ -558,8 +558,8 @@ function addLognormalPrior(){
 	if (isNaN(meanVal)) meanVal = 0;
 	
 	
-	var meanTextBox = "&mu;: <input type='number' title='Select the logarithmic mean value of this parameter' id='lognormalMeanVal' value=" + meanVal + " style='vertical-align: middle; text-align:right; width: 70px' onChange=plotLognormalDistrbutionCanvas()></input>";
-	var sdLimitTextBox = "&sigma;: <input type='number' title='Select the logarithmic standard deviation of this parameter' id='lognormalSdVal' value=" + sd + " style='vertical-align: middle; text-align:right; width: 70px' onChange=plotLognormalDistrbutionCanvas()></input>";
+	var meanTextBox = "&mu;: <input type='number' title='Select the logarithmic mean value of this parameter' id='lognormalMeanVal' value=" + meanVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px' onChange=plotLognormalDistrbutionCanvas()></input>";
+	var sdLimitTextBox = "&sigma;: <input type='number' title='Select the logarithmic standard deviation of this parameter' id='lognormalSdVal' value=" + sd + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px' onChange=plotLognormalDistrbutionCanvas()></input>";
 	$("#parameterDistnCell").append(meanTextBox + "&nbsp;" + sdLimitTextBox);
 
 	
@@ -605,8 +605,8 @@ function addGammaPrior(){
 	if (currentVal <= 0) rateVal = 1; // We don't want infinite or negative rates
 	
 	
-	var shapeTextBox = "&alpha;: <input type='number' title='Select the shape for this gamma-distributed parameter' id='gammaShapeVal' value=" + shapeVal + " style='vertical-align: middle; text-align:right; width: 70px' onChange=plotGammaDistrbutionCanvas()></input>";
-	var rateTextBox = "&beta;: <input type='number' title='Select the rate for this gamma-distributed parameter' id='gammaRateVal' value=" + rateVal + " style='vertical-align: middle; text-align:right; width: 70px' onChange=plotGammaDistrbutionCanvas()></input>";
+	var shapeTextBox = "&alpha;: <input type='number' title='Select the shape for this gamma-distributed parameter' id='gammaShapeVal' value=" + shapeVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px' onChange=plotGammaDistrbutionCanvas()></input>";
+	var rateTextBox = "&beta;: <input type='number' title='Select the rate for this gamma-distributed parameter' id='gammaRateVal' value=" + rateVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px' onChange=plotGammaDistrbutionCanvas()></input>";
 	$("#parameterDistnCell").append(shapeTextBox + "&nbsp;" + rateTextBox);
 
 	
@@ -657,8 +657,8 @@ function addPoissonPrior(){
 		if (minVal != null) poissonRateVal -= minVal;
 	}
 	
-	if (minVal != null) rateTextBox = "&lambda;: <input type='number' title='Select the rate for this Poisson distributed parameter. " + minVal + " will be added onto the sampled value' id='poissonRateVal' value=" + poissonRateVal + " style='vertical-align: middle; text-align:right; width: 70px'></input>";
-	else rateTextBox = "&lambda;: <input type='number' title='Select the rate for this Poisson distributed parameter' id='poissonRateVal' value=" + poissonRateVal + " style='vertical-align: middle; text-align:right; width: 70px'></input>";
+	if (minVal != null) rateTextBox = "&lambda;: <input type='number' title='Select the rate for this Poisson distributed parameter. " + minVal + " will be added onto the sampled value' id='poissonRateVal' value=" + poissonRateVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px'></input>";
+	else rateTextBox = "&lambda;: <input type='number' title='Select the rate for this Poisson distributed parameter' id='poissonRateVal' value=" + poissonRateVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px'></input>";
 		
 
 	$("#parameterDistnCell").append(rateTextBox);
@@ -709,8 +709,8 @@ function addDiscreteUniformPrior(){
 	}
 	
 	
-	var lowerLimitTextBox = "Lower: <input type='number' title='Select the lower limit for this parameter' id='uniformDistnLowerVal' value=" + lowerLimitVal + " style='vertical-align: middle; text-align:right; width: 70px'></input>";
-	var upperLimitTextBox = "Upper: <input type='number' title='Select the upper limit for this parameter' id='uniformDistnUpperVal' value=" + upperLimitVal + " style='vertical-align: middle; text-align:right; width: 70px'></input>";
+	var lowerLimitTextBox = "Lower: <input type='number' title='Select the lower limit for this parameter' id='uniformDistnLowerVal' value=" + lowerLimitVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px'></input>";
+	var upperLimitTextBox = "Upper: <input type='number' title='Select the upper limit for this parameter' id='uniformDistnUpperVal' value=" + upperLimitVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px'></input>";
 	
 	$("#parameterDistnCell").append(lowerLimitTextBox + "&nbsp;" + upperLimitTextBox);
 
@@ -727,13 +727,13 @@ function changeDistribution(element){
 	console.log("Changing the distribution of", element);
 	
 
-
-
-
 	var correspondingTextfield = $("#" + $(element).attr('id').replace("_distn", ""));
 	
+	closeAllDialogs();
 	$("#main").css("opacity", 0.5);
 	$("#mySidenav").css("opacity", 0.5);
+	
+	
 	
 	var popupHTML = getDistributionChangeTemplate();
 	popupHTML = popupHTML.replace("XX_ID_XX", correspondingTextfield.attr('id'));
@@ -744,7 +744,7 @@ function changeDistribution(element){
 	
 	var paramID = correspondingTextfield.attr("id");
 
-	closeAllDialogs();
+	
 	
 	
 	var loadParams = function(PHYSICAL_PARAMETERS_LOCAL){

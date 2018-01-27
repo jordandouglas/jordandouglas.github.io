@@ -81,11 +81,6 @@ function beginABC(){
 	$("#MCMCntrials").attr("disabled", "disabled");
 
 
-	$("#ABC_useMCMC").css("cursor", "auto");
-	$("#ABC_useMCMC").css("background-color", "#858280");
-	$("#ABC_useMCMC").attr("disabled", "disabled");
-
-
 	//$("#ABC_chiSq").css("cursor", "auto");
 	//$("#ABC_chiSq").css("background-color", "#858280");
 	//$("#ABC_chiSq").attr("disabled", "disabled");
@@ -105,10 +100,7 @@ function onABCStart(which){
 
 	$("#downloadABC").show(50);
 	$("#uploadABC").hide(50);
-	
-	$(".ABC_display").show(50);
-	if ($("#ABC_useMCMC").val() == 1) $(".RABC_display").show(50);
-	if ($("#ABC_useMCMC").val() == 2) $(".MCMC_display").show(50);
+
 	
 	$("#ABCacceptancePercentage_val").html("0");
 	$("#nRowsToDisplayABC").show(50);
@@ -481,8 +473,6 @@ function addNewABCData(type = "forceVelocity"){
 	
 	// Add the curve template to the newly opened cell
 	$("#ABCPanelTable" + ABCtableToUse).append(HTMLtemplate);
-	if ($("#ABC_useMCMC").val() != 1) $(".rejection_ABC_chiSq").hide(0);
-	else $(".rejection_ABC_chiSq").show(0);
 
 	// Switch to the other ABC table next time so we have 2 columns of curves
 	ABCtableToUse ++;
@@ -887,7 +877,7 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 
 			// If MCMC then account for the burn-in
-			var startingPosteriorNum = $("#ABC_useMCMC").val() == 2 ? Math.floor(parseFloat($("#MCMC_burnin").val()) / 100 * posterior.length) : 0;
+			var startingPosteriorNum = Math.floor(parseFloat($("#MCMC_burnin").val()) / 100 * posterior.length);
 
 			for (var postNum = startingPosteriorNum; postNum < posterior.length; postNum++){
 
@@ -1084,7 +1074,7 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 
 
 			// If MCMC then account for the burn-in
-			var startingPosteriorNum = $("#ABC_useMCMC").val() == 2 ? Math.floor(parseFloat($("#MCMC_burnin").val()) / 100 * posterior.length) : 0;
+			var startingPosteriorNum = Math.floor(parseFloat($("#MCMC_burnin").val()) / 100 * posterior.length);
 
 			for (var postNum = startingPosteriorNum; postNum < posterior.length; postNum++){
 
@@ -1595,35 +1585,6 @@ function toggleAcceptedOrRejected(){
 	get_unrendered_ABCoutput_controller(function(){
 		renderABCoutput();
 	});
-
-}
-
-
-function toggleMCMC(){
-
-
-	// 1 = Rejection ABC
-	if ($("#ABC_useMCMC").val() == 1){
-		$(".ABC_settings").show(0);
-		$(".MCMC_settings").hide(0);
-		$(".rejection_ABC_chiSq").show(0);
-	}
-	
-	// 2 = MCMC ABC
-	else if ($("#ABC_useMCMC").val() == 2){
-		$(".ABC_settings").hide(0);
-		$(".MCMC_settings").show(0);
-		$(".rejection_ABC_chiSq").hide(0);
-	}
-	
-	
-	// 3 = NS ABC
-	else if ($("#ABC_useMCMC").val() == 3){
-		//$("#ABC_settings").show(100);
-		//$("#MCMC_settings").hide(0);
-		//$(".rejection_ABC_chiSq").show(100);
-	}
-
 
 }
 

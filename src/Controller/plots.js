@@ -3787,10 +3787,10 @@ function getDownloadPlotTemplate(){
 
 	
 	return `
-		<div id='downloadPopup' style='background-color:adadad; padding: 10 10; position:fixed; width: 20vw; left:40vw; top:50vh; z-index:5' plotNum="XX_plotNum_XX">
-			<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+		<div id='downloadPopup' style='background-color:#008cba; padding: 10 10; position:fixed; width: 20vw; left:40vw; top:50vh; z-index:5' plotNum="XX_plotNum_XX">
+			<div style='background-color:white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> Download XX_plotName_XX </span>
-				<span style='font-size: 30px; cursor:pointer; position:fixed; left:59.5vw; top:50.5vh' onclick='closePlotDownloadPopup()'>&times;</span>
+				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closePlotDownloadPopup()'>&times;</span>
 				<table cellpadding=10 style='width:90%; margin:auto; font-size: 18px;'>
 				
 				<tr>
@@ -4328,12 +4328,13 @@ function getPlotOptionsTemplate(){
 
 
 	return `
-		<div id='settingsPopup' style='background-color:adadad; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:20vh; z-index:5' plotNum="XX_plotNum_XX">
-			<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+		<div id='settingsPopup' style='background-color:008cba; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:20vh; z-index:5' plotNum="XX_plotNum_XX">
+			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> XX_plotName_XX settings </span>
 
 
-				<span style='font-size: 30px; cursor:pointer; position:fixed; left:64.5vw; top:20.5vh' onclick='closePlotSettingsPopup()'>&times;</span>
+
+				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closePlotSettingsPopup()'>&times;</span>
 				<div style='padding:2; font-size:18px;'> Choose the display settings for this plot </div>
 				<table cellpadding=10 style='width:90%; margin:auto;'>
 				
