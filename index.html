@@ -54,6 +54,7 @@
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 
 
+
 <script language='JavaScript' type='text/JavaScript' src="src/Model/WebWorker.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Model/sequences.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Model/freeEnergy.js"></script>
@@ -67,6 +68,8 @@
 <script language='JavaScript' type='text/JavaScript' src="src/Model/stateEncoding.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Model/XMLparser.js"></script>
 
+
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/webassembly.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/WebWorkerMessager.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/plots.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/freeEnergy.js"></script>
@@ -86,6 +89,37 @@
   ga('send', 'pageview');
 
 </script>
+
+<!--<script async type="text/javascript" src="src/asm/simpol_asm.js"></script>-->
+
+
+<!--
+<script language='JavaScript' type='text/JavaScript'>
+	WEB_WORKER_WASM = new Worker("src/asm/WasmInterface.js");
+	WEB_WORKER_WASM.onerror = function (evt) { console.log(`Error from Web Worker: ${evt.message}`); }
+	WEB_WORKER_WASM.onmessage = function (evt) { alert(`Message from the Web Worker:\n\n ${evt.data}`); }
+
+
+
+	//fetch("test.wasm").then(response =>
+	fetch("src/asm/simpol_asm.wasm").then(response =>
+		 response.arrayBuffer()
+	).then(bytes =>
+		WebAssembly.compile(bytes)
+	);
+	
+	//.then(WasmModule =>
+	//	g_WebWorker.postMessage({ "MessagePurpose": "CompiledModule", "WasmModule": WasmModule })
+	//);
+
+	//function OnClickTest() {
+		// Ask the Web Worker to add two values
+	//	g_WebWorker.postMessage({ "MessagePurpose": "AddValues", "Val1": 1, "Val2": 2 });
+	//}
+
+</script>
+-->
+
 
 <script language='JavaScript' type='text/JavaScript'>
 
@@ -254,6 +288,13 @@ function init(){
 		registerWW().then(() => toDoAfterWWRegistration());
 
 
+		loadWebAssembly_controller();
+		// Load in the webassembly code
+		//$.getScript('src/asm/simpol_asm.js', function()
+		//{
+		    //initWebAssembly();
+		//});
+		
 		
 		
 	}catch(e){
@@ -267,9 +308,7 @@ function init(){
 
 
 
-
 }
-
 
 
 
@@ -705,7 +744,7 @@ function userChangeNTPType(ntpType){
 
 // Disable the default function of the left and right arrow keys (unless in a textbox)
 window.addEventListener("keydown", function(e) {
-    if(!$("textarea").is(':focus') && [37, 39].indexOf(e.keyCode) > -1) {
+    if(!$("textarea").is(':focus') &&  !("input").is(':focus') && [37, 39].indexOf(e.keyCode) > -1) {
         e.preventDefault();
     }
 }, false);
@@ -715,10 +754,10 @@ window.addEventListener("keydown", function(e) {
 window.onkeyup = function(e) {
 
 
+	if ($("textarea").is(':focus') || $("input").is(':focus')) return;
 
-	if ($("textarea").is(':focus')) return;
-
-   var key = e.keyCode ? e.keyCode : e.which;
+    var key = e.keyCode ? e.keyCode : e.which;
+	
 	if (key == 39 && !simulating) { // Right arrow
 		if (e.ctrlKey && !e.shiftKey) slip_right_controller(); // Ctrl + right = slippage
 		else if (e.shiftKey) bindNTP_controller(); // Shift + right = bind/catalyse
@@ -748,7 +787,7 @@ window.onkeyup = function(e) {
 		$("#nbasesToSimulate").select();
 	}else if (key == 27 && !e.ctrlKey && !e.shiftKey) { // Escape
 		stop_controller();
-		
+		console.log("trueSlidingPeakHeights", trueSlidingPeakHeights, "trueSlidingTroughHeights", trueSlidingTroughHeights);
 		//getSlidingHeights_controller(function(result){ console.log(result)});
 		//addNotificationMessage("Hello there", 100, 100);
 
@@ -846,6 +885,7 @@ function disable_all_buttons(){
 	$("#ntpT").attr("disabled", false);
 	$("#viewModelBtn").attr("disabled", false);
 	$(".errorBtn").attr("disabled", false);
+	$(".ABCbtn").attr("disabled", false);
 	$("#viewNTPmodelBtn").attr("disabled", false);
 
 
@@ -1474,6 +1514,7 @@ function openNav() {
 
 }
 
+
 function closeNav() {
 	
 	
@@ -1525,7 +1566,7 @@ function closeNav() {
 			<div id="screen" style="opacity:1;">
 
 			<div id="mySidenav" class="sidenav">
-				<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+				<a href="javascript:void(0)" title="Close" class="closebtn" onclick="closeNav()">&times;</a>
 
 			  
 			  
@@ -1880,8 +1921,8 @@ function closeNav() {
 		
 					<tr id="translocationSummaryContainer" style="display:none">
 
-						<td colspan = 4 style="text-align:left; font-size:14px; padding: 10 10; background-color:white; width:100%">
-				 			<div style='font-size: 30px; color:#008cba; vertical-align:top; cursor:pointer; float:right;' onclick='$("#translocationSummaryContainer").hide(100);'>&times;</div>
+						<td colspan = 4 style="position:relative; text-align:left; font-size:14px; padding: 10 10; background-color:#ebe9e7; width:100%">
+				 			<div title = "Close" class="blueCloseBtn" onclick='$("#translocationSummaryContainer").hide(100);'>&times;</div>
 							<div title = "Free energy of the pretranslocated state divided by that of the posttranslocated state, averaged across the whole sequence"> Mean translocation equilibrium constant: <span id="meanEquilibriumConstant"></span> </div> 
 							<div title = "Rate of translocation from the pretranslocated into the posttranslocated state, averaged across the whole sequence"> Mean forward translocation rate: <span id="meanForwardRate"></span> s<sup>-1</sup> </div> 
 							<div title = "Rate of translocation from the posttranslocated into the pretranslocated state, averaged across the whole sequence"> Mean backward translocation rate: <span id="meanBackwardsRate"></span> s<sup>-1</sup> </div>
@@ -2508,7 +2549,7 @@ function closeNav() {
 				
 				
 			<div id="paramsTab" style="transition:0.5s; position:fixed; left: -5px; top: 300px; transform: rotate(-90deg); transform-origin: left top 0; padding: 5 10; background-color:#008cba; color:white; border-radius: 0 0 10px 10px; z-index:3">
-				<span id="openNavBtn" style="text-align:right;  font-size:20px;cursor:pointer; font-color: #858280;" onclick="openNav(); ">&#9776; Parameters</span>
+				<span id="openNavBtn" title="Toggle parameter side-navigation menu" style="text-align:right;  font-size:20px;cursor:pointer; font-color: #858280;" onclick="openNav(); ">&#9776; Parameters</span>
 			</div>
 
 			
@@ -3011,7 +3052,7 @@ function closeNav() {
 					<input type=button id='showABCPanel' class='minimise' value='+' onClick=showABCPanelFn()> 
 					<b class="noselect">Approximate Bayesian Computation</b> 
 						<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
-							- Fit your parameters to experimental data using a Bayesian analysis
+							- Fit your parameters to experimental data using Markov-chain-Monte-Carlo approximate Bayesian computation (MCMC-ABC)
 						</span>
  						<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#setupABC_ABCSectionHelp"><img class="helpIcon" src="src/Images/help.png"></a>
 						
@@ -3045,15 +3086,16 @@ function closeNav() {
 						<br><br>
 
 
-
 						<table padding=5 cellpadding=10 style="vertical-align:top">
 
 							<tr>
+								
+								<!--
 								<td>
 									<div style="position:relative; vertical-align:top;">
 										
 										<b>Inference Method:</b><br>
-										<input type="range" min="1" max="3" value="1" class="rangeslider noselect" style="width:100px" OnChange="toggleMCMC()" id="ABC_useMCMC" title="Use the R-ABC, MCMC-ABC, or NS-ABC algorithm to fit the data">
+										<input type="range" min="1" max="3" value="2" class="rangeslider noselect" style="width:100px" OnChange="toggleMCMC()" id="ABC_useMCMC" title="Use the R-ABC, MCMC-ABC, or NS-ABC algorithm to fit the data">
 										<table style="margin-left: 30px; height: 100px; margin-top: -26px;">
 											<tr>
 												<td>
@@ -3078,27 +3120,14 @@ function closeNav() {
 										 
 									</div>
 								</td>
-							
+								-->
 
 								<td style="vertical-align:top; text-align:right">
 
-									<b>Length settings</b><br>
-									<table style="text-align:right">
-										<tr class="ABC_settings">
-											<td>
-												Number of iterations:
-												<input type="number" id="ABCntrials" min=0 value=1000 title="Number of iterations to run the ABC for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
-											</td>
-										</tr>
+									<b style="text-align:right">Length settings</b><br>
+									<table style="text-align:right;  float:right">
 										
-										<tr class="ABC_settings">
-											<td>
-												Number of trials per data point:
-												<input type="number" id="ABC_ntestsperdata" min=1 value=20 title="Number of tests to perform at each force/NTP setting. The median velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
-											</td>
-										</tr>
-										
-										<tr class="MCMC_settings" style="display:none">
+										<tr>
 											<td>
 												Number of MCMC iterations:
 												<input type="number" id="MCMCntrials" min=0 value=10000 title="Number of iterations to run the MCMC chain for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
@@ -3107,10 +3136,10 @@ function closeNav() {
 
 
 
-										<tr class="MCMC_settings" style="display:none">
+										<tr>
 											<td>
 												Number of trials per data point:
-												<input type="number" id="MCMC_ntestsperdata" min=1 value=5 title="Number of tests to perform at each force/NTP setting. The median velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 40px;  font-size:14px; background-color:#663399">
+												<input type="number" id="MCMC_ntestsperdata" min=1 value=5 title="Number of tests to perform at each force/NTP setting. The mean velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
 											</td>
 										</tr>
 									
@@ -3121,28 +3150,28 @@ function closeNav() {
 
 
 
-								<td class="MCMC_settings" style="display:none; vertical-align:top; text-align:right">
+								<td style="vertical-align:top; text-align:right">
 
-									<b>Threshold settings</b><br>
-									<table style="text-align:right">
+									<b style="text-align:right">Threshold settings</b><br>
+									<table style="text-align:right; float:right">
 										<tr>
 											<td>
 												&isin;<sub>min</sub> =
-												<input type="number" id="MCMC_chiSqthreshold_min" min=0 value=12.5 title="Chi-squared threshold which must be met to accept a point into the posterior" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">
+												<input type="number" id="MCMC_chiSqthreshold_min" min=0 value=12 title="Chi-squared threshold which must be met to accept a point into the posterior" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#663399">
 											</td>
 										</tr>
 										
 										<tr>
 											<td>
 												&isin;<sub>0</sub> =
-												<input type="number" id="MCMC_chiSqthreshold_0" min=0 value=2000 title="Initial chi-squared threshold. This will be decreased every iteration until reaching the minimum threshold" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">
+												<input type="number" id="MCMC_chiSqthreshold_0" min=0 value=1000 title="Initial chi-squared threshold. This will be decreased every iteration until reaching the minimum threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#663399">
 											</td>
 										</tr>
 										
 										<tr>
 											<td>
 												&gamma; =
-												<input type="number" id="MCMC_chiSqthreshold_gamma" min=0 max=1 value=0.999 title="Exponential decrease in chi-squared threshold" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">
+												<input type="number" id="MCMC_chiSqthreshold_gamma" min=0 max=1 value=0.999 title="Exponential decrease in chi-squared threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#663399">
 											</td>
 										</tr>
 
@@ -3153,21 +3182,21 @@ function closeNav() {
 
 
 
-								<td class="MCMC_settings" style="display:none; vertical-align:top; text-align:right">
+								<td style="vertical-align:top; text-align:right">
 
-									<b>Chain settings</b><br>
-									<table style="text-align:right">
+									<b style="text-align:right">Chain settings</b><br>
+									<table style="text-align:right; float:right">
 										<tr>
 											<td>
-												Burn-in:
-												<input type="number" id="MCMC_burnin" onChange="validateAllAbcDataInputs(); update_burnin_controller(); drawPlots()" min=0 max=100 value=10 title="Percentage of points to throw away before reaching the posterior distribution" class="variable" style="vertical-align: middle; text-align:left; width: 40px;  font-size:14px; background-color:#663399">%
+												Burn-in (%):
+												<input type="number" id="MCMC_burnin" onChange="validateAllAbcDataInputs(); update_burnin_controller(); drawPlots()" min=0 max=100 value=10 title="Percentage of points to throw away before reaching the posterior distribution" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#663399">
 											</td>
 										</tr>
 										
 										<tr>
 											<td>
-												Log every
-												<input type="number" id="MCMC_logevery" min=1 value=20 title="How often do you want to log the current position" class="variable" style="vertical-align: middle; text-align:left; width: 50px;  font-size:14px; background-color:#663399">states
+												Log every (states):
+												<input type="number" id="MCMC_logevery" min=1 value=20 title="How often do you want to log the current position" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#663399">
 											</td>
 										</tr>
 										
@@ -3184,12 +3213,8 @@ function closeNav() {
 									
 									<table style="text-align:right">
 										<tr>
-											<td class="ABC_settings">
-												<input type=button id="beginABC_btn" onClick=beginABC() value='Begin ABC' title="Begin the approximate Bayesian computation with the current settings" class="operation beginABC_btn" style="background-color:#663399"> 
 
-											</td>
-
-											<td class="MCMC_settings" style="display:none">
+											<td>
 												<input type=button id="beginMCMC_btn" onClick="beginABC()" value='Begin MCMC-ABC' title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="operation beginABC_btn" style="background-color:#663399; width: 150px"> 
 												
 
@@ -3332,8 +3357,15 @@ function closeNav() {
 				</div>
 
 			</div>
-			
 
+
+
+			<!--
+			<div id="output_asm" style="margin-left:130px; width:100%; height: 200px; overflow-y: scroll; background-color:black; color:white">
+				
+			</div>
+			<button class="mybutton" onclick="myFunction_wasm(69)">Run myFunction</button>
+			-->
 
 
 			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
