@@ -381,7 +381,8 @@ div.vertical{
     z-index: 4;
     top: 0;
     left: 0;
-    background-color: #008CBA; /*baafab*/
+    %background-color: #008CBA; /*baafab*/
+	background-color: #b3b3b3; /*baafab*/
     overflow-x: hidden;
     overflow-y:scroll;
     transition: 0.5s;
@@ -408,16 +409,48 @@ div.vertical{
 }
 
 .sidenav a:hover, .offcanvas a:focus{
-    color: #f1f1f1;
+    color: white;
 }
 
 .sidenav .closebtn {
     position: absolute;
-    top: 0;
-    right: 25px;
+    top: -2px;
+    right: 5px;
     font-size: 36px;
     margin-left: 50px;
-    color:#baafab;
+    color: #ebe9e7;
+}
+
+
+.blueCloseBtn:hover{
+    color: white;
+}
+
+.blueCloseBtn {
+    font-size: 30px;
+	color:#008cba;
+	vertical-align:top;
+	cursor:pointer;
+	float:right;
+	position:absolute;
+	top: -5px;
+	right: 5px;
+}
+
+
+.blueDarkblueCloseBtn:hover{
+    color: #708090;
+}
+
+.blueDarkblueCloseBtn {
+    font-size: 30px;
+	color:#008cba;
+	vertical-align:top;
+	cursor:pointer;
+	float:right;
+	position:absolute;
+	top: -5px;
+	right: 5px;
 }
 
 #main {
@@ -443,7 +476,8 @@ div.vertical{
 }
 
 .parameter-bg {
-	background-color: #ebe9e7;
+	%background-color: #ebe9e7;
+	background-color: white;
     border: none;
     color: black;
     padding: 10px 10px;
@@ -610,6 +644,7 @@ input {
 	width:38px; 
 	height:12px;
 	text-align:right;
+	cursor:pointer;
 }
 
 
