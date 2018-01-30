@@ -190,7 +190,7 @@ function init(){
 				var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
 				
 				if (JSONurl.s != null){
-					var FessionFileLocation = "http://www.polymerase.nz/about/Examples/" + JSONurl.s;
+					var sessionFileLocation = "http://www.polymerase.nz/about/Examples/" + JSONurl.s;
 					var toDoAfterLoadSession = function() {
 						
 						if (JSONurl.p != null){
