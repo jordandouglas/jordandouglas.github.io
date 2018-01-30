@@ -90,6 +90,8 @@ function register_WebWorker(resolve = function() { }){
     if (WEB_WORKER_WASM != null){
 
 
+    	$("#output_asm").show(true);
+
     	// Connect to webassembly
 		fetch("src/asm/simpol_asm.wasm").then(response =>
 			 response.arrayBuffer()
@@ -1838,6 +1840,7 @@ function startTrials_controller(){
 			
 			var resolve = function(result){
 				console.log("time and velocity", result);
+				$("#output_asm").append("<div style='padding:5 5'>Velocity: " + roundToSF(result.meanVelocity, 4) + "bp/s; Time taken: " + roundToSF(result.realTime, 4) + "s </div>"); 
 				updateDOM();
 			}
 			
