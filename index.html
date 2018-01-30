@@ -45,7 +45,7 @@
 
 <script language='JavaScript' type='text/JavaScript' src='http://d3js.org/d3.v4.min.js'></script> 
 <!-- <script language='JavaScript' type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.bundle.min.js"></script> -->
-<script language='JavaScript' type="text/javascript" src="https://rawgit.com/eligrey/FileSaver.js/master/FileSaver.js"></script>
+<script language='JavaScript' type="text/javascript" src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.js"></script>
 <script language='JavaScript' type="text/javascript" src ="https://rawgit.com/eligrey/canvas-toBlob.js/master/canvas-toBlob.js"></script>
 
 
@@ -69,7 +69,7 @@
 <script language='JavaScript' type='text/JavaScript' src="src/Model/XMLparser.js"></script>
 
 
-<script language='JavaScript' type='text/JavaScript' src="src/Controller/webassembly.js"></script>
+<!--<script language='JavaScript' type='text/JavaScript' src="src/Controller/webassembly.js"></script>-->
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/WebWorkerMessager.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/plots.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/freeEnergy.js"></script>
@@ -93,32 +93,7 @@
 <!--<script async type="text/javascript" src="src/asm/simpol_asm.js"></script>-->
 
 
-<!--
-<script language='JavaScript' type='text/JavaScript'>
-	WEB_WORKER_WASM = new Worker("src/asm/WasmInterface.js");
-	WEB_WORKER_WASM.onerror = function (evt) { console.log(`Error from Web Worker: ${evt.message}`); }
-	WEB_WORKER_WASM.onmessage = function (evt) { alert(`Message from the Web Worker:\n\n ${evt.data}`); }
 
-
-
-	//fetch("test.wasm").then(response =>
-	fetch("src/asm/simpol_asm.wasm").then(response =>
-		 response.arrayBuffer()
-	).then(bytes =>
-		WebAssembly.compile(bytes)
-	);
-	
-	//.then(WasmModule =>
-	//	g_WebWorker.postMessage({ "MessagePurpose": "CompiledModule", "WasmModule": WasmModule })
-	//);
-
-	//function OnClickTest() {
-		// Ask the Web Worker to add two values
-	//	g_WebWorker.postMessage({ "MessagePurpose": "AddValues", "Val1": 1, "Val2": 2 });
-	//}
-
-</script>
--->
 
 
 <script language='JavaScript' type='text/JavaScript'>
@@ -151,6 +126,7 @@ function init(){
 		running_ABC = false;
 		$("#nbasesToSimulate").val(30);
 		$("#translocationSummaryContainer").hide(100);
+		$("#currentTranslocationModel").val("sealingBarriers");
 		maxHeight = 10000;
 		nTimes20SequencesToDisplay = 1;
 		addWebworkerRegistrationHTML();
@@ -172,6 +148,17 @@ function init(){
 		WEB_WORKER = null;
 
 
+		USE_WASM = false;
+
+		// Use webassembly? Defaults to false unless specified in url
+		if (location.href.indexOf("?") != -1){
+			var search = location.search.substring(1);
+			var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
+
+			if (JSONurl.wasm != null){
+				USE_WASM = JSONurl.wasm == "true";
+			}
+		}
 
 
 		var toDoAfterWWRegistration = function(){
@@ -196,30 +183,28 @@ function init(){
 			
 
 			// Load a session specified in the url
+
 			if (location.href.indexOf("?") != -1){
 				
 				var search = location.search.substring(1);
 				var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
 				
-				console.log("XXX", JSONurl);
-				
 				if (JSONurl.s != null){
-					var sessionFileLocation = "http://www.polymerase.nz/about/Examples/" + JSONurl.s;
+					var FessionFileLocation = "http://www.polymerase.nz/about/Examples/" + JSONurl.s;
 					var toDoAfterLoadSession = function() {
 						
 						if (JSONurl.p != null){
 							
 							var posteriorFileLocation = "http://www.polymerase.nz/about/Examples/" + JSONurl.p;
 							uploadABCFromURL(posteriorFileLocation);
-							
 						}
-						
 						
 					};
 					loadSessionFromURL(sessionFileLocation, toDoAfterLoadSession);
 				}
-				
-				
+
+				else userChangeSequence();
+
 				
 			}else{
 				userChangeSequence();
@@ -241,11 +226,11 @@ function init(){
 			movedToolbarRight = true;
 
 
-			var ua = window.navigator.userAgent;
-		    IS_INTERNET_EXPLORER = ua.indexOf("MSIE") > -1 || ua.indexOf("Edge") > -1;
+			var IS_SAFARI = window.navigator.userAgent.indexOf("Safari") > -1 && window.navigator.userAgent.indexOf('Chrome') == -1;
 
-		    // If internet explorer then display IE warning message
-		    if (IS_INTERNET_EXPLORER) $("#IEwarningMsg").show(true);
+		    // If safari then display IE warning message
+		    if (IS_SAFARI && WEB_WORKER_WASM == null) $("#SafariWarningMsg").show(true);
+			else if (USE_WASM && WEB_WORKER_WASM == null) $("#webassemblyNotRegister").show(true);
 
 
 			IS_MOBILE = false; 
@@ -288,7 +273,6 @@ function init(){
 		registerWW().then(() => toDoAfterWWRegistration());
 
 
-		loadWebAssembly_controller();
 		// Load in the webassembly code
 		//$.getScript('src/asm/simpol_asm.js', function()
 		//{
@@ -350,7 +334,7 @@ function addWebworkerRegistrationHTML(){
 
 	var html = `
 		<div id="registerWW" style="position:absolute; padding:5 5; left: 380px; top:130px; background-color:#FFFFB2;; zIndex=2; text-align:center">
-			&#10711; Establishing WebWorker &#10711;
+			&#10711; Instantiating WebAssembly &#10711;
 		</div>
 	`;
 
@@ -744,7 +728,7 @@ function userChangeNTPType(ntpType){
 
 // Disable the default function of the left and right arrow keys (unless in a textbox)
 window.addEventListener("keydown", function(e) {
-    if(!$("textarea").is(':focus') &&  !("input").is(':focus') && [37, 39].indexOf(e.keyCode) > -1) {
+    if(!$("textarea").is(':focus') && !$("input").is(':focus') && [37, 39].indexOf(e.keyCode) > -1) {
         e.preventDefault();
     }
 }, false);
@@ -787,11 +771,11 @@ window.onkeyup = function(e) {
 		$("#nbasesToSimulate").select();
 	}else if (key == 27 && !e.ctrlKey && !e.shiftKey) { // Escape
 		stop_controller();
-		console.log("trueSlidingPeakHeights", trueSlidingPeakHeights, "trueSlidingTroughHeights", trueSlidingTroughHeights);
+		//console.log("trueSlidingPeakHeights", trueSlidingPeakHeights, "trueSlidingTroughHeights", trueSlidingTroughHeights);
 		//getSlidingHeights_controller(function(result){ console.log(result)});
 		//addNotificationMessage("Hello there", 100, 100);
 
-		
+		//console.log(JSON.stringify({XXX:{XXX: "there"}, YYY: "hello"}));
 	}
 	
 
@@ -2060,9 +2044,15 @@ function closeNav() {
 				 		</td>
 
 						<td colspan = 3 style="text-align:center">
+
 				 			Barrier height model:
 				 			<select class="dropdown modelSetting" style="width:150px;"  id = "currentTranslocationModel" title="Select which model to use for estimating translocation free energy barrier heights" OnChange="userInputModel_controller()">
-						 </select>
+
+				 				<option value="midpointBarriers">Midpoint model</option>
+				 				<option value="meltingBarriers">Melting bubble</option>
+				 				<option value="sealingBarriers">Sealing bubble</option>
+
+							</select>
 				 		</td>
 
 
@@ -2536,15 +2526,23 @@ function closeNav() {
 
 
 
-			<div class="errorMsg" id="IEwarningMsg" style="display:none"> We notice that you are using Internet Explorer. To get the most out of SimPol we recommend you
-						change to another web browser (Chrome, Safari or Firefox). </div>
+			<div class="errorMsg" id="SafariWarningMsg" style="display:none"> We notice that you are using Safari. To get the most out of SimPol we recommend you
+						change to a web browser which supports WebAssembly (Chrome, Firefox or Internet Explorer). </div>
 			
 			<div class="errorMsg" id="badBrowser" style="display:none"> There was a javascript error which will prevent this page from operating. Please update your web browser. If this problem persists then send us information about the bug to support@polymerase.nz </div>
+			
 			<div class="errorMsg" id="browserWWdisabled" style="display:none">This program employs a Web Worker to speed up the simulation. 
 			There was a problem connecting. For maximum performance please upgrade your browser or change your browser settings to allow the Web Worker to register. </div>
 
+			<div class="errorMsg" id="webassemblyNotRegister"  style="display:none"> This program uses WebAssembly to maximise performance. Your browser is not allowing WebAssembly to instantiate. The program will still work,
+					however for maximum performance we recommend you upgrade your browser or change  browser settings to support WebAssembly. </div>
+			
+			
 			<div class="errorMsg" id="landscapeRequest" style="font-size: 25px;">
 				We recommend you view this page in landscape mode! </div>
+				
+				
+			
 
 				
 				
@@ -2626,7 +2624,7 @@ function closeNav() {
 									<option value="slow">Slow</option>
 									<option value="medium">Medium</option>
 									<option value="fast">Fast</option>
-									<option value="ultrafast">Ultrafast</option>
+									<!--<option value="ultrafast">Ultrafast</option>-->
 									<option value="hidden">Hidden</option>
 								</select>
 							</div>
@@ -3360,11 +3358,13 @@ function closeNav() {
 
 
 
+
+			
+
 			<!--
 			<div id="output_asm" style="margin-left:130px; width:100%; height: 200px; overflow-y: scroll; background-color:black; color:white">
-				
+				<button class="mybutton" onclick="myFunction_wasm()">Run myFunction</button>
 			</div>
-			<button class="mybutton" onclick="myFunction_wasm(69)">Run myFunction</button>
 			-->
 
 
