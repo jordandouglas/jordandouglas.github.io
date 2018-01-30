@@ -348,14 +348,14 @@ function addFixedPrior(){
 	$("#distrbutionCanvas").show(100);
 	
 	var paramID = $("#popup_distn").attr("paramID")
-	var currentVal = PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"];
+	var currentVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"]);
 	var inputBox = $("#popup_distn").attr("paramName") + " = <input type='number' title='Select the fixed value for this parameter' id='fixedDistnVal' value=" + currentVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px'></input>";
 	
 	$("#parameterDistnCell").append(inputBox);
 
 
 	if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null){
-		$("#fixedDistnVal").attr("min", PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]);
+		$("#fixedDistnVal").attr("min", parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]));
 	}
 
 	
@@ -369,7 +369,8 @@ function addFixedPrior(){
 		xmin = Math.floor(xmin);
 		xmax = Math.ceil(xmax);
 	}
-	
+
+
 	var fixedFn = function(x) {
 		if (Math.abs(x - currentVal) < (xmax - xmin) / 150) return 1 / 1.1;
 		return 0;
@@ -391,11 +392,11 @@ function addUniformPrior(){
 	
 	
 	var paramID = $("#popup_distn").attr("paramID")
-	var currentVal = PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"];
-	var lowerLimitVal = PHYSICAL_PARAMETERS_TEMP[paramID]["uniformDistnLowerVal"];
-	var upperLimitVal = PHYSICAL_PARAMETERS_TEMP[paramID]["uniformDistnUpperVal"];
-	if (lowerLimitVal == null) lowerLimitVal = roundToSF((currentVal - (currentVal * 0.5)));
-	if (upperLimitVal == null) upperLimitVal = roundToSF((currentVal + (currentVal * 0.5)));
+	var currentVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"]);
+	var lowerLimitVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["uniformDistnLowerVal"]);
+	var upperLimitVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["uniformDistnUpperVal"]);
+	if (lowerLimitVal == null || isNaN(lowerLimitVal)) lowerLimitVal = roundToSF((currentVal - (currentVal * 0.5)));
+	if (upperLimitVal == null || isNaN(upperLimitVal)) upperLimitVal = roundToSF((currentVal + (currentVal * 0.5)));
 	
 	if (PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"]) lowerLimitVal = Math.max(lowerLimitVal, 0);
 	if (PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"]) upperLimitVal = Math.max(upperLimitVal, 0);
@@ -414,7 +415,7 @@ function addUniformPrior(){
 
 
 	if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null){
-		$("#uniformDistnLowerVal").attr("min", PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]);
+		$("#uniformDistnLowerVal").attr("min", parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]));
 	}
 	
 	
@@ -462,10 +463,10 @@ function addExponentialPrior(){
 	$("#parameterDistnCell").html("");
 	
 	var paramID = $("#popup_distn").attr("paramID")
-	var currentVal = PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"];
+	var currentVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"]);
 	
-	var expRate = PHYSICAL_PARAMETERS_TEMP[paramID]["ExponentialDistnVal"];
-	if (expRate == null) expRate = roundToSF(1/currentVal);
+	var expRate = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["ExponentialDistnVal"]);
+	if (expRate == null || isNaN(expRate)) expRate = roundToSF(1/currentVal);
 	if (currentVal <= 0) expRate = 1; // We don't want infinite or negative rates
 	
 	var textBox = "&lambda;: <input type='number' title='Select the rate for this parameter. The rate is the inverse of the mean' id='ExponentialDistnVal' value=" + expRate + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px' onChange=plotExponentialDistrbutionCanvas()></input>";
@@ -505,12 +506,13 @@ function addNormalPrior(){
 	
 	
 	var paramID = $("#popup_distn").attr("paramID")
-	var currentVal = PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"];
+	var currentVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"]);
 	
-	var meanVal = PHYSICAL_PARAMETERS_TEMP[paramID]["normalMeanVal"];
-	var sd = PHYSICAL_PARAMETERS_TEMP[paramID]["normalSdVal"];
-	if (meanVal == null) meanVal = roundToSF(currentVal);
-	if (sd == null) sd = roundToSF(meanVal * 0.25);
+	var meanVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["normalMeanVal"]);
+	var sd = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["normalSdVal"]);
+
+	if (meanVal == null || isNaN(meanVal)) meanVal = roundToSF(currentVal);
+	if (sd == null || isNaN(sd)) sd = roundToSF(meanVal * 0.25);
 	
 	if (sd == 0) sd = 1;
 
@@ -549,12 +551,12 @@ function addLognormalPrior(){
 	$("#parameterDistnCell").html("");
 	
 	var paramID = $("#popup_distn").attr("paramID")
-	var currentVal = PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"];
+	var currentVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"]);
 	
-	var meanVal = PHYSICAL_PARAMETERS_TEMP[paramID]["lognormalMeanVal"];
-	var sd = PHYSICAL_PARAMETERS_TEMP[paramID]["lognormalSdVal"];
-	if (sd == null) sd = 0.5;
-	if (meanVal == null) meanVal = roundToSF(Math.log(currentVal / Math.exp(sd*sd/2)));
+	var meanVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["lognormalMeanVal"]);
+	var sd = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["lognormalSdVal"]);
+	if (sd == null || isNaN(meanVal)) sd = 0.5;
+	if (meanVal == null || isNaN(sd)) meanVal = roundToSF(Math.log(currentVal / Math.exp(sd*sd/2)));
 	if (isNaN(meanVal)) meanVal = 0;
 	
 	
@@ -596,12 +598,12 @@ function addGammaPrior(){
 	$("#parameterDistnCell").html("");
 	
 	var paramID = $("#popup_distn").attr("paramID")
-	var currentVal = PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"];
+	var currentVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"]);
 	
-	var shapeVal = PHYSICAL_PARAMETERS_TEMP[paramID]["gammaShapeVal"];
-	var rateVal = PHYSICAL_PARAMETERS_TEMP[paramID]["gammaRateVal"];
-	if (shapeVal == null) shapeVal = 2;
-	if (rateVal == null) rateVal = roundToSF(shapeVal/currentVal);
+	var shapeVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["gammaShapeVal"]);
+	var rateVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["gammaRateVal"]);
+	if (shapeVal == null || isNaN(shapeVal)) shapeVal = 2;
+	if (rateVal == null || isNaN(rateVal)) rateVal = roundToSF(shapeVal/currentVal);
 	if (currentVal <= 0) rateVal = 1; // We don't want infinite or negative rates
 	
 	
@@ -646,13 +648,13 @@ function addPoissonPrior(){
 	var paramID = $("#popup_distn").attr("paramID")
 	
 	var minVal = null;
-	if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null) minVal = PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"];
+	if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null) minVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]);
 	else if (PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"] != null && PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"]) minVal = 1;
 	
 	var rateTextBox;
-	var currentVal = PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"];
-	var poissonRateVal = PHYSICAL_PARAMETERS_TEMP[paramID]["poissonRateVal"];
-	if (poissonRateVal == null) {
+	var currentVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"]);
+	var poissonRateVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["poissonRateVal"]);
+	if (poissonRateVal == null || isNaN(poissonRateVal)) {
 		poissonRateVal = currentVal;
 		if (minVal != null) poissonRateVal -= minVal;
 	}
@@ -665,7 +667,7 @@ function addPoissonPrior(){
 
 
 	if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null){
-		$("#poissonRateVal").attr("min", PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]);
+		$("#poissonRateVal").attr("min", parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]));
 	}
 
 	
@@ -686,19 +688,19 @@ function addDiscreteUniformPrior(){
 	
 	
 	var minVal = null;
-	if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null) minVal = PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"];
+	if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null) minVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]);
 	else if (PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"] != null && PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"]) minVal = 1;
 
 
-	var maxVal = PHYSICAL_PARAMETERS_TEMP[paramID]["maxVal"];
+	var maxVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["maxVal"]);
 	
 	
-	var currentVal = PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"];
-	var lowerLimitVal = PHYSICAL_PARAMETERS_TEMP[paramID]["uniformDistnLowerVal"];
-	var upperLimitVal = PHYSICAL_PARAMETERS_TEMP[paramID]["uniformDistnUpperVal"];
+	var currentVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"]);
+	var lowerLimitVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["uniformDistnLowerVal"]);
+	var upperLimitVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["uniformDistnUpperVal"]);
 	
-	if (lowerLimitVal == null) lowerLimitVal = roundToSF(Math.floor(roundToSF((currentVal - (currentVal * 0.5)))));
-	if (upperLimitVal == null) upperLimitVal = roundToSF(Math.ceil( roundToSF((currentVal + (currentVal * 0.5)))));
+	if (lowerLimitVal == null || isNaN(lowerLimitVal)) lowerLimitVal = roundToSF(Math.floor(roundToSF((currentVal - (currentVal * 0.5)))));
+	if (upperLimitVal == null || isNaN(upperLimitVal)) upperLimitVal = roundToSF(Math.ceil( roundToSF((currentVal + (currentVal * 0.5)))));
 	
 	
 	if (minVal != null && lowerLimitVal < minVal) lowerLimitVal = minVal
@@ -716,7 +718,7 @@ function addDiscreteUniformPrior(){
 
 
 	if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null){
-		$("#uniformDistnLowerVal").attr("min", PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]);
+		$("#uniformDistnLowerVal").attr("min", parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]));
 	}
 
 }
@@ -758,7 +760,7 @@ function changeDistribution(element){
 			popupHTML = popupHTML.replace("XX_DISTRIBUTION_XX", getDiscreteVariableDistributionsTemplate());
 			
 			var minVal = null;
-			if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null) minVal = PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"];
+			if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null) minVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]);
 			else if (PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"] != null && PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"]) minVal = 1;
 			if (minVal != null) {
 				popupHTML = popupHTML.replace("Poisson Distribution", "Shifted Poisson Distribution");
@@ -768,7 +770,7 @@ function changeDistribution(element){
 			var maxVal = PHYSICAL_PARAMETERS_TEMP[paramID]["maxVal"];
 			if (maxVal != null) {
 				popupHTML = popupHTML.replace("Poisson Distribution", "Shifted Poisson Distribution");
-				discreteDescriptionStr += "<br>The largest value allowed is " + maxVal;
+				discreteDescriptionStr += "<br>The largest value allowed is " + parseFloat(maxVal);
 			};
 			
 			

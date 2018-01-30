@@ -247,6 +247,8 @@ function updateModelDOM(elongation_model_temp){
 	}
 
 
+
+	
 	// 1 NTP concentration or 4
 	if (elongation_model_temp["useFourNTPconcentrations"]) {
 		$("#NTPconc_container").hide(0);
@@ -322,14 +324,19 @@ function setModelOptions(){
 	getElongationModels_controller(function(result){
 
 
+
 		
 		$("#SelectElongationModel").empty();
-		var currentElongationModel = result["currentElongationModel"];
-		var elongation_model = result["ELONGATION_MODELS"];
-		var currentTranslocationModel = elongation_model[currentElongationModel]["currentTranslocationModel"];
-		var translocation_model = result["TRANSLOCATION_MODELS"];
-
+		//var currentElongationModel = result["currentElongationModel"];
+		//var elongation_model = result["ELONGATION_MODELS"];
+		//var currentTranslocationModel = elongation_model[currentElongationModel]["currentTranslocationModel"];
+		
+		if (WEB_WORKER_WASM != null) ELONGATION_MODEL_TEMP = result;
+		else ELONGATION_MODEL_TEMP = result["ELONGATION_MODELS"][result["currentElongationModel"]];
+		
+		
 		// Elongation models
+		/*
 		var dropdown = document.getElementById('SelectElongationModel');
 		for (var mod in elongation_model){
 			var opt = document.createElement('option');
@@ -338,22 +345,12 @@ function setModelOptions(){
 			dropdown.appendChild(opt);
 		
 		}
-
-		console.log("Translocation models", translocation_model, "currentTranslocationModel", currentTranslocationModel);
-
-		// Translocation models
-		dropdown = document.getElementById('currentTranslocationModel');
-		for (var mod in translocation_model){
-			var opt = document.createElement('option');
- 			opt.value = translocation_model[mod]["id"];
-			opt.innerHTML = translocation_model[mod]["name"];
-			dropdown.appendChild(opt);
+		*/
 		
-		} 
 
 
-		ELONGATION_MODEL_TEMP = elongation_model[currentElongationModel];
-		$("#SelectElongationModel").val(currentElongationModel);
+		//ELONGATION_MODEL_TEMP = currentElongationModel; //elongation_model[currentElongationModel];
+		//$("#SelectElongationModel").val(currentElongationModel);
 		$("#currentTranslocationModel").val(currentTranslocationModel);
 		updateModelDOM(ELONGATION_MODEL_TEMP);
 

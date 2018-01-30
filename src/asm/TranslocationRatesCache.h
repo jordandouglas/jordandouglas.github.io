@@ -1,0 +1,50 @@
+﻿/* 
+	--------------------------------------------------------------------
+	--------------------------------------------------------------------
+	This file is part of SimPol.
+
+    SimPol is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    SimPol is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with SimPol.  If not, see <http://www.gnu.org/licenses/>. 
+    --------------------------------------------------------------------
+    --------------------------------------------------------------------
+-*/
+
+
+#ifndef TRANSLOCATIONRATESCACHE_H
+#define TRANSLOCATIONRATESCACHE_H
+
+#include "State.h"
+
+#include <string>
+#include <vector>
+#include <map>
+
+using namespace std;
+
+
+class TranslocationRatesCache{
+
+	private:
+		static double*** translocationRateTable;
+		static double** backtrackRateTable;
+	
+	public:
+		static double getTranslocationRates(State* state, bool fwd);
+		static void buildTranslocationRateTable();
+		static void buildBacktrackRateTable();
+
+
+};
+
+
+#endif

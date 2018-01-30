@@ -3678,9 +3678,9 @@ function writeLatexLabelOnCanvas(ctx, label, xPos, yPos, fontSize){
 			scripts.push({pretext: spaceFreeLabel, scripttext: "", super: false});
 		}
 
-		else if (label[i] == "{") continue;
+		else if (label[i] == "[" || label[i] == "{") continue;
 
-		else if (label[i] == "}"){
+		else if (label[i] == "]" || label[i] == ""){
 			isSuperscript = false;
 			isSubscript = false;
 		}

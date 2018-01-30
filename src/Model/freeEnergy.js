@@ -73,6 +73,8 @@ FE_JS.initFreeEnergy_WW = function(){
 
 	var toReturn = {currentElongationModel: FE_JS.currentElongationModel, ELONGATION_MODELS: FE_JS.ELONGATION_MODELS, TRANSLOCATION_MODELS: FE_JS.TRANSLOCATION_MODELS};
 
+	
+	//console.log("XXX", toReturn);
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
 	}
@@ -112,6 +114,7 @@ FE_JS.initFreeEnergy_WW = function(){
 
 
 	PARAMS_JS.PHYSICAL_PARAMETERS["DGHyperDag"]["hidden"] = !modelSettings.allowHypertranslocation;
+	
 
 	PARAMS_JS.PHYSICAL_PARAMETERS["NTPconc"]["hidden"] = modelSettings.useFourNTPconcentrations;
 	PARAMS_JS.PHYSICAL_PARAMETERS["ATPconc"]["hidden"] = !modelSettings.useFourNTPconcentrations;
@@ -1436,7 +1439,7 @@ function getSlipRightLabel_WW(state, S){
 	else if (allowMultipleBulges && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] - 1) != -1) toReturn = {label: "Fuse"};	
 	else if (state["leftMBase"] > 1 && allowMultipleBulges &&  state["bulgePos"][S] == 0 && ((state["bulgePos"].indexOf(h - 1) != -1) || state["bulgePos"].indexOf(h - 2) != -1)) toReturn = {label: "Form", title: "Create a bulge at the left end of the hybrid (ctrl + &rarr;)"};	
 	else if (state["bulgePos"][S] < h && state["bulgePos"][S] > 1 && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) != 1) toReturn = {label: "Diffuse", title: "Move the bulge one step to the right (ctrl + &rarr;)"};
-	else if (state["bulgePos"][S] == 0) toReturn = {label: "Form", title: "Create a bulge at the left end of the hybrid (ctrl + &)"};
+	else if (state["bulgePos"][S] == 0) toReturn = {label: "Form", title: "Create a bulge at the left end of the hybrid (ctrl + &rarr;)"};
 	
 
 	return toReturn;

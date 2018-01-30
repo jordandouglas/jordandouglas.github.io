@@ -1,0 +1,28 @@
+g++ -std=c++11 -o tempexe cimpol.cpp Parameter.cpp XMLparser.cpp Model.cpp MCMC.cpp ExperimentalData.cpp PosteriorDistriutionSample.cpp Simulator.cpp State.cpp Settings.cpp FreeEnergy.cpp TranslocationRatesCache.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp 
+
+cl  /EHsc cimpol.cpp Parameter.cpp XMLparser.cpp Model.cpp MCMC.cpp ExperimentalData.cpp PosteriorDistriutionSample.cpp Simulator.cpp State.cpp Settings.cpp FreeEnergy.cpp TranslocationRatesCache.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp 
+
+
+Read https://dzone.com/articles/webassembly-web-workers for webworkers and webassembly
+https://developer.mozilla.org/en-US/docs/WebAssembly/C_to_wasm ccall
+https://kripken.github.io/emscripten-site/docs/api_reference/preamble.js.html more on ccall
+https://kripken.github.io/emscripten-site/docs/porting/connecting_cpp_and_javascript/Interacting-with-code.html
+
+
+https://becominghuman.ai/passing-and-returning-webassembly-array-parameters-a0f572c65d97 parsing arrays
+
+
+
+E:\STOREDFILES\Research\OverprintingDisorder\WebAssembly\emsdk\emsdk_env
+
+
+cd /home/jdou557/Documents/Sequences/emsdk
+source ./emsdk_env.sh --build=Release
+cd /home/jdou557/Documents/Cimpol/SimpolC/SimpolC/src/asm
+
+//emcc -s WASM=1 -o simpol_asm.html -s "EXPORTED_FUNCTIONS=['_main', '_saveParameterDistribution', '_getParameterValue', '_getAllParameters', '_getModelSettings', '_setModelSettings', '_startTrials']"  -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'Pointer_stringify']" -s ASSERTIONS=1 -O1 -O2 -O3 -std=c++11 -s NO_EXIT_RUNTIME=1 -s ALLOW_MEMORY_GROWTH=1   cimpol.cpp WasmInterface.cpp Parameter.cpp MCMC.cpp ExperimentalData.cpp PosteriorDistriutionSample.cpp XMLparser.cpp Model.cpp Simulator.cpp State.cpp Settings.cpp FreeEnergy.cpp TranslocationRatesCache.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp
+
+
+
+emcc -s WASM=1 -o simpol_asm.html -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'Pointer_stringify']" -s ASSERTIONS=1 -O1 -O2 -O3 -std=c++11 -s NO_EXIT_RUNTIME=1 -s ALLOW_MEMORY_GROWTH=1   cimpol.cpp WasmInterface.cpp Parameter.cpp MCMC.cpp ExperimentalData.cpp PosteriorDistriutionSample.cpp XMLparser.cpp Model.cpp Simulator.cpp State.cpp Settings.cpp FreeEnergy.cpp TranslocationRatesCache.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp
+

@@ -1,12 +1,39 @@
-﻿MESSAGE_LISTENER = {};
+﻿
+
+/* 
+	--------------------------------------------------------------------
+	--------------------------------------------------------------------
+	This file is part of SimPol.
+
+    SimPol is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    SimPol is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with SimPol.  If not, see <http://www.gnu.org/licenses/>. 
+    --------------------------------------------------------------------
+    --------------------------------------------------------------------
+-*/
+
+MESSAGE_LISTENER = {};
 
 function register_WebWorker(resolve = function() { }){
 
 	
 	WEB_WORKER = null;
+	WEB_WORKER_WASM = null;
 	if(typeof(Worker) !== "undefined") {
         	if(WEB_WORKER == null) {
 				try {
+
+					 	 // Setup webworker for webassembly
+					    if (USE_WASM) WEB_WORKER_WASM = new Worker("src/asm/WasmInterface.js");
             			WEB_WORKER = new Worker("src/Model/WebWorker.js");
 
             			// Tell the WebWorker to initialise
@@ -27,6 +54,14 @@ function register_WebWorker(resolve = function() { }){
 				}
         	}
 
+
+
+		  
+			
+
+
+
+
     } else {
        	console.log('WebWorker registration failed');
        	removeWebworkerRegistrationHTML();
@@ -34,7 +69,9 @@ function register_WebWorker(resolve = function() { }){
     }
 
 
-    // Set up message listener
+
+    // Set up message listeners
+    MESSAGE_LISTENER = {};
     if (WEB_WORKER != null){
 
 
@@ -43,70 +80,98 @@ function register_WebWorker(resolve = function() { }){
 	    	console.log("WW error", err);
 		}
 
-
-    	MESSAGE_LISTENER = {};
     	WEB_WORKER.onmessage = function(event) {
-
-			//console.log("Received message", event.data);
-
-			// A message for debugging purposes
-			if (event.data.substring(0,4) == "MSG:"){
-				console.log("WW says:", event.data.substring(4));
-				return;
-			}
-
-
-			// If the message starts with _ then it is a request for a function call
-			if (event.data[0] == "_"){
-				var fn = event.data.substring(1);
-				executeFunctionFromString(fn);
-				return;
-			}
-
-
-
-			// Otherwise the message will be the following format "id~X~result"
-			var id = event.data.split("~X~")[0];
-			var result = event.data.split("~X~")[1];
-
-
-
-
-			// Find the object in MESSAGE_LISTENER with the corresponding id
-			var obj = MESSAGE_LISTENER[id];
-			if (obj == null) return;
-
-
-			// If the result is 'done' then we can continue with the callback
-			if (result == "done"){
-				obj["resolve"](null);
-			}
-
-
-			else{
-				// Otherwise we continue with the callback but with the JSON-parsed parameter
-				result = JSON.parse(result);
-				//console.log("Returning JSON ", result);
-				obj["resolve"](result);
-			}
-
-
-			// Remove this object from the MESSAGE_LISTENER list
-			MESSAGE_LISTENER[id] = null;
-
+			onWebWorkerReceiveMessage(event);
 		}
-
-
 
     }
 
 
-    resolve();
+    if (WEB_WORKER_WASM != null){
+
+
+    	// Connect to webassembly
+		fetch("src/asm/simpol_asm.wasm").then(response =>
+			 response.arrayBuffer()
+		).then(bytes =>
+			WebAssembly.compile(bytes)
+		);
+
+
+   		 // Error handler
+	    WEB_WORKER_WASM.onerror = function (err) {
+	    	console.log("WASM error", err);
+		}
+
+    	WEB_WORKER_WASM.onmessage = function(event) {
+			onWebWorkerReceiveMessage(event, resolve);
+		}
+    	
+
+    }  else resolve();
 
 
 
 }
 
+
+function onWebWorkerReceiveMessage(event, resolveAfterWebassemblyInitialised = function() { }){
+
+	//console.log("Received message", event.data);
+
+
+	if (event.data == "wasm_initialised"){
+		console.log("wasm_initialised");
+		resolveAfterWebassemblyInitialised();
+		return;
+	}
+
+
+	// A message for debugging purposes
+	if (event.data.substring(0,4) == "MSG:"){
+		console.log("WW says:", event.data.substring(4));
+		return;
+	}
+
+
+	// If the message starts with _ then it is a request for a function call
+	if (event.data[0] == "_"){
+		var fn = event.data.substring(1);
+		executeFunctionFromString(fn);
+		return;
+	}
+
+
+
+	// Otherwise the message will be the following format "id~X~result"
+	var id = event.data.split("~X~")[0];
+	var result = event.data.split("~X~")[1];
+
+
+	// Find the object in MESSAGE_LISTENER with the corresponding id
+	var obj = MESSAGE_LISTENER[id];
+	if (obj == null) return;
+
+
+	// If the result is 'done' then we can continue with the callback
+	if (result == "done"){
+		obj["resolve"](null);
+	}
+
+
+	else{
+		// Otherwise we continue with the callback but with the JSON-parsed parameter
+		result = JSON.parse(result);
+
+
+		//console.log("Returning JSON ", result);
+		obj["resolve"](result);
+	}
+
+
+	// Remove this object from the MESSAGE_LISTENER list
+	MESSAGE_LISTENER[id] = null;
+}
 
 
 
@@ -240,7 +305,9 @@ function stop_controller(resolve = function() { }){
 
 	if (WEB_WORKER == null) {
 		resolve(WW_JS.stop_WW());
-	}else{
+	}
+	
+	else if (true || WEB_WORKER_WASM == null){
 
 		var res = stringifyFunction("WW_JS.stop_WW", [null], true);
 		var fnStr = res[0];
@@ -249,6 +316,19 @@ function stop_controller(resolve = function() { }){
 		console.log("Sending function: " + fnStr);
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall(fnStr).then(() => resolve());
+	}
+	
+	else{
+		
+		
+		var res = stringifyFunction("stopWebAssembly", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		
+		console.log("Sending function: " + fnStr);
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall(fnStr).then(() => resolve());
+		
 	}
 
 
@@ -640,17 +720,43 @@ function get_PHYSICAL_PARAMETERS_controller(resolve = function(dict) {}){
 
 
 
+
 	if (WEB_WORKER == null) {
 		var toCall = () => new Promise((resolve) => PARAMS_JS.get_PHYSICAL_PARAMETERS_WW(resolve));
 		toCall().then((dict) => resolve(dict));
 
-	}else{
+	} 
+
+	// Use the js webworker as a model
+	else if (WEB_WORKER_WASM == null) {
+		
+		
 		var res = stringifyFunction("PARAMS_JS.get_PHYSICAL_PARAMETERS_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall(fnStr).then((dict) => resolve(dict));
+
+		
+	}
+
+	// Use the webassembly module as a model
+	else  {
+
+
+		callWebWorkerFunction(stringifyFunction("PARAMS_JS.get_PHYSICAL_PARAMETERS_WW", []));
+	
+		var res = stringifyFunction("getAllParameters", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		//console.log("Sending function: " + fnStr);
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+
+
+		toCall(fnStr).then((dict) => resolve(dict));
+
+
 	}
 
 
@@ -691,36 +797,50 @@ function submitDistribution_controller(resolve = function() {}){
 	var paramID = $("#popup_distn").attr("paramID");
 	var distributionName = $("#SelectDistribution").val();
 	var distributionParams = [];
+	var distributionParamsDict = {};
 
 	switch(distributionName) {
 	    case "Fixed":
 	    	distributionParams.push(parseFloat($("#fixedDistnVal").val()));
+	    	distributionParamsDict.fixedDistnVal = parseFloat($("#fixedDistnVal").val());
 	        break;
 	    case "Uniform":
 	    	distributionParams.push(parseFloat($("#uniformDistnLowerVal").val()));
 	    	distributionParams.push(parseFloat($("#uniformDistnUpperVal").val()));
+	    	distributionParamsDict.uniformDistnLowerVal = parseFloat($("#uniformDistnLowerVal").val());
+	    	distributionParamsDict.uniformDistnUpperVal = parseFloat($("#uniformDistnUpperVal").val());
 	        break;
 		case "Exponential":
 			distributionParams.push(parseFloat($("#ExponentialDistnVal").val()));
+			distributionParamsDict.ExponentialDistnVal = parseFloat($("#ExponentialDistnVal").val());
 		    break;
 		case "Normal":
 			distributionParams.push(parseFloat($("#normalMeanVal").val()));
 	    	distributionParams.push(parseFloat($("#normalSdVal").val()));
+	    	distributionParamsDict.normalMeanVal = parseFloat($("#normalMeanVal").val());
+	    	distributionParamsDict.normalSdVal = parseFloat($("#normalSdVal").val());
 			break;
 		case "Lognormal":
 			distributionParams.push(parseFloat($("#lognormalMeanVal").val()));
 	    	distributionParams.push(parseFloat($("#lognormalSdVal").val()));
+	    	distributionParamsDict.lognormalMeanVal = parseFloat($("#lognormalMeanVal").val());
+	    	distributionParamsDict.lognormalSdVal = parseFloat($("#lognormalSdVal").val());
 			break;
 		case "Gamma":
 			distributionParams.push(parseFloat($("#gammaShapeVal").val()));
 	    	distributionParams.push(parseFloat($("#gammaRateVal").val()));
+	    	distributionParamsDict.gammaShapeVal = parseFloat($("#gammaShapeVal").val());
+	    	distributionParamsDict.gammaRateVal = parseFloat($("#gammaRateVal").val());
 			break;
 		case "DiscreteUniform":
 			distributionParams.push(parseFloat($("#uniformDistnLowerVal").val()));
 		   	distributionParams.push(parseFloat($("#uniformDistnUpperVal").val()));
+		   	distributionParamsDict.uniformDistnLowerVal = parseFloat($("#uniformDistnLowerVal").val());
+	    	distributionParamsDict.uniformDistnUpperVal = parseFloat($("#uniformDistnUpperVal").val());
 			break;
 		case "Poisson":
 			distributionParams.push(parseFloat($("#poissonRateVal").val()));
+			distributionParamsDict.poissonRateVal = parseFloat($("#poissonRateVal").val());
 			break;
 	}
 
@@ -762,13 +882,26 @@ function submitDistribution_controller(resolve = function() {}){
 		toCall().then((result) => updateDOM(result));
 	}
 
-	else{
+	else if(WEB_WORKER_WASM == null){
 		var res = stringifyFunction("PARAMS_JS.submitDistribution_WW", [paramID, distributionName, distributionParams, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => updateDOM(result));
 
+	}
+	
+	else {
+		
+		callWebWorkerFunction(stringifyFunction("PARAMS_JS.submitDistribution_WW", [paramID, distributionName, distributionParams]));
+
+		// Send to WebAssembly webworker
+		var res = stringifyFunction("saveParameterDistribution", [paramID, distributionName, distributionParamsDict], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => updateDOM(result));
+		
 	}
 
 }
@@ -1669,12 +1802,15 @@ function startTrials_controller(){
 		}
 
 
-		// If it is in asynchronous or hidden mode, then we keep going until the end
-		else{
+		
+		// WebWorker. If it is in asynchronous or hidden mode, then we keep going until the end
+		else if (WEB_WORKER_WASM == null || ($("#PreExp").val() != "ultrafast" && $("#PreExp").val() != "hidden")){
+			
+
 			var res = stringifyFunction("SIM_JS.startTrials_WW", [ntrials, null], true);
 			var fnStr = res[0];
 			msgID_simulation = res[1];
-
+			
 			var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID_simulation));
 			toCall(fnStr).then((x) => updateDOM(x));
 
@@ -1689,8 +1825,26 @@ function startTrials_controller(){
 			else{
 				simulationRenderingController = false;
 			}
-
 		}
+			
+			
+		// Run simulations in Webassembly if service is available and if running in hidden mode
+		else{
+			
+			var res = stringifyFunction("startTrials", [ntrials], true);
+			var fnStr = "wasm_" + res[0];
+			var msgID = res[1];
+			var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+			
+			var resolve = function(result){
+				console.log("time and velocity", result);
+				updateDOM();
+			}
+			
+			toCall().then((result) => resolve(result));
+		}
+
+		
 	
 	
 	});
@@ -1933,13 +2087,26 @@ function getElongationModels_controller(resolve = function(x) { }){
 		toCall().then((result) => resolve(result));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("FE_JS.getElongationModels_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => resolve(result));
+		
 
+	}
+	
+	 else  {
+		 
+		//callWebWorkerFunction(stringifyFunction("FE_JS.getElongationModels_WW", []));
+		 
+		var res = stringifyFunction("getModelSettings", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+		
 	}
 
 
@@ -2005,7 +2172,7 @@ function loadSession_controller(XMLData, resolve = function() { }){
 
 	var updateDom = function(result){
 
-
+		console.log("updateDom", result);
 
 		var seqObject = result["seq"];
 		var model = result["model"];
@@ -2150,12 +2317,25 @@ function loadSession_controller(XMLData, resolve = function() { }){
 		toCall().then((whichPlotInWhichCanvas) => updateDom(whichPlotInWhichCanvas));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("XML_JS.loadSession_WW", [XMLData, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((whichPlotInWhichCanvas) => updateDom(whichPlotInWhichCanvas));
+
+	}
+
+	else{
+
+		callWebWorkerFunction(stringifyFunction("XML_JS.loadSession_WW", [XMLData]));
+
+		var res = stringifyFunction("loadSessionFromXML", [XMLData], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((whichPlotInWhichCanvas) => updateDom(whichPlotInWhichCanvas));
+
 
 	}
 	
@@ -2255,13 +2435,27 @@ function userInputModel_controller(){
 		toCall().then((mod) => updateDOM(mod));
 	}
 
-	else{
+	else if(WEB_WORKER_WASM == null){
 		var res = stringifyFunction("FE_JS.userInputModel_WW", [toSend, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((mod) => updateDOM(mod));
 
+	}
+	
+	else{
+		
+
+		
+		callWebWorkerFunction(stringifyFunction("FE_JS.userInputModel_WW", [toSend]));
+		
+		var res = stringifyFunction("setModelSettings", [toSend], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((mod) => updateDOM(mod));
+		
 	}
 
 
@@ -2627,36 +2821,23 @@ function getPosteriorDistribution_controller(resolve = function(posterior) { }){
 
 
 
-function loadWebAssembly_controller(){
 
-	if (WEB_WORKER == null) {
-		WW_JS.loadWebAssembly_WW();
-	}else{
-		var fnStr = stringifyFunction("WW_JS.loadWebAssembly_WW", []);
-		callWebWorkerFunction(fnStr);
+
+function myFunction_wasm(resolve = function() { }){
+
+
+	resolve = function(res){
+
+		console.log(res);
 	}
 
 
-}
-
-
-function startWebAssembly_controller(){
-	if (WEB_WORKER == null) {
-		WW_JS.startWebAssembly_WW();
-	}else{
-		var fnStr = stringifyFunction("WW_JS.startWebAssembly_WW", []);
-		callWebWorkerFunction(fnStr);
-	}
-
-}
-
-
-
-
-function myFunction_wasm(argc){
-	
-	var fnStr = "wasm_" + stringifyFunction("myFunction", [argc]);
-	callWebWorkerFunction(fnStr);
+	var res = stringifyFunction("getAllParameters", [], true);
+	var fnStr = "wasm_" + res[0];
+	var msgID = res[1];
+	//console.log("Sending function: " + fnStr);
+	var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+	toCall(fnStr).then((dict) => resolve(dict));
 	
 }
 
