@@ -334,17 +334,16 @@ function addCitations(){
 						<div class="block-subtitle" style="font-size:45px"> An interactive graphical simulation of nucleic acid polymerases </div> <br>
 					
 						<b>Disclaimer:</b> SimPol is currently in prerelease. It has not been peer-reviewed or published. <br><br>
-					
-						SimPol is a free open-source web-based program aimed to help researchers, teachers and students visualise transcription at the level of a single molecule. Transcription is the copying of a template (typically DNA) 
-						into messenger RNA (mRNA) and is one of the most central processes in all of biology. The copying process is carried out by a protein called RNA polymerase. RNA polymerase runs along the template 
-						as it extends the mRNA. While this main pathway of transcription is fairly straightfoward, some of the less-common and off-pathway events can be	cause complications. For example, sometimes	
-						RNA polymerase moves very far in the wrong direction (backtracking), sometimes a nucleotide is copied incorrectly (a misincorporation), and sometimes the template and mRNA slip along each other (which can cause an insertion or deletion).
-						Researchers have built kinetic models of transcription to describe and quantify the main pathway and some of these off-pathway processes.
+						SimPol is a free open-source web-based program aimed to help researchers, teachers and students visualise transcription at the level of a single molecule. 
+						<u>Transcription</u> is a critical biological process which occurs in all living organisms. It involves the copying of a template, typically DNA, 
+						into messenger RNA (mRNA). mRNA is used by cellular machinery to produce protein. This initial copying process is carried out by a protein called RNA polymerase. 
+			
 						<br><br>
-
 						
-						This program has two main functions: (1) <b>Visualisation</b> of transcription elongation, misincorporations and transcriptional slippage, and for more advanced users (2) <b>Simulation</b> of transcription elongation  
-						with kinetic models. This webpage contains tutorials on how to use SimPol.   <br><br>
+						This program is designed to be used by a wide range of users. Students, teachers, and others interested in learning biology may find SimPol helpful to understand transcription.
+						Molecular biologists may be interested in exploring how RNA polymerase interacts with certain genes. 
+						Researchers who are interested in RNA polymerase single-molecule experiments, and the mathematical models associated with them, may find use in the parameter inference feature of this software.
+						This webpage contains tutorials on how to use SimPol and is hopefully friendly to all users.   <br><br>
 						
 						
 						
@@ -376,7 +375,7 @@ function addCitations(){
 									
 									<br><br><br>
 									
-									The first thing you may want to do is choose your nucleic acid sequence. Open up the &#9776; Parameters side-navigation menu, where you can enter your own sequence or 
+									The first thing you may want to do is choose your nucleic acid sequence (or you can stick with the default sequence). Open up the &#9776; Parameters side-navigation menu, where you can enter your own sequence or 
 									use one of the example sequences.
 									
 									
@@ -402,7 +401,7 @@ function addCitations(){
 
 
 									Polymerases read the template strand (eg. the genome) in the 3&prime; &rarr; 5&prime; direction, and copy it to create the nascent strand (eg. mRNA) which grows in the 5&prime; &rarr; 3&prime; direction. You can control the polymerase using the Navigation panel
-									(described in the section below). RNA polymerases typically contain four channels: a template entry channel, a template exit channel, a nascent strand exit channel and an NTP entry pore. Within the RNA polymerase, 
+									(described in the section below). Bases exist in the cell in the form of nucleoside triphosphate (NTP). RNA polymerases typically contain four channels: a template entry channel, a template exit channel, a nascent strand exit channel and an NTP entry pore. Within the RNA polymerase, 
 									the template and nascent strand basepair to form a hybrid. If the template is double-stranded then RNA polymerase needs to melt the template in order to access the strand which is being copied. 
 									This set of bases which are melted comprises the transcription bubble. In the example below, the transcription bubble contains 2 + 9 + 1 = 12bp.  <br><br>
 									
@@ -568,7 +567,6 @@ function addCitations(){
 														<option value="slow">Slow</option>
 														<option value="medium">Medium</option>
 														<option value="fast">Fast</option>
-														<option value="ultrafast">Ultrafast</option>
 														<option value="hidden">Hidden</option>
 													</select>
 												</div>
@@ -632,14 +630,12 @@ function addCitations(){
 											<option value="slow">Slow</option>
 											<option value="medium">Medium</option>
 											<option value="fast">Fast</option>
-											<option value="ultrafast">Ultrafast</option>
 											<option value="hidden">Hidden</option>
 										</select>
 	
 										is a variable which controls the speed of the animation while Copying, Stuttering or Simulating. If the speed is set to <b>slow</b>,
-										<b>medium</b> or <b>fast</b>, then the polymerase will animate each reaction at a slow, medium or fast speed, respectively. If the speed is <b>ultrafast</b>,
-										then the animation will not show every reaction and will only update periodically. If the speed is <b>hidden</b>, then this is the same as
-										<b>ultrafast</b> except that the polymerase is no longer displayed and will not animate at all. <b>Hidden</b> is the fastest setting. <br><br>
+										<b>medium</b> or <b>fast</b>, then the polymerase will animate each reaction at a slow, medium or fast speed, respectively. If the speed is <b>hidden</b>,
+										then the polymerase is no longer displayed and will not animate at all. The plots will update periodically. <b>Hidden</b> is the fastest setting. <br><br>
 										
 										<b>Save</b> <img src="../src/Images/downloadGreen.png"  style="vertical-align:middle; height:20px;"> downloads the current session in XML format. If the page is refreshed or if your web browser crashes you will 
 										lose your current settings. If you do not want to lose your settings then you should save. <br><br>
@@ -859,9 +855,8 @@ function addCitations(){
 
 												<div class="parameter-bg" style="font-size:18px">
 													
-													<div class="parameter-title" style="font-size:30px">NTP Concentrations </div>  
-													<div class="parameter-title" style="font-size:18px">The concentrations of NTP (or dNTP if the nascent strand is DNA). The default values are estimated averages across multiple species and
-																have been borrowed from Traut 1994.<cite val="traut1994physiological"></cite> It is recommended that you change these values if you know what they are for your system.</div>  <br> 
+													<div class="parameter-title" style="font-size:30px">Experimental Conditions </div>  
+													<div class="parameter-title" style="font-size:18px">The concentrations of NTP (or dNTP if the nascent strand is DNA), and the size of the assisting force applied to the system</div>  <br> 
 
 
 														<div class="paramHelp" id="useFourNTPconcentrations_paramHelp">
@@ -900,22 +895,26 @@ function addCitations(){
 														</div><br>
 
 														<div class="paramHelp" id="ATPconc_ParamHelp">
-															<b>[ATP]</b> - concentration of ATP (or dATP). Default: 3152&mu;M (or 24&mu;M) 
+															<b>[ATP]</b> - concentration of ATP (or dATP). Default: 3152&mu;M (or 24&mu;M)<cite val="traut1994physiological"></cite>
 														</div><br>
 
 														<div class="paramHelp" id="CTPconc_ParamHelp">
-															<b>[CTP]</b> - concentration of CTP (or dCTP). Default: 278&mu;M (or 29&mu;M) 
+															<b>[CTP]</b> - concentration of CTP (or dCTP). Default: 278&mu;M (or 29&mu;M)<cite val="traut1994physiological"></cite>
 														</div><br>
 
 														<div class="paramHelp" id="GTPconc_ParamHelp">
-															<b>[GTP]</b> - concentration of GTP (or dGTP). Default: 468&mu;M (or 5.2&mu;M) 
+															<b>[GTP]</b> - concentration of GTP (or dGTP). Default: 468&mu;M (or 5.2&mu;M)<cite val="traut1994physiological"></cite>
 														</div><br>
 
 														<div class="paramHelp" id="UTPconc_ParamHelp">
-															<b>[UTP]</b> - concentration of UTP (or dTTP). Default: 567&mu;M (or 37&mu;M) 
+															<b>[UTP]</b> - concentration of UTP (or dTTP). Default: 567&mu;M (or 37&mu;M)<cite val="traut1994physiological"></cite>
 														</div><br>
 																			   
-														
+														<div class="paramHelp" id="FAssist_ParamHelp">
+															<b style="font-size:20px">$F_{assist}$</b> - the size of the force being applied to the polymerase during a single-molecule experiment. Positive forces are assisting loads and increase
+																	the rate of transcription. Negative forces are hindering loads and decrease the rate of transcription. In a natural cellular environment this external force
+																	does not exist. Default: 0pN
+														</div><br>	
 									
 												</div>
 
@@ -957,22 +956,22 @@ function addCitations(){
 														<div class="paramHelp" id="GDagSlide_ParamHelp">
 															<b style="font-size:20px">$\Delta\Delta G^\dagger_{t}$</b> - free energy barrier height of translocation. To translocate forwards or backwards, several
 																	basepairs may need to be broken. The energy barrier which must be overcome in order to translocate is estimated as the energy needed to break these basepairs
-																	plus the value of this parameter. Increasing this value will make translocation slower. Default: 4.5k<sub>B</sub>T
+																	plus the value of this parameter. Increasing this value will make translocation slower. Default: 9 k<sub>B</sub>T
 														</div><br>	
 
 														
-
-														<div class="paramHelp" id="FAssist_ParamHelp">
-															<b style="font-size:20px">$F_{assist}$</b> - the size of the force being applied to the polymerase during a single-molecule experiment. Positive forces are assisting loads and increase
-																	the rate of transcription. Negative forces are hindering loads and decrease the rate of transcription. When this force reaches a critical value, $k_{cat}$ becomes
-																	the rate limiting step. Default: 0pN
+														<div class="paramHelp" id="DGPost_ParamHelp">
+															<b style="font-size:20px">$\Delta\Delta G_{t1}$</b> - free energy term added to that of the posttranslocated state. When this value is low,
+															RNA polymerase spends more time in the posttranslocated state (compared with the pretranslocated state). Default: 0 k<sub>B</sub>T
 														</div><br>	
+														
 
-
-														<div class="paramHelp" id="arrestTime_ParamHelp">
-															<b>Arrest time </b> - the amount of time the polymerase may take to copy a base before the simulation trial is aborted. When the timeout is
-																	reached, copying will prematurely terminate and the next trial will begin. Default: 600s 
-														</div><br>		
+														<div class="paramHelp" id="barrierPos_ParamHelp">
+															<b style="font-size:20px">$\delta_1$</b> - position of the translocation intermediate state, with respect to the two connected ground states. 
+															This parameter lies between 0 and the width of a single basepair in DNA (3.4 &#x212b;<cite val="watson1953molecular"></cite>). This term only applies
+															when translocation is kinetic and when an assisting force $F_{assist}$ is applied. Default: 1.7 &#x212b;
+														</div><br>	
+														
 																	
 
 																			   
@@ -1057,11 +1056,13 @@ function addCitations(){
 													<div class="parameter-title" style="font-size:30px">RNA Folding Parameters  </div>  
 													<div class="parameter-title" style="font-size:18px">Settings behind folding the nascent RNA strand.</div>  <br> 
 													
-														<b>Enable mRNA folding </b> - whether or not the nascent RNA strand will fold automatically during the simulation. The predicted energy barrier 
-																of unfolding secondary structures in the mRNA may need to be overcome when the polymerase translocates backwards. When the nascent strand
-																is DNA or dsRNA this feature is not applicable. Note that enabling this feature will slow down the first trial of the simulation as we compute
-																the predicted (MFE<cite val="zuker1981optimal"></val></cite>) secondary structure of the RNA. You can view the RNA secondary structure with the Fold 
-																<img src="../src/Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"></img> button. Default: TRUE <br><br>
+														<div class="paramHelp">
+															<b>Enable mRNA folding </b> - whether or not the nascent RNA strand will fold automatically during the simulation. The predicted energy barrier 
+																	of unfolding secondary structures in the mRNA may need to be overcome when the polymerase translocates backwards. When the nascent strand
+																	is DNA or dsRNA this feature is not applicable. Note that enabling this feature will slow down the first trial of the simulation as we compute
+																	the predicted (MFE<cite val="zuker1981optimal"></val></cite>) secondary structure of the RNA. You can view the RNA secondary structure with the Fold 
+																	<img src="../src/Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"></img> button. Default: FALSE <br><br>
+														</div><br>
 
 
 														<div class="paramHelp" id="nbpToFold_ParamHelp">
@@ -1072,7 +1073,17 @@ function addCitations(){
 												</div>
 
 
-
+											<br><br>
+												<div class="parameter-bg" style="font-size:18px">
+													
+													<div class="parameter-title" style="font-size:30px">Advanced Model Settings</div>  
+													<div class="parameter-title" style="font-size:18px">Other parameters relating to the algorithm and model.</div>  <br> 
+													<div class="paramHelp" id="arrestTime_ParamHelp">
+														<b>Arrest time </b> - the amount of time the polymerase may take to copy a base before the simulation trial is aborted. When the timeout is
+																reached, copying will prematurely terminate and the next trial will begin. Default: 600s 
+													</div><br>		
+													
+												</div>
 
 												<br><br>
 											
@@ -1095,7 +1106,7 @@ function addCitations(){
 								<br><br>
 								<div class="about-block">
 									<div class="about-block-inner">
-										<div id="priorDistribution_ParamHelp" class="block-subtitle" > Adding a background distribution to a parameter</div> <br>
+										<div id="priorDistribution_ParamHelp" class="block-subtitle" > Adding a prior distribution to a parameter</div> <br>
 											
 											
 
@@ -1465,7 +1476,7 @@ function addCitations(){
 											</h3>
 										
 										
-											We use a pre-exponential constant of $A = 10^6$ s<sup>-1</sup>.	SimPol has two models for estimating the $\Delta G^\dagger_{x,y}$ term. <br><br><br>
+											We use a pre-exponential constant of $A = 10^6$ s<sup>-1</sup>.	SimPol has three models for estimating the $\Delta G^\dagger_{x,y}$ term. <br><br><br>
 										
 									<div style="padding: 10 10; background-color:#ebe9e7">		
 										<div id="translocation_ModelHelp" class="block-subtitle" style="font-size:30px; text-align:left"> 1. Midpoint model</div> 
@@ -1548,11 +1559,12 @@ function addCitations(){
 
 
 										<h3>
-											$$ 	k_{x \rightarrow y} = 10^6 e^{-(\Delta G_{x,y}^\dagger - \Delta G_x - 0.5F \delta)},$$
+											$$ 	k_{x \rightarrow y} = \cases{10^6 e^{-(\Delta G_{x,y}^\dagger - \Delta G_x - F(\delta_1))} & \text{for forward translocation} \\ 
+																			10^6 e^{-(\Delta G_{x,y}^\dagger - \Delta G_x - F(\delta - \delta_1))} &  \text{for backward translocation}}$$
 										</h3>
 
 									where $\delta$ is the distance between consecutive basepairs ($\delta = 3.4$&#8491; in dsDNA<cite val="watson1953molecular"></cite>), and the intermediate state 
-									 is assumed to be $0.5\delta$&#8491; between the two neighbouring positions.
+									 is to be $\delta_1$ (&#8491;) between the two neighbouring positions.
 
 
 							
@@ -2225,7 +2237,7 @@ function addCitations(){
 						
 						
 							<span id='performanceBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
-							Improving Software Performance 
+							Software Information 
 						</div> 
 						<div id="performance"  style="display:none">
 				
@@ -2251,7 +2263,7 @@ function addCitations(){
 
 										Compiling the C++ code with WebAssembly increases speed performance approximately 10x over the same algorithm written in JavaScript for the fastest JavaScript environments. Furthermore, the C++ WebAssembly
 										module performs approximately 2x as fast as compiling the C++ using GNU and running through the command line. For maximum performance we recommend using SimPol on Firefox, Chrome or Safari.
-
+										
 										
 										<span style="padding: 1 5; background-color:#ebe9e7"> 
 											<b style="color:#008cba">Benchmark session:</b> 
@@ -2705,26 +2717,6 @@ function addCitations(){
 
 
 
-							<!--
-							<br><br>
-							<div class="about-block">
-								<div class="about-block-inner">
-									<div class="block-subtitle"> Web workers </div> <br>
-										
-										Setting the simulation speed to <b>slow</b>, <b>medium</b> or <b>fast</b> will determine the animation time of each reaction.
-										If you don't need to see the animations then you can set the speed to <b>ultrafast</b> or <b>hidden</b>. In these modes,
-										the operations all occur behind the scenes and the HTML will only update periodically or not at all. Sampling reactions is resource intensive 
-										and can make the browser unresponsive. For this reason we try to run these background processes in a Web Worker while rendering the animation is done in the main window. <br><br>
-										
-										A Web Worker is like a socket, or an invisible tab your browser opens which runs on its own thread and can communicate
-										with the main window. <a href="https://www.w3schools.com/html/html5_webworkers.asp">Most modern browsers support Web Workers</a> but if 
-										your browser is not up to date or if you have an overzealous third-party plugin then the Web Worker may not register (SimPol will notify you with an error message). 
-										We recommend that you allow the Web Worker to register, to ensure the whole program runs smoothly and you can run simulations in <b>ultrafast</b> or <b>hidden</b> mode.
-
-								</div>
-							</div>
-							-->
-
 
 
 
@@ -2737,7 +2729,7 @@ function addCitations(){
 										<div style="padding: 10 10; background-color:#ebe9e7" >
 
 											<b> 1. Generate a SimPol session file.</b> Go to <a href="http://www.polymerase.nz">SimPol</a> in your web browser and configure the number of trials, parameters, model settings, ABC settings, etc.
-											When you are happy with all the settings, download the session as an XML file <img id='saveSessionID'   src="../src/Images/downloadGreen.png" style="padding:5 0; vertical-align:middle; height:25px;">.
+											When you are happy with all the settings, download the session as an XML file <img id='saveSessionID'  src="../src/Images/downloadGreen.png" style="padding:5 0; vertical-align:middle; height:25px;">.
 
 										</div> <br>
 
@@ -2745,7 +2737,7 @@ function addCitations(){
 										
 										<div style="padding: 10 10; background-color:#ebe9e7" >
 
-											<b> 2. Download SimPol </b> from <a href="../download">here</a> and unzip. Open up the command terminal and navigate to this folder.
+											<b> 2. Download SimPol </b> from <a href="https://github.com/jordandouglas/jordandouglas.github.io">here</a> and unzip. Open up the command terminal and navigate to this folder.
 
 										</div> <br>
 
@@ -2769,12 +2761,12 @@ function addCitations(){
 
 										<div style="padding: 10 10; background-color:#ebe9e7" >
 
-											<b> 4. Run SimPol.</b> On Linux/Mac this is done using <span class="code">SimpolC</span> generated in step 3. If running on Windows use SimpolCx32.exe or SimpolCx64.exe (for 32 or 64bit):  <br><br>
+											<b> 4. Run SimPol.</b> On Linux/Mac this is done using <span class="code">SimpolC</span> generated in step 3. If running on Windows use <span class="code">SimpolCx32.exe</span> or <span class="code">SimpolCx64.exe</span> (for 32 or 64bit):  <br><br>
 
 												<div class="code" style="margin-left: 100px;">
 													
-													./SimpolC -i &lt;ipath/to/session.xml&gt; <span class="comment">// For Linux/Mac </span> <br>
-													SimpolCxNN.exe -i &lt;path\to\session.xml&gt; <span class="comment">// For Windows </span> <br>
+													./SimpolC -i &lt;ipath/to/session.xml&gt; <span class="comment"># For Linux/Mac </span> <br>
+													SimpolCxNN.exe -i &lt;path\to\session.xml&gt; <span class="comment"># For Windows </span> <br>
 
 												</div> <br>
 
