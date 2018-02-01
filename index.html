@@ -226,11 +226,7 @@ function init(){
 			movedToolbarRight = true;
 
 
-			var IS_SAFARI = window.navigator.userAgent.indexOf("Safari") > -1 && window.navigator.userAgent.indexOf('Chrome') == -1;
 
-		    // If safari then display IE warning message
-		    if (IS_SAFARI && WEB_WORKER_WASM == null) $("#SafariWarningMsg").show(true);
-			else if (USE_WASM && WEB_WORKER_WASM == null) $("#webassemblyNotRegister").show(true);
 
 
 			IS_MOBILE = false; 
@@ -2529,8 +2525,6 @@ function closeNav() {
 
 
 
-			<div class="errorMsg" id="SafariWarningMsg" style="display:none"> We notice that you are using Safari. To get the most out of SimPol we recommend you
-						change to a web browser which supports WebAssembly (Chrome, Firefox or Internet Explorer). </div>
 			
 			<div class="errorMsg" id="badBrowser" style="display:none"> There was a javascript error which will prevent this page from operating. Please update your web browser. If this problem persists then send us information about the bug to support@polymerase.nz </div>
 			
