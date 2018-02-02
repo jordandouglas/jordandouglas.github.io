@@ -24,6 +24,7 @@
 #include "State.h"
 #include "Simulator.h"
 #include "XMLparser.h"
+#include "FreeEnergy.h"
 #include "TranslocationRatesCache.h"
 
 #include <emscripten.h>
@@ -73,7 +74,6 @@ extern "C" {
 
 		XMLparser::parseXMLFromString(XMLdata);
 		Settings::sampleAll();
-   	 	complementSequence = Settings::complementSeq(templateSequence, TemplateType.substr(2) == "RNA");
 
 	    // Build the rates table
 	   	TranslocationRatesCache::buildTranslocationRateTable(); 
@@ -86,10 +86,52 @@ extern "C" {
 	}
 
 
+	// Get the sequences saved to the model
+	void EMSCRIPTEN_KEEPALIVE getSequences(int msgID){
+
+		string parametersJSON = "{";
+
+		// Iterate through all sequences
+		for(std::map<string, Sequence*>::iterator iter = sequences.begin(); iter != sequences.end(); ++iter){
+			string id = iter->first;
+			Sequence* seq = iter->second;
+			parametersJSON += seq->toJSON() + ",";
+		}
+
+		parametersJSON = parametersJSON.substr(0, parametersJSON.length()-1); // Remove final ,
+		parametersJSON += "}";
+		messageFromWasmToJS(parametersJSON, msgID);
+
+	}
+
+
+	// User enter their own sequence. Return whether or not it worked
+	int EMSCRIPTEN_KEEPALIVE userInputSequence(char* newSeq, char* newTemplateType, char* newPrimerType, int inputSequenceIsNascent, int msgID){
+
+		string seq = inputSequenceIsNascent == 1 ? Settings::complementSeq(string(newSeq), string(newTemplateType).substr(2) == "RNA") : string(newSeq);
+		if (seq.length() < hybridLen->getVal() + 2) return 0;
+		Sequence* newSequence = new Sequence("$user", string(newTemplateType), string(newPrimerType), seq); 
+		sequences["$user"] = newSequence;
+		Settings::setSequence("$user");
+
+		return 1;
+
+	}
+
+
+	// Set the sequence to one in the list
+	void EMSCRIPTEN_KEEPALIVE userSelectSequence(char* seqID){
+		bool succ = Settings::setSequence(string(seqID));
+		if (!succ) cout << "Cannot find sequence " << seqID << "." << endl;
+	}
+
 	// Save the distribution and its arguments of a parameter (and samples it)
 	void EMSCRIPTEN_KEEPALIVE saveParameterDistribution(char* paramID, char* distributionName, char* distributionArgNames, double* distributionArgValues, int nArgs) {
 
-		Parameter* param = Settings::getParameterByName(string(paramID));
+		string paramID_s = string(paramID);
+		if (paramID_s == "hybridLen" || paramID_s == "bubbleLeft" || paramID_s == "bubbleRight") needToReinitiateAnimation = true;
+
+		Parameter* param = Settings::getParameterByName(paramID_s);
 		if (param){
 			param->setPriorDistribution(string(distributionName));
 
@@ -97,7 +139,7 @@ extern "C" {
 			for (int i = 0; i < nArgs; i ++) {
 				string argName = argNames.at(i);
 				double argVal = distributionArgValues[i];
-				cout << string(paramID) << ": " << argName << " = " << argVal << endl;
+				cout << paramID_s << ": " << argName << " = " << argVal << endl;
 				param->setDistributionParameter(argName, argVal);
 			}
 
@@ -127,12 +169,15 @@ extern "C" {
 
 		string parametersJSON = "{";
 
+		parametersJSON += "refreshDOM:" + string(needToReinitiateAnimation ? "true" : "false") + ",";
+
 		for (int i = 0; i < Settings::paramList.size(); i ++){
 			parametersJSON += Settings::paramList.at(i)->getJSON();
 			if (i < Settings::paramList.size()-1) parametersJSON += ",";
 		}
 
 		parametersJSON += "}";
+		needToReinitiateAnimation = false;
 		messageFromWasmToJS(parametersJSON, msgID);
 	}
 	
@@ -216,6 +261,25 @@ extern "C" {
 		
 		
 	}
+
+
+	// Calculates the mean translocation equilibrium constant, and mean rates of going forward and backwards
+	void EMSCRIPTEN_KEEPALIVE calculateMeanTranslocationEquilibriumConstant(int msgID){
+
+		double results[3];
+		FreeEnergy::calculateMeanTranslocationEquilibriumConstant(results);
+
+		// Build JSON string
+		string parametersJSON = "{";
+		parametersJSON += "meanEquilibriumConstant:" + to_string(results[0]) + ",";
+		parametersJSON += "meanForwardRate:" + to_string(results[1]) + ",";
+		parametersJSON += "meanBackwardsRate:" + to_string(results[2]);
+		parametersJSON += "}";
+		messageFromWasmToJS(parametersJSON, msgID);
+
+	}
+
+
 	
 
 

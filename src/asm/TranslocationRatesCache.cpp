@@ -144,6 +144,7 @@ void TranslocationRatesCache::buildTranslocationRateTable(){
 
 
 	cout << "Building translocation rate table..." << endl;
+	delete translocationRateTable;
 	
 	int h = (int)hybridLen->getVal();
 	int nLengths = templateSequence.length() - h + 1;
@@ -180,12 +181,14 @@ void TranslocationRatesCache::buildBacktrackRateTable(){
 	// are the same per position across different nascent strand lengths. The bases added onto the nascent strand
 	// which are coming out of the NTP pore don't matter. This assumption would no longer hold if we started
 	// folding the 3' end of the nascent strand
-	
+
+	cout << "Building backtrack rate table..." << endl;
+	delete backtrackRateTable;
+
 	int h = (int)hybridLen->getVal();
 	if (templateSequence.length() - h - 1 < 0) return;
 	backtrackRateTable = new double*[templateSequence.length() - h - 1];
 
-	cout << "Building backtrack rate table..." << endl;
 
 	for (int leftHybridBase = 1; leftHybridBase <= templateSequence.length() - h - 1; leftHybridBase ++){
 		int indexNum = leftHybridBase - 1;

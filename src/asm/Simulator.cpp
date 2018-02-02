@@ -61,6 +61,7 @@ double Simulator::perform_N_Trials(int N, State* state, bool verbose){
 	
 	if (verbose) {
 		cout << "Performing " << N << " trials" << endl;
+		//cout << templateSequence << endl;
 		if (currentModel->get_assumeBindingEquilibrium()) cout << "Binding assumed to be at equilibrium" << endl;
 		if (currentModel->get_assumeTranslocationEquilibrium()) cout << "Translocation assumed to be at equilibrium" << endl;
 	}

@@ -90,12 +90,13 @@ int main(int argc, char** argv) {
 	}
 	
     Settings::sampleAll();
-    complementSequence = Settings::complementSeq(templateSequence, TemplateType.substr(2) == "RNA");
+    //complementSequence = Settings::complementSeq(templateSequence, TemplateType.substr(2) == "RNA");
 
 
     // Build the rates table
    	TranslocationRatesCache::buildTranslocationRateTable(); 
    	TranslocationRatesCache::buildBacktrackRateTable();
+
 
 	
 	 // If no arguments then exit now

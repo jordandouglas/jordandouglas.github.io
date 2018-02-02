@@ -879,11 +879,11 @@ function getComplementSequence_WW(seq, toRNA){
 
 	}
 		
-
+	var toReturn = {succ: goodLength};
 	if (msgID != null){
-		postMessage(msgID + "~X~" + goodLength);
+		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
 	}else{
-		return goodLength;
+		return toReturn;
 	}
 
 }

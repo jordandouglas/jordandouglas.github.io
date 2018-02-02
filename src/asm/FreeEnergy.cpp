@@ -415,6 +415,62 @@ double FreeEnergy::getFreeEnergyOfTranscriptionBubbleHybridString(string templat
 }
 
 
+// Calculates the mean pre-posttranslocated equilibrium constant (kfwd / kbck) across the whole sequence
+// Populates the provided array[3] with 1) meanEquilibriumConstant, 2) meanForwardRate and 3) meanBackwardsRate
+void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
+
+	State* state = new State(true);
+
+	// Iterate until the end of the sequence
+	state->transcribe(1);
+	int nsites = templateSequence.length() - hybridLen->getVal() - bubbleLeft->getVal() - 3;
+	vector<double> equilibriumConstants(nsites);
+	vector<double> forwardRates(nsites);
+	vector<double> backwardsRates(nsites);
+	for (int i = 0; i < nsites; i ++){
+	//while (state->get_mRNAPosInActiveSite() + state->get_nascentLength() + 1 <= templateSequence.length()){
+		
+
+
+		// Get rate of pre -> post
+		state->backward();
+		double kPreToPost = state->calculateForwardRate(true, true);
+
+		// Get rate of post -> pre
+		state->forward();
+		double kPostToPre = state->calculateBackwardRate(true, true);
+		
+		// Calculate equilibrium constant
+		equilibriumConstants.at(i) = kPreToPost / kPostToPre;
+		forwardRates.at(i) = kPreToPost;
+		backwardsRates.at(i) = kPostToPre;
+		
+		// Bind NTP and catalyse to get next state
+		state->transcribe(1);
+		
+	}
+
+
+	// Calculate mean equilibrium constant
+	double meanEquilibriumConstant = 0;
+	double meanForwardRate = 0;
+	double meanBackwardsRate = 0;
+	for (int i = 0; i < nsites; i ++) {
+		meanEquilibriumConstant += equilibriumConstants.at(i) / nsites;
+		meanForwardRate += forwardRates.at(i) / nsites;
+		meanBackwardsRate += backwardsRates.at(i) / nsites;
+	}
+	
+	results[0] = meanEquilibriumConstant;
+	results[1] = meanForwardRate;
+	results[2] = meanBackwardsRate;
+
+	delete state;
+
+
+}
+
+
 
 void FreeEnergy::init_BP_parameters(){
 

@@ -237,7 +237,7 @@ PARAMS_JS.refreshNTP_WW = function(){
 PARAMS_JS.update_this_parameter_WW = function(paramID, fixedVal, resolve = function(toReturn) {}, msgID = null){
 	
 	
-	var toReturn = {refresh: false}
+	var toReturn = {refreshDOM: false}
 
 	var initialVal = PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"];
 	
@@ -254,7 +254,7 @@ PARAMS_JS.update_this_parameter_WW = function(paramID, fixedVal, resolve = funct
 		PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["fixedDistnVal"] = fixedVal;
 		
 		// Some parameters require a refresh
-		toReturn["refresh"] = PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["refreshOnChange"] != null && PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["refreshOnChange"];
+		toReturn["refreshDOM"] = PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["refreshOnChange"] != null && PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["refreshOnChange"];
 
 
 	}

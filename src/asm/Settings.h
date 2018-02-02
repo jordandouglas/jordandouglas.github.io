@@ -27,6 +27,7 @@
 #include "Model.h"
 #include "ExperimentalData.h"
 #include "randomc/randomc.h"
+#include "Sequence.h"
 
 #include <random>
 #include <string>
@@ -49,6 +50,8 @@ extern string templateSequence;
 extern string complementSequence;
 extern string TemplateType;
 extern string PrimerType;
+extern map<string, Sequence*> sequences;
+extern Sequence* currentSequence;
 
 
 
@@ -76,6 +79,7 @@ extern Model* currentModel;
 
 // User interface information
 extern bool stop;
+extern bool needToReinitiateAnimation;
 
 
 
@@ -125,6 +129,7 @@ class Settings{
 		static Parameter* getParameterByName(string paramID);
 		static vector<Parameter*> paramList;
 		static string toJSON();
+		static bool setSequence(string seqID);
 
 		// Utilities
 		static vector<string> split(const std::string& s, char delimiter);

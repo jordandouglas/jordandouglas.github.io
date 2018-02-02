@@ -123,6 +123,50 @@ stopWebAssembly = function(msgID = null){
 }
 
 
+// Get all sequences from the model
+getSequences = function(msgID = null) {
+
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+
+	Module.ccall("getSequences", null, ["number"],  [msgID]); 
+
+}
+
+
+// User enter their own sequence. Return whether or not it worked
+userInputSequence = function(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent, msgID = null){
+
+
+	var result = Module.ccall("userInputSequence", "number", ["string", "string", "string", "number", "number"],  [newSeq, newTemplateType, newPrimerType, (inputSequenceIsNascent ? 1 : 0), msgID]); 
+	var toReturn = {succ: result == 1}; 
+	postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+
+
+}
+
+// Select the sequencefrom list
+userSelectSequence = function(newSequenceID, msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log("Returning", JSON.parse(resultStr));
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+
+	Module.ccall("userSelectSequence", null, ["string"],  [newSequenceID]); 
+
+	var toReturn = {succ: true}; 
+	postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+
+}
+
+
 // Saves the parameter's distribution name and args to the module
 saveParameterDistribution = function(paramID, distributionName, distributionParams, msgID = null){
 
@@ -214,6 +258,23 @@ startTrials = function(N, msgID = null){
 	
 	
 }
+
+
+// Calculates the mean pre-posttranslocated equilibrium constant (kfwd / kbck) across the whole sequence
+calculateMeanTranslocationEquilibriumConstant = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("calculateMeanTranslocationEquilibriumConstant", null, ["number"], [msgID]);
+
+}
+
+
+
 
 onmessage = function(e) {
 

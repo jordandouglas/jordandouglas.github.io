@@ -51,6 +51,8 @@ class FreeEnergy{
 		static double getFreeEnergyOfTranscriptionBubbleIntermediate(State* state1, State* state2);
 		static void init_BP_parameters();
 
+		static void calculateMeanTranslocationEquilibriumConstant(double* results);
+
 };
 
 
