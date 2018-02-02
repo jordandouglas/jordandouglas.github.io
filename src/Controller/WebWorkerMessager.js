@@ -546,11 +546,26 @@ function calculateMeanTranslocationEquilibriumConstant_controller(resolve = func
 	if (WEB_WORKER == null) {
 		toDoAfter(FE_JS.calculateMeanTranslocationEquilibriumConstant_WW());
 
-	}else{
+	}
+
+	else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("FE_JS.calculateMeanTranslocationEquilibriumConstant_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		callWebWorkerFunction(fnStr, toDoAfter, msgID);
+	}
+
+	else {
+		
+		var res = stringifyFunction("calculateMeanTranslocationEquilibriumConstant", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		//console.log("Sending function: " + fnStr);
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+
+		toCall(fnStr).then((x) => resolve(x));
+
+
 	}
 
 
@@ -560,17 +575,30 @@ function calculateMeanTranslocationEquilibriumConstant_controller(resolve = func
 
 function userInputSequence_controller(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent, resolve){
 
-
-	
-
 	if (WEB_WORKER == null) {
 		resolve(WW_JS.userInputSequence_WW(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent));
 
-	}else{
+	}
+
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("WW_JS.userInputSequence_WW", [newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		callWebWorkerFunction(fnStr, resolve, msgID);
+	}
+
+	else{
+		
+		callWebWorkerFunction(stringifyFunction("WW_JS.userInputSequence_WW", [newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent]));
+	
+		var res = stringifyFunction("userInputSequence", [newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		//console.log("Sending function: " + fnStr);
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+
+		toCall(fnStr).then((x) => resolve(x));
+
 	}
 
 
@@ -580,17 +608,31 @@ function userSelectSequence_controller(newSequenceID, newTemplateType, newPrimer
 
 
 
-
 	if (WEB_WORKER == null) {
 		resolve(WW_JS.userSelectSequence_WW(newSequenceID, newTemplateType, newPrimerType));
 
-	}else{
+	}
+
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("WW_JS.userSelectSequence_WW", [newSequenceID, newTemplateType, newPrimerType], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall(fnStr).then((goodLength) => resolve(goodLength));
+	}
+
+	else{
 		
+		callWebWorkerFunction(stringifyFunction("WW_JS.userSelectSequence_WW", [newSequenceID, newTemplateType, newPrimerType]));
+	
+		var res = stringifyFunction("userSelectSequence", [newSequenceID], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		//console.log("Sending function: " + fnStr);
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+
+		toCall(fnStr).then((x) => resolve(x));
+
 	}
 
 
@@ -925,11 +967,13 @@ function update_this_parameter_controller(element){
 
 		// Function to call when webworker has responded
 		var updateDOM = function(result){
-			
-			if (result["refresh"]){
+
+			if (result["refreshDOM"]){
 				refresh();
 				return;
 			}
+
+			if (result["val"] == null) result = result[paramID];
 
 			// If this is an NTP concentration or an NTP binding parameter then we also need to resample the next NTP addition event
 			if (paramID.substring(3) == "conc" || paramID == "RateBind" || paramID == "RateMisbind" || paramID == "TransitionTransversionRatio") setNextBaseToAdd_controller();
@@ -949,12 +993,26 @@ function update_this_parameter_controller(element){
 			toCall().then((result) => updateDOM(result));
 		}
 
-		else{
+		else if (WEB_WORKER_WASM == null) {
 			var res = stringifyFunction("PARAMS_JS.update_this_parameter_WW", [paramID, val, null], true);
 			var fnStr = res[0];
 			var msgID = res[1];
 			var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 			toCall().then((result) => updateDOM(result));
+
+		}
+
+		else {
+		
+			callWebWorkerFunction(stringifyFunction("PARAMS_JS.update_this_parameter_WW", [paramID, val]));
+
+			// Send to WebAssembly webworker
+			var res = stringifyFunction("saveParameterDistribution", [paramID, "Fixed", {fixedDistnVal: val}], true);
+			var fnStr = "wasm_" + res[0];
+			var msgID = res[1];
+			var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+			toCall().then((result) => updateDOM(result));
+			
 
 		}
 
@@ -2168,7 +2226,24 @@ function getMFESequenceBonds_controller(){
 	
 }
 
+function getAllSequences_controller(resolve = function(allSeqs) { }){
 
+	if (WEB_WORKER_WASM == null) {
+		resolve(SEQS_JS.all_sequences);
+	}
+
+	else{
+
+		var res = stringifyFunction("getSequences", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((seqs) => resolve(seqs));
+
+	}
+
+
+}
 
 function loadSession_controller(XMLData, resolve = function() { }){
 	
@@ -2823,26 +2898,6 @@ function getPosteriorDistribution_controller(resolve = function(posterior) { }){
 
 
 
-
-
-
-function myFunction_wasm(resolve = function() { }){
-
-
-	resolve = function(res){
-
-		console.log(res);
-	}
-
-
-	var res = stringifyFunction("getAllParameters", [], true);
-	var fnStr = "wasm_" + res[0];
-	var msgID = res[1];
-	//console.log("Sending function: " + fnStr);
-	var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-	toCall(fnStr).then((dict) => resolve(dict));
-	
-}
 
 
 
