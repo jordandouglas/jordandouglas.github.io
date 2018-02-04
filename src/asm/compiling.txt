@@ -24,5 +24,5 @@ cd /home/jdou557/Documents/Cimpol/SimpolC/SimpolC/src/asm
 
 
 
-emcc -s WASM=1 -o simpol_asm.html -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'Pointer_stringify']" -s ASSERTIONS=1 -O1 -O2 -O3 -std=c++11 -s NO_EXIT_RUNTIME=1 -s ALLOW_MEMORY_GROWTH=1   cimpol.cpp WasmInterface.cpp Parameter.cpp MCMC.cpp ExperimentalData.cpp PosteriorDistriutionSample.cpp XMLparser.cpp Model.cpp Simulator.cpp State.cpp Settings.cpp FreeEnergy.cpp TranslocationRatesCache.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp
+emcc -s WASM=1 -o simpol_asm.html -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'Pointer_stringify']" -s ASSERTIONS=1 -O1 -O2 -O3 -std=c++11 -s NO_EXIT_RUNTIME=1 -s ALLOW_MEMORY_GROWTH=1   cimpol.cpp WasmInterface.cpp Sequence.cpp Parameter.cpp MCMC.cpp ExperimentalData.cpp PosteriorDistriutionSample.cpp XMLparser.cpp Model.cpp Simulator.cpp State.cpp Settings.cpp FreeEnergy.cpp TranslocationRatesCache.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp
 

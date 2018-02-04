@@ -111,6 +111,8 @@ CRandomMersenne* Settings::SFMT;
 // User interface information
 bool stop = false;
 bool needToReinitiateAnimation = false;
+Simulator* interfaceSimulator; // The simulator object being used by the GUI
+chrono::system_clock::time_point interfaceSimulation_startTime = chrono::system_clock::now();
 
 
 void Settings::init(){

@@ -233,30 +233,70 @@ extern "C" {
 	
 	
 	
-	// Perform N simulations. Returns mean velocity and real time taken
-	void EMSCRIPTEN_KEEPALIVE startTrials(int N, int msgID){
+	// Perform N simulations
+	// Returns mean velocity, real time taken and remaining number of trials to go
+	// Returns to the js webworker periodically depending on speed mode
+	void EMSCRIPTEN_KEEPALIVE startTrials(int N, int speedMode, int msgID){
 		
 		
 		stop = false;
+		
+		// Speedmode: 1 = slow, 2 = medium, 3 = fast, 4 = hidden
 
 		cout << "Starting " << N << endl;
 		
 		// Start timer
-		auto startTime = chrono::system_clock::now();
+		interfaceSimulation_startTime = chrono::system_clock::now();
 		
 		// Prepare for simulating
-		Simulator* sim = new Simulator();
+		interfaceSimulator = new Simulator();
 	   	State* initialState = new State(true);
-	   	double velocity = sim->perform_N_Trials(N, initialState, true);
+	   	double velocity = interfaceSimulator->perform_N_Trials(N, initialState, true);
 		
 		
 		// Stop timer
 		auto endTime = chrono::system_clock::now();
-		chrono::duration<double> elapsed_seconds = endTime-startTime;
+		chrono::duration<double> elapsed_seconds = endTime - interfaceSimulation_startTime;
 		double time = elapsed_seconds.count();
 		
 		
-		string toReturnJSON = "{meanVelocity:" + to_string(velocity) + ",realTime:" + to_string(time) + "}";
+		string toReturnJSON = "{stop:false,meanVelocity:" + to_string(velocity) + ",realTime:" + to_string(time) + ",N:" + to_string(N) + "}";
+		
+		messageFromWasmToJS(toReturnJSON, msgID);
+		
+		
+	}
+	
+	
+	// Resumes the simulations that were created in StartTrials
+	// Returns mean velocity, real time taken and remaining number of trials to go
+	// Returns to the js webworker periodically depending on speed mode
+	void EMSCRIPTEN_KEEPALIVE resumeTrials(int msgID){
+		
+		
+		// Check if told to stop
+		if (stop){
+			string toReturnJSON = "{stop:true}";
+			stop = false;
+			messageFromWasmToJS(toReturnJSON, msgID);
+			delete interfaceSimulator;
+			delete interfaceSimulation_startTime;
+			return;
+		}
+		
+		
+		
+		
+	   	double velocity = interfaceSimulator->perform_N_Trials(N, initialState, true);
+		
+		
+		// Stop timer
+		auto endTime = chrono::system_clock::now();
+		chrono::duration<double> elapsed_seconds = endTime-interfaceSimulation_startTime;
+		double time = elapsed_seconds.count();
+		
+		
+		string toReturnJSON = "{stop:false,meanVelocity:" + to_string(velocity) + ",realTime:" + to_string(time) + ",N:" + to_string(N) + "}";
 		messageFromWasmToJS(toReturnJSON, msgID);
 		
 		

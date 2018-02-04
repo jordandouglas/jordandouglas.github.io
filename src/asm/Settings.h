@@ -28,10 +28,13 @@
 #include "ExperimentalData.h"
 #include "randomc/randomc.h"
 #include "Sequence.h"
+#include "Simulator.h"
 
 #include <random>
 #include <string>
 #include <list>
+#include <chrono>
+#include <ctime>
 
 using namespace std;
 
@@ -80,6 +83,8 @@ extern Model* currentModel;
 // User interface information
 extern bool stop;
 extern bool needToReinitiateAnimation;
+extern Simulator* interfaceSimulator; // The simulator object being used by the GUI
+extern chrono::system_clock::time_point interfaceSimulation_startTime; // The start time of the GUI simulation
 
 
 

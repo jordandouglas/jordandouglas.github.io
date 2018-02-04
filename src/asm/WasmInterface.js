@@ -254,7 +254,7 @@ startTrials = function(N, msgID = null){
 		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 	}
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
-	Module.ccall("startTrials", null, ["number", "number"], [N, msgID]);
+	Module.ccall("startTrials", null, ["number", "number", "number"], [N, 4, msgID]);
 	
 	
 }
