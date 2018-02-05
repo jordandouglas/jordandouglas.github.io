@@ -1,3 +1,0 @@
-State	logPrior	chiSquared
-0	0	0
-0	0	0
