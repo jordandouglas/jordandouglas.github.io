@@ -2271,7 +2271,7 @@ function addCitations(){
 										Each setting was tested on 1000 simulations of the 4029nt E.coli ropB gene (accession number KP670789). 
 
 										Compiling the C++ code with WebAssembly increases speed performance approximately 10x over the same algorithm written in JavaScript for the fastest JavaScript environments. Furthermore, the C++ WebAssembly
-										module performs approximately 2x as fast as compiling the C++ using GNU and running through the command line. For maximum performance we recommend using SimPol on Firefox, Chrome or Safari.
+										module performs approximately 2x as fast as compiling the C++ using GNU (on Linux) or Visual C++ (Windows and running through the command line. For maximum performance we recommend using SimPol on Firefox, Chrome or Safari.
 										
 										
 										<span style="padding: 1 5; background-color:#ebe9e7"> 
@@ -2784,9 +2784,11 @@ function addCitations(){
 
 												<div style="margin-left: 100px;">
 													
-													<span class="code">-MCMC</span> : Run MCMC analysis instead of just simulating. <br><br>
+													<span class="code">-MCMC</span>: Run MCMC analysis instead of just simulating. <br><br>
 
-													<span class="code">-o outputfolder</span> : Write the output into the specified file. <br><br>
+													<span class="code">-o file.log </span>: Write the output into the specified file. <br><br>
+													
+													<span class="code">-nthreads N</span>: Parallelise the simulations over N threads. <br><br>
 
 
 
