@@ -33,6 +33,9 @@
 #include <vector>
 #include <chrono>
 #include <ctime>
+#include <random>
+#include <functional>
+#include <thread>
 
 
 using namespace std;
@@ -68,7 +71,7 @@ extern "C" {
 	// Parse XML settings in string form
 	void EMSCRIPTEN_KEEPALIVE loadSessionFromXML(char* XMLdata, int msgID){
 
-		// Reinitialise the model
+		// Reinitialise the modeltimer_start
 		delete currentModel;
 		currentModel = new Model();
 
@@ -244,6 +247,7 @@ extern "C" {
 		// Speedmode: 1 = slow, 2 = medium, 3 = fast, 4 = hidden
 
 		cout << "Starting " << N << endl;
+
 		
 		// Start timer
 		interfaceSimulation_startTime = chrono::system_clock::now();
@@ -273,14 +277,14 @@ extern "C" {
 	// Returns to the js webworker periodically depending on speed mode
 	void EMSCRIPTEN_KEEPALIVE resumeTrials(int msgID){
 		
-		
+		/*
 		// Check if told to stop
 		if (stop){
 			string toReturnJSON = "{stop:true}";
 			stop = false;
 			messageFromWasmToJS(toReturnJSON, msgID);
 			delete interfaceSimulator;
-			delete interfaceSimulation_startTime;
+			//delete interfaceSimulation_startTime;
 			return;
 		}
 		
@@ -298,7 +302,7 @@ extern "C" {
 		
 		string toReturnJSON = "{stop:false,meanVelocity:" + to_string(velocity) + ",realTime:" + to_string(time) + ",N:" + to_string(N) + "}";
 		messageFromWasmToJS(toReturnJSON, msgID);
-		
+		*/
 		
 	}
 

@@ -49,6 +49,7 @@ const double _kBT = 1.380649e-23 * 310;
 const double _preExp = 1e6;	
 
 
+
 // Sequence information
 int ntrials_sim = 1000;
 map<string, Sequence*> sequences;
@@ -71,6 +72,7 @@ double _chiSqthreshold_gamma = 0.999;
 int burnin = 10; 
 int logEvery = 100;
 string outputFilename = "";
+int N_THREADS = 1;
 
 
 // Experimental data
@@ -514,3 +516,5 @@ vector<std::string> Settings::split(const std::string& s, char delimiter){
    }
    return tokens;
 }
+
+

@@ -25,13 +25,16 @@
 #include "State.h"
 #include "Model.h"
 #include "Parameter.h"
-#include "Simulator.h"
+#include "SimulatorPthread.h"
 #include "Settings.h"
+
+
 
 
 #include <iostream>
 #include <list>
 #include <math.h> 
+#include <thread>
 
 using namespace std;
 
@@ -42,7 +45,6 @@ bool MCMC::estimatingModel;
 bool MCMC::hasAchievedBurnin;
 
 double MCMC::epsilon = 0;
-Simulator* MCMC::simulator = new Simulator();
 
 /*
 To do next:
@@ -260,8 +262,6 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 		double runifNum = Settings::runif();
 		double priorRatio = exp(thisMCMCState->get_logPriorProb() - prevMCMCState->get_logPriorProb());
 
-		//cout << "Accepting prior with probability " << priorRatio << " (" << thisMCMCState->get_logPriorProb() << "," << prevMCMCState->get_logPriorProb() << ")" << endl;
-
 		// Reject
 		if (runifNum > priorRatio){
 			return false;
@@ -277,13 +277,11 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 
 
 	// Iterate through all experimental settings and perform simulations at each setting. The velocities generated are cached in the posterior object
-	State* initialState = new State(true); // Will stay at initial state (not mutated by simulator)
 
 	// Run simulations and stop if it exceeds threshold (unless this is the first trial)
-	double simulatedVelocity = MCMC::simulator->perform_N_Trials(ntrialsPerDatapoint, initialState, false);
+	double simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint);
 	thisMCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
 	if (thisMCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
-		delete initialState;
 		return false;
 	}
 
@@ -291,10 +289,9 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 	while (MCMC::nextExperiment()){
 
 		// Run simulations and stop if it exceeds threshold (unless this is the first trial)
-		simulatedVelocity = MCMC::simulator->perform_N_Trials(ntrialsPerDatapoint, initialState, false);
+		simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint);
 		thisMCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
 		if (thisMCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
-			delete initialState;
 			return false;
 		}
 
@@ -302,7 +299,6 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 
 
 	// Exceeds threshold -> reject
-	delete initialState;
 	if (thisMCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) return false;
 
 

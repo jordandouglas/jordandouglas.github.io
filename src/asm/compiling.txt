@@ -11,6 +11,8 @@ https://kripken.github.io/emscripten-site/docs/porting/connecting_cpp_and_javasc
 
 https://becominghuman.ai/passing-and-returning-webassembly-array-parameters-a0f572c65d97 parsing arrays
 
+https://github.com/kripken/emscripten/wiki/Pthreads-with-WebAssembly pthread
+
 
 
 E:\STOREDFILES\Research\OverprintingDisorder\WebAssembly\emsdk\emsdk_env
@@ -24,5 +26,9 @@ cd /home/jdou557/Documents/Cimpol/SimpolC/SimpolC/src/asm
 
 
 
-emcc -s WASM=1 -o simpol_asm.html -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'Pointer_stringify']" -s ASSERTIONS=1 -O1 -O2 -O3 -std=c++11 -s NO_EXIT_RUNTIME=1 -s ALLOW_MEMORY_GROWTH=1   cimpol.cpp WasmInterface.cpp Sequence.cpp Parameter.cpp MCMC.cpp ExperimentalData.cpp PosteriorDistriutionSample.cpp XMLparser.cpp Model.cpp Simulator.cpp State.cpp Settings.cpp FreeEnergy.cpp TranslocationRatesCache.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp
+emcc -s WASM=1 -o simpol_asm.html -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'Pointer_stringify']" -s ASSERTIONS=1 -O1 -O2 -O3 -std=c++11 -s ALLOW_MEMORY_GROWTH=1  -s NO_EXIT_RUNTIME=1  cimpol.cpp WasmInterface.cpp Sequence.cpp Parameter.cpp MCMC.cpp ExperimentalData.cpp PosteriorDistriutionSample.cpp XMLparser.cpp Model.cpp Simulator.cpp State.cpp Settings.cpp FreeEnergy.cpp TranslocationRatesCache.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp SimulatorPthread.cpp
 
+-s ALLOW_MEMORY_GROWTH=1 
+-s USE_PTHREADS=1  
+-s WASM_MEM_MAX=33554432 
+-s TOTAL_MEMORY=30MB

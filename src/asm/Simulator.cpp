@@ -34,6 +34,8 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <chrono>
+#include <ctime>
 
 using namespace std;
 
@@ -46,7 +48,20 @@ Simulator::Simulator(){
 	random_device rd; 
 	sfmt = new CRandomMersenne(rd());
 
+	simulateForMilliSeconds = -1;
+
 }
+
+
+
+/*
+void Simulator::timer_start(unsigned int interval) {
+    thread([interval]() {
+        this_thread::sleep_for(chrono::milliseconds(interval));
+        cout << "Time's up" << endl;
+    }).detach();
+}
+*/
 
 
 
@@ -54,10 +69,13 @@ Simulator::Simulator(){
 double Simulator::perform_N_Trials(int N, State* state, bool verbose){
 
 
+
+	//Simulator::timer_start(1000);
+
 	//Settings::print();
 
 	//currentModel->print();
-
+	simulateForMilliSeconds = -1; 
 	
 	if (verbose) {
 		cout << "Performing " << N << " trials" << endl;
@@ -120,6 +138,54 @@ double Simulator::perform_N_Trials(int N, State* state, bool verbose){
 }
 
 
+// Performs upto N trials and then returns with whatever progress has been made after msUntilStop has elapsed
+void Simulator::perform_N_Trials_and_stop(int N, State* state, double msUntilStop, double* toReturn){
+
+	nTrialsTotalGUI = N;
+	nTrialsCompletedGUI = 0;
+	simulateForMilliSeconds = msUntilStop;
+	delete currentGUIState;
+
+	//this->timer_start(1000);
+
+	// Simulate until time elapses
+	double meanMeanVelocity = 0;
+	double meanMeanTime = 0;
+	State* initialState = new State(true);
+	State* clonedState;
+	for (int n = 1; n <= N; n ++){
+		if (n == 1 || n % 100 == 0) cout << "Starting trial " << n << endl;
+
+		double result[2];
+		clonedState = initialState->clone();
+		performSimulation(clonedState, result);
+
+		// If the velocity -1, then the current simulation was interrupted by a timeout
+		if (result[0] < 0){
+			currentGUIState = clonedState;
+			inSimulationTimeElapsedCurrentSimulation = result[1];
+		}
+		else {
+			nTrialsCompletedGUI++;
+			meanMeanVelocity += result[0];
+			meanMeanTime += result[1];
+			delete clonedState;
+		}
+
+	}
+
+
+
+}
+
+
+// Resumes the trials initiated by perform_N_Trials_and_stop() and then returns with whatever progress has been made after msUntilStop has elapsed
+void Simulator::resume_trials(double* toReturn){
+
+
+}
+
+
 double Simulator::rexp(double rate){
 	return -log(runif()) / rate;
 	//return -log(sfmt->Random()) / rate;
@@ -144,9 +210,20 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 	int lastBaseTranscribed = s->get_nascentLength();
 	double timeElapsedSinceLastCatalysis = 0;
 
+	chrono::system_clock::time_point startTime;
+	if (simulateForMilliSeconds != -1) startTime = chrono::system_clock::now();
 	
 	while(!s->isTerminated() && !stop){
-		
+
+
+
+		// Check if GUI timeout has been reached (if there is a timeout)
+		if (simulateForMilliSeconds != -1){
+			auto timeElapsed = chrono::system_clock::now();
+
+		} 
+
+
 
 		// Arrest if timeout has been reached
 		if (arrestTime->getVal() != 0 && timeElapsedSinceLastCatalysis >= arrestTime->getVal()){

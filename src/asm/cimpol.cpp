@@ -29,17 +29,22 @@
 #include "FreeEnergy.h"
 #include "TranslocationRatesCache.h"
 #include "MCMC.h"
+#include "SimulatorPthread.h"
+
 
 
 #include <iostream>
 #include <string>
 #include <random>
+#include <vector>
 #include <map>
 #include <chrono>
 #include <ctime>
-//#include <unistd.h>
+#include <thread>
+
 
 using namespace std;
+
 
 
 
@@ -47,11 +52,14 @@ using namespace std;
 				-MCMC: perform MCMC instead of simulating (default false)
 				-i <filename>: load in an xml file
 				-o <filename>: log file to write to
+				-nthreads <n>: number of threads to split simulations over (default 1)
 */
 int main(int argc, char** argv) { 
 
 	
     cout << "Starting Simpol_cpp" << endl;
+
+
 
 	
 	auto startTime = std::chrono::system_clock::now();
@@ -81,6 +89,12 @@ int main(int argc, char** argv) {
 			i++;
 			outputFilename = string(argv[i]);
 		}
+
+		else if(arg == "-nthreads" && i+1 < argc) {
+			i++;
+			N_THREADS = atoi(argv[i]);
+		}
+
 		
 		else {
 			cout << "Invalid command line arguments" << endl;
@@ -88,7 +102,8 @@ int main(int argc, char** argv) {
 		}
 		
 	}
-	
+
+	SimulatorPthread::init();
     Settings::sampleAll();
     //complementSequence = Settings::complementSeq(templateSequence, TemplateType.substr(2) == "RNA");
 
@@ -117,11 +132,7 @@ int main(int argc, char** argv) {
 	
 	// Just simulate
 	else{
-
-	   	Simulator* sim = new Simulator();
-	   	State* initialState = new State(true);
-	   	sim->perform_N_Trials(ntrials_sim, initialState, true);
-
+   		SimulatorPthread::performNSimulations(ntrials_sim);
    	}
 
 	
@@ -133,6 +144,10 @@ int main(int argc, char** argv) {
    return 0;
 
 }
+
+
+
+
 
 
 

@@ -1,4 +1,5 @@
-﻿/* 
+﻿
+/* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
 	This file is part of SimPol.
@@ -20,42 +21,31 @@
 -*/
 
 
-#ifndef MCMC_H
-#define MCMC_H
+#ifndef SIMULATOR_PTHREAD_H
+#define SIMULATOR_PTHREAD_H
 
-#include "ExperimentalData.h"
-#include "Parameter.h"
+
+#include "Settings.h"
 #include "Simulator.h"
-#include "PosteriorDistriutionSample.h"
 
-#include <list>
+
 #include <string>
+#include <iostream>
+#include <vector>
+#include <thread>
+
 using namespace std;
 
-class MCMC{
+class SimulatorPthread{
 
-	static list<ExperimentalData>::iterator currentExperiment;
-	static list<Parameter*> parametersToEstimate;
-	static bool estimatingModel;
-	static double epsilon; // The current chi-squared threshold
-	static bool hasAchievedBurnin;
-
-	static void makeProposal();
-	static bool metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCMCState, PosteriorDistriutionSample* prevMCMCState);
-	static double calculateLogPriorProbability();
-	static void tryToEstimateParameter(Parameter* param);
+	static void createThreadAndSimulate(int threadNum, int nsims, double* toReturn);
+	static vector<Simulator*> simulators;
 
 
 	public:
+		static void init();
+		static double performNSimulations(int N);
 
-
-		static void beginMCMC();
-
-		// Experimental data
-		static bool resetExperiment();
-		static bool nextExperiment();
-		static double getExperimentalVelocity();
-		
 
 };
 

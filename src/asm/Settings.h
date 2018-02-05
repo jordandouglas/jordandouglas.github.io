@@ -35,6 +35,8 @@
 #include <list>
 #include <chrono>
 #include <ctime>
+#include <thread>
+
 
 using namespace std;
 
@@ -44,6 +46,7 @@ extern const double _RT;
 extern const double _kBT;
 extern const double _preExp;
 extern const int INF;
+
 
 
 // Sequence information
@@ -69,6 +72,7 @@ extern double _chiSqthreshold_gamma;
 extern int burnin; // Percentage
 extern int logEvery;
 extern string outputFilename;
+extern int N_THREADS;
 
 
 // Experimental data
@@ -135,6 +139,8 @@ class Settings{
 		static vector<Parameter*> paramList;
 		static string toJSON();
 		static bool setSequence(string seqID);
+
+	
 
 		// Utilities
 		static vector<string> split(const std::string& s, char delimiter);

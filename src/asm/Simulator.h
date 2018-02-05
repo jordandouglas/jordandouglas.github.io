@@ -29,7 +29,9 @@
 
 #include <string>
 #include <list>
-#include <random>
+#include <thread>
+
+
 
 using namespace std;
 
@@ -43,6 +45,18 @@ class Simulator{
 	double geometricTranslocationBindingSampling(State* s);
 	double geometricBindingSampling(State* s);
 
+
+	// Timer
+	//void timer_start(unsigned int interval);
+
+
+	// Store the number of trials remaining and the current state for GUI purposes
+	int nTrialsTotalGUI;
+	int nTrialsCompletedGUI;
+	State* currentGUIState;
+	double simulateForMilliSeconds;
+	double inSimulationTimeElapsedCurrentSimulation; // Time elapsed in the current simulation (for GUI)
+
 	// Random number generation
 	random_device rd; 
     CRandomMersenne* sfmt;
@@ -50,6 +64,8 @@ class Simulator{
     public:
     	Simulator();
     	double perform_N_Trials(int N, State* state, bool verbose);
+    	void perform_N_Trials_and_stop(int N, State* state, double msUntilStop, double* toReturn);
+    	void resume_trials(double* toReturn);
     	double rexp(double rate);
     	double runif();
 
