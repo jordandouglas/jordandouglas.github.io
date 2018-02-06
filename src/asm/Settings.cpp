@@ -47,6 +47,13 @@ const int INF = 100000000;
 const double _RT = 0.6156;
 const double _kBT = 1.380649e-23 * 310;
 const double _preExp = 1e6;	
+const double _PI = 3.14159265359;	
+
+
+// Command line arguments
+string outputFilename = "";
+string inputXMLfilename = "";
+bool isWASM = false;
 
 
 
@@ -71,7 +78,6 @@ double _chiSqthreshold_0 = 1000;
 double _chiSqthreshold_gamma = 0.999;
 int burnin = 10; 
 int logEvery = 100;
-string outputFilename = "";
 int N_THREADS = 1;
 
 
@@ -296,7 +302,7 @@ double Settings::getNormalDensity(double x, double mu, double sigma, double lowe
 	if (lowerVal != -INFINITY) normaliseBy -= Settings::getNormalCDF(lowerVal, mu, sigma);
 	if (upperVal !=  INFINITY) normaliseBy -= Settings::getNormalCDF(upperVal, mu, sigma);
 
-	double density = 1 / (sqrt(2 * M_PI * sigma * sigma)) * exp(-(x-mu) * (x-mu) / (2 * sigma * sigma));
+	double density = 1 / (sqrt(2 * _PI * sigma * sigma)) * exp(-(x-mu) * (x-mu) / (2 * sigma * sigma));
 	return density / normaliseBy;
 }
 
@@ -316,7 +322,7 @@ double Settings::getLognormalDensity(double x, double mu, double sigma, double l
 	if (lowerVal < 0) normaliseBy -= Settings::getNormalCDF(lowerVal, mu, sigma);
 	if (upperVal !=  INFINITY) normaliseBy -= Settings::getNormalCDF(upperVal, mu, sigma);
 
-	double density = 1 / (sqrt(2 * M_PI * sigma * sigma)) * exp(-(x-mu) * (x-mu) / (2 * sigma * sigma));
+	double density = 1 / (sqrt(2 * _PI * sigma * sigma)) * exp(-(x-mu) * (x-mu) / (2 * sigma * sigma));
 	return density / normaliseBy;
 
 }

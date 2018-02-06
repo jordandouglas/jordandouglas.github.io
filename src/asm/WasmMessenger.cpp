@@ -1,4 +1,5 @@
-﻿/* 
+﻿
+/* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
 	This file is part of SimPol.
@@ -20,47 +21,23 @@
 -*/
 
 
-#ifndef MCMC_H
-#define MCMC_H
+#include "WasmMessenger.h"
 
-#include "ExperimentalData.h"
-#include "Parameter.h"
-#include "Simulator.h"
-#include "PosteriorDistriutionSample.h"
-
-#include <list>
+#include <emscripten.h>
+#include <iostream>
 #include <string>
+
+
+
 using namespace std;
 
-class MCMC{
 
-	static list<ExperimentalData>::iterator currentExperiment;
-	static list<Parameter*> parametersToEstimate;
-	static bool estimatingModel;
-	static double epsilon; // The current chi-squared threshold
-	static bool hasAchievedBurnin;
-	static bool hasAchievedPreBurnin;
-
-	static void makeProposal();
-	static bool metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCMCState, PosteriorDistriutionSample* prevMCMCState);
-	static double calculateLogPriorProbability();
-	static void tryToEstimateParameter(Parameter* param);
+// Send the next log file line to javascript so it can print it
+void WasmMessenger::printLogFileLine(const string & msg, bool append) {
+	EM_ASM_ARGS({
+    	var msg = Pointer_stringify($0); // Convert message to JS string                              
+    	printLogFileLine(msg, $1);                                            
+  	}, msg.c_str(), append);
+}
 
 
-	public:
-
-
-		static void beginMCMC();
-
-		// Experimental data
-		static bool resetExperiment();
-		static bool nextExperiment();
-		static double getExperimentalVelocity();
-		
-
-};
-
-
-
-
-#endif

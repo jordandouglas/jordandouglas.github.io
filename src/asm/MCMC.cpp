@@ -43,6 +43,7 @@ list<ExperimentalData>::iterator MCMC::currentExperiment;
 list<Parameter*> MCMC::parametersToEstimate;
 bool MCMC::estimatingModel;
 bool MCMC::hasAchievedBurnin;
+bool MCMC::hasAchievedPreBurnin;
 
 double MCMC::epsilon = 0;
 
@@ -66,6 +67,7 @@ void MCMC::beginMCMC(){
 	MCMC::estimatingModel = modelsToEstimate.size() > 1;
 	MCMC::parametersToEstimate.clear();
 	MCMC::hasAchievedBurnin = false;
+	MCMC::hasAchievedPreBurnin = false;
 
 	MCMC::tryToEstimateParameter(hybridLen);
 	MCMC::tryToEstimateParameter(bubbleLeft);
@@ -116,12 +118,19 @@ void MCMC::beginMCMC(){
 		}
 
 
+		// If almost at epsilon then switch to the large number of tests per datapoint
+		if (!MCMC::hasAchievedPreBurnin && MCMC::epsilon <= _chiSqthreshold_min * 2){
+			MCMC::hasAchievedPreBurnin = true;
+			cout << "------- Pre-burn-in reached. Number of trials per datapoint = " << testsPerData << " -------" << endl;
+		}
+		
+		
 		// See if burnin has been achieved. Once it has, print it out in console and reset the acceptance rate
 		if (!MCMC::hasAchievedBurnin && MCMC::epsilon <= _chiSqthreshold_min && previousMCMCstate->get_chiSquared() <= MCMC::epsilon){
 			MCMC::hasAchievedBurnin = true;
 			nTrialsUntilBurnin = n;
 			nacceptances = 0;
-			cout << "------- Burn-in achieved. Number of trials per datapoint = " << testsPerData << " -------" << endl;
+			cout << "------- Burn-in achieved. Resetting acceptance rate. -------" << endl;
 		}
 
 
@@ -272,8 +281,8 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 	}
 
 
-	// Run a different number of trials pre- and post- burnin
-	int ntrialsPerDatapoint = MCMC::hasAchievedBurnin || _testsPerData_preburnin < 0 ? testsPerData : _testsPerData_preburnin; 
+	// Run a different number of trials pre- and post- pre-burnin
+	int ntrialsPerDatapoint = MCMC::hasAchievedPreBurnin || _testsPerData_preburnin < 0 ? testsPerData : _testsPerData_preburnin; 
 
 
 	// Iterate through all experimental settings and perform simulations at each setting. The velocities generated are cached in the posterior object

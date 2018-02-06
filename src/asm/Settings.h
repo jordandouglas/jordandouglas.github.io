@@ -45,6 +45,7 @@ using namespace std;
 extern const double _RT;
 extern const double _kBT;
 extern const double _preExp;
+extern const double _PI;
 extern const int INF;
 
 
@@ -60,6 +61,10 @@ extern map<string, Sequence*> sequences;
 extern Sequence* currentSequence;
 
 
+// Command line arguments. These are global constants to enable WebAssembly calling using node.js
+extern string inputXMLfilename;
+extern string outputFilename;
+extern bool isWASM;
 
 // ABC information
 extern string inferenceMethod;
@@ -71,7 +76,6 @@ extern double _chiSqthreshold_0;
 extern double _chiSqthreshold_gamma;
 extern int burnin; // Percentage
 extern int logEvery;
-extern string outputFilename;
 extern int N_THREADS;
 
 

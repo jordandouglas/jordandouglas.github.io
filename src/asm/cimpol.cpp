@@ -63,9 +63,7 @@ int main(int argc, char** argv) {
 
 	
 	auto startTime = std::chrono::system_clock::now();
-    Settings::init();
-	FreeEnergy::init_BP_parameters(); // Initialise the thermodynamic parameter table
-    currentModel = new Model();
+
 
 
 	// Parse arguments
@@ -75,13 +73,16 @@ int main(int argc, char** argv) {
 		string arg = string(argv[i]);
 		if (arg == "-MCMC") doMCMC = true;
 		
+		else if (arg == "-sim") doMCMC = false;
+		
+		else if (arg == "-wasm") isWASM = true;
+		
 		else if(arg == "-i" && i+1 < argc) {
 			i++;
-			char* filename = argv[i];
+			inputXMLfilename = string(argv[i]);
 			//char filename[] = "/home/jdou557/Documents/Cimpol/SimpolC/SimpolC/about/Examples/benchmark.xml";
 			//char filename[] = "/home/jdou557/Documents/Cimpol/SimpolC/SimpolC/models12.xml";
 
-			bool succ = XMLparser::parseXMLFromFilename(filename);
 		}
 		
 		
@@ -102,16 +103,34 @@ int main(int argc, char** argv) {
 		}
 		
 	}
+	
+	
+	// Initialise the thermodynamic parameter table
+	FreeEnergy::init_BP_parameters();
+	
+	if (!isWASM){
+		Settings::init();
+		currentModel = new Model();
+	}
 
+
+	if (inputXMLfilename != ""){
+		char* filename = new char[inputXMLfilename.length() + 1];
+		strcpy(filename, inputXMLfilename.c_str());
+		bool succ = XMLparser::parseXMLFromFilename(filename);
+		delete [] filename;
+		
+		if (!succ) exit(1);
+		
+		// Build the rates table
+		TranslocationRatesCache::buildTranslocationRateTable(); 
+		TranslocationRatesCache::buildBacktrackRateTable();
+		
+	}
+	
 	SimulatorPthread::init();
     Settings::sampleAll();
     //complementSequence = Settings::complementSeq(templateSequence, TemplateType.substr(2) == "RNA");
-
-
-    // Build the rates table
-   	TranslocationRatesCache::buildTranslocationRateTable(); 
-   	TranslocationRatesCache::buildBacktrackRateTable();
-
 
 	
 	 // If no arguments then exit now
@@ -132,7 +151,8 @@ int main(int argc, char** argv) {
 	
 	// Just simulate
 	else{
-   		SimulatorPthread::performNSimulations(ntrials_sim);
+   		double velocity = SimulatorPthread::performNSimulations(ntrials_sim);
+		cout << "Mean velocity: " << velocity << "bp/s" << endl;
    	}
 
 	

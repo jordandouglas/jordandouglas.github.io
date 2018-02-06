@@ -22,6 +22,7 @@
 
 #include "Settings.h"
 #include "PosteriorDistriutionSample.h"
+#include "WasmMessenger.h"
 
 
 #include <iostream>
@@ -90,6 +91,11 @@ void PosteriorDistriutionSample::addSimulatedAndObservedValue(double simVal, dou
 // Prints the first row (ie. column names instead of values)
 void PosteriorDistriutionSample::printHeader(bool toFile){
 
+
+	// Send to javascript if using WASM
+	string WASM_string = "";
+
+
 	// Attempt to open up file if applicable. Do not append
 	ofstream* logFile;
 	if (toFile) {
@@ -100,27 +106,38 @@ void PosteriorDistriutionSample::printHeader(bool toFile){
 		}
 	}
 
-	(toFile ? (*logFile) : cout) << "State\t";
+	if (isWASM) WASM_string += "State\t";
+	else (toFile ? (*logFile) : cout) << "State\t";
 
 	// Print model indicator
-	if (this->modelIndicator != "") (toFile ? (*logFile) : cout) << "Model\t";
+	if (this->modelIndicator != ""){
+		if (isWASM) WASM_string += "Model\t";
+		else (toFile ? (*logFile) : cout) << "Model\t";
+	}
 
 	// Print parameter names
 	for(std::map<string, double>::iterator iter = this->parameterEstimates.begin(); iter != this->parameterEstimates.end(); ++ iter){
 		string paramID =  iter->first;
-		(toFile ? (*logFile) : cout) << paramID << "\t";
+		if (isWASM) WASM_string += paramID + "\t";
+		else (toFile ? (*logFile) : cout) << paramID << "\t";
 	}
 
 	// Print 'V'N for each observation 
 	for (int i = 0; i < this->simulatedValues.size(); i ++){
-		(toFile ? (*logFile) : cout) << "V" << (i+1) << "\t";
+		if (isWASM) WASM_string += "V" + to_string(i+1) + "\t";
+		else (toFile ? (*logFile) : cout) << "V" << (i+1) << "\t";
 	}
 
 	// Print prior and chi-squared
-	(toFile ? (*logFile) : cout) << "logPrior\tchiSquared" << endl;
+	if (isWASM) WASM_string += "logPrior\tchiSquared\n";
+	else (toFile ? (*logFile) : cout) << "logPrior\tchiSquared" << endl;
 	
 	
 	if (toFile) logFile->close();
+	
+	if (isWASM) {
+		WasmMessenger::printLogFileLine(WASM_string, false);
+	}
 
 
 }
@@ -129,6 +146,11 @@ void PosteriorDistriutionSample::printHeader(bool toFile){
 
 void PosteriorDistriutionSample::print(bool toFile){
 
+
+	// Send to javascript if using WASM
+	string WASM_string = "";
+
+	
 	// Attempt to open up file if applicable. Append to end of file
 	ofstream logFile;
 	if (toFile) {
@@ -140,28 +162,40 @@ void PosteriorDistriutionSample::print(bool toFile){
 		}
 	}
 	
-
-	(toFile ? logFile : cout) << this->sampleNum << "\t";
+	if (isWASM) WASM_string += to_string(this->sampleNum) + "\t";
+	else (toFile ? logFile : cout) << this->sampleNum << "\t";
 
 	// Print model indicator
-	if (this->modelIndicator != "") (toFile ? logFile : cout) << this->modelIndicator << "\t";
+	if (this->modelIndicator != "") {
+		if (isWASM) WASM_string += this->modelIndicator + "\t";
+		else (toFile ? logFile : cout) << this->modelIndicator << "\t";
+		
+	}
 
 	// Print parameter values
 	for(std::map<string, double>::iterator iter = this->parameterEstimates.begin(); iter != this->parameterEstimates.end(); ++ iter){
 		double value = iter->second;
-		(toFile ? logFile : cout) << value << "\t";
+		if (isWASM) WASM_string += to_string(value) + "\t";
+		else (toFile ? logFile : cout) << value << "\t";
 	}
 	
 	// Print simulated values
 	for (int i = 0; i < this->simulatedValues.size(); i ++){
-		(toFile ? logFile : cout) << simulatedValues.at(i) << "\t";
+		if (isWASM) WASM_string += to_string(simulatedValues.at(i)) + "\t";
+		else (toFile ? logFile : cout) << simulatedValues.at(i) << "\t";
 	}
 
 	// Print prior and chi-squared values
-	(toFile ? logFile : cout) << this->priorProb << "\t" << this->chiSquared << endl;
+	if (isWASM) WASM_string += to_string(this->priorProb) + "\t" + to_string(this->chiSquared) + "\n";
+	else (toFile ? logFile : cout) << this->priorProb << "\t" << this->chiSquared << endl;
 	
 	
 	if (toFile) logFile.close();
+	
+	
+	if (isWASM) {
+		WasmMessenger::printLogFileLine(WASM_string, true);
+	}
 
 }
 

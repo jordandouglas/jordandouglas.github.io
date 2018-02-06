@@ -1,4 +1,5 @@
-﻿/* 
+﻿
+/* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
 	This file is part of SimPol.
@@ -20,43 +21,25 @@
 -*/
 
 
-#ifndef MCMC_H
-#define MCMC_H
+#ifndef WASMMESSENGER_H
+#define WASMMESSENGER_H
 
-#include "ExperimentalData.h"
-#include "Parameter.h"
-#include "Simulator.h"
-#include "PosteriorDistriutionSample.h"
 
-#include <list>
+
 #include <string>
+
+
 using namespace std;
 
-class MCMC{
 
-	static list<ExperimentalData>::iterator currentExperiment;
-	static list<Parameter*> parametersToEstimate;
-	static bool estimatingModel;
-	static double epsilon; // The current chi-squared threshold
-	static bool hasAchievedBurnin;
-	static bool hasAchievedPreBurnin;
-
-	static void makeProposal();
-	static bool metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCMCState, PosteriorDistriutionSample* prevMCMCState);
-	static double calculateLogPriorProbability();
-	static void tryToEstimateParameter(Parameter* param);
+// This class exists to send messages directly to javascript. 
+// Do not use any of these functions if not using WebAssembly
+// WasmMessenger.ccp should not be compiled if you are not using emscripten since #include <emscripten.h> will throw an error
+class WasmMessenger{
 
 
-	public:
-
-
-		static void beginMCMC();
-
-		// Experimental data
-		static bool resetExperiment();
-		static bool nextExperiment();
-		static double getExperimentalVelocity();
-		
+    public:
+    	static void printLogFileLine(const string & msg, bool append);
 
 };
 
@@ -64,3 +47,4 @@ class MCMC{
 
 
 #endif
+

@@ -52,6 +52,7 @@ void messageFromWasmToJS(const string & msg) {
 
 
 void messageFromWasmToJS(const string & msg, int msgID) {
+	if (msgID == -1) return;
 	EM_ASM_ARGS({
     	var msg = Pointer_stringify($0); // Convert message to JS string                              
     	messageFromWasmToJS(msg, $1);                                       
@@ -65,16 +66,21 @@ extern "C" {
 
 	void EMSCRIPTEN_KEEPALIVE stopWebAssembly(){
 		stop = true;
+		cout << "Stopping" << endl;
 	}
+	
+	
 
 
 	// Parse XML settings in string form
 	void EMSCRIPTEN_KEEPALIVE loadSessionFromXML(char* XMLdata, int msgID){
 
+		Settings::init();
+	
 		// Reinitialise the modeltimer_start
 		delete currentModel;
 		currentModel = new Model();
-
+		
 		XMLparser::parseXMLFromString(XMLdata);
 		Settings::sampleAll();
 
@@ -85,6 +91,7 @@ extern "C" {
 		// Send the globals settings back to the DOM 
 		string parametersJSON = "{" + Settings::toJSON() + "}";
 		messageFromWasmToJS(parametersJSON, msgID);
+		
 
 	}
 
@@ -323,6 +330,23 @@ extern "C" {
 
 	}
 
+
+	
+	// **********************
+	//   NODE.JS FUNCTIONS
+	// **********************
+	
+	
+	// Set the input file name for subsequent use by main()
+	void EMSCRIPTEN_KEEPALIVE setInputFilename(char* filename){
+		inputXMLfilename = string(filename);
+	}
+	
+	// Set the output file name for subsequent use by main()
+	void EMSCRIPTEN_KEEPALIVE setOutputFilename(char* filename){
+		outputFilename = string(filename);
+	}
+	
 
 	
 

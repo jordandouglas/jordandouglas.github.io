@@ -43,7 +43,7 @@ using namespace std;
 bool XMLparser::parseXMLFromFilename(char* fileName){
 
 
-	cout << "parsing " << fileName << endl;
+	cout << "Parsing " << fileName << endl;
 	TiXmlDocument doc(fileName);
 	bool succ = doc.LoadFile();
 

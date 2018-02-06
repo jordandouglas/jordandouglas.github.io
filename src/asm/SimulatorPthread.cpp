@@ -45,7 +45,6 @@ void SimulatorPthread::init(){
 double SimulatorPthread::performNSimulations(int N){
 
 
-
 	// No threading
 	if (N_THREADS == 1){
 		double result[1];
@@ -89,6 +88,11 @@ double SimulatorPthread::performNSimulations(int N){
    		//cout << velocities.at(i)[0] << endl;
    	}
 
+	
+	nSimsPerThread.clear();
+	velocities.clear();
+	threads.clear();
+	
 
    	//cout << "Mean velocity = " << meanVelocity << endl;
    	return meanVelocity;
@@ -105,6 +109,17 @@ void SimulatorPthread::createThreadAndSimulate(int threadNum, int nsims, double*
     State* initialState = new State(true);
    	double velocity = SimulatorPthread::simulators.at(threadNum-1)->perform_N_Trials(nsims, initialState, false);
    	delete initialState;
+	//cout << "Velocity " << velocity << endl;
    	toReturn[0] = velocity;
 
 }
+
+
+
+
+
+
+
+
+
+
