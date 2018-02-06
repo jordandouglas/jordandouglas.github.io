@@ -413,7 +413,7 @@ function landscape_plot(fn, range, id, col) {
 
 
 	// Add dashed lines corresponding to every few yvals. Only plot at nice numbers
-	var result = getNiceAxesNumbers(range[2], range[3], canvas.height, false, 0, [1])
+	var result = getNiceAxesNumbers(range[2], range[3], canvas.height, false, false, 0, [1])
 	range[2] = result["min"];
 	range[3] = result["max"];
 	var heightScale = result["widthOrHeightScale"];
@@ -694,8 +694,8 @@ function plotTimeChart(){
 			ymin = 0;
 
 			var distTravelled = DISTANCE_VS_TIME_CONTROLLER[index]["distances"][DISTANCE_VS_TIME_CONTROLLER[index]["distances"].length-1];
-			if (PLOT_DATA["medianDistanceTravelledPerTemplate"] > distTravelled){
-				ymax = PLOT_DATA["medianDistanceTravelledPerTemplate"];
+			if (1.1 * PLOT_DATA["medianDistanceTravelledPerTemplate"] >= distTravelled){
+				ymax = 1.1 * PLOT_DATA["medianDistanceTravelledPerTemplate"];
 			}else{
 				ymax = distTravelled * 1.2;
 			}
@@ -729,8 +729,8 @@ function plotTimeChart(){
 			}
 
 
-			if (PLOT_DATA["medianTimeSpentOnATemplate"] > acumTime){
-				xmax = PLOT_DATA["medianTimeSpentOnATemplate"];
+			if (1.1 * PLOT_DATA["medianTimeSpentOnATemplate"] >= acumTime){
+				xmax = 1.1* PLOT_DATA["medianTimeSpentOnATemplate"];
 			}else{
 				xmax = acumTime * 1.5;
 			}
@@ -851,53 +851,79 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 	
 
 	var ctx = canvas.getContext('2d');
-
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	
+
 	var plotWidth = canvas.width - axisGap;
 	var plotHeight = canvas.height - axisGap;
-	
+
+
+
 	var widthScale = (plotWidth / (range[1] - range[0]));
 	var heightScale = (plotHeight / (range[3] - range[2]));
-	
-	
+
 	
 	if (!isNaN(range[1])) {
-		ctx.lineWidth = 2 * canvasSizeMultiplier;
-	
+
+
+		// Refine xmax and xmin and select positions to add ticks
+		var xlabPos = [];
+		var xResult = getNiceAxesNumbers(range[0], range[1], plotWidth, range[0] == 0);
+		range[0] = xResult["min"]
+		range[1] = xResult["max"]
+		widthScale = xResult["widthOrHeightScale"]
+		xlabPos = xResult["vals"]
+		//console.log("xResult", xResult);
+
+		var ylabPos = [];
+		var yResult = getNiceAxesNumbers(range[2], range[3], plotHeight, range[2] == 0);
+		range[2] = yResult["min"]
+		range[3] = yResult["max"]
+		heightScale = yResult["widthOrHeightScale"]
+		ylabPos = yResult["vals"]
+		//console.log("yResult", yResult);
+
+
+
 		// X min and max
-		var axisPointMargin = 10 * canvasSizeMultiplier;
+		var axisPointMargin = 5 * canvasSizeMultiplier;
 		ctx.font = 12 * canvasSizeMultiplier + "px Arial";
 		ctx.textBaseline="top"; 
-		ctx.textAlign="left"; 
-		ctx.fillText(roundToSF(range[0], 1), axisGap, canvas.height - axisGap + axisPointMargin);
-		ctx.textAlign="right"; 
-		ctx.fillText(roundToSF(range[1], 1), canvas.width, canvas.height - axisGap + axisPointMargin);
-	
+		var tickLength = 10 * canvasSizeMultiplier;
+		ctx.lineWidth = 1 * canvasSizeMultiplier;
+
+		for (var labelID = 0; labelID < xlabPos.length; labelID++){
+			var x0 = widthScale * (xlabPos[labelID] - range[0]) + axisGap;
+			ctx.textAlign= labelID == 0 ? "left" : "center";
+			ctx.fillText(xlabPos[labelID], x0, canvas.height - axisGap + axisPointMargin);
+
+			// Draw a tick on the axis
+			ctx.beginPath();
+			ctx.moveTo(x0, canvas.height - axisGap - tickLength/2);
+			ctx.lineTo(x0, canvas.height - axisGap + tickLength/2);
+			ctx.stroke();
+
+		}
 
 
-		
 		// Y min and max
-		ctx.save()
-		ctx.font = 12 * canvasSizeMultiplier + "px Arial";
 		ctx.textBaseline="bottom"; 
-		ctx.textAlign="right"; 
-		ctx.translate(axisGap - axisPointMargin, canvas.height - heightScale * (range[2]+1 - range[2]) - axisGap);
-		ctx.rotate(-Math.PI/2);
-		ctx.fillText(Math.ceil(range[2]+1), 0, 0);
-		ctx.restore();
-		
-		ctx.save()
-		ctx.font = 12 * canvasSizeMultiplier + "px Arial";
-		ctx.textAlign="right"; 
-		ctx.textBaseline="bottom"; 
-		ctx.translate(axisGap - axisPointMargin, 0);
-		ctx.rotate(-Math.PI/2);
-		ctx.fillText(Math.floor(range[3]), 0, 0);
-		ctx.restore();
-		
-		
 
+		ctx.save()
+		ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
+		ctx.rotate(-Math.PI/2);
+		for (var labelID = 0; labelID < ylabPos.length; labelID++){
+			var y0 = heightScale * (ylabPos[labelID] - range[2]);
+			ctx.fillText(ylabPos[labelID], y0, 0);
+
+			// Draw a tick on the axis
+			ctx.beginPath();
+			ctx.moveTo(y0, axisPointMargin - tickLength/2);
+			ctx.lineTo(y0, axisPointMargin + tickLength/2);
+			ctx.stroke();
+
+
+		}
+		ctx.restore();
 
 
 		// Add dashed lines corresponding to each yval
@@ -911,15 +937,11 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 				//console.log("Plotting at",yPrime);
 				ctx.beginPath();
 				ctx.moveTo(axisGap,yPt);
-
 				ctx.lineTo(canvas.width, yPt);
 				ctx.stroke();
 
 			}
 		}
-
-
-		
 
 		ctx.setLineDash([])
 		ctx.strokeStyle = col;
@@ -1014,6 +1036,9 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 			ctx.stroke(); 
 		
 		}
+
+
+
 		
 		ctx.globalAlpha = 1;
 
@@ -1064,7 +1089,7 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 	ctx.textAlign="center"; 
 	ctx.textBaseline="bottom"; 
 	ctx.save()
-	var ylabXPos = 2 * axisGap / 3;
+	var ylabXPos = axisGap / 2;
 	var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
 	ctx.translate(ylabXPos, ylabYPos);
 	ctx.rotate(-Math.PI/2);
@@ -1240,7 +1265,7 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, xlab =
 	var heightScale = 1;
 	var ylabPos = [];
 	if (yVals != null && yVals.length > 0){
-		var yResult = getNiceAxesNumbers(range[2], range[3], plotHeight, range[2] == 0);
+		var yResult = getNiceAxesNumbers(range[2], range[3], plotHeight, range[2] == 0, false);
 		range[2] = yResult["min"]
 		range[3] = yResult["max"]
 		heightScale = yResult["widthOrHeightScale"]
@@ -1267,12 +1292,12 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, xlab =
 			var axisPointMargin = 4 * canvasSizeMultiplier;
 			ctx.font = 10 * canvasSizeMultiplier + "px Arial";
 			ctx.textBaseline="top"; 
-			ctx.textAlign="center"; 
 			var tickLength = 10 * canvasSizeMultiplier;
 			ctx.lineWidth = 1 * canvasSizeMultiplier;
 
 			for (var labelID = 0; labelID < xlabPos.length; labelID++){
 				var x0 = widthScale * (xlabPos[labelID] - range[0]) + axisGap;
+				ctx.textAlign= labelID == 0 ? "left" : "center";
 				ctx.fillText(xlabPos[labelID], x0, canvas.height - axisGap + axisPointMargin);
 
 				// Draw a tick on the axis
@@ -1287,7 +1312,6 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, xlab =
 
 			// Y min and max
 			ctx.textBaseline="bottom"; 
-			ctx.textAlign="center"; 
 
 			ctx.save()
 			ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
@@ -1781,7 +1805,7 @@ function maximumFromList(list){
 
 
 
-// Assumes that values are sorted. Will not display the top 5% of values
+// Assumes that values are sorted
 function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = "", ylab = "Probability density", hoverLabels = false, canvasSizeMultiplier = 1, logSpace = false, col = "#008CBA"){
 
 	if (canvasDivID != null && $("#" + canvasDivID).is( ":hidden" )) return;
@@ -2067,14 +2091,12 @@ function log(num, base = null){
 
 function add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbins, widthScale, heightScale, binGap, ymax, canvasSizeMultiplier){
 	
-
 	
 	ctx.globalAlpha = 1;
 	
 
 	// Calculate the smallest order of magnitude across bars so we can express x-values in scientific notation. 
 	// eg if mean order of magnitude is 5 then will express x-labels as 1.5e5, 20e5, etc.
-
 	var meanBarOrderOfMagnitude = Math.ceil(log(binSize + minVal, 10)); 
 	if (nbins == 1) meanBarOrderOfMagnitude = Math.ceil(log(binSize, 10)); 
 
@@ -2099,10 +2121,11 @@ function add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbi
 
 
 	var binsEvery = nbins < 5 ? 1 : nbins < 10 ? 2 : nbins < 15 ? 3 : 4;
+	var tickLength = 6 * canvasSizeMultiplier;
+	ctx.lineWidth = 1;
 	for (i = 1; i <= nbins; i += binsEvery){
 
-
-		var x0 = widthScale * i + axisGap + binGap * (i-1);
+		var x0 = widthScale * (i-1) + axisGap + binGap * (i) + canvasSizeMultiplier;
 		var txtLabel = roundToSF((minVal + binSize * (i-1)) * Math.pow(10, -meanBarOrderOfMagnitude), 3) + orderOfMagnitudeString;
 
 
@@ -2110,11 +2133,16 @@ function add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbi
 		 if ((canvas.width - x0) / canvas.width < 0.1) ctx.textAlign= "right";
 		else ctx.textAlign= "center";
 
-		ctx.fillText(txtLabel, x0, canvas.height - axisGap + axisPointMargin);
-		
+		ctx.fillText(txtLabel, x0, canvas.height - axisGap + axisPointMargin + 3 * canvasSizeMultiplier);
+
+
+		// Draw axis tick
+		ctx.beginPath();
+		ctx.moveTo(x0, canvas.height - axisGap);
+		ctx.lineTo(x0, canvas.height - axisGap + tickLength);
+		ctx.stroke();
 
 	} 
-
 
 
 
@@ -2163,26 +2191,26 @@ function add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLab
 	
 	
 	if (!hoverLabels){
-	// X title
-	ctx.fillStyle = "black";
-	ctx.textBaseline="top"; 
-	var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
-	var xlabYPos = canvas.height - axisGap / 2;
-	writeLatexLabelOnCanvas(ctx, xlab, xlabXPos, xlabYPos, fontSize);
-	//ctx.fillText(xlab, xlabXPos, xlabYPos);
-	
-	// Y title
-	ctx.textAlign="center"; 
-	ctx.textBaseline="bottom"; 
-	ctx.font = fontSize + "px Arial";
-	ctx.save()
-	var ylabXPos = 2 * axisGap / 3;
-	var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
-	ctx.translate(ylabXPos, ylabYPos);
-	ctx.rotate(-Math.PI/2);
-	ctx.fillText(ylab, 0 ,0);
-	ctx.restore();
-	
+		// X title
+		ctx.fillStyle = "black";
+		ctx.textBaseline="top"; 
+		var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
+		var xlabYPos = canvas.height - axisGap / 2;
+		writeLatexLabelOnCanvas(ctx, xlab, xlabXPos, xlabYPos, fontSize);
+		//ctx.fillText(xlab, xlabXPos, xlabYPos);
+		
+		// Y title
+		ctx.textAlign="center"; 
+		ctx.textBaseline="bottom"; 
+		ctx.font = fontSize + "px Arial";
+		ctx.save()
+		var ylabXPos = 2 * axisGap / 3;
+		var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
+		ctx.translate(ylabXPos, ylabYPos);
+		ctx.rotate(-Math.PI/2);
+		ctx.fillText(ylab, 0 ,0);
+		ctx.restore();
+		
 		return null;
 	
 	}
@@ -3302,7 +3330,7 @@ function plot_custom(plotNumCustom = null){
 
 
 
-function getNiceAxesNumbers(min, max, plotWidthOrHeight, minAtZero = min == 0, axisGap = 45, niceBinSizes = [1, 2, 5]){
+function getNiceAxesNumbers(min, max, plotWidthOrHeight, minAtZero = min == 0, zeroLabel = true, axisGap = 45, niceBinSizes = [1, 2, 5]){
 
 	if (min > max) max = min+1;
 
@@ -3356,14 +3384,14 @@ function getNiceAxesNumbers(min, max, plotWidthOrHeight, minAtZero = min == 0, a
 		nLabels = Math.ceil((max - min) / binSize);
 	}
 	
-	
 
 	var widthOrHeightScale = (plotWidthOrHeight / (max - min));
 
 
 	var vals = [];
 	var tooBigByFactorOf =  Math.max(Math.ceil(nLabels / maxNumLabels), 1)
-	for(var labelID = 1; labelID < nLabels; labelID ++){
+	for(var labelID = 0; labelID < nLabels; labelID ++){
+		if (labelID == 0 && !zeroLabel) continue;
 		if (labelID % tooBigByFactorOf == 0 && labelID * binSize / (max - min) < 0.95) vals.push(roundToSF(labelID * binSize + min));
 	}
 
@@ -3434,7 +3462,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	var heightScale = 1;
 	var ylabPos = [];
 	if (yvals != null && yvals.length > 0){
-		var yResult = getNiceAxesNumbers(range[2], range[3], plotHeight);
+		var yResult = getNiceAxesNumbers(range[2], range[3], plotHeight, range[2] == 0, false);
 		range[2] = yResult["min"]
 		range[3] = yResult["max"]
 		heightScale = yResult["widthOrHeightScale"]
