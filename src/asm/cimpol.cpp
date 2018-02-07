@@ -111,6 +111,7 @@ int main(int argc, char** argv) {
 	if (!isWASM){
 		Settings::init();
 		currentModel = new Model();
+		Settings::sampleAll();
 	}
 
 
@@ -119,17 +120,14 @@ int main(int argc, char** argv) {
 		strcpy(filename, inputXMLfilename.c_str());
 		bool succ = XMLparser::parseXMLFromFilename(filename);
 		delete [] filename;
-		
 		if (!succ) exit(1);
 		
-		// Build the rates table
-		TranslocationRatesCache::buildTranslocationRateTable(); 
-		TranslocationRatesCache::buildBacktrackRateTable();
 		
 	}
 	
+	Settings::sampleAll();
 	SimulatorPthread::init();
-    Settings::sampleAll();
+    
     //complementSequence = Settings::complementSeq(templateSequence, TemplateType.substr(2) == "RNA");
 
 	
@@ -151,7 +149,7 @@ int main(int argc, char** argv) {
 	
 	// Just simulate
 	else{
-   		double velocity = SimulatorPthread::performNSimulations(ntrials_sim);
+   		double velocity = SimulatorPthread::performNSimulations(ntrials_sim, true);
 		cout << "Mean velocity: " << velocity << "bp/s" << endl;
    	}
 

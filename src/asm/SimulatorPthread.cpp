@@ -42,13 +42,13 @@ void SimulatorPthread::init(){
 
 
 // Performs N simulations over N_THREADS threads and returns the mean velocity
-double SimulatorPthread::performNSimulations(int N){
+double SimulatorPthread::performNSimulations(int N, bool verbose){
 
 
 	// No threading
 	if (N_THREADS == 1){
 		double result[1];
-		SimulatorPthread::createThreadAndSimulate(1, N, result);
+		SimulatorPthread::createThreadAndSimulate(1, N, result, verbose);
 		double velocity = result[0];
 		return velocity;
 	}
@@ -71,7 +71,7 @@ double SimulatorPthread::performNSimulations(int N){
    	vector<double*> velocities(N_THREADS);
    	for (int i = 0; i < N_THREADS; i++){
    		velocities.at(i) = new double[1];
-   		threads.at(i) = new thread(SimulatorPthread::createThreadAndSimulate, i+1, nSimsPerThread.at(i), velocities.at(i));
+   		threads.at(i) = new thread(SimulatorPthread::createThreadAndSimulate, i+1, nSimsPerThread.at(i), velocities.at(i), verbose);
    	}
 
 
@@ -103,11 +103,11 @@ double SimulatorPthread::performNSimulations(int N){
 
 
 
-void SimulatorPthread::createThreadAndSimulate(int threadNum, int nsims, double* toReturn){
+void SimulatorPthread::createThreadAndSimulate(int threadNum, int nsims, double* toReturn, bool verbose){
 
 	//cout << "Running " << nsims << " simulations on thread " << threadNum << endl;
     State* initialState = new State(true);
-   	double velocity = SimulatorPthread::simulators.at(threadNum-1)->perform_N_Trials(nsims, initialState, false);
+   	double velocity = SimulatorPthread::simulators.at(threadNum-1)->perform_N_Trials(nsims, initialState, verbose);
    	delete initialState;
 	//cout << "Velocity " << velocity << endl;
    	toReturn[0] = velocity;

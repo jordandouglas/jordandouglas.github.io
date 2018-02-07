@@ -38,13 +38,13 @@ using namespace std;
 
 class SimulatorPthread{
 
-	static void createThreadAndSimulate(int threadNum, int nsims, double* toReturn);
+	static void createThreadAndSimulate(int threadNum, int nsims, double* toReturn, bool verbose);
 	static vector<Simulator*> simulators;
 
 
 	public:
 		static void init();
-		static double performNSimulations(int N);
+		static double performNSimulations(int N, bool verbose);
 
 
 };
