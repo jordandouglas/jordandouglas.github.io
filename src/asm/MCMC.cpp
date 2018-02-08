@@ -288,7 +288,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 	// Iterate through all experimental settings and perform simulations at each setting. The velocities generated are cached in the posterior object
 
 	// Run simulations and stop if it exceeds threshold (unless this is the first trial)
-	double simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint);
+	double simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
 	thisMCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
 	if (thisMCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
 		return false;
@@ -298,7 +298,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 	while (MCMC::nextExperiment()){
 
 		// Run simulations and stop if it exceeds threshold (unless this is the first trial)
-		simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint);
+		simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
 		thisMCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
 		if (thisMCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
 			return false;
