@@ -2,17 +2,14 @@
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
 	This file is part of SimPol.
-
     SimPol is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
     SimPol is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with SimPol.  If not, see <http://www.gnu.org/licenses/>. 
     --------------------------------------------------------------------
@@ -413,7 +410,7 @@ function landscape_plot(fn, range, id, col) {
 
 
 	// Add dashed lines corresponding to every few yvals. Only plot at nice numbers
-	var result = getNiceAxesNumbers(range[2], range[3], canvas.height, false, 0, [1])
+	var result = getNiceAxesNumbers(range[2], range[3], canvas.height, false, false, 0, [1])
 	range[2] = result["min"];
 	range[3] = result["max"];
 	var heightScale = result["widthOrHeightScale"];
@@ -477,12 +474,10 @@ function landscape_plot(fn, range, id, col) {
 	ctx.moveTo(1,0);
 	ctx.lineTo(1, canvas.height);
 	ctx.stroke();
-
 	ctx.beginPath();
 	ctx.moveTo(1,1);
 	ctx.lineTo(8,1);
 	ctx.stroke();
-
 	ctx.beginPath();
 	ctx.moveTo(1,canvas.height - 1);
 	ctx.lineTo(8,canvas.height - 1);
@@ -694,8 +689,8 @@ function plotTimeChart(){
 			ymin = 0;
 
 			var distTravelled = DISTANCE_VS_TIME_CONTROLLER[index]["distances"][DISTANCE_VS_TIME_CONTROLLER[index]["distances"].length-1];
-			if (PLOT_DATA["medianDistanceTravelledPerTemplate"] > distTravelled){
-				ymax = PLOT_DATA["medianDistanceTravelledPerTemplate"];
+			if (1.1 * PLOT_DATA["medianDistanceTravelledPerTemplate"] >= distTravelled){
+				ymax = 1.1 * PLOT_DATA["medianDistanceTravelledPerTemplate"];
 			}else{
 				ymax = distTravelled * 1.2;
 			}
@@ -729,8 +724,8 @@ function plotTimeChart(){
 			}
 
 
-			if (PLOT_DATA["medianTimeSpentOnATemplate"] > acumTime){
-				xmax = PLOT_DATA["medianTimeSpentOnATemplate"];
+			if (1.1 * PLOT_DATA["medianTimeSpentOnATemplate"] >= acumTime){
+				xmax = 1.1* PLOT_DATA["medianTimeSpentOnATemplate"];
 			}else{
 				xmax = acumTime * 1.5;
 			}
@@ -851,53 +846,79 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 	
 
 	var ctx = canvas.getContext('2d');
-
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	
+
 	var plotWidth = canvas.width - axisGap;
 	var plotHeight = canvas.height - axisGap;
-	
+
+
+
 	var widthScale = (plotWidth / (range[1] - range[0]));
 	var heightScale = (plotHeight / (range[3] - range[2]));
-	
-	
+
 	
 	if (!isNaN(range[1])) {
-		ctx.lineWidth = 2 * canvasSizeMultiplier;
-	
+
+
+		// Refine xmax and xmin and select positions to add ticks
+		var xlabPos = [];
+		var xResult = getNiceAxesNumbers(range[0], range[1], plotWidth, range[0] == 0);
+		range[0] = xResult["min"]
+		range[1] = xResult["max"]
+		widthScale = xResult["widthOrHeightScale"]
+		xlabPos = xResult["vals"]
+		//console.log("xResult", xResult);
+
+		var ylabPos = [];
+		var yResult = getNiceAxesNumbers(range[2], range[3], plotHeight, range[2] == 0);
+		range[2] = yResult["min"]
+		range[3] = yResult["max"]
+		heightScale = yResult["widthOrHeightScale"]
+		ylabPos = yResult["vals"]
+		//console.log("yResult", yResult);
+
+
+
 		// X min and max
-		var axisPointMargin = 10 * canvasSizeMultiplier;
+		var axisPointMargin = 5 * canvasSizeMultiplier;
 		ctx.font = 12 * canvasSizeMultiplier + "px Arial";
 		ctx.textBaseline="top"; 
-		ctx.textAlign="left"; 
-		ctx.fillText(roundToSF(range[0], 1), axisGap, canvas.height - axisGap + axisPointMargin);
-		ctx.textAlign="right"; 
-		ctx.fillText(roundToSF(range[1], 1), canvas.width, canvas.height - axisGap + axisPointMargin);
-	
+		var tickLength = 10 * canvasSizeMultiplier;
+		ctx.lineWidth = 1 * canvasSizeMultiplier;
+
+		for (var labelID = 0; labelID < xlabPos.length; labelID++){
+			var x0 = widthScale * (xlabPos[labelID] - range[0]) + axisGap;
+			ctx.textAlign= labelID == 0 ? "left" : "center";
+			ctx.fillText(xlabPos[labelID], x0, canvas.height - axisGap + axisPointMargin);
+
+			// Draw a tick on the axis
+			ctx.beginPath();
+			ctx.moveTo(x0, canvas.height - axisGap - tickLength/2);
+			ctx.lineTo(x0, canvas.height - axisGap + tickLength/2);
+			ctx.stroke();
+
+		}
 
 
-		
 		// Y min and max
-		ctx.save()
-		ctx.font = 12 * canvasSizeMultiplier + "px Arial";
 		ctx.textBaseline="bottom"; 
-		ctx.textAlign="right"; 
-		ctx.translate(axisGap - axisPointMargin, canvas.height - heightScale * (range[2]+1 - range[2]) - axisGap);
-		ctx.rotate(-Math.PI/2);
-		ctx.fillText(Math.ceil(range[2]+1), 0, 0);
-		ctx.restore();
-		
-		ctx.save()
-		ctx.font = 12 * canvasSizeMultiplier + "px Arial";
-		ctx.textAlign="right"; 
-		ctx.textBaseline="bottom"; 
-		ctx.translate(axisGap - axisPointMargin, 0);
-		ctx.rotate(-Math.PI/2);
-		ctx.fillText(Math.floor(range[3]), 0, 0);
-		ctx.restore();
-		
-		
 
+		ctx.save()
+		ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
+		ctx.rotate(-Math.PI/2);
+		for (var labelID = 0; labelID < ylabPos.length; labelID++){
+			var y0 = heightScale * (ylabPos[labelID] - range[2]);
+			ctx.fillText(ylabPos[labelID], y0, 0);
+
+			// Draw a tick on the axis
+			ctx.beginPath();
+			ctx.moveTo(y0, axisPointMargin - tickLength/2);
+			ctx.lineTo(y0, axisPointMargin + tickLength/2);
+			ctx.stroke();
+
+
+		}
+		ctx.restore();
 
 
 		// Add dashed lines corresponding to each yval
@@ -911,15 +932,11 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 				//console.log("Plotting at",yPrime);
 				ctx.beginPath();
 				ctx.moveTo(axisGap,yPt);
-
 				ctx.lineTo(canvas.width, yPt);
 				ctx.stroke();
 
 			}
 		}
-
-
-		
 
 		ctx.setLineDash([])
 		ctx.strokeStyle = col;
@@ -1014,6 +1031,9 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 			ctx.stroke(); 
 		
 		}
+
+
+
 		
 		ctx.globalAlpha = 1;
 
@@ -1064,7 +1084,7 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 	ctx.textAlign="center"; 
 	ctx.textBaseline="bottom"; 
 	ctx.save()
-	var ylabXPos = 2 * axisGap / 3;
+	var ylabXPos = axisGap / 2;
 	var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
 	ctx.translate(ylabXPos, ylabYPos);
 	ctx.rotate(-Math.PI/2);
@@ -1240,7 +1260,7 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, xlab =
 	var heightScale = 1;
 	var ylabPos = [];
 	if (yVals != null && yVals.length > 0){
-		var yResult = getNiceAxesNumbers(range[2], range[3], plotHeight, range[2] == 0);
+		var yResult = getNiceAxesNumbers(range[2], range[3], plotHeight, range[2] == 0, false);
 		range[2] = yResult["min"]
 		range[3] = yResult["max"]
 		heightScale = yResult["widthOrHeightScale"]
@@ -1267,12 +1287,12 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, xlab =
 			var axisPointMargin = 4 * canvasSizeMultiplier;
 			ctx.font = 10 * canvasSizeMultiplier + "px Arial";
 			ctx.textBaseline="top"; 
-			ctx.textAlign="center"; 
 			var tickLength = 10 * canvasSizeMultiplier;
 			ctx.lineWidth = 1 * canvasSizeMultiplier;
 
 			for (var labelID = 0; labelID < xlabPos.length; labelID++){
 				var x0 = widthScale * (xlabPos[labelID] - range[0]) + axisGap;
+				ctx.textAlign= labelID == 0 ? "left" : "center";
 				ctx.fillText(xlabPos[labelID], x0, canvas.height - axisGap + axisPointMargin);
 
 				// Draw a tick on the axis
@@ -1287,7 +1307,6 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, xlab =
 
 			// Y min and max
 			ctx.textBaseline="bottom"; 
-			ctx.textAlign="center"; 
 
 			ctx.save()
 			ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
@@ -1328,14 +1347,10 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, xlab =
 		/*
 		// Show the threshold epsilon decrease
 		if (epsilon != null){
-
 			var pixelY = epsilon.e0;
 			var converged = false;
 			for (var pixelX = axisGap; pixelX <= canvas.width - outerMargin; pixelX++){
-
-
 				var trueX = range[0] + xVals[pixelX - axisGap]
-
 				if (!converged){
 					pixelY *= epsilon.gamma;
 					if (pixelY > epsilon.emin){
@@ -1343,11 +1358,8 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, xlab =
 						converged = true;
 					}
 				}
-
 			}
-
 		}
-
 		*/
 
 
@@ -1781,7 +1793,7 @@ function maximumFromList(list){
 
 
 
-// Assumes that values are sorted. Will not display the top 5% of values
+// Assumes that values are sorted
 function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = "", ylab = "Probability density", hoverLabels = false, canvasSizeMultiplier = 1, logSpace = false, col = "#008CBA"){
 
 	if (canvasDivID != null && $("#" + canvasDivID).is( ":hidden" )) return;
@@ -2067,14 +2079,12 @@ function log(num, base = null){
 
 function add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbins, widthScale, heightScale, binGap, ymax, canvasSizeMultiplier){
 	
-
 	
 	ctx.globalAlpha = 1;
 	
 
 	// Calculate the smallest order of magnitude across bars so we can express x-values in scientific notation. 
 	// eg if mean order of magnitude is 5 then will express x-labels as 1.5e5, 20e5, etc.
-
 	var meanBarOrderOfMagnitude = Math.ceil(log(binSize + minVal, 10)); 
 	if (nbins == 1) meanBarOrderOfMagnitude = Math.ceil(log(binSize, 10)); 
 
@@ -2099,10 +2109,11 @@ function add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbi
 
 
 	var binsEvery = nbins < 5 ? 1 : nbins < 10 ? 2 : nbins < 15 ? 3 : 4;
+	var tickLength = 6 * canvasSizeMultiplier;
+	ctx.lineWidth = 1;
 	for (i = 1; i <= nbins; i += binsEvery){
 
-
-		var x0 = widthScale * i + axisGap + binGap * (i-1);
+		var x0 = widthScale * (i-1) + axisGap + binGap * (i) + canvasSizeMultiplier;
 		var txtLabel = roundToSF((minVal + binSize * (i-1)) * Math.pow(10, -meanBarOrderOfMagnitude), 3) + orderOfMagnitudeString;
 
 
@@ -2110,11 +2121,16 @@ function add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbi
 		 if ((canvas.width - x0) / canvas.width < 0.1) ctx.textAlign= "right";
 		else ctx.textAlign= "center";
 
-		ctx.fillText(txtLabel, x0, canvas.height - axisGap + axisPointMargin);
-		
+		ctx.fillText(txtLabel, x0, canvas.height - axisGap + axisPointMargin + 3 * canvasSizeMultiplier);
+
+
+		// Draw axis tick
+		ctx.beginPath();
+		ctx.moveTo(x0, canvas.height - axisGap);
+		ctx.lineTo(x0, canvas.height - axisGap + tickLength);
+		ctx.stroke();
 
 	} 
-
 
 
 
@@ -2163,26 +2179,26 @@ function add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLab
 	
 	
 	if (!hoverLabels){
-	// X title
-	ctx.fillStyle = "black";
-	ctx.textBaseline="top"; 
-	var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
-	var xlabYPos = canvas.height - axisGap / 2;
-	writeLatexLabelOnCanvas(ctx, xlab, xlabXPos, xlabYPos, fontSize);
-	//ctx.fillText(xlab, xlabXPos, xlabYPos);
-	
-	// Y title
-	ctx.textAlign="center"; 
-	ctx.textBaseline="bottom"; 
-	ctx.font = fontSize + "px Arial";
-	ctx.save()
-	var ylabXPos = 2 * axisGap / 3;
-	var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
-	ctx.translate(ylabXPos, ylabYPos);
-	ctx.rotate(-Math.PI/2);
-	ctx.fillText(ylab, 0 ,0);
-	ctx.restore();
-	
+		// X title
+		ctx.fillStyle = "black";
+		ctx.textBaseline="top"; 
+		var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
+		var xlabYPos = canvas.height - axisGap / 2;
+		writeLatexLabelOnCanvas(ctx, xlab, xlabXPos, xlabYPos, fontSize);
+		//ctx.fillText(xlab, xlabXPos, xlabYPos);
+		
+		// Y title
+		ctx.textAlign="center"; 
+		ctx.textBaseline="bottom"; 
+		ctx.font = fontSize + "px Arial";
+		ctx.save()
+		var ylabXPos = 2 * axisGap / 3;
+		var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
+		ctx.translate(ylabXPos, ylabYPos);
+		ctx.rotate(-Math.PI/2);
+		ctx.fillText(ylab, 0 ,0);
+		ctx.restore();
+		
 		return null;
 	
 	}
@@ -3302,7 +3318,7 @@ function plot_custom(plotNumCustom = null){
 
 
 
-function getNiceAxesNumbers(min, max, plotWidthOrHeight, minAtZero = min == 0, axisGap = 45, niceBinSizes = [1, 2, 5]){
+function getNiceAxesNumbers(min, max, plotWidthOrHeight, minAtZero = min == 0, zeroLabel = true, axisGap = 45, niceBinSizes = [1, 2, 5]){
 
 	if (min > max) max = min+1;
 
@@ -3356,14 +3372,14 @@ function getNiceAxesNumbers(min, max, plotWidthOrHeight, minAtZero = min == 0, a
 		nLabels = Math.ceil((max - min) / binSize);
 	}
 	
-	
 
 	var widthOrHeightScale = (plotWidthOrHeight / (max - min));
 
 
 	var vals = [];
 	var tooBigByFactorOf =  Math.max(Math.ceil(nLabels / maxNumLabels), 1)
-	for(var labelID = 1; labelID < nLabels; labelID ++){
+	for(var labelID = 0; labelID < nLabels; labelID ++){
+		if (labelID == 0 && !zeroLabel) continue;
 		if (labelID % tooBigByFactorOf == 0 && labelID * binSize / (max - min) < 0.95) vals.push(roundToSF(labelID * binSize + min));
 	}
 
@@ -3434,7 +3450,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	var heightScale = 1;
 	var ylabPos = [];
 	if (yvals != null && yvals.length > 0){
-		var yResult = getNiceAxesNumbers(range[2], range[3], plotHeight);
+		var yResult = getNiceAxesNumbers(range[2], range[3], plotHeight, range[2] == 0, false);
 		range[2] = yResult["min"]
 		range[3] = yResult["max"]
 		heightScale = yResult["widthOrHeightScale"]
@@ -3794,7 +3810,6 @@ function getDownloadPlotTemplate(){
 				<table cellpadding=10 style='width:90%; margin:auto; font-size: 18px;'>
 				
 				<tr>
-
 						<td> 
 								Download as
 								<select class="dropdown" style="width:60px; font-size:14px; text-align:center" name="SelectDownload" id="SelectDownload">
@@ -3807,15 +3822,12 @@ function getDownloadPlotTemplate(){
 						<td> 
 								<input type=button class="operation" onClick=downloadPlotInFormat() value='Download' title="Download plot in the selected format" style="width:100px; float:right"></input>
 						</td>
-
 						
 					</tr>
 					
-
 				</table>
 				
 				
-
 			</div>
 		</div>
 	
@@ -4331,9 +4343,6 @@ function getPlotOptionsTemplate(){
 		<div id='settingsPopup' style='background-color:008cba; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:20vh; z-index:5' plotNum="XX_plotNum_XX">
 			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> XX_plotName_XX settings </span>
-
-
-
 				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closePlotSettingsPopup()'>&times;</span>
 				<div style='padding:2; font-size:18px;'> Choose the display settings for this plot </div>
 				<table cellpadding=10 style='width:90%; margin:auto;'>
@@ -4347,8 +4356,6 @@ function getPlotOptionsTemplate(){
 							
 						</td>
 					</tr>
-
-
 					<tr>
 						<td id="settingCell3" style="vertical-align:top"> 
 							
@@ -4359,9 +4366,6 @@ function getPlotOptionsTemplate(){
 							
 						</td>
 					</tr>
-
-
-
 					<tr>
 						<td id="settingCell5" style="vertical-align:top"> 
 							
@@ -4372,9 +4376,6 @@ function getPlotOptionsTemplate(){
 							
 						</td>
 					</tr>
-
-
-
 					<tr>
 						<td id="settingCell7" style="vertical-align:top"> 
 							
@@ -4386,11 +4387,9 @@ function getPlotOptionsTemplate(){
 						</td>
 					</tr>
 					
-
 				</table>
 				
 				<input type=button id='submitDistn' class="operation" onClick=saveSettings_controller() value='Save' title="Submit your changes" style="width:60px; float:right"></input>
-
 			</div>
 		</div>
 	`;
@@ -4403,17 +4402,13 @@ function distanceVsTimeOptionsTemplate1(){
 	
 	return `
 		<legend><b>Time range</b></legend>
-
 			<table>
-
 				<tr style="cursor:pointer" onclick= " $('input[name=xRange][value=automaticX]').prop('checked', true); disableTextbox('#xMin_textbox'); disableTextbox('#xMax_textbox') ">
 					<td>
 						 <input type="radio" name="xRange" value="automaticX"> 
 					</td>
 					<td>Auto</td>
 					<td></td>
-
-
 				</tr>
 				
 				
@@ -4424,7 +4419,6 @@ function distanceVsTimeOptionsTemplate1(){
 					</td>
 					<td colspan=2>Pauses (&#x1D6D5; > 1s)</td>
 					
-
 				</tr>
 				
 				
@@ -4433,41 +4427,31 @@ function distanceVsTimeOptionsTemplate1(){
 							 <input type="radio" name="xRange" value="shortPauseX"> 
 						</td>
 						<td colspan=2>Short pauses (1s < &#x1D6D5; < 25s)</td>
-
-
 					</tr>
 				
-
 				
 				
-
 			<tr style="cursor:pointer" onclick= " $('input[name=xRange][value=specifyX]').prop('checked', true); enableTextbox('#xMin_textbox'); enableTextbox('#xMax_textbox') ">
 				<td>
 					<input class="textboxBlue" type="radio" name="xRange" onclick="enableTextbox('#xMin_textbox'); enableTextbox('#xMax_textbox')"  value="specifyX">
 				</td>
-
 				<td>
 					Min = 
 				</td>
-
 				<td>
 					<input class="textboxBlue" type="number" style="width:50px; text-align:right" id="xMin_textbox" value = 0> XUNITS 
 				</td>
 			</tr>
 			<tr style="cursor:pointer" onclick= " $('input[name=xRange][value=specifyX]').prop('checked', true); enableTextbox('#xMin_textbox'); enableTextbox('#xMax_textbox') ">
 				<td></td>
-
-
 				<td>
 					Max = 
 				</td>
-
 				<td>
 					<input class="textboxBlue" type="number" style="width:50px; text-align:right" id="xMax_textbox" value = 1> XUNITS 
 				</td>
 			</tr>
 		</table>
-
 	`;
 	
 }
@@ -4478,38 +4462,29 @@ function distanceVsTimeOptionsTemplate2(){
 	return `
 		<legend><b>Distance range</b></legend>
 		<table>
-
 				<tr style="cursor:pointer" onclick= " $('input[name=yRange][value=automaticY]').prop('checked', true); disableTextbox('#yMin_textbox'); disableTextbox('#yMax_textbox') ">
 					<td>
 						 <input type="radio" name="yRange" value="automaticY"> 
 					</td>
 					<td>Auto</td>
 					<td></td>
-
-
 				</tr>
-
 			<tr style="cursor:pointer" onclick= " $('input[name=yRange][value=specifyY]').prop('checked', true); enableTextbox('#yMin_textbox'); enableTextbox('#yMax_textbox') ">
 				<td>
 					<input type="radio" name="yRange" onclick="enableTextbox('#yMin_textbox'); enableTextbox('#yMax_textbox')"  value="specifyY">
 				</td>
-
 				<td>
 					Min = 
 				</td>
-
 				<td>
 					<input class="textboxBlue" type="number" style="width:50px; text-align:right" id="yMin_textbox" value=YMINDEFAULT> YUNITS 
 				</td>
 			</tr>
 			<tr style="cursor:pointer" onclick= " $('input[name=yRange][value=specifyY]').prop('checked', true); enableTextbox('#yMin_textbox'); enableTextbox('#yMax_textbox') ">
 				<td></td>
-
-
 				<td>
 					Max = 
 				</td>
-
 				<td>
 					<input class="textboxBlue" type="number" style="width:50px; text-align:right" id="yMax_textbox" value=YMAXDEFAULT> YUNITS 
 				</td>
@@ -4528,38 +4503,29 @@ function distanceVsTimeOptionsTemplate3(){
 	return `
 		<legend><b>Z-axis range</b></legend>
 		<table>
-
 				<tr style="cursor:pointer" onclick= " $('input[name=zRange][value=automaticZ]').prop('checked', true); disableTextbox('#zMin_textbox'); disableTextbox('#zMax_textbox') ">
 					<td>
 						 <input type="radio" name="zRange" value="automaticZ"> 
 					</td>
 					<td>Auto</td>
 					<td></td>
-
-
 				</tr>
-
 			<tr style="cursor:pointer" onclick= " $('input[name=zRange][value=specifyZ]').prop('checked', true); enableTextbox('#zMin_textbox'); enableTextbox('#zMax_textbox') ">
 				<td>
 					<input type="radio" name="zRange" onclick="enableTextbox('#zMin_textbox'); enableTextbox('#zMax_textbox')"  value="specifyZ">
 				</td>
-
 				<td>
 					Min = 
 				</td>
-
 				<td>
 					<input class="textboxBlue" type="number" style="width:50px; text-align:right" id="zMin_textbox" value=ZMINDEFAULT> 
 				</td>
 			</tr>
 			<tr style="cursor:pointer" onclick= " $('input[name=zRange][value=specifyZ]').prop('checked', true); enableTextbox('#zMin_textbox'); enableTextbox('#zMax_textbox') ">
 				<td></td>
-
-
 				<td>
 					Max = 
 				</td>
-
 				<td>
 					<input class="textboxBlue" type="number" style="width:50px; text-align:right" id="zMax_textbox" value=ZMAXDEFAULT> 
 				</td>
@@ -4576,8 +4542,6 @@ function heatmapZAxisLegend(){
 	
 	return `
 		<legend><b>Point Colour</b></legend> 
-
-
 		<select class="dropdown" title="Select the colour of the points in this plot" id = "zColouring" style="width:200px; vertical-align: middle; text-align:left;">
 			<option value="blue">Blue</option>
 			<option value="rainbow">Rainbow</option>
@@ -4585,7 +4549,6 @@ function heatmapZAxisLegend(){
 			<option value="yellowRed">Yellow-red</option>
 			<option value="purpleYellow">Purple-yellow</option>
 		</select>
-
 	`;
 	
 }
@@ -4687,7 +4650,6 @@ function customPlotSiteConstraintTemplate(){
 function customPlotSelectParameterTemplate(){
 	
 	return `
-
 		<legend><b>Variable (x-axis)</b></legend>
 		<select class="dropdown" onChange="updateParameterPlotSettings()" title="What do you want to show on the x-axis?" id = "customParamX" style="vertical-align: middle; text-align:right;">
 			<option value="none">Select a parameter...</option>
@@ -4698,7 +4660,6 @@ function customPlotSelectParameterTemplate(){
 			<option value="logLikelihood">Chi-squared test statistic</option>
 		</select><br>
 		Calculated per trial.
-
 	`;
 	
 }
@@ -4707,7 +4668,6 @@ function customPlotSelectParameterTemplate(){
 function customPlotSelectPropertyTemplate(){
 	
 	return `
-
 		<legend><b>Variable (y-axis)</b></legend>
 		<select class="dropdown" onChange="updateParameterPlotSettings()" title="What do you want to show on the y-axis?" id = "customParamY" style="vertical-align: middle; text-align:right;">
 			<option value="probability">Probability</option>
@@ -4718,7 +4678,6 @@ function customPlotSelectPropertyTemplate(){
 			<option value="logLikelihood">Chi-squared test statistic</option>
 		</select><br>
 		Calculated per trial.
-
 	`;
 	
 }
@@ -4727,7 +4686,6 @@ function customPlotSelectPropertyTemplate(){
 function parameterHeatmapZAxisTemplate(){
 
 	return `
-
 		<legend><b>Variable (z-axis)</b></legend>
 		<select class="dropdown" onChange="updateParameterPlotSettings()" title="What do you want to show on the z-axis?" id = "customParamZ" style="vertical-align: middle; text-align:right;">
 			<option value="none">Select a parameter...</option>
@@ -4738,7 +4696,6 @@ function parameterHeatmapZAxisTemplate(){
 			<option value="logLikelihood">Chi-squared test statistic</option>
 		</select><br>
 		Calculated per trial.
-
 	`;
 
 
@@ -4749,14 +4706,12 @@ function parameterHeatmapZAxisTemplate(){
 function getTracePlotDropdownTemplate(){
 	
 	return `
-
 		<legend><b>Y-axis variable</b></legend>
 		<select class="dropdown" title="What do you want to show on the y-axis?" id = "traceVariableY" style="vertical-align: middle; text-align:right;">
 			<option value="logLikelihood">chiSq</option>
 			<option value="logPrior">log prior</option>
 		</select><br>
 		Calculated per trial.
-
 	`;
 	
 }
@@ -4772,7 +4727,6 @@ function getPosteriorCheckboxTemplate(){
 		<span style="font-size:15px; vertical-align:middle">Posterior</span>
 		
 		
-
 	`;
 
 
@@ -5288,10 +5242,4 @@ function binaryFind(sortedArray, searchElement) {
   return currentElement < searchElement ? currentIndex + 1 : currentIndex;
 
 }
-
-
-
-
-
-
 
