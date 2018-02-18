@@ -132,6 +132,19 @@ void MCMC::beginMCMC(){
 			nacceptances = 0;
 			cout << "------- Burn-in achieved. Resetting acceptance rate. -------" << endl;
 		}
+		
+		
+		// Temp HACK: if burnin has not been achieved but it should have then exit
+		if (!MCMC::hasAchievedBurnin && MCMC::epsilon <= _chiSqthreshold_min && previousMCMCstate->get_chiSquared() > MCMC::epsilon){
+			
+			// Wait 500 states after convergence has failed until exiting
+			double cutoff = log(_chiSqthreshold_min / _chiSqthreshold_0) / log(_chiSqthreshold_gamma) + 500;
+			if (n > cutoff){
+				cout << "------- Burn-in failed. Exiting now. -------" << endl;
+				exit(0);
+			}
+		}
+		
 
 
 		// Make proposal and alter the parameters to those of the new state
@@ -288,7 +301,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 	// Iterate through all experimental settings and perform simulations at each setting. The velocities generated are cached in the posterior object
 
 	// Run simulations and stop if it exceeds threshold (unless this is the first trial)
-	double simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
+	double simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint);
 	thisMCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
 	if (thisMCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
 		return false;
@@ -298,7 +311,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 	while (MCMC::nextExperiment()){
 
 		// Run simulations and stop if it exceeds threshold (unless this is the first trial)
-		simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
+		simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint);
 		thisMCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
 		if (thisMCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
 			return false;
