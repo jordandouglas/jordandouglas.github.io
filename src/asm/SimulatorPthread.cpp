@@ -53,6 +53,9 @@ double SimulatorPthread::performNSimulations(int N, bool verbose){
 		return velocity;
 	}
 
+	double meanVelocity = 0;
+
+
 
 	// Allocate number of simulations to each thread
 	// Each worker has same number of simulations, and if there are n remainders these are distributed equally among the first n threads 
@@ -82,7 +85,6 @@ double SimulatorPthread::performNSimulations(int N, bool verbose){
 
 
    	// Calculate mean velocity
-   	double meanVelocity = 0;
    	for (int i = 0; i < N_THREADS; i++){
    		meanVelocity += (velocities.at(i)[0] * nSimsPerThread.at(i)) / N;
    		//cout << velocities.at(i)[0] << endl;
@@ -93,10 +95,10 @@ double SimulatorPthread::performNSimulations(int N, bool verbose){
 	velocities.clear();
 	threads.clear();
 	
-
    	//cout << "Mean velocity = " << meanVelocity << endl;
-   	return meanVelocity;
 
+
+   	return meanVelocity;
 }
 
 

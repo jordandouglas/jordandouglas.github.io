@@ -94,6 +94,7 @@ string Model::getID(){
 
 void Model::addParameterHardcoding(string paramID, string value){
 
+
 	// If the value is declaration of which instance number to use then divert to addParameterInstanceMapping
 	vector<string> split_vector = Settings::split(value, ':');
 	if (split_vector.size() == 2 && split_vector.at(0) == "instance") {
@@ -138,7 +139,7 @@ void Model::activateModel(){
 
 	//this->modelIsActive = true;
 	for(std::map<string, double>::iterator iter = this->parameterHardcodings.begin(); iter != this->parameterHardcodings.end(); ++iter){
-
+		
 		string paramID =  iter->first;
 		double value = iter->second;
 
@@ -215,6 +216,16 @@ void Model::print(){
 		int instanceNum = iter->second;
 		cout << paramID << " instance: " << instanceNum << endl;
 	}
+
+
+	for(std::map<string, double>::iterator iter = this->parameterHardcodings.begin(); iter != this->parameterHardcodings.end(); ++iter){
+		string paramID =  iter->first;
+		double hcval = iter->second;
+		cout << paramID << " = " << hcval << endl;
+	}
+
+
+
 
 	cout << "--------------\n" << endl;
 

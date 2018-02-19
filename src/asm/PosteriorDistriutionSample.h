@@ -41,12 +41,13 @@ class PosteriorDistriutionSample {
 	double priorProb;
 	string modelIndicator;
 	map<string, double> parameterEstimates;
-	vector<double> simulatedValues; // eg. velocities
+	vector<double> simulatedValues; // eg. Velocities
 
 
     public:
     	PosteriorDistriutionSample(int sampleNum);
     	void setStateNumber(int sampleNum);
+    	int getStateNumber();
     	void set_modelIndicator(string val);
     	string get_modelIndicator();
     	double get_chiSquared();
@@ -57,6 +58,8 @@ class PosteriorDistriutionSample {
 		
     	void print(bool toFile);
     	void printHeader(bool toFile);
+    	void loadFromLogFile(string filename);
+    	void setParametersFromState();
 
 
 };

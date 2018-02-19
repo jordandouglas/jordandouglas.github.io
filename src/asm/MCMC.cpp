@@ -44,21 +44,14 @@ list<Parameter*> MCMC::parametersToEstimate;
 bool MCMC::estimatingModel;
 bool MCMC::hasAchievedBurnin;
 bool MCMC::hasAchievedPreBurnin;
-
 double MCMC::epsilon = 0;
-
-/*
-To do next:
-	1) Verify that the experimental settings are being set corectly
-	2) Ensure that forces work
-	3) Have two KDs
-*/
-
 
 
 void MCMC::beginMCMC(){
 
 	cout << "\nInitialising MCMC..." << endl;
+
+
 
 	// Sample parameters and model
 	Settings::sampleAll();
@@ -79,6 +72,31 @@ void MCMC::beginMCMC(){
 	MCMC::tryToEstimateParameter(Kdiss);
 	MCMC::tryToEstimateParameter(RateBind);
 
+
+	// 2 states stored in memory
+	PosteriorDistriutionSample* previousMCMCstate = new PosteriorDistriutionSample(0);
+	PosteriorDistriutionSample* currentMCMCstate;
+	bool printToFile = outputFilename != "";
+	
+
+
+	// Load initial state from file
+	if (_resumeFromLogfile){
+		previousMCMCstate->loadFromLogFile(outputFilename);
+		previousMCMCstate->setParametersFromState();
+	}
+
+
+	// Otherwise perform the first MCMC trial on the initial state
+	else{
+
+		MCMC::metropolisHastings(0, previousMCMCstate, nullptr);
+		previousMCMCstate->printHeader(printToFile);
+		previousMCMCstate->print(printToFile);
+
+	}
+
+
 	cout << "Estimating the following " << parametersToEstimate.size() << " parameters:" << endl;
 	for (list<Parameter*>::iterator it = parametersToEstimate.begin(); it != parametersToEstimate.end(); ++it){
 		(*it)->print();
@@ -86,29 +104,23 @@ void MCMC::beginMCMC(){
 	cout << endl;
 
 
+
+
+
 	// Intialise epsilon to the initial threshold value
-	MCMC::epsilon = _chiSqthreshold_0;
-
-
-	// Perform the first MCMC trial on the initial state
-	bool accepted ;
-	PosteriorDistriutionSample* previousMCMCstate = new PosteriorDistriutionSample(0);
-	PosteriorDistriutionSample* currentMCMCstate;
-	MCMC::metropolisHastings(0, previousMCMCstate, nullptr);
-
-	bool printToFile = outputFilename != "";
-	previousMCMCstate->printHeader(printToFile);
-	previousMCMCstate->print(printToFile);
-
+	int initialStateNum = previousMCMCstate->getStateNumber() + 1;
+	MCMC::epsilon = max(_chiSqthreshold_0 * pow(_chiSqthreshold_gamma, initialStateNum-1), _chiSqthreshold_min);
 
 
 	// Iterate
 	int nacceptances = 0;
 	int nTrialsUntilBurnin = 0;
-	for (int n = 1; n <= ntrials_abc; n ++){
-
-		if (n == 1 || n % logEvery == 0){
-			cout << "Performing MCMC trial " << n << "; epsilon = " << MCMC::epsilon << "; Acceptance rate = " << ((double)nacceptances/(n - nTrialsUntilBurnin)) <<  endl;
+	bool accepted;
+	//Settings::print();
+	for (int n = initialStateNum; n <= ntrials_abc; n ++){
+		
+		if (n == initialStateNum || n % logEvery == 0){
+			cout << "Performing MCMC trial " << n << "; epsilon = " << MCMC::epsilon << "; Acceptance rate = " << ((double)nacceptances/(n - nTrialsUntilBurnin - initialStateNum + 1)) <<  endl;
 		}
 
 
@@ -267,6 +279,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 	}
 
 
+
 	// Cache the parameter values in posterior row object
 	for (list<Parameter*>::iterator it = parametersToEstimate.begin(); it != parametersToEstimate.end(); ++it){
 		thisMCMCState->addParameterEstimate((*it)->getID(), (*it)->getTrueVal());
@@ -301,7 +314,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 	// Iterate through all experimental settings and perform simulations at each setting. The velocities generated are cached in the posterior object
 
 	// Run simulations and stop if it exceeds threshold (unless this is the first trial)
-	double simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint);
+	double simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
 	thisMCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
 	if (thisMCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
 		return false;
@@ -311,7 +324,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 	while (MCMC::nextExperiment()){
 
 		// Run simulations and stop if it exceeds threshold (unless this is the first trial)
-		simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint);
+		simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
 		thisMCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
 		if (thisMCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
 			return false;
@@ -322,6 +335,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 
 	// Exceeds threshold -> reject
 	if (thisMCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) return false;
+
 
 
 	return true;
@@ -366,6 +380,7 @@ bool MCMC::resetExperiment(){
 
 	// Apply settings
 	Settings::clearParameterHardcodings();
+	currentModel->activateModel();
 	(*currentExperiment).reset();
 
 	return true;
@@ -379,6 +394,7 @@ bool MCMC::nextExperiment(){
 
 	// Attempt to apply the settings of the next observation in the current experiment
 	Settings::clearParameterHardcodings();
+	currentModel->activateModel();
 	if ((*currentExperiment).next()) return true;
 
 	// If fails then move onto next experiment

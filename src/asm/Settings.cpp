@@ -54,6 +54,7 @@ const double _PI = 3.14159265359;
 string outputFilename = "";
 string inputXMLfilename = "";
 bool isWASM = false;
+bool _resumeFromLogfile = false;
 
 
 
@@ -237,6 +238,11 @@ void Settings::print(){
 	for (list<Model>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
 		(*it).print();
 	}
+
+
+	cout << "Current model" << endl;
+	currentModel->print();
+
 
 	// Print parameters
 	cout << "Parameters:" << endl;

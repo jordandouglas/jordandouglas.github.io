@@ -61,10 +61,11 @@ extern map<string, Sequence*> sequences;
 extern Sequence* currentSequence;
 
 
-// Command line arguments. These are global constants to enable WebAssembly calling using node.js
+// Command line arguments
 extern string inputXMLfilename;
 extern string outputFilename;
 extern bool isWASM;
+extern bool _resumeFromLogfile;
 
 // ABC information
 extern string inferenceMethod;

@@ -29,6 +29,8 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <sstream>
+#include <regex>
 
 using namespace std;
 
@@ -45,6 +47,10 @@ PosteriorDistriutionSample::PosteriorDistriutionSample(int sampleNum){
 
 void PosteriorDistriutionSample::setStateNumber(int sampleNum){
 	this->sampleNum = sampleNum;
+}
+
+int PosteriorDistriutionSample::getStateNumber(){
+	return this->sampleNum;
 }
 
 double PosteriorDistriutionSample::get_chiSquared(){
@@ -200,3 +206,140 @@ void PosteriorDistriutionSample::print(bool toFile){
 }
 
 
+
+void PosteriorDistriutionSample::loadFromLogFile(string filename){
+
+
+	// Get the last line in the logfile
+	ifstream logfile;
+	string line;
+    logfile.open(filename);
+    if(logfile.is_open()) {
+
+    	// Get number of lines
+    	int numLines = 0;
+    	vector<string> headerLineSplit;
+    	bool headerParsed = false;
+        while(getline(logfile, line)) {
+
+        	if (line == "" || line == "\n") break;
+        	numLines++;
+
+        	// Parse first line
+        	if (!headerParsed){
+        		headerParsed = true;
+        		headerLineSplit = Settings::split(line, '\t');
+        	}
+
+
+        }
+
+
+
+
+        // Get last line and parse it
+        logfile.clear();
+		logfile.seekg(0, ios::beg);
+        int currentLine = 0;
+        regex velocityMatch("(V)([0-9]+)$");
+        while(getline(logfile, line)) {
+        	currentLine++;
+
+        	// Parse this line
+        	if (currentLine == numLines) {
+        		vector<string> splitLine = Settings::split(line, '\t');
+
+
+        		int simulatedVal = 0;
+        		for (int i = 0; i < splitLine.size(); i ++){
+
+        			string header = headerLineSplit.at(i);
+        			string value = splitLine.at(i);
+
+        			if (header == "State") this->setStateNumber(stoi(value));
+        			else if (header == "Model") this->set_modelIndicator(value);
+        			else if (header == "logPrior") this->priorProb = stof(value);
+        			else if (header == "chiSquared") this->chiSquared = stof(value);
+        			else if (std::regex_match (header, velocityMatch)) {
+        				simulatedValues.at(simulatedVal) = stof(value); // Parse velocity
+        				simulatedVal++;
+        			}
+        			else {
+        				this->addParameterEstimate(header, stof(value)); // Parse parameter
+        			}
+        		}
+        	}
+        }
+
+        logfile.close();
+
+    }
+
+}
+
+
+
+
+void PosteriorDistriutionSample::setParametersFromState(){
+	
+
+	// Set the parameters
+	regex instanceMatch("(.+)(instance[0-9]+)(.+)");
+	for(map<string, double>::iterator iter = this->parameterEstimates.begin(); iter != this->parameterEstimates.end(); ++iter){
+		string paramID =  iter->first;
+		double value = iter->second;
+
+
+		// If parameter has multiple instances then need to do one at a time
+		if (regex_match (paramID, instanceMatch)){
+
+			// Convert PARAMID(instancex) into string paramID = PARAMID and int instanceNum = x
+			vector<string> splitLine = Settings::split(paramID, '(');
+			paramID = splitLine.at(0);
+			string instanceNum_str = splitLine.at(1).substr(8); // Remove "instance"
+			int instanceNum = stoi(instanceNum_str.substr(0, instanceNum_str.size()-1)); // Remove ")"
+
+			Parameter* param = Settings::getParameterByName(paramID);
+			if (param != nullptr){
+				param->getParameterFromMetaParameter(instanceNum)->setVal(value);
+			}
+
+			else {
+				cout << "ERROR: Cannot find parameter " << paramID << endl;
+				exit(0);
+			}
+
+		}
+
+
+		// Single instance
+		else{
+
+			Parameter* param = Settings::getParameterByName(paramID);
+			if (param != nullptr){
+				param->setVal(value);
+			}
+
+		
+
+			else {
+				cout << "ERROR: Cannot find parameter " << paramID << endl;
+				exit(0);
+			}
+
+		}
+
+
+	}
+
+	// Set model number
+	Settings::setModel(this->get_modelIndicator());
+
+
+	// Update the global settings to apply the parameters in this model
+	Settings::clearParameterHardcodings();
+	currentModel->activateModel();
+
+
+
+}

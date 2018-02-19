@@ -69,13 +69,16 @@ int main(int argc, char** argv) {
 	// Parse arguments
 	bool doMCMC = false;
 	for (int i = 1; i < argc; i ++){
-		
+
 		string arg = string(argv[i]);
+
 		if (arg == "-MCMC") doMCMC = true;
 		
 		else if (arg == "-sim") doMCMC = false;
 		
 		else if (arg == "-wasm") isWASM = true;
+
+		else if (arg == "-resume") _resumeFromLogfile = true;
 		
 		else if(arg == "-i" && i+1 < argc) {
 			i++;
@@ -96,7 +99,7 @@ int main(int argc, char** argv) {
 			N_THREADS = atoi(argv[i]);
 		}
 
-		
+
 		else {
 			cout << "Invalid command line arguments" << endl;
 			exit(0);
