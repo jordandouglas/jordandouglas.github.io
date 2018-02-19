@@ -232,7 +232,6 @@ double Parameter::calculateLogPrior(){
 	}
 
 
-
 	// Check boundaries
 	if ((this->zeroTruncated == "exclusive" && this->val <= 0) || (this->zeroTruncated == "inclusive" && this->val <  0)) return -INFINITY;
 
@@ -240,6 +239,7 @@ double Parameter::calculateLogPrior(){
 	if (this->distributionName == "Fixed"){
 		return 0;
 	}
+
 
 	else if (this->distributionName == "Uniform"){
 		double lower = this->distributionParameters["uniformDistnLowerVal"];

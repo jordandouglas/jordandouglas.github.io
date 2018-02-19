@@ -82,6 +82,7 @@ void PosteriorDistriutionSample::addParameterEstimate(string paramID, double val
 // Cache the simulated value, and use the simulated and observed values to update the chi squared test statistic
 void PosteriorDistriutionSample::addSimulatedAndObservedValue(double simVal, double obsVal){
 
+
 	if (this->currentObsNum >= this->simulatedValues.size()) return;
 	this->simulatedValues.at(this->currentObsNum) = simVal;
 	this->currentObsNum ++;
@@ -89,6 +90,9 @@ void PosteriorDistriutionSample::addSimulatedAndObservedValue(double simVal, dou
 
 	// Calculate accumulative chi-squared
 	this->chiSquared += pow(simVal - obsVal, 2) / simVal;
+
+	//Settings::print();
+	//cout << "Simval " << simVal << "obsVal " << obsVal << " X2 " << this->chiSquared << endl;
 
 }
 

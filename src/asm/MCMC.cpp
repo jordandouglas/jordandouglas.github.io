@@ -124,6 +124,8 @@ void MCMC::beginMCMC(){
 		}
 
 
+		//Settings::print();
+
 		// Update threshold epsilon
 		if (MCMC::epsilon > _chiSqthreshold_min){
 			MCMC::epsilon = max(MCMC::epsilon * _chiSqthreshold_gamma, _chiSqthreshold_min);
@@ -140,7 +142,7 @@ void MCMC::beginMCMC(){
 		// See if burnin has been achieved. Once it has, print it out in console and reset the acceptance rate
 		if (!MCMC::hasAchievedBurnin && MCMC::epsilon <= _chiSqthreshold_min && previousMCMCstate->get_chiSquared() <= MCMC::epsilon){
 			MCMC::hasAchievedBurnin = true;
-			nTrialsUntilBurnin = n;
+			nTrialsUntilBurnin = n - initialStateNum + 1;
 			nacceptances = 0;
 			cout << "------- Burn-in achieved. Resetting acceptance rate. -------" << endl;
 		}
@@ -167,13 +169,17 @@ void MCMC::beginMCMC(){
 		currentMCMCstate = new PosteriorDistriutionSample(n);
 		accepted = MCMC::metropolisHastings(n, currentMCMCstate, previousMCMCstate);
 
+		//currentMCMCstate->print(false);
+
 		// Accept
 		if (accepted){
-
+			
 			nacceptances ++;
 			//cout << "Accept" << endl;
 			delete previousMCMCstate;
 			previousMCMCstate = currentMCMCstate;
+
+			//currentMCMCstate->print(false);
 
 			// Reset all parameters to make their new value final
 			for (list<Parameter*>::iterator it = parametersToEstimate.begin(); it != parametersToEstimate.end(); ++it){
@@ -293,7 +299,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 
 
 	// Efficiency: sample from the Metropolis prior-ratio now instead of after the simulation. If rejected then don't bother simulating
-	if (sampleNum > 0){
+	if (false && sampleNum > 0){
 		double runifNum = Settings::runif();
 		double priorRatio = exp(thisMCMCState->get_logPriorProb() - prevMCMCState->get_logPriorProb());
 
