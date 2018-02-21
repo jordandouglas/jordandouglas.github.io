@@ -1003,7 +1003,7 @@ OPS_JS.form_bulge_WW = function(state = null, UPDATE_COORDS, S = 0, form_left = 
 				if (state["bulgedBase"][S]-i <= PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) WW_JS.move_nt_WW(i, "m", 25, -52/(1+PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]));
 				else WW_JS.move_nt_WW(i, "m", 25, 0);
 			}
-		}else{
+		}else if(UPDATE_COORDS){
 			WW_JS.move_nt_WW(0, "m", 25, 0);
 			PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]--;
 		}
@@ -1108,7 +1108,7 @@ OPS_JS.diffuse_left_WW = function(state = null, UPDATE_COORDS, S = 0, DOMupdates
 				if (state["leftMBase"] - i <= (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)) WW_JS.move_nt_WW(i, "m", -25, 52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
 				else WW_JS.move_nt_WW(i, "m", -25, 0);
 			}		
-		}else{
+		}else if(UPDATE_COORDS){
 			WW_JS.move_nt_WW(1, "m", -25, 0);
 			WW_JS.move_nt_WW(0, "m", -25, 0);
 			PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]++;

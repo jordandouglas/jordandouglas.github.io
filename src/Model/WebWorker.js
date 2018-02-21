@@ -176,7 +176,7 @@ WW_JS.refresh_WW = function(resolve, msgID){
 
 
 
- WW_JS.add_pairs_WW = function(msgID){
+WW_JS.add_pairs_WW = function(msgID){
 
 	if (msgID === undefined) msgID = null;
 	
@@ -751,7 +751,7 @@ WW_JS.delete_HTMLobj_WW = function(id){
 
 
 // Move the object with the specified id
- WW_JS.move_obj_from_id_WW = function(id, dx, dy, animationTime){
+WW_JS.move_obj_from_id_WW = function(id, dx, dy, animationTime){
 
 	if (animationTime === undefined) animationTime = ANIMATION_TIME;
 	var obj = HTMLobjects[id];
@@ -762,7 +762,10 @@ WW_JS.delete_HTMLobj_WW = function(id){
 }
 
 // Move the nucleotide with the specified position in the specified sequence
- WW_JS.move_nt_WW = function(pos, seq, dx, dy, animationTime) {
+WW_JS.move_nt_WW = function(pos, seq, dx, dy, animationTime) {
+
+
+ 	
 
 	if (animationTime === undefined) animationTime = ANIMATION_TIME;
 	var nt = null;
