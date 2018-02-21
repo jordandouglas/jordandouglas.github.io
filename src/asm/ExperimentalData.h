@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*  
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
 	This file is part of SimPol.
@@ -23,7 +23,6 @@
 #ifndef EXPERIMENTALDATA_H
 #define EXPERIMENTALDATA_H
 
-
 #include <string>
 #include <vector>
 
@@ -42,10 +41,13 @@ class ExperimentalData{
 	double GTPconc_local;
 	double UTPconc_local;
 	double force;
+	string sequenceID; // Use a separate sequence for this dataset? Optional 
 
 	int currentExperiment;
 	vector<double> settingsX; // eg. forces, NTP concentrations
 	vector<double> observationsY; // eg. velocity
+	vector<int> ntrials; // Number of simulations to perform per observation (optional) 
+
 
 	public:
 		
@@ -53,8 +55,10 @@ class ExperimentalData{
 
 		bool reset(); // Changes the global settings to reflect the settings described by the first experiment in settingsX
 		bool next(); // Moves on to the next experimental settings
+		int getNTrials(); // Returns the number of trials to perform on the current observation (will return 0 if this has not been set)
 		double getObservation(); // Return the current observation
 		void addDatapoint(double setting, double observation);
+		void addDatapoint(double setting, double observation, int n);
 		void print();
 
 
@@ -63,6 +67,7 @@ class ExperimentalData{
 		void set_GTPconc(double val);
 		void set_UTPconc(double val);
 		void set_force(double val);
+		void set_sequenceID(string seqID);
 
 		double get_ATPconc();
 		double get_CTPconc();

@@ -299,7 +299,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 
 
 	// Efficiency: sample from the Metropolis prior-ratio now instead of after the simulation. If rejected then don't bother simulating
-	if (false && sampleNum > 0){
+	if (sampleNum > 0){
 		double runifNum = Settings::runif();
 		double priorRatio = exp(thisMCMCState->get_logPriorProb() - prevMCMCState->get_logPriorProb());
 
@@ -313,13 +313,11 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 	}
 
 
-	// Run a different number of trials pre- and post- pre-burnin
-	int ntrialsPerDatapoint = MCMC::hasAchievedPreBurnin || _testsPerData_preburnin < 0 ? testsPerData : _testsPerData_preburnin; 
-
 
 	// Iterate through all experimental settings and perform simulations at each setting. The velocities generated are cached in the posterior object
 
 	// Run simulations and stop if it exceeds threshold (unless this is the first trial)
+	int ntrialsPerDatapoint = MCMC::getNTrials();
 	double simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
 	thisMCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
 	if (thisMCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
@@ -330,6 +328,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 	while (MCMC::nextExperiment()){
 
 		// Run simulations and stop if it exceeds threshold (unless this is the first trial)
+		ntrialsPerDatapoint = MCMC::getNTrials();
 		simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
 		thisMCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
 		if (thisMCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
@@ -417,4 +416,17 @@ bool MCMC::nextExperiment(){
 // Returns the velocity of the current experiment
 double MCMC::getExperimentalVelocity(){
 	return (*currentExperiment).getObservation();
+}
+
+
+
+// Returns the number of trials to perform for the current experimrnt
+int MCMC::getNTrials(){
+
+	if ((*currentExperiment).getNTrials() != 0) return (*currentExperiment).getNTrials();
+
+	// Run a different number of trials pre- and post- pre-burnin
+	return MCMC::hasAchievedPreBurnin || _testsPerData_preburnin < 0 ? testsPerData : _testsPerData_preburnin; 
+
+
 }

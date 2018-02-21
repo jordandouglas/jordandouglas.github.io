@@ -43,9 +43,11 @@ ExperimentalData::ExperimentalData(int id, string dataType, int nObs){
 	this->GTPconc_local = GTPconc->getVal();
 	this->UTPconc_local = UTPconc->getVal();
 	this->currentExperiment = 0;
+	this->sequenceID = _seqID;
 
 	settingsX.resize(nObs); 
 	observationsY.resize(nObs);
+	ntrials.resize(nObs);
 
 }
 
@@ -61,12 +63,27 @@ void ExperimentalData::addDatapoint(double setting, double observation){
 }
 
 
+void ExperimentalData::addDatapoint(double setting, double observation, int n){
+
+	if (currentExperiment < settingsX.size()){
+		settingsX.at(currentExperiment) = setting;
+		observationsY.at(currentExperiment) = observation;
+		ntrials.at(currentExperiment) = n;
+		currentExperiment ++;
+	}
+
+}
+
+
+
 
 void ExperimentalData::print(){
 
 	cout << "Experiment " << this->id << ": " << this->dataType << "; [ATP] = " << this->ATPconc_local <<  "; [CTP] = " << this->CTPconc_local << "; [GTP] = " << this->GTPconc_local << "; [UTP] = " << this->UTPconc_local << "; Force = " << this->force << "; observations: ";
 	for (int i = 0; i < settingsX.size(); i ++){
-		cout << settingsX.at(i) << "," << observationsY.at(i) << "; ";
+		cout << settingsX.at(i) << ", " << observationsY.at(i);
+		if (ntrials.at(i) != 0) cout << ", n=" << ntrials.at(i);
+		cout << ", seq length: " << sequences[this->sequenceID]->get_templateSequence().length() << " nt;" << endl;
 	}
 	cout << endl;
 
@@ -101,6 +118,11 @@ bool ExperimentalData::next() {
 
 }
 
+int ExperimentalData::getNTrials(){
+	if (this->currentExperiment >= this->settingsX.size()) return 0;
+	return this->ntrials.at(this->currentExperiment);
+}
+
 
 
 
@@ -111,6 +133,10 @@ void ExperimentalData::applySettings(){
 
 	//cout << "Changing settings to experiment " << this->id << " obs " << this->currentExperiment << endl;
 	currentModel->set_useFourNTPconcentrations(true); // Ensure that 4 NTP concentrations are being used
+
+	// Select the appropriate sequence
+	Settings::setSequence(this->sequenceID);
+
 
 	double currentXVal = this->settingsX.at(this->currentExperiment);
 	if (this->dataType == "forceVelocity"){
@@ -156,6 +182,10 @@ void ExperimentalData::set_UTPconc(double val) {
 void ExperimentalData::set_force(double val) {
 	this->force = val;
 }
+void ExperimentalData::set_sequenceID(string seqID){
+	this->sequenceID = seqID;
+}
+
 
 
 

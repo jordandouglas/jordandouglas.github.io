@@ -30,8 +30,13 @@
 
 using namespace std;
 
-double*** TranslocationRatesCache::translocationRateTable;
-double** TranslocationRatesCache::backtrackRateTable;
+
+
+
+TranslocationRatesCache::TranslocationRatesCache(){
+	
+}
+
 
 double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 
@@ -131,7 +136,7 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 }
 
 
-void TranslocationRatesCache::buildTranslocationRateTable(){
+void TranslocationRatesCache::buildTranslocationRateTable(string templSequence){
 
 	// Don't calculate all at once, only calculating for active site positions 0 and 1. Simulation caches hypertranslocated rates as it goes. 
 	// Most states are never sampled. Otherwise far too slow to load for n > 300
@@ -143,17 +148,16 @@ void TranslocationRatesCache::buildTranslocationRateTable(){
 	// There are l + 1 entries in each row, where l is the length of the nascent strand in the row
 
 
-	cout << "Building translocation rate table..." << endl;
-	delete translocationRateTable;
+	//cout << "Building translocation rate table..." << templSequence.length() << endl;
 	
 	int h = (int)hybridLen->getVal();
-	int nLengths = templateSequence.length() - h + 1;
+	int nLengths = templSequence.length() - h + 1;
 	int nPositions = h + 1;
 	if (nLengths <= 0) return;
 	translocationRateTable = new double**[nLengths];//[nPositions][2];
 
 
-	for(int nascentLen = h-1; nascentLen < templateSequence.length(); nascentLen ++){
+	for(int nascentLen = h-1; nascentLen < templSequence.length(); nascentLen ++){
 		
 		int rowNum = nascentLen - (h-1);
 		translocationRateTable[rowNum] = new double*[nPositions];
@@ -174,7 +178,7 @@ void TranslocationRatesCache::buildTranslocationRateTable(){
 
 
 
-void TranslocationRatesCache::buildBacktrackRateTable(){
+void TranslocationRatesCache::buildBacktrackRateTable(string templSequence){
 
 
 	// Once the polymerase has entered state -2 (ie backtracked by 2 positions) then all backtracking rates 
@@ -182,15 +186,14 @@ void TranslocationRatesCache::buildBacktrackRateTable(){
 	// which are coming out of the NTP pore don't matter. This assumption would no longer hold if we started
 	// folding the 3' end of the nascent strand
 
-	cout << "Building backtrack rate table..." << endl;
-	delete backtrackRateTable;
+	//cout << "Building backtrack rate table..." << templSequence.length() << endl;
 
 	int h = (int)hybridLen->getVal();
-	if (templateSequence.length() - h - 1 < 0) return;
-	backtrackRateTable = new double*[templateSequence.length() - h - 1];
+	if (templSequence.length() - h - 1 < 0) return;
+	backtrackRateTable = new double*[templSequence.length() - h - 1];
 
 
-	for (int leftHybridBase = 1; leftHybridBase <= templateSequence.length() - h - 1; leftHybridBase ++){
+	for (int leftHybridBase = 1; leftHybridBase <= templSequence.length() - h - 1; leftHybridBase ++){
 		int indexNum = leftHybridBase - 1;
 
 		// Will leave it empty and add values only as they are needed

@@ -154,6 +154,7 @@ int main(int argc, char** argv) {
 	else{
    		double velocity = SimulatorPthread::performNSimulations(ntrials_sim, true);
 		cout << "Mean velocity: " << velocity << "bp/s" << endl;
+		cout << "Sequence length: " << templateSequence.length() << endl;
    	}
 
 	

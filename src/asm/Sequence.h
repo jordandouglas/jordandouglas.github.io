@@ -24,7 +24,7 @@
 #ifndef SEQUENCE_H
 #define SEQUENCE_H
 
-
+#include "TranslocationRatesCache.h"
 
 #include <random>
 #include <string>
@@ -42,6 +42,9 @@ class Sequence{
 	bool template_RNA;
 	bool nascent_SS;
 	bool template_SS;
+	void correctSequence(string seq);
+	TranslocationRatesCache* translocationRatesCache;
+	bool rateTableBuilt;
 
 
 	public:
@@ -49,6 +52,8 @@ class Sequence{
 		string get_templateSequence();
 		string get_complementSequence();
 		string getID();
+		TranslocationRatesCache* getRatesCache();
+		void initRateTable();
 
 		bool nascentIsRNA();
 		bool nascentIsSS();

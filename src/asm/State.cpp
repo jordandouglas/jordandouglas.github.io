@@ -158,7 +158,7 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 	
 	// Lookup in table first or calculate it again?
 	if (lookupFirst){
-		double kFwd = TranslocationRatesCache::getTranslocationRates(this, true);
+		double kFwd = _translocationRatesCache->getTranslocationRates(this, true);
 		return kFwd;
 	}
 	
@@ -194,7 +194,7 @@ double State::calculateBackwardRate(bool lookupFirst, bool ignoreStateRestrictio
 	
 	// Lookup in table first or calculate it again?
 	if (lookupFirst){
-		double kBck = TranslocationRatesCache::getTranslocationRates(this, false);
+		double kBck = _translocationRatesCache->getTranslocationRates(this, false);
 		return kBck;
 	}
 	

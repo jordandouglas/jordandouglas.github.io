@@ -94,8 +94,8 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 		TiXmlElement *sequenceEle = sessionEle->FirstChildElement("sequence");
 		if (sequenceEle){
 
-			seqID = sequenceEle->Attribute("seqID") ? sequenceEle->Attribute("seqID") : seqID;
-			bool succ = Settings::setSequence(seqID);
+			_seqID = sequenceEle->Attribute("seqID") ? sequenceEle->Attribute("seqID") : _seqID;
+			bool succ = Settings::setSequence(_seqID);
 
 			// If sequence does not already exist then create it
 			if (!succ){
@@ -104,9 +104,9 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 				string templateType = sequenceEle->Attribute("TemplateType") ? sequenceEle->Attribute("TemplateType") : "dsDNA";
 				string primerType = sequenceEle->Attribute("PrimerType") ? sequenceEle->Attribute("PrimerType") : "ssRNA";
 
-				Sequence* newSeq = new Sequence(seqID, templateType, primerType, templateSeq);
-				sequences[seqID] = newSeq;
-				Settings::setSequence(seqID);
+				Sequence* newSeq = new Sequence(_seqID, templateType, primerType, templateSeq);
+				sequences[_seqID] = newSeq;
+				Settings::setSequence(_seqID);
 
 			}
 
@@ -268,6 +268,21 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 				if (experimentEle->Attribute("force")) experiment.set_force(atof(experimentEle->Attribute("force")));
 
 
+				// Use a separate sequence for this dataset?
+				if (experimentEle->Attribute("seq")) {
+					string templateSeq = experimentEle->Attribute("seq");
+					string templateType = experimentEle->Attribute("TemplateType") ? experimentEle->Attribute("TemplateType") : TemplateType;
+					string primerType = experimentEle->Attribute("PrimerType") ? experimentEle->Attribute("PrimerType") : PrimerType;
+					string seqID = "Sequence for experiment " + to_string(experiments.size()+1); 
+
+					Sequence* newSeq = new Sequence(seqID, templateType, primerType, templateSeq);
+					sequences[seqID] = newSeq;
+					experiment.set_sequenceID(seqID);
+
+				}
+
+				// Use default sequence
+				else experiment.set_sequenceID(_seqID);
 
 
 				// Add experimental settings (x-axis) and observations (y-axis)
@@ -282,7 +297,18 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 					vector<string> split_vector = Settings::split(obs, ',');
 					double x = atof(split_vector.at(0).c_str());
 					double y = atof(split_vector.at(1).c_str());
-					experiment.addDatapoint(x, y);
+					if (split_vector.size() == 2) experiment.addDatapoint(x, y);
+
+					// Additionally parse the number of trials
+					else if (split_vector.size() == 3){
+						int n = atoi(split_vector.at(2).c_str());
+						experiment.addDatapoint(x, y, n);
+					}
+
+					else {
+						cout << "Error: cannot parse experimental observations." << endl;
+						exit(0);
+					}
 
 
 				}

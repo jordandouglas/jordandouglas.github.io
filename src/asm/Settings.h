@@ -52,11 +52,12 @@ extern const int INF;
 
 // Sequence information
 extern int ntrials_sim;
-extern string seqID;
+extern string _seqID;
 extern string templateSequence;
 extern string complementSequence;
 extern string TemplateType;
 extern string PrimerType;
+extern TranslocationRatesCache* _translocationRatesCache;
 extern map<string, Sequence*> sequences;
 extern Sequence* currentSequence;
 

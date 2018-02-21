@@ -25,12 +25,14 @@
 
 #include "Sequence.h"
 #include "Settings.h"
+#include <algorithm>
 
 using namespace std;
 
 Sequence::Sequence(string seqID, string TemplateType, string PrimerType, string templateSequence){
 
 	this->seqID = seqID;
+	this->correctSequence(templateSequence);
 	this->templateSequence = templateSequence;
 	this->nascent_RNA = PrimerType.substr(2) == "RNA";
 	this->template_RNA = TemplateType.substr(2) == "RNA";
@@ -39,6 +41,29 @@ Sequence::Sequence(string seqID, string TemplateType, string PrimerType, string 
 	if (!this->template_SS) this->complementSequence = Settings::complementSeq(this->templateSequence, this->template_RNA);
 	else this->complementSequence = "";
 
+	this->rateTableBuilt = false;
+	this->translocationRatesCache = new TranslocationRatesCache();
+
+
+
+}
+
+
+// Initialise the translocation rates table for this sequence
+void Sequence::initRateTable(){
+
+	if (this->rateTableBuilt) return;
+	cout << "Initialising rate tables for " << seqID << endl;
+	
+	this->translocationRatesCache->buildTranslocationRateTable(this->templateSequence); 
+   	this->translocationRatesCache->buildBacktrackRateTable(this->templateSequence);
+   	this->rateTableBuilt = true;
+}
+
+
+// Remove newlines from sequence
+void Sequence::correctSequence(string seq){
+	seq.erase(remove(seq.begin(), seq.end(), '\n'), seq.end());
 }
 
 
@@ -59,6 +84,9 @@ void Sequence::print(){
 
 }
 
+TranslocationRatesCache* Sequence::getRatesCache(){
+	return this->translocationRatesCache;
+}
 
 string Sequence::getID(){
 	return this->seqID;

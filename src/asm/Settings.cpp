@@ -26,7 +26,6 @@
 #include "TranslocationRatesCache.h"
 
 
-
 #include <locale> 
 #include <random>
 #include <string>
@@ -62,11 +61,12 @@ bool _resumeFromLogfile = false;
 int ntrials_sim = 1000;
 map<string, Sequence*> sequences;
 Sequence* currentSequence;
-string seqID = "";
+string _seqID = "";
 string templateSequence = "";
 string complementSequence = "";
 string TemplateType = "dsDNA";
 string PrimerType = "ssRNA";
+TranslocationRatesCache* _translocationRatesCache;
 
 
 // ABC settings
@@ -203,10 +203,8 @@ bool Settings::setSequence(string seqID){
 	TemplateType = currentSequence->get_templateType();
 	PrimerType = currentSequence->get_primerType();
 
-
-    // Build the rates table
-   	TranslocationRatesCache::buildTranslocationRateTable(); 
-   	TranslocationRatesCache::buildBacktrackRateTable();
+	currentSequence->initRateTable();
+	_translocationRatesCache = currentSequence->getRatesCache();
 
 	return true;
 
@@ -217,7 +215,7 @@ bool Settings::setSequence(string seqID){
 string Settings::toJSON(){
 
 	string parametersJSON = "";
-	parametersJSON += "seq:{seqID:" + seqID + ",seq:" + templateSequence + ",template:" + TemplateType + ",primer:" + PrimerType + "},";
+	parametersJSON += "seq:{seqID:" + _seqID + ",seq:" + templateSequence + ",template:" + TemplateType + ",primer:" + PrimerType + "},";
 	parametersJSON += "model:{" + currentModel->getJSON() + "},";
 	parametersJSON += "N:" + to_string(ntrials_sim) + ",";
 	parametersJSON += "speed:hidden";
@@ -229,7 +227,7 @@ string Settings::toJSON(){
 void Settings::print(){
 
 	cout << "\n---Settings---" << endl;
-	cout << seqID << "; TemplateType: " << TemplateType << "; PrimerType: " << PrimerType << endl;
+	cout << _seqID << "; TemplateType: " << TemplateType << "; PrimerType: " << PrimerType << endl;
 	cout << complementSequence << endl;
 	cout << templateSequence << endl << endl;
 

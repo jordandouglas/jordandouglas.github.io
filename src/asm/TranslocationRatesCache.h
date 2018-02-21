@@ -35,13 +35,14 @@ using namespace std;
 class TranslocationRatesCache{
 
 	private:
-		static double*** translocationRateTable;
-		static double** backtrackRateTable;
+		double*** translocationRateTable;
+		double** backtrackRateTable;
 	
 	public:
-		static double getTranslocationRates(State* state, bool fwd);
-		static void buildTranslocationRateTable();
-		static void buildBacktrackRateTable();
+		double getTranslocationRates(State* state, bool fwd);
+		void buildTranslocationRateTable(string templSequence);
+		void buildBacktrackRateTable(string templSequence);
+		TranslocationRatesCache();
 
 
 };

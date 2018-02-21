@@ -56,6 +56,7 @@ class MCMC{
 		static bool resetExperiment();
 		static bool nextExperiment();
 		static double getExperimentalVelocity();
+		static int getNTrials();
 		
 
 };

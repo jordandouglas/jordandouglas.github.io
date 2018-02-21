@@ -84,10 +84,6 @@ extern "C" {
 		XMLparser::parseXMLFromString(XMLdata);
 		Settings::sampleAll();
 
-	    // Build the rates table
-	   	TranslocationRatesCache::buildTranslocationRateTable(); 
-	   	TranslocationRatesCache::buildBacktrackRateTable();
-
 		// Send the globals settings back to the DOM 
 		string parametersJSON = "{" + Settings::toJSON() + "}";
 		messageFromWasmToJS(parametersJSON, msgID);
