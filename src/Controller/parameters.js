@@ -555,8 +555,8 @@ function addLognormalPrior(){
 	
 	var meanVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["lognormalMeanVal"]);
 	var sd = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["lognormalSdVal"]);
-	if (sd == null || isNaN(meanVal)) sd = 0.5;
-	if (meanVal == null || isNaN(sd)) meanVal = roundToSF(Math.log(currentVal / Math.exp(sd*sd/2)));
+	if (sd == null || isNaN(sd)) sd = 0.5;
+	if (meanVal == null || isNaN(meanVal)) meanVal = roundToSF(Math.log(currentVal / Math.exp(sd*sd/2)));
 	if (isNaN(meanVal)) meanVal = 0;
 	
 	
@@ -693,7 +693,7 @@ function addDiscreteUniformPrior(){
 
 
 	var maxVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["maxVal"]);
-	
+		
 	
 	var currentVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"]);
 	var lowerLimitVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["uniformDistnLowerVal"]);
@@ -703,13 +703,13 @@ function addDiscreteUniformPrior(){
 	if (upperLimitVal == null || isNaN(upperLimitVal)) upperLimitVal = roundToSF(Math.ceil( roundToSF((currentVal + (currentVal * 0.5)))));
 	
 	
-	if (minVal != null && lowerLimitVal < minVal) lowerLimitVal = minVal
-	if (maxVal != null && upperLimitVal > minVal) upperLimitVal = maxVal
+	if (minVal != null && !isNaN(minVal) && lowerLimitVal < minVal) lowerLimitVal = minVal
+	if (maxVal != null && !isNaN(maxVal) && upperLimitVal > minVal) upperLimitVal = maxVal
 	
 	if (lowerLimitVal >= upperLimitVal){
 		upperLimitVal += 1;
 	}
-	
+
 	
 	var lowerLimitTextBox = "Lower: <input type='number' title='Select the lower limit for this parameter' id='uniformDistnLowerVal' value=" + lowerLimitVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px'></input>";
 	var upperLimitTextBox = "Upper: <input type='number' title='Select the upper limit for this parameter' id='uniformDistnUpperVal' value=" + upperLimitVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px'></input>";

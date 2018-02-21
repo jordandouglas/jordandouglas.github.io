@@ -634,7 +634,7 @@ function renderObjects(override = false, resolve = function(){}){
 						//console.log("Generating", nt["id"]);
 
 						var img = $("<img></img>");
-						if (nt["pos"] != "0") img.attr("title", "Base " + nt["pos"]);
+						if (nt["pos"] != "0" && nt["pos"] != null) img.attr("title", "Base " + nt["pos"]);
 						img.attr("id", nt["id"]);
 						img.attr("src", "src/Images/" + nt["src"] + ".png");
 						img.css("left", nt["x"] == parseInt(nt["x"], 10) ? nt["x"] + "px" : nt["x"]); // If there are no units then use pixels
