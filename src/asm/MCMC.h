@@ -57,6 +57,7 @@ class MCMC{
 		static bool nextExperiment();
 		static double getExperimentalVelocity();
 		static int getNTrials();
+		static int getNTrialsPostBurnin();
 		
 
 };

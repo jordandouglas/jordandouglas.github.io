@@ -428,5 +428,16 @@ int MCMC::getNTrials(){
 	// Run a different number of trials pre- and post- pre-burnin
 	return MCMC::hasAchievedPreBurnin || _testsPerData_preburnin < 0 ? testsPerData : _testsPerData_preburnin; 
 
+}
+
+
+// Returns the number of trials to perform for the current experimrnt
+int MCMC::getNTrialsPostBurnin(){
+
+	if ((*currentExperiment).getNTrials() != 0) return (*currentExperiment).getNTrials();
+	return testsPerData; 
 
 }
+
+
+

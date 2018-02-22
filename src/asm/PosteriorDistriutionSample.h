@@ -48,13 +48,17 @@ class PosteriorDistriutionSample {
     	PosteriorDistriutionSample(int sampleNum);
     	void setStateNumber(int sampleNum);
     	int getStateNumber();
+    	PosteriorDistriutionSample* clone(bool copySimulations);
     	void set_modelIndicator(string val);
     	string get_modelIndicator();
     	double get_chiSquared();
     	void set_logPriorProb(double val);
     	double get_logPriorProb();
     	void addParameterEstimate(string paramID, double val);
+    	double getParameterEstimate(string paramID);
+    	vector<string> getParameterNames();
     	void addSimulatedAndObservedValue(double simVal, double obsVal);
+    	void parseFromLogFileLine(string line, vector<string> headerLineSplit);
 		
     	void print(bool toFile);
     	void printHeader(bool toFile);

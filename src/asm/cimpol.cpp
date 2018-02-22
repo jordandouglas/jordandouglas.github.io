@@ -30,6 +30,8 @@
 #include "TranslocationRatesCache.h"
 #include "MCMC.h"
 #include "SimulatorPthread.h"
+#include "BayesianCalculations.h"
+#include "PosteriorDistriutionSample.h"
 
 
 
@@ -49,11 +51,22 @@ using namespace std;
 
 
 /* Optional arguments: 
-				-MCMC: perform MCMC instead of simulating (default false)
-				-i <filename>: load in an xml file
-				-o <filename>: log file to write to
+				
+				-xml <filename>: load in an xml file
+				-logO <filename>: log file to write to
+				-logI <filename>: log file to read from (only used by -summary and -sample)
 				-nthreads <n>: number of threads to split simulations over (default 1)
+
+				-MCMC: perform MCMC instead of simulating (default false)
+				-resume: resumes MCMC from the last state printed in the file specified by -logO and appends to -logO (default false)
+				-summary: prints a summary of the log file specified by -logI into the terminal (default false)
+				-sample: samples from posterior under a given model according to the experiment data presented in -xml xmlfile (default false)
+							If -logI is specified then will sample from the posterior distribution
+							If -summary is also specified then will use the geometric median
+							Otherwise will sample from the distributions specified in -xml xmlfile
+							This will be printed into terminal, or -logO file if specified
 */
+
 int main(int argc, char** argv) { 
 
 	
@@ -78,9 +91,13 @@ int main(int argc, char** argv) {
 		
 		else if (arg == "-wasm") isWASM = true;
 
-		else if (arg == "-resume") _resumeFromLogfile = true;
+		else if (arg == "-resume") _resumeFromLogfile = true; 
+
+		else if (arg == "-summary") _printSummary = true; 
+
+		else if (arg == "-sample") _sampleFromLikelihood = true; 
 		
-		else if(arg == "-i" && i+1 < argc) {
+		else if(arg == "-xml" && i+1 < argc) {
 			i++;
 			inputXMLfilename = string(argv[i]);
 			//char filename[] = "/home/jdou557/Documents/Cimpol/SimpolC/SimpolC/about/Examples/benchmark.xml";
@@ -89,9 +106,15 @@ int main(int argc, char** argv) {
 		}
 		
 		
-		else if(arg == "-o" && i+1 < argc) {
+		else if(arg == "-logO" && i+1 < argc) {
 			i++;
 			outputFilename = string(argv[i]);
+		}
+
+
+		else if(arg == "-logI" && i+1 < argc) {
+			i++;
+			_inputLogFileName = string(argv[i]);
 		}
 
 		else if(arg == "-nthreads" && i+1 < argc) {
@@ -105,6 +128,28 @@ int main(int argc, char** argv) {
 			exit(0);
 		}
 		
+	}
+
+
+	if (_printSummary && _inputLogFileName == ""){
+		cout << "You have enabled summary mode. Please specify a log file with -logI" << endl;
+		exit(0);
+	}
+
+	if (_printSummary && inputXMLfilename == ""){
+		cout << "You have enabled summary mode. Please specify an input xml file with -xml" << endl;
+		exit(0);
+	}
+
+
+	if (_sampleFromLikelihood && _printSummary && inputXMLfilename == ""){
+		cout << "You have enabled posterior sampling mode using the geometric median. Please specify an input log file with -logI" << endl;
+		exit(0);
+	}
+
+	if (_sampleFromLikelihood && inputXMLfilename == ""){
+		cout << "You have enabled posterior sampling mode. Please specify an input xml file with -xml" << endl;
+		exit(0);
 	}
 	
 	
@@ -149,7 +194,30 @@ int main(int argc, char** argv) {
 	if (doMCMC){
 		MCMC::beginMCMC();
 	}
-	
+
+
+	// Sample from the posterior
+	else if (_sampleFromLikelihood){
+		vector<PosteriorDistriutionSample*> statesPostBurnin(0);
+		if (_inputLogFileName != "") statesPostBurnin = BayesianCalculations::loadLogFile(_inputLogFileName, _chiSqthreshold_min);
+		if (_printSummary && statesPostBurnin.size() > 0) { // Use geometric median as the single state to sample from 
+			statesPostBurnin.resize(1);
+			statesPostBurnin.at(0) = BayesianCalculations::printGeometricMedian(statesPostBurnin);
+			cout << "Sampling new data using geometric median parameters" << endl;
+		}
+		else if (!_printSummary && statesPostBurnin.size() > 0) cout << "Sampling new data using parameters in posterior distribution " << _inputLogFileName << endl;
+		else cout << "Sampling new data using parameters specified by " << inputXMLfilename << endl;
+		BayesianCalculations::sampleFromPosterior(statesPostBurnin);
+	}
+
+
+	// Read in log file and print a summary to the terminal
+	else if (_printSummary){
+		vector<PosteriorDistriutionSample*> statesPostBurnin = BayesianCalculations::loadLogFile(_inputLogFileName, _chiSqthreshold_min);
+		BayesianCalculations::printGeometricMedian(statesPostBurnin);
+	}
+
+
 	// Just simulate
 	else{
    		double velocity = SimulatorPthread::performNSimulations(ntrials_sim, true);

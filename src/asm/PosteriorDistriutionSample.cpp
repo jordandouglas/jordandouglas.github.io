@@ -45,6 +45,35 @@ PosteriorDistriutionSample::PosteriorDistriutionSample(int sampleNum){
 }	
 
 
+// Clones the object (including the simulations if specified)
+PosteriorDistriutionSample* PosteriorDistriutionSample::clone(bool copySimulations){
+	
+	PosteriorDistriutionSample* copy = new PosteriorDistriutionSample(this->sampleNum);
+	copy->modelIndicator = this->modelIndicator;
+	copy->priorProb = this->priorProb;
+
+
+
+	// Copy parameters
+	for(std::map<string, double>::iterator iter = this->parameterEstimates.begin(); iter != this->parameterEstimates.end(); ++ iter){
+		string paramID = iter->first;
+		double value = iter->second;
+		copy->addParameterEstimate(paramID, value);
+	}
+
+	// Copy simulated velocities
+	if (copySimulations) {
+		copy->chiSquared = this->chiSquared;
+		copy->currentObsNum = this->currentObsNum;
+		for (int i = 0; i < this->simulatedValues.size(); i ++){
+			copy->simulatedValues.at(i) = this->simulatedValues.at(i);
+		}
+	}
+
+	return copy;
+
+}
+
 void PosteriorDistriutionSample::setStateNumber(int sampleNum){
 	this->sampleNum = sampleNum;
 }
@@ -76,6 +105,26 @@ string PosteriorDistriutionSample::get_modelIndicator(){
 
 void PosteriorDistriutionSample::addParameterEstimate(string paramID, double val){
 	this->parameterEstimates[paramID] = val;
+}
+
+
+double PosteriorDistriutionSample::getParameterEstimate(string paramID){
+	return this->parameterEstimates[paramID];
+}
+
+// Gets a list of all parameters being estimated and returns as a string
+vector<string> PosteriorDistriutionSample::getParameterNames(){
+
+	// Get parameter names
+	list<string> paramIDs; 
+	for(std::map<string, double>::iterator iter = this->parameterEstimates.begin(); iter != this->parameterEstimates.end(); ++ iter){
+		string paramID =  iter->first;
+		paramIDs.push_back(paramID);
+	}
+
+	vector<string> paramIDs_vector{ std::begin(paramIDs), std::end(paramIDs) };
+	return paramIDs_vector;
+
 }
 
 
@@ -210,7 +259,7 @@ void PosteriorDistriutionSample::print(bool toFile){
 }
 
 
-
+// Sets this state to the last state in the specified log file
 void PosteriorDistriutionSample::loadFromLogFile(string filename){
 
 
@@ -239,39 +288,17 @@ void PosteriorDistriutionSample::loadFromLogFile(string filename){
         }
 
 
-
-
         // Get last line and parse it
         logfile.clear();
 		logfile.seekg(0, ios::beg);
         int currentLine = 0;
-        regex velocityMatch("(V)([0-9]+)$");
+
         while(getline(logfile, line)) {
         	currentLine++;
 
         	// Parse this line
         	if (currentLine == numLines) {
-        		vector<string> splitLine = Settings::split(line, '\t');
-
-
-        		int simulatedVal = 0;
-        		for (int i = 0; i < splitLine.size(); i ++){
-
-        			string header = headerLineSplit.at(i);
-        			string value = splitLine.at(i);
-
-        			if (header == "State") this->setStateNumber(stoi(value));
-        			else if (header == "Model") this->set_modelIndicator(value);
-        			else if (header == "logPrior") this->priorProb = stof(value);
-        			else if (header == "chiSquared") this->chiSquared = stof(value);
-        			else if (std::regex_match (header, velocityMatch)) {
-        				simulatedValues.at(simulatedVal) = stof(value); // Parse velocity
-        				simulatedVal++;
-        			}
-        			else {
-        				this->addParameterEstimate(header, stof(value)); // Parse parameter
-        			}
-        		}
+        		parseFromLogFileLine(line, headerLineSplit);
         	}
         }
 
@@ -283,7 +310,36 @@ void PosteriorDistriutionSample::loadFromLogFile(string filename){
 
 
 
+void PosteriorDistriutionSample::parseFromLogFileLine(string stateLine, vector<string> headerLineSplit){
 
+	regex velocityMatch("(V)([0-9]+)$");
+	vector<string> splitLine = Settings::split(stateLine, '\t');
+
+	int simulatedVal = 0;
+	for (int i = 0; i < splitLine.size(); i ++){
+
+		string header = headerLineSplit.at(i);
+		string value = splitLine.at(i);
+
+		if (header == "State") this->setStateNumber(stoi(value));
+		else if (header == "Model") this->set_modelIndicator(value);
+		else if (header == "logPrior") this->priorProb = stof(value);
+		else if (header == "chiSquared") this->chiSquared = stof(value);
+		else if (std::regex_match (header, velocityMatch)) {
+			simulatedValues.at(simulatedVal) = stof(value); // Parse velocity
+			simulatedVal++;
+		}
+		else {
+			this->addParameterEstimate(header, stof(value)); // Parse parameter
+		}
+	}
+
+
+}
+
+
+
+// Update global settings to the parameters etc. specified by this state
 void PosteriorDistriutionSample::setParametersFromState(){
 	
 
@@ -347,3 +403,6 @@ void PosteriorDistriutionSample::setParametersFromState(){
 
 
 }
+
+
+

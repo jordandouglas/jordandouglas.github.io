@@ -52,9 +52,11 @@ const double _PI = 3.14159265359;
 // Command line arguments
 string outputFilename = "";
 string inputXMLfilename = "";
+string _inputLogFileName = "";
 bool isWASM = false;
 bool _resumeFromLogfile = false;
-
+bool _printSummary = false;
+bool _sampleFromLikelihood = false;
 
 
 // Sequence information

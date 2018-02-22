@@ -65,8 +65,11 @@ extern Sequence* currentSequence;
 // Command line arguments
 extern string inputXMLfilename;
 extern string outputFilename;
+extern string _inputLogFileName;
 extern bool isWASM;
 extern bool _resumeFromLogfile;
+extern bool _printSummary;
+extern bool _sampleFromLikelihood;
 
 // ABC information
 extern string inferenceMethod;

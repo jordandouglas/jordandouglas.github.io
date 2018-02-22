@@ -154,7 +154,7 @@ void TranslocationRatesCache::buildTranslocationRateTable(string templSequence){
 	int nLengths = templSequence.length() - h + 1;
 	int nPositions = h + 1;
 	if (nLengths <= 0) return;
-	translocationRateTable = new double**[nLengths];//[nPositions][2];
+	translocationRateTable = new double**[nLengths];
 
 
 	for(int nascentLen = h-1; nascentLen < templSequence.length(); nascentLen ++){
