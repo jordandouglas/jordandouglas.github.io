@@ -72,8 +72,6 @@ int main(int argc, char** argv) {
 	
     cout << "Starting Simpol_cpp" << endl;
 
-
-
 	
 	auto startTime = std::chrono::system_clock::now();
 

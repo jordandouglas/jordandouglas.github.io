@@ -55,7 +55,7 @@ double SimulatorPthread::performNSimulations(int N, bool verbose){
 
 	double meanVelocity = 0;
 
-	/*
+
 
 	// Allocate number of simulations to each thread
 	// Each worker has same number of simulations, and if there are n remainders these are distributed equally among the first n threads 
@@ -97,7 +97,7 @@ double SimulatorPthread::performNSimulations(int N, bool verbose){
 	
    	//cout << "Mean velocity = " << meanVelocity << endl;
 
-   	*/
+
    	return meanVelocity;
 }
 

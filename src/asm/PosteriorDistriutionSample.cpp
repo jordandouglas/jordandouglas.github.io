@@ -205,6 +205,8 @@ void PosteriorDistriutionSample::printHeader(bool toFile){
 
 void PosteriorDistriutionSample::print(bool toFile){
 
+	// Print to 10 sf
+	std::cout.precision(10);
 
 	// Send to javascript if using WASM
 	string WASM_string = "";
@@ -219,6 +221,9 @@ void PosteriorDistriutionSample::print(bool toFile){
 			cout << "Cannot open file " << outputFilename << endl;
 			exit(0);
 		}
+		logFile.precision(10);
+		logFile.setf(ios::fixed);
+		logFile.setf(ios::showpoint); 
 	}
 	
 	if (isWASM) WASM_string += to_string(this->sampleNum) + "\t";
