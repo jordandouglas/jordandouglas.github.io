@@ -141,7 +141,7 @@ void PosteriorDistriutionSample::addSimulatedAndObservedValue(double simVal, dou
 	this->chiSquared += pow(simVal - obsVal, 2) / simVal;
 
 	//Settings::print();
-	//cout << "Simval " << simVal << "obsVal " << obsVal << " X2 " << this->chiSquared << endl;
+	//cout << "Simval " << simVal << "; obsVal " << obsVal << "; X2 " << this->chiSquared << endl;
 
 }
 

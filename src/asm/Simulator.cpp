@@ -260,6 +260,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
 
+
 		bool beforeEndOfTemplate = s->get_nascentLength() + 1 < templateSequence.length();
 		bool afterStartOfTemplate = s->get_nascentLength() > s->get_initialLength();
 		double geometricTime = -1;
@@ -641,10 +642,11 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 	// Calculate mean velocity
 	int distanceTravelled = s->get_nascentLength() - s->get_initialLength();
 	double velocity = distanceTravelled / timeElapsed;
-	//cout << "distanceTravelled = " << distanceTravelled << endl;
-	//cout << "timeElapsed = " << timeElapsed << endl;
-
-
+	/*cout << "distanceTravelled = " << distanceTravelled << endl;
+	cout << "timeElapsed = " << timeElapsed << endl;
+	cout << "kcat " << kCat->getVal() << " KD " << Kdiss->getVal() << "[ATP] = " << ATPconc->getVal() << "F = " << FAssist->getVal() << "DGslide = " << GDagSlide->getVal() << endl;
+	cout << "Trans eq: " << currentModel->get_assumeTranslocationEquilibrium() << " Bind eq " << currentModel->get_assumeBindingEquilibrium() << endl;
+	*/
 	//cout << s->get_initialLength() << ";" "distanceTravelled = " << distanceTravelled << endl;
 	toReturn[0] = velocity;
 	toReturn[1] = timeElapsed;
@@ -734,6 +736,9 @@ double Simulator::geometricTranslocationBindingSampling(State* s){
 	s->backward(); 
 	double kFwd  = s->calculateForwardRate(true, true); // Forward = from 0 to 1
 	s->forward();
+
+
+	//cout << "kBck " << kBck << " kFwd " << kFwd << endl;
 
 
 

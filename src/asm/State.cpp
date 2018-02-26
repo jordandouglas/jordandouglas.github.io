@@ -165,6 +165,9 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 	
 	double groundEnergy = this->calculateTranslocationFreeEnergy();
 	double forwardHeight = this->calculateForwardTranslocationFreeEnergyBarrier();
+
+	//cout << "forwardHeight " << forwardHeight << ", groundEnergy = " << groundEnergy << ", diff = " << (forwardHeight - groundEnergy) << endl;
+
 	if (forwardHeight >= INF) return 0;
 	
 	
@@ -349,7 +352,6 @@ void State::set_mRNAPosInActiveSite(int newVal){
 
 double State::calculateTranslocationFreeEnergy(){
 	double freeEnergy = FreeEnergy::getFreeEnergyOfHybrid(this) - FreeEnergy::getFreeEnergyOfTranscriptionBubble(this);
-	freeEnergy += DGPost->getVal();
 	return freeEnergy;	
 }
 

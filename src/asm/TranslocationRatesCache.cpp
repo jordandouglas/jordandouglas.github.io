@@ -67,8 +67,10 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		}
 
 
-		//cout << "rates" << rates[0] << endl;
-
+		//cout << "F = " << FAssist->getVal() << ", delta1 = " << barrierPos->getVal() << endl;
+		//cout << "kbck = " << rates[0] << ", kfwd = " << rates[1] << ", forceGradientFwd = " << forceGradientFwd << ", GDagRateModifier = " << GDagRateModifier  << endl;
+		//if (fwd) cout << rates[1] * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd << endl;
+		//else cout << rates[0] * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck << endl;
 
 
 		if (rates[0] != -1) {

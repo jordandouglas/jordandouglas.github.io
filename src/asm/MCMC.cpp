@@ -400,13 +400,20 @@ bool MCMC::nextExperiment(){
 	// Attempt to apply the settings of the next observation in the current experiment
 	Settings::clearParameterHardcodings();
 	currentModel->activateModel();
-	if ((*currentExperiment).next()) return true;
+	if ((*currentExperiment).next()) {
+		//cout << "Next setting" << endl;
+		//Settings::print();
+		return true;
+	}
 
 	// If fails then move onto next experiment
 	++currentExperiment;
 	if (currentExperiment == experiments.end()) return false;
 
 	(*currentExperiment).reset();
+
+	//cout << "Next experiment" << endl;
+	//Settings::print();
 
 	return true;
 }
