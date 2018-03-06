@@ -32,6 +32,7 @@
 #include <fstream>
 #include <sstream>
 #include <regex>
+#include <map>
 
 
 using namespace std;
@@ -51,6 +52,8 @@ vector<PosteriorDistriutionSample*> BayesianCalculations::loadLogFile(string log
 		// Parse header
     	getline(logfile, line);
     	vector<string> headerLineSplit = Settings::split(line, '\t');
+
+
 
 
     	// Iterate through states in logfile and build list of burnin states
@@ -82,6 +85,10 @@ vector<PosteriorDistriutionSample*> BayesianCalculations::loadLogFile(string log
         logfile.close();
 
 
+
+
+
+
         vector<PosteriorDistriutionSample*> states_vector{ std::begin(states), std::end(states) };
         return states_vector;
 
@@ -92,6 +99,37 @@ vector<PosteriorDistriutionSample*> BayesianCalculations::loadLogFile(string log
    		exit(0);
    }
 
+
+}
+
+
+// Calculate and print number of times each model appears in the posterior distribution 
+void BayesianCalculations::printModelFrequencies(vector<PosteriorDistriutionSample*> posteriorDistribution){
+
+	if (modelsToEstimate.size()) {
+
+
+		cout << "\n------ Calculating model posterior probabilities ------" << endl;
+
+		// Count the number of times each model appears
+		map<string,int> modelFrequencies;
+		for (int i = 0; i < posteriorDistribution.size(); i++) {
+			string modelID = posteriorDistribution.at(i)->get_modelIndicator();
+			modelFrequencies[modelID] ++;
+		}
+
+		// Print
+		for(std::map<string, int>::iterator iter = modelFrequencies.begin(); iter != modelFrequencies.end(); ++iter){
+			string k =  iter->first;
+			int v = iter->second;
+
+			cout << "P(M = " << k << "|D) = " << (double(v) /  double(posteriorDistribution.size())) << endl;
+
+		}
+
+		cout << "-------------------------------------------------------\n" << endl;
+
+	}
 
 }
 

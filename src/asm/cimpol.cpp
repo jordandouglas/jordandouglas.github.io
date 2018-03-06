@@ -200,6 +200,7 @@ int main(int argc, char** argv) {
 		if (_inputLogFileName != "") statesPostBurnin = BayesianCalculations::loadLogFile(_inputLogFileName, _chiSqthreshold_min);
 		if (_printSummary && statesPostBurnin.size() > 0) { // Use geometric median as the single state to sample from 
 			statesPostBurnin.resize(1);
+			BayesianCalculations::printModelFrequencies(statesPostBurnin);
 			statesPostBurnin.at(0) = BayesianCalculations::printGeometricMedian(statesPostBurnin);
 			cout << "Sampling new data using geometric median parameters" << endl;
 		}
@@ -212,6 +213,7 @@ int main(int argc, char** argv) {
 	// Read in log file and print a summary to the terminal
 	else if (_printSummary){
 		vector<PosteriorDistriutionSample*> statesPostBurnin = BayesianCalculations::loadLogFile(_inputLogFileName, _chiSqthreshold_min);
+		BayesianCalculations::printModelFrequencies(statesPostBurnin);
 		BayesianCalculations::printGeometricMedian(statesPostBurnin);
 	}
 
