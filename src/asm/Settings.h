@@ -70,6 +70,7 @@ extern bool isWASM;
 extern bool _resumeFromLogfile;
 extern bool _printSummary;
 extern bool _sampleFromLikelihood;
+extern bool _marginalModel;
 
 // ABC information
 extern string inferenceMethod;
@@ -94,7 +95,8 @@ extern Model* currentModel;
 
 
 // User interface information
-extern bool stop;
+extern bool USING_GUI;
+extern bool GUI_STOP;
 extern bool needToReinitiateAnimation;
 extern Simulator* interfaceSimulator; // The simulator object being used by the GUI
 extern chrono::system_clock::time_point interfaceSimulation_startTime; // The start time of the GUI simulation

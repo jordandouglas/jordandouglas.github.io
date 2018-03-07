@@ -24,6 +24,7 @@
 #include "Settings.h"
 #include "MCMC.h"
 #include "SimulatorPthread.h"
+#include "Model.h"
 
 #include <iostream>
 #include <vector>
@@ -53,8 +54,9 @@ vector<PosteriorDistriutionSample*> BayesianCalculations::loadLogFile(string log
     	getline(logfile, line);
     	vector<string> headerLineSplit = Settings::split(line, '\t');
 
-
-
+    	//cout << "line: " << line << endl;
+    	//for (int i = 0; i < headerLineSplit.size(); i ++) cout << headerLineSplit.at(i) << endl;
+    	//cout << headerLineSplit.at(54) << endl;
 
     	// Iterate through states in logfile and build list of burnin states
         while(getline(logfile, line)) {
@@ -65,6 +67,8 @@ vector<PosteriorDistriutionSample*> BayesianCalculations::loadLogFile(string log
         	// Parse state
           	PosteriorDistriutionSample* state = new PosteriorDistriutionSample(0);
         	state->parseFromLogFileLine(line, headerLineSplit);
+
+
 
 
         	// Check if X2 <= epsilon. If so then add to the list. 
@@ -90,6 +94,10 @@ vector<PosteriorDistriutionSample*> BayesianCalculations::loadLogFile(string log
 
 
         vector<PosteriorDistriutionSample*> states_vector{ std::begin(states), std::end(states) };
+
+        states_vector.at(5)->printHeader(false);
+        states_vector.at(5)->print(false);
+
         return states_vector;
 
    }
@@ -134,16 +142,56 @@ void BayesianCalculations::printModelFrequencies(vector<PosteriorDistriutionSamp
 }
 
 
-// Calculate and print geometric median for each parameter
-PosteriorDistriutionSample* BayesianCalculations::printGeometricMedian(vector<PosteriorDistriutionSample*> states){
+// Partition the posterior distribution into models and calculate the geometric median for each
+void BayesianCalculations::printMarginalGeometricMedians(vector<PosteriorDistriutionSample*> states){
 
-	cout << "\n------ Calculating geometric median ------" << endl;
+	
+
+	if (modelsToEstimate.size()) {
+
+
+		for (list<Model>::iterator model = modelsToEstimate.begin(); model != modelsToEstimate.end(); ++model){
+
+			// Compile a list of states which use this model
+			list<PosteriorDistriutionSample*> statesThisModel;
+			for (int j = 0; j < states.size(); j++) {
+				if (states.at(j)->get_modelIndicator() == (*model).getID()) statesThisModel.push_back(states.at(j));
+			}
+
+
+			if (statesThisModel.size() == 0) continue;
+
+
+			// Convert list into vector
+			vector<PosteriorDistriutionSample*> statesThisModel_vector{ std::begin(statesThisModel), std::end(statesThisModel) };
+
+
+			// Print geometric median
+			cout << "\n------ Calculating geometric median for Model " << (*model).getID() << "------" << endl;
+			BayesianCalculations::printGeometricMedian(statesThisModel_vector, false);
+			cout << "------------------------------------------------------\n" << endl;
+
+		}
+
+
+	}
+
+
+}
+
+
+
+// Calculate and print geometric median for each parameter
+PosteriorDistriutionSample* BayesianCalculations::printGeometricMedian(vector<PosteriorDistriutionSample*> states, bool printBanners){
+
+	if (printBanners) cout << "\n------ Calculating geometric median ------" << endl;
 
 	if (states.size() == 0){
 		cout << "Cannot calculate geometric median for 0 states" << endl;
 		return nullptr;
 	}
 
+	cout << "Number of states: " << states.size() << endl;
 
 	// Get list of parameters
 	vector<string> paramIDs = states.at(0)->getParameterNames();
@@ -239,13 +287,14 @@ PosteriorDistriutionSample* BayesianCalculations::printGeometricMedian(vector<Po
 		string paramID = paramIDs.at(i);
 		cout << paramID << " = " <<  geometricMedian->getParameterEstimate(paramID) << endl;
 	}
+	cout << "logPrior = " << geometricMedian->get_logPriorProb() << endl;
 	cout << "X2 = " << geometricMedian->get_chiSquared() << endl;
 	cout << "Mean (z-score normalised) Euclidean distance to all other states = " << meanDistance << endl;
 
 	//geometricMedian->print(false);
 
 
-	cout << "-------------------------------------------\n" << endl;
+	if (printBanners) cout << "-------------------------------------------\n" << endl;
 
 
 	return geometricMedian;

@@ -65,6 +65,8 @@ using namespace std;
 							If -summary is also specified then will use the geometric median
 							Otherwise will sample from the distributions specified in -xml xmlfile
 							This will be printed into terminal, or -logO file if specified
+
+				-marginal: if -summary is enabled then will print a marginal-model geometric median summary. Models 
 */
 
 int main(int argc, char** argv) { 
@@ -94,6 +96,8 @@ int main(int argc, char** argv) {
 		else if (arg == "-summary") _printSummary = true; 
 
 		else if (arg == "-sample") _sampleFromLikelihood = true; 
+
+		else if (arg == "-marginal") _marginalModel = true; 
 		
 		else if(arg == "-xml" && i+1 < argc) {
 			i++;
@@ -201,7 +205,7 @@ int main(int argc, char** argv) {
 		if (_printSummary && statesPostBurnin.size() > 0) { // Use geometric median as the single state to sample from 
 			statesPostBurnin.resize(1);
 			BayesianCalculations::printModelFrequencies(statesPostBurnin);
-			statesPostBurnin.at(0) = BayesianCalculations::printGeometricMedian(statesPostBurnin);
+			statesPostBurnin.at(0) = BayesianCalculations::printGeometricMedian(statesPostBurnin, true);
 			cout << "Sampling new data using geometric median parameters" << endl;
 		}
 		else if (!_printSummary && statesPostBurnin.size() > 0) cout << "Sampling new data using parameters in posterior distribution " << _inputLogFileName << endl;
@@ -214,7 +218,9 @@ int main(int argc, char** argv) {
 	else if (_printSummary){
 		vector<PosteriorDistriutionSample*> statesPostBurnin = BayesianCalculations::loadLogFile(_inputLogFileName, _chiSqthreshold_min);
 		BayesianCalculations::printModelFrequencies(statesPostBurnin);
-		BayesianCalculations::printGeometricMedian(statesPostBurnin);
+
+		if (_marginalModel) BayesianCalculations::printMarginalGeometricMedians(statesPostBurnin);
+		else BayesianCalculations::printGeometricMedian(statesPostBurnin, true);
 	}
 
 

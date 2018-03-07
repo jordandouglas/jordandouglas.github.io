@@ -57,6 +57,7 @@ bool isWASM = false;
 bool _resumeFromLogfile = false;
 bool _printSummary = false;
 bool _sampleFromLikelihood = false;
+bool _marginalModel = false;
 
 
 // Sequence information
@@ -120,7 +121,8 @@ CRandomMersenne* Settings::SFMT;
 
 
 // User interface information
-bool stop = false;
+bool USING_GUI = false;
+bool GUI_STOP = false;
 bool needToReinitiateAnimation = false;
 Simulator* interfaceSimulator; // The simulator object being used by the GUI
 chrono::system_clock::time_point interfaceSimulation_startTime = chrono::system_clock::now();
