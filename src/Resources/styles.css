@@ -23,6 +23,7 @@
 
 body { 
 	font-family: Arial; 
+	%background-color:#ebe9e7;
 }
 
 canvas {
@@ -298,6 +299,7 @@ div.vertical{
 	-ms-user-select: none;      
 	user-select: none;
 
+
 }
 
 
@@ -326,6 +328,7 @@ div.vertical{
 	vertical-align: middle; 
 	width:110px;
 	cursor:pointer;
+	%box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 
@@ -488,6 +491,29 @@ div.vertical{
 	
 }
 
+.panelOuter{
+
+	%background-color: #008bca;
+	%background-color: black;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    color: black;
+    %padding: 5px 5px;
+    text-align: left;
+    text-decoration: none;
+    font-size: 14px;
+	transition: 0.5s;
+
+
+}
+
+
+.panelInner{
+	padding: 5px 5px;
+	%background-color: white;
+	background-color:ebe9e7;
+
+}
+
 .parameter-title {
 	font-size: 18px;
 	text-decoration: none;
@@ -496,12 +522,12 @@ div.vertical{
 }
 
 .header {
-	
 	background-color: #b3b3b3;
 	min-width:99%;
 	padding: 5px 5px;
 	text-align: center;
 	font-family: "Arial";
+	%box-shadow: 5px 4px 8px 0 #424f4f, 6px 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .plot-dropdown {
