@@ -28,7 +28,7 @@ PHYSICAL_PARAMETERS_TEMP = [];
 
 function renderParameters(){
 
-
+	//console.trace();
 	var toCall = () => new Promise((resolve) => get_PHYSICAL_PARAMETERS_controller(resolve));
 	toCall().then((PHYSICAL_PARAMETERS_LOCAL) => {
 		renderParameters_givenParameters(PHYSICAL_PARAMETERS_LOCAL);
@@ -42,38 +42,39 @@ function renderParameters(){
 function renderParameters_givenParameters(PHYSICAL_PARAMETERS_LOCAL){
 
 
-		for (var paramID in PHYSICAL_PARAMETERS_LOCAL){
-			
+	for (var paramID in PHYSICAL_PARAMETERS_LOCAL){
+		
 
-			if (PHYSICAL_PARAMETERS_LOCAL[paramID]["hidden"] != null && PHYSICAL_PARAMETERS_LOCAL[paramID]["hidden"]){
-				$("#" + paramID + "_container").hide(100);
-			}
-			
-			if (PHYSICAL_PARAMETERS_LOCAL[paramID]["hidden"] == null || !PHYSICAL_PARAMETERS_LOCAL[paramID]["hidden"]){
-				$("#" + paramID + "_container").show(100);
-			}
-
-			//console.log("Setting", "#" + paramID, "to", roundToSF(PHYSICAL_PARAMETERS_LOCAL[paramID]["val"], 3));
-			if (PHYSICAL_PARAMETERS_LOCAL[paramID]["binary"] == null || PHYSICAL_PARAMETERS_LOCAL[paramID]["binary"] == false){
-				if (PHYSICAL_PARAMETERS_LOCAL[paramID]["distribution"] != "Fixed" || !simulating) $("#" + paramID).val(roundToSF(PHYSICAL_PARAMETERS_LOCAL[paramID]["val"], 3));
-				
-				
-				if (PHYSICAL_PARAMETERS_LOCAL[paramID]["distribution"] != "Fixed") {
-					$("#" + paramID).addClass("parameter-disabled");
-					$("#" + paramID).attr("disabled", true);
-				}else{
-					$("#" + paramID).removeClass("parameter-disabled");
-					$("#" + paramID).attr("disabled", false);
-				}
-				
-			}else{
-				$("#" + paramID).prop('checked', PHYSICAL_PARAMETERS_LOCAL[paramID]["val"]);
-			}
-
-			$("#" + paramID).attr("title", PHYSICAL_PARAMETERS_LOCAL[paramID]["title"]);
-			$("#" + paramID).attr("name", PHYSICAL_PARAMETERS_LOCAL[paramID]["name"]);
-
+		if (PHYSICAL_PARAMETERS_LOCAL[paramID]["hidden"] != null && PHYSICAL_PARAMETERS_LOCAL[paramID]["hidden"]){
+			$("#" + paramID + "_container").hide(100);
 		}
+		
+		if (PHYSICAL_PARAMETERS_LOCAL[paramID]["hidden"] == null || !PHYSICAL_PARAMETERS_LOCAL[paramID]["hidden"]){
+			$("#" + paramID + "_container").show(100);
+		}
+
+		//console.log("Setting", "#" + paramID, "to", roundToSF(PHYSICAL_PARAMETERS_LOCAL[paramID]["val"], 3));
+		if (PHYSICAL_PARAMETERS_LOCAL[paramID]["binary"] == null || PHYSICAL_PARAMETERS_LOCAL[paramID]["binary"] == false){
+			
+			if (PHYSICAL_PARAMETERS_LOCAL[paramID]["distribution"] != "Fixed" || !simulating || WEB_WORKER_WASM != null) $("#" + paramID).val(roundToSF(PHYSICAL_PARAMETERS_LOCAL[paramID]["val"], 3));
+			
+			
+			if (PHYSICAL_PARAMETERS_LOCAL[paramID]["distribution"] != "Fixed") {
+				$("#" + paramID).addClass("parameter-disabled");
+				$("#" + paramID).attr("disabled", true);
+			}else{
+				$("#" + paramID).removeClass("parameter-disabled");
+				$("#" + paramID).attr("disabled", false);
+			}
+			
+		}else{
+			$("#" + paramID).prop('checked', PHYSICAL_PARAMETERS_LOCAL[paramID]["val"]);
+		}
+
+		$("#" + paramID).attr("title", PHYSICAL_PARAMETERS_LOCAL[paramID]["title"]);
+		$("#" + paramID).attr("name", PHYSICAL_PARAMETERS_LOCAL[paramID]["name"]);
+
+	}
 
 
 }
@@ -135,16 +136,9 @@ function update_parameters() {
 	//$("#hybridLen").val(hybridLenTemp);
 	//if (hybridLenTemp != hybridLen) refresh();
 
-
-
-	
-
 	
 	if (document.getElementById("SelectSequence").value != "$user") specialSite = SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["editSite"];//parseFloat(document.getElementById("specialSite").value);
 	else specialSite = -1;
-	
-
-	
 	
 	//renderGraphicsEveryNsteps = Math.max(Math.ceil(15 * PHYSICAL_PARAMETERS["RateUnbind"]["val"] / PHYSICAL_PARAMETERS["kCat"]["val"]), 100);
 	

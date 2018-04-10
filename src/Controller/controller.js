@@ -62,6 +62,7 @@ function translocationCalculationSummary(){
 	calculateMeanTranslocationEquilibriumConstant_controller(function(toReturn) {
 		
 		$("#meanEquilibriumConstant").html(roundToSF(toReturn.meanEquilibriumConstant, 3));
+		$("#meanEquilibriumConstantFwdOverBck").html(roundToSF(toReturn.meanEquilibriumConstantFwdOverBck, 3));
 		$("#meanForwardRate").html(roundToSF(toReturn.meanForwardRate, 3));
 		$("#meanBackwardsRate").html(roundToSF(toReturn.meanBackwardsRate, 3));
 		$("#translocationSummaryContainer").show(100);
@@ -73,6 +74,29 @@ function translocationCalculationSummary(){
 	
 }
 
+
+// If WASM is enabled then can create the dropdown list of polymerases, which are stored in the wasm model
+function populatePolymeraseDropdown(){
+
+	if (!USE_WASM) return;
+
+
+	getPolymerases_controller(function(pols) {
+		
+		console.log("pols", pols);
+		for (var pol in pols.polymerases){
+
+			var optionHTML = "<option value=" + pol + ">" + pols.polymerases[pol].name + "</option>";
+			$("#SelectPolymerase").append(optionHTML);
+
+		}
+		$("#SelectPolymerase").val(pols.currentPolymerase);
+		$("#polymeraseSelectionDiv").show(true);
+
+	});
+
+
+}
 
 
 
@@ -452,8 +476,7 @@ function renderHTML_hidden(){
 }
 
 
-function renderObjectsUntilReceiveMessage(msgID){
-
+function renderObjectsUntilReceiveMessage(msgID, first = true){
 
 	if(MESSAGE_LISTENER[msgID] == null || (simulating && !simulationRenderingController)) return;
 
@@ -469,19 +492,33 @@ function renderObjectsUntilReceiveMessage(msgID){
 	
 	*/
 
+	//console.log("renderObjectsUntilReceiveMessage", first, msgID);
 
 
-	if (simulating) drawPlots();
+	if (WEB_WORKER_WASM == null){
+		window.requestAnimationFrame(function(){
 
-	window.requestAnimationFrame(function(){
+			if (simulating) drawPlots();
+			setNextBaseToAdd_controller();
+			renderObjects(false, function() { renderObjectsUntilReceiveMessage(msgID) });
+
+		});
+	}
 
 
-		renderObjects(false, function() { renderObjectsUntilReceiveMessage(msgID) });
-		renderParameters();
-		setNextBaseToAdd_controller();
+	// Window request animationframe is too frequent especiially for larger plots. Instead update less frequently
+	else{
+		setTimeout(function(){
+			window.requestAnimationFrame(function(){
+				setNextBaseToAdd_controller();
+				if (simulating) drawPlots(false, function() {
+					renderObjects(false, function() { renderObjectsUntilReceiveMessage(msgID, false) });
+				});
+				else renderObjects(false, function() { renderObjectsUntilReceiveMessage(msgID, false) });
 
-	});
-
+			});
+		}, 20);
+	}
 }
 
 
@@ -514,7 +551,9 @@ function ctx_ellipse(ctx, x, y, radiusX, radiusY, rotation, startAngle, endAngle
 
 function generatePol(obj){
 
-	
+
+	$('#' + obj["id"]).remove();
+
 	var canvas = $("<canvas></canvas>");
 	canvas.attr("id", obj["id"]);
 	canvas.css("left", obj["x"] == parseInt(obj["x"], 10) ? obj["x"] + "px" : obj["x"]); // If there are no units then use pixels
@@ -535,10 +574,7 @@ function generatePol(obj){
 		ctx.fillStyle = "#b3b3b3"; 
 		ctx.beginPath();
 		
-		
 		//ctx.ellipse(canvas.width/2, canvas.height/2, canvas.width/2, canvas.height/2, 0, 0, 2 * Math.PI);
-		
-	
 		
 		ctx_ellipse(ctx, canvas.width/2, canvas.height/2, canvas.width/2, canvas.height/2, 0, 0, 2*Math.PI);
 		
@@ -563,15 +599,13 @@ function generatePol(obj){
 	ctx.fillRect(x, y, width, height);
 	
 
-
-
-
 }
 
 
 
 function renderObjects(override = false, resolve = function(){}){
 
+	
 	if (!ALLOW_ANIMATIONS) return;
 
 	if (simulating && ANIMATION_TIME_controller == 1 && !override) return; // Do not do this if simulating in fast mode, unless permission is granted
@@ -587,12 +621,13 @@ function renderObjects(override = false, resolve = function(){}){
 		var toCall = () => new Promise((resolve) => get_unrenderedObjects_controller(resolve));
 		toCall().then((unrenderedObjects_controller) => {
 
+			//console.log("unrenderedObjects_controller", unrenderedObjects_controller);
+
 			//renderingObjects = true;
-			while(unrenderedObjects_controller.length > 0){
+			while (unrenderedObjects_controller.length > 0){
 
 				var nt = unrenderedObjects_controller.shift();
-
-
+				//console.log(nt);
 
 				if (nt["id"] == "clear") {
 					$('#bases').html("");
@@ -600,8 +635,7 @@ function renderObjects(override = false, resolve = function(){}){
 					continue;
 				}
 
-
-
+				if (nt.id == "" || nt.id == null) continue;
 				
 				// Remove the object from the page
 				if(nt["needsDeleting"]){
@@ -617,10 +651,7 @@ function renderObjects(override = false, resolve = function(){}){
 				
 
 				// Add the nucleotide object on to html
-				if(nt["needsGenerating"]){
-
-
-					if ($("#" + nt["id"]).length != 0) continue;
+				if($("#" + nt["id"]).length == 0 || nt["needsGenerating"]){
 
 
 					// Polymerase is generated differently since it is a canvas not an image
@@ -634,7 +665,7 @@ function renderObjects(override = false, resolve = function(){}){
 						//console.log("Generating", nt["id"]);
 
 						var img = $("<img></img>");
-						if (nt["pos"] != "0" && nt["pos"] != null) img.attr("title", "Base " + nt["pos"]);
+						if (parseFloat(nt["pos"]) > 0 && nt["pos"] != null) img.attr("title", "Base " + nt["pos"]);
 						img.attr("id", nt["id"]);
 						img.attr("src", "src/Images/" + nt["src"] + ".png");
 						img.css("left", nt["x"] == parseInt(nt["x"], 10) ? nt["x"] + "px" : nt["x"]); // If there are no units then use pixels
@@ -680,14 +711,13 @@ function renderObjects(override = false, resolve = function(){}){
 
 
 				// Change the x and y coordinates of the object and move the triphoshate with it
+				var TP_inDOM = nt["seq"] == "m" && $("#phos" + nt["pos"]).length > 0;
 				if(nt["needsAnimating"]){
 
 					//console.log("Animating", nt["id"]);
 
 					var element = $("#" + nt["id"]);
 
-
-					var TP_inDOM = nt["seq"] == "m" && $("#phos" + nt["pos"]).length > 0;
 
 					// Add the triphosphate if required
 					if (nt["hasTP"] && !TP_inDOM) add_triphosphate(nt["pos"], nt["x"], nt["y"]);
@@ -734,10 +764,6 @@ function renderObjects(override = false, resolve = function(){}){
 
 				if (nt["id"] == "pol") {
 					moveScrollBar();
-
-
-
-
 				}
 
 			}
@@ -1133,8 +1159,8 @@ function getCacheClearTemplate(){
 
 
 	return `
-		<div id='clearCachePopup' style='background-color:adadad; padding: 10 10; position:fixed; width: 500px; left:35vw; top:50vh; z-index:5'>
-			<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto;'>
+		<div id='clearCachePopup' style='background-color:008cba; padding: 10 10; position:fixed; width: 500px; left:35vw; top:50vh; z-index:5'>
+			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto;'>
 				<span style='font-size: 22px'> Clear Cache </span>
 				<span style='font-size: 30px; cursor:pointer; position:absolute; left:490px; top:5px' onclick='closeKineticCachePopup()'>&times;</span>
 				<div style='padding:2; font-size:18px;'> Please select which data you would like to clear </div>
@@ -1194,7 +1220,6 @@ function clearKineticDataCache(){
 	getCacheSizes_controller(function(result){
 
 
-
 		popupHTML = popupHTML.replace("DVTSIZE", result["DVTsize"]);
 		popupHTML = popupHTML.replace("TIMESIZE", result["timeSize"]);
 		popupHTML = popupHTML.replace("PARAMSIZE", result["parameterPlotSize"]);
@@ -1246,7 +1271,9 @@ function clearCache(){
 	}
 
 	stop_controller(function(){
-		
+
+		console.log("stopped");
+
 		closeKineticCachePopup();
 		refresh(function(){
 			
@@ -1273,20 +1300,18 @@ function clearCache(){
 			}
 
 
-
 			deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, function(plotData){
 
-				
-				update_PLOT_DATA(plotData)
+				//console.log("plotData", plotData);
+
 
 
 				window.requestAnimationFrame(function(){
+					update_PLOT_DATA(plotData)
 					for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
 						if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "none" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom"  && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
 						else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
 					}
-					
-					
 				});
 
 

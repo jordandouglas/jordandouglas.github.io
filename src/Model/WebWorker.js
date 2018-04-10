@@ -120,10 +120,9 @@ WW_JS.init_WW = function(isWW = false){
 
 
 
-WW_JS.refresh_WW = function(resolve, msgID){
+WW_JS.refresh_WW = function(resolve = function() {}, msgID = null){
+	
 
-	if (resolve === undefined) resolve = function() {};
-	if (msgID === undefined) msgID = null;
 	OPS_JS.deterministic_mode = true;
 
 
@@ -155,7 +154,6 @@ WW_JS.refresh_WW = function(resolve, msgID){
 
 	WW_JS.setNextBaseToAdd_WW();
 	OPS_JS.transcribe_WW(2 + Math.max(2, PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+2), true); // Keep moving right until transcription bubble is sealed
-
 	PLOTS_JS.refreshPlotData();
 
 	STATE_JS.initTranslocationRateCache();
@@ -181,8 +179,6 @@ WW_JS.add_pairs_WW = function(msgID){
 	if (msgID === undefined) msgID = null;
 	
 	var bases = SEQS_JS.all_sequences[sequenceID]["seq"].toUpperCase();
-
-
 
 
 	
@@ -242,9 +238,6 @@ WW_JS.add_pairs_WW = function(msgID){
 		if ((SEQS_JS.all_sequences[sequenceID]["template"] == "ssRNA" || SEQS_JS.all_sequences[sequenceID]["template"] == "dsRNA") && baseToAdd == "T") baseToAdd = "U";
 		if ((SEQS_JS.all_sequences[sequenceID]["template"] == "ssDNA" || SEQS_JS.all_sequences[sequenceID]["template"] == "dsDNA") && baseToAdd == "U") baseToAdd = "T";
 		
-
-
-
 		
 		
 		if (index < PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]){
@@ -330,7 +323,7 @@ WW_JS.add_pairs_WW = function(msgID){
 	if (msgID != null){
 		postMessage(msgID + "~X~" + "done");
 	}
-	else resolve();
+	else if (resolve != null) resolve();
 
 
 
@@ -433,12 +426,11 @@ function tagAllObjectsForGeneration(){
 		unrenderedObjects.push(obj);
 	}
 
-
 }
 
 
 
- WW_JS.create_HTMLobject_WW = function(id, x, y, width, height, src, zIndex){
+WW_JS.create_HTMLobject_WW = function(id, x, y, width, height, src, zIndex){
 
 
 	if (zIndex === undefined) zIndex = 1;
@@ -449,7 +441,7 @@ function tagAllObjectsForGeneration(){
 
 }
 
- WW_JS.create_pol_WW = function(x, y, src){
+WW_JS.create_pol_WW = function(x, y, src){
 
 
 	if (src === undefined) src = "pol";
@@ -457,7 +449,7 @@ function tagAllObjectsForGeneration(){
 
 	var width, height; 
 	if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) == "ds"){
-		src = "square";
+		//src = "square";
 	}
 
 	if (src == "paraPol") {
@@ -475,7 +467,7 @@ function tagAllObjectsForGeneration(){
 
 
 
- WW_JS.change_src_of_object_WW = function(obj, newSrc){
+WW_JS.change_src_of_object_WW = function(obj, newSrc){
 
 	obj["src"] = newSrc;
 	if (!obj["needsGenerating"] && !obj["needsAnimating"] && !obj["needsSourceUpdate"] && !obj["needsDeleting"]) unrenderedObjects.push(obj);
@@ -487,7 +479,7 @@ function tagAllObjectsForGeneration(){
 
 
 // Change the src on a nucleotide to represent the object flipping
- WW_JS.flip_base_WW = function(pos, seq, flipTo){
+WW_JS.flip_base_WW = function(pos, seq, flipTo){
 
 
 	var nt = null;
@@ -662,7 +654,7 @@ function tagAllObjectsForGeneration(){
 
 
 // Declare which template base the primer base was copied from
- WW_JS.setPrimerSequenceBaseParent = function(nascentBaseID, templateBaseID){
+WW_JS.setPrimerSequenceBaseParent = function(nascentBaseID, templateBaseID){
 
 	var nt = primerSequence[nascentBaseID];
 	if (nt == null) return;
@@ -897,6 +889,7 @@ function getComplementSequence_WW(seq, toRNA){
  WW_JS.userSelectSequence_WW = function(newSequenceID, newTemplateType, newPrimerType, msgID = null){
 
 
+ 	
 
 	// Only apply change if there is one
 	if (newSequenceID != sequenceID ||newTemplateType != SEQS_JS.all_sequences[sequenceID]["template"] || newPrimerType != SEQS_JS.all_sequences[sequenceID]["primer"]){
@@ -920,7 +913,6 @@ function getComplementSequence_WW(seq, toRNA){
 		PARAMS_JS.setStructuralParameters_WW();
 
 	}
-
 
 	if (msgID != null){
 		postMessage(msgID + "~X~" + "done");
@@ -1008,7 +1000,7 @@ WW_JS.getBaseInSequenceAtPosition_WW = function(baseID){
 
 
 
- WW_JS.setNextBaseToAdd_WW = function(resolve, msgID){
+WW_JS.setNextBaseToAdd_WW = function(resolve, msgID){
 
 
 	if (resolve === undefined) resolve = function() {};
@@ -1043,7 +1035,7 @@ WW_JS.getBaseInSequenceAtPosition_WW = function(baseID){
 
 }
 
- WW_JS.userSetNextBaseToAdd_WW = function(ntpType, resolve, msgID){
+WW_JS.userSetNextBaseToAdd_WW = function(ntpType, resolve, msgID){
 
 	if (resolve === undefined) resolve = function() {};
 	if (msgID === undefined) msgID = null;

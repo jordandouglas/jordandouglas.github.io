@@ -28,6 +28,7 @@ SIM_JS.renderPlotsEveryMS = 5000; // If in hidden mode, render the plots every f
 
  SIM_JS.startTrials_WW = function(n, resolve = function() { }, msgID = null){
 
+ 	
 	
 	if (!WW_JS.stopRunning_WW && !ABC_JS.ABC_simulating) { // If ABC is running then allow this to proceed 
 		if (msgID != null){
@@ -235,7 +236,6 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 	printDateAndTime("Sampling action");
 	var result = SIM_JS.sampleAction_WW(stateC);
 
-	
 
 	if (result["toDo"].length > 1){
 		for (var i = 0; i < result["toDo"].length-1; i ++){
@@ -271,6 +271,7 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 	var prepareForNextTrial = function(){
 
 		printDateAndTime("Perparing for next trial");
+
 		// If this is in animation mode, then this process is synchronous with rendering so we return in between operators
 		// THIS BLOCK OF CODE WILL ONLY WORK IF NOT RUNNING AS A WEBWORKER
 		if (!WW_JS.isWebWorker && !RUNNING_FROM_COMMAND_LINE){

@@ -61,9 +61,7 @@ OPS_JS.transcribe_WW = function(nbasesToTranscribe, fastMode = false, resolve = 
 		actions.push(function() { OPS_JS.forward_WW(null, true) });
 	}
 
-
 	OPS_JS.applyActions(actions, fastMode, resolve, msgID);
-	
 	
 
 
@@ -71,7 +69,7 @@ OPS_JS.transcribe_WW = function(nbasesToTranscribe, fastMode = false, resolve = 
 
 
 
- OPS_JS.stutter_WW = function(nbasesToStutter, fastMode = false, resolve = function() {}, msgID = null){
+OPS_JS.stutter_WW = function(nbasesToStutter, fastMode = false, resolve = function() {}, msgID = null){
 
 
 
@@ -801,8 +799,6 @@ OPS_JS.deactivate_WW = function(state = null, UPDATE_COORDS, resolve = function(
 
 		state["activated"] = false;
 		//if (state["NTPbound"]) OPS_JS.releaseNTP_WW(state, UPDATE_COORDS); // This gives a very different model when kRelease is low
-		state["NTPbound"] = false;
-		
 		
 		// Change the pol picture to the paused one
 		if (UPDATE_COORDS){

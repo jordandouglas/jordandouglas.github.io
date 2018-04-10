@@ -216,6 +216,9 @@ function drawTranslocationCanvas(){
 
 	getTranslocationCanvasData_controller(function(result){
 
+
+		//console.log("result", result);
+
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		$(canvas).parent().find(".navArrow").remove();
 
@@ -431,14 +434,14 @@ function drawDeactivationCanvas(){
 		// There will be an arrow going from the current state to the other state
 		// Above the arrow is the rate constant
 		// Below the arrow is a button to perform the reaction manually
-		var state = result["state"];
+		var activated = result.activated;
+		var NTPbound = result.NTPbound;
 		var kA = result["kA"];
 		var kU = result["kU"];
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		$(canvas).parent().find(".navArrow").remove();
 		
 
-		//state[3] = !state[3];
 
 		var currentStateMargin = 2;
 		var spacingBetweenStates = plotWidth * 0.25 - 2*currentStateMargin;
@@ -453,13 +456,13 @@ function drawDeactivationCanvas(){
 		var inactivePolXCoord = plotWidth * 0.65 + polWidthRad;
 
 
-		//ctx.globalAlpha = state[3] ? 1 : 0.4;
+
 		ctx.fillStyle = "#b3b3b3";
 		ctx.beginPath();
 		ctx_ellipse(ctx, activePolXCoord, polYCoord, polWidthRad, polHeightRad, 0, 0, 2*Math.PI);
 		ctx.fill();
 
-		//ctx.globalAlpha = !state[3] ? 1 : 0.4;
+
 		ctx.beginPath();
 		ctx_ellipse(ctx, inactivePolXCoord, polYCoord, polWidthRad, polHeightRad, 0, 0, 2*Math.PI);
 		ctx.fill();
@@ -474,7 +477,7 @@ function drawDeactivationCanvas(){
 		var activeRectXPos = rectWidth * 1/6 + currentStateMargin;
 		var inactiveRectXPos = plotWidth * 0.65 + rectWidth * 1/6;
 
-		//ctx.globalAlpha = state[3] ? 1 : 0.4;
+
 		ctx.fillStyle = "#e6e6e6";
 		ctx.fillRect(activeRectXPos, rectYPos, rectWidth, rectHeight);
 		/*ctx.beginPath();
@@ -482,7 +485,7 @@ function drawDeactivationCanvas(){
 		ctx.strokeStyle="#536872";
 		ctx.rect(activeRectXPos, rectYPos, rectWidth, rectHeight);
 		ctx.stroke();*/
-		//ctx.globalAlpha = !state[3] ? 1 : 0.4;
+		//ctx.globalAlpha = !activated ? 1 : 0.4;
 		ctx.fillStyle = "#708090";
 		ctx.fillRect(inactiveRectXPos, rectYPos, rectWidth, rectHeight);
 
@@ -494,7 +497,7 @@ function drawDeactivationCanvas(){
 		var stateHeight = plotHeight;
 		var stateWidth = plotWidth * 0.35 + currentStateMargin;
 		var stateY = 0;
-		var stateX = state[3] ? 0 : plotWidth * 0.65 - currentStateMargin; // State[3] is whether the polymerase is active or not
+		var stateX = activated ? 0 : plotWidth * 0.65 - currentStateMargin; // activated is whether the polymerase is active or not
 		ctx.beginPath();
 		ctx.lineWidth="6";
 		ctx.strokeStyle="#008cba";
@@ -507,12 +510,12 @@ function drawDeactivationCanvas(){
 
 
 		// Arrow from current state to other state
-		var fromX = (state[3] ?  plotWidth * 0.35 + currentStateMargin : plotWidth * 0.65 - currentStateMargin);
-		var rate = state[3] ? kU : kA;
-		var onClick = state[3] ? "deactivate_controller" : "activate_controller";
+		var fromX = (activated ?  plotWidth * 0.35 + currentStateMargin : plotWidth * 0.65 - currentStateMargin);
+		var rate = activated ? kU : kA;
+		var onClick = activated ? "deactivate_controller" : "activate_controller";
 
-		if (state[2] || !result.allowDeactivation) rate = 0; // Cannot deactivate if NTP bound
-		plotArrowButton_navigationPanel(ctx, fromX, plotHeight / 2, state[3] ? "right" : "left", state[3] ? "Deactivate" : "Activate", rate, onClick, state[3] ? "Send the polymerase into a catalytically inactive state" : "Bring the polymerase back into its catalytically active form", spacingBetweenStates, canvas, !state[2]);
+		if (NTPbound || !result.allowDeactivation) rate = 0; // Cannot deactivate if NTP bound
+		plotArrowButton_navigationPanel(ctx, fromX, plotHeight / 2, activated ? "right" : "left", activated ? "Deactivate" : "Activate", rate, onClick, activated ? "Send the polymerase into a catalytically inactive state" : "Bring the polymerase back into its catalytically active form", spacingBetweenStates, canvas, !NTPbound);
 
 
 

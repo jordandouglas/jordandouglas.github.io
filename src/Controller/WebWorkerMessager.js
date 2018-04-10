@@ -55,20 +55,13 @@ function register_WebWorker(resolve = function() { }){
         	}
 
 
-
-		  
-			
-
-
-
-
     } else {
        	console.log('WebWorker registration failed');
        	removeWebworkerRegistrationHTML();
 		$("#browserWWdisabled").show(true);
     }
 
-
+    if (WEB_WORKER_WASM == null) USE_WASM = false;
 
     // Set up message listeners
     MESSAGE_LISTENER = {};
@@ -89,8 +82,7 @@ function register_WebWorker(resolve = function() { }){
 
     if (WEB_WORKER_WASM != null){
 
-
-    	$("#output_asm").show(true);
+    	//$("#output_asm").show(true);
 
     	// Connect to webassembly
 		fetch("src/asm/simpol_asm.wasm").then(response =>
@@ -108,6 +100,7 @@ function register_WebWorker(resolve = function() { }){
     	WEB_WORKER_WASM.onmessage = function(event) {
 			onWebWorkerReceiveMessage(event, resolve);
 		}
+	
     	
 
     }  else resolve();
@@ -163,8 +156,8 @@ function onWebWorkerReceiveMessage(event, resolveAfterWebassemblyInitialised = f
 
 	else{
 		// Otherwise we continue with the callback but with the JSON-parsed parameter
+		//console.log("result", id, result);
 		result = JSON.parse(result);
-
 
 		//console.log("Returning JSON ", result);
 		obj["resolve"](result);
@@ -172,12 +165,12 @@ function onWebWorkerReceiveMessage(event, resolveAfterWebassemblyInitialised = f
 
 
 	// Remove this object from the MESSAGE_LISTENER list
-	MESSAGE_LISTENER[id] = null;
+	if (MESSAGE_LISTENER[id] != null && (MESSAGE_LISTENER[id].remove == null || MESSAGE_LISTENER[id].remove == true)) MESSAGE_LISTENER[id] = null;
 }
 
 
 
-function callWebWorkerFunction(fn, resolve = null, msgID = null){
+function callWebWorkerFunction(fn, resolve = null, msgID = null, removeAfter = true){
 
 
 	WorkerToUse = WEB_WORKER;
@@ -205,7 +198,7 @@ function callWebWorkerFunction(fn, resolve = null, msgID = null){
 
 		// Otherwise add this to MESSAGE_LISTENER with a unique id and send the message along with the id
 		else{
-			MESSAGE_LISTENER[msgID] = {resolve: resolve};
+			MESSAGE_LISTENER[msgID] = {resolve: resolve, remove: removeAfter};
 			WorkerToUse.postMessage(msgID + "~X~" + fnStr);
 
 		}
@@ -288,7 +281,7 @@ function refresh_controller(resolve_fn = function(x) {}){
 	if (WEB_WORKER == null) {
 		var toCall = () => new Promise((resolve) => WW_JS.refresh_WW(resolve));
 		toCall().then((x) => resolve_fn(x));
-	}else{
+	}else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("WW_JS.refresh_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
@@ -296,6 +289,19 @@ function refresh_controller(resolve_fn = function(x) {}){
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall(fnStr).then((x) => resolve_fn(x));
 
+	}
+
+	else{
+
+		callWebWorkerFunction(stringifyFunction("WW_JS.refresh_WW", []));
+		
+		var res = stringifyFunction("refresh", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall(fnStr).then(() => resolve_fn());
+		
 	}
 
 }
@@ -309,7 +315,7 @@ function stop_controller(resolve = function() { }){
 		resolve(WW_JS.stop_WW());
 	}
 	
-	else if (true || WEB_WORKER_WASM == null){
+	else if (WEB_WORKER_WASM == null){
 
 		var res = stringifyFunction("WW_JS.stop_WW", [null], true);
 		var fnStr = res[0];
@@ -321,13 +327,13 @@ function stop_controller(resolve = function() { }){
 	}
 	
 	else{
-		
+
+		callWebWorkerFunction(stringifyFunction("WW_JS.stop_WW", [null]));
 		
 		var res = stringifyFunction("stopWebAssembly", [], true);
 		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		
-		console.log("Sending function: " + fnStr);
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall(fnStr).then(() => resolve());
 		
@@ -493,13 +499,22 @@ function get_unrenderedObjects_controller(resolve){
 
 	if (WEB_WORKER == null) {
 		resolve(WW_JS.get_unrenderedObjects_WW());
-	}else{
+	} else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("WW_JS.get_unrenderedObjects_WW", [], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
 		callWebWorkerFunction(fnStr, resolve, msgID);
+	} else {
+
+		var res = stringifyFunction("getUnrenderedobjects", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		callWebWorkerFunction(fnStr, resolve, msgID);
 	}
+
+
+
 
 }
 
@@ -565,6 +580,56 @@ function calculateMeanTranslocationEquilibriumConstant_controller(resolve = func
 
 		toCall(fnStr).then((x) => resolve(x));
 
+
+	}
+
+
+}
+
+
+function getPolymerases_controller(resolve = function(polymerases) { }){
+
+	if (WEB_WORKER_WASM != null) {
+
+		var res = stringifyFunction("getPolymerases", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		//console.log("Sending function: " + fnStr);
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+
+		toCall(fnStr).then((x) => resolve(x));
+
+	}
+
+}
+
+// User changes the polymerase in the dropdown list. Only supported on WASM 
+function userChangePolymerase_controller(){
+
+	if (WEB_WORKER_WASM != null) {
+
+
+		var toDoAfterChange = function(){
+			renderParameters();
+			setModelOptions();
+
+			update_sliding_curve(0);
+			update_slipping_curve(0);
+			refreshNavigationCanvases();
+
+		}
+
+
+		var selectedPolymeraseID = $("#SelectPolymerase").val();
+
+
+		var res = stringifyFunction("userChangePolymerase", [selectedPolymeraseID], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		//console.log("Sending function: " + fnStr);
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+
+		toCall(fnStr).then(() => toDoAfterChange());
 
 	}
 
@@ -665,13 +730,22 @@ function getPlotData_controller(forceUpdate = false, resolve){
 		var toCall = () => new Promise((resolve) => PLOTS_JS.getPlotData_WW(forceUpdate, resolve, null));
 		toCall().then((dict) => resolve(dict));
 
-	}else{
+	}else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("PLOTS_JS.getPlotData_WW", [forceUpdate, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall(fnStr).then((dict) => resolve(dict));
+	}else{
+		
+		var res = stringifyFunction("getPlotData", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		//console.log("Sending function: " + fnStr);
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall(fnStr).then((dict) => resolve(dict));
+
 	}
 	
 }
@@ -957,12 +1031,9 @@ function update_this_parameter_controller(element){
 
 	var paramID = $(element).attr("id");
 	// Special case for the assisting force 
-	if (paramID == "FAssist"){
+	if (paramID == "FAssist" && WEB_WORKER_WASM == null){
 		updateForce_controller();
 	}else{
-
-
-
 
 
 		// Function to call when webworker has responded
@@ -1042,12 +1113,18 @@ function updateForce_controller(){
 
 
 	// If it is in asynchronous or hidden mode, then we keep going until the end
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("PARAMS_JS.updateForce_WW", [newFAssist, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall(fnStr).then((x) => updateDOM(x));
+
+
+	}
+
+	else{
+
 
 
 	}
@@ -1082,6 +1159,7 @@ function transcribe_controller(nbasesToTranscribe = null, fastMode = false, reso
 
 
 	var updateDOM = function(){
+
 		reactivate_buttons();
 		setNextBaseToAdd_controller();
 		renderObjects();
@@ -1101,17 +1179,30 @@ function transcribe_controller(nbasesToTranscribe = null, fastMode = false, reso
 
 
 	// If it is in asynchronous or hidden mode, then we keep going until the end
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("OPS_JS.transcribe_WW", [nbasesToTranscribe, fastMode, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall(fnStr).then((x) => updateDOM(x));
+		toCall(fnStr).then(() => updateDOM());
 
 		renderObjectsUntilReceiveMessage(msgID);
 
 	}
+
+
+	else{
+		var res = stringifyFunction("transcribe", [nbasesToTranscribe], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then(() => updateDOM());
+
+		renderObjectsUntilReceiveMessage(msgID);
+
+	}
+
 
 }
 
@@ -1167,33 +1258,35 @@ function forward_controller(state = null, UPDATE_COORDS = true, resolve = functi
 
 
 	var updateDOM = function(DOMupdates){
-		if(DOMupdates["successfulOp"]){
+		if(DOMupdates == null || DOMupdates["successfulOp"]){
 			
 			refreshNavigationCanvases();
 			update_sliding_curve(1);
 			update_slipping_curve(0);
 			renderObjects();
 		}
-		
 
-		// Create any new slippage landscapes that are required
-		for (var i = 0; i < DOMupdates["where_to_create_new_slipping_landscape"].length; i ++){
-			create_new_slipping_landscape(DOMupdates["where_to_create_new_slipping_landscape"][i]);
+
+		if (DOMupdates != null) {
+
+			// Create any new slippage landscapes that are required
+			for (var i = 0; i < DOMupdates["where_to_create_new_slipping_landscape"].length; i ++){
+				create_new_slipping_landscape(DOMupdates["where_to_create_new_slipping_landscape"][i]);
+			}
+
+
+			// Reset slippage landscapes
+			for (var i = 0; i < DOMupdates["landscapes_to_reset"].length; i ++){
+				reset_slipping_landscape(DOMupdates["landscapes_to_reset"][i]);
+			}
+
+
+			// Delete slippage landscapes
+			for (var i = 0; i < DOMupdates["landscapes_to_delete"].length; i ++){
+				delete_slipping_landscape(DOMupdates["landscapes_to_delete"][i]);
+			}
+
 		}
-
-
-		// Reset slippage landscapes
-		for (var i = 0; i < DOMupdates["landscapes_to_reset"].length; i ++){
-			reset_slipping_landscape(DOMupdates["landscapes_to_reset"][i]);
-		}
-
-
-		// Delete slippage landscapes
-		for (var i = 0; i < DOMupdates["landscapes_to_delete"].length; i ++){
-			delete_slipping_landscape(DOMupdates["landscapes_to_delete"][i]);
-		}
-
-
 
 		resolve();
 
@@ -1206,7 +1299,7 @@ function forward_controller(state = null, UPDATE_COORDS = true, resolve = functi
 
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("OPS_JS.forward_WW", [state, UPDATE_COORDS, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
@@ -1214,6 +1307,14 @@ function forward_controller(state = null, UPDATE_COORDS = true, resolve = functi
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => updateDOM(result));
 
+	}
+
+	else{
+		var res = stringifyFunction("translocateForward", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then(() => updateDOM());
 	}
 
 
@@ -1228,7 +1329,7 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 
 	var updateDOM = function(DOMupdates){
 
-		if(DOMupdates["successfulOp"]){
+		if (DOMupdates == null || DOMupdates["successfulOp"]){
 			
 			refreshNavigationCanvases();
 			update_sliding_curve(-1);
@@ -1237,26 +1338,27 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 			$("#mRNAsvg").remove();
 			$("#bases").children().show(0);
 		}
+
+		if (DOMupdates != null) {
 		
+			// Create any new slippage landscapes that are required
+			for (var i = 0; i < DOMupdates["where_to_create_new_slipping_landscape"].length; i ++){
+				create_new_slipping_landscape(DOMupdates["where_to_create_new_slipping_landscape"][i]);
+			}
 
-		// Create any new slippage landscapes that are required
-		for (var i = 0; i < DOMupdates["where_to_create_new_slipping_landscape"].length; i ++){
-			create_new_slipping_landscape(DOMupdates["where_to_create_new_slipping_landscape"][i]);
+
+			// Reset slippage landscapes
+			for (var i = 0; i < DOMupdates["landscapes_to_reset"].length; i ++){
+				reset_slipping_landscape(DOMupdates["landscapes_to_reset"][i]);
+			}
+
+
+			// Delete slippage landscapes
+			for (var i = 0; i < DOMupdates["landscapes_to_delete"].length; i ++){
+				delete_slipping_landscape(DOMupdates["landscapes_to_delete"][i]);
+			}
+
 		}
-
-
-		// Reset slippage landscapes
-		for (var i = 0; i < DOMupdates["landscapes_to_reset"].length; i ++){
-			reset_slipping_landscape(DOMupdates["landscapes_to_reset"][i]);
-		}
-
-
-		// Delete slippage landscapes
-		for (var i = 0; i < DOMupdates["landscapes_to_delete"].length; i ++){
-			delete_slipping_landscape(DOMupdates["landscapes_to_delete"][i]);
-		}
-
-
 
 		resolve();
 
@@ -1267,16 +1369,22 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 		toCall().then((result) => updateDOM(result));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("OPS_JS.backwards_WW", [state, UPDATE_COORDS, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => updateDOM(result));
+	}
 
 
-
+	else{
+		var res = stringifyFunction("translocateBackwards", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then(() => updateDOM());
 	}
 
 
@@ -1315,13 +1423,21 @@ function bindNTP_controller(state = null, UPDATE_COORDS = true, resolve = functi
 
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("OPS_JS.bindNTP_WW", [state, UPDATE_COORDS, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => updateDOM(result));
 
+	}
+
+	else{
+		var res = stringifyFunction("bindOrCatalyseNTP", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then(() => updateDOM());
 	}
 
 
@@ -1352,13 +1468,21 @@ function releaseNTP_controller(state = null, UPDATE_COORDS = true, resolve = fun
 
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("OPS_JS.releaseNTP_WW", [state, UPDATE_COORDS, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => updateDOM(result));
 
+	}
+
+	else{
+		var res = stringifyFunction("releaseOrRemoveNTP", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then(() => updateDOM());
 	}
 
 }
@@ -1387,11 +1511,21 @@ function activate_controller(state = null, UPDATE_COORDS = true, resolve = funct
 
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("OPS_JS.activate_WW", [state, UPDATE_COORDS, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => updateDOM(result));
+
+	}
+
+	else{
+
+		var res = stringifyFunction("activatePolymerase", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => updateDOM(result));
 
@@ -1423,11 +1557,21 @@ function deactivate_controller(state = null, UPDATE_COORDS = true, resolve = fun
 
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("OPS_JS.deactivate_WW", [state, UPDATE_COORDS, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => updateDOM(result));
+
+	}
+
+	else{
+
+		var res = stringifyFunction("deactivatePolymerase", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => updateDOM(result));
 
@@ -1560,11 +1704,7 @@ function slip_right_controller(S = 0, state = null, UPDATE_COORDS = true, resolv
 
 function changeSpeed_controller(){
 
-
-
-
 	var speed = $("#PreExp").val();
-
 
 	if (speed != ANIMATION_TIME_controller && SPEED_controller == "hidden") addSequenceLoadingHTML();
 	if (speed != "hidden") deleteHiddenModeNotification();
@@ -1624,11 +1764,23 @@ function changeSpeed_controller(){
 		toCall().then((res) => updateDOM(res));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("WW_JS.changeSpeed_WW", [speed, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((res) => updateDOM(res));
+
+	}
+
+	else {
+		
+		//callWebWorkerFunction(stringifyFunction("WW_JS.changeSpeed_WW", [speed]));
+
+		var res = stringifyFunction("changeSpeed", [speed], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((res) => updateDOM(res));
 
@@ -1669,11 +1821,21 @@ function getStateDiagramInfo_controller(resolve = function(state) { }){
 		toCall().then((result) => resolve(result));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("FE_JS.getStateDiagramInfo_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
+	}
+
+	else{
+
+		var res = stringifyFunction("getStateDiagramInfo", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => resolve(result));
 
@@ -1710,12 +1872,23 @@ function getTranslocationCanvasData_controller(resolve = function(result){}){
 		toCall().then((result) => resolve(result));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("FE_JS.getTranslocationCanvasData_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => resolve(result));
+
+	}
+
+	else{
+
+		var res = stringifyFunction("getTranslocationCanvasData", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
 
 	}
 
@@ -1731,7 +1904,7 @@ function getNTPCanvasData_controller(resolve = function(result){}){
 		toCall().then((result) => resolve(result));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("FE_JS.getNTPCanvasData_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
@@ -1739,6 +1912,18 @@ function getNTPCanvasData_controller(resolve = function(result){}){
 		toCall().then((result) => resolve(result));
 
 	}
+
+	else{
+
+		var res = stringifyFunction("getNTPCanvasData", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
+
+	}
+
 
 
 }
@@ -1752,12 +1937,23 @@ function getDeactivationCanvasData_controller(resolve = function(result){}){
 		toCall().then((result) => resolve(result));
 	}
 
-	else{
+	else  if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("FE_JS.getDeactivationCanvasData_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => resolve(result));
+
+	}
+
+	else{
+
+		var res = stringifyFunction("getDeactivationCanvasData", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
 
 	}
 
@@ -1790,7 +1986,6 @@ function startTrials_controller(){
 
 
 	if ($("#simulateBtn").hasClass("toolbarIconDisabled")) return;
-	if ($("#SelectPrimerType").val().substring(0,2) == "ds") return;
 	var ntrials = $("#nbasesToSimulate").val();
 	if(ntrials <= 0) return;
 	
@@ -1831,13 +2026,13 @@ function startTrials_controller(){
 
 
 
-		var updateDOM = function(){
+		var updateDOM = function(result){
 			deleteHiddenModeNotification();
 			reactivate_buttons();
 			setNextBaseToAdd_controller();
 			refreshNavigationCanvases();
 			if($("#PreExp").val() != "hidden") renderObjects();
-			drawPlots();
+			if (WEB_WORKER_WASM == null) drawPlots();
 			console.log("Updating dom");
 			simulating = false;
 			hideStopButtonAndShow("simulate");
@@ -1864,7 +2059,7 @@ function startTrials_controller(){
 
 		
 		// WebWorker. If it is in asynchronous or hidden mode, then we keep going until the end
-		else if (WEB_WORKER_WASM == null || ($("#PreExp").val() != "ultrafast" && $("#PreExp").val() != "hidden")){
+		else if (WEB_WORKER_WASM == null){
 			
 
 			var res = stringifyFunction("SIM_JS.startTrials_WW", [ntrials, null], true);
@@ -1888,21 +2083,48 @@ function startTrials_controller(){
 		}
 			
 			
-		// Run simulations in Webassembly if service is available and if running in hidden mode
+		// Run simulations in Webassembly if service is available
 		else{
 			
 			var res = stringifyFunction("startTrials", [ntrials], true);
 			var fnStr = "wasm_" + res[0];
 			var msgID = res[1];
-			var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-			
+
 			var resolve = function(result){
-				console.log("time and velocity", result);
-				$("#output_asm").append("<div style='padding:5 5'>Velocity: " + roundToSF(result.meanVelocity, 4) + "bp/s; Time taken: " + roundToSF(result.realTime, 4) + "s </div>"); 
-				updateDOM();
+				
+				//console.log("Back here", result);
+				drawPlotsFromData(result.plots);
+
+				if (result.stop) {
+					updateDOM(result);
+					MESSAGE_LISTENER[msgID] = null;
+				}
+				else{
+					//MESSAGE_LISTENER[msgID].remove = false;
+					if ($("#counterProgress").html() != Math.floor(result.N)) {
+						renderParameters(); // Update parameters at the end of each trial
+					}
+
+					$("#counterProgress").html(Math.floor(result.N));
+					//$("#output_asm").append("<div style='padding:5 5'>Velocity: " + roundToSF(result.meanVelocity, 4) + "bp/s; Time taken: " + roundToSF(result.realTime, 4) + "s; n complete = " + result.N + "</div>"); 
+				}
+
 			}
 			
-			toCall().then((result) => resolve(result));
+
+			callWebWorkerFunction(fnStr, resolve, msgID, false);
+
+			// Render every animationFrame unless ultrafast or hidden
+			if ($("#PreExp").val() != "ultrafast" && $("#PreExp").val() != "hidden") {
+				simulationRenderingController = true;
+				renderObjectsUntilReceiveMessage(msgID);
+			}
+
+			// If hidden mode then the model will tell us when to render
+			else{
+				simulationRenderingController = false;
+			}
+
 		}
 
 		
@@ -1923,12 +2145,22 @@ function selectPlot_controller(plotNum, value, deleteData, updateDOM = function(
 		toCall().then((plotData) => updateDOM(plotData));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("PLOTS_JS.selectPlot_WW", [plotNum, value, deleteData, true, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((plotData) => updateDOM(plotData));
+
+	}else{
+
+
+		var res = stringifyFunction("userSelectPlot", [plotNum, value, deleteData], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => updateDOM(result));
+
 
 	}
 	
@@ -2063,7 +2295,8 @@ function saveSettings_controller(){
 	}
 	
 	var updateDom = function(whichPlotInWhichCanvas){
-		
+
+
 		PLOT_DATA["whichPlotInWhichCanvas"] = whichPlotInWhichCanvas;
 		functionToCallAfterSaving();
 		closePlotSettingsPopup();
@@ -2076,12 +2309,23 @@ function saveSettings_controller(){
 		toCall().then((whichPlotInWhichCanvas) => updateDom(whichPlotInWhichCanvas));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("PLOTS_JS.saveSettings_WW", [plotNum, plotType, values, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((whichPlotInWhichCanvas) => updateDom(whichPlotInWhichCanvas));
+
+	}
+
+	else{
+
+		var res = stringifyFunction("savePlotSettings", [plotNum, values], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((whichPlotInWhichCanvas) => updateDom(whichPlotInWhichCanvas));
+
 
 	}
 	
@@ -2422,18 +2666,21 @@ function loadSession_controller(XMLData, resolve = function() { }){
 }
 
 
+// Show or hide all plots
+function showPlots_controller(hidden){
 
-
-
-function showPlot_controller(hidden){
 
 	if (WEB_WORKER == null) {
-		PLOTS_JS.showPlot_WW(hidden);
-	}else{
-		var fnStr = stringifyFunction("PLOTS_JS.showPlot_WW", [hidden]);
+		PLOTS_JS.showPlots_WW(hidden);
+	}else if (WEB_WORKER_WASM == null){
+		var fnStr = stringifyFunction("PLOTS_JS.showPlots_WW", [hidden]);
 		//console.log("Sending function: " + fnStr);
 		callWebWorkerFunction(fnStr);
+	}else{
+		var fnStr = "wasm_" + stringifyFunction("showPlots", [hidden]);
+		callWebWorkerFunction(fnStr);
 	}
+
 
 }
 
@@ -2461,9 +2708,17 @@ function getNTPparametersAndSettings_controller(resolve = function(){}){
 		toCall().then((mod) => resolve(mod));
 	}
 
-	else{
+	else if(WEB_WORKER_WASM == null){
 		var res = stringifyFunction("FE_JS.getNTPparametersAndSettings_WW", [null], true);
 		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((mod) => resolve(mod));
+
+	}else{
+
+		var res = stringifyFunction("getParametersAndModelSettings", [], true);
+		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((mod) => resolve(mod));
@@ -2549,12 +2804,23 @@ function getCacheSizes_controller(resolve = function(){}){
 		toCall().then((result) => resolve(result));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("PLOTS_JS.getCacheSizes_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => resolve(result));
+
+	}
+
+	else{
+
+		var res = stringifyFunction("getCacheSizes", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
 
 	}
 
@@ -2573,9 +2839,19 @@ function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardat
 		toCall().then((result) => resolve(result));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("PLOTS_JS.deletePlots_WW", [distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, null], true);
 		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
+	}
+
+	else{
+
+		var res = stringifyFunction("deletePlots", [distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata], true);
+		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => resolve(result));

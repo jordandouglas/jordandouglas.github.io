@@ -73,6 +73,7 @@ function update_DISTANCE_VS_TIME(DISTANCE_VS_TIME_UNSENT){
 
 	if (DISTANCE_VS_TIME_UNSENT == null) return;
 
+	//console.log("DISTANCE_VS_TIME_UNSENT", DISTANCE_VS_TIME_UNSENT);
 
 	// Add the new distance and time values to the pre-existing lists
 	for (var simNum in DISTANCE_VS_TIME_UNSENT){
@@ -119,32 +120,52 @@ function update_DISTANCE_VS_TIME(DISTANCE_VS_TIME_UNSENT){
 
 
 
-function drawPlots(forceUpdate = false){
+function drawPlots(forceUpdate = false, callback = function() { }){
 
-
+	//console.trace();
+	//console.log("drawPlots");
 	
 	// Only make a request if there exists a visible plot
 	//console.log("visibilities", $("#plotDIV1").is(":visible"), $("#plotDIV2").is(":visible"), $("#plotDIV3").is(":visible"), $("#plotDIV4").is(":visible"));
-	if (!$("#plotDIV1").is(":visible") && !$("#plotDIV2").is(":visible") && !$("#plotDIV3").is(":visible") && !$("#plotDIV4").is(":visible")) return;
+	if (!$("#plotDIV1").is(":visible") && !$("#plotDIV2").is(":visible") && !$("#plotDIV3").is(":visible") && !$("#plotDIV4").is(":visible")) {
+		callback();
+		return;
+	}
+
 	
 	var toCall = () => new Promise((resolve) => getPlotData_controller(forceUpdate, resolve));
 	toCall().then((plotData) => {
 
+		//console.log("Called get data got", plotData);
 
-			update_PLOT_DATA(plotData)
-	
-			window.requestAnimationFrame(function(){
-				for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
-					if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "none" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
-					else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
-				}
-			});
-	
-	
+		drawPlotsFromData(plotData, callback)
 	});
 	
 
 }
+
+
+
+function drawPlotsFromData(plotData, resolve = function() { }){
+
+	update_PLOT_DATA(plotData)
+
+	//console.log("drawPlotsFromData");
+	//console.trace();
+
+	window.requestAnimationFrame(function(){
+		for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
+			if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "none" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
+			else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
+		}
+
+		resolve();
+
+	});
+	
+
+}
+
 
 
 
@@ -207,14 +228,13 @@ function selectPlot(plotNum, deleteData = null){
 	var plotSelect = $("#selectPlot" + plotNum);
 	var value = plotSelect.val();
 
-
-
-	
 	
 	// Update the model
 	selectPlot_controller(plotNum, value, deleteData, function(plotData){
 		
 		update_PLOT_DATA(plotData);
+
+		console.log(plotNum, value, "plotData", PLOT_DATA);
 
 		// Delete the canvas and add it back later so it doesn't bug
 		$("#plotCanvas" + plotNum).remove();
@@ -253,7 +273,7 @@ function selectPlot(plotNum, deleteData = null){
 
 
 
-		if ( value != "none") {
+		if (value != "none") {
 
 
 			// If there is a plot display the buttons
@@ -661,10 +681,11 @@ function plotTimeChart(){
 	}
 
 
+	//console.log("DISTANCE_VS_TIME_CONTROLLER", DISTANCE_VS_TIME_CONTROLLER);
+	//console.log("medianTimeSpentOnATemplate", PLOT_DATA["medianTimeSpentOnATemplate"], "medianDistanceTravelledPerTemplate", PLOT_DATA["medianDistanceTravelledPerTemplate"]);
 
 	var index = DISTANCE_VS_TIME_CONTROLLER.length-1; // Index of the last list in the list
 	if (index > 0 && DISTANCE_VS_TIME_CONTROLLER[index]["times"].length == 1) index--; // Use the second last value if this one is empty
-
 
 	for (var j = 0; j < canvasesToPrintTo.length; j ++){
 
@@ -672,8 +693,6 @@ function plotTimeChart(){
 
 		var pltNum = canvasesToPrintTo[j];
 		if ($("#plotDIV" + pltNum).is( ":hidden" )) continue;
-
-		
 
 
 		// Change the time elapsed label
@@ -685,7 +704,7 @@ function plotTimeChart(){
 		var ymin = 0;
 		if (index >=0 && PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["yRange"] == "automaticY"){
 
-
+			//console.log("Looking for index", index, "DISTANCE_VS_TIME_CONTROLLER", DISTANCE_VS_TIME_CONTROLLER);
 			ymin = 0;
 
 			var distTravelled = DISTANCE_VS_TIME_CONTROLLER[index]["distances"][DISTANCE_VS_TIME_CONTROLLER[index]["distances"].length-1];
@@ -751,6 +770,7 @@ function plotTimeChart(){
 
 			var numPoints = 0;
 			for (var trial = 0; trial < DISTANCE_VS_TIME_CONTROLLER.length; trial++){
+				if (DISTANCE_VS_TIME_CONTROLLER[trial] == null) continue;
 				numPoints += DISTANCE_VS_TIME_CONTROLLER[trial]["distances"].length;
 			}
 			if (numPoints > 500000){
@@ -764,7 +784,7 @@ function plotTimeChart(){
 		}
 
 
-
+		//console.log("Plotting values", DISTANCE_VS_TIME_CONTROLLER);
 		step_plot(DISTANCE_VS_TIME_CONTROLLER, [xmin, xmax, ymin, ymax], "plotCanvas" + pltNum, "plotCanvasContainer" + pltNum, "#008CBA", addDashedLines, "Time (s)", "Distance (nt)", PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["canvasSizeMultiplier"]);
 	}
 	
@@ -1651,14 +1671,8 @@ function plot_pause_distribution(){
 
 
 		}
-		
-		
-		
-
-
 
 		meanElongationDuration /= timesToPlot.length;
-		
 		
 		// Print the mean velocity to the html
 		if (isNaN(meanElongationDuration)) meanElongationDuration = 0;
@@ -3780,14 +3794,14 @@ function showPlots(setTo = null){
 
 		$("#showPlots").val("+");
 		$("#plotsTableDIV").slideUp(100);
-		showPlot_controller(true); // Inform the model that the plots are hidden so that it stops sending through data
+		showPlots_controller(true); // Inform the model that the plots are hidden so that it stops sending through data
+
 
 	}else{	// Show the plots
 
 		$("#showPlots").val("-");
 		$("#plotsTableDIV").slideDown(100);
-		showPlot_controller(false);
-
+		showPlots_controller(false);
 
 		drawPlots();
 	}
@@ -4554,15 +4568,6 @@ function heatmapZAxisLegend(){
 }
 
 
-/*
-function pauseHistogramOptionsTemplate(){
-	
-	return `
-		Only display the bottom <input id="displayBottomProportionOf" type="text" style="width:80px; text-align:right"></input> of values.
-	`;
-	
-}
-*/
 
 
 function pauseHistogramOptionsTemplate(){
@@ -4820,6 +4825,9 @@ function plotOptions(plotNum){
 		
 
 		case "distanceVsTime":
+
+			console.log("PLOT_DATA", PLOT_DATA);
+
 			$("#settingCell1").html(distanceVsTimeOptionsTemplate1().replace("XUNITS", "s").replace("XUNITS", "s"));
 			$("#settingCell2").html(distanceVsTimeOptionsTemplate2().replace("YUNITS", "nt").replace("YUNITS", "nt").replace("YMINDEFAULT", 10).replace("YMAXDEFAULT", 100));
 
@@ -4904,8 +4912,6 @@ function plotOptions(plotNum){
 			$('input[name="timeSpaceX"][value="' + PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["timeSpaceX"] + '"]').prop('checked', true)
 			$('input[name="timeSpaceY"][value="' + PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["timeSpaceY"] + '"]').prop('checked', true)
 
-			//$("#displayBottomProportionOf").val(roundToSF(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["displayBottomProportionOf"] ));
-
 
 			break;
 		
@@ -4921,7 +4927,7 @@ function plotOptions(plotNum){
 
 		
 		case "parameterHeatmap": 
-
+			
 
 			// X-axis parameter
 			$("#settingCell1").html(customPlotSelectParameterTemplate());
@@ -4931,7 +4937,7 @@ function plotOptions(plotNum){
 			get_PHYSICAL_PARAMETERS_controller(function(params){
 				console.log("params",params, params.length);
 				for (var paramID in params){
-					if (!params[paramID]["hidden"] && !params[paramID]["binary"]) {
+					if (!params[paramID]["hidden"] && !params[paramID]["binary"] && params[paramID].name != null) {
 						$("#customParamX").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
 						$("#customParamY").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
 						$("#customParamZ").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);

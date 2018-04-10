@@ -1238,7 +1238,11 @@ FE_JS.getStateDiagramInfo_WW = function(resolve, msgID){
 
 	var toReturn = {};
 
-	toReturn["currentState"] = WW_JS.currentState;
+
+	toReturn.NTPbound = WW_JS.currentState.NTPbound;
+	toReturn.activated = WW_JS.currentState.activated;
+	toReturn.mRNAPosInActiveSite = WW_JS.currentState.mRNAPosInActiveSite;
+	toReturn.mRNALength = WW_JS.currentState.mRNALength-1;
 
 
 	// Calculate all terms for the state where the pol is pretranslocated unbound and activated in the appropriate position
@@ -1274,7 +1278,8 @@ FE_JS.getStateDiagramInfo_WW = function(resolve, msgID){
 
 	stateToCalculateFor["activated"] = true; 
 	toReturn["kbind"] = stateToCalculateFor["rateOfBindingNextBase"]; 
-
+	toReturn["KD"] = PHYSICAL_PARAMETERS.Kdiss.val;
+	toReturn["Kt"] = toReturn["k +1,0"] / toReturn["k 0,+1"];
 
 	// TODO: get this working without using update_bindingPeakHeights_WW
 	if (false && FE_JS.currentElongationModel == "twoSiteBrownian"){
@@ -1406,7 +1411,8 @@ FE_JS.getNTPCanvasData_WW = function(resolve, msgID){
 	if (resolve === undefined) resolve = function() {};
 	if (msgID === undefined) msgID = null;
 
-	var toReturn = {state: STATE_JS.convertFullStateToCompactState(WW_JS.currentState), kU: PARAMS_JS.PHYSICAL_PARAMETERS["kU"]["val"], kA: PARAMS_JS.PHYSICAL_PARAMETERS["kA"]["val"], allowDeactivation:  FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel].allowInactivation};
+	var state = STATE_JS.convertFullStateToCompactState(WW_JS.currentState);
+	var toReturn = {NTPbound: state[2], activated: state[3], kU: PARAMS_JS.PHYSICAL_PARAMETERS["kU"]["val"], kA: PARAMS_JS.PHYSICAL_PARAMETERS["kA"]["val"], allowDeactivation:  FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel].allowInactivation};
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
 	}else{

@@ -71,7 +71,7 @@ PLOTS_JS.whichPlotInWhichCanvas = {};
 
 
 
- PLOTS_JS.refreshPlotData = function(){
+PLOTS_JS.refreshPlotData = function(){
 
 
  	
@@ -182,7 +182,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 
 // Returns a string of the sequence stored inside primerSequence / templateSequence / complementSequence
- getSequenceOfObject_WW = function(nt_obj){
+getSequenceOfObject_WW = function(nt_obj){
 	
 	var seq = "";
 	for (var i = 1; i < nt_obj.length; i ++){
@@ -196,7 +196,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 
 
- PLOTS_JS.getPlotData_WW = function(forceUpdate = false, resolve = function(plotData) { }, msgID = null){
+PLOTS_JS.getPlotData_WW = function(forceUpdate = false, resolve = function(plotData) { }, msgID = null){
 	
 
 	var plotData = {};
@@ -358,7 +358,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 }
 
 
- PLOTS_JS.plots_complete_simulation_WW = function(){
+PLOTS_JS.plots_complete_simulation_WW = function(){
 
 
  	/*
@@ -396,7 +396,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 }
 
 
- PLOTS_JS.updatePlotData_WW = function(stateC, actionsToDo, reactionTime){
+PLOTS_JS.updatePlotData_WW = function(stateC, actionsToDo, reactionTime){
 
  	
 
@@ -496,7 +496,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 
 
- PLOTS_JS.showPlot_WW = function(isHidden){
+ PLOTS_JS.showPlots_WW = function(isHidden){
 
 	PLOTS_JS.plotsAreHidden = isHidden;
 
@@ -600,9 +600,9 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 }
 
 
- PLOTS_JS.saveSettings_WW = function(plotNum, plotType, values, resolve = function() { }, msgID = null ){
+PLOTS_JS.saveSettings_WW = function(plotNum, plotType, values, resolve = function() { }, msgID = null ){
 
-
+	
 	switch(plotType){
 
 
@@ -617,7 +617,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 			}
 
 
-			if (values[0] == "automaticY") PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
+			if (values[1] == "automaticY") PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yRange"] = "automaticY";
 			else{
 				var yMin = Math.max(parseFloat(values[1][0]), 1);
 				var yMax = Math.max(parseFloat(values[1][1]), yMin+1);
@@ -627,7 +627,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 			break;
 
-		case "pauseHistogram": // Save the proportion of values to display
+		case "pauseHistogram": 
 			PLOTS_JS.whichPlotInWhichCanvas[plotNum]["perTime"] = values[0];
 
 
@@ -835,7 +835,7 @@ PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW = function(resolve = function() { 
 
 
 
- PLOTS_JS.update_custom_plot_data_WW = function(){
+PLOTS_JS.update_custom_plot_data_WW = function(){
 
 
 
@@ -1208,7 +1208,7 @@ if (RUNNING_FROM_COMMAND_LINE){
 		getPlotData_WW: PLOTS_JS.getPlotData_WW,
 		plots_complete_simulation_WW: PLOTS_JS.plots_complete_simulation_WW,
 		updatePlotData_WW: PLOTS_JS.updatePlotData_WW,
-		showPlot_WW: PLOTS_JS.showPlot_WW,
+		showPlots_WW: PLOTS_JS.showPlots_WW,
 		selectPlot_WW: PLOTS_JS.selectPlot_WW,
 		saveSettings_WW: PLOTS_JS.saveSettings_WW,
 		delete_plot_data_WW: PLOTS_JS.delete_plot_data_WW,

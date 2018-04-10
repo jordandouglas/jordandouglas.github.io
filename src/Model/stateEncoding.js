@@ -50,7 +50,7 @@ STATE_JS.initTranslocationRateCache = function(){
 
 
 
- STATE_JS.updateCoordsOfcurrentState = function(){
+STATE_JS.updateCoordsOfcurrentState = function(){
 
 
  	if (RUNNING_FROM_COMMAND_LINE) return;
@@ -58,8 +58,11 @@ STATE_JS.initTranslocationRateCache = function(){
 
 	// Coordinates of pol
 	var h = PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"];
-	var polX = 165 + 25 * (WW_JS.currentState["rightMBase"] - h + 1);
+	//console.log(WW_JS.currentState["leftMBase"]);
+	//var polX = 165 + 25 * (WW_JS.currentState["rightMBase"] - h + 1); // - HTMLobjects["pol"].width);
+	var polX = 165 + 25 * (WW_JS.currentState["leftMBase"]); // - HTMLobjects["pol"].width);
 	var polY = 81;
+
 	WW_JS.move_obj_absolute("pol", polX, polY, 1);
 	WW_JS.change_src_of_object_WW(HTMLobjects["pol"], WW_JS.currentState["activated"] ? "pol" : "pol_U"); // Activated or deactivated?
 
@@ -74,11 +77,11 @@ STATE_JS.initTranslocationRateCache = function(){
 		if (i == 0) ntX = 150;
 
 		// Y value determined by whether it is part of hybrid, bubble or on the bottom
-
 		var ntY = 207;
-		if (i <= WW_JS.currentState["leftMBase"] &&  i > WW_JS.currentState["leftMBase"]  - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0) dy += -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)
-		if (i > WW_JS.currentState["rightMBase"] && i < WW_JS.currentState["rightMBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1) dy += 52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)
-
+		if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) == "ss"){
+			if (i <= WW_JS.currentState["leftMBase"] &&  i > WW_JS.currentState["leftMBase"]  - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0) dy += -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)
+			if (i > WW_JS.currentState["rightMBase"] && i < WW_JS.currentState["rightMBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1) dy += 52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)
+		} else ntY -= 52;
 		//if (SEQS_JS.all_sequences[sequenceID]["primer"] != "dsRNA") 
 		//for (i = state["leftMBase"] - 1; UPDATE_COORDS &&  i > state["leftMBase"] - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) - 1 && i >= 0; i--) WW_JS.move_nt_WW(i, "m", 0, -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
 
@@ -104,8 +107,10 @@ STATE_JS.initTranslocationRateCache = function(){
 		// Y value determined by whether it is part of hybrid, bubble or on the bottom
 
 		var ntY = 78;
-		if (i <= WW_JS.currentState["leftGBase"] &&  i > WW_JS.currentState["leftGBase"]  - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0) dy += 52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)
-		if (i > WW_JS.currentState["rightGBase"] && i < WW_JS.currentState["rightGBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1) dy += -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)
+		if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) == "ss"){
+			if (i <= WW_JS.currentState["leftGBase"] &&  i > WW_JS.currentState["leftGBase"]  - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) && i >= 0) dy += 52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1)
+			if (i > WW_JS.currentState["rightGBase"] && i < WW_JS.currentState["rightGBase"] + (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1) + 1) dy += -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleRight"]["val"]+1)
+		} else ntY += 52;
 
 		//if (SEQS_JS.all_sequences[sequenceID]["primer"] != "dsRNA") 
 		//for (i = state["leftMBase"] - 1; UPDATE_COORDS &&  i > state["leftMBase"] - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) - 1 && i >= 0; i--) WW_JS.move_nt_WW(i, "m", 0, -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
@@ -292,7 +297,7 @@ STATE_JS.getTranslocationRates = function(compactState){
 
 
 
- STATE_JS.buildBacktrackRateTable = function(){
+STATE_JS.buildBacktrackRateTable = function(){
 	
 	
 	// Once the polymerase has entered state -2 (ie backtracked by 2 positions) then all backtracking rates 

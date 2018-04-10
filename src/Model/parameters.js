@@ -63,8 +63,8 @@ PARAMS_JS.PHYSICAL_PARAMETERS["RateMisbind"] = {distribution:"Fixed", fixedDistn
 PARAMS_JS.PHYSICAL_PARAMETERS["TransitionTransversionRatio"] = {distribution:"Fixed", fixedDistnVal: 4, name: "Transition:transversion", title: "How much more likely is a transition mis-binding event than a transversion mis-binding event", zeroTruncated: "exclusive", integer: false, hidden:true};
 
 
-PARAMS_JS.PHYSICAL_PARAMETERS["kU"] = {distribution:"Fixed", fixedDistnVal: 0.05, name: "kU (s\u207B\u00B9)", name: "k_{U}  (s^{\u22121\u2009})", title: "Rate constant of polymerase entering the unactive state", zeroTruncated: "inclusive", integer: false, hidden:true};
-PARAMS_JS.PHYSICAL_PARAMETERS["kA"] = {distribution:"Fixed", fixedDistnVal: 3, name: "kA (s\u207B\u00B9)", name: "k_{A}  (s^{\u22121\u2009})", title: "Rate constant of polymerase leaving the unactive state", zeroTruncated: "inclusive", integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["kU"] = {distribution:"Fixed", fixedDistnVal: 0.05, name: "kU (s\u207B\u00B9)", latexName: "k_{U}  (s^{\u22121\u2009})", title: "Rate constant of polymerase entering the unactive state", zeroTruncated: "inclusive", integer: false, hidden:true};
+PARAMS_JS.PHYSICAL_PARAMETERS["kA"] = {distribution:"Fixed", fixedDistnVal: 3, name: "kA (s\u207B\u00B9)", latexName: "k_{A}  (s^{\u22121\u2009})", title: "Rate constant of polymerase leaving the unactive state", zeroTruncated: "inclusive", integer: false, hidden:true};
 //PARAMS_JS.PHYSICAL_PARAMETERS["kUspecial"] = {distribution:"Fixed", fixedDistnVal: 1, name: "kU' (s\u207B\u00B9)", title: "Rate of entry into unactivated state multiplier at edit site", zeroTruncated: true, integer: false, hidden:true};
 //PARAMS_JS.PHYSICAL_PARAMETERS["kAspecial"] = {distribution:"Fixed", fixedDistnVal: 1, name: "kA' (s\u207B\u00B9)", title: "Rate of entry into activated state multiplier at edit site", zeroTruncated: true, integer: false, hidden:true};
 

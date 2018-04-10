@@ -109,12 +109,7 @@ function parseXML_plots_WW(attr, values){
 	
 	PLOTS_JS.selectPlot_WW(plotNum, values["name"], null, false); // Initialise the plot
 	for (var prop in values){
-		if (prop != "name" && prop != "xRange" && prop != "yRange") PLOTS_JS.whichPlotInWhichCanvas[plotNum][prop] = values[prop]; // Copy all the settings over
-		else if (prop != "xRange" || prop != "yRange"){
-			splitVal = values[prop].split(",");
-			if (splitVal.length == 1) PLOTS_JS.whichPlotInWhichCanvas[plotNum][prop] = values[prop]; // Copy over string settings
-			else if (splitVal.length == 2) PLOTS_JS.whichPlotInWhichCanvas[plotNum][prop] = [parseFloat(splitVal[0]), parseFloat(splitVal[1])]; // Else split into two parts
-		}
+		if (prop != "name") PLOTS_JS.whichPlotInWhichCanvas[plotNum][prop] = values[prop]; // Copy all the settings over
 	}
 
 	
