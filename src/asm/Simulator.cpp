@@ -23,6 +23,7 @@
 #include "Settings.h"
 #include "Simulator.h"
 #include "State.h"
+#include "Plots.h"
 //#include "sfmt/include/sfmt/SFMT.h"
 #include "randomc/randomc.h"
 //#include "RandomLib/Random.hpp"
@@ -32,7 +33,6 @@
 //#include "RandomTest-master/CmDistribution.h"
 
 #include <iostream>
-#include <vector>
 #include <random>
 #include <chrono>
 #include <ctime>
@@ -48,34 +48,23 @@ Simulator::Simulator(){
 	random_device rd; 
 	sfmt = new CRandomMersenne(rd());
 
-	simulateForMilliSeconds = -1;
+	simulateForSeconds = -1;
+	this->animatingGUI = false;
 
 }
-
-
-
-/*
-void Simulator::timer_start(unsigned int interval) {
-    thread([interval]() {
-        this_thread::sleep_for(chrono::milliseconds(interval));
-        cout << "Time's up" << endl;
-    }).detach();
-}
-*/
 
 
 
 // Returns the mean velocity acros N trials
 double Simulator::perform_N_Trials(int N, State* state, bool verbose){
 
+	// Generate plots?
+	if (_plotFolderName != "") Plots::init();
 
-
-	//Simulator::timer_start(1000);
-
-	//Settings::print();
 
 	//currentModel->print();
-	simulateForMilliSeconds = -1; 
+	simulateForSeconds = -1; 
+	this->animatingGUI = false;
 	
 	if (verbose) {
 		cout << "Performing " << N << " trials" << endl;
@@ -92,15 +81,18 @@ double Simulator::perform_N_Trials(int N, State* state, bool verbose){
 
 	double meanMeanVelocity = 0;
 	double meanMeanTime = 0;
-	//vector<double> velocities(N);
-	//vector<double> times(N);
 	State* clonedState;
+	double result[3];
 	for (int n = 1; n <= N; n ++){
 		if (verbose && (n == 1 || n % 100 == 0)) cout << "Starting trial " << n << endl;
 
-		double result[2];
+		result[0] = 0;
+		result[1] = 0;
+		result[2] = 0;
 		clonedState = state->clone();
+		if (_plotFolderName != "") Plots::refreshPlotData(clonedState); // New simulation -> refresh plot data
 		performSimulation(clonedState, result);
+		Plots::updateParameterPlotData(clonedState); // Update parameter plot before starting next trial
 		delete clonedState;
 		meanMeanVelocity += result[0] / N;
 		meanMeanTime += result[1] / N;
@@ -131,56 +123,175 @@ double Simulator::perform_N_Trials(int N, State* state, bool verbose){
 		cout << "Mean time to copy template = " << meanMeanTime << "s" << endl;
 	}
 
-
+	_GUI_simulating = false;
 	return meanMeanVelocity;
 
 
 }
 
 
-// Performs upto N trials and then returns with whatever progress has been made after msUntilStop has elapsed
-void Simulator::perform_N_Trials_and_stop(int N, State* state, double msUntilStop, double* toReturn){
+// Initialises N trials to be performed in hidden or animation mode. Does not simulate
+void Simulator::initialise_GUI_simulation(int N, double msUntilStop){
 
-	nTrialsTotalGUI = N;
-	nTrialsCompletedGUI = 0;
-	simulateForMilliSeconds = msUntilStop;
-	delete currentGUIState;
+	this->nTrialsTotalGUI = N;
+	this->nTrialsCompletedGUI = 0;
+	this->simulateForSeconds = msUntilStop / 1000;
 
+}
+
+
+// Samples a single action in animated mode. Does not perform the action, it just returns the action (or a list of actions)
+list<int> Simulator::sample_action_GUI(){
+
+	// Upto 3 reactions may be sampled at a time (depending on equilibrium assumptions)
+	this->actionsToReturn.clear();
+	this->animatingGUI = true;
+
+
+	// Move onto next trial if terminated
+	if (_currentStateGUI->isTerminated()) {
+		Plots::updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
+		delete _currentStateGUI;
+		_currentStateGUI = new State(true, true);
+		this->nTrialsCompletedGUI++;
+		Settings::sampleAll(); // Resample the parameters
+		Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
+
+		// Return now if have performed all N trials
+		if (this->nTrialsCompletedGUI >= this->nTrialsTotalGUI) return this->actionsToReturn;
+
+	}
+
+
+	// This function will populate the list of actions to do but won't actually do them
+	double result[3];
+	performSimulation(_currentStateGUI, result);
+
+	return this->actionsToReturn;
+
+}
+
+
+
+
+// Performs upto N trials and then returns with whatever progress has been made after msUntilStop has elapsed. 
+void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
+
+	this->animatingGUI = false;
 	//this->timer_start(1000);
 
 	// Simulate until time elapses
 	double meanMeanVelocity = 0;
 	double meanMeanTime = 0;
-	State* initialState = new State(true);
-	State* clonedState;
-	for (int n = 1; n <= N; n ++){
-		if (n == 1 || n % 100 == 0) cout << "Starting trial " << n << endl;
+	double result[3];
+	for (int n = 1; n <= nTrialsTotalGUI; n ++){
+		//if (n == 1 || n % 100 == 0) cout << "Starting trial " << n << endl;
 
-		double result[2];
-		clonedState = initialState->clone();
-		performSimulation(clonedState, result);
 
-		// If the velocity -1, then the current simulation was interrupted by a timeout
-		if (result[0] < 0){
-			currentGUIState = clonedState;
+
+		result[0] = 0;
+		result[1] = 0;
+		result[2] = 0;
+		Settings::sampleAll(); // Resample the parameters
+		Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
+		performSimulation(_currentStateGUI, result);
+
+
+		// If 3rd element is 0, then the current simulation was interrupted by a timeout
+		if (result[2] == 0){
+			//cout << "Stopped simulation after timeout - completed " << (n-1) << " trials" << endl;
 			inSimulationTimeElapsedCurrentSimulation = result[1];
+			meanMeanVelocity = meanMeanVelocity / (n-1);
+
+			toReturn[0] = meanMeanVelocity;
+			toReturn[1] = double(n-1);
+			toReturn[2] = 0; // Have not finished yet
+			return;
 		}
+
 		else {
 			nTrialsCompletedGUI++;
 			meanMeanVelocity += result[0];
 			meanMeanTime += result[1];
-			delete clonedState;
+
+			Plots::updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
+			delete _currentStateGUI;
+			_currentStateGUI = new State(true, true);
 		}
 
 	}
+
+	meanMeanVelocity = meanMeanVelocity / nTrialsTotalGUI;
+	toReturn[0] = meanMeanVelocity;
+	toReturn[1] = double(nTrialsTotalGUI);
+	toReturn[2] = 1; // Finished simulating
+	_GUI_simulating = false;
+	return;
 
 
 
 }
 
 
-// Resumes the trials initiated by perform_N_Trials_and_stop() and then returns with whatever progress has been made after msUntilStop has elapsed
-void Simulator::resume_trials(double* toReturn){
+// Resumes the trials initiated by perform_N_Trials_and_stop_GUI() and then returns with whatever progress has been made after msUntilStop has elapsed
+void Simulator::resume_trials_GUI(double* toReturn){
+
+
+	this->animatingGUI = false;
+	
+	// Simulate until time elapses
+	double meanMeanVelocity = 0;
+	double meanMeanTime = 0;
+
+	// Resume simulating from the previous state and with the same time elapsed
+	double result[3];
+	result[0] = 0;
+	result[1] = inSimulationTimeElapsedCurrentSimulation;
+	result[2] = 0;
+
+	for (int n = nTrialsCompletedGUI+1; n <= nTrialsTotalGUI; n ++){
+		//if (n == 1 || n % 100 == 0) cout << "Starting trial " << n << endl;
+
+
+		performSimulation(_currentStateGUI, result);
+
+
+		// If 3rd element is 0, then the current simulation was interrupted by a timeout
+		if (result[2] == 0){
+			//cout << "Stopped simulation after timeout - completed " << (n-1) << " trials" << endl;
+			inSimulationTimeElapsedCurrentSimulation = result[1];
+			meanMeanVelocity = meanMeanVelocity / (n-1);
+			toReturn[0] = meanMeanVelocity;
+			toReturn[1] = double(n-1);
+			toReturn[2] = 0; // Have not finished yet
+			return;
+		}
+		else {
+			nTrialsCompletedGUI++;
+			meanMeanVelocity += result[0];
+			meanMeanTime += result[1];
+
+		}
+
+
+		// Restart from initial state for the next simulation
+		Plots::updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
+		delete _currentStateGUI;
+		_currentStateGUI = new State(true, true);
+		result[0] = 0;
+		result[1] = 0;
+		result[2] = 0;
+
+		Settings::sampleAll(); // Resample the parameters
+		Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
+
+	}
+
+	meanMeanVelocity = meanMeanVelocity / nTrialsTotalGUI;
+	toReturn[0] = meanMeanVelocity;
+	toReturn[1] = double(nTrialsTotalGUI);
+	toReturn[2] = 1; // Finished simulating
+	return;
 
 
 }
@@ -199,6 +310,20 @@ double Simulator::runif(){
 }
 
 
+
+
+// Returns the total number of GUI trials
+int Simulator::getNtrialsTotal_GUI(){
+	return this->nTrialsTotalGUI;
+}
+
+
+// Returns the number of GUI trials remaining
+int Simulator::getNtrialsCompleted_GUI(){
+	return this->nTrialsCompletedGUI;
+}
+
+
 void Simulator::performSimulation(State* s, double* toReturn) {
 
 
@@ -210,16 +335,37 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 	int lastBaseTranscribed = s->get_nascentLength();
 	double timeElapsedSinceLastCatalysis = 0;
 
-	chrono::system_clock::time_point startTime;
-	if (simulateForMilliSeconds != -1) startTime = chrono::system_clock::now();
+
+	// GUI timeout function
+	int niterationsUntilLastTimeoutCheck = 0;
+	int checkTimeoutEveryNIterations = 1000;
 	
-	while(!s->isTerminated() && !stop){
+	while(!s->isTerminated()){
 
 
 
 		// Check if GUI timeout has been reached (if there is a timeout)
-		if (simulateForMilliSeconds != -1){
-			auto timeElapsed = chrono::system_clock::now();
+		if (simulateForSeconds != -1 && _animationSpeed == "hidden"){
+			niterationsUntilLastTimeoutCheck ++;
+
+			// Make time comparison only once in a while because this operation is slow
+			if (niterationsUntilLastTimeoutCheck >= checkTimeoutEveryNIterations){
+				niterationsUntilLastTimeoutCheck = 0;
+				chrono::duration<double> elapsed_seconds = chrono::system_clock::now() - _interfaceSimulation_startTime;
+				double time = elapsed_seconds.count();
+				if (time >= simulateForSeconds){
+
+
+					cout << "Timeout reached " << time << endl;
+					// If timeout has been reached then return the current time elapsed
+					toReturn[0] = 0;
+					toReturn[1] += timeElapsed; // Total time taken
+					toReturn[2] = 0; // Failure
+					return;
+
+				} 
+
+			}
 
 		} 
 
@@ -227,11 +373,15 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 		// Arrest if timeout has been reached
 		if (arrestTime->getVal() != 0 && timeElapsedSinceLastCatalysis >= arrestTime->getVal()){
+			s->set_terminated(true);
 			break;
 		}
 
 
-		if (s->get_mRNAPosInActiveSite() <= 1 && s->get_mRNAPosInActiveSite() + s->get_nascentLength() + 1 > templateSequence.length()) break;
+		if (s->get_mRNAPosInActiveSite() <= 1 && s->get_mRNAPosInActiveSite() + s->get_nascentLength() + 1 > templateSequence.length()) {
+			s->set_terminated(true);
+		 	break;
+		}
 
 
 		// If NTP is not bound and we are in posttranslocated state, and user has requested to assume binding equilibrium but NOT translocation
@@ -253,28 +403,29 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 													&& (s->get_mRNAPosInActiveSite() == 0 || s->get_mRNAPosInActiveSite() == 1) && !s->NTPbound();
 
 
-		bool nothingEquilibrium = !justBindingEquilibrium && !justTranslocationEquilibrium && !bindingAndTranslocationEquilibrium;
-
-
-
-
+		bool nothingEquilibrium = !currentModel->get_assumeBindingEquilibrium() && !currentModel->get_assumeTranslocationEquilibrium();
 
 
 
 		bool beforeEndOfTemplate = s->get_nascentLength() + 1 < templateSequence.length();
 		bool afterStartOfTemplate = s->get_nascentLength() > s->get_initialLength();
 		double geometricTime = -1;
-		if (currentModel->get_allowGeometricCatalysis() && beforeEndOfTemplate && afterStartOfTemplate && !bindingAndTranslocationEquilibrium && (s->get_mRNAPosInActiveSite() == 0 || s->get_mRNAPosInActiveSite() == 1)){
+
+		// Geometric speed boost whereby the number of cycles spent in a set of states is sampled from the geometric distribution. 
+		// This is faster because the inner loop is smaller, especially when the back and forth rate is very high eg. NTP binding/release
+		if (currentModel->get_allowGeometricCatalysis() && beforeEndOfTemplate && afterStartOfTemplate && !bindingAndTranslocationEquilibrium && s->get_activated() && (s->get_mRNAPosInActiveSite() == 0 || s->get_mRNAPosInActiveSite() == 1)){
 
 
-			// Geometric sampling speed boost for when nothing is kinetic (and backtracking/hypertranslocation prohibited)
+			
+
+			// Geometric sampling speed boost for when nothing is at equilibrium (and backtracking/hypertranslocation prohibited)
 			if (nothingEquilibrium && !currentModel->get_allowBacktracking() && !currentModel->get_allowHypertranslocation() && s->get_mRNAPosInActiveSite() == 1) {
 				geometricTime = geometricTranslocationBindingSampling(s);
 			}
 
 
 			// Geometric sampling speed boost for when just binding is kinetic (or both kinetic but backtracking/hypertranslocation are not prohibited)
-			else if ((nothingEquilibrium && s->get_mRNAPosInActiveSite() == 1) || justTranslocationEquilibrium){
+			/*else*/ if ((nothingEquilibrium && s->get_mRNAPosInActiveSite() == 1) || justTranslocationEquilibrium){
 				geometricTime = geometricBindingSampling(s);
 			}
 
@@ -289,6 +440,12 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 		// Geometric sampling was a success. End of trial
 		if (geometricTime != -1){
+
+
+			// If animation mode then return right away
+			if (this->animatingGUI) return;
+
+
 			//cout << "geometricTime" << endl;
 			timeElapsed += geometricTime;
 			if (s->get_nascentLength() != lastBaseTranscribed){
@@ -307,8 +464,9 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			double kBck = s->calculateBackwardRate(true, false);
 			double kFwd = s->calculateForwardRate(true, false);
 			double kRelease = s->calculateReleaseNTPRate(false);
-			double kBindOrCat = s->calculateBindNTPrate(false);
-
+			double kBindOrCat = s->calculateBindOrCatNTPrate(false);
+			double kActivate = s->calculateActivateRate(false);
+			double kDeactivate = s->calculateDeactivateRate(false);
 
 
 
@@ -336,6 +494,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				kBindOrCat = kCat->getVal() * probabilityBound; // Can only catalyse if NTP bound
 				kFwd = kFwd * probabilityUnbound; // Can only translocate if NTP is not bound
 				kBck = kBck * probabilityUnbound;
+				kDeactivate = kDeactivate * probabilityUnbound; // Can only deactivate if NTP is not bound
 
 
 			}
@@ -343,7 +502,6 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 			// Assume equilbirium between pre and post translocated states but NOT between bound and unbound states
 			else if (justTranslocationEquilibrium){
-
 
 				// Get rate of translocating from 0 to -1
 				int currentTranslocationPosition = s->get_mRNAPosInActiveSite();
@@ -368,18 +526,20 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				double probabilityPosttranslocated = 1;
 				double probabilityPretranslocated = 0;
 
-				if (eqConstantFwdTranslocation != INFINITY){
+				if (eqConstantFwdTranslocation != INFINITY && eqConstantFwdTranslocation != 0){
 					probabilityPosttranslocated = eqConstantFwdTranslocation / (eqConstantFwdTranslocation + 1);
 					probabilityPretranslocated = 1 - probabilityPosttranslocated;
 				}
 
 
 				//console.log("k0_1", k0_1, "k1_0", k1_0, "probabilityPosttranslocated", probabilityPosttranslocated);
-				
+
 
 				// Can only bind NTP if not beyond the end of the sequence, go forward to terminate
-				if (s->get_mRNAPosInActiveSite() + 1 < templateSequence.length()) kBindOrCat = s->calculateBindNTPrate(true) * probabilityPosttranslocated;
+				if (s->get_activated() && s->get_mRNAPosInActiveSite() + 1 < templateSequence.length()) kBindOrCat = s->calculateBindOrCatNTPrate(true) * probabilityPosttranslocated;
 				else kBindOrCat = 0;
+
+				//cout << "kBindOrCat " << kBindOrCat << " eqConstantFwdTranslocation " << eqConstantFwdTranslocation << endl;
 
 
 				kFwd = k1_2 * probabilityPosttranslocated; // Can only enter hypertranslocated state from posttranslocated
@@ -422,11 +582,11 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				double boltzmannG0 = 0;
 				double boltzmannG1 = 1;
 				double boltzmannGN = 0;
-				if (k1_0 != 0){
+				if (k1_0 != 0 && s->getLeftTemplateBaseNumber() >= 1 && s->getLeftTemplateBaseNumber() - bubbleLeft->getVal() -1 > 2){
 					boltzmannG0 = 1;
 					boltzmannG1 = k0_1 / k1_0;
 				}
-				
+
 
 				//console.log("sampledBaseToAdd", sampledBaseToAdd);
 
@@ -434,8 +594,8 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				// Get KD and [NTP]
 				if (s->get_mRNAPosInActiveSite() + 1 < templateSequence.length()){
 
-
-					kBindOrCat = s->calculateBindNTPrate(true);
+					kBindOrCat = s->calculateBindOrCatNTPrate(true);
+					
 					if (kBindOrCat != 0){
 
 						double NTPconcentration = 0;
@@ -453,10 +613,6 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 					}
 
 				}
-
-
-
-
 
 			
 
@@ -477,10 +633,6 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				double probabilityPosttranslocated = boltzmannG1 / normalisationZ;
 				double probabilityBound = boltzmannGN / normalisationZ;
 			
-
-
-				//console.log("probabilityPretranslocated", probabilityPretranslocated, "probabilityPosttranslocated", probabilityPosttranslocated, "probabilityBound", probabilityBound);
-
 			
 
 				// Can only catalyse if not beyond the end of the sequence, go forward to terminate
@@ -491,24 +643,15 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 				kFwd = k1_2 * probabilityPosttranslocated; // Can only enter hypertranslocated state from posttranslocated
 				kBck = k0_minus1 * probabilityPretranslocated; // Can only backtrack from pretranslocated
-
-				//console.log("probabilityPretranslocated", probabilityPretranslocated, "probabilityPosttranslocated", probabilityPosttranslocated, "probabilityBound", probabilityBound);
+				kDeactivate = kDeactivate * (probabilityPosttranslocated + probabilityPretranslocated); // Can only deactivate from post and pretranslocated states
 
 
 
 			}
 
 
-			//s->print();
-			double rates[] = { kBck, kFwd, kRelease, kBindOrCat };
+			double rates[] = { kBck, kFwd, kRelease, kBindOrCat, kActivate, kDeactivate };
 			int numReactions = (sizeof(rates)/sizeof(*rates));
-			//cout << "kfwd = " << s->calculateForwardRate(true) << endl;
-
-			//cout << rates[0] << "," << rates[1] << "," << rates[2] << "," << rates[3] << "|" << numReactions << endl;
-
-
-
-
 
 			double rateSum = 0;
 			for (int i = 0; i < numReactions; i ++) {
@@ -540,11 +683,8 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			}
 			
 			
-			
 			double reactionTime = rexp(rateSum); // Random exponential
 			
-			
-
 			//cout << "sampled reaction " << reactionToDo  << ", time elapsed = " << timeElapsed << endl;
 
 			int actionsToDoList[3] = {reactionToDo, -2, -2};
@@ -617,11 +757,23 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
 
-			// Apply the reaction(s)
+
+
+			// Apply the reaction(s) unless in animation mode
 			for (int i = 0; i < 3; i ++){
 				if (actionsToDoList[i] == -2) break;
-				executeAction(s, actionsToDoList[i]);
+
+				// Update the plots immediately before the final reaction in the list has been applied
+				if ((_USING_GUI || _plotFolderName != "") && (i == 2 || actionsToDoList[i+1] == -2)) Plots::updatePlotData(s, actionsToDoList, reactionTime);
+
+				if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
+				else this->actionsToReturn.push_back(actionsToDoList[i]);
+
 			}
+
+
+			// Return now if in animation mode
+			if (this->animatingGUI) return;
 
 
 			timeElapsed += reactionTime;
@@ -638,7 +790,11 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 		//s.print();
 	}
 	
-	
+
+	// Total time taken
+	toReturn[1] += timeElapsed;
+	timeElapsed = toReturn[1];
+
 	// Calculate mean velocity
 	int distanceTravelled = s->get_nascentLength() - s->get_initialLength();
 	double velocity = distanceTravelled / timeElapsed;
@@ -649,26 +805,35 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 	*/
 	//cout << s->get_initialLength() << ";" "distanceTravelled = " << distanceTravelled << endl;
 	toReturn[0] = velocity;
-	toReturn[1] = timeElapsed;
-	
+	toReturn[2] = 1; // Success
 	
 }
+
 
 
 // Assumes binding to be at equilibrium
 double Simulator::geometricTranslocationSampling(State* s){
 
-	if (s->isTerminated()) return 0;
-	if (s->NTPbound()) return 0;
-	if (s->get_mRNAPosInActiveSite() != 1) return 0;
+	if (s->isTerminated()) return -1;
+	if (!s->get_activated()) return -1;
+	if (s->NTPbound()) return -1;
+	if (s->get_mRNAPosInActiveSite() != 1) return -1;
 
-
+	//cout << "geometricTranslocationSampling" << endl;
 
 	// Get forward and backward rates
 	double kBck = s->calculateBackwardRate(true, true);
 	s->backward(); 
 	double kFwd  = s->calculateForwardRate(true, true);
 	s->forward();
+
+
+	// Deactivate rate
+	double kDeactivate = s->calculateDeactivateRate(false);
+
+
+	//s->print();
+	//cout << "geometricTranslocationSampling kbck " << kBck << endl;
 
 
 	// Get time spent in bound and unbound states
@@ -689,31 +854,67 @@ double Simulator::geometricTranslocationSampling(State* s){
 	// Mofify the rates
 	double kcat = kCat->getVal() * probabilityBound; // Can only catalyse if NTP bound
 	kBck = kBck * probabilityUnbound; // Can only translocate if NTP is not bound
+	double kDeactPost = kDeactivate * probabilityUnbound; // Can only deactivate in postranslocated state if NTP is not bound (or any time in pretranslocated state)
 
 
-	// While next action is not catalysis
-	double rate = kBck + kcat; 
+
+	// Rate of going back then forward, vs back then deactivate
+	double kFwdInact = kFwd + kDeactivate;
+	double kBckFwd = kBck * kFwd / kFwdInact;
+	double kBckInact = kBck * kDeactivate / kFwdInact;
+
+
+	double rate = kBck + kcat + kDeactPost;
 
 
 	// Keep sampling until it is NOT back-forward
 	double runifNum = runif() * rate;
 	double totalReactionTime = 0;
-	while(runifNum < kBck){
+	while(runifNum < kBckFwd){
 		totalReactionTime += rexp(rate);  // Time taken to go back
-		totalReactionTime += rexp(kFwd); // Time taken to come forward again
+		totalReactionTime += rexp(kFwdInact); // Time taken to come forward again without inactivating
 		runifNum = runif() * rate;
 	}
-
-
-	// Time taken for catalysis
 	totalReactionTime += rexp(rate);
 
 
-	// Actions to do: bind, catalyse
-	int actionsToDoList[2] = {3, 3};
-	for (int i = 0; i < 2; i ++){
-		executeAction(s, actionsToDoList[i]);
+
+	int actionsToDoList[2] = {-2, -2};
+
+	// Back then inactivate
+	if (runifNum - kBckFwd < kBckInact){
+		totalReactionTime += rexp(kFwdInact); // Rate inactivation after going backwards
+		actionsToDoList[0] = 0;
+		actionsToDoList[1] = 5;
 	}
+
+
+	// Bind then catalyse
+	else if (runifNum - kBckFwd < kBckInact + kcat){
+		actionsToDoList[0] = 3;
+		actionsToDoList[1] = 3;
+	}
+
+
+	// Otherwise just deactivate from the posttranslocated position
+	else {
+		actionsToDoList[0] = 5;
+	}
+
+
+	// Apply the reaction(s) unless in animation mode
+	for (int i = 0; i < 2; i ++){
+		if (actionsToDoList[i] == -2) break;
+
+		// Update the plots immediately before the final reaction in the list has been applied
+		if ((_USING_GUI || _plotFolderName != "") && (i == 1 || actionsToDoList[i+1] == -2)) Plots::updatePlotData(s, actionsToDoList, totalReactionTime);
+
+		if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
+		else this->actionsToReturn.push_back(actionsToDoList[i]);
+
+	}
+
+
 	
 	return totalReactionTime;
 
@@ -726,9 +927,10 @@ double Simulator::geometricTranslocationSampling(State* s){
 // Assumes neither binding nor translocation to be at equilibrium
 double Simulator::geometricTranslocationBindingSampling(State* s){
 
-	if (s->isTerminated()) return 0;
-	if (s->NTPbound()) return 0;
-	if (s->get_mRNAPosInActiveSite() != 1) return 0;
+	if (s->isTerminated()) return -1;
+	if (s->NTPbound()) return -1;
+	if (!s->get_activated()) return -1;
+	if (s->get_mRNAPosInActiveSite() != 1) return -1;
 	
 
 	// Get forward and backward rates
@@ -739,16 +941,27 @@ double Simulator::geometricTranslocationBindingSampling(State* s){
 
 
 	//cout << "kBck " << kBck << " kFwd " << kFwd << endl;
+	//s->print();
+	//cout << "geometricTranslocationBindingSampling " << endl;// << kBck << " kFwd " << kFwd << endl;
 
 
+	// Rate of going back then forward, vs back then deactivate
+	double kDeactivate = s->calculateDeactivateRate(false);
+	double kFwdInact = kFwd + kDeactivate;
+	double kBckFwd = kBck * kFwd / kFwdInact;
+	double kBckInact = kBck * kDeactivate / kFwdInact;
 
+
+	// Rate of binding then releasing, vs binding then catalysing
 	double kRelease = s->calculateReleaseNTPRate(true);
-	double kBind = s->calculateBindNTPrate(true);
+	double kBind = s->calculateBindOrCatNTPrate(true);
 	double kcat = kCat->getVal();
 	double rateRelCat = kRelease + kcat;
 	double rateBindRelease = kBind * kRelease / rateRelCat;
-	double rate_bindRelease_or_backforward = rateBindRelease + kBck;
-	double rate = kBck + kBind;
+	double rateBindCat = kBind * kcat / rateRelCat;
+
+	double rate_bindRelease_or_backforward = rateBindRelease + kBckFwd;
+	double rate = kBind + kBck + kDeactivate;
 
 
 	// Keep sampling until it is NOT bind-release or back-forward 
@@ -766,25 +979,65 @@ double Simulator::geometricTranslocationBindingSampling(State* s){
 		// Back-forward
 		else{
 			totalReactionTime += rexp(rate); // Time taken to go back
-			totalReactionTime += rexp(kFwd); // Time taken to come forward again
+			totalReactionTime += rexp(kFwdInact); // Time taken to come forward again
 		}
 		//n++;
 		runifNum = runif() * rate;
 	}
 
+	totalReactionTime += rexp(rate);
 	//cout << n << endl;
 
+
+	int actionsToDoList[2] = {-2, -2};
+
+
 	// Bind then catalyse
-	double rateBindCat = kBind * kcat / rateRelCat;
-	totalReactionTime += rexp(rateBindCat); // Rate bind
-	totalReactionTime += rexp(rateRelCat); // Rate cat
+	if (runifNum - rate_bindRelease_or_backforward < rateBindCat){
 
+		totalReactionTime += rexp(rateRelCat); // Rate cat after binding
 
-	// Actions to do: bind, catalyse
-	int actionsToDoList[2] = {3, 3};
-	for (int i = 0; i < 2; i ++){
-		executeAction(s, actionsToDoList[i]);
+		// Actions to do: bind, catalyse
+		actionsToDoList[0] = 3;
+		actionsToDoList[1] = 3;
+
 	}
+
+
+	// Back then inactivate
+	else if (runifNum - rate_bindRelease_or_backforward <  rateBindCat + kBckInact){
+
+		totalReactionTime += rexp(kFwdInact); // Rate inactivation after going backwards
+
+		// Actions to do: back, deactivate
+		actionsToDoList[0] = 0;
+		actionsToDoList[1] = 5;
+
+	}
+
+
+	// Deactivate from posttranslocated position
+	else{
+
+		// To do: deactivate
+		actionsToDoList[0] = 5;
+
+	}
+
+
+	// Apply the reaction(s) unless in animation mode
+	for (int i = 0; i < 2; i ++){
+		if (actionsToDoList[i] == -2) break;
+
+		// Update the plots immediately before the final reaction in the list has been applied
+		if ((_USING_GUI || _plotFolderName != "") && (i == 1 || actionsToDoList[i+1] == -2)) Plots::updatePlotData(s, actionsToDoList, totalReactionTime);
+
+		if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
+		else this->actionsToReturn.push_back(actionsToDoList[i]);
+
+	}
+
+
 	
 	return totalReactionTime;
 
@@ -797,18 +1050,21 @@ double Simulator::geometricTranslocationBindingSampling(State* s){
 // Assumes binding to be kinetic
 double Simulator::geometricBindingSampling(State* s){
 
-	if (s->isTerminated()) return 0;
-	if (s->NTPbound()) return 0;
-	if (s->get_mRNAPosInActiveSite() != 0 && s->get_mRNAPosInActiveSite() != 1) return 0;
+	if (s->isTerminated()) return 0-1;
+	if (s->NTPbound()) return -1;
+	if (!s->get_activated()) return -1;
+	if (s->get_mRNAPosInActiveSite() != 0 && s->get_mRNAPosInActiveSite() != 1) return -1;
 	
 
 	double kBck = s->calculateBackwardRate(true, true);
 	double kFwd = s->calculateForwardRate(true, true);
 	double kRelease = s->calculateReleaseNTPRate(true);
-	double kBind = s->calculateBindNTPrate(true);
+	double kBind = s->calculateBindOrCatNTPrate(true);
 	double kcat = kCat->getVal();
+	double kDeactivate = s->calculateDeactivateRate(false);
 
-
+	//s->print();
+	//cout << "geometricBindingSampling " << s->get_mRNAPosInActiveSite() << endl;
 
 
 	bool assumeTranslocationEquilibrium =  	!currentModel->get_assumeBindingEquilibrium()
@@ -840,13 +1096,11 @@ double Simulator::geometricBindingSampling(State* s){
 
 
 
-
-
 		// Percentage of time spent in either state
 		double eqConstantFwdTranslocation = k0_1 / k1_0;
 		double probabilityPosttranslocated = 1;
 		double probabilityPretranslocated = 0;
-		if (eqConstantFwdTranslocation != INFINITY){
+		if (eqConstantFwdTranslocation != INFINITY && eqConstantFwdTranslocation != 0){
 			probabilityPosttranslocated = eqConstantFwdTranslocation / (eqConstantFwdTranslocation + 1);
 			probabilityPretranslocated = 1 - probabilityPosttranslocated;
 		}
@@ -860,6 +1114,8 @@ double Simulator::geometricBindingSampling(State* s){
 		//kcat = kcat * probabilityPosttranslocated;
 		kBck = k0_minus1 * probabilityPretranslocated; // Can only backtrack from pretranslocated
 
+		//kDeactivate = kDeactivate*probabilityPretranslocated + probabilityPosttranslocated*probabilityPosttranslocated;
+
 
 	}
 	//cout << "kBind=" << kBind << endl;
@@ -867,7 +1123,7 @@ double Simulator::geometricBindingSampling(State* s){
 
 	double rateRelCat = kRelease + kcat;
 	double rateBindRelease = kBind * kRelease / rateRelCat;
-	double rate = kBck + kFwd + kBind; // + kRelease
+	double rate = kBck + kFwd + kBind + kDeactivate; // + kRelease
 
 
 	//cout << "kBck = " << kBck << " kFwd = " << kFwd << " kRelease = " << kRelease << " kBind = " << kBind << " kcat = " << kcat << " rateRelCat = " << rateRelCat << " rateBindRelease = " << rateBindRelease << " rate = " << rate << endl;
@@ -881,14 +1137,15 @@ double Simulator::geometricBindingSampling(State* s){
 		totalReactionTime += rexp(rateRelCat); // Time taken to release
 		runifNum = runif() * rate;
 	}
+	totalReactionTime += rexp(rate); // Add the time of the next action
 
 
 	// Choose next action uniformly
 	kRelease = 0;
-	double rateBindCat = assumeTranslocationEquilibrium ? kBind : kBind * kcat / rateRelCat;
-	double rates[] = { kBck, kFwd, kRelease, rateBindCat };
+	double rateBindCat = kBind * kcat / rateRelCat;// assumeTranslocationEquilibrium ? kBind : kBind * kcat / rateRelCat;
+	double rates[] = { kBck, kFwd, kRelease, rateBindCat, 0, kDeactivate };
 	int numReactions = (sizeof(rates)/sizeof(*rates));
-	double sum = kBck + kFwd + kRelease + rateBindCat;
+	double sum = kBck + kFwd + kRelease + rateBindCat + kDeactivate;
 	runifNum = runif() * sum;
 	double cumsum = 0;
 	int toDo = -1;
@@ -900,7 +1157,6 @@ double Simulator::geometricBindingSampling(State* s){
 		}
 
 	}
-	totalReactionTime += rexp(sum);
 
 
 	//cout << "rateBindCat = " << rateBindCat << " numReactions = " << numReactions << " sum = " << sum << " toDo = " << toDo << endl;
@@ -956,13 +1212,16 @@ double Simulator::geometricBindingSampling(State* s){
 
 
 
-
-
-	
-	
+	// Apply the reaction(s) unless in animation mode
 	for (int i = 0; i < 3; i ++){
 		if (actionsToDoList[i] == -2) break;
-		executeAction(s, actionsToDoList[i]);
+
+		// Update the plots immediately before the final reaction in the list has been applied
+		if ((_USING_GUI || _plotFolderName != "") && (i == 2 || actionsToDoList[i+1] == -2)) Plots::updatePlotData(s, actionsToDoList, totalReactionTime);
+
+		if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
+		else this->actionsToReturn.push_back(actionsToDoList[i]);
+
 	}
 
 	
@@ -972,6 +1231,7 @@ double Simulator::geometricBindingSampling(State* s){
 
 
 void Simulator::executeAction(State* s, int reactionToDo) {
+
 
 	switch (reactionToDo) {
 		case -1:
@@ -991,6 +1251,12 @@ void Simulator::executeAction(State* s, int reactionToDo) {
 			break;
 		case 3:
 			s->bindNTP();
+			break;
+		case 4:
+			s->activate();
+			break;
+		case 5:
+			s->deactivate();
 			break;
 	}
 

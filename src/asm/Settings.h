@@ -29,6 +29,7 @@
 #include "randomc/randomc.h"
 #include "Sequence.h"
 #include "Simulator.h"
+#include "Polymerase.h"
 
 #include <random>
 #include <string>
@@ -60,12 +61,15 @@ extern string PrimerType;
 extern TranslocationRatesCache* _translocationRatesCache;
 extern map<string, Sequence*> sequences;
 extern Sequence* currentSequence;
+extern vector<Polymerase*> _polymerases;
+extern string _currentPolymerase;
 
 
 // Command line arguments
 extern string inputXMLfilename;
 extern string outputFilename;
 extern string _inputLogFileName;
+extern string _plotFolderName;
 extern bool isWASM;
 extern bool _resumeFromLogfile;
 extern bool _printSummary;
@@ -89,18 +93,22 @@ extern int N_THREADS;
 extern list<ExperimentalData> experiments;
 extern int _numExperimentalObservations;
 
+
 // Model
 extern list<Model> modelsToEstimate;
 extern Model* currentModel;
 
 
 // User interface information
-extern bool USING_GUI;
-extern bool GUI_STOP;
-extern bool needToReinitiateAnimation;
-extern Simulator* interfaceSimulator; // The simulator object being used by the GUI
-extern chrono::system_clock::time_point interfaceSimulation_startTime; // The start time of the GUI simulation
-
+extern bool _USING_GUI;
+extern bool _GUI_STOP;
+extern bool _needToReinitiateAnimation;
+extern bool _GUI_simulating;
+extern bool _applyingReactionsGUI;
+extern string _animationSpeed;
+extern Simulator* _interfaceSimulator; // The simulator object being used by the GUI
+extern State* _currentStateGUI; // The current state displayed on the GUI and used in all GUI simulations
+extern chrono::system_clock::time_point _interfaceSimulation_startTime; // The start time of the GUI simulation
 
 
 // Parameters
@@ -124,7 +132,8 @@ extern Parameter *kCat;
 extern Parameter *Kdiss;
 extern Parameter *RateBind;
 
-
+extern Parameter *RateActivate;
+extern Parameter *RateDeactivate;
 
 
 
@@ -134,20 +143,25 @@ class Settings{
 
 		// RNG
     	static CRandomMersenne* SFMT;
+    	static void initPolymerases();
 	
 
 	public:
 		static void init();
+		static void initSequences();
 		static void print();
 		static string complementSeq(string orig, bool toRNA);
 
+		static void activatePolymerase(string polymeraseID);
 		static void updateParameterVisibilities();
 		static void clearParameterHardcodings();
+		static void setParameterList(vector<Parameter*> params);
 		static void sampleAll();
 		static void sampleModel();
 		static void setModel(string modelID);
 		static Parameter* getParameterByName(string paramID);
 		static vector<Parameter*> paramList;
+		static vector<Parameter*> getParamListClone();
 		static string toJSON();
 		static bool setSequence(string seqID);
 
@@ -155,6 +169,7 @@ class Settings{
 
 		// Utilities
 		static vector<string> split(const std::string& s, char delimiter);
+		static bool strIsNumber(const string& s);
     	static double rexp(double rate);
     	static double runif();
     	static double wrap(double x, double a, double b);
@@ -163,7 +178,8 @@ class Settings{
     	//static double getLognormalDensity(double x, double mu, double sigma, double lowerVal, double upperVal); // Lognormal PDF
     	//static double getLognormalCDF(double x, double mu, double sigma);	// Lognormal CDF
 
-
+    	static void sortedPush(std::vector<int> &cont, int value);
+    	static void sortedPush(std::vector<double> &cont, double value);
 
 };
 

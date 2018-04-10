@@ -26,6 +26,7 @@
 #include "Model.h"
 #include "Simulator.h"
 #include "State.h"
+#include "Plots.h"
 #include "FreeEnergy.h"
 #include "TranslocationRatesCache.h"
 #include "MCMC.h"
@@ -58,6 +59,7 @@ using namespace std;
 				-nthreads <n>: number of threads to split simulations over (default 1)
 
 				-MCMC: perform MCMC instead of simulating (default false)
+				-plotO <foldername> folder name to save plot data into (only if MCMC is false) 
 				-resume: resumes MCMC from the last state printed in the file specified by -logO and appends to -logO (default false)
 				-summary: prints a summary of the log file specified by -logI into the terminal (default false)
 				-sample: samples from posterior under a given model according to the experiment data presented in -xml xmlfile (default false)
@@ -76,7 +78,6 @@ int main(int argc, char** argv) {
 
 	
 	auto startTime = std::chrono::system_clock::now();
-
 
 
 	// Parse arguments
@@ -119,6 +120,12 @@ int main(int argc, char** argv) {
 			_inputLogFileName = string(argv[i]);
 		}
 
+		else if(arg == "-plotO" && i+1 < argc) {
+			i++;
+			_plotFolderName = string(argv[i]);
+		}
+
+
 		else if(arg == "-nthreads" && i+1 < argc) {
 			i++;
 			N_THREADS = atoi(argv[i]);
@@ -159,9 +166,12 @@ int main(int argc, char** argv) {
 	FreeEnergy::init_BP_parameters();
 	
 	if (!isWASM){
+		cout << "ABC" << endl;
 		Settings::init();
 		currentModel = new Model();
+		Settings::activatePolymerase("RNAP");
 		Settings::sampleAll();
+		Settings::initSequences();
 	}
 
 
@@ -171,18 +181,21 @@ int main(int argc, char** argv) {
 		bool succ = XMLparser::parseXMLFromFilename(filename);
 		delete [] filename;
 		if (!succ) exit(1);
-		
-		
+
 	}
 	
 	Settings::sampleAll();
 	SimulatorPthread::init();
+	Plots::init();
+
+
     
     //complementSequence = Settings::complementSeq(templateSequence, TemplateType.substr(2) == "RNA");
 
 	
 	 // If no arguments then exit now
     if (argc == 1) {
+    	
     	cout << "Please enter command line arguments to start Simpol" << endl;
     	exit(1);
     }
@@ -226,9 +239,17 @@ int main(int argc, char** argv) {
 
 	// Just simulate
 	else{
+
+
    		double velocity = SimulatorPthread::performNSimulations(ntrials_sim, true);
 		cout << "Mean velocity: " << velocity << "bp/s" << endl;
 		cout << "Sequence length: " << templateSequence.length() << endl;
+
+		if (_plotFolderName != "") {
+			string JSON = Plots::getPlotDataAsJSON();
+			cout << "JSON " << JSON;
+		}
+
    	}
 
 	

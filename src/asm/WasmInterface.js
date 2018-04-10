@@ -28,25 +28,42 @@ WASM_MESSAGE_LISTENER = {};
 
 // Send a message back to the original JS module to inform that the program has initialised
 onRuntimeInitialised = function(){
+	Module.ccall("initGUI"); // Initialise the WASM module for GUI use
 	postMessage("wasm_initialised");
 }
 Module['onRuntimeInitialized'] = onRuntimeInitialised;
 
 
 // Receive a message from the webassembly module
-messageFromWasmToJS = function(msg, msgID = null){
+messageFromWasmToJS = function(msg = null, msgID = null){
 
 	//console.log(msg, msgID);
+
 
 
 	// See if the message has a callback
 	if (msgID != null && WASM_MESSAGE_LISTENER[msgID] != null){
 
-		// Convert the message into a string that can be parsed directly by JSON
-		msg = msg.replace(/"/g, '\\"').replace(/,/g, '","').replace(/:/g,'":"').replace(/}/g,'"}').replace(/{/g,'{"').replace(/"{/g,'{').replace(/}"/g,'}');
-		msg = msg.replace(/"false"/g, 'false').replace(/"true"/g, 'true'); // Convert string bools into bool bools 
-		WASM_MESSAGE_LISTENER[msgID].resolve(msg)
-		WASM_MESSAGE_LISTENER[msgID] = null;
+
+		if (msg == null || msg == ""){
+			WASM_MESSAGE_LISTENER[msgID].resolve("done");
+		}else{
+
+			//console.log("msg", msg);
+
+			// Convert the message into a string that can be parsed directly by JSON
+			msg = msg.replace(/'/g, '\"').replace(/'/g, "\\'").replace(/"\[/g, "[").replace(/\]"/g, "]");
+
+			//console.log("msg", msgID, msg);
+
+			WASM_MESSAGE_LISTENER[msgID].resolve(msg)
+
+		}
+
+		// Do not delete the message listener event if requested 
+		if (WASM_MESSAGE_LISTENER[msgID] != null && (WASM_MESSAGE_LISTENER[msgID].remove == null || WASM_MESSAGE_LISTENER[msgID].remove == true)){
+			WASM_MESSAGE_LISTENER[msgID] = null;
+		}
 	}
 
 }
@@ -98,6 +115,22 @@ getCppArrayFromDict = function(dict, dataType = "double"){
 */
 
 
+
+// Returns a JSON string with all unrendered objects and removes these objects from the list
+getUnrenderedobjects = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log("unrendered", JSON.parse(resultStr));
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	
+	Module.ccall("getUnrenderedobjects", null, ["number"], [msgID]);
+
+}
+
+
 loadSessionFromXML = function(xmlData, msgID = null){
 
 	// Create the callback function
@@ -109,18 +142,36 @@ loadSessionFromXML = function(xmlData, msgID = null){
 	Module.ccall("loadSessionFromXML", null, ["string", "number"], [xmlData, msgID]);
 }
 
+
+// Refresh the current state
+refresh = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(){
+		if (msgID != null) postMessage(msgID + "~X~done" );
+	}
+
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("refresh", [], ["number"], [msgID]);
+
+}
+
+
+// Instructs the animation / simulation to stop
 stopWebAssembly = function(msgID = null){
 	
-	
 	// Create the callback function
-	var toDoAfterCall = function(resultStr){
-		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	var toDoAfterCall = function(){
+		if (msgID != null) postMessage(msgID + "~X~done" );
 	}
+
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
-	
-	Module.ccall("stopWebAssembly");
+	//console.log("STOPPING JS");
+	Module.ccall("stopWebAssembly", [], ["number"], [msgID]);
 	
 }
+
 
 
 // Get all sequences from the model
@@ -163,6 +214,41 @@ userSelectSequence = function(newSequenceID, msgID = null){
 
 	var toReturn = {succ: true}; 
 	postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+
+}
+
+
+// Get the list of polymerases and the currently selected one
+getPolymerases = function(msgID = null){
+	
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log("Returning", JSON.parse(resultStr));
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+
+	Module.ccall("getPolymerases", null, ["int"],  [msgID]); 
+
+
+}
+
+
+// Select the current RNA polymerase to use
+userChangePolymerase = function(selectedPolymeraseID, msgID = null){
+
+
+	// Create the callback function
+	var toDoAfterCall = function(){
+		//console.log("Returning", JSON.parse(resultStr));
+		if (msgID != null) postMessage(msgID + "~X~done");
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+
+	Module.ccall("userChangePolymerase", null, ["string", "int"],  [selectedPolymeraseID, msgID]); 
 
 }
 
@@ -245,18 +331,221 @@ getModelSettings = function(msgID = null){
 }
 
 
-// Perform N simulations
-startTrials = function(N, msgID = null){
-	
+// Returns all parameters and model settings
+getParametersAndModelSettings = function(msgID = null){
+
 	// Create the callback function
 	var toDoAfterCall = function(resultStr){
 		//console.log(JSON.parse(resultStr));
 		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+
 	}
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
-	Module.ccall("startTrials", null, ["number", "number", "number"], [N, 4, msgID]);
+	Module.ccall("getParametersAndModelSettings", null, ["number"], [msgID]);
+
+}
+
+
+// Perform N simulations and then return to js after a timeout (~1000ms) has been reached to check if user has requested to stop
+startTrials = function(N, msgID = null){
 	
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+
+
+		//console.log("Returning", resultStr);
+		var result = JSON.parse(resultStr);
+
+		// Exit now
+		if (result.stop){
+			if (msgID != null) {
+				postMessage(msgID + "~X~" + resultStr);
+				WASM_MESSAGE_LISTENER[msgID] = null;
+			}
+		}
+
+
+		else{
+
+
+			if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+
+			// Animated mode. Perform the actions specified and then sample more actions 
+			if (result.animationTime > 0 && result.actions != null) applyReactions(result.actions, result.animationTime, function() { resumeTrials(msgID); }, null);
+
+			// Hidden mode. Resume the trials and tell the messenger to not delete the message
+			else {
+				resumeTrials(msgID);
+			}
+		}
+	}
+
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall, remove: false};
+	Module.ccall("startTrials", null, ["number", "number"], [N, msgID]);
+	//Module.ccall("getPlotDataJSON", null, [], []);
 	
+}
+
+
+
+// Resume simulations from before continuing from the current state and time elapsed
+resumeTrials = function(msgID = null){
+
+
+	// Pause for a bit in case user requests to stop
+	setTimeout(function(){
+
+		// Create the callback function
+		var toDoAfterCall = function(resultStr){
+			var result = JSON.parse(resultStr);
+			// Exit now
+			if (result.stop){
+				if (msgID != null) {
+					postMessage(msgID + "~X~" + resultStr);
+					WASM_MESSAGE_LISTENER[msgID] = null;
+				}
+			}
+
+			else{
+
+				if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+
+
+				// Animated mode. Perform the actions specified and then sample more actions 
+				if (result.animationTime > 0 && result.actions != null) applyReactions(result.actions, result.animationTime, function() { resumeTrials(msgID); }, null);
+
+				// Hidden mode. Resume the trials and tell the messenger to not delete the message
+				else {
+					resumeTrials(msgID);
+				}
+
+			}
+		}
+
+		WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall, remove: false};
+		Module.ccall("resumeTrials", null, ["number"], [msgID]);
+		//Module.ccall("getPlotDataJSON", null, [], []);
+
+
+
+
+	}, 1);
+	
+}
+
+
+// Returns all unsent plot data and all plot display settings
+getPlotData = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log(JSON.parse(resultStr));
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	Module.ccall("getPlotData", null, ["number"], [msgID]);
+
+}
+
+
+
+// Save the current plot settings (by pressing 'Save' on the plot settings dialog)
+savePlotSettings = function(plotNum, values, msgID = null) {
+
+	
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		var whichPlotInWhichCanvas = JSON.parse(resultStr).whichPlotInWhichCanvas
+		if (msgID != null) postMessage(msgID + "~X~" + JSON.stringify(whichPlotInWhichCanvas));
+
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+
+	// Convert list (of lists?) into a string where each element in the main list is separated by |
+	// And each element in a sublist is separated by ,
+	var values_str = "";
+	for (var i = 0; i < values.length; i ++){
+		if (values[i] == null) values_str += "null";
+		else values_str += values[i].toString();
+		if (i < values.length-1) values_str += "|";
+
+	}
+
+	Module.ccall("savePlotSettings", null, ["number", "string", "number"], [plotNum, values_str, msgID]);
+
+
+
+}
+
+
+// Show or hide all current plots. While all plots of a given type are hidden then data will no longer be sent to the controller
+showPlots = function(hidden){
+
+	Module.ccall("showPlots", null, ["number"], [(hidden ? 1 : 0)]);
+
+}
+
+
+// Select the speed of the animation. Slow, medium, fast or hidden
+changeSpeed = function(speed, msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("changeSpeed", null, ["string", "number"], [speed, msgID]);
+
+
+}
+
+
+// Returns an object which contains the sizes of each object in the cache that can be cleared
+getCacheSizes = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("getCacheSizes", null, ["number"], [msgID]);
+
+
+}
+
+
+// Deletes all plot data of the specified types
+deletePlots = function(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, msgID = null){
+
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("deletePlots", null, ["number", "number", "number", "number", "number", "number"], [distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, msgID]);
+
+}
+
+
+
+// User selects which plot should be displayed at a particular plot slot
+userSelectPlot = function(plotNum, value, deleteData, msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("userSelectPlot", null, ["number", "string", "number", "number"], [plotNum, value, (deleteData ? 1 : 0), msgID]);
+
+
 }
 
 
@@ -272,6 +561,209 @@ calculateMeanTranslocationEquilibriumConstant = function(msgID = null){
 	Module.ccall("calculateMeanTranslocationEquilibriumConstant", null, ["number"], [msgID]);
 
 }
+
+
+
+// Gets all information necessary to plot rates onto the state diagram 
+getStateDiagramInfo = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("getStateDiagramInfo", null, ["number"], [msgID]);
+
+}
+
+
+
+
+// Recursively applies the actions in the list. Pauses in between actions to allow the DOM to animate the change
+applyReactions = function(actionsList, animationTime, resolve = null,  msgID = null){
+
+	if (actionsList.length == 0){
+
+		// If there is a callback perform it now
+		if (resolve != null) resolve();
+
+		// Inform the controller that this action has finished
+		if (msgID != null && WASM_MESSAGE_LISTENER[msgID] != null) {
+			postMessage(msgID + "~X~done");
+			WASM_MESSAGE_LISTENER[msgID] = null;
+		}
+		return;
+	}
+
+
+	//console.log("actionsList", actionsList);
+
+	actionToDo = actionsList.shift();
+	var toStop = Module.ccall("applyReaction", "number", ["number"], [actionToDo]);
+
+
+	// If need to stop then deplete the list of actions so that it stops after performing this action
+	if (toStop == 1) actionsList = [];
+
+	// Wait animationTime before proceeding
+	setTimeout(function() {
+		applyReactions(actionsList, animationTime, resolve, msgID);
+	}, animationTime + 2);
+
+
+}
+
+
+// Transcirbe N bases. This is done by first finding the actions to perform, and then allowing the controller to render one at a time
+transcribe = function(N, msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+
+
+		// Hidden mode -> return to controller now
+		if (resultStr == "" || resultStr == "done"){
+			postMessage(msgID + "~X~done");
+			WASM_MESSAGE_LISTENER[msgID] = null;
+		}
+		// Animated mode -> animate each action one at a time
+		else{
+			var result = JSON.parse(resultStr);
+			//console.log("result", result, result.animationTime);
+			applyReactions(result.actions, result.animationTime, null, msgID);
+		}
+
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall, remove: false};
+
+	Module.ccall("getTranscriptionActions", null, ["number", "number"], [N, msgID]);
+
+}
+
+// Move the polymerase forwards
+translocateForward = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(){
+		if (msgID != null) postMessage(msgID + "~X~done");
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("translocateForward", null, ["number"], [msgID]);
+
+}
+
+// Move the polymerase backwards
+translocateBackwards = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(){
+		if (msgID != null) postMessage(msgID + "~X~done");
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("translocateBackwards", null, ["number"], [msgID]);
+
+}
+
+
+// Bind NTP or add it onto the chain if already bound
+bindOrCatalyseNTP = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(){
+		if (msgID != null) postMessage(msgID + "~X~done");
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("bindOrCatalyseNTP", null, ["number"], [msgID]);
+
+}
+
+// Release NTP or remove it from the chain if already added
+releaseOrRemoveNTP = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(){
+		if (msgID != null) postMessage(msgID + "~X~done");
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("releaseOrRemoveNTP", null, ["number"], [msgID]);
+
+}
+
+
+// Activate the polymerase from its catalytically inactive state
+activatePolymerase = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(){
+		if (msgID != null) postMessage(msgID + "~X~done");
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("activatePolymerase", null, ["number"], [msgID]);
+
+}
+
+// Deactivate the polymerase by putting it into a catalytically inactive state
+deactivatePolymerase = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(){
+		if (msgID != null) postMessage(msgID + "~X~done");
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("deactivatePolymerase", null, ["number"], [msgID]);
+
+}
+
+
+// Returns all data needed to draw the translocation navigation canvas
+getTranslocationCanvasData = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("getTranslocationCanvasData", null, ["number"], [msgID]);
+
+}
+
+// Returns all data needed to draw the NTP bind/release navigation canvas
+getNTPCanvasData = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log("resultStr", resultStr);
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("getNTPCanvasData", null, ["number"], [msgID]);
+
+}
+
+// Returns all data needed to draw the activate/deactivate navigation canvas
+getDeactivationCanvasData = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log("resultStr", resultStr);
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("getDeactivationCanvasData", null, ["number"], [msgID]);
+
+}
+
+
 
 
 

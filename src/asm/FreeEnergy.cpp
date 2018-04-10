@@ -30,6 +30,7 @@
 #include <map>
 #include <vector>
 #include <list>
+#include <math.h> 
 
 using namespace std;
 
@@ -424,7 +425,8 @@ void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
 	// Iterate until the end of the sequence
 	state->transcribe(1);
 	int nsites = templateSequence.length() - hybridLen->getVal() - bubbleLeft->getVal() - 3;
-	vector<double> equilibriumConstants(nsites);
+	vector<double> equilibriumConstantsBckOverFwd(nsites);
+	vector<double> equilibriumConstantsFwdOverBck(nsites);
 	vector<double> forwardRates(nsites);
 	vector<double> backwardsRates(nsites);
 	for (int i = 0; i < nsites; i ++){
@@ -441,7 +443,8 @@ void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
 		double kPostToPre = state->calculateBackwardRate(true, true);
 		
 		// Calculate equilibrium constant
-		equilibriumConstants.at(i) = kPreToPost / kPostToPre;
+		equilibriumConstantsBckOverFwd.at(i) = kPostToPre / kPreToPost;
+		equilibriumConstantsFwdOverBck.at(i) = kPreToPost / kPostToPre;
 		forwardRates.at(i) = kPreToPost;
 		backwardsRates.at(i) = kPostToPre;
 		
@@ -451,19 +454,22 @@ void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
 	}
 
 
-	// Calculate mean equilibrium constant
-	double meanEquilibriumConstant = 0;
+	// Calculate geometric-mean equilibrium constant
+	double meanEquilibriumConstant_BckOverFwd = 0;
+	double meanEquilibriumConstant_FwdOverBck = 0;
 	double meanForwardRate = 0;
 	double meanBackwardsRate = 0;
 	for (int i = 0; i < nsites; i ++) {
-		meanEquilibriumConstant += equilibriumConstants.at(i) / nsites;
+		meanEquilibriumConstant_BckOverFwd += log(equilibriumConstantsBckOverFwd.at(i));
+		meanEquilibriumConstant_FwdOverBck += log(equilibriumConstantsFwdOverBck.at(i));
 		meanForwardRate += forwardRates.at(i) / nsites;
 		meanBackwardsRate += backwardsRates.at(i) / nsites;
 	}
 	
-	results[0] = meanEquilibriumConstant;
-	results[1] = meanForwardRate;
-	results[2] = meanBackwardsRate;
+	results[0] = exp(meanEquilibriumConstant_BckOverFwd / nsites);
+	results[1] = exp(meanEquilibriumConstant_FwdOverBck / nsites);
+	results[2] = meanForwardRate;
+	results[3] = meanBackwardsRate;
 
 	delete state;
 

@@ -26,6 +26,9 @@
 #include "XMLparser.h"
 #include "FreeEnergy.h"
 #include "TranslocationRatesCache.h"
+#include "Plots.h"
+#include "Coordinates.h"
+
 
 #include <emscripten.h>
 #include <iostream>
@@ -64,12 +67,246 @@ void messageFromWasmToJS(const string & msg, int msgID) {
 // Interface between javascript and cpp for webassembly
 extern "C" {
 
-	void EMSCRIPTEN_KEEPALIVE stopWebAssembly(){
-		stop = true;
-		cout << "Stopping" << endl;
+
+	void EMSCRIPTEN_KEEPALIVE initGUI(){
+		_USING_GUI = true;
+		//_currentStateGUI = new State(true, true);
 	}
-	
-	
+
+
+	// Returns a JSON string with all unrendered objects and removes these objects from the list
+	void EMSCRIPTEN_KEEPALIVE getUnrenderedobjects(int msgID){
+		string unrenderedObjectJSON = Coordinates::getUnrenderedObjectsJSON(true);
+		messageFromWasmToJS(unrenderedObjectJSON, msgID);
+	}
+
+
+	/* 
+	------------------  Reactions  -----------------
+	*/
+
+
+	// Returns the list of actions needed to transcribe 10 bases, and the animation speed
+	void EMSCRIPTEN_KEEPALIVE getTranscriptionActions(int N, int msgID){
+
+		_GUI_STOP = false;
+		_applyingReactionsGUI = true;
+
+		int animationSpeed = Coordinates::getAnimationTime();
+
+		// Hidden mode
+		if (animationSpeed == 0){
+			_currentStateGUI->transcribe(N);
+			messageFromWasmToJS("", msgID);
+		}
+
+		else{
+
+			// Do not perform all the actions immediately (unless hidden mode).
+			// Instead this function returns a list of actions to do. Then each action is
+			// performed one at a time, and is rendered on the DOM in between subsequent actions
+			list<int> actionsToDo = _currentStateGUI->getTranscribeActions(N);
+			string actionsJSON = "{'actions':[";
+			for (list<int>::iterator it= actionsToDo.begin(); it != actionsToDo.end(); ++it){
+				actionsJSON += to_string(*it) + ",";
+			}
+			if (actionsJSON.substr(actionsJSON.length()-1, 1) == ",") actionsJSON = actionsJSON.substr(0, actionsJSON.length() - 1);
+			actionsJSON += "],";
+
+			// Get animation speed
+			actionsJSON += "'animationTime':" + to_string(animationSpeed) + "}";
+
+			messageFromWasmToJS(actionsJSON, msgID);
+
+		}
+
+		_applyingReactionsGUI = false;
+
+
+	}
+
+
+
+
+	// Apply the specified reaction
+	bool EMSCRIPTEN_KEEPALIVE applyReaction(int reactionNumber){
+
+
+		if (!_GUI_STOP){
+
+			_applyingReactionsGUI = true;
+			if (reactionNumber == 0) _currentStateGUI->backward();
+			else if (reactionNumber == 1) _currentStateGUI->forward();
+			else if (reactionNumber == 2) _currentStateGUI->releaseNTP();
+			else if (reactionNumber == 3) _currentStateGUI->bindNTP();
+			else if (reactionNumber == 4) _currentStateGUI->activate();
+			else if (reactionNumber == 5) _currentStateGUI->deactivate();
+
+			_applyingReactionsGUI = false;
+
+		}
+
+		return _GUI_STOP || _currentStateGUI->isTerminated();
+
+	}
+
+
+	// Move the polymerase forwards
+	void EMSCRIPTEN_KEEPALIVE translocateForward(int msgID){
+		_applyingReactionsGUI = true;
+		_currentStateGUI->forward();
+		_applyingReactionsGUI = false;
+		messageFromWasmToJS("", msgID);
+	}
+
+	// Move the polymerase backwards
+	void EMSCRIPTEN_KEEPALIVE translocateBackwards(int msgID){
+		_applyingReactionsGUI = true;
+		_currentStateGUI->backward();
+		_applyingReactionsGUI = false;
+		messageFromWasmToJS("", msgID);
+	}
+
+	// Bind NTP or add it onto the chain if already bound
+	void EMSCRIPTEN_KEEPALIVE bindOrCatalyseNTP(int msgID){
+		_applyingReactionsGUI = true;
+		_currentStateGUI->bindNTP();
+		_applyingReactionsGUI = false;
+		messageFromWasmToJS("", msgID);
+	}
+
+	// Release NTP or remove it from the chain if already added
+	void EMSCRIPTEN_KEEPALIVE releaseOrRemoveNTP(int msgID){
+		_applyingReactionsGUI = true;
+		_currentStateGUI->releaseNTP();
+		_applyingReactionsGUI = false;
+		messageFromWasmToJS("", msgID);
+	}
+
+	// Activate the polymerase from its catalytically inactive state
+	void EMSCRIPTEN_KEEPALIVE activatePolymerase(int msgID){
+		_applyingReactionsGUI = true;
+		_currentStateGUI->activate();
+		_applyingReactionsGUI = false;
+		messageFromWasmToJS("", msgID);
+	}
+
+	// Deactivate the polymerase by putting it into a catalytically inactive state
+	void EMSCRIPTEN_KEEPALIVE deactivatePolymerase(int msgID){
+		_applyingReactionsGUI = true;
+		_currentStateGUI->deactivate();
+		_applyingReactionsGUI = false;
+		messageFromWasmToJS("", msgID);
+	}
+
+
+	// Returns all data needed to draw the translocation arrow canvas
+	void EMSCRIPTEN_KEEPALIVE getTranslocationCanvasData(int msgID){
+
+
+		double kBck = _currentStateGUI->calculateBackwardRate(true, false);
+		double kFwd = _currentStateGUI->calculateForwardRate(true, false);
+		bool bckBtnActive = _currentStateGUI->getLeftBaseNumber() - bubbleLeft->getVal() - 1 > 2; // Do not allow backstepping if it will break the 3' bubble
+		bool fwdBtnActive = _currentStateGUI->getLeftBaseNumber() < templateSequence.length(); // Do not going forward if beyond the end of the sequence
+		string fwdBtnLabel = !_currentStateGUI->isTerminated() && _currentStateGUI->getLeftBaseNumber() >= _currentStateGUI->get_nascentLength() ? "Terminate" : "Forward";
+
+		// Build the JSON string
+		string translocationJSON = "{";
+		translocationJSON += "'kBck':" + to_string(kBck) + ",";
+		translocationJSON += "'kFwd':" + to_string(kFwd) + ",";
+		translocationJSON += "'bckBtnActive':" + string(bckBtnActive ? "true" : "false") + ",";
+		translocationJSON += "'fwdBtnActive':" + string(fwdBtnActive ? "true" : "false") + ",";
+		translocationJSON += "'fwdBtnLabel':'" + fwdBtnLabel + "'";
+		translocationJSON += "}";
+
+		messageFromWasmToJS(translocationJSON, msgID);
+
+	}
+
+
+	// Returns all data needed to draw the NTP bind/release navigation canvas
+	void EMSCRIPTEN_KEEPALIVE getNTPCanvasData(int msgID){
+
+		// If the polymerase is post-translocated or hypertranslocated, then return the base to be transcribed next and the pair before it
+		// Otherwise return the most recently transcribed base
+		int deltaBase = _currentStateGUI->get_mRNAPosInActiveSite() <= 0 ? -1 : 0;
+		string baseToAdd = deltaBase == 0 ? Settings::complementSeq(templateSequence.substr(_currentStateGUI->get_nextTemplateBaseToCopy()-1, 1), PrimerType.substr(2) == "RNA") : _currentStateGUI->get_NascentSequence().substr(_currentStateGUI->get_nascentLength() - 1, 1);
+
+		// Build the JSON string
+		string ntpJSON = "{";
+		ntpJSON += "'NTPbound':" + string(_currentStateGUI->NTPbound() ? "true" : "false") + ",";
+		ntpJSON += "'mRNAPosInActiveSite':" + to_string(_currentStateGUI->get_mRNAPosInActiveSite()) + ",";
+		ntpJSON += "'baseToAdd':'" + baseToAdd + "',";
+		ntpJSON += "'kBind':" + to_string(_currentStateGUI->calculateBindNTPrate(false)) + ",";
+		ntpJSON += "'kRelease':" + to_string(_currentStateGUI->calculateReleaseNTPRate(false)) + ",";
+		ntpJSON += "'kCat':" + to_string(_currentStateGUI->calculateCatalysisRate(false)) + ",";
+		ntpJSON += "'templateBaseBeingCopied':'" + templateSequence.substr(_currentStateGUI->get_nextTemplateBaseToCopy() + deltaBase - 1, 1) + "',";
+		ntpJSON += "'previousTemplateBase':'" + templateSequence.substr(_currentStateGUI->get_nextTemplateBaseToCopy() + deltaBase - 2, 1) + "',";
+		ntpJSON += "'previousNascentBase':'" + _currentStateGUI->get_NascentSequence().substr(_currentStateGUI->get_nascentLength() + deltaBase - 1, 1) + "',";
+		ntpJSON += "'activated':" + string(_currentStateGUI->get_activated() ? "true" : "false");
+		ntpJSON += "}";
+
+		messageFromWasmToJS(ntpJSON, msgID);
+
+	}
+
+
+	// Returns all data needed to draw the activate/deactivate navigation canvas
+	void EMSCRIPTEN_KEEPALIVE getDeactivationCanvasData(int msgID){
+
+		string activationJSON = "{";
+		activationJSON += "'NTPbound':" + string(_currentStateGUI->NTPbound() ? "true" : "false") + ",";
+		activationJSON += "'activated':" + string(_currentStateGUI->get_activated() ? "true" : "false") + ",";
+		activationJSON += "'kA':" + to_string(_currentStateGUI->calculateActivateRate(false)) + ",";
+		activationJSON += "'kU':" + to_string(_currentStateGUI->calculateDeactivateRate(false)) + ",";
+		activationJSON += "'allowDeactivation':" + string(currentModel->get_allowInactivation() ? "true" : "false");
+		activationJSON += "}";
+		messageFromWasmToJS(activationJSON, msgID);
+
+	}
+
+
+
+
+	// Refresh the current state
+	void EMSCRIPTEN_KEEPALIVE refresh(int msgID){
+
+		// Sample parameters
+		Settings::sampleAll();
+
+		// Reset state
+		delete _currentStateGUI;
+		_currentStateGUI = new State(true, true);
+
+		// Refresh plot
+		Plots::refreshPlotData(_currentStateGUI);
+
+		messageFromWasmToJS("", msgID);
+	}
+
+
+
+	// Instructs the animation / simulation to stop
+	void EMSCRIPTEN_KEEPALIVE stopWebAssembly(int msgID){
+		_GUI_STOP = true;
+		cout << "STOPPING C++" << endl;
+		messageFromWasmToJS("", msgID);
+	}
+
+	// User change the animation speed
+	void EMSCRIPTEN_KEEPALIVE changeSpeed(char* speed, int msgID){
+
+		
+		// If speed was changed to hidden then delete all coordinate objects
+		//if (string(speed) == "hidden" && _animationSpeed != "hidden") Coordinates::clearAllCoordinates();
+
+		// If speed was change from hidden to visible then add all the objects back
+		if (string(speed) != "hidden" && _animationSpeed == "hidden") Coordinates::generateAllCoordinates(_currentStateGUI);
+
+
+		_animationSpeed = speed;
+		messageFromWasmToJS("", msgID);
+	}
 
 
 	// Parse XML settings in string form
@@ -83,6 +320,7 @@ extern "C" {
 		
 		XMLparser::parseXMLFromString(XMLdata);
 		Settings::sampleAll();
+		Settings::initSequences();
 
 		// Send the globals settings back to the DOM 
 		string parametersJSON = "{" + Settings::toJSON() + "}";
@@ -106,6 +344,9 @@ extern "C" {
 
 		parametersJSON = parametersJSON.substr(0, parametersJSON.length()-1); // Remove final ,
 		parametersJSON += "}";
+
+		//cout << "Returning " << parametersJSON << endl;
+
 		messageFromWasmToJS(parametersJSON, msgID);
 
 	}
@@ -119,6 +360,9 @@ extern "C" {
 		Sequence* newSequence = new Sequence("$user", string(newTemplateType), string(newPrimerType), seq); 
 		sequences["$user"] = newSequence;
 		Settings::setSequence("$user");
+		delete _currentStateGUI;
+		_currentStateGUI = new State(true, true);
+		Plots::init(); // Reinitialise plot data every time sequence changes
 
 		return 1;
 
@@ -129,13 +373,45 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE userSelectSequence(char* seqID){
 		bool succ = Settings::setSequence(string(seqID));
 		if (!succ) cout << "Cannot find sequence " << seqID << "." << endl;
+		else {
+			delete _currentStateGUI;
+			_currentStateGUI = new State(true, true);
+			Plots::init(); // Reinitialise plot data every time sequence changes
+		}
+
 	}
+
+
+	// Returns a list of all polymerases and specifies which one is currently selected
+	void EMSCRIPTEN_KEEPALIVE getPolymerases(int msgID){
+
+		string JSON = "{'polymerases':{";
+		for (int i = 0; i < _polymerases.size(); i ++){
+			JSON += _polymerases.at(i)->toJSON();
+			if (i < _polymerases.size()-1) JSON += ",";
+		}
+		JSON += "},'currentPolymerase':'" + _currentPolymerase + "'}";
+
+		messageFromWasmToJS(JSON, msgID);
+
+	}
+
+	// Set the current polymerase to the one specified by the user (specified by ID)
+	void EMSCRIPTEN_KEEPALIVE userChangePolymerase(char* polID, int msgID){
+
+		Settings::activatePolymerase(polID);
+		messageFromWasmToJS("", msgID);
+
+	}
+
+
+
 
 	// Save the distribution and its arguments of a parameter (and samples it)
 	void EMSCRIPTEN_KEEPALIVE saveParameterDistribution(char* paramID, char* distributionName, char* distributionArgNames, double* distributionArgValues, int nArgs) {
 
 		string paramID_s = string(paramID);
-		if (paramID_s == "hybridLen" || paramID_s == "bubbleLeft" || paramID_s == "bubbleRight") needToReinitiateAnimation = true;
+		if (paramID_s == "hybridLen" || paramID_s == "bubbleLeft" || paramID_s == "bubbleRight") _needToReinitiateAnimation = true;
 
 		Parameter* param = Settings::getParameterByName(paramID_s);
 		if (param){
@@ -175,22 +451,21 @@ extern "C" {
 
 		string parametersJSON = "{";
 
-		parametersJSON += "refreshDOM:" + string(needToReinitiateAnimation ? "true" : "false") + ",";
+		parametersJSON += "'refreshDOM':" + string(_needToReinitiateAnimation ? "true" : "false") + ",";
 
 		for (int i = 0; i < Settings::paramList.size(); i ++){
-			parametersJSON += Settings::paramList.at(i)->getJSON();
+			parametersJSON += Settings::paramList.at(i)->toJSON();
 			if (i < Settings::paramList.size()-1) parametersJSON += ",";
 		}
 
 		parametersJSON += "}";
-		needToReinitiateAnimation = false;
+		_needToReinitiateAnimation = false;
 		messageFromWasmToJS(parametersJSON, msgID);
 	}
 	
 	
 	
 	// Saves the current model settings
-	
 	void EMSCRIPTEN_KEEPALIVE setModelSettings(int msgID, char* modelSettingNames, char* modelSettingVals){
 		
 		vector<string> settings = Settings::split(string(modelSettingNames), ','); // Split by , to get values
@@ -219,7 +494,7 @@ extern "C" {
 		Settings::updateParameterVisibilities();
 		
 		// Return the model settings
-		string parametersJSON = "{" + currentModel->getJSON() + "}";
+		string parametersJSON = "{" + currentModel->toJSON() + "}";
 
 		//currentModel->print();
 
@@ -231,46 +506,187 @@ extern "C" {
 
 	
 	// Returns the current model settings
-	
 	void EMSCRIPTEN_KEEPALIVE getModelSettings(int msgID){
-		string parametersJSON = "{" + currentModel->getJSON() + "}";
+		string parametersJSON = "{" + currentModel->toJSON() + "}";
 		messageFromWasmToJS(parametersJSON, msgID);
 	}
-	
-	
+
+
+	// Gets all information necessary to plot rates onto the state diagram 
+	void EMSCRIPTEN_KEEPALIVE getStateDiagramInfo(int msgID){
+
+
+		string stateDiagramJSON = "{";
+
+		// Current state
+		stateDiagramJSON += "'NTPbound':" + string(_currentStateGUI->NTPbound() ? "true" : "false") + ",";
+		stateDiagramJSON += "'activated':" + string(_currentStateGUI->get_activated() ? "true" : "false") + ",";
+		stateDiagramJSON += "'mRNAPosInActiveSite':" + to_string(_currentStateGUI->get_mRNAPosInActiveSite()) + ",";
+		stateDiagramJSON += "'mRNALength':" + to_string(_currentStateGUI->get_nascentLength()) + ",";
+
+
+		// Calculate all rates for the state (from backtrack -2 to hypertranslocated +3) 
+		State* stateToCalculateFor = _currentStateGUI->clone();
+		stateToCalculateFor->releaseNTP();
+		stateToCalculateFor->deactivate(); // Set to deactivated so we can backtrack
+
+
+		// Get the state into backtracked (m = -2)
+		for (int i = stateToCalculateFor->get_mRNAPosInActiveSite(); i < -2; i ++){
+			stateToCalculateFor->forward();
+		}
+		for (int i = stateToCalculateFor->get_mRNAPosInActiveSite(); i > -2; i --){
+			stateToCalculateFor->backward();
+		}
+
+
+		// State m = -2
+		stateDiagramJSON += "'k -2,-1':" + to_string(stateToCalculateFor->calculateForwardRate(true, false)) + ","; // From backtrack 2 to backtrack 1
+
+		// State m = -1
+		stateToCalculateFor->forward();
+		stateDiagramJSON += "'k -1,-2':" + to_string(stateToCalculateFor->calculateBackwardRate(true, false)) + ","; // From backtrack 1 to backtrack 2
+		stateDiagramJSON += "'k -1,0':" + to_string(stateToCalculateFor->calculateForwardRate(true, false)) + ","; // From backtrack 1 to pretranslocated
+
+
+		// State m = 0
+		stateToCalculateFor->forward();
+		double k_01 = stateToCalculateFor->calculateForwardRate(true, true);
+		stateDiagramJSON += "'k 0,-1':" + to_string(stateToCalculateFor->calculateBackwardRate(true, false)) + ","; // From pretranslocated to backtrack 1
+		stateDiagramJSON += "'k 0,+1':" + to_string(stateToCalculateFor->calculateForwardRate(true, false)) + ","; // From pretranslocated to posttranslocated
+
+
+		// State m = 1
+		stateToCalculateFor->forward();
+		double k_10 = stateToCalculateFor->calculateBackwardRate(true, true);
+		stateDiagramJSON += "'k +1,0':" + to_string(stateToCalculateFor->calculateBackwardRate(true, false)) + ","; // From posttranslocated to pretranslocated
+		stateDiagramJSON += "'k +1,+2':" + to_string(stateToCalculateFor->calculateForwardRate(true, false)) + ","; // From posttranslocated to hypertranslocated 1
+		stateDiagramJSON += "'kbind':" + to_string(stateToCalculateFor->calculateBindNTPrate(true)) + ","; // Rate of binding NTP
+		stateDiagramJSON += "'krelease':" + to_string(stateToCalculateFor->calculateReleaseNTPRate(true)) + ","; // Rate of releasing NTP
+		stateDiagramJSON += "'kcat':" + to_string(stateToCalculateFor->calculateCatalysisRate(true)) + ","; // Rate of catalysis
+		stateDiagramJSON += "'KD':" + to_string(Kdiss->getVal()) + ","; // Dissociation constant
+		stateDiagramJSON += "'Kt':" + to_string(k_10 == 0 || k_01 == 0 ? 0 : k_10 / k_01) + ","; // Translocation constant
+		//cout << "k_10 " << k_10 << " k_01 " << k_01 << endl;
+
+
+		// State m = 2
+		stateToCalculateFor->forward();
+		stateDiagramJSON += "'k +2,+1':" + to_string(stateToCalculateFor->calculateBackwardRate(true, false)) + ","; // From hypertranslocated 1 to posttranslocated
+		stateDiagramJSON += "'k +2,+3':" + to_string(stateToCalculateFor->calculateForwardRate(true, false)) + ","; // From hypertranslocated 1 to hypertranslocated 2
+
+
+		// State m = 3
+		stateToCalculateFor->forward();
+		stateDiagramJSON += "'k +3,+2':" + to_string(stateToCalculateFor->calculateBackwardRate(true, false)) + ","; // From hypertranslocated 2 to hypertranslocated 1
+
+
+		stateDiagramJSON += "'kA':" + to_string(stateToCalculateFor->calculateActivateRate(true)) + ","; // Rate of activation
+		stateDiagramJSON += "'kU':" + to_string(stateToCalculateFor->calculateDeactivateRate(true)); // Rate of ianctivation
+
+		stateDiagramJSON += "}";
+		messageFromWasmToJS(stateDiagramJSON, msgID);
+
+		delete stateToCalculateFor;
+
+	}
+
+
+	// Returns the current model settings
+	void EMSCRIPTEN_KEEPALIVE getParametersAndModelSettings(int msgID){
+		string JSON = "{'params':{";
+
+		for (int i = 0; i < Settings::paramList.size(); i ++){
+			JSON += Settings::paramList.at(i)->toJSON();
+			if (i < Settings::paramList.size()-1) JSON += ",";
+		}
+
+		JSON += "},'model':{" + currentModel->toJSON() + "}}";
+		messageFromWasmToJS(JSON, msgID);
+	}
+
+
 	
 	// Perform N simulations
 	// Returns mean velocity, real time taken and remaining number of trials to go
 	// Returns to the js webworker periodically depending on speed mode
-	void EMSCRIPTEN_KEEPALIVE startTrials(int N, int speedMode, int msgID){
+	void EMSCRIPTEN_KEEPALIVE startTrials(int N, int msgID){
 		
 		
-		stop = false;
+		_GUI_STOP = false;
+		_GUI_simulating = true;
+		bool toStop = false;
 		
-		// Speedmode: 1 = slow, 2 = medium, 3 = fast, 4 = hidden
-
 		cout << "Starting " << N << endl;
 
 		
 		// Start timer
-		interfaceSimulation_startTime = chrono::system_clock::now();
+		_interfaceSimulation_startTime = chrono::system_clock::now();
 		
 		// Prepare for simulating
-		interfaceSimulator = new Simulator();
-	   	State* initialState = new State(true);
-	   	double velocity = interfaceSimulator->perform_N_Trials(N, initialState, true);
-		
-		
+		_interfaceSimulator = new Simulator();
+		_interfaceSimulator->initialise_GUI_simulation(N, 1000);
+
+
+		// Create JSON string
+		string toReturnJSON = "{";
+	   	
+
+	   	// Hidden mode (perform simulations continuously and then send information back and pause once every 1000ms
+	   	if (_animationSpeed == "hidden"){
+
+	   		double result[3];
+		   	_interfaceSimulator->perform_N_Trials_and_stop_GUI(result);
+
+		   	double velocity = result[0];
+			double NtrialsComplete = result[1];
+			toStop = result[2] == 1;
+
+			// Return JSON string
+			toReturnJSON += "'meanVelocity':" + to_string(velocity) + ",'N':" + to_string(NtrialsComplete) + ",";
+		}
+
+
+		// Animated mode: sample a single action, return the action and then come back to do the next one
+		else {
+
+			// Perform a single action
+			list<int> actionsToDo = _interfaceSimulator->sample_action_GUI();
+
+
+			// Get the number of completed trials
+			toReturnJSON += "'N':" + to_string(_interfaceSimulator->getNtrialsCompleted_GUI()) + ",";
+
+			// Add the list of actions to do
+			toReturnJSON += "'actions':[";
+			for (list<int>::iterator i = actionsToDo.begin(); i != actionsToDo.end(); ++i){
+				toReturnJSON += to_string(*i) + ",";
+			}
+
+			if (toReturnJSON.substr(toReturnJSON.length()-1, 1) == ",") toReturnJSON = toReturnJSON.substr(0, toReturnJSON.length() - 1);
+			toReturnJSON += "],";
+
+			toStop = actionsToDo.size() == 0 || _interfaceSimulator->getNtrialsCompleted_GUI() >= _interfaceSimulator->getNtrialsTotal_GUI();
+
+		}
+
+
+		// Get relevant plot data string (if all plots are invisible etc. then this string should be {})
+		string plotsJSON = Plots::getPlotDataAsJSON();
+
+
 		// Stop timer
 		auto endTime = chrono::system_clock::now();
-		chrono::duration<double> elapsed_seconds = endTime - interfaceSimulation_startTime;
+		chrono::duration<double> elapsed_seconds = endTime - _interfaceSimulation_startTime;
 		double time = elapsed_seconds.count();
-		
-		
-		string toReturnJSON = "{stop:false,meanVelocity:" + to_string(velocity) + ",realTime:" + to_string(time) + ",N:" + to_string(N) + "}";
-		
+
+
+		toReturnJSON += "'animationTime':" + to_string(Coordinates::getAnimationTime()) + ",";
+		toReturnJSON += "'plots':" + plotsJSON + ",";
+		toReturnJSON += "'stop':" + string(toStop ?  "true" : "false") + ",";
+		toReturnJSON += "'realTime':" + to_string(time);
+		toReturnJSON += "}";
 		messageFromWasmToJS(toReturnJSON, msgID);
-		
+			
 		
 	}
 	
@@ -280,51 +696,169 @@ extern "C" {
 	// Returns to the js webworker periodically depending on speed mode
 	void EMSCRIPTEN_KEEPALIVE resumeTrials(int msgID){
 		
-		/*
+
+		_GUI_simulating = true;
+
 		// Check if told to stop
-		if (stop){
-			string toReturnJSON = "{stop:true}";
-			stop = false;
+		if (_GUI_STOP){
+			string plotsJSON = Plots::getPlotDataAsJSON();
+			string toReturnJSON = "{'stop':true, 'plots':" + plotsJSON + "}";
+			_GUI_STOP = false;
+			_GUI_simulating = false;
 			messageFromWasmToJS(toReturnJSON, msgID);
-			delete interfaceSimulator;
-			//delete interfaceSimulation_startTime;
+			delete _interfaceSimulator;
+			//delete _interfaceSimulation_startTime;
 			return;
 		}
+
+		// Start timer
+		_interfaceSimulation_startTime = chrono::system_clock::now();
+		bool toStop = false;
 		
-		
-		
-		
-	   	double velocity = interfaceSimulator->perform_N_Trials(N, initialState, true);
-		
-		
+
+
+		////
+
+		// Create JSON string
+		string toReturnJSON = "{";
+	   	
+
+	   	// Hidden mode (perform simulations continuously and then send information back and pause once every 1000ms
+	   	// Resume
+	   	if (_animationSpeed == "hidden"){
+
+	   		double result[3];
+		   	_interfaceSimulator->resume_trials_GUI(result);
+
+		   	double velocity = result[0];
+			double NtrialsComplete = result[1];
+			toStop = result[2] == 1;
+
+			// Return JSON string
+			toReturnJSON += "'meanVelocity':" + to_string(velocity) + ",'N':" + to_string(NtrialsComplete) + ",";
+		}
+
+
+		// Animated mode: sample a single action, return the action and then come back to do the next one
+		else {
+
+			// Perform a single action
+			list<int> actionsToDo = _interfaceSimulator->sample_action_GUI();
+
+
+			// Get the number of completed trials
+			toReturnJSON += "'N':" + to_string(_interfaceSimulator->getNtrialsCompleted_GUI()) + ",";
+
+			// Add the list of actions to do
+			toReturnJSON += "'actions':[";
+			for (list<int>::iterator i = actionsToDo.begin(); i != actionsToDo.end(); ++i){
+				toReturnJSON += to_string(*i) + ",";
+			}
+
+			if (toReturnJSON.substr(toReturnJSON.length()-1, 1) == ",") toReturnJSON = toReturnJSON.substr(0, toReturnJSON.length() - 1);
+			toReturnJSON += "],";
+
+			toStop = actionsToDo.size() == 0 ||  _interfaceSimulator->getNtrialsCompleted_GUI() >= _interfaceSimulator->getNtrialsTotal_GUI();
+
+		}
+
+
+		// Get relevant plot data string (if all plots are invisible etc. then this string should be {})
+		string plotsJSON = Plots::getPlotDataAsJSON();
+
+
 		// Stop timer
 		auto endTime = chrono::system_clock::now();
-		chrono::duration<double> elapsed_seconds = endTime-interfaceSimulation_startTime;
+		chrono::duration<double> elapsed_seconds = endTime - _interfaceSimulation_startTime;
 		double time = elapsed_seconds.count();
-		
-		
-		string toReturnJSON = "{stop:false,meanVelocity:" + to_string(velocity) + ",realTime:" + to_string(time) + ",N:" + to_string(N) + "}";
+
+
+		// Return string
+		toReturnJSON += "'animationTime':" + to_string(Coordinates::getAnimationTime()) + ",";
+		toReturnJSON += "'plots':" + plotsJSON + ",";
+		toReturnJSON += "'stop':" + string(toStop ?  "true" : "false") + ",";
+		toReturnJSON += "'realTime':" + to_string(time);
+		toReturnJSON += "}";
 		messageFromWasmToJS(toReturnJSON, msgID);
-		*/
+
 		
 	}
+
+
+	// Return any unsent plot data as well as the plot display settings
+	void EMSCRIPTEN_KEEPALIVE getPlotData(int msgID){
+		string JSON = Plots::getPlotDataAsJSON();
+		messageFromWasmToJS(JSON, msgID);
+	}
+
+
+	// User selects which plot should be displayed in a certain plot slot
+	void EMSCRIPTEN_KEEPALIVE userSelectPlot(int plotNum, char* value, int deleteData, int msgID){
+
+		Plots::userSelectPlot(plotNum, string(value), deleteData == 1);
+		string plotsJSON = Plots::getPlotDataAsJSON();
+		messageFromWasmToJS(plotsJSON, msgID);
+
+	}
+
+
+	// User saves plot settings for a given plot
+	void EMSCRIPTEN_KEEPALIVE savePlotSettings(int plotNum, char* values_str, int msgID){
+		
+		Plots::savePlotSettings(plotNum, string(values_str));
+		string plotsJSON = Plots::getPlotDataAsJSON();
+		messageFromWasmToJS(plotsJSON, msgID);
+
+	}
+
+
+
+	// User shows or hides all plots
+	void EMSCRIPTEN_KEEPALIVE showPlots(int hidden){
+		Plots::hideAllPlots(hidden == 1);
+	}
+
+
+
+	// Returns an object which contains the sizes of each object in the cache that can be cleared
+	void EMSCRIPTEN_KEEPALIVE getCacheSizes(int msgID){
+		string cacheSizeJSON = Plots::getCacheSizeJSON();
+		messageFromWasmToJS(cacheSizeJSON, msgID);
+	}
+
+
+	// Delete the specified plot data (ie. clear the cache) 
+	void EMSCRIPTEN_KEEPALIVE deletePlots(bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata, int msgID){
+
+		Plots::deletePlotData(_currentStateGUI, distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata);
+		string plotsJSON = Plots::getPlotDataAsJSON();
+		messageFromWasmToJS(plotsJSON, msgID);
+	}
+
+
 
 
 	// Calculates the mean translocation equilibrium constant, and mean rates of going forward and backwards
 	void EMSCRIPTEN_KEEPALIVE calculateMeanTranslocationEquilibriumConstant(int msgID){
 
-		double results[3];
+		double results[4];
 		FreeEnergy::calculateMeanTranslocationEquilibriumConstant(results);
 
 		// Build JSON string
 		string parametersJSON = "{";
-		parametersJSON += "meanEquilibriumConstant:" + to_string(results[0]) + ",";
-		parametersJSON += "meanForwardRate:" + to_string(results[1]) + ",";
-		parametersJSON += "meanBackwardsRate:" + to_string(results[2]);
+		parametersJSON += "'meanEquilibriumConstant':" + to_string(results[0]) + ",";
+		parametersJSON += "'meanEquilibriumConstantFwdOverBck':" + to_string(results[1]) + ",";
+		parametersJSON += "'meanForwardRate':" + to_string(results[2]) + ",";
+		parametersJSON += "'meanBackwardsRate':" + to_string(results[3]);
 		parametersJSON += "}";
 		messageFromWasmToJS(parametersJSON, msgID);
 
 	}
+
+
+
+
+
 
 
 	

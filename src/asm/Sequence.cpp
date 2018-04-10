@@ -32,12 +32,13 @@ using namespace std;
 Sequence::Sequence(string seqID, string TemplateType, string PrimerType, string templateSequence){
 
 	this->seqID = seqID;
-	this->correctSequence(templateSequence);
-	this->templateSequence = templateSequence;
 	this->nascent_RNA = PrimerType.substr(2) == "RNA";
 	this->template_RNA = TemplateType.substr(2) == "RNA";
 	this->nascent_SS = PrimerType.substr(0,2) == "ss";
 	this->template_SS = TemplateType.substr(0,2) == "ss";
+
+	this->correctSequence(templateSequence, this->template_RNA);
+	this->templateSequence = templateSequence;
 	if (!this->template_SS) this->complementSequence = Settings::complementSeq(this->templateSequence, this->template_RNA);
 	else this->complementSequence = "";
 
@@ -61,8 +62,10 @@ void Sequence::initRateTable(){
 }
 
 
-// Remove newlines from sequence
-void Sequence::correctSequence(string seq){
+// Remove newlines from sequence and replace A with U (if RNA) or U with A (if DNA), and any non matches with X
+void Sequence::correctSequence(string seq, bool isRNA){
+	if (isRNA) replace(seq.begin(), seq.end(), 'A', 'U');
+	else replace(seq.begin(), seq.end(), 'U', 'A');
 	seq.erase(remove(seq.begin(), seq.end(), '\n'), seq.end());
 }
 
@@ -70,7 +73,7 @@ void Sequence::correctSequence(string seq){
 string Sequence::toJSON(){
 	string nascentType = string(this->nascent_SS ? "ss" : "ds") + string(this->nascent_RNA ? "RNA" : "DNA");
 	string templateType = string(this->template_SS ? "ss" : "ds") + string(this->template_RNA ? "RNA" : "DNA");
-	string parametersJSON = seqID + ":{seq:" + templateSequence + ",template:" + templateType + ",primer:" + nascentType + "}";
+	string parametersJSON = "'" + seqID  + "':{'seq':'" + this->templateSequence + "','template':'" + templateType + "','primer':'" + nascentType + "'}";
 	return parametersJSON;
 }
 
@@ -78,10 +81,9 @@ string Sequence::toJSON(){
 void Sequence::print(){
 	string nascentType = string(this->nascent_SS ? "ss" : "ds") + string(this->nascent_RNA ? "RNA" : "DNA");
 	string templateType = string(this->template_SS ? "ss" : "ds") + string(this->template_RNA ? "RNA" : "DNA");
-	cout << seqID << "; TemplateType: " << templateType << "; PrimerType: " << nascentType << endl;
-	cout << complementSequence << endl;
-	cout << templateSequence << endl << endl;
-
+	cout << this->seqID << "; TemplateType: " << templateType << "; PrimerType: " << nascentType << endl;
+	cout << this->complementSequence << endl;
+	cout << this->templateSequence << endl << endl;
 }
 
 TranslocationRatesCache* Sequence::getRatesCache(){

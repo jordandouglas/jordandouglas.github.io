@@ -321,10 +321,16 @@ void PosteriorDistriutionSample::parseFromLogFileLine(string stateLine, vector<s
 	vector<string> splitLine = Settings::split(stateLine, '\t');
 
 	int simulatedVal = 0;
-	for (int i = 0; i < splitLine.size(); i ++){
+	//cout << headerLineSplit.size() << "," << splitLine.size() << endl;
+
+	for (int i = 0; i < headerLineSplit.size(); i ++){
 
 		string header = headerLineSplit.at(i);
 		string value = splitLine.at(i);
+
+		//cout << "i = " << i << endl;
+		//cout << header << " = " << value << endl;
+		//cout << "i = " << i << ":" << headerLineSplit.at(54) << " header = " << header << endl;
 
 		if (header == "State") this->setStateNumber(stoi(value));
 		else if (header == "Model") this->set_modelIndicator(value);

@@ -168,24 +168,24 @@ void Model::activateModel(){
 
 
 // Converts the model settings into a JSON string for use by javascript (not wrapped in { })
-string Model::getJSON(){
+string Model::toJSON(){
 	
 	
-	string JSON = "id:simpleBrownian,name:Simple Brownian ratchet model,";
+	string JSON = "'id':'simpleBrownian','name':'Simple Brownian ratchet model',";
 	
-	JSON += "allowBacktracking:" + string(this->allowBacktracking ? "true" : "false") + ",";
-	JSON += "allowHypertranslocation:" + string(this->allowHypertranslocation ? "true" : "false") + ",";
-	JSON += "allowInactivation:" + string(this->allowInactivation ? "true" : "false") + ",";
-	JSON += "allowBacktrackWithoutInactivation:" + string(this->allowBacktrackWithoutInactivation ? "true" : "false") + ",";
-	JSON += "deactivateUponMisincorporation:" + string(this->deactivateUponMisincorporation ? "true" : "false") + ",";
-	JSON += "allowGeometricCatalysis:" + string(this->allowGeometricCatalysis ? "true" : "false") + ",";
-	JSON += "allowmRNAfolding:" + string(this->allowmRNAfolding ? "true" : "false") + ",";
-	JSON += "allowMisincorporation:" + string(this->allowMisincorporation ? "true" : "false") + ",";
-	JSON += "useFourNTPconcentrations:" + string(this->useFourNTPconcentrations ? "true" : "false") + ",";
-	JSON += "NTPbindingNParams:" + to_string(this->NTPbindingNParams) + ",";
-	JSON += "currentTranslocationModel:" + this->currentTranslocationModel + ",";
-	JSON += "assumeBindingEquilibrium:" + string(this->assumeBindingEquilibrium ? "true" : "false") + ",";
-	JSON += "assumeTranslocationEquilibrium:" + string(this->assumeTranslocationEquilibrium ? "true" : "false");
+	JSON += "'allowBacktracking':" + string(this->allowBacktracking ? "true" : "false") + ",";
+	JSON += "'allowHypertranslocation':" + string(this->allowHypertranslocation ? "true" : "false") + ",";
+	JSON += "'allowInactivation':" + string(this->allowInactivation ? "true" : "false") + ",";
+	JSON += "'allowBacktrackWithoutInactivation':" + string(this->allowBacktrackWithoutInactivation ? "true" : "false") + ",";
+	JSON += "'deactivateUponMisincorporation':" + string(this->deactivateUponMisincorporation ? "true" : "false") + ",";
+	JSON += "'allowGeometricCatalysis':" + string(this->allowGeometricCatalysis ? "true" : "false") + ",";
+	JSON += "'allowmRNAfolding':" + string(this->allowmRNAfolding ? "true" : "false") + ",";
+	JSON += "'allowMisincorporation':" + string(this->allowMisincorporation ? "true" : "false") + ",";
+	JSON += "'useFourNTPconcentrations':" + string(this->useFourNTPconcentrations ? "true" : "false") + ",";
+	JSON += "'NTPbindingNParams':" + to_string(this->NTPbindingNParams) + ",";
+	JSON += "'currentTranslocationModel':'" + this->currentTranslocationModel + "',";
+	JSON += "'assumeBindingEquilibrium':" + string(this->assumeBindingEquilibrium ? "true" : "false") + ",";
+	JSON += "'assumeTranslocationEquilibrium':" + string(this->assumeTranslocationEquilibrium ? "true" : "false");
 	
 	return JSON;
 	

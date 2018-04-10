@@ -32,7 +32,6 @@
 #include <thread>
 
 
-
 using namespace std;
 
 class Simulator{
@@ -45,6 +44,9 @@ class Simulator{
 	double geometricTranslocationBindingSampling(State* s);
 	double geometricBindingSampling(State* s);
 
+	// Animation mode
+	bool animatingGUI;
+	list<int> actionsToReturn;
 
 	// Timer
 	//void timer_start(unsigned int interval);
@@ -53,8 +55,7 @@ class Simulator{
 	// Store the number of trials remaining and the current state for GUI purposes
 	int nTrialsTotalGUI;
 	int nTrialsCompletedGUI;
-	State* currentGUIState;
-	double simulateForMilliSeconds;
+	double simulateForSeconds;
 	double inSimulationTimeElapsedCurrentSimulation; // Time elapsed in the current simulation (for GUI)
 
 	// Random number generation
@@ -64,8 +65,12 @@ class Simulator{
     public:
     	Simulator();
     	double perform_N_Trials(int N, State* state, bool verbose);
-    	void perform_N_Trials_and_stop(int N, State* state, double msUntilStop, double* toReturn);
-    	void resume_trials(double* toReturn);
+    	int getNtrialsTotal_GUI();
+    	int getNtrialsCompleted_GUI();
+    	list<int> sample_action_GUI();
+    	void initialise_GUI_simulation(int N, double msUntilStop);
+    	void perform_N_Trials_and_stop_GUI(double* toReturn);
+    	void resume_trials_GUI(double* toReturn);
     	double rexp(double rate);
     	double runif();
 

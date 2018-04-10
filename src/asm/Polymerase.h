@@ -1,5 +1,4 @@
-﻿
-/* 
+﻿/* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
 	This file is part of SimPol.
@@ -21,54 +20,44 @@
 -*/
 
 
-#ifndef SEQUENCE_H
-#define SEQUENCE_H
+#ifndef POLYMERASE_H
+#define POLYMERASE_H
 
-#include "TranslocationRatesCache.h"
 
-#include <random>
+#include "Parameter.h"
+#include "Model.h"
 #include <string>
-#include <list>
 
 using namespace std;
 
-class Sequence{
 
+class Polymerase{
 
-	string seqID;
-	string templateSequence;
-	string complementSequence;
-	bool nascent_RNA;
-	bool template_RNA;
-	bool nascent_SS;
-	bool template_SS;
-	void correctSequence(string seq, bool isRNA);
-	TranslocationRatesCache* translocationRatesCache;
-	bool rateTableBuilt;
+	string id;
+	string name;
+	string templateType;
+	string nascentType;
+
+	// Parameters and model
+	Model* polymeraseModel;
+	vector<Parameter*> polymeraseParameters;
 
 
 	public:
-		Sequence(string seqID, string TemplateType, string PrimerType, string templateSequence);
-		string get_templateSequence();
-		string get_complementSequence();
+
+		Polymerase(string id, string name, string templateType, string nascentType);
+		void setModel(Model* model);
 		string getID();
-		TranslocationRatesCache* getRatesCache();
-		void initRateTable();
-
-		bool nascentIsRNA();
-		bool nascentIsSS();
-		bool templateIsRNA();
-		bool templateIsSS();
-		string get_templateType();
-		string get_primerType();
-
+		void setParameters(vector<Parameter*> params); // Set the list of parameters
+		void setParameter(Parameter* param); // Only specify one parameter
 		string toJSON();
-		void print();
+		void activatePolymerase(); // Use the parameters and model associated with this polymerase
+	
 
 
 
 };
 
 
-
 #endif
+

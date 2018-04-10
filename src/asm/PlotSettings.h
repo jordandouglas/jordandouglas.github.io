@@ -1,5 +1,4 @@
-﻿
-/* 
+﻿/* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
 	This file is part of SimPol.
@@ -21,54 +20,61 @@
 -*/
 
 
-#ifndef SEQUENCE_H
-#define SEQUENCE_H
+#ifndef PLOT_SETTINGS_H
+#define PLOT_SETTINGS_H
 
-#include "TranslocationRatesCache.h"
+#include "ParameterHeatmapData.h"
 
-#include <random>
 #include <string>
 #include <list>
+#include <vector>
+
 
 using namespace std;
 
-class Sequence{
+// This class stores the display settings of an individual plot used by the GUI
+class PlotSettings{
+
+	int plotNumber; // 1,2 and 3 control the 3 top plots. 4 is the large plot on the bottom
+	string name; // Name of plot
+	string plotFunction; // JS function to call to generate the plot
+	string xRange;
+	string yRange;
+	string zRange;
 
 
-	string seqID;
-	string templateSequence;
-	string complementSequence;
-	bool nascent_RNA;
-	bool template_RNA;
-	bool nascent_SS;
-	bool template_SS;
-	void correctSequence(string seq, bool isRNA);
-	TranslocationRatesCache* translocationRatesCache;
-	bool rateTableBuilt;
+	// Time histogram only
+	string perTime;
+
+	// Velocity histogram only
+	double windowSize;
+
+	// Long pause plot only
+	string yAxis; 
+
+
+	// Parameter heatmap only
+	vector<int> sitesToRecord;
+	string customParamX;
+	string customParamY;
+	string metricZ;
+	string zColouring;
+	bool plotFromPosterior;
+	string xData;
+	string yData;
+	string zData;
+
 
 
 	public:
-		Sequence(string seqID, string TemplateType, string PrimerType, string templateSequence);
-		string get_templateSequence();
-		string get_complementSequence();
-		string getID();
-		TranslocationRatesCache* getRatesCache();
-		void initRateTable();
-
-		bool nascentIsRNA();
-		bool nascentIsSS();
-		bool templateIsRNA();
-		bool templateIsSS();
-		string get_templateType();
-		string get_primerType();
-
+		PlotSettings(int plotNumber, string name);
+		void savePlotSettings(string plotSettingStr);
+		string getName();
 		string toJSON();
-		void print();
-
+		void updateHeatmapData(list<ParameterHeatmapData*> heatmapData);
 
 
 };
 
-
-
 #endif
+

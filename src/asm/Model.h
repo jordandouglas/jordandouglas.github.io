@@ -64,7 +64,7 @@ class Model{
 
 		Model();
 		Model* clone();
-		string getJSON();
+		string toJSON();
 		void print();
 		void setID(string id);
 		string getID();

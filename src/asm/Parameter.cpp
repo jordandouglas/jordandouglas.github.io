@@ -35,12 +35,26 @@ using namespace std;
 
 
 
+
+
+Parameter::Parameter(string id, bool integer, string zeroTruncated, string name, string title, string latexName){
+	this->id = id;
+	this->integer = integer;
+	this->zeroTruncated = zeroTruncated;
+	this->name = name;
+	this->title = title;
+	this->init();
+	this->latexName = latexName;
+}
+
+
 Parameter::Parameter(string id, bool integer, string zeroTruncated, string name, string title){
 	this->id = id;
 	this->integer = integer;
 	this->zeroTruncated = zeroTruncated;
 	this->name = name;
 	this->title = title;
+	this->latexName = "";
 	this->init();
 }
 
@@ -51,6 +65,7 @@ Parameter::Parameter(string id, bool integer, string zeroTruncated){
 	this->zeroTruncated = zeroTruncated;
 	this->title = "";
 	this->name = "";
+	this->latexName = "";
 	this->init();
 }
 
@@ -88,7 +103,11 @@ void Parameter::init(){
 
 
 string Parameter::getID(){
-	return id;
+	return this->id;
+}
+
+string Parameter::getName(){
+	return this->name;
 }
 
 Parameter* Parameter::hide(){
@@ -135,10 +154,11 @@ string Parameter::getPriorDistributionName(){
 	return this->distributionName;
 }
 
-/*
+
+// Clones the parameter, but will not recurse down to its instances 
 Parameter* Parameter::clone(){
 
-	Parameter* paramClone = new Parameter(this->id, this->integer, this->zeroTruncated);
+	Parameter* paramClone = new Parameter(this->id, this->integer, this->zeroTruncated, this->name, this->title);
 	paramClone->distributionName = this->distributionName;
 	paramClone->isHardcoded = this->isHardcoded;
 	paramClone->hardcodedVal = this->hardcodedVal;
@@ -154,7 +174,7 @@ Parameter* Parameter::clone(){
 	return paramClone;
 
 }
-*/
+
 
 
 
@@ -320,7 +340,7 @@ void Parameter::makeProposal(){
 			// Wrap the value so that it bounces back into the right range
 			stepSize = this->distributionParameters["uniformDistnUpperVal"] - this->distributionParameters["uniformDistnLowerVal"];
 			newVal = this->val + x * stepSize;
-			newVal = Settings::wrap(newVal, this->distributionParameters["uniformDistnLowerVal"],  this->distributionParameters["uniformDistnUpperVal"]);
+			//newVal = Settings::wrap(newVal, this->distributionParameters["uniformDistnLowerVal"],  this->distributionParameters["uniformDistnUpperVal"]);
 			this->val = newVal;
 		}
 				
@@ -430,22 +450,23 @@ Parameter* Parameter::setDistributionParameter(string name, double value){
 
 
 // Converts the parameter into a JSON string for use by javascript (not wrapped in { })
-string Parameter::getJSON(){
+string Parameter::toJSON(){
 
-	string JSON = this->getID() + ":{";
+	string JSON = "'" + this->getID() + "':{";
 
-	JSON += "distribution:" + this->distributionName + ",";
-	JSON += "val:" + to_string(this->val) + ",";
-	JSON += "name:" + this->name + ",";
-	JSON += "title:" + this->title + ",";
-	JSON += "integer:" + string(this->integer ? "true" : "false") + ",";
-	JSON += "hidden:" + string(this->hidden ? "true" : "false") + ",";
-	JSON += "zeroTruncated:" + this->zeroTruncated + ",";
+	JSON += "'distribution':'" + this->distributionName + "',";
+	JSON += "'val':" + to_string(this->val) + ",";
+	JSON += "'name':'" + this->name + "',";
+	JSON += "'title':'" + this->title + "',";
+	JSON += "'integer':" + string(this->integer ? "true" : "false") + ",";
+	JSON += "'hidden':" + string(this->hidden ? "true" : "false") + ",";
+	JSON += "'zeroTruncated':'" + this->zeroTruncated + "',";
+	if (this->latexName != "") JSON += "'name':'" + this->latexName + "',";
 
 	for(std::map<string, double>::iterator iter = this->distributionParameters.begin(); iter != this->distributionParameters.end(); ++iter){
 		string k =  iter->first;
 		string v = to_string(iter->second);
-		if (iter->second != INFINITY && iter->second != -INFINITY) JSON += k + ":" + v + ",";
+		if (iter->second != INFINITY && iter->second != -INFINITY) JSON += "'" + k + "':" + v + ",";
 	}
 	JSON = JSON.substr(0, JSON.length()-1); // Remove last ,
 	JSON += "}";

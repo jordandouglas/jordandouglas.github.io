@@ -31,12 +31,16 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include <sstream>
 #include <iterator>
 #include <numeric>
 #include <math.h>
 #include <cmath>
 #include <list>
+
+#include <stdio.h>
+#include <string.h>
 
 using namespace std;
 
@@ -53,6 +57,7 @@ const double _PI = 3.14159265359;
 string outputFilename = "";
 string inputXMLfilename = "";
 string _inputLogFileName = "";
+string _plotFolderName = "";
 bool isWASM = false;
 bool _resumeFromLogfile = false;
 bool _printSummary = false;
@@ -70,6 +75,8 @@ string complementSequence = "";
 string TemplateType = "dsDNA";
 string PrimerType = "ssRNA";
 TranslocationRatesCache* _translocationRatesCache;
+vector<Polymerase*> _polymerases;
+string _currentPolymerase;
 
 
 // ABC settings
@@ -96,16 +103,16 @@ Model* currentModel = new Model();
 
 
 // Parameters
-Parameter* NTPconc = new Parameter("NTPconc", false, "inclusive", "[NTP] (\u03bcM)", "Cellular concentration of NTP");
-Parameter* ATPconc = new Parameter("ATPconc", false, "inclusive", "[ATP] (\u03bcM)", "Cellular concentration of ATP");
-Parameter* CTPconc = new Parameter("CTPconc", false, "inclusive", "[CTP] (\u03bcM)", "Cellular concentration of CTP");
-Parameter* GTPconc = new Parameter("GTPconc", false, "inclusive", "[GTP] (\u03bcM)", "Cellular concentration of GTP");
-Parameter* UTPconc = new Parameter("UTPconc", false, "inclusive", "[UTP] (\u03bcM)", "Cellular concentration of UTP");
+Parameter* NTPconc = new Parameter("NTPconc", false, "inclusive", " [NTP] (\u03bcM)", "Cellular concentration of NTP");
+Parameter* ATPconc = new Parameter("ATPconc", false, "inclusive", " [ATP] (\u03bcM)", "Cellular concentration of ATP");
+Parameter* CTPconc = new Parameter("CTPconc", false, "inclusive", " [CTP] (\u03bcM)", "Cellular concentration of CTP");
+Parameter* GTPconc = new Parameter("GTPconc", false, "inclusive", " [GTP] (\u03bcM)", "Cellular concentration of GTP");
+Parameter* UTPconc = new Parameter("UTPconc", false, "inclusive", " [UTP] (\u03bcM)", "Cellular concentration of UTP");
 Parameter* FAssist = new Parameter("FAssist", false, "false", "Force  (pN)", "Assisting force applied to the polymerase during single-molecule experiments.");
 
 Parameter* hybridLen = new Parameter("hybridLen", true, "exclusive", "Hybrid length (bp)", "Number of base pairs inside the polymerase");
-Parameter* bubbleLeft = new Parameter("bubbleLeft", true, "exclusive", "Bubble length left (bp)", "Number of unpaired template bases 3' of the hybrid");
-Parameter* bubbleRight = new Parameter("bubbleRight", true, "exclusive", "Bubble length right (bp)", "Number of unpaired template bases 5' of the hybrid");
+Parameter* bubbleLeft = new Parameter("bubbleLeft", true, "exclusive", "Bubble length left (bp)", "Number of unpaired template bases 3\u2032 of the hybrid");
+Parameter* bubbleRight = new Parameter("bubbleRight", true, "exclusive", "Bubble length right (bp)", "Number of unpaired template bases 5\u2032 of the hybrid");
 
 Parameter* GDagSlide = new Parameter("GDagSlide", false, "false", "\u0394\u0394G\u2020t", "Free energy barrier height of translocation");
 Parameter* DGPost = new Parameter("DGPost", false, "false", "\u0394\u0394Gt1", "Free energy added on to posttranslocated ground state");
@@ -115,17 +122,25 @@ Parameter* kCat = new Parameter("kCat", false, "inclusive", "Rate of catalysis (
 Parameter* Kdiss = new Parameter("Kdiss", false, "exclusive", "KD (\u03bcM)", "Dissociation constant of NTP");
 Parameter* RateBind = new Parameter("RateBind", false, "inclusive", "Rate of binding  (\u03bcM\u207B\u00B9 s\u207B\u00B9)", "Second order rate constant of binding the correct NTP");
 
-vector<Parameter*> Settings::paramList(16);
+Parameter* RateActivate = new Parameter("kA", false, "inclusive", "kA (s\u207B\u00B9)", "Rate constant of polymerase leaving the catalytically unactive state", "k_[A]  (s^[\u22121\u2009])");
+Parameter* RateDeactivate = new Parameter("kU", false, "inclusive", "kU (s\u207B\u00B9)", "Rate constant of polymerase entering the catalytically unactive state", "k_[U]  (s^[\u22121\u2009])");
+
+
+vector<Parameter*> Settings::paramList(18);
 
 CRandomMersenne* Settings::SFMT;
 
 
 // User interface information
-bool USING_GUI = false;
-bool GUI_STOP = false;
-bool needToReinitiateAnimation = false;
-Simulator* interfaceSimulator; // The simulator object being used by the GUI
-chrono::system_clock::time_point interfaceSimulation_startTime = chrono::system_clock::now();
+bool _USING_GUI = false;
+bool _GUI_STOP = false;
+bool _needToReinitiateAnimation = false;
+bool _GUI_simulating = false;
+bool _applyingReactionsGUI = false;
+string _animationSpeed = "medium";
+Simulator* _interfaceSimulator; // The simulator object being used by the GUI
+State* _currentStateGUI; // The current state displayed on the GUI and used in all GUI simulations
+chrono::system_clock::time_point _interfaceSimulation_startTime = chrono::system_clock::now();
 
 
 void Settings::init(){
@@ -159,6 +174,8 @@ void Settings::init(){
 
 	arrestTime->setDistributionParameter("fixedDistnVal", 600);
 
+	RateActivate->setDistributionParameter("fixedDistnVal", 4);
+	RateDeactivate->setDistributionParameter("fixedDistnVal", 0.1);
 
 	
 	// Populate the list of parameters
@@ -179,7 +196,135 @@ void Settings::init(){
 	paramList.at(13) = kCat;
 	paramList.at(14) = Kdiss;
 	paramList.at(15) = RateBind;
+	paramList.at(16) = RateActivate;
+	paramList.at(17) = RateDeactivate;
 
+
+
+
+	// Create the polymerase objects
+	initPolymerases();
+
+
+}
+
+
+
+void Settings::initPolymerases(){
+
+
+	_polymerases.resize(3);
+
+	Polymerase* ecoliPol = new Polymerase("RNAP", "Escherichia coli RNAP", "dsDNA", "ssRNA");
+	Polymerase* yeastPol = new Polymerase("polII", "Saccharomyces cerevisiae RNAP II", "dsDNA", "ssRNA");
+	Polymerase* T7pol = new Polymerase("T7pol", "Bacteriophage T7 RNAP", "dsDNA", "ssRNA");
+
+
+	// Use the default parameters for each polymerase unless specified otherwise
+	ecoliPol->setParameters(Settings::getParamListClone());
+	yeastPol->setParameters(Settings::getParamListClone());
+	T7pol->setParameters(Settings::getParamListClone());
+
+	// E. coli parameters
+	ecoliPol->setParameter(GDagSlide->clone()->setDistributionParameter("fixedDistnVal", 9.079));
+	ecoliPol->setParameter(DGPost->clone()->setDistributionParameter("fixedDistnVal", -2.007));
+	ecoliPol->setParameter(barrierPos->clone()->setDistributionParameter("fixedDistnVal", 2.838));
+	ecoliPol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 25.56));
+	ecoliPol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 1.8));
+	ecoliPol->setParameter(RateBind->clone()->setDistributionParameter("fixedDistnVal", 0.5448));
+
+	// S. cerevisiae parameters
+	yeastPol->setParameter(GDagSlide->clone()->setDistributionParameter("fixedDistnVal", 8.536));
+	yeastPol->setParameter(DGPost->clone()->setDistributionParameter("fixedDistnVal", -4.323));
+	yeastPol->setParameter(barrierPos->clone()->setDistributionParameter("fixedDistnVal", 2.889));
+	yeastPol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 29.12));
+	yeastPol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 72));
+
+	// T7 parameters
+	T7pol->setParameter(DGPost->clone()->setDistributionParameter("fixedDistnVal", -4.709));
+	T7pol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 127.3));
+	T7pol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 105));
+
+
+	// Choose the default model settings
+	ecoliPol->setModel((new Model())->set_assumeTranslocationEquilibrium(false)->set_assumeBindingEquilibrium(false)->set_allowGeometricCatalysis(false));
+	yeastPol->setModel((new Model())->set_assumeTranslocationEquilibrium(false)->set_assumeBindingEquilibrium(true)->set_allowGeometricCatalysis(false));
+	T7pol->setModel((new Model())->set_assumeTranslocationEquilibrium(true)->set_assumeBindingEquilibrium(true)->set_allowGeometricCatalysis(false));
+
+
+	_polymerases.at(0) = ecoliPol;
+	_polymerases.at(1) = yeastPol;
+	_polymerases.at(2) = T7pol;
+
+
+	// Activate the E. coli polymerase as the default
+	Settings::activatePolymerase("RNAP");
+
+}
+
+
+// Activate the selected RNA polymerase
+void Settings::activatePolymerase(string polymeraseID){
+
+	for (int i = 0; i < _polymerases.size(); i ++){
+		if (_polymerases.at(i)->getID() == polymeraseID){
+			_polymerases.at(i)->activatePolymerase();
+			_currentPolymerase = polymeraseID;
+			return;
+		}
+	}
+
+	cout << "ERROR: Cannot find polymerase " << polymeraseID << endl;
+	exit(0);
+
+}
+
+
+// TODO: Does not yet recursively clone instances of the Parameters
+vector<Parameter*> Settings::getParamListClone(){
+
+	vector<Parameter*> paramListClone(paramList.size());
+	for (int i = 0; i < paramList.size(); i ++){
+		Parameter* paramClone = paramList.at(i)->clone();
+		paramListClone.at(i) = paramClone;
+	}
+
+	return paramListClone;
+
+}
+
+
+void Settings::setParameterList(vector<Parameter*> params){
+
+
+	Settings::paramList = params;
+
+	// Populate the list of parameters
+	NTPconc = paramList.at(0);
+	ATPconc = paramList.at(1);
+	CTPconc = paramList.at(2);
+	GTPconc = paramList.at(3);
+	UTPconc = paramList.at(4);
+	FAssist = paramList.at(5);
+
+	hybridLen = paramList.at(6);
+	bubbleLeft = paramList.at(7);
+	bubbleRight = paramList.at(8);
+	GDagSlide = paramList.at(9);
+	DGPost = paramList.at(10);
+	barrierPos = paramList.at(11);
+	arrestTime = paramList.at(12);
+	kCat = paramList.at(13);
+	Kdiss = paramList.at(14);
+	RateBind = paramList.at(15);
+	RateActivate = paramList.at(16);
+	RateDeactivate = paramList.at(17);
+
+
+}
+
+
+void Settings::initSequences(){
 
 	// Create sequence objects
 	Sequence* seq = new Sequence("Buchnera aphidicola murC1 EU274658", "dDNA", "ssRNA", "GGAAGACTATTAGGTCTTTAATATCGTCGATTTTTTTTTTGTAAGGATATGATAATTCTCGACTTTA");
@@ -192,7 +337,6 @@ void Settings::init(){
 	sequences[seq->getID()] = seq;
 
 	setSequence("Buchnera aphidicola murC1 EU274658");
-
 
 }
 
@@ -219,10 +363,19 @@ bool Settings::setSequence(string seqID){
 string Settings::toJSON(){
 
 	string parametersJSON = "";
-	parametersJSON += "seq:{seqID:" + _seqID + ",seq:" + templateSequence + ",template:" + TemplateType + ",primer:" + PrimerType + "},";
-	parametersJSON += "model:{" + currentModel->getJSON() + "},";
-	parametersJSON += "N:" + to_string(ntrials_sim) + ",";
-	parametersJSON += "speed:hidden";
+	parametersJSON += "'seq':{'seqID':" + _seqID + ",'seq':" + templateSequence + ",'template':" + TemplateType + ",'primer':" + PrimerType + "},";
+	parametersJSON += "'model':{" + currentModel->toJSON() + "},";
+	parametersJSON += "N':" + to_string(ntrials_sim) + ",";
+	parametersJSON += "'speed':'" + _animationSpeed + "',";
+
+
+	parametersJSON += "'polymerases':{";
+	for (int i = 0; i < _polymerases.size(); i ++){
+		parametersJSON += _polymerases.at(i)->toJSON();
+		if (i < _polymerases.size()-1) parametersJSON += ",";
+	}
+	parametersJSON += "}, 'currentPolymerase':" + _currentPolymerase;
+
 
 	return parametersJSON;
 
@@ -270,6 +423,8 @@ void Settings::print(){
 	Kdiss->print();
 	RateBind->print();
 
+	RateActivate->print();
+	RateDeactivate->print();
 
 	cout << endl << endl;
 
@@ -373,6 +528,19 @@ void Settings::updateParameterVisibilities(){
 	}else{
 		RateBind->show();
 	}
+
+
+
+	// Activation allowed?
+	if (currentModel->get_allowInactivation()){
+		RateActivate->show();
+		RateDeactivate->show();
+	}else{
+		RateActivate->hide();
+		RateDeactivate->hide();
+	}
+
+
 	
 }
 
@@ -419,6 +587,8 @@ void Settings::clearParameterHardcodings(){
 	kCat->stopHardcoding();
 	Kdiss->stopHardcoding();
 	RateBind->stopHardcoding();
+	RateActivate->stopHardcoding();
+	RateDeactivate->stopHardcoding();
 
 }
 
@@ -444,6 +614,8 @@ void Settings::sampleAll(){
 	kCat->sample();
 	Kdiss->sample();
 	RateBind->sample();
+	RateActivate->sample();
+	RateDeactivate->sample();
 
 
 	// Samples a model
@@ -472,6 +644,8 @@ Parameter* Settings::getParameterByName(string paramID){
 	if (paramID == "kCat") return kCat;
 	if (paramID == "Kdiss") return Kdiss;
 	if (paramID == "RateBind") return RateBind;
+	if (paramID == "kA") return RateActivate;
+	if (paramID == "kU") return RateDeactivate;
 
 	return nullptr;
 }
@@ -530,5 +704,29 @@ vector<std::string> Settings::split(const std::string& s, char delimiter){
    }
    return tokens;
 }
+
+
+bool Settings::strIsNumber(const string& s){
+	if (s == "") return false;
+    return( strspn( s.c_str(), "-.0123456789" ) == s.size() );
+}
+
+
+
+
+
+// Insert an element into the right position of a sorted vector of integers
+void Settings::sortedPush(std::vector<int> &cont, int value) {
+    std::vector<int>::iterator it = std::lower_bound( cont.begin(), cont.end(), value, std::less<int>() ); // Increasing order
+    cont.insert( it, value ); // insert before iterator it
+}
+
+
+// Insert an element into the right position of a sorted vector of doubles
+void Settings::sortedPush(std::vector<double> &cont, double value) {
+    std::vector<double> ::iterator it = std::lower_bound( cont.begin(), cont.end(), value, std::less<double>() ); // Increasing order
+    cont.insert(it, value); // insert before iterator it
+}
+
 
 

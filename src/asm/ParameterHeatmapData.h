@@ -21,54 +21,38 @@
 -*/
 
 
-#ifndef SEQUENCE_H
-#define SEQUENCE_H
+#ifndef PARAMETER_HEATMAP_DATA_H
+#define PARAMETER_HEATMAP_DATA_H
 
-#include "TranslocationRatesCache.h"
 
-#include <random>
+
 #include <string>
 #include <list>
+#include <vector>
 
 using namespace std;
 
-class Sequence{
+// This class stores the recorded data per trial of a given parameter or metric
+class ParameterHeatmapData{
 
+	string id; // id of plot
+	string name; // Name to display on axis label
+	string latexName; // If this is provided then will try to render this in latex math notation instead of the name
+	list<double> values; // Values (one number for each trial)
 
-	string seqID;
-	string templateSequence;
-	string complementSequence;
-	bool nascent_RNA;
-	bool template_RNA;
-	bool nascent_SS;
-	bool template_SS;
-	void correctSequence(string seq, bool isRNA);
-	TranslocationRatesCache* translocationRatesCache;
-	bool rateTableBuilt;
 
 
 	public:
-		Sequence(string seqID, string TemplateType, string PrimerType, string templateSequence);
-		string get_templateSequence();
-		string get_complementSequence();
+		ParameterHeatmapData(string id, string name);
+		ParameterHeatmapData(string id, string name, string latexName);
+		void addValue(double val);
 		string getID();
-		TranslocationRatesCache* getRatesCache();
-		void initRateTable();
-
-		bool nascentIsRNA();
-		bool nascentIsSS();
-		bool templateIsRNA();
-		bool templateIsSS();
-		string get_templateType();
-		string get_primerType();
-
 		string toJSON();
-		void print();
+		list<double> getVals();
 
 
 
 };
 
-
-
 #endif
+

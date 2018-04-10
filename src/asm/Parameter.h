@@ -43,6 +43,7 @@ class Parameter{
     bool hidden;
     string name;
     string title;
+    string latexName;
     void init();
 
     bool hasMadeProposal;
@@ -64,9 +65,11 @@ class Parameter{
     public:
     	Parameter(string id, bool integer, string zeroTruncated); // Parameter constructor
     	Parameter(string id, bool integer, string zeroTruncated, string name, string title);
+    	Parameter(string id, bool integer, string zeroTruncated, string name, string title, string latexName);
 
 
     	string getID();
+    	string getName();
     	double getVal(); // Returns the effective value (being used for simulation purposes)
     	double getTrueVal(); // Returns the true underlying estimate of this parameter (used for MCMC purposes)
 		void setVal(double val);
@@ -75,14 +78,14 @@ class Parameter{
 		void acceptProposal();
 		void rejectProposal();
 		string getPriorDistributionName();
-		//Parameter* clone();
+		Parameter* clone();
 		void sample();
 		void hardcodeValue(double value);
 		void stopHardcoding();
 		Parameter* setDistributionParameter(string name, double value);
 		void print();
 		double calculateLogPrior();
-		string getJSON();
+		string toJSON();
 		Parameter* hide();
 		Parameter* show();
 
