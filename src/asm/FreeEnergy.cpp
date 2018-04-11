@@ -72,8 +72,7 @@ double FreeEnergy::getFreeEnergyOfIntermediateState(State* state1, State* state2
 	vector<string> hybridStrings1 = FreeEnergy::getHybridString(state1);
 	vector<string> hybridStrings2 = FreeEnergy::getHybridString(state2);
 	vector<string> intermediateString = FreeEnergy::getHybridIntermediateString(hybridStrings1, hybridStrings2, state1->getLeftBaseNumber(), state2->getLeftBaseNumber());
-	
-	
+
 	freeEnergy = getHybridFreeEnergy(intermediateString.at(0), intermediateString.at(1), TemplateType.substr(2), PrimerType.substr(2));
 	
 	
@@ -355,7 +354,10 @@ list<string> FreeEnergy::getBasePairs(string templateString, string nascentStrin
 double FreeEnergy::getHybridFreeEnergy(string templateString, string nascentString, string templateType, string nascentType){
 
 
+
 	double freeEnergy = 0;
+
+	if (templateString.length() == 0 || nascentString.length() == 0) return freeEnergy;
 		
 	for (int hybridPos = 0; hybridPos < min(templateString.length(), nascentString.length()) - 1; hybridPos ++){
 		

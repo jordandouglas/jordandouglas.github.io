@@ -50,8 +50,7 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		int rowNum = state->get_nascentLength() - (h-1);
 		int colNum = state->get_mRNAPosInActiveSite() + 1;
 		
-		
-		auto rates = translocationRateTable[rowNum][colNum];
+		double* rates = translocationRateTable[rowNum][colNum];
 		double GDagRateModifier = exp(-GDagSlide->getVal());
 		double forceGradientFwd = exp(( FAssist->getVal() * 1e-12 * (barrierPos->getVal()) * 1e-10) / (_kBT));
 		double forceGradientBck = exp((-FAssist->getVal() * 1e-12 * (3.4-barrierPos->getVal()) * 1e-10) / (_kBT));
@@ -73,12 +72,14 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		//else cout << rates[0] * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck << endl;
 
 
+
+
 		if (rates[0] != -1) {
 			if (fwd) return rates[1] * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd;
 			else return rates[0] * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck;
 		}
 
-		
+
 		// Temporarily set state to inactive so it lets us backtrack
 		//int temp = compactState[3];
 		//compactState[3] = false;
@@ -141,8 +142,6 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 void TranslocationRatesCache::buildTranslocationRateTable(string templSequence){
 
 	// Don't calculate all at once, only calculating for active site positions 0 and 1. Simulation caches hypertranslocated rates as it goes. 
-	// Most states are never sampled. Otherwise far too slow to load for n > 300
-	
 	
 	// Rows are the lengths of the mRNA and cols are the position of the active site (minimum value -1, maximum value h-1). Backtracking rates are found in the backtracking table
 	// Each entry is a tuple (kbck, kfwd)

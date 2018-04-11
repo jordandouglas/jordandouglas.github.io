@@ -141,6 +141,7 @@ extern "C" {
 			else if (reactionNumber == 3) _currentStateGUI->bindNTP();
 			else if (reactionNumber == 4) _currentStateGUI->activate();
 			else if (reactionNumber == 5) _currentStateGUI->deactivate();
+			else if (reactionNumber == 6) _currentStateGUI->terminate();
 
 			_applyingReactionsGUI = false;
 
@@ -671,7 +672,7 @@ extern "C" {
 
 
 		// Get relevant plot data string (if all plots are invisible etc. then this string should be {})
-		string plotsJSON = Plots::getPlotDataAsJSON();
+		//string plotsJSON = Plots::getPlotDataAsJSON();
 
 
 		// Stop timer
@@ -681,7 +682,7 @@ extern "C" {
 
 
 		toReturnJSON += "'animationTime':" + to_string(Coordinates::getAnimationTime()) + ",";
-		toReturnJSON += "'plots':" + plotsJSON + ",";
+		//toReturnJSON += "'plots':" + plotsJSON + ",";
 		toReturnJSON += "'stop':" + string(toStop ?  "true" : "false") + ",";
 		toReturnJSON += "'realTime':" + to_string(time);
 		toReturnJSON += "}";
@@ -716,9 +717,6 @@ extern "C" {
 		bool toStop = false;
 		
 
-
-		////
-
 		// Create JSON string
 		string toReturnJSON = "{";
 	   	
@@ -742,8 +740,10 @@ extern "C" {
 		// Animated mode: sample a single action, return the action and then come back to do the next one
 		else {
 
+
 			// Perform a single action
 			list<int> actionsToDo = _interfaceSimulator->sample_action_GUI();
+
 
 
 			// Get the number of completed trials
@@ -764,7 +764,7 @@ extern "C" {
 
 
 		// Get relevant plot data string (if all plots are invisible etc. then this string should be {})
-		string plotsJSON = Plots::getPlotDataAsJSON();
+		//string plotsJSON = Plots::getPlotDataAsJSON();
 
 
 		// Stop timer
@@ -775,7 +775,7 @@ extern "C" {
 
 		// Return string
 		toReturnJSON += "'animationTime':" + to_string(Coordinates::getAnimationTime()) + ",";
-		toReturnJSON += "'plots':" + plotsJSON + ",";
+		//toReturnJSON += "'plots':" + plotsJSON + ",";
 		toReturnJSON += "'stop':" + string(toStop ?  "true" : "false") + ",";
 		toReturnJSON += "'realTime':" + to_string(time);
 		toReturnJSON += "}";

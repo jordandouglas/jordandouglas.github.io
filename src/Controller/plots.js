@@ -689,7 +689,7 @@ function plotTimeChart(){
 
 	for (var j = 0; j < canvasesToPrintTo.length; j ++){
 
-
+		
 
 		var pltNum = canvasesToPrintTo[j];
 		if ($("#plotDIV" + pltNum).is( ":hidden" )) continue;

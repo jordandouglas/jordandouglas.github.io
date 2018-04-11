@@ -49,7 +49,7 @@ int Coordinates::getAnimationTime(){
 
 	if (_animationSpeed == "slow") return 200;
 	if (_animationSpeed == "medium") return 60;
-	if (_animationSpeed == "fast") return 8;
+	if (_animationSpeed == "fast") return 4;
 	return 0; // Hidden does not animate it just changes
 }
 
@@ -227,6 +227,15 @@ void Coordinates::generateAllCoordinates(State* state){
 		} else ntY -= 52;
 
 
+
+		// Bases may have been deleted due to termination -> create objects again
+		if (!Coordinates::move_nt_absolute(i, "m", ntX, ntY + dy)){
+			string baseStr = i == 0 ? "5" : state->get_NascentSequence().substr(i-1, 1);
+			string src = baseStr == "5" ? "5" + PrimerType.substr(2) : baseStr + "m";
+			Coordinates::create_nucleotide(i, "m", ntX, ntY + dy, baseStr, src, false);
+		} 
+
+
 		// Is NTP bound?
 		if (i == state->get_NascentSequence().length()-1 && state->NTPbound()){
 			ntX += 10;
@@ -234,7 +243,7 @@ void Coordinates::generateAllCoordinates(State* state){
 		}else Coordinates::set_TP_state(i, "m", false);
 
 
-		Coordinates::move_nt_absolute(i, "m", ntX, ntY + dy); 
+
 
 
 	}
@@ -407,7 +416,7 @@ void Coordinates::move_obj_absolute(string id, double newX, double newY){
 }
 
 
-void Coordinates::move_nt_absolute(int pos, string whichSeq, double newX, double newY){
+bool Coordinates::move_nt_absolute(int pos, string whichSeq, double newX, double newY){
 
 
 	HTMLobject* nt;
@@ -416,7 +425,9 @@ void Coordinates::move_nt_absolute(int pos, string whichSeq, double newX, double
 	if (whichSeq == "g" && pos < Coordinates::TemplateSequenceHTMLObjects.size()) nt = Coordinates::TemplateSequenceHTMLObjects.at(pos);
 	else if (whichSeq == "m" && pos < Coordinates::NascentSequenceHTMLObjects.size()) nt = Coordinates::NascentSequenceHTMLObjects.at(pos);
 	else if (whichSeq == "o" && pos < Coordinates::ComplementSequenceHTMLObjects.size()) nt = Coordinates::ComplementSequenceHTMLObjects.at(pos);
-	if (nt == nullptr) return;
+
+
+	if (nt == nullptr) return false;
 
 
 	double dx = newX - nt->getX();
@@ -424,6 +435,7 @@ void Coordinates::move_nt_absolute(int pos, string whichSeq, double newX, double
 
 	Coordinates::move_obj(nt, dx, dy);
 
+	return true;
 
 }
 

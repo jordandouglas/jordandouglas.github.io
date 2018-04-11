@@ -56,6 +56,7 @@ class State{
 
     	// Reactions and their rates
 		State* forward();
+		State* terminate();
 		double calculateForwardRate(bool lookupFirst, bool ignoreStateRestrictions);
 		State* backward();
 		double calculateBackwardRate(bool lookupFirst, bool ignoreStateRestrictions);

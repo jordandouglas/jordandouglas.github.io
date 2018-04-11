@@ -2093,7 +2093,9 @@ function startTrials_controller(){
 			var resolve = function(result){
 				
 				//console.log("Back here", result);
-				drawPlotsFromData(result.plots);
+				//drawPlotsFromData(result.plots);
+				drawPlots();
+				if($("#PreExp").val() != "hidden") renderObjects(false);
 
 				if (result.stop) {
 					updateDOM(result);
@@ -2107,6 +2109,14 @@ function startTrials_controller(){
 
 					$("#counterProgress").html(Math.floor(result.N));
 					//$("#output_asm").append("<div style='padding:5 5'>Velocity: " + roundToSF(result.meanVelocity, 4) + "bp/s; Time taken: " + roundToSF(result.realTime, 4) + "s; n complete = " + result.N + "</div>"); 
+
+
+					// Go back to the model when done
+					if (result.animationTime > 0){
+						var resumeTrialsFnStr = "wasm_" + stringifyFunction("resumeTrials", [msgID]);
+						callWebWorkerFunction(resumeTrialsFnStr, null, null, false);
+					}
+
 				}
 
 			}
@@ -2117,7 +2127,7 @@ function startTrials_controller(){
 			// Render every animationFrame unless ultrafast or hidden
 			if ($("#PreExp").val() != "ultrafast" && $("#PreExp").val() != "hidden") {
 				simulationRenderingController = true;
-				renderObjectsUntilReceiveMessage(msgID);
+				//renderObjectsUntilReceiveMessage(msgID);
 			}
 
 			// If hidden mode then the model will tell us when to render

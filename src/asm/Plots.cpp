@@ -215,8 +215,8 @@ void Plots::refreshPlotData(State* state){
 void Plots::updateParameterPlotData(State* state){
 	
 
-	if (Plots::catalysisTimesThisTrial.size() == 0) return; 
 
+	if (Plots::catalysisTimesThisTrial.size() == 0) return; 
 	if (Plots::totaltimeElapsedThisTrial == 0) return;
 
 
@@ -376,7 +376,7 @@ string Plots::getPlotDataAsJSON(){
 
 	string plotDataJSON = "{";
 
-	plotDataJSON += "'timeElapsed':" + to_string(Plots::timeElapsed);
+	plotDataJSON += "'timeElapsed':" + to_string(Plots::totaltimeElapsedThisTrial);
 	plotDataJSON += ",'velocity':" + to_string(Plots::velocity);
 	plotDataJSON += ",'templateSeq':'" + currentSequence->get_templateSequence() + "'";
 	plotDataJSON += ",'nbases':" + to_string(currentSequence->get_templateSequence().length());

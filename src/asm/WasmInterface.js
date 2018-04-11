@@ -368,17 +368,22 @@ startTrials = function(N, msgID = null){
 		else{
 
 
-			if (msgID != null) postMessage(msgID + "~X~" + resultStr);
-
 			// Animated mode. Perform the actions specified and then sample more actions 
-			if (result.animationTime > 0 && result.actions != null) applyReactions(result.actions, result.animationTime, function() { resumeTrials(msgID); }, null);
+			if (result.animationTime > 0 && result.actions != null) {
+				applyReactions(result.actions, result.animationTime, function() { 
+					if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+					//resumeTrials(msgID);
+				}, null);
+			}
 
 			// Hidden mode. Resume the trials and tell the messenger to not delete the message
 			else {
+				if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 				resumeTrials(msgID);
 			}
 		}
 	}
+
 
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall, remove: false};
 	Module.ccall("startTrials", null, ["number", "number"], [N, msgID]);
@@ -408,14 +413,18 @@ resumeTrials = function(msgID = null){
 
 			else{
 
-				if (msgID != null) postMessage(msgID + "~X~" + resultStr);
-
-
+				
 				// Animated mode. Perform the actions specified and then sample more actions 
-				if (result.animationTime > 0 && result.actions != null) applyReactions(result.actions, result.animationTime, function() { resumeTrials(msgID); }, null);
+				if (result.animationTime > 0 && result.actions != null) {
+					applyReactions(result.actions, result.animationTime, function() { 
+						if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+						//resumeTrials(msgID);
+					}, null);
+				}
 
 				// Hidden mode. Resume the trials and tell the messenger to not delete the message
 				else {
+					if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 					resumeTrials(msgID);
 				}
 
@@ -439,7 +448,7 @@ getPlotData = function(msgID = null){
 
 	// Create the callback function
 	var toDoAfterCall = function(resultStr){
-		//console.log(JSON.parse(resultStr));
+		//console.log("plotdata", JSON.parse(resultStr));
 		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 
 	}

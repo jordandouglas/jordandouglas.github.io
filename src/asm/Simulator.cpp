@@ -150,6 +150,7 @@ list<int> Simulator::sample_action_GUI(){
 
 	// Move onto next trial if terminated
 	if (_currentStateGUI->isTerminated()) {
+
 		Plots::updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
 		delete _currentStateGUI;
 		_currentStateGUI = new State(true, true);
@@ -163,8 +164,12 @@ list<int> Simulator::sample_action_GUI(){
 	}
 
 
+
 	// This function will populate the list of actions to do but won't actually do them
 	double result[3];
+	result[0] = 0;
+	result[1] = 0;
+	result[2] = 0;
 	performSimulation(_currentStateGUI, result);
 
 	return this->actionsToReturn;
@@ -217,6 +222,7 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
 			Plots::updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
 			delete _currentStateGUI;
 			_currentStateGUI = new State(true, true);
+			Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
 		}
 
 	}
@@ -328,7 +334,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
 
-	
+
 	double timeElapsed = 0;
 
 	// Detect if the polymerase has stalled at a position
@@ -371,17 +377,21 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
 
-		// Arrest if timeout has been reached
-		if (arrestTime->getVal() != 0 && timeElapsedSinceLastCatalysis >= arrestTime->getVal()){
-			s->set_terminated(true);
-			break;
+		// Arrest if timeout has been reached or if have gone beyond the end of the sequence
+		if ((arrestTime->getVal() != 0 && timeElapsedSinceLastCatalysis >= arrestTime->getVal()) ||
+			(s->get_mRNAPosInActiveSite() <= 1 && s->get_mRNAPosInActiveSite() + s->get_nascentLength() + 1 > templateSequence.length())){
+
+			if (!this->animatingGUI) {
+				s->terminate();
+				break;
+			}
+			else {
+				this->actionsToReturn.push_back(6); // 6 = terminate
+				return;
+			}
 		}
 
 
-		if (s->get_mRNAPosInActiveSite() <= 1 && s->get_mRNAPosInActiveSite() + s->get_nascentLength() + 1 > templateSequence.length()) {
-			s->set_terminated(true);
-		 	break;
-		}
 
 
 		// If NTP is not bound and we are in posttranslocated state, and user has requested to assume binding equilibrium but NOT translocation
@@ -467,7 +477,6 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			double kBindOrCat = s->calculateBindOrCatNTPrate(false);
 			double kActivate = s->calculateActivateRate(false);
 			double kDeactivate = s->calculateDeactivateRate(false);
-
 
 
 			// Assume equilbirium between bound and unbound states but NOT pre and post translocated states
@@ -627,6 +636,8 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				*/
 
 
+
+
 				double normalisationZ = boltzmannG0 + boltzmannG1 + boltzmannGN;
 
 				double probabilityPretranslocated = boltzmannG0 / normalisationZ;
@@ -659,6 +670,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				rateSum += rates[i];
 			}
 			//cout << endl;
+
 			
 			if (rateSum <= 0){
 				cout << "No operations to apply" << endl;
@@ -789,7 +801,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 		
 		//s.print();
 	}
-	
+
 
 	// Total time taken
 	toReturn[1] += timeElapsed;
@@ -1257,6 +1269,9 @@ void Simulator::executeAction(State* s, int reactionToDo) {
 			break;
 		case 5:
 			s->deactivate();
+			break;
+		case 6:
+			s->terminate();
 			break;
 	}
 

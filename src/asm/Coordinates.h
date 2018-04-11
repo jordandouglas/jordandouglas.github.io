@@ -73,7 +73,7 @@ class Coordinates{
 
 		// Move objects (absolute coordinates specified)
 		static void move_obj_absolute(string id, double newX, double newY);
-		static void move_nt_absolute(int pos, string whichSeq, double newX, double newY);  
+		static bool move_nt_absolute(int pos, string whichSeq, double newX, double newY);  
 
 		// Changing objects
 		static void flip_base(int pos, string flipFrom, string flipTo);  

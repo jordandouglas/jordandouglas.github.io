@@ -460,7 +460,7 @@ string Parameter::toJSON(){
 	JSON += "'title':'" + this->title + "',";
 	JSON += "'integer':" + string(this->integer ? "true" : "false") + ",";
 	JSON += "'hidden':" + string(this->hidden ? "true" : "false") + ",";
-	JSON += "'zeroTruncated':'" + this->zeroTruncated + "',";
+	JSON += "'zeroTruncated':" + (this->zeroTruncated == "false" ? string("false") : "'" + this->zeroTruncated + "'") + ",";
 	if (this->latexName != "") JSON += "'name':'" + this->latexName + "',";
 
 	for(std::map<string, double>::iterator iter = this->distributionParameters.begin(); iter != this->distributionParameters.end(); ++iter){

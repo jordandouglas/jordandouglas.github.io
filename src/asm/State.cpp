@@ -264,9 +264,39 @@ State* State::forward(){
 
 	if (!this->NTPbound()) this->mRNAPosInActiveSite ++; // Only move forward if NTP is not bound
 	if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal()-1) ||
-		(this->mRNAPosInActiveSite <= 1 && this->mRNAPosInActiveSite + this->get_nascentLength() + 1 > templateSequence.length())) this->terminated = true;
+		(this->mRNAPosInActiveSite <= 1 && this->mRNAPosInActiveSite + this->get_nascentLength() + 1 > templateSequence.length())) this->terminate();
 
 
+	return this;
+}
+
+
+
+
+State* State::terminate(){
+
+	if (this->terminated) return this;
+
+	this->terminated = true;
+
+
+	for (int i = 0; i <= this->nascentSequence.length(); i ++){
+		Coordinates::delete_nt(i, "m");
+	}
+
+
+
+	/*
+	if (WW_JS.isWebWorker && !RUNNING_FROM_COMMAND_LINE && !ABC_JS.ABC_simulating){
+		postMessage("_renderTermination(" + JSON.stringify({primerSeq: primerSeq, insertPositions: insertPositions}) + ")" );
+	}else if(!RUNNING_FROM_COMMAND_LINE && !ABC_JS.ABC_simulating){
+		renderTermination({primerSeq: primerSeq, insertPositions: insertPositions});
+	}
+
+	for (var i = 0; i <= primerSequence.length - 1; i ++){
+		delete_nt_WW(i, "m");
+	}
+	*/
 	return this;
 }
 
@@ -381,14 +411,12 @@ double State::calculateBackwardRate(bool lookupFirst, bool ignoreStateRestrictio
 	}
 
 
-
 	
 	// Lookup in table first or calculate it again?
 	if (lookupFirst){
 		double kBck = _translocationRatesCache->getTranslocationRates(this, false);
 		return kBck;
 	}
-	
 	
 	
 	double groundEnergy = this->calculateTranslocationFreeEnergy();
@@ -705,6 +733,7 @@ double State::calculateForwardTranslocationFreeEnergyBarrier(){
 
 	
 	State* stateAfterForwardtranslocation = this->clone()->forward();
+
 
 
 	// Midpoint model: free energy barrier is halfway between the two on either side
