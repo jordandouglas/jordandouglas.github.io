@@ -1182,7 +1182,7 @@ function drawModelDiagramCanvas_givenParams(canvasID, kineticStateDescriptionID,
 		plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",+1)\u2071", xCoordOfMainState, yCoordOfMainState + stateHeight + spacingBetweenStates, "The polymerase is <b>posttranslocated</b> and catalytically inactive. The nascent strand is " + m + "nt long.", isCurrentState, "#c0306d");
 		rateSum = kA + paramsResult["k +1,0"] + (elongationModel["allowHypertranslocation"] ? paramsResult["k +1,+2"] : 0);
 		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates - arrowSpace, "up", "kA", kA, rateSum, kineticStateDescriptionID, "k<sub>A</sub>");
-		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState - arrowSpace, yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", paramsResult["k +1,0"], rateSum, kineticStateDescriptionID, "k<sub>bck</sub>");
+		if (!elongationModel.assumeTranslocationEquilibrium) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState - arrowSpace, yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", paramsResult["k +1,0"], rateSum, kineticStateDescriptionID, "k<sub>bck</sub>");
 		if (elongationModel["allowHypertranslocation"]) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + stateWidth + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right",  "kfwd", paramsResult["k +1,+2"], rateSum, kineticStateDescriptionID, "k<sub>fwd</sub>");
 		/////////////////
 
@@ -1193,10 +1193,17 @@ function drawModelDiagramCanvas_givenParams(canvasID, kineticStateDescriptionID,
 		isCurrentState = paramsResult["mRNAPosInActiveSite"] == 0 && !paramsResult["activated"];
 		plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",0)\u2071",  xCoordOfMainState - spacingBetweenStates - stateWidth, yCoordOfMainState + stateHeight + spacingBetweenStates, "The polymerase is <b>pretranslocated</b> and catalytically inactive. The nascent strand is " + m + "nt long.", isCurrentState, "#c0306d");
 		rateSum = kA + paramsResult["k 0,+1"] + (elongationModel["allowBacktracking"] ? paramsResult["k 0,-1"] : 0);
-		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState - spacingBetweenStates + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right", "kfwd", paramsResult["k 0,+1"], rateSum, kineticStateDescriptionID, "k<sub>fwd</sub>");
+		if (!elongationModel.assumeTranslocationEquilibrium) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState - spacingBetweenStates + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right", "kfwd", paramsResult["k 0,+1"], rateSum, kineticStateDescriptionID, "k<sub>fwd</sub>");
 		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + arrowSpace - spacingBetweenStates - stateWidth, yCoordOfMainState + stateHeight + spacingBetweenStates - arrowSpace, "up", "kA", kA, rateSum, kineticStateDescriptionID, "k<sub>A</sub>");
 		if (elongationModel["allowBacktracking"]) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + -1*spacingBetweenStates - stateWidth - arrowSpace,	yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", paramsResult["k 0,-1"], rateSum, kineticStateDescriptionID, "k<sub>bck</sub>");
 		/////////////////
+
+
+
+		// Translocation equilibrium: add an equilibrium arrow between states 0 and 1
+		if (elongationModel.assumeTranslocationEquilibrium){
+			plotEquilibriumArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState - spacingBetweenStates + arrowSpace, yCoordOfMainState + 2 * arrowSpace + stateHeight + spacingBetweenStates, stateWidth, "horizontal", "Kt", "", paramsResult["Kt"], kineticStateDescriptionID, "K<sub>t</sub> = k<sub>bck</sub> / k<sub>fwd</sub>")
+		}
 
 
 
