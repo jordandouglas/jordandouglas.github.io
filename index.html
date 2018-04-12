@@ -2913,9 +2913,9 @@ function closeNav() {
 							<input type=image id='plotOptions4' title="Change the settings of this plot" onClick=plotOptions(4) src="src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px;">  
 
 							&nbsp;&nbsp;
-							<input type=button id='minus100Sites' class='minimise dropdown-disabled' style='width:50px'  value='&larr;100' onClick=minus100Sites() title='See previous 100 sites'>
+							<input type=button id='minus100Sites' class='minimise dropdown-disabled' style='width:50px'  value='&larr;120' onClick=minus100Sites() title='See previous 120 sites'>
 							&nbsp;Showing sites <span id='numSitesDisplayed'></span> out of <span id='numSitesTotal'>0</span>&nbsp;
-							<input type=button id='plus100Sites' class='minimise dropdown-disabled' style='width:50px'  value='100&rarr;' onClick=plus100Sites() title='See next 100 sites'>
+							<input type=button id='plus100Sites' class='minimise dropdown-disabled' style='width:50px'  value='120&rarr;' onClick=plus100Sites() title='See next 120 sites'>
 
 							&nbsp;&nbsp;<input type=image id='downloadPlot4' title="Download the data displayed in this plot" onClick=downloadPlot(4) src="src/Images/download.png" style="vertical-align: middle; height:20px;">  
 						</span>
@@ -3371,11 +3371,14 @@ function closeNav() {
 						<div class="noselect" style='font-size:16px; font-family:Bookman;'>
 							<input type=button class='minimise' id='hideSequences'  value='+' title='Hide/show the sequence window' onClick=toggleSequences()>
 							<span style='font-size:18px; '><b>Copied sequences</b> &nbsp;&nbsp;&nbsp;</span>
-							<input type=button id='minus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='&larr;20' onClick=minusSequences() title='See previous 20 sequences'>
-							&nbsp;Displaying seqs <span id='numSeqsDisplayed'>0</span> out of <span id='numSeqsSimulated'>0</span>&nbsp;
-							<input type=button id='plus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='20&rarr;' onClick=plusSequences() title='See next 20 sequences'>
-							&nbsp;&nbsp;&nbsp;
-							<input type="image" style="vertical-align: middle; height:20px;  padding: 5 0; display:none; cursor: pointer" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="src/Images/download.png"> </input>
+							<span id="terminatedSequencesDescription" style="display:none">
+								<input type=button id='minus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='&larr;20' onClick=minusSequences() title='See previous 20 sequences'>
+								 &nbsp;Displaying seqs <span id='numSeqsDisplayed'>0</span> out of <span id='numSeqsSimulated'>0</span>&nbsp; 
+								<input type=button id='plus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='20&rarr;' onClick=plusSequences() title='See next 20 sequences'>
+								&nbsp;&nbsp;&nbsp;
+								<input type="image" style="vertical-align: middle; height:20px;  padding: 5 0; display:none; cursor: pointer" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="src/Images/download.png"> </input>
+							</span>
+
 						</div>
 
 						<div id='sequencesTableDIV' class='scrollbar' style='overflow-x: scroll; position:relative; width:100%;'></div>
