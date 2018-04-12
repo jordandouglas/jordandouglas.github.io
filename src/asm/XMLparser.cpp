@@ -89,6 +89,11 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 
 		ntrials_sim = sessionEle->Attribute("N") ? atoi(sessionEle->Attribute("N")) : ntrials_sim;
+		if (sessionEle->Attribute("polymerase")){
+			string pol = sessionEle->Attribute("polymerase");
+			Settings::activatePolymerase(pol);
+		}
+
 
 		// Parse sequence information
 		TiXmlElement *sequenceEle = sessionEle->FirstChildElement("sequence");

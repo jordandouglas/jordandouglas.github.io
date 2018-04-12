@@ -42,7 +42,7 @@ class Sequence{
 	bool template_RNA;
 	bool nascent_SS;
 	bool template_SS;
-	void correctSequence(string seq, bool isRNA);
+	string correctSequence(string seq, bool isRNA);
 	TranslocationRatesCache* translocationRatesCache;
 	bool rateTableBuilt;
 

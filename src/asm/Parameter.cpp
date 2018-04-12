@@ -22,6 +22,7 @@
 
 #include "Settings.h"
 #include "Parameter.h"
+#include "Coordinates.h"
 #include <string>
 
 #include <iostream>
@@ -94,8 +95,6 @@ void Parameter::init(){
 	distributionParameters["exponentialDistnVal"] = INFINITY;
 	distributionParameters["poissonRateVal"] = INFINITY;
 
-	distributionParameters["upperVal"] =  INFINITY;
-	distributionParameters["lowerVal"] = -INFINITY;
 	distributionParameters["upperVal"] =  INFINITY;
 	distributionParameters["lowerVal"] = -INFINITY;
 
@@ -181,6 +180,8 @@ Parameter* Parameter::clone(){
 void Parameter::sample(){
 
 
+	double prevVal = this->val;
+
 	if (this->isMetaParameter) {
 		for (int i = 0; i < this->instances.size(); i ++){
 			 this->instances.at(i)->sample();
@@ -231,6 +232,14 @@ void Parameter::sample(){
 
 		// TODO exponential poisson, discrete uniform, gamma
 	}
+
+
+
+	// If animating and this is the FAssist parameter then update the optical tweezer coordinates whenever this parameter changes
+	if (this->id == "FAssist" && _currentStateGUI != nullptr && _animationSpeed != "hidden"){
+		Coordinates::updateForceEquipment(this->val, prevVal);
+	}
+
 
 
 }
@@ -443,8 +452,25 @@ void Parameter::stopHardcoding(){
 
 Parameter* Parameter::setDistributionParameter(string name, double value){
 	if (this->isMetaParameter) return this;
-	if (this->distributionParameters.find(name) == this->distributionParameters.end()) return nullptr; // Do not add if not one of the canonical parameters
-	this->distributionParameters[name] = value;
+	if (this->distributionParameters.find(name) == this->distributionParameters.end()) return this; // Do not add if not one of the canonical parameters
+	if (!value && value != 0) return this; // Do not add if this is not a number
+
+
+	// Check number is not out of range
+	if (name == "fixedDistnVal" && ((this->zeroTruncated == "exclusive" && value <= 0) || (this->zeroTruncated == "inclusive" && value <  0))) return this;
+	if (name == "uniformDistnLowerVal" && ((this->zeroTruncated == "exclusive" && value < 0) || (this->zeroTruncated == "inclusive" && value <  0))) return this;
+	if (name == "uniformDistnUpperVal" && ((this->zeroTruncated == "exclusive" && value < 0) || (this->zeroTruncated == "inclusive" && value <  0))) return this;
+	if (name == "normalSdVal" && value <= 0) return this;
+	if (name == "lognormalMeanVal" && value <= 0) return this;
+	if (name == "lognormalSdVal" && value <= 0) return this;
+	if (name == "exponentialDistnVal" && value <= 0) return this;
+	if (name == "gammaRateVal" && value <= 0) return this;
+	if (name == "gammaShapeVal" && value <= 0) return this;
+	if (name == "poissonRateVal" && value <= 0) return this;
+	if (distributionParameters["upperVal"] < value) return this;
+	if (distributionParameters["lowerVal"] > value) return this;
+
+	this->distributionParameters[name] = value; 
 	return this;
 }
 

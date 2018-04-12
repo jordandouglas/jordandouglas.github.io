@@ -1412,7 +1412,7 @@ function plotArrow_stateDiagram(ctx, stateHoverEvents, fromx, fromy, direction, 
 		else mouseInArrow = mouseInArrow && fromy  <= mouseY && toy + headlen >= mouseY; 
 
 		if (mouseInArrow){
-			var fullDescription = "Rate constant " + (htmlLabel == "" ? label : htmlLabel) + " = " + roundToSF(rate) +  "s\u207B\u00B9.";
+			var fullDescription = "Rate constant " + (htmlLabel == "" ? label : htmlLabel) + " = " + roundToSF(rate) +  " s\u207B\u00B9.";
 			if (rateSum != 0) {
 				var sf = 3;
 				var prob = roundToSF(rate/rateSum, sf);
@@ -1443,7 +1443,7 @@ function plotArrow_stateDiagram(ctx, stateHoverEvents, fromx, fromy, direction, 
 
 
 function plotEquilibriumArrow_stateDiagram(ctx, stateHoverEvents, leftX, topY, stateHeightorWidth, direction, label = "", units = "", val = 0, kineticStateDescriptionID, htmlLabel = ""){
-
+ 
 	ctx.strokeStyle = "#708090";
 	ctx.globalAlpha = 1;
 	ctx.lineWidth = 10;
@@ -1520,6 +1520,8 @@ function plotEquilibriumArrow_stateDiagram(ctx, stateHoverEvents, leftX, topY, s
 
 
 	if (label == "") return;
+	if (units != "") units = " " + units;
+
 
 	// Label
 	ctx.fillStyle = "black";

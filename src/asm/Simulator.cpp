@@ -379,7 +379,8 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 		// Arrest if timeout has been reached or if have gone beyond the end of the sequence
 		if ((arrestTime->getVal() != 0 && timeElapsedSinceLastCatalysis >= arrestTime->getVal()) ||
-			(s->get_mRNAPosInActiveSite() <= 1 && s->get_mRNAPosInActiveSite() + s->get_nascentLength() + 1 > templateSequence.length())){
+			(s->get_mRNAPosInActiveSite() <= 1 && s->get_mRNAPosInActiveSite() + s->get_nascentLength() > templateSequence.length()) ||
+			(s->get_mRNAPosInActiveSite() == 0 && s->getRightTemplateBaseNumber() == templateSequence.length()) ){
 
 			if (!this->animatingGUI) {
 				s->terminate();
@@ -435,7 +436,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
 			// Geometric sampling speed boost for when just binding is kinetic (or both kinetic but backtracking/hypertranslocation are not prohibited)
-			/*else*/ if ((nothingEquilibrium && s->get_mRNAPosInActiveSite() == 1) || justTranslocationEquilibrium){
+			else if ((nothingEquilibrium && s->get_mRNAPosInActiveSite() == 1) || justTranslocationEquilibrium){
 				geometricTime = geometricBindingSampling(s);
 			}
 
@@ -1046,6 +1047,8 @@ double Simulator::geometricTranslocationBindingSampling(State* s){
 
 		if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
 		else this->actionsToReturn.push_back(actionsToDoList[i]);
+
+		//cout << "Pushing " << actionsToDoList[i] << endl;
 
 	}
 

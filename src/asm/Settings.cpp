@@ -157,7 +157,7 @@ void Settings::init(){
 	CTPconc->setDistributionParameter("fixedDistnVal", 278)->hide();
 	GTPconc->setDistributionParameter("fixedDistnVal", 468)->hide();
 	UTPconc->setDistributionParameter("fixedDistnVal", 567)->hide();
-	FAssist->setDistributionParameter("fixedDistnVal", 0);
+	FAssist->setDistributionParameter("fixedDistnVal", 0)->setDistributionParameter("uniformDistnLowerVal", -30)->setDistributionParameter("uniformDistnUpperVal", 30);
 
 	hybridLen->setDistributionParameter("fixedDistnVal", 9);
 	bubbleLeft->setDistributionParameter("fixedDistnVal", 2);
@@ -258,7 +258,7 @@ void Settings::initPolymerases(){
 
 
 	// Activate the E. coli polymerase as the default
-	Settings::activatePolymerase("RNAP");
+	if (_currentPolymerase == "") Settings::activatePolymerase("RNAP");
 
 }
 
@@ -266,6 +266,7 @@ void Settings::initPolymerases(){
 // Activate the selected RNA polymerase
 void Settings::activatePolymerase(string polymeraseID){
 
+	cout << "Activating " << polymeraseID << endl;
 	for (int i = 0; i < _polymerases.size(); i ++){
 		if (_polymerases.at(i)->getID() == polymeraseID){
 			_polymerases.at(i)->activatePolymerase();
@@ -373,9 +374,9 @@ bool Settings::setSequence(string seqID){
 string Settings::toJSON(){
 
 	string parametersJSON = "";
-	parametersJSON += "'seq':{'seqID':" + _seqID + ",'seq':" + templateSequence + ",'template':" + TemplateType + ",'primer':" + PrimerType + "},";
+	parametersJSON += "'seq':{'seqID':'" + _seqID + "','seq':'" + templateSequence + "','template':'" + TemplateType + "','primer':'" + PrimerType + "'},";
 	parametersJSON += "'model':{" + currentModel->toJSON() + "},";
-	parametersJSON += "N':" + to_string(ntrials_sim) + ",";
+	parametersJSON += "'N':" + to_string(ntrials_sim) + ",";
 	parametersJSON += "'speed':'" + _animationSpeed + "',";
 
 
@@ -384,7 +385,7 @@ string Settings::toJSON(){
 		parametersJSON += _polymerases.at(i)->toJSON();
 		if (i < _polymerases.size()-1) parametersJSON += ",";
 	}
-	parametersJSON += "}, 'currentPolymerase':" + _currentPolymerase;
+	parametersJSON += "}, 'currentPolymerase':'" + _currentPolymerase + "'";
 
 
 	return parametersJSON;

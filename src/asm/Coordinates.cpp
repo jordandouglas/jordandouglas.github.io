@@ -440,6 +440,25 @@ bool Coordinates::move_nt_absolute(int pos, string whichSeq, double newX, double
 }
 
 
+/*
+void Coordinates::setXYWHsrc(string id, double x, double y, double width, double height, string src){
+
+	HTMLobject* obj;
+	for (list<HTMLobject*>::iterator it = Coordinates::HTMLobjects.begin(); it != Coordinates::HTMLobjects.end(); ++it){
+		if ((*it)->getID() == id){
+			obj = (*it);
+			break;
+		}
+	}
+	if (obj == nullptr) return;
+
+
+	if (!obj->get_needsGenerating() && !obj->get_needsAnimating() && !obj->get_needsSourceUpdate() && !obj->get_needsDeleting()) Coordinates::unrenderedObjects.push_back(obj);
+	obj->setX();
+
+
+}
+*/
 
 void Coordinates::change_src_of_object(HTMLobject* obj, string newSrc){
 
@@ -452,8 +471,6 @@ void Coordinates::change_src_of_object(HTMLobject* obj, string newSrc){
 
 void Coordinates::change_src_of_object_from_id(string id, string newSrc){
 
-
-
 	HTMLobject* obj;
 	for (list<HTMLobject*>::iterator it = Coordinates::HTMLobjects.begin(); it != Coordinates::HTMLobjects.end(); ++it){
 		if ((*it)->getID() == id){
@@ -463,8 +480,7 @@ void Coordinates::change_src_of_object_from_id(string id, string newSrc){
 	}
 	if (obj == nullptr) return;
 
-	 Coordinates::change_src_of_object(obj, newSrc);
-
+	Coordinates::change_src_of_object(obj, newSrc);
 
 }
 
@@ -511,6 +527,27 @@ void Coordinates::set_TP_state(int pos, string whichSeq, bool addTP){
 
 
 
+void Coordinates::delete_HTMLobj(string id){
+
+	
+	HTMLobject* obj;
+	for (list<HTMLobject*>::iterator it = Coordinates::HTMLobjects.begin(); it != Coordinates::HTMLobjects.end(); ++it){
+		if ((*it)->getID() == id){
+			obj = (*it);
+			break;
+		}
+	}
+	if (obj == nullptr) return;
+
+	if (!obj->get_needsGenerating() && !obj->get_needsAnimating() && !obj->get_needsSourceUpdate() && !obj->get_needsDeleting()) Coordinates::unrenderedObjects.push_back(obj);
+	obj->deleteObject();
+
+
+}
+
+
+
+
 void Coordinates::delete_nt(int pos, string whichSeq){
 
 
@@ -538,3 +575,118 @@ void Coordinates::delete_nt(int pos, string whichSeq){
 
 
 }
+
+
+
+bool Coordinates::objectExists(string id){
+
+	for (list<HTMLobject*>::iterator it = Coordinates::HTMLobjects.begin(); it != Coordinates::HTMLobjects.end(); ++it){
+		if ((*it)->getID() == id) return true;
+	}
+	return false;
+}
+
+
+HTMLobject* Coordinates::getObjectByID(string id){
+
+	HTMLobject* obj;
+	for (list<HTMLobject*>::iterator it = Coordinates::HTMLobjects.begin(); it != Coordinates::HTMLobjects.end(); ++it){
+		if ((*it)->getID() == id) return (*it);
+	}
+	return nullptr;
+}
+
+
+
+// Updates the coordinates of the force equipment
+void Coordinates::updateForceEquipment(double newForce, double oldForce){
+
+
+	// If force is removed/added then delete/create the force equipment
+	if (oldForce != 0 && newForce == 0) Coordinates::remove_force_equipment();
+	else if ((oldForce == 0 && newForce != 0) || !Coordinates::objectExists("forceArrow1")) Coordinates::add_force_equipment(newForce);
+
+
+
+	// If force changes between negative and positive then change the arrows
+	else if ( (oldForce > 0 && newForce < 0) || (oldForce < 0 && newForce > 0)){
+		Coordinates::remove_force_equipment();
+		Coordinates::add_force_equipment(newForce);
+	}
+
+
+}
+
+
+
+// Get the arrow size from the force mangitude. Larger forces = larger arrows
+double Coordinates::getForceArrowSize(double force){
+
+	double minArrowSize = 25;
+	double maxArrowSize = 50;
+	double maxForceSize = 40;
+	return std::min(std::abs(force) / maxForceSize, 1.0) * (maxArrowSize - minArrowSize) + minArrowSize;
+}
+
+
+// Deletes all HTML coordinate objects which show the optical tweezer setup
+void Coordinates::remove_force_equipment(){
+
+	Coordinates::delete_HTMLobj("leftBead");
+	Coordinates::delete_HTMLobj("rightBead");
+	Coordinates::delete_HTMLobj("tweezer");
+	Coordinates::delete_HTMLobj("forceArrow1");
+	Coordinates::delete_HTMLobj("forceArrow2");
+
+}
+
+
+// Create all HTML coordinate objects which show the optical tweezer setup
+void Coordinates::add_force_equipment(double force){
+
+
+	// Add the beads
+	HTMLobject* pol = Coordinates::getObjectByID("pol");
+	double arrowSize = Coordinates::getForceArrowSize(force);
+	double firstBaseXpos = Coordinates::TemplateSequenceHTMLObjects.at(1)->getX();
+	double finalBaseXpos = Coordinates::TemplateSequenceHTMLObjects.at(Coordinates::TemplateSequenceHTMLObjects.size()-1)->getX();
+		
+
+	// Assisting load
+	if (force > 0){
+
+		Coordinates::create_HTMLobject("leftBead",  firstBaseXpos - 75, 3, 150, 150, "bead", 0);
+		Coordinates::create_HTMLobject("rightBead", pol->getX() + pol->getWidth() - 10, pol->getY() + std::ceil((pol->getHeight() - 150) / 2), 150, 150, "bead", 0);
+
+		// Add the string/tweezers
+		Coordinates::create_HTMLobject("tweezer",  pol->getX() + pol->getWidth() + 140 - 10, pol->getY() + 75, finalBaseXpos - pol->getX() - pol->getWidth(), 15, "string", 0);
+		
+		// Add the arrows
+		Coordinates::create_HTMLobject("forceArrow1", pol->getX() + pol->getWidth() + 140 - 10,               pol->getY() + 83 - 0.5*arrowSize, arrowSize, arrowSize, "rightForce", 0);
+		Coordinates::create_HTMLobject("forceArrow2", pol->getX() + pol->getWidth() + 140 - 10 + 2*arrowSize, pol->getY() + 83 - 0.5*arrowSize, arrowSize, arrowSize, "rightForce", 0);
+
+	}
+
+
+	// Hindering load
+	else if (force < 0){
+
+		Coordinates::create_HTMLobject("leftBead",  pol->getX()+10 - 140, pol->getY() + std::ceil((pol->getHeight() - 150) / 2), 150, 150, "bead", 0);
+		Coordinates::create_HTMLobject("rightBead", finalBaseXpos - 75, 3, 150, 150, "bead", 0);
+
+		// Add the string/tweezers
+		double tweezerLength = finalBaseXpos - pol->getWidth() - 130;
+		Coordinates::create_HTMLobject("tweezer",  (pol->getX() - 140 + 20) - tweezerLength, pol->getY() + 75, tweezerLength, 15, "string", 0);
+
+		// Add the arrows
+		Coordinates::create_HTMLobject("forceArrow1", pol->getX()+10 - 140 + 10 - 1*arrowSize,               pol->getY() + 83 - 0.5*arrowSize, arrowSize, arrowSize, "leftForce", 0);
+		Coordinates::create_HTMLobject("forceArrow2", pol->getX()+10 - 140 + 10 - 3*arrowSize, pol->getY() + 83 - 0.5*arrowSize, arrowSize, arrowSize, "leftForce", 0);
+
+	}
+
+}
+
+
+
+
+

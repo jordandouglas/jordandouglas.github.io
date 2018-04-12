@@ -220,6 +220,16 @@ double HTMLobject::getY(){
 	return this->y;
 }
 
+double HTMLobject::getWidth(){
+	return this->width;
+}
+
+double HTMLobject::getHeight(){
+	return this->height;
+}
+
+
+
 string HTMLobject::getID(){
 	return this->id;
 }

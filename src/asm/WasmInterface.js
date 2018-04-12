@@ -131,6 +131,7 @@ getUnrenderedobjects = function(msgID = null){
 }
 
 
+// Loads a session from an XML string
 loadSessionFromXML = function(xmlData, msgID = null){
 
 	// Create the callback function
@@ -140,6 +141,19 @@ loadSessionFromXML = function(xmlData, msgID = null){
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 	
 	Module.ccall("loadSessionFromXML", null, ["string", "number"], [xmlData, msgID]);
+}
+
+
+// Provides all information necessary to construct an XML string so the user can download the current session
+getSaveSessionData = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	
+	Module.ccall("getSaveSessionData", null, ["number"], [msgID]);
 }
 
 
@@ -277,6 +291,7 @@ saveParameterDistribution = function(paramID, distributionName, distributionPara
 	getAllParameters(msgID);
 	
 }
+
 
 
 setModelSettings = function(tosend, msgID = null){

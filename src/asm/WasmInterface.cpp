@@ -330,6 +330,36 @@ extern "C" {
 
 	}
 
+	// Provides all information necessary to construct an XML string so the user can download the current session
+	void EMSCRIPTEN_KEEPALIVE getSaveSessionData(int msgID){
+
+		// Send the globals settings back to the DOM 
+		string sessionJSON = "{";
+
+		// Parameters
+		sessionJSON += "'PHYSICAL_PARAMETERS':{";
+		for (int i = 0; i < Settings::paramList.size(); i ++){
+			sessionJSON += Settings::paramList.at(i)->toJSON();
+			if (i < Settings::paramList.size()-1) sessionJSON += ",";
+		}
+		sessionJSON += "}";
+
+
+		// Template sequence
+		sessionJSON += ",'TEMPLATE_SEQUENCE':'" + templateSequence + "'";
+
+		// Current polymerase
+		sessionJSON += ",'POLYMERASE':'" + _currentPolymerase + "'";
+
+		// Current model
+		sessionJSON += ",'ELONGATION_MODEL':{" + currentModel->toJSON() + "}";
+	
+
+		sessionJSON += "}";
+		messageFromWasmToJS(sessionJSON, msgID);
+		
+	}
+
 
 	// Get the sequences saved to the model
 	void EMSCRIPTEN_KEEPALIVE getSequences(int msgID){
@@ -554,16 +584,16 @@ extern "C" {
 		stateToCalculateFor->forward();
 		double k_01 = stateToCalculateFor->calculateForwardRate(true, true);
 		stateDiagramJSON += "'k 0,-1':" + to_string(stateToCalculateFor->calculateBackwardRate(true, false)) + ","; // From pretranslocated to backtrack 1
-		stateDiagramJSON += "'k 0,+1':" + to_string(stateToCalculateFor->calculateForwardRate(true, false)) + ","; // From pretranslocated to posttranslocated
+		stateDiagramJSON += "'k 0,+1':" + to_string(currentModel->get_assumeTranslocationEquilibrium() ? 0 : stateToCalculateFor->calculateForwardRate(true, false)) + ","; // From pretranslocated to posttranslocated
 
 
 		// State m = 1
 		stateToCalculateFor->forward();
 		double k_10 = stateToCalculateFor->calculateBackwardRate(true, true);
-		stateDiagramJSON += "'k +1,0':" + to_string(stateToCalculateFor->calculateBackwardRate(true, false)) + ","; // From posttranslocated to pretranslocated
+		stateDiagramJSON += "'k +1,0':" + to_string(currentModel->get_assumeTranslocationEquilibrium() ? 0 : stateToCalculateFor->calculateBackwardRate(true, false)) + ","; // From posttranslocated to pretranslocated
 		stateDiagramJSON += "'k +1,+2':" + to_string(stateToCalculateFor->calculateForwardRate(true, false)) + ","; // From posttranslocated to hypertranslocated 1
-		stateDiagramJSON += "'kbind':" + to_string(stateToCalculateFor->calculateBindNTPrate(true)) + ","; // Rate of binding NTP
-		stateDiagramJSON += "'krelease':" + to_string(stateToCalculateFor->calculateReleaseNTPRate(true)) + ","; // Rate of releasing NTP
+		stateDiagramJSON += "'kbind':" + to_string(currentModel->get_assumeBindingEquilibrium() ? 0 : stateToCalculateFor->calculateBindNTPrate(true)) + ","; // Rate of binding NTP
+		stateDiagramJSON += "'krelease':" + to_string(currentModel->get_assumeBindingEquilibrium() ? 0 : stateToCalculateFor->calculateReleaseNTPRate(true)) + ","; // Rate of releasing NTP
 		stateDiagramJSON += "'kcat':" + to_string(stateToCalculateFor->calculateCatalysisRate(true)) + ","; // Rate of catalysis
 		stateDiagramJSON += "'KD':" + to_string(Kdiss->getVal()) + ","; // Dissociation constant
 		stateDiagramJSON += "'Kt':" + to_string(k_10 == 0 || k_01 == 0 ? 0 : k_10 / k_01) + ","; // Translocation constant

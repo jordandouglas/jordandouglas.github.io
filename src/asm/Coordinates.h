@@ -43,9 +43,13 @@ class Coordinates{
 	static vector<HTMLobject*> ComplementSequenceHTMLObjects; // All nucleotides in the complement sequence and their coordinates etc.
 	static list<HTMLobject*> HTMLobjects; // Other objects and their coordinates etc.
 
-
 	static list<HTMLobject*> unrenderedObjects; // A subset of the above 4 arrays. Only contains objects which have had a recent change
 
+
+	// Control the positioning of the optical tweezer animations
+	static double getForceArrowSize(double force);
+	static void add_force_equipment(double force);
+	static void remove_force_equipment();
 
 	public:
 
@@ -55,6 +59,8 @@ class Coordinates{
 		static void resetToInitialState(); // Sets coordinates to the initial state
 		static void clearAllCoordinates(); // Deletes all coordinate objects
 		static void generateAllCoordinates(State* state); // Generate all coordinates for this state, and adds the current cooordinates of all objects to the list of unrendered objects (eg. everything has been deleted from DOM and now must be added back)
+		static bool objectExists(string id); // See if object exists
+		static HTMLobject* getObjectByID(string id);
 
 
 		// Returns a JSON string which contains information on what changes must be made (eg. on the next animation frame)
@@ -81,12 +87,15 @@ class Coordinates{
 		static void change_src_of_object(HTMLobject* obj, string newSrc);
 		static void change_src_of_object_from_id(string id, string newSrc);
 		static void set_TP_state(int pos, string whichSeq, bool addTP);
+		//static void setXYWHsrc(string id, double x, double y, double width, double height, string src);
 
 		// Deleting objects
 		static void delete_HTMLobj(string id);
 		static void delete_nt(int pos, string whichSeq);
 
 
+		// Manipulating force equipment coordinates
+		static void updateForceEquipment(double newForce, double oldForce);
 
 
 };

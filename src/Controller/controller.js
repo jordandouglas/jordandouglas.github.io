@@ -105,7 +105,8 @@ function renderTermination(result){
 	var primerSeq = result["primerSeq"];
 	var insertPositions = result["insertPositions"]; // Has there been an insertion due to slippage?
 
-	//console.log("insertPositions", insertPositions);
+
+	//console.log("primerSeq", primerSeq);
 	if (terminatedSequences.length < maxNumberTerminatedSequences){
 
 		
@@ -152,7 +153,7 @@ function initSequencesPanel(){
 		$("#downloadSeqs").show(100);
 		if ($("#hideSequences").val() == "-") $("#sequencesTableDIV").height(20 * 21 + 100 + "px");
 
-		if($("#PreExp").val() == "hidden") toggleSequences();
+		// if($("#PreExp").val() == "hidden") toggleSequences();
 
 	}
 
@@ -361,18 +362,25 @@ function minusSequences(){
 
 function toggleSequences(){
 
+
+	
+
 	// Minimising the table deletes everything
 	if($("#hideSequences").val() == "-"){
 		$("#hideSequences").val("+");
 		$("#sequencesTableDIV").html("");
 		$("#sequencesTableDIV").height("0px");
+		$("#terminatedSequencesDescription").hide(true);
 	}
 
 	// Maximising the table adds it all back
 	else{
 		$("#hideSequences").val("-");
+		drawPlots();
 		renderTerminatedSequences();
 		$("#sequencesTableDIV").height(20 * 21 + 100 + "px");
+		$("#terminatedSequencesDescription").show(true);
+
 	}
 	
 }
@@ -662,7 +670,7 @@ function renderObjects(override = false, resolve = function(){}){
 
 
 
-						//console.log("Generating", nt["id"]);
+						//console.log("Generating", nt);
 
 						var img = $("<img></img>");
 						if (parseFloat(nt["pos"]) > 0 && nt["pos"] != null) img.attr("title", "Base " + nt["pos"]);
@@ -875,10 +883,13 @@ function saveSession(){
 	var toCall = () => new Promise((resolve) => getSaveSessionData_controller(resolve));
 	toCall().then((result) => {
 
-	
+
+		//console.log(result);
+
 		var PHYSICAL_PARAMETERS_LOCAL = result["PHYSICAL_PARAMETERS"];
 		var ELONGATION_MODEL = result["ELONGATION_MODEL"];
 		var STATE = result["STATE"];
+		var POLYMERASE = result["POLYMERASE"];
 
 		var saveXML = new XMLWriter();
 		saveXML.writeStartDocument();
@@ -896,6 +907,8 @@ function saveSession(){
 		saveXML.writeAttributeString('datetime', datetime);
 		saveXML.writeAttributeString("N", $("#nbasesToSimulate").val());
 		saveXML.writeAttributeString('speed', $("#PreExp").val());
+		if (POLYMERASE != null) saveXML.writeAttributeString('polymerase', POLYMERASE);
+
 		
 			// Sequence
 			saveXML.writeStartElement('sequence');

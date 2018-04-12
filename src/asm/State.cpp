@@ -23,6 +23,7 @@
 
 #include "State.h"
 #include "Settings.h"
+#include "Plots.h"
 #include "Parameter.h"
 #include "Model.h"
 #include "FreeEnergy.h"
@@ -259,12 +260,23 @@ State* State::forward(){
 		if (this->NTPbound()) this->releaseNTP();
 
 
+
+		// Move bead to the right
+		if (FAssist->getVal() != 0){
+			if (FAssist->getVal() > 0) Coordinates::move_obj_from_id("rightBead", 25, 0); // Assisting load
+			else Coordinates::move_obj_from_id("leftBead", 25, 0); // Hindering load
+			Coordinates::move_obj_from_id("tweezer", 25, 0);
+			Coordinates::move_obj_from_id("forceArrow1", 25, 0);
+			Coordinates::move_obj_from_id("forceArrow2", 25, 0);
+		}
+
+
 	}
 
 
 	if (!this->NTPbound()) this->mRNAPosInActiveSite ++; // Only move forward if NTP is not bound
 	if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal()-1) ||
-		(this->mRNAPosInActiveSite <= 1 && this->mRNAPosInActiveSite + this->get_nascentLength() + 1 > templateSequence.length())) this->terminate();
+		(this->mRNAPosInActiveSite <= 1 && this->mRNAPosInActiveSite + this->get_nascentLength() > templateSequence.length())) this->terminate();
 
 
 	return this;
@@ -280,9 +292,19 @@ State* State::terminate(){
 	this->terminated = true;
 
 
-	for (int i = 0; i <= this->nascentSequence.length(); i ++){
-		Coordinates::delete_nt(i, "m");
+	if (this->isGuiState) {
+
+		if (_applyingReactionsGUI && _animationSpeed != "hidden"){
+			for (int i = 0; i <= this->nascentSequence.length(); i ++){
+				Coordinates::delete_nt(i, "m");
+			}
+		}
+
+		Plots::addCopiedSequence(this->nascentSequence);
+
 	}
+
+
 
 
 
@@ -390,6 +412,16 @@ State* State::backward(){
 
 		// Remove NTP
 		if (this->NTPbound()) this->releaseNTP();
+
+
+		// Move bead to the left
+		if (FAssist->getVal() != 0){
+			if (FAssist->getVal() > 0) Coordinates::move_obj_from_id("rightBead", -25, 0); // Assisting load
+			else Coordinates::move_obj_from_id("leftBead", -25, 0); // Hindering load
+			Coordinates::move_obj_from_id("tweezer", -25, 0);
+			Coordinates::move_obj_from_id("forceArrow1", -25, 0);
+			Coordinates::move_obj_from_id("forceArrow2", -25, 0);
+		}
 		
 
 	}

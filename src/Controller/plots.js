@@ -127,7 +127,7 @@ function drawPlots(forceUpdate = false, callback = function() { }){
 	
 	// Only make a request if there exists a visible plot
 	//console.log("visibilities", $("#plotDIV1").is(":visible"), $("#plotDIV2").is(":visible"), $("#plotDIV3").is(":visible"), $("#plotDIV4").is(":visible"));
-	if (!$("#plotDIV1").is(":visible") && !$("#plotDIV2").is(":visible") && !$("#plotDIV3").is(":visible") && !$("#plotDIV4").is(":visible")) {
+	if (!$("#plotDIV1").is(":visible") && !$("#plotDIV2").is(":visible") && !$("#plotDIV3").is(":visible") && !$("#plotDIV4").is(":visible") && parseFloat($("#sequencesTableDIV").height()) == 0 ) {
 		callback();
 		return;
 	}
@@ -173,6 +173,11 @@ function update_PLOT_DATA(plotData){
 
 	PLOT_DATA = plotData;
 
+	if (PLOT_DATA.sequences != null) {
+		for (var i = 0; i < PLOT_DATA.sequences.length; i ++){
+			renderTermination({primerSeq: PLOT_DATA.sequences[i], insertPositions: []});
+		}
+	}
 
 	// Add the new values to the DISTANCE_VS_TIME_CONTROLLER data structure
 	update_DISTANCE_VS_TIME(plotData["DVT_UNSENT"]);
@@ -1612,7 +1617,8 @@ function plot_pause_distribution(){
 	for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
 		if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "pauseHistogram") canvasesToPrintTo.push(plt);
 	}
-	
+
+	//console.log("DWELL_TIMES_CONTROLLER", DWELL_TIMES_CONTROLLER);
 
 	for (var canvasNum = 0; canvasNum < canvasesToPrintTo.length; canvasNum ++){
 		

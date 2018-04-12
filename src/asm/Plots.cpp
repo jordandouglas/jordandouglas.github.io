@@ -66,6 +66,10 @@ vector<double> Plots::pauseTimePerSite;
 list<ParameterHeatmapData*> Plots::parametersPlotData;
 
 
+// Copied sequences (only the ones that have not been sent to the controller)
+list<string> Plots::unsentCopiedSequences;
+
+
 
 // Miscellaneous information
 double Plots::timeElapsed = 0;
@@ -129,7 +133,8 @@ void Plots::init(){
 	}
 
 
-
+	// Copied sequences
+	Plots::unsentCopiedSequences.clear();
 
 	// Miscellaneous information
 	Plots::totalDisplacement = 0;
@@ -271,7 +276,9 @@ void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) 
 	Plots::totaltimeElapsedThisTrial += reactionTime;
 
 
+	//cout << "reactionTime " << reactionTime << endl;
 
+	//cout << "timeWaitedUntilNextTranslocation " << Plots::timeWaitedUntilNextTranslocation << endl;
 
 
 	// If there has been a translocation action, add it to the distance~time chart, and update the time spent at this site
@@ -329,8 +336,8 @@ void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) 
 
 	// If this is a catalysis event, add it to the pause histogram and if it is a misincorporation then add to misincorportion plot
 	//cout << "lastAction " << lastAction << "state->NTPbound()" << state->NTPbound() << endl;
-	bool thereWasATCatalysis = lastAction == 3 && state->NTPbound();
-	if (thereWasATCatalysis) {
+	bool thereWasACatalysis = lastAction == 3 && (state->NTPbound() || currentModel->get_assumeBindingEquilibrium());
+	if (thereWasACatalysis) {
 
 
 		// Dwell time histogram
@@ -338,7 +345,6 @@ void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) 
 		if (Plots::catalysisTimesSize < Plots::catalysisTimesSizeMax){
 
 			Plots::catalysisTimesSize ++;
-
 			Plots::catalysisTimes.back().push_back(Plots::timeWaitedUntilNextCatalysis);
 
 
@@ -359,9 +365,6 @@ void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) 
 		Plots::timeWaitedUntilNextCatalysis = 0;
 
 	}
-
-
-
 
 
 }
@@ -388,6 +391,7 @@ string Plots::getPlotDataAsJSON(){
 	bool pauseHistogram_needsData = false;
 	bool pausePerSite_needsData = false;
 	bool parameterHeatmap_needsData = false;
+	bool terminatedSequences_needsData = true;
 	for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
 		if (Plots::plotSettings.at(pltNum) != nullptr && (Plots::plotSettings.at(pltNum)->getName() == "distanceVsTime" || Plots::plotSettings.at(pltNum)->getName() == "velocityHistogram")) distanceVsTime_needsData = true;
 		else if (Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->getName() == "pauseHistogram") pauseHistogram_needsData = true;
@@ -434,6 +438,7 @@ string Plots::getPlotDataAsJSON(){
         		--j;
 
         		distanceTime.clear();
+        		delete &distanceTime;
 
 			}
 
@@ -453,6 +458,7 @@ string Plots::getPlotDataAsJSON(){
 
 
 			simulationList.clear();
+			delete &simulationList;
 
 
 		}
@@ -477,7 +483,6 @@ string Plots::getPlotDataAsJSON(){
 
 
 
-		// Reset the list of unsent data
 		Plots::distanceVsTimeDataUnsent.clear();
 
 
@@ -489,7 +494,6 @@ string Plots::getPlotDataAsJSON(){
     	list<vector<double>> distanceTimeThisSimulation;
 		distanceTimeThisSimulation.push_back(distanceTimeUnsent);
     	Plots::distanceVsTimeDataUnsent.push_back(distanceTimeThisSimulation);
-
 
 				
 	}
@@ -525,6 +529,7 @@ string Plots::getPlotDataAsJSON(){
         		}
         		--j;
 
+
 			}
 
 			catalysisTimeDataUnsent_JSON += "]";
@@ -536,6 +541,7 @@ string Plots::getPlotDataAsJSON(){
     		--it;
 
 			simulationList.clear();
+			delete &simulationList;
 
 		}
 
@@ -551,7 +557,6 @@ string Plots::getPlotDataAsJSON(){
 		// Reinitialise the unsent data structure
 		list<double> catalysisTimesTrial;
 		catalysisTimesTrial.push_back(Plots::currentSimNumber * 1.0); // First element is the simulation number 
-		catalysisTimesTrial.push_back(Plots::timeWaitedUntilNextCatalysis);
 		Plots::catalysisTimes.push_back(catalysisTimesTrial);
 		Plots::catalysisTimesUnsent.push_back(catalysisTimesTrial);
 
@@ -591,6 +596,32 @@ string Plots::getPlotDataAsJSON(){
 	}
 
 
+	// Send through a list of terminated sequences which have not yet been sent through
+	if (terminatedSequences_needsData) {
+
+		plotDataJSON += ",'sequences':[";
+
+		for (list<string>::iterator it = Plots::unsentCopiedSequences.begin(); it != Plots::unsentCopiedSequences.end(); ++it){
+
+			plotDataJSON += "'" + (*it) + "'";
+
+
+			// Add commas if there is another element in the list
+			if (++it != Plots::unsentCopiedSequences.end()){
+    			plotDataJSON += ",";	
+    		}
+    		--it;
+
+		}
+
+
+		plotDataJSON += "]";
+		Plots::unsentCopiedSequences.clear();
+
+
+	} 
+
+
 
 	//cout << "Plots JSON = " << plotDataJSON << endl;
 
@@ -604,6 +635,7 @@ string Plots::getPlotDataAsJSON(){
 	plotSettingsJSON += "}";
 	plotDataJSON += "," + plotSettingsJSON;
 
+	//cout << "plotDataJSON " << plotDataJSON << endl;
 
 	return plotDataJSON + "}";
 
@@ -757,6 +789,9 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 
 
 
+void Plots::addCopiedSequence(string sequence){
 
+	Plots::unsentCopiedSequences.push_back(sequence);
 
+}
 

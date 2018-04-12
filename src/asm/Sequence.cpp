@@ -37,8 +37,7 @@ Sequence::Sequence(string seqID, string TemplateType, string PrimerType, string 
 	this->nascent_SS = PrimerType.substr(0,2) == "ss";
 	this->template_SS = TemplateType.substr(0,2) == "ss";
 
-	this->correctSequence(templateSequence, this->template_RNA);
-	this->templateSequence = templateSequence;
+	this->templateSequence = this->correctSequence(templateSequence, this->template_RNA);
 	if (!this->template_SS) this->complementSequence = Settings::complementSeq(this->templateSequence, this->template_RNA);
 	else this->complementSequence = "";
 
@@ -63,10 +62,11 @@ void Sequence::initRateTable(){
 
 
 // Remove newlines from sequence and replace A with U (if RNA) or U with A (if DNA), and any non matches with X
-void Sequence::correctSequence(string seq, bool isRNA){
-	if (isRNA) replace(seq.begin(), seq.end(), 'A', 'U');
-	else replace(seq.begin(), seq.end(), 'U', 'A');
+string Sequence::correctSequence(string seq, bool isRNA){
+	if (isRNA) replace(seq.begin(), seq.end(), 'T', 'U');
+	else replace(seq.begin(), seq.end(), 'U', 'T');
 	seq.erase(remove(seq.begin(), seq.end(), '\n'), seq.end());
+	return seq;
 }
 
 

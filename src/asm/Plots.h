@@ -66,6 +66,10 @@ class Plots{
 	static list<ParameterHeatmapData*> parametersPlotData;
 
 
+	// Copied sequences (only the ones that have not been sent to the controller)
+	static list<string> unsentCopiedSequences;
+
+
 	// Miscellaneous information
 	static double timeElapsed;
 	static double velocity;
@@ -78,7 +82,6 @@ class Plots{
 	static bool arrestTimeoutReached;
 	static double timeWaitedUntilNextTranslocation;
 	static double timeWaitedUntilNextCatalysis;
-
 
 
 	// Plot settings
@@ -99,7 +102,7 @@ class Plots{
 		static void hideAllPlots(bool hide);
 		static string getCacheSizeJSON();
 		static void deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata);
-
+		static void addCopiedSequence(string sequence);
 
 };
 

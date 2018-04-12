@@ -80,6 +80,8 @@ class HTMLobject{
 		string getBase();
 		double getX();
 		double getY();
+		double getWidth();
+		double getHeight();
 		bool get_hasTP();
 		bool get_needsGenerating();
 		bool get_needsAnimating();

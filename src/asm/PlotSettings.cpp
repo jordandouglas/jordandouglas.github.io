@@ -305,14 +305,14 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 
 			vector<string> tuple = Settings::split(values.at(1), ','); 
 
-			// Do not accept negative values or non strings
+			// Do not accept non strings
 			if (! (tuple.size() < 2 || !Settings::strIsNumber(tuple.at(0)) || !Settings::strIsNumber(tuple.at(1))) ) {
 
 				double xMin = stod(tuple.at(0));
 				double xMax = stod(tuple.at(1));
 				if (xMax <= xMin) xMax = xMin + 0.1;
 
-				if (! (xMax <= 0 || xMin < 0)) this->xRange = "[" + to_string(xMin) + "," + to_string(xMax) + "]";
+				this->xRange = "[" + to_string(xMin) + "," + to_string(xMax) + "]";
 			}
 
 		}
@@ -349,7 +349,7 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 			vector<string> tuple = Settings::split(values.at(3), ','); 
 
 
-			// Do not accept negative values or non strings
+			// Do not accept non strings
 			if (tuple.size() < 2 || !Settings::strIsNumber(tuple.at(0)) || !Settings::strIsNumber(tuple.at(1))) this->xRange = "automaticX";
 			else{
 
@@ -358,8 +358,7 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 				if (xMax <= xMin) xMax = xMin + 0.1;
 
 
-				if (xMax <= 0 || xMin < 0) this->xRange = "automaticX";
-				else this->xRange = "[" + to_string(xMin) + "," + to_string(xMax) + "]";
+				this->xRange = "[" + to_string(xMin) + "," + to_string(xMax) + "]";
 			}
 
 		}
@@ -372,7 +371,7 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 			vector<string> tuple = Settings::split(values.at(4), ','); 
 
 
-			// Do not accept negative values or non strings
+			// Do not accept non strings
 			if (tuple.size() < 2 || !Settings::strIsNumber(tuple.at(0)) || !Settings::strIsNumber(tuple.at(1))) this->yRange = "automaticY";
 			else{
 
@@ -381,8 +380,7 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 				if (yMax <= yMin) yMax = yMin + 0.1;
 
 
-				if (yMax <= 0 || yMin < 0) this->yRange = "automaticY";
-				else this->yRange = "[" + to_string(yMin) + "," + to_string(yMax) + "]";
+				this->yRange = "[" + to_string(yMin) + "," + to_string(yMax) + "]";
 			}
 
 		}
@@ -395,7 +393,7 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 			vector<string> tuple = Settings::split(values.at(5), ','); 
 
 
-			// Do not accept negative values or non strings
+			// Do not accept non strings
 			if (tuple.size() < 2 || !Settings::strIsNumber(tuple.at(0)) || !Settings::strIsNumber(tuple.at(1))) this->zRange = "automaticZ";
 			else{
 
@@ -403,9 +401,7 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 				double zMax = stod(tuple.at(1));
 				if (zMax <= zMin) zMax = zMin + 0.1;
 
-
-				if (zMax <= 0 || zMin < 0) this->zRange = "automaticZ";
-				else this->zRange = "[" + to_string(zMin) + "," + to_string(zMax) + "]";
+				this->zRange = "[" + to_string(zMin) + "," + to_string(zMax) + "]";
 			}
 
 		}

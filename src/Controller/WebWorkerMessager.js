@@ -823,13 +823,24 @@ function getSaveSessionData_controller(resolve){
 		var toCall = () => new Promise((resolve) => WW_JS.getSaveSessionData_WW(resolve));
 		toCall().then((dict) => resolve(dict));
 
-	}else{
+	}else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("WW_JS.getSaveSessionData_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall(fnStr).then((dict) => resolve(dict));
+	}
+
+	else{
+
+		var res = stringifyFunction("getSaveSessionData", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		//console.log("Sending function: " + fnStr);
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall(fnStr).then((dict) => resolve(dict));
+
 	}
 	
 }
@@ -989,6 +1000,9 @@ function submitDistribution_controller(resolve = function() {}){
 		
 		
 		renderParameters();
+
+		if (paramID == "FAssist") renderObjects();
+
 		resolve();
 
 		
@@ -1031,7 +1045,7 @@ function update_this_parameter_controller(element){
 
 	var paramID = $(element).attr("id");
 	// Special case for the assisting force 
-	if (paramID == "FAssist" && WEB_WORKER_WASM == null){
+	if (WEB_WORKER_WASM == null && paramID == "FAssist"){
 		updateForce_controller();
 	}else{
 
@@ -1053,6 +1067,7 @@ function update_this_parameter_controller(element){
 			update_sliding_curve(0);
 			update_slipping_curve(0);
 			refreshNavigationCanvases();
+			renderObjects();
 		};
 
 
@@ -1094,9 +1109,9 @@ function update_this_parameter_controller(element){
 
 
 function updateForce_controller(){
-	
-	var newFAssist = parseFloat($("#FAssist").val());
 
+
+	var newFAssist = parseFloat($("#FAssist").val());
 
 	
 	var updateDOM = function(){
@@ -1105,30 +1120,22 @@ function updateForce_controller(){
 		refreshNavigationCanvases();
 	};
 
-	// If this is in animation mode, then this process is synchronous with rendering so we return in between operators
 	if (WEB_WORKER == null) {
 		var toCall = () => new Promise((resolve) => PARAMS_JS.updateForce_WW(newFAssist, resolve));
 		toCall().then(() => updateDOM());
 	}
 
 
-	// If it is in asynchronous or hidden mode, then we keep going until the end
-	else if (WEB_WORKER_WASM == null){
+	else {
 		var res = stringifyFunction("PARAMS_JS.updateForce_WW", [newFAssist, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall(fnStr).then((x) => updateDOM(x));
 
-
 	}
 
-	else{
 
-
-
-	}
-	
 }
 
 
@@ -2095,29 +2102,37 @@ function startTrials_controller(){
 				//console.log("Back here", result);
 				//drawPlotsFromData(result.plots);
 				drawPlots();
-				if($("#PreExp").val() != "hidden") renderObjects(false);
 
-				if (result.stop) {
-					updateDOM(result);
-					MESSAGE_LISTENER[msgID] = null;
-				}
-				else{
-					//MESSAGE_LISTENER[msgID].remove = false;
-					if ($("#counterProgress").html() != Math.floor(result.N)) {
-						renderParameters(); // Update parameters at the end of each trial
+
+				var toDoAfterObjectRender = function() {
+
+					if (result.stop) {
+						updateDOM(result);
+						MESSAGE_LISTENER[msgID] = null;
+					}
+					else{
+						//MESSAGE_LISTENER[msgID].remove = false;
+						if ($("#counterProgress").html() != Math.floor(result.N)) {
+							renderParameters(); // Update parameters at the end of each trial
+						}
+
+						$("#counterProgress").html(Math.floor(result.N));
+						//$("#output_asm").append("<div style='padding:5 5'>Velocity: " + roundToSF(result.meanVelocity, 4) + "bp/s; Time taken: " + roundToSF(result.realTime, 4) + "s; n complete = " + result.N + "</div>"); 
+
+
+						// Go back to the model when done
+						if (result.animationTime > 0){
+							var resumeTrialsFnStr = "wasm_" + stringifyFunction("resumeTrials", [msgID]);
+							callWebWorkerFunction(resumeTrialsFnStr, null, null, false);
+						}
+
 					}
 
-					$("#counterProgress").html(Math.floor(result.N));
-					//$("#output_asm").append("<div style='padding:5 5'>Velocity: " + roundToSF(result.meanVelocity, 4) + "bp/s; Time taken: " + roundToSF(result.realTime, 4) + "s; n complete = " + result.N + "</div>"); 
+				};
 
+				if($("#PreExp").val() != "hidden") renderObjects(false, toDoAfterObjectRender);
+				else toDoAfterObjectRender();
 
-					// Go back to the model when done
-					if (result.animationTime > 0){
-						var resumeTrialsFnStr = "wasm_" + stringifyFunction("resumeTrials", [msgID]);
-						callWebWorkerFunction(resumeTrialsFnStr, null, null, false);
-					}
-
-				}
 
 			}
 			
@@ -2560,6 +2575,11 @@ function loadSession_controller(XMLData, resolve = function() { }){
 			submitCustomSequence(openPlots);
 		}
 
+
+		// Current polymerase
+		if (result.currentPolymerase != null){
+			$("#SelectPolymerase").val(result.currentPolymerase);
+		}
 
 
 		// Update the ABC panel

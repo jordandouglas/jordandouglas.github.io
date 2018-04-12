@@ -597,7 +597,6 @@ PARAMS_JS.getArrowSize_WW = function(force){
 	WW_JS.create_HTMLobject_WW("forceArrow1",  HTMLobjects["pol"]["x"] + HTMLobjects["pol"]["width"] - 10 + 200,               HTMLobjects["pol"]["y"] + 83 - 0.5*arrowSize, arrowSize, arrowSize, arrowSrc, 0);
 	WW_JS.create_HTMLobject_WW("forceArrow2",  HTMLobjects["pol"]["x"] + HTMLobjects["pol"]["width"] - 10 + 200 + 2*arrowSize, HTMLobjects["pol"]["y"] + 83 - 0.5*arrowSize, arrowSize, arrowSize, arrowSrc, 0);
 	
-
 	
 }
 
