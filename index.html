@@ -150,7 +150,7 @@ function init(){
 
 
 		USE_WASM = false;
-		//USE_WASM = true;
+		USE_WASM = true;
 
 		// Use webassembly? Defaults to false unless specified in url
 		if (location.href.indexOf("?") != -1){
@@ -265,6 +265,7 @@ function init(){
 
 				barchart(true);
 				initABCpanel();
+				callWebWorkerFunction(stringifyFunction("WW_JS.refresh_WW", []));
 			});
 		
 
@@ -521,8 +522,7 @@ function userChangeSequence(resolveAfterRefresh = function() { }){
 
 
 function resetBtn(){
-	stop_controller();
-	refresh();
+	stop_controller(function() { setTimeout( function() { refresh(); }, 20); });
 }
 
 
@@ -562,7 +562,7 @@ function refresh(resolve = function(){}){
 
 
 
-		}else{
+		} else{
 			$("#SelectTemplateType").prop("disabled", false);
 			$("#SelectPrimerType").prop("disabled", false);
 			$("#SelectTemplateType").removeClass("dropdown-disabled");
@@ -673,11 +673,6 @@ function refresh(resolve = function(){}){
 
 
 		//toDoAfterRefresh();
-
-
-	
-
-	
 	
 
 }
