@@ -95,6 +95,7 @@ class Coordinates{
 
 
 		// Manipulating force equipment coordinates
+		static void updateForceEquipment(double newForce);
 		static void updateForceEquipment(double newForce, double oldForce);
 
 

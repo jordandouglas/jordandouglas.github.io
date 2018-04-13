@@ -598,6 +598,19 @@ HTMLobject* Coordinates::getObjectByID(string id){
 
 
 
+
+
+// Updates the coordinates of the force equipment
+void Coordinates::updateForceEquipment(double newForce){
+
+
+	// If force is removed/added then delete/create the force equipment
+	Coordinates::remove_force_equipment();
+	Coordinates::add_force_equipment(newForce);
+
+}
+
+
 // Updates the coordinates of the force equipment
 void Coordinates::updateForceEquipment(double newForce, double oldForce){
 
@@ -644,6 +657,8 @@ void Coordinates::remove_force_equipment(){
 // Create all HTML coordinate objects which show the optical tweezer setup
 void Coordinates::add_force_equipment(double force){
 
+
+	if (force == 0) return;
 
 	// Add the beads
 	HTMLobject* pol = Coordinates::getObjectByID("pol");

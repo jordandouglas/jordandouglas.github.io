@@ -344,7 +344,7 @@ PARAMS_JS.sample_parameter_WW = function(paramID, resolve = function() { }, msgI
 	        break;
 	
 		case "Exponential":
-		    PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] = RAND_JS.exponential(PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["ExponentialDistnVal"]);
+		    PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] = RAND_JS.exponential(PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["exponentialDistnVal"]);
 		    break;
 		
 		case "Normal": // May have to repeatedly resample if this parameter is zero-truncated
@@ -426,7 +426,7 @@ PARAMS_JS.submitDistribution_WW = function(paramID, distributionName, distributi
 	        break;
 		case "Exponential":
 			if (distributionParams[0] <= 0) distributionParams[0] = 1;
-		    PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["ExponentialDistnVal"] = distributionParams[0];
+		    PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["exponentialDistnVal"] = distributionParams[0];
 		    break;
 		case "Normal":
 			if (distributionParams[1] <= 0) distributionParams[1] = 1;

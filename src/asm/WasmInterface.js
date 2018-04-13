@@ -412,6 +412,7 @@ startTrials = function(N, msgID = null){
 resumeTrials = function(msgID = null){
 
 
+
 	// Pause for a bit in case user requests to stop
 	setTimeout(function(){
 
@@ -419,6 +420,7 @@ resumeTrials = function(msgID = null){
 		var toDoAfterCall = function(resultStr){
 			var result = JSON.parse(resultStr);
 			// Exit now
+
 			if (result.stop){
 				if (msgID != null) {
 					postMessage(msgID + "~X~" + resultStr);
@@ -543,7 +545,7 @@ getCacheSizes = function(msgID = null){
 
 
 // Deletes all plot data of the specified types
-deletePlots = function(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, msgID = null){
+deletePlots = function(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata, msgID = null){
 
 
 	// Create the callback function
@@ -552,7 +554,7 @@ deletePlots = function(distanceVsTime_cleardata, timeHistogram_cleardata, timePe
 	}
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 
-	Module.ccall("deletePlots", null, ["number", "number", "number", "number", "number", "number"], [distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, msgID]);
+	Module.ccall("deletePlots", null, ["number", "number", "number", "number", "number", "number", "number"], [distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata, msgID]);
 
 }
 

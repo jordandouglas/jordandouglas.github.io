@@ -694,7 +694,7 @@ string Plots::getCacheSizeJSON(){
 
 
 
-void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata){
+void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata, bool sequences_cleardata){
 
 
 	if (distanceVsTime_cleardata) {
@@ -775,6 +775,13 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 	}
 
 
+
+	// Clear the list of unsent sequences
+	if (sequences_cleardata){
+		Plots::unsentCopiedSequences.clear();
+	}
+
+
 	// Clear the data saved in the ABC output, and the posterior distribution
 	if (ABC_cleardata) {
 
@@ -790,8 +797,6 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 
 
 void Plots::addCopiedSequence(string sequence){
-
 	Plots::unsentCopiedSequences.push_back(sequence);
-
 }
 

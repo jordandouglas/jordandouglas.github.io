@@ -74,7 +74,7 @@ State* State::setToInitialState(){
 
 	
 	// Transcribe a few bases forward to avoid left bubble effects
-	this->transcribe(2 + max(2, (int)(bubbleLeft->getVal())));
+	this->transcribe(4 + max(2, (int)(bubbleLeft->getVal())));
 	if (this->isGuiState) _applyingReactionsGUI = false;
 	return this;
 }
@@ -331,8 +331,18 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 	
 	// Lookup in table first or calculate it again?
 	if (lookupFirst){
-		double kFwd = _translocationRatesCache->getTranslocationRates(this, true);
-		return kFwd;
+
+		// Check if hypertranslocation is permitted
+		if (!currentModel->get_allowHypertranslocation() && this->mRNAPosInActiveSite >= 1) return 0;
+
+
+		// Check if going from backtracked to pretranslocated is permitted while activated
+		if (currentModel->get_allowBacktracking() && currentModel->get_allowInactivation() && !currentModel->get_allowBacktrackWithoutInactivation() && this->activated && this->mRNAPosInActiveSite == -1) return 0;
+
+
+
+		return _translocationRatesCache->getTranslocationRates(this, true);
+
 	}
 	
 	
@@ -443,11 +453,19 @@ double State::calculateBackwardRate(bool lookupFirst, bool ignoreStateRestrictio
 	}
 
 
+
 	
 	// Lookup in table first or calculate it again?
 	if (lookupFirst){
-		double kBck = _translocationRatesCache->getTranslocationRates(this, false);
-		return kBck;
+
+		// Check if backtracking is permitted
+		if (!currentModel->get_allowBacktracking() && this->mRNAPosInActiveSite <= 0) return 0;
+
+		// Check if backtracking is permitted while activated
+		if (currentModel->get_allowBacktracking() && currentModel->get_allowInactivation() && !currentModel->get_allowBacktrackWithoutInactivation() && this->activated && this->mRNAPosInActiveSite == 0) return 0;
+
+		return _translocationRatesCache->getTranslocationRates(this, false);
+
 	}
 	
 	
@@ -758,14 +776,7 @@ double State::calculateForwardTranslocationFreeEnergyBarrier(){
 	double barrierHeight = 0;
 	
 
-	// Check if hypertranslocation is permitted
-	if (!currentModel->get_allowHypertranslocation() && this->mRNAPosInActiveSite >= 1){
-		return INF;
-	}
-
-	
 	State* stateAfterForwardtranslocation = this->clone()->forward();
-
 
 
 	// Midpoint model: free energy barrier is halfway between the two on either side
@@ -799,10 +810,6 @@ double State::calculateBackwardTranslocationFreeEnergyBarrier(){
 	}
 
 
-	// Check if backtracking is permitted
-	if (!currentModel->get_allowBacktracking() && this->mRNAPosInActiveSite <= 0){
-		return INF;
-	}
  
 	State* stateAfterBackwardtranslocation = this->clone()->backward();
 

@@ -991,7 +991,7 @@ function saveSession(){
 			if (PHYSICAL_PARAMETERS_LOCAL[paramID]["fixedDistnVal"] != null) saveXML.writeAttributeString('fixedDistnVal', PHYSICAL_PARAMETERS_LOCAL[paramID]["fixedDistnVal"]);
 			if (PHYSICAL_PARAMETERS_LOCAL[paramID]["uniformDistnLowerVal"] != null) saveXML.writeAttributeString('uniformDistnLowerVal', PHYSICAL_PARAMETERS_LOCAL[paramID]["uniformDistnLowerVal"]);
 			if (PHYSICAL_PARAMETERS_LOCAL[paramID]["uniformDistnUpperVal"] != null) saveXML.writeAttributeString('uniformDistnUpperVal', PHYSICAL_PARAMETERS_LOCAL[paramID]["uniformDistnUpperVal"]);
-			if (PHYSICAL_PARAMETERS_LOCAL[paramID]["ExponentialDistnVal"] != null) saveXML.writeAttributeString('ExponentialDistnVal', PHYSICAL_PARAMETERS_LOCAL[paramID]["ExponentialDistnVal"]);
+			if (PHYSICAL_PARAMETERS_LOCAL[paramID]["exponentialDistnVal"] != null) saveXML.writeAttributeString('exponentialDistnVal', PHYSICAL_PARAMETERS_LOCAL[paramID]["exponentialDistnVal"]);
 			if (PHYSICAL_PARAMETERS_LOCAL[paramID]["normalMeanVal"] != null) saveXML.writeAttributeString('normalMeanVal', PHYSICAL_PARAMETERS_LOCAL[paramID]["normalMeanVal"]);
 			if (PHYSICAL_PARAMETERS_LOCAL[paramID]["normalSdVal"] != null) saveXML.writeAttributeString('normalSdVal', PHYSICAL_PARAMETERS_LOCAL[paramID]["normalSdVal"]);
 			if (PHYSICAL_PARAMETERS_LOCAL[paramID]["lognormalMeanVal"] != null) saveXML.writeAttributeString('lognormalMeanVal', PHYSICAL_PARAMETERS_LOCAL[paramID]["lognormalMeanVal"]);
@@ -1278,7 +1278,7 @@ function clearCache(){
 	if (sequences_cleardata) clearSequences();
 	
 
-	if (!distanceVsTime_cleardata && !timeHistogram_cleardata && !timePerSite_cleardata && !customPlot_cleardata && !ABC_cleardata) {
+	if (!distanceVsTime_cleardata && !timeHistogram_cleardata && !timePerSite_cleardata && !customPlot_cleardata && !ABC_cleardata && !sequences_cleardata) {
 		closeKineticCachePopup();
 		return;
 	}
@@ -1313,7 +1313,7 @@ function clearCache(){
 			}
 
 
-			deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, function(plotData){
+			deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata, function(plotData){
 
 				//console.log("plotData", plotData);
 

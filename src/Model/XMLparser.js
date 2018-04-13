@@ -1,4 +1,4 @@
-﻿﻿
+﻿
 /* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
@@ -221,7 +221,7 @@ function parseXML_param_WW(paramID, paramNode){
 	var fixedDistnVal = paramNode["fixedDistnVal"]; 
 	var uniformDistnLowerVal = paramNode["uniformDistnLowerVal"]; 
 	var uniformDistnUpperVal = paramNode["uniformDistnUpperVal"];
-	var ExponentialDistnVal = paramNode["ExponentialDistnVal"];
+	var exponentialDistnVal = paramNode["exponentialDistnVal"];
 	var normalMeanVal = paramNode["normalMeanVal"]; 
 	var normalSdVal = paramNode["normalSdVal"];
 	var lognormalMeanVal = paramNode["lognormalMeanVal"];
@@ -242,7 +242,7 @@ function parseXML_param_WW(paramID, paramNode){
 	if (fixedDistnVal != null) parameterObject["fixedDistnVal"] = parseFloat(fixedDistnVal);
 	if (uniformDistnLowerVal != null) parameterObject["uniformDistnLowerVal"] = parseFloat(uniformDistnLowerVal);
 	if (uniformDistnUpperVal != null) parameterObject["uniformDistnUpperVal"] = parseFloat(uniformDistnUpperVal);
-	if (ExponentialDistnVal != null) parameterObject["ExponentialDistnVal"] = parseFloat(ExponentialDistnVal);
+	if (exponentialDistnVal != null) parameterObject["exponentialDistnVal"] = parseFloat(exponentialDistnVal);
 	if (normalMeanVal != null) parameterObject["normalMeanVal"] = parseFloat(normalMeanVal);
 	if (normalSdVal != null) parameterObject["normalSdVal"] = parseFloat(normalSdVal);
 	if (lognormalMeanVal != null) parameterObject["lognormalMeanVal"] = parseFloat(lognormalMeanVal);

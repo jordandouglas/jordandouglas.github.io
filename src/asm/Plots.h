@@ -101,7 +101,7 @@ class Plots{
 		static void updateParameterPlotData(State* state);
 		static void hideAllPlots(bool hide);
 		static string getCacheSizeJSON();
-		static void deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata);
+		static void deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata, bool sequences_cleardata);
 		static void addCopiedSequence(string sequence);
 
 };

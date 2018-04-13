@@ -287,7 +287,7 @@ function getDiscreteVariableDistributionsTemplate(){
 		<select class="dropdown" id="SelectDistribution" OnChange="selectPriorDistribution()">
 		  	<option value="Fixed">Fixed</option>
 		  	<option value="DiscreteUniform">Discrete Uniform Distribution</option>
-			<option value="Poisson">Poisson Distribution</option>
+			<!--<option value="Poisson">Poisson Distribution</option>-->
 		</select>
 		<div id="discreteDescription" style="font-size:14px"></div>
 	
@@ -459,18 +459,18 @@ function addExponentialPrior(){
 	var paramID = $("#popup_distn").attr("paramID")
 	var currentVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"]);
 	
-	var expRate = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["ExponentialDistnVal"]);
+	var expRate = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["exponentialDistnVal"]);
 	if (expRate == null || isNaN(expRate)) expRate = roundToSF(1/currentVal);
 	if (currentVal <= 0) expRate = 1; // We don't want infinite or negative rates
 	
-	var textBox = "&lambda;: <input type='number' title='Select the rate for this parameter. The rate is the inverse of the mean' id='ExponentialDistnVal' value=" + expRate + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px' onChange=plotExponentialDistrbutionCanvas()></input>";
+	var textBox = "&lambda;: <input type='number' title='Select the rate for this parameter. The rate is the inverse of the mean' id='exponentialDistnVal' value=" + expRate + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px' onChange=plotExponentialDistrbutionCanvas()></input>";
 	
 	$("#parameterDistnCell").append(textBox);
 	
 	
 	plotExponentialDistrbutionCanvas = function(){
 
-		var rate = parseFloat($("#ExponentialDistnVal").val());
+		var rate = parseFloat($("#exponentialDistnVal").val());
 		if (rate <= 0) return;
 		var exponentialFn = function(x) {
 			if (x < 0) return 0;
@@ -506,7 +506,7 @@ function addNormalPrior(){
 	var sd = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["normalSdVal"]);
 
 	if (meanVal == null || isNaN(meanVal)) meanVal = roundToSF(currentVal);
-	if (sd == null || isNaN(sd)) sd = roundToSF(meanVal * 0.25);
+	if (sd == null || isNaN(sd) || sd <= 0) sd = roundToSF(meanVal * 0.25);
 	
 	if (sd == 0) sd = 1;
 
@@ -549,9 +549,9 @@ function addLognormalPrior(){
 	
 	var meanVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["lognormalMeanVal"]);
 	var sd = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["lognormalSdVal"]);
-	if (sd == null || isNaN(sd)) sd = 0.5;
+	if (sd == null || isNaN(sd) || sd <= 0) sd = 0.5;
 	if (meanVal == null || isNaN(meanVal)) meanVal = roundToSF(Math.log(currentVal / Math.exp(sd*sd/2)));
-	if (isNaN(meanVal)) meanVal = 0;
+	if (isNaN(meanVal) || meanVal <= 0) meanVal = 1;
 	
 	
 	var meanTextBox = "&mu;: <input type='number' title='Select the logarithmic mean value of this parameter' id='lognormalMeanVal' value=" + meanVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px' onChange=plotLognormalDistrbutionCanvas()></input>";

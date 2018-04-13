@@ -293,7 +293,7 @@ function refresh_controller(resolve_fn = function(x) {}){
 
 	else{
 
-		callWebWorkerFunction(stringifyFunction("WW_JS.refresh_WW", []));
+		
 		
 		var res = stringifyFunction("refresh", [], true);
 		var fnStr = "wasm_" + res[0];
@@ -328,7 +328,7 @@ function stop_controller(resolve = function() { }){
 	
 	else{
 
-		callWebWorkerFunction(stringifyFunction("WW_JS.stop_WW", [null]));
+		//callWebWorkerFunction(stringifyFunction("WW_JS.stop_WW", [null]));
 		
 		var res = stringifyFunction("stopWebAssembly", [], true);
 		var fnStr = "wasm_" + res[0];
@@ -654,7 +654,6 @@ function userInputSequence_controller(newSeq, newTemplateType, newPrimerType, in
 
 	else{
 		
-		callWebWorkerFunction(stringifyFunction("WW_JS.userInputSequence_WW", [newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent]));
 	
 		var res = stringifyFunction("userInputSequence", [newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent], true);
 		var fnStr = "wasm_" + res[0];
@@ -688,7 +687,6 @@ function userSelectSequence_controller(newSequenceID, newTemplateType, newPrimer
 
 	else{
 		
-		callWebWorkerFunction(stringifyFunction("WW_JS.userSelectSequence_WW", [newSequenceID, newTemplateType, newPrimerType]));
 	
 		var res = stringifyFunction("userSelectSequence", [newSequenceID], true);
 		var fnStr = "wasm_" + res[0];
@@ -940,8 +938,8 @@ function submitDistribution_controller(resolve = function() {}){
 	    	distributionParamsDict.uniformDistnUpperVal = parseFloat($("#uniformDistnUpperVal").val());
 	        break;
 		case "Exponential":
-			distributionParams.push(parseFloat($("#ExponentialDistnVal").val()));
-			distributionParamsDict.ExponentialDistnVal = parseFloat($("#ExponentialDistnVal").val());
+			distributionParams.push(parseFloat($("#exponentialDistnVal").val()));
+			distributionParamsDict.exponentialDistnVal = parseFloat($("#exponentialDistnVal").val());
 		    break;
 		case "Normal":
 			distributionParams.push(parseFloat($("#normalMeanVal").val()));
@@ -2040,7 +2038,7 @@ function startTrials_controller(){
 			refreshNavigationCanvases();
 			if($("#PreExp").val() != "hidden") renderObjects();
 			if (WEB_WORKER_WASM == null) drawPlots();
-			console.log("Updating dom");
+			//console.log("Updating dom");
 			simulating = false;
 			hideStopButtonAndShow("simulate");
 			update_sliding_curve(0);
@@ -2099,7 +2097,6 @@ function startTrials_controller(){
 
 			var resolve = function(result){
 				
-				//console.log("Back here", result);
 				//drawPlotsFromData(result.plots);
 				drawPlots();
 
@@ -2130,7 +2127,7 @@ function startTrials_controller(){
 
 				};
 
-				if($("#PreExp").val() != "hidden") renderObjects(false, toDoAfterObjectRender);
+				if(!result.stop && result.animationTime != 0) renderObjects(false, toDoAfterObjectRender);
 				else toDoAfterObjectRender();
 
 
@@ -2860,7 +2857,7 @@ function getCacheSizes_controller(resolve = function(){}){
 
 
 
-function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, resolve){
+function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata, resolve){
 
 
 
@@ -2880,7 +2877,7 @@ function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardat
 
 	else{
 
-		var res = stringifyFunction("deletePlots", [distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata], true);
+		var res = stringifyFunction("deletePlots", [distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata], true);
 		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));

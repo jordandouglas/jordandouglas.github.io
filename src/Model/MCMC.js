@@ -398,7 +398,7 @@ MCMC_JS.getLogPrior = function(hackLimits = true){
 
 
 			case "Exponential":
-				var rate = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].ExponentialDistnVal;
+				var rate = PARAMS_JS.PHYSICAL_PARAMETERS[paramID].exponentialDistnVal;
 				if (val <= 0) logPriorProbability = Number.NEGATIVE_INFINITY;
 				else logPriorProbability += Math.log(rate * Math.exp(-rate * val));
 				break;

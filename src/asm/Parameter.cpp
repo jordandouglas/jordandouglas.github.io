@@ -217,8 +217,8 @@ void Parameter::sample(){
 	else if (this->distributionName == "Lognormal"){
 		lognormal_distribution<> distribution{this->distributionParameters["lognormalMeanVal"], this->distributionParameters["lognormalSdVal"]};
 
-
 		this->val =  distribution(generator);
+
 		bool withinRange = this->zeroTruncated == "false" || (this->zeroTruncated == "exclusive" && this->val > 0) || (this->zeroTruncated == "inclusive" && this->val >= 0);
 		withinRange = withinRange && this->val > this->distributionParameters["lowerVal"] && this->val < this->distributionParameters["upperVal"];
 		while (!withinRange) {
@@ -226,11 +226,54 @@ void Parameter::sample(){
 			bool withinRange = this->zeroTruncated == "false" || (this->zeroTruncated == "exclusive" && this->val > 0) || (this->zeroTruncated == "inclusive" && this->val >= 0);
 			withinRange = withinRange && this->val > this->distributionParameters["lowerVal"] && this->val < this->distributionParameters["upperVal"];
 		}
+
+
+	}
+
+	else if (this->distributionName == "Exponential"){
+
+		this->val = Settings::rexp(distributionParameters["exponentialDistnVal"]);
+
+		bool withinRange = withinRange && this->val > this->distributionParameters["lowerVal"] && this->val < this->distributionParameters["upperVal"];
+		while (!withinRange) {
+			this->val = Settings::rexp(distributionParameters["exponentialDistnVal"]);
+			withinRange = this->val > this->distributionParameters["lowerVal"] && this->val < this->distributionParameters["upperVal"];
+		}
+
+
+		//cout << "sampled " << this->val << " from " << distributionParameters["exponentialDistnVal"] << endl;
+
+	}
+
+
+	else if (this->distributionName == "Gamma"){
+
+  		gamma_distribution<double> distribution(distributionParameters["gammaShapeVal"], 1/distributionParameters["gammaRateVal"]);
+  		this->val =  distribution(generator);
+
+		bool withinRange = withinRange && this->val > this->distributionParameters["lowerVal"] && this->val < this->distributionParameters["upperVal"];
+		while (!withinRange) {
+			this->val =  distribution(generator);
+			withinRange = this->val > this->distributionParameters["lowerVal"] && this->val < this->distributionParameters["upperVal"];
+		}
+
+		//cout << "sampled " << this->val << " from " << distributionParameters["gammaShapeVal"] << "," << distributionParameters["gammaRateVal"] << endl;
+
+	}
+
+
+	else if (this->distributionName == "DiscreteUniform"){
+
+  		uniform_real_distribution<> distribution{this->distributionParameters["uniformDistnLowerVal"], this->distributionParameters["uniformDistnUpperVal"] + 1};
+		this->val = std::floor(distribution(generator));
+		//cout << "sampled " << this->val << " from " << distributionParameters["gammaShapeVal"] << "," << distributionParameters["gammaRateVal"] << endl;
+
 	}
 
 	else {
 
-		// TODO exponential poisson, discrete uniform, gamma
+		cout << "ERROR: Unrecognised distribution: " << this->distributionName << endl;
+		exit(1);
 	}
 
 
@@ -299,6 +342,10 @@ double Parameter::calculateLogPrior(){
 	}
 
 	else {
+
+
+		cout << "ERROR: SimPol cannot calculate probability density for: " << this->distributionName << endl;
+		exit(1);
 
 		// TODO poisson, discrete uniform
 		return 0;
@@ -371,6 +418,13 @@ void Parameter::makeProposal(){
 			this->val = newVal;
 
 		}	
+
+		else{
+
+			cout << "ERROR: SimPol cannot make proposal for: " << this->distributionName << endl;
+			exit(1);
+
+		}
 				
 				
 		// TODO: gamma, exponential, poisson

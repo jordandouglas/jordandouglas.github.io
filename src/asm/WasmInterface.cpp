@@ -272,15 +272,17 @@ extern "C" {
 	// Refresh the current state
 	void EMSCRIPTEN_KEEPALIVE refresh(int msgID){
 
-		// Sample parameters
-		Settings::sampleAll();
-
 		// Reset state
 		delete _currentStateGUI;
 		_currentStateGUI = new State(true, true);
 
+
+		// Sample parameters
+		Settings::sampleAll();
+
 		// Refresh plot
 		Plots::refreshPlotData(_currentStateGUI);
+
 
 		messageFromWasmToJS("", msgID);
 	}
@@ -858,9 +860,9 @@ extern "C" {
 
 
 	// Delete the specified plot data (ie. clear the cache) 
-	void EMSCRIPTEN_KEEPALIVE deletePlots(bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata, int msgID){
+	void EMSCRIPTEN_KEEPALIVE deletePlots(bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata, bool sequences_cleardata, int msgID){
 
-		Plots::deletePlotData(_currentStateGUI, distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata);
+		Plots::deletePlotData(_currentStateGUI, distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata);
 		string plotsJSON = Plots::getPlotDataAsJSON();
 		messageFromWasmToJS(plotsJSON, msgID);
 	}
