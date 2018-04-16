@@ -2127,7 +2127,7 @@ function closeNav() {
 			
 			<br>
 			<div class="parameter-bg">
-				<div class="parameter-title">Unactivated State Parameters </div>  <br> 
+				<div class="parameter-title">Pause Parameters </div>  <br> 
 
 
 
@@ -2204,6 +2204,31 @@ function closeNav() {
 
 				 		<td>
 							<input type=image id='kA_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
+				 		</td>
+
+				 	</tr>
+
+
+
+					<tr id="RateCleave_container">
+
+
+				 		<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateCleave_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							k<sub>cleave</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="RateCleave" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='RateCleave_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
 				 		</td>
 
 				 	</tr>
@@ -2750,8 +2775,8 @@ function closeNav() {
 										<div style="font-size:18px; font-family:Arial; vertical-align:top">
 											Deactivation reactions
 										</div> <br>
-										<div id="deactivationCanvasDIV" style="position:relative; margin:auto; width: 350px">
-											<canvas id="deactivationCanvas"  height=70 width=350></canvas>
+										<div id="deactivationCanvasDIV" style="position:relative; margin:auto; width: 300px">
+											<canvas id="deactivationCanvas"  height=70 width=300></canvas>
 										</div><br>
 
 
@@ -2762,6 +2787,29 @@ function closeNav() {
 									<td style="width:25%; vertical-align:top">
 
 
+										<div style="font-size:18px; font-family:Arial; vertical-align:top">
+											Cleavage reactions
+										</div> <br>
+										<div id="cleavageCanvasDIV"  style="position:relative; margin:auto; width: 300px">
+											<canvas id="cleavageCanvas"  height=70 width=300></canvas>
+										</div><br>
+
+
+									</td>
+
+
+
+
+								</tr>
+
+
+
+								<tr style="text-align:center;">
+
+
+									<td style="width:25%; vertical-align:top">
+
+										<br><br>
 										<div style="font-size:18px; font-family:Arial; vertical-align:top">
 											Slippage reactions
 										</div> <br><br>
@@ -2778,87 +2826,8 @@ function closeNav() {
 								</tr>
 
 
+
 							
-								<tr style="text-align:center; display:none">
-									
-									<td class="landscape">
-										
-										
-									</td>
-									
-									<td class="spacer"></td>
-
-									<td class="landscape">
-										
-												<input type=button id='nntp' onClick=releaseNTP_controller() value='Release NTP' title="Release NTP or reverse-catalyse" class="operation"> 
-												NTP 
-												<input type=button id='ntp' onClick=bindNTP_controller() value='Bind NTP' title="Bind NTP or add NTP to the chain" class="operation">
-												
-
-												
-
-									</td>
-									
-									<td class="spacer"></td>
-									
-									<td class="landscape">
-										<input type=button id='unpauseBtn' onClick=activate_controller() value='Activate' title="Activate the polymerase" class="operation">
-										Deactivation
-										<input type=button id='pauseBtn' onClick=deactivate_controller() value='Deactivate' title="Put the polymerase into a catalytically inactive state" class="operation">
-									</td>
-									
-									
-								</tr>
-								
-
-								<tr style="text-align:center; display:none" id="primerSlipGraphs">
-
-									
-										
-									<td id='primerSlipCanvasCell0' class="landscape">
-										<canvas id="slipCanvas0" width="410px" height="0px"></canvas>
-									</td>
-									<td class="spacer" id="primerSlipCanvasCellSpacer0"></td>
-
-								</tr>
-									
-								<tr style="text-align:center; display:none" id="primerSlipButtons" >
-									
-									<td id='primerSlipBtnCell0' class="landscape">
-										<input type=button id='hideSlip0' class='minimise' value='+' onClick=toggleSlip(0)>
-									</td>
-									<td class="spacer" id="primerSlipBtnCellSpacer0"></td>
-										
-								</tr>
-								
-									
-									
-								<tr style="text-align:center; display:none">
-									
-									
-									
-									<td class="landscape">
-										<canvas id="TslipCanvas"  width="410px" height="100px"></canvas>
-									</td>
-									<td class="spacer"></td>
-
-								</tr>
-								
-								<tr style="text-align:center; display:none">
-
-
-
-									<td class="landscape">
-										<input type=button id='Tdbl' onClick=diffuse_left_T() value='Form bulge' title="Move a bulge to the left" class="operation">
-										Template Slippage
-										<input type=button id='Tdbr' onClick=diffuse_right_T() value='Absorb bulge' title="Move a bulge to the right" class="operation">
-										<input type=button id='ThideSlip' class='minimise'  value='+' onClick=toggleSlipT()>
-									</td>
-									<td class="spacer"></td>
-								</tr>
-								
-
-
 							
 							</table> 	
 						</div>
