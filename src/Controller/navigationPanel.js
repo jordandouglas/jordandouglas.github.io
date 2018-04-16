@@ -387,7 +387,7 @@ function drawNTPcanvas(){
 
 			var arrowX = rightStateX - 10;
 			var decayApplicable = result["mRNAPosInActiveSite"] == 0 && result["activated"];
-			plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "left", "Decay", decayRate, onClickLeft, "Remove the most recently added base from the chain (shift + &larr;)", spacingBetweenStates, canvas, decayApplicable);
+			plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "left", "Lysis", decayRate, onClickLeft, "Pyrophosphorylysis; remove the most recently added base from the chain (shift + &larr;)", spacingBetweenStates, canvas, decayApplicable);
 
 
 		}
