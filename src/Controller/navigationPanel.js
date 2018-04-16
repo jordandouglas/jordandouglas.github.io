@@ -35,8 +35,6 @@ function refreshNavigationCanvases(){
 
 function plotArrow_navigationPanel(ctx, fromx, fromy, direction, label = "", rate, spacingBetweenStates, hovering = false, reactionApplicable = true){
 	
-	
-
 
 	ctx.globalAlpha = 1;
 	var headlen = 10;
@@ -142,7 +140,7 @@ function plotArrowButton_navigationPanel(ctx, fromx, fromy, direction, label = "
 
 	var arrowHTML = `
 		<input type="image" class="navArrow ` + cssclass + `" src="` + src + `" title="` + hoverTitle + `" onclick="if (!simulating)` + onClick + `();" style = "padding:` + arrowPadding + `; cursor:` + cursorClass + `;position:absolute; width:` + arrowWidth + `px; height:` + arrowHeight + `px; top:` + arrowTop + `px; left:` + arrowLeft + `px; z-index:2 ">
-		<div class="navArrow noselect" onclick="if (!simulating) ` + onClick + `();" title="` + hoverTitle + `" style="cursor:` + cursorClass + `; vertical-align:middle; color:white; font-family:Arial; text-align:` + textAlign + `; position:absolute; font-size:17px; top:` + labelY + `px; left:` + labelX + `px; width:` + arrowWidth + `px; z-index:2">&nbsp;` + label + `&nbsp;</div>
+		<div class="navArrow noselect" onclick="if (!simulating) ` + onClick + `();" title="` + hoverTitle + `" style="cursor:` + cursorClass + `; vertical-align:middle; color:white; font-family:Arial; text-align:` + textAlign + `; position:absolute; font-size:15px; top:` + labelY + `px; left:` + labelX + `px; width:` + arrowWidth + `px; z-index:2">&nbsp;` + label + `&nbsp;</div>
 
 	`;
 
@@ -150,7 +148,7 @@ function plotArrowButton_navigationPanel(ctx, fromx, fromy, direction, label = "
 	if(rate != null){
 
 		var rateHTML = `
-			<div class="navArrow" style="color:black; font-family:Arial; text-align:` + textAlign + `; position:absolute; font-size:14px; top:` + (arrowTop) + `px; left:` + arrowLeft + `px; width:` + arrowWidth + `px">` + roundToSF(rate, 3) + `s<sup>-1</sup></div>
+			<div class="navArrow" style="color:black; font-family:Arial; text-align:` + textAlign + `; position:absolute; font-size:14px; top:` + (arrowTop - 5) + `px; left:` + arrowLeft + `px; width:` + arrowWidth + `px">` + roundToSF(rate, 3) + `s<sup>-1</sup></div>
 		`;
 
 		arrowHTML += rateHTML;
@@ -441,14 +439,30 @@ function drawDeactivationCanvas(){
 		var kU = result["kU"];
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		$(canvas).parent().find(".navArrow").remove();
-		
+		$("#deactivationCanvasDIV img").remove(); 
 
 
 		var currentStateMargin = 2;
 		var spacingBetweenStates = plotWidth * 0.25 - 2*currentStateMargin;
 
 
+		
+		// Draw a polymerase on either side
+		var polHeightRad = (plotHeight - currentStateMargin) / 2;
+		var polWidthRad = (plotWidth * 0.35 - currentStateMargin) / 2;
+		var polYCoord = 5;
+		var leftPolXCoord = 20;
+		var rightPolXCoord = 200;
 
+
+		
+		var leftHTML = `<img style="position:absolute; width:80px; left:` + leftPolXCoord + `px; top:` + polYCoord + `px;" src = "src/Images/activated.png"></img>`;
+		var rightHTML = `<img style="position:absolute; width:80px; left:` + rightPolXCoord + `px; top:` + polYCoord + `px;" src = "src/Images/inactivated.png"></img>`;
+		$("#deactivationCanvasDIV").append(leftHTML);
+		$("#deactivationCanvasDIV").append(rightHTML);
+		
+		/*
+		
 		// Draw a polymerase on either side
 		var polHeightRad = (plotHeight - currentStateMargin) / 2;
 		var polWidthRad = (plotWidth * 0.35 - currentStateMargin) / 2;
@@ -481,33 +495,14 @@ function drawDeactivationCanvas(){
 
 		ctx.fillStyle = "#e6e6e6";
 		ctx.fillRect(activeRectXPos, rectYPos, rectWidth, rectHeight);
-		/*ctx.beginPath();
-		ctx.lineWidth="2";
-		ctx.strokeStyle="#536872";
-		ctx.rect(activeRectXPos, rectYPos, rectWidth, rectHeight);
-		ctx.stroke();*/
-		//ctx.globalAlpha = !activated ? 1 : 0.4;
+		
 		ctx.fillStyle = "#708090";
 		ctx.fillRect(inactiveRectXPos, rectYPos, rectWidth, rectHeight);
 
 
 		ctx.globalAlpha = 1;
-
-		// Draw a rectangle around the current state
-		/*
-		var stateHeight = plotHeight;
-		var stateWidth = plotWidth * 0.35 + currentStateMargin;
-		var stateY = 0;
-		var stateX = activated ? 0 : plotWidth * 0.65 - currentStateMargin; // activated is whether the polymerase is active or not
-		ctx.beginPath();
-		ctx.lineWidth="6";
-		ctx.strokeStyle="#008cba";
-		ctx.rect(stateX, stateY, stateWidth, stateHeight);
-		ctx.stroke();
+		
 		*/
-
-
-
 
 
 		// Arrow from current state to other state
@@ -550,6 +545,7 @@ function drawCleavageCanvas(){
 		
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		$(canvas).parent().find(".navArrow").remove();
+		$("#cleavageCanvasDIV img").remove(); 
 
 
 		var currentStateMargin = 2;
@@ -560,20 +556,26 @@ function drawCleavageCanvas(){
 		// Draw a polymerase on either side
 		var polHeightRad = (plotHeight - currentStateMargin) / 2;
 		var polWidthRad = (plotWidth * 0.35 - currentStateMargin) / 2;
-		var polYCoord = polHeightRad + currentStateMargin/2;
-		var activePolXCoord = polWidthRad + currentStateMargin;
-		var inactivePolXCoord = plotWidth * 0.65 + polWidthRad;
+		var polYCoord = 15;
+		var leftPolXCoord = -10;
+		var rightPolXCoord = 190;
 
 
-
+		
+		var leftHTML = `<img style="position:absolute; width:120px; left:` + leftPolXCoord + `px; top:` + polYCoord + `px;" src = "src/Images/leftCleavage.png"></img>`;
+		var rightHTML = `<img style="position:absolute; width:120px; left:` + rightPolXCoord + `px; top:` + polYCoord + `px;" src = "src/Images/rightCleavage.png"></img>`;
+		$("#cleavageCanvasDIV").append(leftHTML);
+		$("#cleavageCanvasDIV").append(rightHTML);
+		
+		/*
 		ctx.fillStyle = "#b3b3b3";
 		ctx.beginPath();
-		ctx_ellipse(ctx, activePolXCoord, polYCoord, polWidthRad, polHeightRad, 0, 0, 2*Math.PI);
+		ctx_ellipse(ctx, leftPolXCoord, polYCoord, polWidthRad, polHeightRad, 0, 0, 2*Math.PI);
 		ctx.fill();
 
 
 		ctx.beginPath();
-		ctx_ellipse(ctx, inactivePolXCoord, polYCoord, polWidthRad, polHeightRad, 0, 0, 2*Math.PI);
+		ctx_ellipse(ctx, rightPolXCoord, polYCoord, polWidthRad, polHeightRad, 0, 0, 2*Math.PI);
 		ctx.fill();
 
 
@@ -593,7 +595,7 @@ function drawCleavageCanvas(){
 
 
 		ctx.globalAlpha = 1;
-
+*/
 
 
 
