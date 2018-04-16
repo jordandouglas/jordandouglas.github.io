@@ -403,10 +403,15 @@ string Plots::getPlotDataAsJSON(){
 
 	if (distanceVsTime_needsData) {
 
+		//cout << "1" << endl;
+	
 		// Turn unsent distance versus time object into a JSON
 		string distanceVsTimeDataUnsent_JSON = "'DVT_UNSENT':{";
 		int nruns = 0;
 		for (list<list<vector<double>>>::iterator it = Plots::distanceVsTimeDataUnsent.begin(); it != Plots::distanceVsTimeDataUnsent.end(); ++it){
+
+			nruns++;
+			//cout << "a#" << nruns << endl;
 
 			// Simulation number of this simulation
 			list<vector<double>> simulationList = (*it);
@@ -422,31 +427,41 @@ string Plots::getPlotDataAsJSON(){
 
 			//cout << distanceVsTimeDataUnsent_JSON << endl;
 			//cout << "size of this " << simulationList.size() << "size of parent " << Plots::distanceVsTimeDataUnsent.size() << endl;
-
+			//cout << "b#" << nruns << endl;
+			int nrunsb = 0;
 			for (list<vector<double>>::iterator j = simulationList.begin(); j != simulationList.end(); ++j){
 
 				vector<double> distanceTime = (*j);
-				if (int(distanceTime.at(0)) <= 0) continue;
+				if (distanceTime.size() < 2 || int(distanceTime.at(0)) <= 0) continue;
 				distances += to_string(int(distanceTime.at(0)));
 				times += to_string(distanceTime.at(1));
 
-				// Add commas if there is another element in the list
-				if (++j != simulationList.end()){
-        			distances += ",";	
-        			times += ",";	
-        		}
-        		--j;
-
-        		distanceTime.clear();
-        		delete &distanceTime;
+    			distances += ",";	
+    			times += ",";	
+        		//distanceTime.clear();
+        		//delete &distanceTime;
 
 			}
 
+			//cout << "c#" << nruns << endl;
+
+			nrunsb = 0;
+			for (list<vector<double>>::iterator j = simulationList.begin(); j != simulationList.end(); ++j){
+				nrunsb++;
+				vector<double> distanceTime = (*j);
+        		delete &distanceTime;
+			}
+
+
+
+			if (distances.substr(distances.length()-1, 1) == ",") distances = distances.substr(0, distances.length() - 1);
+			if (times.substr(times.length()-1, 1) == ",") times = times.substr(0, times.length() - 1);
 			distances += "]";
 			times += "]";
 
 			if (distances == "[]" || times == "[]") continue;
 
+			//cout << "d#" << nruns << endl;
 			distanceVsTimeDataUnsent_JSON += "'" + to_string(simulationNum) + "':{'sim':" + to_string(simulationNum);
 			distanceVsTimeDataUnsent_JSON += ",'distances':" + distances + ",'times':" + times + "}";
 
@@ -456,12 +471,18 @@ string Plots::getPlotDataAsJSON(){
     		}
     		--it;
 
+    		//cout << "distanceVsTimeDataUnsent_JSON length " << distanceVsTimeDataUnsent_JSON.length() << endl;
+
+    		//cout << distanceVsTimeDataUnsent_JSON << endl;
+
 
 			simulationList.clear();
 			delete &simulationList;
 
 
 		}
+
+		//cout << "2" << endl;
 
 		distanceVsTimeDataUnsent_JSON += "}";
 
@@ -476,7 +497,7 @@ string Plots::getPlotDataAsJSON(){
 		}
 
 		// Include median time travelled
-		if (Plots::distancesTravelledOnEachTemplate.size() > 0){
+		if (Plots::timesSpentOnEachTemplate.size() > 0){
 			int middleTimeIndex = Plots::timesSpentOnEachTemplate.size() / 2;
 			plotDataJSON += ",'medianTimeSpentOnATemplate':" + to_string(Plots::timesSpentOnEachTemplate.at(middleTimeIndex));
 		}
@@ -487,13 +508,18 @@ string Plots::getPlotDataAsJSON(){
 
 
 		// Reinitialise the unsent data structure
-		vector<double> distanceTimeUnsent(3);
-		//distanceTimeUnsent.at(0) = 0; // Distance (nt);
-		//distanceTimeUnsent.at(1) = Plots::timeWaitedUntilNextTranslocation; // Time (s)
-		distanceTimeUnsent.at(2) = Plots::currentSimNumber;
-    	list<vector<double>> distanceTimeThisSimulation;
-		distanceTimeThisSimulation.push_back(distanceTimeUnsent);
-    	Plots::distanceVsTimeDataUnsent.push_back(distanceTimeThisSimulation);
+		if (Plots::distanceVsTimeSize < Plots::distanceVsTimeSizeMax) {
+			vector<double> distanceTimeUnsent(3);
+			//distanceTimeUnsent.at(0) = 0; // Distance (nt);
+			//distanceTimeUnsent.at(1) = Plots::timeWaitedUntilNextTranslocation; // Time (s)
+			distanceTimeUnsent.at(2) = Plots::currentSimNumber;
+	    	list<vector<double>> distanceTimeThisSimulation;
+			distanceTimeThisSimulation.push_back(distanceTimeUnsent);
+	    	Plots::distanceVsTimeDataUnsent.push_back(distanceTimeThisSimulation);
+    	}
+
+
+    	//cout << "3" << endl;
 
 				
 	}

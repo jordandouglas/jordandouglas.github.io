@@ -27,6 +27,7 @@ function refreshNavigationCanvases(){
 	drawNTPcanvas();
 	drawDeactivationCanvas();
 	drawSlippageCanvas();
+	drawCleavageCanvas();
 
 }
 
@@ -529,6 +530,86 @@ function drawDeactivationCanvas(){
 
 
 
+
+function drawCleavageCanvas(){
+
+	var canvas = $("#cleavageCanvas")[0];
+	if (canvas == null) return;
+
+
+	var ctx = canvas.getContext('2d');
+	ctx.globalAlpha = 1;
+
+	
+	var plotWidth = canvas.width;
+	var plotHeight = canvas.height;
+
+
+	getCleavageCanvasData_controller(function(result){
+
+		
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		$(canvas).parent().find(".navArrow").remove();
+
+
+		var currentStateMargin = 2;
+		var spacingBetweenStates = plotWidth * 0.25 - 2*currentStateMargin;
+
+
+
+		// Draw a polymerase on either side
+		var polHeightRad = (plotHeight - currentStateMargin) / 2;
+		var polWidthRad = (plotWidth * 0.35 - currentStateMargin) / 2;
+		var polYCoord = polHeightRad + currentStateMargin/2;
+		var activePolXCoord = polWidthRad + currentStateMargin;
+		var inactivePolXCoord = plotWidth * 0.65 + polWidthRad;
+
+
+
+		ctx.fillStyle = "#b3b3b3";
+		ctx.beginPath();
+		ctx_ellipse(ctx, activePolXCoord, polYCoord, polWidthRad, polHeightRad, 0, 0, 2*Math.PI);
+		ctx.fill();
+
+
+		ctx.beginPath();
+		ctx_ellipse(ctx, inactivePolXCoord, polYCoord, polWidthRad, polHeightRad, 0, 0, 2*Math.PI);
+		ctx.fill();
+
+
+
+
+		// Rectangle to denote hybrid
+		var rectHeight = (plotHeight - currentStateMargin) * 0.4;
+		var rectWidth = polWidthRad*1.5;
+		var rectYPos = (plotHeight-currentStateMargin) * 0.3 + currentStateMargin/2;
+		var leftRectXPos = rectWidth * 1/6 + currentStateMargin;
+		var rightRectXPos = plotWidth * 0.65 + rectWidth * 1/6;
+
+
+		ctx.fillStyle = "#e6e6e6";
+		ctx.fillRect(leftRectXPos, rectYPos, rectWidth, rectHeight);
+		ctx.fillRect(rightRectXPos, rectYPos, rectWidth, rectHeight);
+
+
+		ctx.globalAlpha = 1;
+
+
+
+
+		// Arrow from current state to other state
+		var fromX = plotWidth * 0.35 + currentStateMargin;
+		var rate = result.kcleave;
+		var onClick = "cleave_controller";
+
+		plotArrowButton_navigationPanel(ctx, fromX, plotHeight / 2, "right", "Cleave", rate, onClick, "Cleave the 3\u2032 end of the nascent strand to break the pause", spacingBetweenStates, canvas, result.canCleave);
+
+
+
+
+	});
+
+}
 
 
 

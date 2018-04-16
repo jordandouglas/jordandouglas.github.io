@@ -1586,6 +1586,39 @@ function deactivate_controller(state = null, UPDATE_COORDS = true, resolve = fun
 }
 
 
+function cleave_controller(state = null, UPDATE_COORDS = true, resolve = function(x) { }){
+
+	if (variableSelectionMode) return resolve(false);
+
+
+	var updateDOM = function(x){
+		
+		refreshNavigationCanvases();
+		update_sliding_curve(0);
+		update_slipping_curve(0);
+		renderObjects();
+		resolve(x);
+
+	};
+
+	if (WEB_WORKER_WASM != null) {
+
+		var res = stringifyFunction("cleaveNascentStrand", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => updateDOM(result));
+
+	}
+
+
+}
+
+
+
+
+
+
 
 function slip_left_controller(S = 0, state = null, UPDATE_COORDS = true, resolve = function() { }){
 
@@ -1963,6 +1996,28 @@ function getDeactivationCanvasData_controller(resolve = function(result){}){
 	}
 
 }
+
+
+
+
+function getCleavageCanvasData_controller(resolve = function(result){}){
+
+
+	if (WEB_WORKER_WASM != null) {
+
+		var res = stringifyFunction("getCleavageCanvasData", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
+	}
+
+}
+
+
+
+
 
 
 function getSlippageCanvasData_controller(S = 0, resolve = function(result){}){

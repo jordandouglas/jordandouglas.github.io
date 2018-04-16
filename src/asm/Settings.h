@@ -134,6 +134,7 @@ extern Parameter *RateBind;
 
 extern Parameter *RateActivate;
 extern Parameter *RateDeactivate;
+extern Parameter *RateCleave;
 
 
 

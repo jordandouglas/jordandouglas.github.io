@@ -68,7 +68,7 @@ void messageFromWasmToJS(const string & msg, int msgID) {
 extern "C" {
 
 
-	void EMSCRIPTEN_KEEPALIVE initGUI(){
+	void EMSCRIPTEN_KEEPALIVE initGUI(bool isMobile){
 		_USING_GUI = true;
 		//_currentStateGUI = new State(true, true);
 	}
@@ -142,6 +142,8 @@ extern "C" {
 			else if (reactionNumber == 4) _currentStateGUI->activate();
 			else if (reactionNumber == 5) _currentStateGUI->deactivate();
 			else if (reactionNumber == 6) _currentStateGUI->terminate();
+			else if (reactionNumber == 7) _currentStateGUI->cleave();
+
 
 			_applyingReactionsGUI = false;
 
@@ -199,6 +201,16 @@ extern "C" {
 		_applyingReactionsGUI = false;
 		messageFromWasmToJS("", msgID);
 	}
+
+	// Cleave the 3' end of the nascent strand if backtracked
+	void EMSCRIPTEN_KEEPALIVE cleaveNascentStrand(int msgID){
+		_applyingReactionsGUI = true;
+		_currentStateGUI->cleave();
+		_applyingReactionsGUI = false;
+		messageFromWasmToJS("", msgID);
+	}
+
+
 
 
 	// Returns all data needed to draw the translocation arrow canvas
@@ -261,6 +273,18 @@ extern "C" {
 		activationJSON += "'kA':" + to_string(_currentStateGUI->calculateActivateRate(false)) + ",";
 		activationJSON += "'kU':" + to_string(_currentStateGUI->calculateDeactivateRate(false)) + ",";
 		activationJSON += "'allowDeactivation':" + string(currentModel->get_allowInactivation() ? "true" : "false");
+		activationJSON += "}";
+		messageFromWasmToJS(activationJSON, msgID);
+
+	}
+
+
+	// Returns all data needed to draw the cleavage navigation canvas
+	void EMSCRIPTEN_KEEPALIVE getCleavageCanvasData(int msgID){
+
+		string activationJSON = "{";
+		activationJSON += "'canCleave':" + string(_currentStateGUI->get_mRNAPosInActiveSite() < 0 ? "true" : "false") + ",";
+		activationJSON += "'kcleave':" + to_string(_currentStateGUI->calculateCleavageRate(false));
 		activationJSON += "}";
 		messageFromWasmToJS(activationJSON, msgID);
 

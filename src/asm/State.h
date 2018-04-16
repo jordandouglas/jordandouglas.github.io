@@ -60,16 +60,24 @@ class State{
 		double calculateForwardRate(bool lookupFirst, bool ignoreStateRestrictions);
 		State* backward();
 		double calculateBackwardRate(bool lookupFirst, bool ignoreStateRestrictions);
+
 		State* bindNTP();
 		double calculateBindOrCatNTPrate(bool ignoreStateRestrictions);
 		double calculateBindNTPrate(bool ignoreStateRestrictions);
 		double calculateCatalysisRate(bool ignoreStateRestrictions);
 		State* releaseNTP();
 		double calculateReleaseNTPRate(bool ignoreStateRestrictions);
+
 		State* activate();
 		double calculateActivateRate(bool ignoreStateRestrictions);
 		State* deactivate();
 		double calculateDeactivateRate(bool ignoreStateRestrictions);
+
+		State* cleave();
+		double calculateCleavageRate(bool ignoreStateRestrictions);
+
+
+
 
 		bool isTerminated();
 		bool NTPbound();

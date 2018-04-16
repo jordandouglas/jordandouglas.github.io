@@ -21,14 +21,14 @@
 -*/
 
 
-
+IS_MOBILE = false;
 self.importScripts('simpol_asm.js');
 WASM_MESSAGE_LISTENER = {};
 
 
 // Send a message back to the original JS module to inform that the program has initialised
 onRuntimeInitialised = function(){
-	Module.ccall("initGUI"); // Initialise the WASM module for GUI use
+	Module.ccall("initGUI", null, ["number"], [IS_MOBILE]); // Initialise the WASM module for GUI use
 	postMessage("wasm_initialised");
 }
 Module['onRuntimeInitialized'] = onRuntimeInitialised;
@@ -734,6 +734,7 @@ activatePolymerase = function(msgID = null){
 
 }
 
+
 // Deactivate the polymerase by putting it into a catalytically inactive state
 deactivatePolymerase = function(msgID = null){
 
@@ -746,6 +747,22 @@ deactivatePolymerase = function(msgID = null){
 	Module.ccall("deactivatePolymerase", null, ["number"], [msgID]);
 
 }
+
+
+
+// Cleave the 3' end of the nascent strand if backtracked
+cleaveNascentStrand = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(){
+		if (msgID != null) postMessage(msgID + "~X~done");
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("cleaveNascentStrand", null, ["number"], [msgID]);
+
+}
+
 
 
 // Returns all data needed to draw the translocation navigation canvas
@@ -790,6 +807,19 @@ getDeactivationCanvasData = function(msgID = null){
 }
 
 
+// Returns all data needed to draw the cleavage navigation canvas
+getCleavageCanvasData = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log("resultStr", resultStr);
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("getCleavageCanvasData", null, ["number"], [msgID]);
+
+}
 
 
 

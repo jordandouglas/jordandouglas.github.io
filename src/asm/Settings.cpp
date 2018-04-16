@@ -122,11 +122,12 @@ Parameter* kCat = new Parameter("kCat", false, "inclusive", "Rate of catalysis (
 Parameter* Kdiss = new Parameter("Kdiss", false, "exclusive", "KD (\u03bcM)", "Dissociation constant of NTP");
 Parameter* RateBind = new Parameter("RateBind", false, "inclusive", "Rate of binding  (\u03bcM\u207B\u00B9 s\u207B\u00B9)", "Second order rate constant of binding the correct NTP");
 
-Parameter* RateActivate = new Parameter("kA", false, "inclusive", "kA (s\u207B\u00B9)", "Rate constant of polymerase leaving the catalytically unactive state", "k_[A]  (s^[\u22121\u2009])");
-Parameter* RateDeactivate = new Parameter("kU", false, "inclusive", "kU (s\u207B\u00B9)", "Rate constant of polymerase entering the catalytically unactive state", "k_[U]  (s^[\u22121\u2009])");
+Parameter* RateActivate = new Parameter("kA", false, "inclusive", "Rate of activation (s\u207B\u00B9)", "Rate constant of polymerase leaving the catalytically unactive state", "k_[A]  (s^[\u22121\u2009])");
+Parameter* RateDeactivate = new Parameter("kU", false, "inclusive", "Rate of inactivation (s\u207B\u00B9)", "Rate constant of polymerase entering the catalytically unactive state", "k_[cleave]  (s^[\u22121\u2009])");
+Parameter* RateCleave = new Parameter("RateCleave", false, "inclusive", "Rate of cleavage (s\u207B\u00B9)", "Rate constant of cleaving the dangling 3\u2032 end of the nascent strand when backtracked", "k_[U]  (s^[\u22121\u2009])");
 
 
-vector<Parameter*> Settings::paramList(18);
+vector<Parameter*> Settings::paramList(19);
 
 CRandomMersenne* Settings::SFMT;
 
@@ -176,6 +177,8 @@ void Settings::init(){
 
 	RateActivate->setDistributionParameter("fixedDistnVal", 4);
 	RateDeactivate->setDistributionParameter("fixedDistnVal", 0.1);
+	RateCleave->setDistributionParameter("fixedDistnVal", 0.1);
+
 
 	
 	// Populate the list of parameters
@@ -198,7 +201,7 @@ void Settings::init(){
 	paramList.at(15) = RateBind;
 	paramList.at(16) = RateActivate;
 	paramList.at(17) = RateDeactivate;
-
+	paramList.at(18) = RateCleave;
 
 
 
@@ -320,6 +323,8 @@ void Settings::setParameterList(vector<Parameter*> params){
 	RateBind = paramList.at(15);
 	RateActivate = paramList.at(16);
 	RateDeactivate = paramList.at(17);
+	RateCleave = paramList.at(18);
+
 
 
 }
@@ -445,6 +450,7 @@ void Settings::print(){
 
 	RateActivate->print();
 	RateDeactivate->print();
+	RateCleave->print();
 
 	cout << endl << endl;
 
@@ -609,6 +615,7 @@ void Settings::clearParameterHardcodings(){
 	RateBind->stopHardcoding();
 	RateActivate->stopHardcoding();
 	RateDeactivate->stopHardcoding();
+	RateCleave->stopHardcoding();
 
 }
 
@@ -636,6 +643,7 @@ void Settings::sampleAll(){
 	RateBind->sample();
 	RateActivate->sample();
 	RateDeactivate->sample();
+	RateCleave->sample();
 
 
 	// Samples a model
@@ -666,6 +674,7 @@ Parameter* Settings::getParameterByName(string paramID){
 	if (paramID == "RateBind") return RateBind;
 	if (paramID == "kA") return RateActivate;
 	if (paramID == "kU") return RateDeactivate;
+	if (paramID == "RateCleave") return RateCleave;
 
 	return nullptr;
 }

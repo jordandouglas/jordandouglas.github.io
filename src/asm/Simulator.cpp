@@ -382,6 +382,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			(s->get_mRNAPosInActiveSite() <= 1 && s->get_mRNAPosInActiveSite() + s->get_nascentLength() > templateSequence.length()) ||
 			(s->get_mRNAPosInActiveSite() == 0 && s->getRightTemplateBaseNumber() == templateSequence.length()) ){
 
+
 			if (!this->animatingGUI) {
 				s->terminate();
 				break;
@@ -478,6 +479,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			double kBindOrCat = s->calculateBindOrCatNTPrate(false);
 			double kActivate = s->calculateActivateRate(false);
 			double kDeactivate = s->calculateDeactivateRate(false);
+			double kCleave = s->calculateCleavageRate(false); // Can only cleave if backtracked in which case equilibrium assumptions do not apply
 
 
 			// Assume equilbirium between bound and unbound states but NOT pre and post translocated states
@@ -662,7 +664,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			}
 
 
-			double rates[] = { kBck, kFwd, kRelease, kBindOrCat, kActivate, kDeactivate };
+			double rates[] = { kBck, kFwd, kRelease, kBindOrCat, kActivate, kDeactivate, 0, kCleave };
 			int numReactions = (sizeof(rates)/sizeof(*rates));
 
 			double rateSum = 0;
@@ -1254,14 +1256,12 @@ void Simulator::executeAction(State* s, int reactionToDo) {
 			exit(0);
 			break;
 		case 0:
-			//s->releaseNTP();
 			s->backward();
 			break;
 		case 1:
 			s->forward();
 			break;
 		case 2:
-			//s->backward();
 			s->releaseNTP();
 			break;
 		case 3:
@@ -1275,6 +1275,9 @@ void Simulator::executeAction(State* s, int reactionToDo) {
 			break;
 		case 6:
 			s->terminate();
+			break;
+		case 7:
+			s->cleave();
 			break;
 	}
 

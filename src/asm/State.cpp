@@ -682,6 +682,42 @@ double State::calculateDeactivateRate(bool ignoreStateRestrictions){
 
 
 
+// Cleave the 3' end of the nascent strand (if the polymerase is backtracked) and reactivates the polymerase
+State* State::cleave(){
+
+	if (this->mRNAPosInActiveSite < 0){
+
+		int newLength = this->nascentSequence.length() + this->mRNAPosInActiveSite;
+		int nbasesCleaved = this->nascentSequence.length() - newLength;
+
+		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
+			
+			// Delete the base objects 
+			for (int baseNum = newLength+1; baseNum <= this->nascentSequence.length(); baseNum++){
+				//Coordinates::move_nt(baseNum, "m", 20, 50);
+				Coordinates::delete_nt(baseNum, "m");
+			}
+
+		}
+
+		this->nextTemplateBaseToCopy -= nbasesCleaved;
+		this->nascentSequence = this->nascentSequence.substr(0, newLength);
+		this->mRNAPosInActiveSite = 0;
+		return this->activate();
+
+	}
+
+
+	return this;
+}
+
+
+double State::calculateCleavageRate(bool ignoreStateRestrictions){
+	if (ignoreStateRestrictions || this->mRNAPosInActiveSite < 0) return RateCleave->getVal();
+	return 0;
+}
+
+
 
 
 
@@ -741,7 +777,6 @@ int State::getLeftTemplateBaseNumber(){
 int State::getRightTemplateBaseNumber(){
 	return this->State::get_nascentLength() + this->State::get_mRNAPosInActiveSite();
 }
-
 
 
 int State::getLeftBaseNumber(){
