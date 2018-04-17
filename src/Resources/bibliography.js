@@ -39,6 +39,9 @@ BIBLIOGRAPHY["komissarova1997transcriptional"] = {name: `Komissarova, Natalia, a
 BIBLIOGRAPHY["gnatt2001structural"] = {name: `Gnatt, Averell L., et al. "Structural basis of transcription: an RNA polymerase II elongation complex at 3.3 Å resolution." Science 292.5523 (2001): 1876-1882.`, DOI: "10.1126/science.1059495"};
 BIBLIOGRAPHY["nudler1997rna"] = {name: `Nudler, Evgeny, et al. "The RNA–DNA hybrid maintains the register of transcription by preventing backtracking of RNA polymerase." Cell 89.1 (1997): 33-41.`, DOI: "10.1016/S0092-8674(00)80180-4"};
 
+BIBLIOGRAPHY["toulme2000grea"] = {name: `Toulmé, Francine, Christine Mosrin‐Huaman, Jason Sparkowski, Asis Das, Marc Leng, and A. Rachid Rahmouni. "GreA and GreB proteins revive backtracked RNA polymerase in vivo by promoting transcript trimming." The EMBO journal 19, no. 24 (2000): 6853-6859."`, DOI: "10.1093%2Femboj%2F19.24.6853"}; 
+
+
 
 BIBLIOGRAPHY["imashimizu2013direct"] = {name: `Imashimizu, Masahiko, et al. "Direct assessment of transcription fidelity by high-resolution RNA sequencing." Nucleic acids research 41.19 (2013): 9090-9104.`, DOI: "10.1093%2Fnar%2Fgkt698"};
 BIBLIOGRAPHY["rosenberger1981estimate"] = {name: `Rosenberger, R. F., and Gillian Foskett. "An estimate of the frequency of in vivo transcriptional errors at a nonsense codon in Escherichia coli." Molecular and General Genetics MGG 183.3 (1981): 561-563.`, DOI: "10.1074%2Fjbc.M202059200"};
