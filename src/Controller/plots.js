@@ -3146,6 +3146,9 @@ function plot_parameter_heatmap(plotNumCustom = null){
 		var yvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["vals"];
 		var zvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"] == null ? null : PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["vals"];
 
+		console.log("xLab", xLab, "ylab", yLab, PLOT_DATA["whichPlotInWhichCanvas"]);
+
+
 
 		// If y is probability make a histogram 
 		if (xvals != null && PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParamY"] == "probability"){
@@ -3568,7 +3571,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	var xlabYPos = canvas.height - axisGap / 3 - 7*canvasSizeMultiplier;
 	ctx.fillStyle = "black";
 	//ctx.fillText(xlab, xlabXPos, xlabYPos);
-	writeLatexLabelOnCanvas(ctx, xlab, xlabXPos, xlabYPos, 20 * canvasSizeMultiplier);
+	writeLatexLabelOnCanvas(ctx, xlab, xlabXPos, xlabYPos, 24 * canvasSizeMultiplier);
 
 	
 	// Y label
@@ -3580,7 +3583,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	ctx.rotate(-Math.PI/2);
 	ctx.fillStyle = "black";
 	//ctx.fillText(ylab, 0 ,0);
-	writeLatexLabelOnCanvas(ctx, ylab, 0, 0, 20 * canvasSizeMultiplier);
+	writeLatexLabelOnCanvas(ctx, ylab, 0, 0, 24 * canvasSizeMultiplier);
 	ctx.restore();
 
 
@@ -3595,7 +3598,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 		ctx.translate(zlabXPos, zlabYPos);
 		ctx.rotate(-Math.PI/2);
 		ctx.fillStyle = "black";
-		writeLatexLabelOnCanvas(ctx, zlab, 0, 0, 14 * canvasSizeMultiplier);
+		writeLatexLabelOnCanvas(ctx, zlab, 0, 0, 16 * canvasSizeMultiplier);
 		//ctx.fillText(zlab, 0 ,0);
 		ctx.restore();
 
@@ -4271,7 +4274,8 @@ function plot_probability_distribution(distn_fn, xmin, xmax, canvasID, xlab = ""
 	ctx.textBaseline="top"; 
 	var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
 	var xlabYPos = canvas.height - 0.5*axisGap;
-	ctx.fillText(xlab, xlabXPos, xlabYPos);
+	//ctx.fillText(xlab, xlabXPos, xlabYPos);
+	writeLatexLabelOnCanvas(ctx, xlab, xlabXPos, xlabYPos, 20);
 	
 	// Y label
 	ctx.font = "14px Arial";

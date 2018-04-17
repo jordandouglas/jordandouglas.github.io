@@ -54,6 +54,7 @@ class Sequence{
 		string getID();
 		TranslocationRatesCache* getRatesCache();
 		void initRateTable();
+		void flagForRateTableRebuilding();
 
 		bool nascentIsRNA();
 		bool nascentIsSS();

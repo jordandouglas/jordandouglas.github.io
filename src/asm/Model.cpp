@@ -342,6 +342,7 @@ bool Model::get_assumeTranslocationEquilibrium(){
 
 
 Model* Model::set_currentTranslocationModel(string val){
+	if (val != this->currentTranslocationModel) Settings::resetRateTables(); // Need to reset the translocation rate cache when this is changed
 	this->currentTranslocationModel = val;
 	return this;
 }

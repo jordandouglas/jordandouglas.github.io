@@ -131,9 +131,10 @@ function renderTermination(result){
 
 
 	// Update progress bar
-	var progressElement = $("#counterProgress");
-	if (progressElement != null) progressElement.html(parseFloat(progressElement.html()) + 1);
-
+	if (WEB_WORKER_WASM == null){
+		var progressElement = $("#counterProgress");
+		if (progressElement != null) progressElement.html(parseFloat(progressElement.html()) + 1);
+	}
 
 
 }

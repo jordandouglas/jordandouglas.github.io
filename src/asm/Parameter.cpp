@@ -35,17 +35,14 @@ using namespace std;
 
 
 
-
-
-
 Parameter::Parameter(string id, bool integer, string zeroTruncated, string name, string title, string latexName){
 	this->id = id;
 	this->integer = integer;
 	this->zeroTruncated = zeroTruncated;
 	this->name = name;
 	this->title = title;
-	this->init();
 	this->latexName = latexName;
+	this->init();
 }
 
 
@@ -109,6 +106,10 @@ string Parameter::getName(){
 	return this->name;
 }
 
+string Parameter::getLatexName(){
+	return this->latexName;
+}
+
 Parameter* Parameter::hide(){
 	this->hidden = true;
 	return this;
@@ -157,7 +158,7 @@ string Parameter::getPriorDistributionName(){
 // Clones the parameter, but will not recurse down to its instances 
 Parameter* Parameter::clone(){
 
-	Parameter* paramClone = new Parameter(this->id, this->integer, this->zeroTruncated, this->name, this->title);
+	Parameter* paramClone = new Parameter(this->id, this->integer, this->zeroTruncated, this->name, this->title, this->latexName);
 	paramClone->distributionName = this->distributionName;
 	paramClone->isHardcoded = this->isHardcoded;
 	paramClone->hardcodedVal = this->hardcodedVal;
@@ -283,6 +284,9 @@ void Parameter::sample(){
 		Coordinates::updateForceEquipment(this->val, prevVal);
 	}
 
+
+	// If this is the a structural parameter then the translocation cache needs to be updated
+	if (prevVal != this->val && (this->id == "hybridLen" || this->id == "bubbleLeft" || this->id == "bubbleRight")) Settings::resetRateTables();
 
 
 }
@@ -541,7 +545,7 @@ string Parameter::toJSON(){
 	JSON += "'integer':" + string(this->integer ? "true" : "false") + ",";
 	JSON += "'hidden':" + string(this->hidden ? "true" : "false") + ",";
 	JSON += "'zeroTruncated':" + (this->zeroTruncated == "false" ? string("false") : "'" + this->zeroTruncated + "'") + ",";
-	if (this->latexName != "") JSON += "'name':'" + this->latexName + "',";
+	if (this->latexName != "") JSON += "'latexName':'" + this->latexName + "',";
 
 	for(std::map<string, double>::iterator iter = this->distributionParameters.begin(); iter != this->distributionParameters.end(); ++iter){
 		string k =  iter->first;

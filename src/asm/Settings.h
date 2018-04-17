@@ -48,7 +48,7 @@ extern const double _kBT;
 extern const double _preExp;
 extern const double _PI;
 extern const int INF;
-
+extern const int _nBasesToTranscribeInit;
 
 
 // Sequence information
@@ -63,6 +63,7 @@ extern map<string, Sequence*> sequences;
 extern Sequence* currentSequence;
 extern vector<Polymerase*> _polymerases;
 extern string _currentPolymerase;
+
 
 
 // Command line arguments
@@ -165,6 +166,7 @@ class Settings{
 		static vector<Parameter*> getParamListClone();
 		static string toJSON();
 		static bool setSequence(string seqID);
+		static void resetRateTables();
 
 	
 

@@ -129,7 +129,7 @@ void Plots::init(){
 
 	// Add all parameters to the list
 	for (int i = 0; i < Settings::paramList.size(); i ++){
-		Plots::parametersPlotData.push_back(new ParameterHeatmapData(Settings::paramList.at(i)->getID(), Settings::paramList.at(i)->getName()));
+		Plots::parametersPlotData.push_back(new ParameterHeatmapData(Settings::paramList.at(i)->getID(), Settings::paramList.at(i)->getName(), Settings::paramList.at(i)->getLatexName()));
 	}
 
 
@@ -780,7 +780,7 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 
 		// Add all parameters to the list
 		for (int i = 0; i < Settings::paramList.size(); i ++){
-			Plots::parametersPlotData.push_back(new ParameterHeatmapData(Settings::paramList.at(i)->getID(), Settings::paramList.at(i)->getName()));
+			Plots::parametersPlotData.push_back(new ParameterHeatmapData(Settings::paramList.at(i)->getID(), Settings::paramList.at(i)->getName(), Settings::paramList.at(i)->getLatexName()));
 		}
 
 

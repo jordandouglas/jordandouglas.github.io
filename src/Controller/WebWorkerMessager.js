@@ -789,9 +789,18 @@ function userSetNextBaseToAdd_controller(ntpType){
 		toCall().then((result) => updateDOM(result));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("WW_JS.userSetNextBaseToAdd_WW", [ntpType, null], true);
 		var fnStr = res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => updateDOM(result));
+
+	}
+
+	else {
+		var res = stringifyFunction("userSetNextBaseToAdd", [ntpType], true);
+		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => updateDOM(result));
@@ -1261,6 +1270,7 @@ function forward_controller(state = null, UPDATE_COORDS = true, resolve = functi
 
 	if (variableSelectionMode) return resolve(false);
 
+	if ($("#fwdBtn").css("cursor") == "not-allowed") return resolve(false);
 
 	var updateDOM = function(DOMupdates){
 		if(DOMupdates == null || DOMupdates["successfulOp"]){
@@ -1331,6 +1341,7 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 
 	if (variableSelectionMode) return resolve(false);
 
+	if ($("#bckBtn").css("cursor") == "not-allowed") return resolve(false);
 
 	var updateDOM = function(DOMupdates){
 
@@ -1837,9 +1848,20 @@ function getSlidingHeights_controller(ignoreModelOptions = false, resolve = func
 		toCall().then((result) => resolve(result));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("FE_JS.getSlidingHeights_WW", [true, ignoreModelOptions, null], true);
 		var fnStr = res[0];
+		var msgID = res[1];
+		//console.log("Sending function: " + fnStr);
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
+	}
+
+	else {
+
+		var res = stringifyFunction("getTranslocationEnergyLandscape", [], true);
+		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -1883,16 +1905,26 @@ function getStateDiagramInfo_controller(resolve = function(state) { }){
 
 
 
-function getCurrentState_controller(resolve = function(state) { }){
+function getTemplateSequenceLength_controller(resolve = function(state) { }){
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => WW_JS.getCurrentState_WW(resolve));
+		var toCall = () => new Promise((resolve) => WW_JS.getTemplateSequenceLength_WW(resolve));
 		toCall().then((result) => resolve(result));
 	}
 
-	else{
-		var res = stringifyFunction("WW_JS.getCurrentState_WW", [null], true);
+	else if (WEB_WORKER_WASM == null) {
+		var res = stringifyFunction("WW_JS.getTemplateSequenceLength_WW", [null], true);
 		var fnStr = res[0];
+		var msgID = res[1];
+		//console.log("Sending function: " + fnStr);
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
+	}
+
+	else{
+		var res = stringifyFunction("getTemplateSequenceLength", [], true);
+		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -2065,12 +2097,10 @@ function startTrials_controller(){
 
 	
 	// If the sequence is big and WebWorker is connected then switch to hidden mode for efficiency
-	getCurrentState_controller(function(result) {
+	getTemplateSequenceLength_controller(function(result) {
 
-		var currentState = result["state"];
 		
-		if ($("#PreExp").val() != "hidden" && WEB_WORKER != null && currentState["nbases"] > 500) changeToHiddenModeAndShowNotification();
-		
+		if ($("#PreExp").val() != "hidden" && WEB_WORKER != null && result["nbases"] > 1000) changeToHiddenModeAndShowNotification();
 		
 		
 		disable_all_buttons();

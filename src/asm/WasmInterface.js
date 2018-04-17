@@ -313,6 +313,21 @@ setModelSettings = function(tosend, msgID = null){
 }
 
 
+// Returns length of the template
+getTemplateSequenceLength = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	Module.ccall("getTemplateSequenceLength", null, ["number"], [msgID]);
+
+}
+
+
+
 // Returns all parameters and their information as a js object
 getAllParameters = function(msgID = null){
 
@@ -529,6 +544,20 @@ changeSpeed = function(speed, msgID = null){
 }
 
 
+// User selects which base to add next manually
+userSetNextBaseToAdd = function(ntpToAdd, msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(){
+		if (msgID != null) postMessage(msgID + "~X~done");
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	Module.ccall("userSetNextBaseToAdd", null, ["string", "number"], [ntpToAdd, msgID]);
+
+
+}
+
+
 // Returns an object which contains the sizes of each object in the cache that can be cleared
 getCacheSizes = function(msgID = null){
 
@@ -557,6 +586,8 @@ deletePlots = function(distanceVsTime_cleardata, timeHistogram_cleardata, timePe
 	Module.ccall("deletePlots", null, ["number", "number", "number", "number", "number", "number", "number"], [distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata, msgID]);
 
 }
+
+
 
 
 
@@ -623,7 +654,6 @@ applyReactions = function(actionsList, animationTime, resolve = null,  msgID = n
 	}
 
 
-	//console.log("actionsList", actionsList);
 
 	actionToDo = actionsList.shift();
 	var toStop = Module.ccall("applyReaction", "number", ["number"], [actionToDo]);
@@ -821,6 +851,21 @@ getCleavageCanvasData = function(msgID = null){
 
 }
 
+
+
+// Returns the trough and peak heights of the translocation energy landscape
+getTranslocationEnergyLandscape = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log("resultStr", resultStr);
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("getTranslocationEnergyLandscape", null, ["number"], [msgID]);
+
+}
 
 
 

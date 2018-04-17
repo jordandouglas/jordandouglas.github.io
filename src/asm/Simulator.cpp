@@ -157,6 +157,7 @@ list<int> Simulator::sample_action_GUI(){
 		this->nTrialsCompletedGUI++;
 		Settings::sampleAll(); // Resample the parameters
 		Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
+		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
 
 		// Return now if have performed all N trials
 		if (this->nTrialsCompletedGUI >= this->nTrialsTotalGUI) return this->actionsToReturn;
@@ -199,6 +200,7 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
 		result[2] = 0;
 		Settings::sampleAll(); // Resample the parameters
 		Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
+		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
 		performSimulation(_currentStateGUI, result);
 
 
@@ -290,6 +292,7 @@ void Simulator::resume_trials_GUI(double* toReturn){
 
 		Settings::sampleAll(); // Resample the parameters
 		Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
+		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
 
 	}
 
@@ -344,10 +347,9 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 	// GUI timeout function
 	int niterationsUntilLastTimeoutCheck = 0;
-	int checkTimeoutEveryNIterations = 1000;
+	int checkTimeoutEveryNIterations = 10000;
 	
 	while(!s->isTerminated()){
-
 
 
 		// Check if GUI timeout has been reached (if there is a timeout)
@@ -425,7 +427,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 		// Geometric speed boost whereby the number of cycles spent in a set of states is sampled from the geometric distribution. 
 		// This is faster because the inner loop is smaller, especially when the back and forth rate is very high eg. NTP binding/release
-		if (currentModel->get_allowGeometricCatalysis() && beforeEndOfTemplate && afterStartOfTemplate && !bindingAndTranslocationEquilibrium && s->get_activated() && (s->get_mRNAPosInActiveSite() == 0 || s->get_mRNAPosInActiveSite() == 1)){
+		if (currentModel->get_allowGeometricCatalysis() && beforeEndOfTemplate && afterStartOfTemplate && s->get_activated() && !bindingAndTranslocationEquilibrium && (s->get_mRNAPosInActiveSite() == 0 || s->get_mRNAPosInActiveSite() == 1)){
 
 
 			
@@ -499,11 +501,12 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				}
 				else NTPconcentration = NTPconc->getVal();
 				double probabilityBound = (NTPconcentration/KD) / (NTPconcentration/KD + 1);
+				if (!s->get_activated()) probabilityBound = 0;
 				double probabilityUnbound = 1 - probabilityBound;
 
 
 				// Mofify the rates
-				kBindOrCat = kCat->getVal() * probabilityBound; // Can only catalyse if NTP bound
+				kBindOrCat = s->calculateCatalysisRate(true) * probabilityBound; // Can only catalyse if NTP bound
 				kFwd = kFwd * probabilityUnbound; // Can only translocate if NTP is not bound
 				kBck = kBck * probabilityUnbound;
 				kDeactivate = kDeactivate * probabilityUnbound; // Can only deactivate if NTP is not bound
@@ -577,7 +580,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				if (s->get_mRNAPosInActiveSite() == 1)  s->backward(); 
 				double k0_1 = s->calculateForwardRate(true, true);
 				double k0_minus1 = s->calculateBackwardRate(true, true);
-				//double boltzmannG0 = exp(-(s->calculateTranslocationFreeEnergy()));
+				//double boltzmannG0 = exp(-(s->calculateTranslocationFreeEnergy(true)));
 
 
 				// Get rate of translocating from 1 to 2
@@ -585,7 +588,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				s->set_terminated(false);
 				double k1_0 = s->calculateBackwardRate(true, true);
 				double k1_2 = s->calculateForwardRate(true, true);
-				//double boltzmannG1 = exp(-(s->calculateTranslocationFreeEnergy()));
+				//double boltzmannG1 = exp(-(s->calculateTranslocationFreeEnergy(true)));
 
 				// Move back to original position
 				s->set_mRNAPosInActiveSite(currentTranslocationPosition);
@@ -622,6 +625,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 						double KD = Kdiss->getVal();
 						boltzmannGN = boltzmannG1 * NTPconcentration / KD;
+						if (!s->get_activated()) boltzmannGN = 0;
 					}
 
 				}
@@ -651,7 +655,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 				// Can only catalyse if not beyond the end of the sequence, go forward to terminate
 				if (s->get_nascentLength() + 1 < templateSequence.length()){
-					kBindOrCat = kCat->getVal() * probabilityBound; // Can only catalyse if NTP bound
+					kBindOrCat = s->calculateCatalysisRate(true) * probabilityBound; // Can only catalyse if NTP bound
 				}
 
 
@@ -812,9 +816,11 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 	// Calculate mean velocity
 	int distanceTravelled = s->get_nascentLength() - s->get_initialLength();
-	double velocity = distanceTravelled / timeElapsed;
-	/*cout << "distanceTravelled = " << distanceTravelled << endl;
-	cout << "timeElapsed = " << timeElapsed << endl;
+	double velocity = timeElapsed > 0 ? distanceTravelled / timeElapsed : 0;
+	//cout << "distanceTravelled = " << distanceTravelled << endl;
+	//cout << "timeElapsed = " << timeElapsed << endl;
+	//cout << "velocity = " << velocity << endl;
+	/*
 	cout << "kcat " << kCat->getVal() << " KD " << Kdiss->getVal() << "[ATP] = " << ATPconc->getVal() << "F = " << FAssist->getVal() << "DGslide = " << GDagSlide->getVal() << endl;
 	cout << "Trans eq: " << currentModel->get_assumeTranslocationEquilibrium() << " Bind eq " << currentModel->get_assumeBindingEquilibrium() << endl;
 	*/
@@ -867,7 +873,7 @@ double Simulator::geometricTranslocationSampling(State* s){
 
 
 	// Mofify the rates
-	double kcat = kCat->getVal() * probabilityBound; // Can only catalyse if NTP bound
+	double kcat = s->calculateCatalysisRate(true) * probabilityBound; // Can only catalyse if NTP bound
 	kBck = kBck * probabilityUnbound; // Can only translocate if NTP is not bound
 	double kDeactPost = kDeactivate * probabilityUnbound; // Can only deactivate in postranslocated state if NTP is not bound (or any time in pretranslocated state)
 
@@ -970,7 +976,7 @@ double Simulator::geometricTranslocationBindingSampling(State* s){
 	// Rate of binding then releasing, vs binding then catalysing
 	double kRelease = s->calculateReleaseNTPRate(true);
 	double kBind = s->calculateBindOrCatNTPrate(true);
-	double kcat = kCat->getVal();
+	double kcat = s->calculateCatalysisRate(true);
 	double rateRelCat = kRelease + kcat;
 	double rateBindRelease = kBind * kRelease / rateRelCat;
 	double rateBindCat = kBind * kcat / rateRelCat;
@@ -1077,7 +1083,7 @@ double Simulator::geometricBindingSampling(State* s){
 	double kFwd = s->calculateForwardRate(true, true);
 	double kRelease = s->calculateReleaseNTPRate(true);
 	double kBind = s->calculateBindOrCatNTPrate(true);
-	double kcat = kCat->getVal();
+	double kcat = s->calculateCatalysisRate(true);
 	double kDeactivate = s->calculateDeactivateRate(false);
 
 	//s->print();

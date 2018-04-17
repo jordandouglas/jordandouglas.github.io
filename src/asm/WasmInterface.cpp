@@ -243,7 +243,9 @@ extern "C" {
 		// If the polymerase is post-translocated or hypertranslocated, then return the base to be transcribed next and the pair before it
 		// Otherwise return the most recently transcribed base
 		int deltaBase = _currentStateGUI->get_mRNAPosInActiveSite() <= 0 ? -1 : 0;
-		string baseToAdd = deltaBase == 0 ? Settings::complementSeq(templateSequence.substr(_currentStateGUI->get_nextTemplateBaseToCopy()-1, 1), PrimerType.substr(2) == "RNA") : _currentStateGUI->get_NascentSequence().substr(_currentStateGUI->get_nascentLength() - 1, 1);
+		string baseToAdd = "";
+		if (deltaBase == 0) baseToAdd = _currentStateGUI->getNextBaseToAdd() != "" ? _currentStateGUI->getNextBaseToAdd() : Settings::complementSeq(templateSequence.substr(_currentStateGUI->get_nextTemplateBaseToCopy()-1, 1), PrimerType.substr(2) == "RNA");
+		else baseToAdd = _currentStateGUI->get_NascentSequence().substr(_currentStateGUI->get_nascentLength() - 1, 1);
 
 		// Build the JSON string
 		string ntpJSON = "{";
@@ -291,6 +293,110 @@ extern "C" {
 	}
 
 
+	// Returns the trough and peak heights of the translocation energy landscape
+	void EMSCRIPTEN_KEEPALIVE getTranslocationEnergyLandscape(int msgID){
+
+
+
+		// 6 peaks and 7 troughs
+		double slidingPeakHeights[6];
+		double slidingTroughHeights[7];
+		double maxHeight = 10000; // Infinity
+		slidingPeakHeights[0] = maxHeight;
+		slidingPeakHeights[1] = maxHeight;
+		slidingPeakHeights[2] = maxHeight;
+		slidingPeakHeights[3] = maxHeight;
+		slidingPeakHeights[4] = maxHeight;
+		slidingPeakHeights[5] = maxHeight;
+		
+
+		// Calculate force gradients. The current state will have change in energy energy due to force = 0
+		double troughForceGradient = FAssist->getVal() * 1e-12 * 3.4  * 1e-10 / (_kBT); // Force x distance / kBT
+		double forceGradientBck = (+FAssist->getVal() * 1e-12 * (3.4-barrierPos->getVal()) * 1e-10) / (_kBT);
+		double forceGradientFwd = (-FAssist->getVal() * 1e-12 * (barrierPos->getVal()) * 1e-10) / (_kBT);
+
+
+		// Energy and 2 surrounding peaks of current state
+		slidingTroughHeights[3] = _currentStateGUI->calculateTranslocationFreeEnergy(false);
+		slidingPeakHeights[2] = _currentStateGUI->calculateBackwardTranslocationFreeEnergyBarrier(false) + forceGradientBck;
+		slidingPeakHeights[3] = _currentStateGUI->calculateForwardTranslocationFreeEnergyBarrier(false) + forceGradientFwd;
+
+
+
+		// Go back as far as permitted
+		if (slidingPeakHeights[2] < INF){
+			
+
+			State* stateClone = _currentStateGUI->clone();
+			for (int i = 2; i >= 0; i --){
+
+				stateClone->backward();
+				slidingTroughHeights[i] = stateClone->calculateTranslocationFreeEnergy(false) + (troughForceGradient * (3-i));
+				if (i > 0) {
+
+					// Do not go backwards again if not permitted
+					double backwardHill = stateClone->calculateBackwardTranslocationFreeEnergyBarrier(false);
+					if (backwardHill >= INF) break;
+					slidingPeakHeights[i-1] = backwardHill + forceGradientBck * (3-(i-1));
+
+				}
+
+			}
+			delete stateClone;
+		} else slidingPeakHeights[2] = maxHeight;
+
+
+		// Go forward as far as permitted
+		if (slidingPeakHeights[3] < INF){
+
+
+			State* stateClone = _currentStateGUI->clone();
+			for (int i = 4; i <= 6; i ++){
+
+				stateClone->forward();
+				slidingTroughHeights[i] = stateClone->calculateTranslocationFreeEnergy(false) + (troughForceGradient * (3-i));
+				if (i < 6) {
+
+					// Do not go forwards again if not permitted
+					double forwardHill = stateClone->calculateForwardTranslocationFreeEnergyBarrier(false);
+					if (forwardHill >= INF) break;
+					slidingPeakHeights[i] = forwardHill + forceGradientFwd * ((i+1)-3);
+
+				}
+
+			}
+			delete stateClone;
+		} else slidingPeakHeights[3] = maxHeight;
+
+
+
+
+		// Build JSON string. Troughs
+		string landscapeJSON = "{";
+		landscapeJSON += "'slidingTroughHeights':[";
+		for (int i = 0; i <= 6; i ++) {
+			landscapeJSON += to_string(slidingTroughHeights[i]);
+			if (i < 6) landscapeJSON += ",";
+		}
+		landscapeJSON += "]";
+
+
+
+		// Peaks
+		landscapeJSON += ",'slidingPeakHeights':[";
+		for (int i = 0; i <= 5; i ++) {
+			landscapeJSON += to_string(slidingPeakHeights[i]);
+			if (i < 5) landscapeJSON += ",";
+		}
+		landscapeJSON += "]";
+		landscapeJSON += "}";
+	
+
+		messageFromWasmToJS(landscapeJSON, msgID);
+
+	}
+
+
 
 
 	// Refresh the current state
@@ -306,6 +412,10 @@ extern "C" {
 
 		// Refresh plot
 		Plots::refreshPlotData(_currentStateGUI);
+
+
+		// Ensure that the current sequence's translocation rate cache is up to date
+		currentSequence->initRateTable();
 
 
 		messageFromWasmToJS("", msgID);
@@ -334,6 +444,21 @@ extern "C" {
 		_animationSpeed = speed;
 		messageFromWasmToJS("", msgID);
 	}
+
+
+
+	// User selects which base to add next manually
+	void EMSCRIPTEN_KEEPALIVE userSetNextBaseToAdd(char* ntpToAdd, int msgID){
+
+		string ntpToAdd_str = string(ntpToAdd);
+		if (ntpToAdd_str == "T" && PrimerType.substr(2) == "RNA") ntpToAdd_str = "U";
+		else if (ntpToAdd_str == "U" && PrimerType.substr(2) == "DNA") ntpToAdd_str = "T";
+
+
+		_currentStateGUI->setNextBaseToAdd(ntpToAdd_str);
+		messageFromWasmToJS("", msgID);
+	}
+
 
 
 	// Parse XML settings in string form
@@ -502,6 +627,7 @@ extern "C" {
 
 	}
 
+
 	// Returns all information of all parameters in JSON format
 	void EMSCRIPTEN_KEEPALIVE getAllParameters(int msgID){
 
@@ -519,7 +645,17 @@ extern "C" {
 		_needToReinitiateAnimation = false;
 		messageFromWasmToJS(parametersJSON, msgID);
 	}
-	
+
+
+
+	// Returns the length of the templaye
+	void EMSCRIPTEN_KEEPALIVE getTemplateSequenceLength(int msgID){
+		string lengthJSON = "{";
+		lengthJSON += "'nbases':" + to_string(templateSequence.length());
+		lengthJSON += "}";
+		messageFromWasmToJS(lengthJSON, msgID);
+	}
+
 	
 	
 	// Saves the current model settings
@@ -546,7 +682,10 @@ extern "C" {
 			else if (setting == "assumeTranslocationEquilibrium") currentModel->set_assumeTranslocationEquilibrium(val == "true");
 			
 		}
-		
+
+
+		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
+
 		// Hide and show parameters
 		Settings::updateParameterVisibilities();
 		
@@ -698,8 +837,10 @@ extern "C" {
 			double NtrialsComplete = result[1];
 			toStop = result[2] == 1;
 
+			string velocity_str = to_string(velocity) == "-nan" || to_string(velocity) == "nan" ? to_string(0) : to_string(velocity);
+
 			// Return JSON string
-			toReturnJSON += "'meanVelocity':" + to_string(velocity) + ",'N':" + to_string(NtrialsComplete) + ",";
+			toReturnJSON += "'meanVelocity':" + velocity_str + ",'N':" + to_string(NtrialsComplete) + ",";
 		}
 
 
@@ -788,8 +929,10 @@ extern "C" {
 			double NtrialsComplete = result[1];
 			toStop = result[2] == 1;
 
+
 			// Return JSON string
-			toReturnJSON += "'meanVelocity':" + to_string(velocity) + ",'N':" + to_string(NtrialsComplete) + ",";
+			string velocity_str = to_string(velocity) == "-nan" || to_string(velocity) == "nan" ? to_string(0) : to_string(velocity);
+			toReturnJSON += "'meanVelocity':" + velocity_str + ",'N':" + to_string(NtrialsComplete) + ",";
 		}
 
 

@@ -68,13 +68,15 @@ State* State::setToInitialState(){
 	}
 	this->mRNAPosInActiveSite = 0;
 	this->boundNTP = "";
+	this->NTPtoAdd = "";
 	this->terminated = false;
 	this->nextTemplateBaseToCopy = sequenceLength + 1;
 	this->activated = true;
+	this->thereHaveBeenMutations = false;
 
 	
 	// Transcribe a few bases forward to avoid left bubble effects
-	this->transcribe(4 + max(2, (int)(bubbleLeft->getVal())));
+	this->transcribe(_nBasesToTranscribeInit + max(2, (int)(bubbleLeft->getVal())));
 	if (this->isGuiState) _applyingReactionsGUI = false;
 	return this;
 }
@@ -85,9 +87,11 @@ State* State::clone(){
 	s->nascentSequence = this->nascentSequence;
 	s->mRNAPosInActiveSite = this->mRNAPosInActiveSite;
 	s->boundNTP = this->boundNTP;
+	s->NTPtoAdd = this->NTPtoAdd;
 	s->terminated = this->terminated;
 	s->activated = this->activated;
 	s->nextTemplateBaseToCopy = this->nextTemplateBaseToCopy;
+	s->thereHaveBeenMutations = this->thereHaveBeenMutations;
 	return s;
 
 }
@@ -200,7 +204,7 @@ list<int> State::getTranscribeActions(int N){
 State* State::forward(){
 
 
-	if (this->terminated) return this;
+	//if (this->terminated) return this;
 
 	// Update coordinates if this state is being displayed by the GUI (and not hidden mode)
 	if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden") {
@@ -346,8 +350,8 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 	}
 	
 	
-	double groundEnergy = this->calculateTranslocationFreeEnergy();
-	double forwardHeight = this->calculateForwardTranslocationFreeEnergyBarrier();
+	double groundEnergy = this->calculateTranslocationFreeEnergy(true);
+	double forwardHeight = this->calculateForwardTranslocationFreeEnergyBarrier(true);
 
 	//cout << "forwardHeight " << forwardHeight << ", groundEnergy = " << groundEnergy << ", diff = " << (forwardHeight - groundEnergy) << endl;
 
@@ -363,7 +367,7 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 
 
 State* State::backward(){
-	if (this->terminated) return this;
+	//if (this->terminated) return this;
 	if (this->getLeftBaseNumber() < 1 || this->getLeftBaseNumber() - bubbleLeft->getVal() -1 <= 2) return this;
 
 	// Update coordinates if this state is being displayed by the GUI
@@ -469,8 +473,8 @@ double State::calculateBackwardRate(bool lookupFirst, bool ignoreStateRestrictio
 	}
 	
 	
-	double groundEnergy = this->calculateTranslocationFreeEnergy();
-	double backwardHeight = this->calculateBackwardTranslocationFreeEnergyBarrier();
+	double groundEnergy = this->calculateTranslocationFreeEnergy(true);
+	double backwardHeight = this->calculateBackwardTranslocationFreeEnergyBarrier(true);
 	if (backwardHeight >= INF) return 0;
 	
 	
@@ -489,7 +493,7 @@ State* State::bindNTP(){
 	// Bind NTP
 	if (!this->NTPbound() && this->mRNAPosInActiveSite == 1){
 
-		this->boundNTP = Settings::complementSeq(templateSequence.substr(this->nextTemplateBaseToCopy-1, 1), PrimerType.substr(2) == "RNA");
+		this->boundNTP = this->NTPtoAdd != "" ? this->NTPtoAdd : Settings::complementSeq(templateSequence.substr(this->nextTemplateBaseToCopy-1, 1), PrimerType.substr(2) == "RNA");
 
 		// Update coordinates if this state is being displayed by the GUI
 		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden") {
@@ -519,6 +523,7 @@ State* State::bindNTP(){
 
 		this->nascentSequence += this->boundNTP;
 		this->boundNTP = "";
+		this->NTPtoAdd = "";
 		this->mRNAPosInActiveSite = 0;
 		this->nextTemplateBaseToCopy ++;
 
@@ -604,14 +609,38 @@ State* State::releaseNTP(){
 	if (this->terminated) return this;
 
 
-
-	if (this->NTPbound()){
+	// Release NTP
+	if (this->NTPbound() && this->activated ){
 		this->boundNTP = "";
+		this->NTPtoAdd = "";
+	
+		// Update coordinates if this state is being displayed by the GUI
+		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden") {
+			Coordinates::delete_nt(this->get_nascentLength()+1, "m");
+		}
+
 	}
 
-	// Update coordinates if this state is being displayed by the GUI
-	if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden") {
-		Coordinates::delete_nt(this->get_nascentLength()+1, "m");
+
+	// Pyrophosphorylysis
+	else if (!this->NTPbound() && this->activated && this->get_nascentLength() > hybridLen->getVal() && this->mRNAPosInActiveSite == 0){
+
+
+		// Add the triphosphate
+		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden") {
+			Coordinates::set_TP_state(this->get_nascentLength(), "m", true);
+			Coordinates::move_nt(this->get_nascentLength(), "m", 10, 10);
+		}
+
+
+		this->boundNTP = this->nascentSequence.substr(this->nascentSequence.length()-1, 1);
+		this->nascentSequence = this->nascentSequence.substr(0, this->nascentSequence.length()-1);
+		this->mRNAPosInActiveSite = 1;
+		this->nextTemplateBaseToCopy --;
+
+		//if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) == "ds") PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]--;
+		
+
 	}
 
 	
@@ -718,7 +747,18 @@ double State::calculateCleavageRate(bool ignoreStateRestrictions){
 }
 
 
+void State::setNextBaseToAdd(string baseToAdd){
+	this->thereHaveBeenMutations = true;
+	this->NTPtoAdd = baseToAdd;
+}
 
+string State::getNextBaseToAdd(){
+	return this->NTPtoAdd;
+}
+
+bool State::get_thereHaveBeenMutations(){
+	return this->thereHaveBeenMutations;
+}
 
 
 bool State::isTerminated(){
@@ -799,13 +839,14 @@ void State::set_mRNAPosInActiveSite(int newVal){
 
 
 
-double State::calculateTranslocationFreeEnergy(){
+double State::calculateTranslocationFreeEnergy(bool ignoreParametersAndSettings){
 	double freeEnergy = FreeEnergy::getFreeEnergyOfHybrid(this) - FreeEnergy::getFreeEnergyOfTranscriptionBubble(this);
+	if (!ignoreParametersAndSettings && this->mRNAPosInActiveSite == 1) freeEnergy += DGPost->getVal();
 	return freeEnergy;	
 }
 
 
-double State::calculateForwardTranslocationFreeEnergyBarrier(){
+double State::calculateForwardTranslocationFreeEnergyBarrier(bool ignoreParametersAndSettings){
 
 
 	double barrierHeight = 0;
@@ -816,16 +857,21 @@ double State::calculateForwardTranslocationFreeEnergyBarrier(){
 
 	// Midpoint model: free energy barrier is halfway between the two on either side
 	if (currentModel->get_currentTranslocationModel() == "midpointBarriers"){
-		barrierHeight += (this->calculateTranslocationFreeEnergy() + stateAfterForwardtranslocation->calculateTranslocationFreeEnergy()) / 2;
+		barrierHeight += (this->calculateTranslocationFreeEnergy(true) + stateAfterForwardtranslocation->calculateTranslocationFreeEnergy(true)) / 2;
 	}
 
 	else if (currentModel->get_currentTranslocationModel() == "meltingBarriers" || currentModel->get_currentTranslocationModel() == "sealingBarriers"){
 		barrierHeight += FreeEnergy::getFreeEnergyOfIntermediateState(this, stateAfterForwardtranslocation);
 		barrierHeight -= FreeEnergy::getFreeEnergyOfTranscriptionBubbleIntermediate(this, stateAfterForwardtranslocation); // Subtract the free energy which we would gain if the intermediate transcription bubble was sealed
 	}
-	
 
-	
+
+
+	if (!ignoreParametersAndSettings) {
+		barrierHeight += GDagSlide->getVal();
+	}
+
+	delete stateAfterForwardtranslocation;
 	return barrierHeight;
 
 
@@ -834,7 +880,7 @@ double State::calculateForwardTranslocationFreeEnergyBarrier(){
 
 
 
-double State::calculateBackwardTranslocationFreeEnergyBarrier(){
+double State::calculateBackwardTranslocationFreeEnergyBarrier(bool ignoreParametersAndSettings){
 
 	double barrierHeight = 0;
 	
@@ -851,7 +897,7 @@ double State::calculateBackwardTranslocationFreeEnergyBarrier(){
 
 	// Midpoint model: free energy barrier is halfway between the two on either side
 	if (currentModel->get_currentTranslocationModel() == "midpointBarriers"){
-		barrierHeight += (this->calculateTranslocationFreeEnergy() + stateAfterBackwardtranslocation->calculateTranslocationFreeEnergy()) / 2;
+		barrierHeight += (this->calculateTranslocationFreeEnergy(true) + stateAfterBackwardtranslocation->calculateTranslocationFreeEnergy(true)) / 2;
 	}
 
 	else if (currentModel->get_currentTranslocationModel() == "meltingBarriers" || currentModel->get_currentTranslocationModel() == "sealingBarriers"){
@@ -860,7 +906,12 @@ double State::calculateBackwardTranslocationFreeEnergyBarrier(){
 	}
 
 
-	
+	if (!ignoreParametersAndSettings) {
+		barrierHeight += GDagSlide->getVal();
+	}
+
+
+	delete stateAfterBackwardtranslocation;
 	return barrierHeight;
 
 

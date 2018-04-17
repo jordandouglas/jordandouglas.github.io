@@ -1207,13 +1207,13 @@ function log_WW(num, base){
 }
 
 
- WW_JS.getCurrentState_WW = function(resolve, msgID){
+ WW_JS.getTemplateSequenceLength_WW = function(resolve, msgID){
 
 
 	if (resolve === undefined) resolve = function() {};
 	if (msgID === undefined) msgID = null;
 
-	var toReturn = {state: WW_JS.currentState, hybridLen: PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]};
+	var toReturn = {nbases: WW_JS.currentState.nbases};
 	if (msgID != null){
 		postMessage(msgID + "~X~" + JSON.stringify(toReturn));
 	}else{

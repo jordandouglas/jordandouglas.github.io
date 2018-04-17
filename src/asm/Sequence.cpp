@@ -49,6 +49,13 @@ Sequence::Sequence(string seqID, string TemplateType, string PrimerType, string 
 }
 
 
+// Instruct the sequence to rebuild the rate table next time requested
+void Sequence::flagForRateTableRebuilding(){
+	this->rateTableBuilt = false;
+}
+
+
+
 // Initialise the translocation rates table for this sequence
 void Sequence::initRateTable(){
 

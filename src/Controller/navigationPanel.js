@@ -122,7 +122,7 @@ function removeArrow(ele){
 	$(ele).remove();
 }
 
-function plotArrowButton_navigationPanel(ctx, fromx, fromy, direction, label = "", rate, onClick = "", hoverTitle = "", spacingBetweenStates, canvas, reactionApplicable = true){
+function plotArrowButton_navigationPanel(ctx, id, fromx, fromy, direction, label = "", rate, onClick = "", hoverTitle = "", spacingBetweenStates, canvas, reactionApplicable = true){
 
 
 	var arrowPadding = IS_MOBILE ? 12 : 0;
@@ -139,7 +139,7 @@ function plotArrowButton_navigationPanel(ctx, fromx, fromy, direction, label = "
 
 
 	var arrowHTML = `
-		<input type="image" class="navArrow ` + cssclass + `" src="` + src + `" title="` + hoverTitle + `" onclick="if (!simulating)` + onClick + `();" style = "padding:` + arrowPadding + `; cursor:` + cursorClass + `;position:absolute; width:` + arrowWidth + `px; height:` + arrowHeight + `px; top:` + arrowTop + `px; left:` + arrowLeft + `px; z-index:2 ">
+		<input type="image" id="` + id + `" class="navArrow ` + cssclass + `" src="` + src + `" title="` + hoverTitle + `" onclick="if (!simulating)` + onClick + `();" style = "padding:` + arrowPadding + `; cursor:` + cursorClass + `;position:absolute; width:` + arrowWidth + `px; height:` + arrowHeight + `px; top:` + arrowTop + `px; left:` + arrowLeft + `px; z-index:2 ">
 		<div class="navArrow noselect" onclick="if (!simulating) ` + onClick + `();" title="` + hoverTitle + `" style="cursor:` + cursorClass + `; vertical-align:middle; color:white; font-family:Arial; text-align:` + textAlign + `; position:absolute; font-size:15px; top:` + labelY + `px; left:` + labelX + `px; width:` + arrowWidth + `px; z-index:2">&nbsp;` + label + `&nbsp;</div>
 
 	`;
@@ -229,7 +229,7 @@ function drawTranslocationCanvas(){
 		var fromX = canvas.width / 2 - 25;
 		var kBck = result["kBck"];
 
-		plotArrowButton_navigationPanel(ctx, fromX, canvas.height/2, "left", "Backwards", kBck, "backwards_controller", "Translocate the polymerase backwards (&larr; key)", spacingBetweenStates, canvas, result["bckBtnActive"]);
+		plotArrowButton_navigationPanel(ctx, "bckBtn", fromX, canvas.height/2, "left", "Backwards", kBck, "backwards_controller", "Translocate the polymerase backwards (&larr; key)", spacingBetweenStates, canvas, result["bckBtnActive"]);
 
 
 
@@ -237,7 +237,7 @@ function drawTranslocationCanvas(){
 		var fromX = canvas.width / 2 + 25;
 		var kFwd = result["kFwd"];
 
-		plotArrowButton_navigationPanel(ctx, fromX, canvas.height/2, "right", result["fwdBtnLabel"], kFwd, "forward_controller", "Translocate the polymerase forwards (&rarr; key)", spacingBetweenStates, canvas, result["fwdBtnActive"]);
+		plotArrowButton_navigationPanel(ctx, "fwdBtn", fromX, canvas.height/2, "right", result["fwdBtnLabel"], kFwd, "forward_controller", "Translocate the polymerase forwards (&rarr; key)", spacingBetweenStates, canvas, result["fwdBtnActive"]);
 
 
 	});
@@ -359,7 +359,7 @@ function drawNTPcanvas(){
 			var arrowX = result["NTPbound"] ? middleStateX - 10: leftStateX + 50;
 			var bindingOrReleasingApplicable = result["mRNAPosInActiveSite"] == 1 && result["activated"];
 			if (!bindingOrReleasingApplicable) bindOrReleaseRate = 0;
-			plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, result["NTPbound"] ? "left" : "right", result["NTPbound"] ? "Release" : "Bind", bindOrReleaseRate, onClickLeft, result["NTPbound"] ? "Release the NTP (shift + &larr;)" : "Bind an NTP molecule (shift + &rarr;)", spacingBetweenStates, canvas, bindingOrReleasingApplicable);
+			plotArrowButton_navigationPanel(ctx, "bindBtn", arrowX, plotHeight / 2, result["NTPbound"] ? "left" : "right", result["NTPbound"] ? "Release" : "Bind", bindOrReleaseRate, onClickLeft, result["NTPbound"] ? "Release the NTP (shift + &larr;)" : "Bind an NTP molecule (shift + &rarr;)", spacingBetweenStates, canvas, bindingOrReleasingApplicable);
 
 
 
@@ -369,7 +369,7 @@ function drawNTPcanvas(){
 				var onClickRight = "bindNTP_controller";
 
 				var arrowX = middleStateX + 55;
-				plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "right", "Catalyse", result["kCat"], onClickRight, "Add the bound NTP onto the end of the nascent strand (shift + &rarr;)", spacingBetweenStates, canvas, true);
+				plotArrowButton_navigationPanel(ctx, "catBtn", arrowX, plotHeight / 2, "right", "Catalyse", result["kCat"], onClickRight, "Add the bound NTP onto the end of the nascent strand (shift + &rarr;)", spacingBetweenStates, canvas, true);
 
 
 			}
@@ -387,7 +387,7 @@ function drawNTPcanvas(){
 
 			var arrowX = rightStateX - 10;
 			var decayApplicable = result["mRNAPosInActiveSite"] == 0 && result["activated"];
-			plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "left", "Lysis", decayRate, onClickLeft, "Pyrophosphorylysis; remove the most recently added base from the chain (shift + &larr;)", spacingBetweenStates, canvas, decayApplicable);
+			plotArrowButton_navigationPanel(ctx, "catBtn", arrowX, plotHeight / 2, "left", "Lysis", decayRate, onClickLeft, "Pyrophosphorylysis; remove the most recently added base from the chain (shift + &larr;)", spacingBetweenStates, canvas, decayApplicable);
 
 
 		}
@@ -511,7 +511,7 @@ function drawDeactivationCanvas(){
 		var onClick = activated ? "deactivate_controller" : "activate_controller";
 
 		if (NTPbound || !result.allowDeactivation) rate = 0; // Cannot deactivate if NTP bound
-		plotArrowButton_navigationPanel(ctx, fromX, plotHeight / 2, activated ? "right" : "left", activated ? "Deactivate" : "Activate", rate, onClick, activated ? "Send the polymerase into a catalytically inactive state" : "Bring the polymerase back into its catalytically active form", spacingBetweenStates, canvas, !NTPbound);
+		plotArrowButton_navigationPanel(ctx, "activBtn", fromX, plotHeight / 2, activated ? "right" : "left", activated ? "Deactivate" : "Activate", rate, onClick, activated ? "Send the polymerase into a catalytically inactive state" : "Bring the polymerase back into its catalytically active form", spacingBetweenStates, canvas, !NTPbound);
 
 
 
@@ -604,7 +604,7 @@ function drawCleavageCanvas(){
 		var rate = result.kcleave;
 		var onClick = "cleave_controller";
 
-		plotArrowButton_navigationPanel(ctx, fromX, plotHeight / 2, "right", "Cleave", rate, onClick, "Cleave the 3\u2032 end of the nascent strand to break the pause", spacingBetweenStates, canvas, result.canCleave);
+		plotArrowButton_navigationPanel(ctx, "cleaveBtn", fromX, plotHeight / 2, "right", "Cleave", rate, onClick, "Cleave the 3\u2032 end of the nascent strand to break the pause", spacingBetweenStates, canvas, result.canCleave);
 
 
 
@@ -738,7 +738,7 @@ function drawSlippageCanvas(S = 0){
 		var onClickLeft = "slip_left_controller";
 		var arrowX = middleStateX - 5;
 		//var decayApplicable = result["mRNAPosInActiveSite"] == 0 && result["activated"];
-		plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "left", result.leftLabel.label, null, onClickLeft, result.leftLabel.title, spacingBetweenStates, canvas, result["leftLabel"].label != "");
+		plotArrowButton_navigationPanel(ctx, "slipLeftBtn" + S, arrowX, plotHeight / 2, "left", result.leftLabel.label, null, onClickLeft, result.leftLabel.title, spacingBetweenStates, canvas, result["leftLabel"].label != "");
 
 
 
@@ -747,7 +747,7 @@ function drawSlippageCanvas(S = 0){
 		var onClickRight = "slip_right_controller";
 		var arrowX = middleStateX + stateWidth + 5;
 		//var decayApplicable = result["mRNAPosInActiveSite"] == 0 && result["activated"];
-		plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "right", result.rightLabel.label, null, onClickRight, result.rightLabel.title, spacingBetweenStates, canvas, result["rightLabel"].label != "");
+		plotArrowButton_navigationPanel(ctx, "slipRightBtn" + S, arrowX, plotHeight / 2, "right", result.rightLabel.label, null, onClickRight, result.rightLabel.title, spacingBetweenStates, canvas, result["rightLabel"].label != "");
 
 
 

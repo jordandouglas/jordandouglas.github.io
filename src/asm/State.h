@@ -37,11 +37,13 @@ class State{
 	string nascentSequence;
 	int mRNAPosInActiveSite;
 	string boundNTP;
+	string NTPtoAdd;
 	bool terminated;
 	int nextTemplateBaseToCopy;
 	bool activated;
 
 	bool isGuiState;
+	bool thereHaveBeenMutations;
 
 
     public:
@@ -78,7 +80,9 @@ class State{
 
 
 
-
+		void setNextBaseToAdd(string baseToAdd);
+		string getNextBaseToAdd();
+		bool get_thereHaveBeenMutations();
 		bool isTerminated();
 		bool NTPbound();
 		string get_boundNTP();
@@ -102,9 +106,9 @@ class State{
 		void set_terminated(bool newVal);
 
 		// Free energy calculations
-		double calculateTranslocationFreeEnergy();
-		double calculateForwardTranslocationFreeEnergyBarrier();
-		double calculateBackwardTranslocationFreeEnergyBarrier();
+		double calculateTranslocationFreeEnergy(bool ignoreParametersAndSettings);
+		double calculateForwardTranslocationFreeEnergyBarrier(bool ignoreParametersAndSettings);
+		double calculateBackwardTranslocationFreeEnergyBarrier(bool ignoreParametersAndSettings);
 
 
 };

@@ -51,6 +51,7 @@ const double _RT = 0.6156;
 const double _kBT = 1.380649e-23 * 310;
 const double _preExp = 1e6;	
 const double _PI = 3.14159265359;	
+const int _nBasesToTranscribeInit = 4;
 
 
 // Command line arguments
@@ -110,21 +111,21 @@ Parameter* GTPconc = new Parameter("GTPconc", false, "inclusive", " [GTP] (\u03b
 Parameter* UTPconc = new Parameter("UTPconc", false, "inclusive", " [UTP] (\u03bcM)", "Cellular concentration of UTP");
 Parameter* FAssist = new Parameter("FAssist", false, "false", "Force  (pN)", "Assisting force applied to the polymerase during single-molecule experiments.");
 
-Parameter* hybridLen = new Parameter("hybridLen", true, "exclusive", "Hybrid length (bp)", "Number of base pairs inside the polymerase");
-Parameter* bubbleLeft = new Parameter("bubbleLeft", true, "exclusive", "Bubble length left (bp)", "Number of unpaired template bases 3\u2032 of the hybrid");
-Parameter* bubbleRight = new Parameter("bubbleRight", true, "exclusive", "Bubble length right (bp)", "Number of unpaired template bases 5\u2032 of the hybrid");
+Parameter* hybridLen = new Parameter("hybridLen", true, "exclusive", "Hybrid length (bp)", "Number of base pairs inside the polymerase", "h (bp)");
+Parameter* bubbleLeft = new Parameter("bubbleLeft", true, "exclusive", "Bubble length left (bp)", "Number of unpaired template bases 3\u2032 of the hybrid", "\u03B2_{1} (bp)");
+Parameter* bubbleRight = new Parameter("bubbleRight", true, "exclusive", "Bubble length right (bp)", "Number of unpaired template bases 5\u2032 of the hybrid", "\u03B2_{2} (bp)");
 
-Parameter* GDagSlide = new Parameter("GDagSlide", false, "false", "\u0394\u0394G\u2020t", "Free energy barrier height of translocation");
-Parameter* DGPost = new Parameter("DGPost", false, "false", "\u0394\u0394Gt1", "Free energy added on to posttranslocated ground state");
-Parameter* barrierPos = new Parameter("barrierPos", false, "false", "Barrier height position  (\u212B)", "Position of translocation intermediate state");
+Parameter* GDagSlide = new Parameter("GDagSlide", false, "false", "\u0394\u0394G\u2020t", "Free energy barrier height of translocation", "\u0394\u0394G_{t}^{\u2020}  (k_{B}T)");
+Parameter* DGPost = new Parameter("DGPost", false, "false", "\u0394\u0394Gt1", "Free energy added on to posttranslocated ground state", "\u0394\u0394G_{t1}  (k_{B}T)");
+Parameter* barrierPos = new Parameter("barrierPos", false, "false", "Barrier height position  (\u212B)", "Position of translocation intermediate state", "\u03B4_{1}");
 Parameter* arrestTime = new Parameter("arrestTime", false, "inclusive", "Arrest timeout  (s)", "Maximum pause duration before the simulation is arrested. Set to zero to prevent arrests.");
-Parameter* kCat = new Parameter("kCat", false, "inclusive", "Rate of catalysis (s\u207B\u00B9)", "Rate constant of catalysing bound NTP");
-Parameter* Kdiss = new Parameter("Kdiss", false, "exclusive", "KD (\u03bcM)", "Dissociation constant of NTP");
-Parameter* RateBind = new Parameter("RateBind", false, "inclusive", "Rate of binding  (\u03bcM\u207B\u00B9 s\u207B\u00B9)", "Second order rate constant of binding the correct NTP");
+Parameter* kCat = new Parameter("kCat", false, "inclusive", "Rate of catalysis (s\u207B\u00B9)", "Rate constant of catalysing bound NTP", "k_{cat}  (s^{\u22121\u2009})");
+Parameter* Kdiss = new Parameter("Kdiss", false, "exclusive", "KD (\u03bcM)", "Dissociation constant of NTP",  "K_{D}  (\u03bcM)");
+Parameter* RateBind = new Parameter("RateBind", false, "inclusive", "Rate of binding  (\u03bcM\u207B\u00B9 s\u207B\u00B9)", "Second order rate constant of binding the correct NTP", "k_{bind} (\u03bcM^{\u22121} s^{\u22121\u2009})");
 
 Parameter* RateActivate = new Parameter("kA", false, "inclusive", "Rate of activation (s\u207B\u00B9)", "Rate constant of polymerase leaving the catalytically unactive state", "k_[A]  (s^[\u22121\u2009])");
 Parameter* RateDeactivate = new Parameter("kU", false, "inclusive", "Rate of inactivation (s\u207B\u00B9)", "Rate constant of polymerase entering the catalytically unactive state", "k_[cleave]  (s^[\u22121\u2009])");
-Parameter* RateCleave = new Parameter("RateCleave", false, "inclusive", "Rate of cleavage (s\u207B\u00B9)", "Rate constant of cleaving the dangling 3\u2032 end of the nascent strand when backtracked", "k_[U]  (s^[\u22121\u2009])");
+Parameter* RateCleave = new Parameter("RateCleave", false, "inclusive", "Rate of cleavage (s\u207B\u00B9)", "Rate constant of cleaving the dangling 3\u2032 end of the nascent strand when backtracked", "k_[cleave]  (s^[\u22121\u2009])");
 
 
 vector<Parameter*> Settings::paramList(19);
@@ -177,7 +178,7 @@ void Settings::init(){
 
 	RateActivate->setDistributionParameter("fixedDistnVal", 4);
 	RateDeactivate->setDistributionParameter("fixedDistnVal", 0.1);
-	RateCleave->setDistributionParameter("fixedDistnVal", 0.1);
+	RateCleave->setDistributionParameter("fixedDistnVal", 0);
 
 
 	
@@ -382,6 +383,19 @@ bool Settings::setSequence(string seqID){
 	return true;
 
 }
+
+
+
+// Instruct all sequences to rebuild their translocation rate cache next time requested
+void Settings::resetRateTables(){
+
+	for(std::map<string, Sequence*>::iterator iter = sequences.begin(); iter != sequences.end(); ++iter){
+		Sequence* seq = iter->second;
+		seq->flagForRateTableRebuilding();
+	}
+	
+}
+
 
 
 // Loads the current settings into a JSON string for use by javascript

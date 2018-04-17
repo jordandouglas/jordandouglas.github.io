@@ -424,9 +424,10 @@ void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
 
 	State* state = new State(true);
 
+
 	// Iterate until the end of the sequence
 	state->transcribe(1);
-	int nsites = templateSequence.length() - hybridLen->getVal() - bubbleLeft->getVal() - 3;
+	int nsites = templateSequence.length() - hybridLen->getVal() - std::max(bubbleLeft->getVal(), 2.0) - _nBasesToTranscribeInit;
 	vector<double> equilibriumConstantsBckOverFwd(nsites);
 	vector<double> equilibriumConstantsFwdOverBck(nsites);
 	vector<double> forwardRates(nsites);
@@ -456,6 +457,7 @@ void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
 	}
 
 
+
 	// Calculate geometric-mean equilibrium constant
 	double meanEquilibriumConstant_BckOverFwd = 0;
 	double meanEquilibriumConstant_FwdOverBck = 0;
@@ -467,7 +469,9 @@ void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
 		meanForwardRate += forwardRates.at(i) / nsites;
 		meanBackwardsRate += backwardsRates.at(i) / nsites;
 	}
-	
+
+
+
 	results[0] = exp(meanEquilibriumConstant_BckOverFwd / nsites);
 	results[1] = exp(meanEquilibriumConstant_FwdOverBck / nsites);
 	results[2] = meanForwardRate;
@@ -475,7 +479,7 @@ void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
 
 	delete state;
 
-
+	cout << "4" << endl;
 }
 
 

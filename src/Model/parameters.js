@@ -239,45 +239,48 @@ PARAMS_JS.update_this_parameter_WW = function(paramID, fixedVal, resolve = funct
 	
 	var toReturn = {refreshDOM: false}
 
-	var initialVal = PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"];
-	
-	if (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["integer"] != null && PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["integer"]) fixedVal = Math.ceil(fixedVal);
-	
-	// Do not accept the change if it is out of range
-	if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["zeroTruncated"]
-		 || (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["zeroTruncated"] == "exclusive" && fixedVal > 0)
-		 || (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["zeroTruncated"] == "inclusive" && fixedVal >= 0)) {
+	if (PARAMS_JS.PHYSICAL_PARAMETERS[paramID] != null){
+
+		var initialVal = PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"];
+		
+		if (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["integer"] != null && PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["integer"]) fixedVal = Math.ceil(fixedVal);
+		
+		// Do not accept the change if it is out of range
+		if (!PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["zeroTruncated"]
+			 || (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["zeroTruncated"] == "exclusive" && fixedVal > 0)
+			 || (PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["zeroTruncated"] == "inclusive" && fixedVal >= 0)) {
+			
+			
+			// Change the values
+			PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] = fixedVal;
+			PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["fixedDistnVal"] = fixedVal;
+			
+			// Some parameters require a refresh
+			toReturn["refreshDOM"] = PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["refreshOnChange"] != null && PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["refreshOnChange"];
+
+
+		}
+		
+		else fixedVal = PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"]
 		
 		
-		// Change the values
-		PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] = fixedVal;
-		PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["fixedDistnVal"] = fixedVal;
+		toReturn["val"] = fixedVal;
+
+
+		// Recalculate misincorporation transition matrix 
+		if (paramID.substring(3) == "conc" || paramID == "RateBind" || paramID == "RateMisbind" || paramID == "TransitionTransversionRatio"){
+			WW_JS.initMisbindingMatrix();
+			WW_JS.setNextBaseToAdd_WW();
+		}
 		
-		// Some parameters require a refresh
-		toReturn["refreshDOM"] = PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["refreshOnChange"] != null && PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["refreshOnChange"];
-
+		
+		// If the parameter has been changed and it will affect translocation rates then we calculate everything again
+		if (initialVal != PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "barrierPos" || paramID == "hybridLen" || paramID == "bubbleLeft" || paramID == "bubbleRight" || paramID == "nbpToFold")){
+			STATE_JS.translocationCacheNeedsUpdating = true; // Recalculate the translocation rate cache
+			STATE_JS.initTranslocationRateCache();
+		}
 
 	}
-	
-	else fixedVal = PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"]
-	
-	
-	toReturn["val"] = fixedVal;
-
-
-	// Recalculate misincorporation transition matrix 
-	if (paramID.substring(3) == "conc" || paramID == "RateBind" || paramID == "RateMisbind" || paramID == "TransitionTransversionRatio"){
-		WW_JS.initMisbindingMatrix();
-		WW_JS.setNextBaseToAdd_WW();
-	}
-	
-	
-	// If the parameter has been changed and it will affect translocation rates then we calculate everything again
-	if (initialVal != PARAMS_JS.PHYSICAL_PARAMETERS[paramID]["val"] && (paramID == "barrierPos" || paramID == "hybridLen" || paramID == "bubbleLeft" || paramID == "bubbleRight" || paramID == "nbpToFold")){
-		STATE_JS.translocationCacheNeedsUpdating = true; // Recalculate the translocation rate cache
-		STATE_JS.initTranslocationRateCache();
-	}
-
 
 
 	if (msgID != null){

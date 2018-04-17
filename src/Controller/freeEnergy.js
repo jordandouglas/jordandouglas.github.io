@@ -59,7 +59,6 @@ function update_sliding_curve(dir){
 	var updateHeights = function(dict){
 
 		// Update the true heights
-		//console.log("Height object", dict);
 		trueSlidingPeakHeights = dict["slidingPeakHeights"];
 		trueSlidingTroughHeights = dict["slidingTroughHeights"];
 

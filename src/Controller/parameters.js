@@ -343,7 +343,7 @@ function addFixedPrior(){
 	
 	var paramID = $("#popup_distn").attr("paramID")
 	var currentVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"]);
-	var inputBox = $("#popup_distn").attr("paramName") + " = <input type='number' title='Select the fixed value for this parameter' id='fixedDistnVal' value=" + currentVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px'></input>";
+	var inputBox = $("#popup_distn").attr("paramName") + " = <input type='number' title='Select the fixed value for this parameter' id='fixedDistnVal' value=" + currentVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:right; width: 70px'  onChange=plotFixedDistrbutionCanvas()></input>";
 	
 	$("#parameterDistnCell").append(inputBox);
 
@@ -352,27 +352,35 @@ function addFixedPrior(){
 		$("#fixedDistnVal").attr("min", parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]));
 	}
 
-	
-	var xmin = roundToSF(currentVal - currentVal*0.2, 1);
-	var xmax = roundToSF(currentVal + currentVal*0.2, 1);
-	if (xmin == xmax){
-		xmin--;
-		xmax++;
+	var xlab = PHYSICAL_PARAMETERS_TEMP[paramID].latexName == null ? PHYSICAL_PARAMETERS_TEMP[paramID].name : PHYSICAL_PARAMETERS_TEMP[paramID].latexName;
+	plotFixedDistrbutionCanvas = function(){
+
+		var fixedVal = parseFloat($("#fixedDistnVal").val());
+
+		var xmin = roundToSF(fixedVal - Math.abs(fixedVal)*0.2, 1);
+		var xmax = roundToSF(fixedVal + Math.abs(fixedVal)*0.2, 1);
+		if (xmin == xmax){
+			xmin--;
+			xmax++;
+		}
+		if (PHYSICAL_PARAMETERS_TEMP[paramID]["integer"]){
+			xmin = Math.floor(xmin);
+			xmax = Math.ceil(xmax);
+		}
+
+
+		var fixedFn = function(x) {
+			if (Math.abs(x - fixedVal) < (xmax - xmin) / 150) return 1 / 1.1;
+			return 0;
+		};
+
+
+		plot_probability_distribution(fixedFn, xmin, xmax, "distrbutionCanvas", xlab);
+
+
 	}
-	if (PHYSICAL_PARAMETERS_TEMP[paramID]["integer"]){
-		xmin = Math.floor(xmin);
-		xmax = Math.ceil(xmax);
-	}
-
-
-	var fixedFn = function(x) {
-		if (Math.abs(x - currentVal) < (xmax - xmin) / 150) return 1 / 1.1;
-		return 0;
-	};
 	
-	plot_probability_distribution(fixedFn, xmin, xmax, "distrbutionCanvas", $("#" + $("#popup_distn").attr("paramID")).attr('name'));
-	
-
+	plotFixedDistrbutionCanvas();
 	
 }
 
@@ -412,8 +420,7 @@ function addUniformPrior(){
 		$("#uniformDistnLowerVal").attr("min", parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]));
 	}
 	
-	
-	
+	var xlab = PHYSICAL_PARAMETERS_TEMP[paramID].latexName == null ? PHYSICAL_PARAMETERS_TEMP[paramID].name : PHYSICAL_PARAMETERS_TEMP[paramID].latexName;
 	plotUniformDistrbutionCanvas = function(){
 
 		var lower = parseFloat($("#uniformDistnLowerVal").val());
@@ -427,7 +434,7 @@ function addUniformPrior(){
 		}
 		
 		if (upper <= lower) {
-			plot_probability_distribution(null, -1, 1, "distrbutionCanvas", $("#" + $("#popup_distn").attr("paramID")).attr('name'));
+			plot_probability_distribution(null, -1, 1, "distrbutionCanvas", xlab);
 			return;
 		}
 		
@@ -440,7 +447,7 @@ function addUniformPrior(){
 
 
 		var xmin = PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"] ? Math.max(0, lower - 0.25*(Math.abs(lower+upper+1))) : lower - 0.25*(Math.abs(lower+upper+1));
-		plot_probability_distribution(uniformFn, xmin, upper + 0.25*(Math.abs(lower+upper+1)), "distrbutionCanvas", $("#" + $("#popup_distn").attr("paramID")).attr('name'));
+		plot_probability_distribution(uniformFn, xmin, upper + 0.25*(Math.abs(lower+upper+1)), "distrbutionCanvas", xlab);
 	
 
 	}
@@ -467,7 +474,7 @@ function addExponentialPrior(){
 	
 	$("#parameterDistnCell").append(textBox);
 	
-	
+	var xlab = PHYSICAL_PARAMETERS_TEMP[paramID].latexName == null ? PHYSICAL_PARAMETERS_TEMP[paramID].name : PHYSICAL_PARAMETERS_TEMP[paramID].latexName;
 	plotExponentialDistrbutionCanvas = function(){
 
 		var rate = parseFloat($("#exponentialDistnVal").val());
@@ -477,7 +484,7 @@ function addExponentialPrior(){
 			return rate * Math.exp(-rate * x);
 		};
 
-		plot_probability_distribution(exponentialFn, 0, 5/rate, "distrbutionCanvas", $("#" + $("#popup_distn").attr("paramID")).attr('name'));
+		plot_probability_distribution(exponentialFn, 0, 5/rate, "distrbutionCanvas", xlab);
 
 	}
 	
@@ -517,7 +524,7 @@ function addNormalPrior(){
 
 	
 	
-	
+	var xlab = PHYSICAL_PARAMETERS_TEMP[paramID].latexName == null ? PHYSICAL_PARAMETERS_TEMP[paramID].name : PHYSICAL_PARAMETERS_TEMP[paramID].latexName;
 	plotNormalDistrbutionCanvas = function(){
 
 		var sd = parseFloat($("#normalSdVal").val());
@@ -529,7 +536,7 @@ function addNormalPrior(){
 
 		var xmin = PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"] ? Math.max(meanVal - sd * 4, 0) : meanVal - sd * 4;
 
-		plot_probability_distribution(normalFn, xmin,  meanVal + sd * 4, "distrbutionCanvas", $("#" + $("#popup_distn").attr("paramID")).attr('name'));
+		plot_probability_distribution(normalFn, xmin,  meanVal + sd * 4, "distrbutionCanvas", xlab);
 	}
 	
 	
@@ -560,7 +567,7 @@ function addLognormalPrior(){
 
 	
 	
-	
+	var xlab = PHYSICAL_PARAMETERS_TEMP[paramID].latexName == null ? PHYSICAL_PARAMETERS_TEMP[paramID].name : PHYSICAL_PARAMETERS_TEMP[paramID].latexName;
 	plotLognormalDistrbutionCanvas = function(){
 
 		var sd = parseFloat($("#lognormalSdVal").val());
@@ -573,7 +580,7 @@ function addLognormalPrior(){
 
 		var sd4 = Math.sqrt((Math.exp(Math.pow(sd, 2) - 1)) * Math.exp(2*meanVal + Math.pow(sd, 2))) * 4; // 4 standard deviations
 		var empMean = Math.exp(meanVal + sd*sd/2);
-		plot_probability_distribution(lognormalFn, Math.max(empMean - sd4, 0), empMean + sd4, "distrbutionCanvas", $("#" + $("#popup_distn").attr("paramID")).attr('name'));
+		plot_probability_distribution(lognormalFn, Math.max(empMean - sd4, 0), empMean + sd4, "distrbutionCanvas", xlab);
 	}
 	
 	
@@ -607,7 +614,7 @@ function addGammaPrior(){
 
 	
 	
-	
+	var xlab = PHYSICAL_PARAMETERS_TEMP[paramID].latexName == null ? PHYSICAL_PARAMETERS_TEMP[paramID].name : PHYSICAL_PARAMETERS_TEMP[paramID].latexName;
 	plotGammaDistrbutionCanvas = function(){
 
 		var shape = parseFloat($("#gammaShapeVal").val());
@@ -621,7 +628,7 @@ function addGammaPrior(){
 		
 		var sd4 = Math.sqrt(shape * scale * scale) * 4; // 4 standard deviations
 		var empMean = shape * scale;
-		plot_probability_distribution(lognormalFn, Math.max(empMean - sd4, 0), empMean + sd4, "distrbutionCanvas", $("#" + $("#popup_distn").attr("paramID")).attr('name'));
+		plot_probability_distribution(lognormalFn, Math.max(empMean - sd4, 0), empMean + sd4, "distrbutionCanvas", xlab);
 	}
 	
 	

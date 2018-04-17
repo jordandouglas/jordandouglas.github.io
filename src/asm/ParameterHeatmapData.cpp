@@ -71,6 +71,7 @@ string ParameterHeatmapData::getID(){
 // Gets the id, name and all values of this object and returns as a JSON string
 string ParameterHeatmapData::toJSON(){
 
+
 	string JSON = "{'name':'" + this->name + "',";
 	if (this->latexName != "") JSON += "'latexName':'" + this->latexName + "',";
 	JSON += "'vals':[";
