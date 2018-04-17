@@ -473,6 +473,20 @@ function addCitations(){
 										and elongation can only resume following an activation event.
 
 									</div> 
+
+
+
+									<br><br>
+									<div style="padding: 10 10; background-color:#ebe9e7" >
+
+										<span class="block-subsubtitle" > <b>4. Nascent strand cleavage:</b> </span>
+										
+										When a nucleic acid polymerase backtracks for too long <i>in vivo</i> it can delay the production of its product and potentially cause roadblocks for other polymerases.
+										Many organisms have evolved elongation factors which serve to rescue the polymerase from this state. One mechanism these factors may act is by cleaving the 3<sup>&prime;</sup> 
+										end of the nascent strand when it pokes out the front of the polymerase during backtracking. This is carried out by GreA and GreB for prokaryotic
+										RNA polymerases and S-II for eukaryotic RNA polymerase II <cite val="toulme2000grea"></cite> and can be performed in SimPol using the cleavage reaction.
+
+									</div> 
 									
 				
 									
@@ -481,7 +495,7 @@ function addCitations(){
 										<br><br>
 									<div style="padding: 10 10; background-color:#ebe9e7" >
 
-										<span class="block-subsubtitle" > <b>4. Slippage:</b> </span>
+										<span class="block-subsubtitle" > <b>5. Slippage:</b> </span>
 										
 										Sometimes the nascent and template strand temporarily melt and a bulge forms in one of the strands. This can be performed by the
 									Form Bulge reaction.
@@ -929,17 +943,17 @@ function addCitations(){
 
 
 														<div class="paramHelp" id="hybridLen_ParamHelp">
-															<b>Hybrid length</b> - number of basepairs in the template/primer hybrid within the polymerase. As translocation rates are determined from sequence composition, this value may affect
+															<b>Hybrid length (h)</b> - number of basepairs in the template/primer hybrid within the polymerase. As translocation rates are determined from sequence composition, this value may affect
 																			   the predicted location of pause sites. In eukaryotes and prokaryotes, RNA polymerase contains a hybrid of 8 or 9bp
 																			   <cite val="komissarova1997transcriptional,gnatt2001structural,nudler1997rna"></cite>. Default: 9bp 
 														</div><br>				   
 
 														<div class="paramHelp" id="bubbleLeft_ParamHelp">			   
-															<b>Bubble size 3&prime;</b> - number of unpaired template bases 3&prime; (left hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 2bp<cite val="maoileidigh2011unified"></cite>
+															<b>Bubble size 3&prime; (&beta;<sub>1</sub>)</b> - number of unpaired template bases 3&prime; (left hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 2bp<cite val="maoileidigh2011unified"></cite>
 														</div><br>	
 
 														<div class="paramHelp" id="bubbleRight_ParamHelp">
-															<b>Bubble size 5&prime;</b> - number of unpaired template bases 5&prime; (right hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 1bp<cite val="maoileidigh2011unified"></cite>
+															<b>Bubble size 5&prime; (&beta;<sub>2</sub>)</b> - number of unpaired template bases 5&prime; (right hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 1bp<cite val="maoileidigh2011unified"></cite>
 														</div><br>	
 									
 												</div>
@@ -956,20 +970,20 @@ function addCitations(){
 														<div class="paramHelp" id="GDagSlide_ParamHelp">
 															<b style="font-size:20px">$\Delta\Delta G^\dagger_{t}$</b> - free energy barrier height of translocation. To translocate forwards or backwards, several
 																	basepairs may need to be broken. The energy barrier which must be overcome in order to translocate is estimated as the energy needed to break these basepairs
-																	plus the value of this parameter. Increasing this value will make translocation slower. Default: 9 k<sub>B</sub>T
+																	plus the value of this parameter. Increasing this value will make translocation slower. Default: 9.079 k<sub>B</sub>T
 														</div><br>	
 
 														
 														<div class="paramHelp" id="DGPost_ParamHelp">
 															<b style="font-size:20px">$\Delta\Delta G_{t1}$</b> - free energy term added to that of the posttranslocated state. When this value is low,
-															RNA polymerase spends more time in the posttranslocated state (compared with the pretranslocated state). Default: 0 k<sub>B</sub>T
+															RNA polymerase spends more time in the posttranslocated state (compared with the pretranslocated state). Default: -2.007 k<sub>B</sub>T
 														</div><br>	
 														
 
 														<div class="paramHelp" id="barrierPos_ParamHelp">
 															<b style="font-size:20px">$\delta_1$</b> - position of the translocation intermediate state, with respect to the two connected ground states. 
 															This parameter lies between 0 and the width of a single basepair in DNA (3.4 &#x212b;<cite val="watson1953molecular"></cite>). This term only applies
-															when translocation is kinetic and when an assisting force $F_{assist}$ is applied. Default: 1.7 &#x212b;
+															when translocation is kinetic and when an assisting force $F_{assist}$ is applied. Default: 2.838 &#x212b;
 														</div><br>	
 														
 																	
@@ -994,20 +1008,20 @@ function addCitations(){
 														<div class="paramHelp" id="Kdissociate_ParamHelp">
 															<b style="font-size:20px">$K_D$</b> - equilibrium constant of NTP dissociation. $K_D$ is used in conjunction with $k_{bind}$ to calculate the rate of releasing
 															bound NTP: $k_\text{release} = K_D \; k_\text{bind}$. $K_D$ is by default shared by all 4 NTPs but you can make it NTP specific instead (ie. 1 term for each of ATP, CTP, GTP, UTP).
-															Defaults: $K_D = 35, K_D^{ATP} = 50, K_D^{CTP} = 33, K_D^{GTP} = 36, K_D^{UTP} = 18\;$ <cite val="bai2007mechanochemical"></cite>
+															Defaults: $K_D = 1.8, K_D^{ATP} = 50, K_D^{CTP} = 33, K_D^{GTP} = 36, K_D^{UTP} = 18\;$ <cite val="bai2007mechanochemical"></cite>
 														</div><br>
 
 
 														<div class="paramHelp" id="kCat_ParamHelp"> 
 															<b style="font-size:20px">$k_{cat}$</b> - rate constant of catalysing bound NTP, thus extending the nascent chain by one base. When translocation is fast,
 																	catalysis is the rate limiting step in transcription. $k_{cat}$ is by default shared by all 4 NTPs but you can make it NTP specific instead (ie. 1 term for each of ATP, CTP, GTP, UTP).
-																	Defaults: $k_{cat} = 30, k_{cat}^{ATP} = 38, k_{cat}^{CTP} = 7, k_{cat}^{GTP} = 62, k_{cat}^{UTP} = 24\;$ <cite val="bai2007mechanochemical"></cite>
+																	Defaults: $k_{cat} = 25.56, k_{cat}^{ATP} = 38, k_{cat}^{CTP} = 7, k_{cat}^{GTP} = 62, k_{cat}^{UTP} = 24\;$ <cite val="bai2007mechanochemical"></cite>
 
 														</div><br>
 														
 														<div class="paramHelp" id="RateBind_ParamHelp">
 															<b style="font-size:20px">$k_{bind}$</b> - used to calculate rate constant of binding the complementary NTP, which is calculated as [NTP] k<sub>bind</sub>. 
-																	This parameter is constant across all NTPs. Default: 30&mu;M<sup>-1</sup>.s<sup>-1</sup>  
+																	This parameter is constant across all NTPs. Default: 0.5448 &mu;M<sup>-1</sup>.s<sup>-1</sup>  
 														</div><br>
 
 														<!--
@@ -1039,11 +1053,17 @@ function addCitations(){
 
 														<div class="paramHelp" id="kU_ParamHelp">
 															<b style="font-size:20px">$k_{U}$</b> - rate constant of polymerase entering the unactive state. When in the unactive state, the polymerase may
-																	translocate but it may not bind NTP or catalyse. Elongation may only continue when the polymerase reactivates. Default: 0.23s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite>
+																	translocate but it may not bind NTP or catalyse. Elongation may only continue when the polymerase reactivates. Default: 0.1s<sup>-1</sup>
 														</div><br>
 
 														<div class="paramHelp" id="kA_ParamHelp">
-															<b style="font-size:20px">$k_{A}$</b> - rate constant of polymerase entering the active state. Default: 3s<sup>-1</sup> <cite val="maoileidigh2011unified"></cite>
+															<b style="font-size:20px">$k_{A}$</b> - rate constant of polymerase entering the active state. Default: 4s<sup>-1</sup>
+														</div><br>
+
+
+														<div class="paramHelp" id="RateCleave_ParamHelp">
+															<b style="font-size:20px">$k_{cleave}$</b> - rate constant of cleaving the 3<sup>&prime;</sup> end of the nascent strand when the polymerase is backtracked. 
+															<i>In vivo</i> this reaction may be carried out by elongation factors, for example, GreA. Default: 0s<sup>-1</sup>
 														</div><br>
 												</div>
 
