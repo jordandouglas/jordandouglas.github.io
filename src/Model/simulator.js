@@ -270,7 +270,7 @@ SIM_JS.trial_WW = function(stateC, resolve = function() { }, msgID = null){
 
 	var prepareForNextTrial = function(){
 
-		printDateAndTime("Perparing for next trial");
+		printDateAndTime("Praparing for next trial");
 
 		// If this is in animation mode, then this process is synchronous with rendering so we return in between operators
 		// THIS BLOCK OF CODE WILL ONLY WORK IF NOT RUNNING AS A WEBWORKER

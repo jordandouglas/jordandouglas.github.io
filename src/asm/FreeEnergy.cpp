@@ -31,6 +31,8 @@
 #include <vector>
 #include <list>
 #include <math.h> 
+#include <ctype.h>
+#include <stdio.h>
 
 using namespace std;
 
@@ -51,9 +53,9 @@ double FreeEnergy::getFreeEnergyOfTranscriptionBubble(State* state){
 		
 	double bubbleFreeEnergy = 0;
 	
-	int leftmostTemplatePos = state->getLeftBaseNumber() - (int)(bubbleLeft->getVal()) - 2;
+	int leftmostTemplatePos = state->getLeftTemplateBaseNumber() - (int)(bubbleLeft->getVal()) - 2;
 	int leftmostComplementPos = leftmostTemplatePos;
-	int rightmostTemplatePos = state->getRightBaseNumber() + (int)(bubbleRight->getVal());
+	int rightmostTemplatePos = state->getRightTemplateBaseNumber() + (int)(bubbleRight->getVal());
 	int rightmostComplementPos = rightmostTemplatePos;
 	vector<string> bubbleStrings = FreeEnergy::getHybridStringOfTranscriptionBubble(leftmostTemplatePos, rightmostTemplatePos, leftmostComplementPos, rightmostComplementPos);
 	//cout << "bubbleStrings " << bubbleStrings.at(0) << "/" <<  bubbleStrings.at(1) << endl;
@@ -71,7 +73,7 @@ double FreeEnergy::getFreeEnergyOfIntermediateState(State* state1, State* state2
 	
 	vector<string> hybridStrings1 = FreeEnergy::getHybridString(state1);
 	vector<string> hybridStrings2 = FreeEnergy::getHybridString(state2);
-	vector<string> intermediateString = FreeEnergy::getHybridIntermediateString(hybridStrings1, hybridStrings2, state1->getLeftBaseNumber(), state2->getLeftBaseNumber());
+	vector<string> intermediateString = FreeEnergy::getHybridIntermediateString(hybridStrings1, hybridStrings2, state1->getLeftTemplateBaseNumber(), state1->getLeftNascentBaseNumber(), state2->getLeftTemplateBaseNumber(), state2->getLeftNascentBaseNumber());
 
 	freeEnergy = getHybridFreeEnergy(intermediateString.at(0), intermediateString.at(1), TemplateType.substr(2), PrimerType.substr(2));
 	
@@ -87,9 +89,9 @@ double FreeEnergy::getFreeEnergyOfTranscriptionBubbleIntermediate(State* state1,
 	if (TemplateType.substr(0,2)== "ss") return 0;
 	double freeEnergy = 0;
 	
-	int leftmostTemplatePos = min(state1->getLeftBaseNumber(), state2->getLeftBaseNumber()) - (int)bubbleLeft->getVal() - 2;
+	int leftmostTemplatePos = min(state1->getLeftTemplateBaseNumber(), state2->getLeftTemplateBaseNumber()) - (int)bubbleLeft->getVal() - 2;
 	int leftmostComplementPos = leftmostTemplatePos;
-	int rightmostTemplatePos = max(state1->getRightBaseNumber(), state2->getRightBaseNumber()) + (int)bubbleRight->getVal();
+	int rightmostTemplatePos = max(state1->getRightTemplateBaseNumber(), state2->getRightTemplateBaseNumber()) + (int)bubbleRight->getVal();
 	int rightmostComplementPos = rightmostTemplatePos;
 
 
@@ -118,24 +120,37 @@ vector<string> FreeEnergy::getHybridString(State *state){
 
 	string templateString = "";
 	string nascentString = "";
+
+
+	int activeSiteShift = state->get_mRNAPosInActiveSite() > 1 ? 1 : 0;
 	int stopWhenAt = (int)hybridLen->getVal();
-	int rightBase = state->getRightBaseNumber();
-	int leftBase = state->getLeftBaseNumber();
+	int templatePastBulge = 0;
+	int nascentPastBulge = 0;
 
 	for (int hybridPos = 0; hybridPos < stopWhenAt; hybridPos++){
 			
-			
-		int baseNum = rightBase - hybridPos;
+
+		int templateBaseNum = state->getRightTemplateBaseNumber() - (hybridPos + templatePastBulge);
+		int nascentBaseNum = state->getRightNascentBaseNumber() - (hybridPos + nascentPastBulge);
+
+		//int baseNum = rightBase - hybridPos;
 
 		
 		// Go to next base if this one does not exist
-		if (baseNum < 0 || baseNum < leftBase || baseNum > templateSequence.length() || baseNum > state->get_nascentLength()) continue;
-		
-		string gBase = templateSequence.substr(baseNum-1, 1);
-		string nBase = state->get_NascentSequence().substr(baseNum-1, 1);
-		
-		templateString = gBase + templateString;
-		nascentString = nBase + nascentString;
+		if (templateBaseNum <= 0 || templateBaseNum <= state->getLeftTemplateBaseNumber() || templateBaseNum > templateSequence.length()) continue;
+		if (nascentBaseNum <= 0 || nascentBaseNum <= state->getLeftNascentBaseNumber() || nascentBaseNum > state->get_nascentLength()) continue;
+
+
+		// Ensure that the rightMostMbase is part of the chain and not bound as free NTP
+		if (state->NTPbound() && (nascentBaseNum == state->getRightNascentBaseNumber() || nascentBaseNum == state->getRightNascentBaseNumber()+1)) continue;
+
+
+		string templateBase = templateSequence.substr(templateBaseNum-1, 1);
+		string nascentBase = state->get_NascentSequence().substr(nascentBaseNum-1, 1);
+
+
+		templateString = templateBase + templateString;
+		nascentString = nascentBase + nascentString;
 		
 	}
 
@@ -247,12 +262,12 @@ list<string> getListUnion(list<string> list1, list<string> list2){
 
 
 
-vector<string> FreeEnergy::getHybridIntermediateString(vector<string> hybridStrings1, vector<string> hybridStrings2, int left1, int left2){
+vector<string> FreeEnergy::getHybridIntermediateString(vector<string> hybridStrings1, vector<string> hybridStrings2, int leftTemplate1, int leftNascent1, int leftTemplate2, int leftNascent2){
 
 	
 	// Build a list of basepairs between template and hybrid in each sequence
-	list<string> basepairs1 = FreeEnergy::getBasePairs(hybridStrings1[0], hybridStrings1[1], left1);
-	list<string> basepairs2 = FreeEnergy::getBasePairs(hybridStrings2[0], hybridStrings2[1], left2);
+	list<string> basepairs1 = FreeEnergy::getBasePairs(hybridStrings1[0], hybridStrings1[1], leftTemplate1, leftNascent1);
+	list<string> basepairs2 = FreeEnergy::getBasePairs(hybridStrings2[0], hybridStrings2[1], leftTemplate2, leftNascent2);
 
 	// Find the basepairs which are in both sets (ie. the intersection)
 	list<string> basepairsIntermediate = getListIntersection(basepairs1, basepairs2);
@@ -271,12 +286,11 @@ vector<string> FreeEnergy::getHybridIntermediateString(vector<string> hybridStri
 		vector<string> split_vector = Settings::split(*it, '_');
 
 		
-		int baseNum1 = atoi(split_vector.at(0).c_str());
-		int baseIndex = baseNum1 - left1;
+		int template_baseNum = atoi(split_vector.at(0).c_str());
+		int nascent_baseNum = atoi(split_vector.at(1).c_str());
 		
-		
-		string Tbase = hybridStrings1.at(0).substr(baseIndex, 1); // Intersection means that either string1 or string2 can be used
-		string Nbase = hybridStrings1.at(1).substr(baseIndex, 1);
+		string Tbase = hybridStrings1.at(0).substr(template_baseNum - leftTemplate1, 1); // Intersection means that either string1 or string2 can be used
+		string Nbase = hybridStrings1.at(1).substr(nascent_baseNum - leftNascent1, 1);
 		
 		strIntermediateT += Tbase;
 		strIntermediateN += Nbase;
@@ -294,52 +308,47 @@ vector<string> FreeEnergy::getHybridIntermediateString(vector<string> hybridStri
 
 
 
-list<string> FreeEnergy::getBasePairs(string templateString, string nascentString, int leftT){
+list<string> FreeEnergy::getBasePairs(string templateString, string nascentString, int leftT, int leftN){
 
 	
 	list<string> basePairs;
 
 	int templateIndex = 0;
-	int primerIndex = 0;
+	int nascentIndex = 0;
 
 	while(true){
 		
 		// If we have exceeded the string lengths then exit
-		if (templateIndex >= templateString.length() || primerIndex >= nascentString.length()) break;
+		if (templateIndex >= templateString.length() || nascentIndex >= nascentString.length()) break;
 		
-		
+
+
+
 		// If both are uppercase then they are basepaired
-		//if (isUpperCase_WW(strT[templateIndex]) && isUpperCase_WW(strP[primerIndex])){
-
-			//string key = to_string(templateIndex + leftT) + "_" + to_string(primerIndex + leftT);
-			//basePairs.push_back(key);
-
+		if (isupper(templateString[templateIndex]) && isupper(nascentString[nascentIndex])){
+			
 			char szKeyText[32];
-            sprintf( szKeyText, "%u_%u", templateIndex + leftT, primerIndex + leftT );
+            sprintf( szKeyText, "%u_%u", templateIndex + leftT, nascentIndex + leftN );
             basePairs.push_back(szKeyText);
 			templateIndex++;
-			primerIndex++;
-
-            
-
-		//}
-		
-		
-		/*
-		// If only one is uppercase then skip the other one
-		else if (isUpperCase_WW(strT[templateIndex]) & !isUpperCase_WW(strP[primerIndex])){
-			primerIndex++;
+			nascentIndex++;
 		}
-		else if (!isUpperCase_WW(strT[templateIndex]) & isUpperCase_WW(strP[primerIndex])){
+		
+
+		// If only one is uppercase then skip the other one
+		else if (isupper(templateString[templateIndex]) && !isupper(nascentString[nascentIndex])){
+			nascentIndex++;
+		}
+		else if (!isupper(templateString[templateIndex]) && isupper(nascentString[nascentIndex])){
 			templateIndex++;
 		}
 		
 		
 		// If neither are uppercase then skip both
-		else if (!isUpperCase_WW(strT[templateIndex]) && !isUpperCase_WW(strP[primerIndex])){
+		else if (!isupper(templateString[templateIndex]) && !isupper(nascentString[nascentIndex])){
 			templateIndex++;
-			primerIndex++;
-		}*/
+			nascentIndex++;
+		}
 
 		
 	}

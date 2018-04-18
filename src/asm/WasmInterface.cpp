@@ -210,6 +210,22 @@ extern "C" {
 		messageFromWasmToJS("", msgID);
 	}
 
+	// Form / diffuse / fuse / fissure / absorb bulge with id S to the left
+	void EMSCRIPTEN_KEEPALIVE slipLeft(int S, int msgID){
+		_applyingReactionsGUI = true;
+		_currentStateGUI->slipLeft(S);
+		_applyingReactionsGUI = false;
+		messageFromWasmToJS("", msgID);
+	}
+
+	// Form / diffuse / fuse / fissure / absorb bulge with id S to the right
+	void EMSCRIPTEN_KEEPALIVE slipRight(int S, int msgID){
+		_applyingReactionsGUI = true;
+		_currentStateGUI->slipRight(S);
+		_applyingReactionsGUI = false;
+		messageFromWasmToJS("", msgID);
+	}
+
 
 
 
@@ -219,9 +235,9 @@ extern "C" {
 
 		double kBck = _currentStateGUI->calculateBackwardRate(true, false);
 		double kFwd = _currentStateGUI->calculateForwardRate(true, false);
-		bool bckBtnActive = _currentStateGUI->getLeftBaseNumber() - bubbleLeft->getVal() - 1 > 2; // Do not allow backstepping if it will break the 3' bubble
-		bool fwdBtnActive = _currentStateGUI->getLeftBaseNumber() < templateSequence.length(); // Do not going forward if beyond the end of the sequence
-		string fwdBtnLabel = !_currentStateGUI->isTerminated() && _currentStateGUI->getLeftBaseNumber() >= _currentStateGUI->get_nascentLength() ? "Terminate" : "Forward";
+		bool bckBtnActive = _currentStateGUI->getLeftTemplateBaseNumber() - bubbleLeft->getVal() - 1 > 2; // Do not allow backstepping if it will break the 3' bubble
+		bool fwdBtnActive = _currentStateGUI->getLeftTemplateBaseNumber() < templateSequence.length(); // Do not going forward if beyond the end of the sequence
+		string fwdBtnLabel = !_currentStateGUI->isTerminated() && _currentStateGUI->getLeftTemplateBaseNumber() >= _currentStateGUI->get_nascentLength() ? "Terminate" : "Forward";
 
 		// Build the JSON string
 		string translocationJSON = "{";
@@ -291,6 +307,34 @@ extern "C" {
 		messageFromWasmToJS(activationJSON, msgID);
 
 	}
+
+
+	// Returns all data needed to draw the slippage navigation canvas
+	void EMSCRIPTEN_KEEPALIVE getSlippageCanvasData(int S, int msgID){
+
+
+		State* stateLeft = _currentStateGUI->clone();
+		State* stateRight = _currentStateGUI->clone();
+		stateLeft->slipLeft(S);
+		stateRight->slipRight(S);
+
+		// Return the 3 states, the 2 button names and the hybrid length
+		//var toReturn = {stateMiddle: stateMiddle, stateLeft: stateLeft, stateRight:stateRight, 
+
+
+		string slippageJSON = "{";
+		slippageJSON += "'stateMiddle':" + _currentStateGUI->toJSON() + ",";
+		slippageJSON += "'stateLeft':" + stateLeft->toJSON() + ",";
+		slippageJSON += "'stateRight':" + stateRight->toJSON() + ",";
+		slippageJSON += "'leftLabel':" + _currentStateGUI->getSlipLeftLabel(S) + ",";
+		slippageJSON += "'rightLabel':" + _currentStateGUI->getSlipRightLabel(S) + ",";
+		slippageJSON += "'hybridLen':" + to_string(hybridLen->getVal());
+		slippageJSON += "}";
+		messageFromWasmToJS(slippageJSON, msgID);
+
+	}
+
+ 
 
 
 	// Returns the trough and peak heights of the translocation energy landscape
@@ -454,10 +498,22 @@ extern "C" {
 		if (ntpToAdd_str == "T" && PrimerType.substr(2) == "RNA") ntpToAdd_str = "U";
 		else if (ntpToAdd_str == "U" && PrimerType.substr(2) == "DNA") ntpToAdd_str = "T";
 
-
 		_currentStateGUI->setNextBaseToAdd(ntpToAdd_str);
 		messageFromWasmToJS("", msgID);
 	}
+
+
+
+	// Gets the next base to add 
+	void EMSCRIPTEN_KEEPALIVE getNextBaseToAdd(int msgID){
+
+		// Build the JSON string
+		string baseToAdd = _currentStateGUI->getNextBaseToAdd() != "" ? _currentStateGUI->getNextBaseToAdd() : Settings::complementSeq(templateSequence.substr(_currentStateGUI->get_nextTemplateBaseToCopy()-1, 1), PrimerType.substr(2) == "RNA");
+		string baseToAddJSON = "{'NTPtoAdd':'" + baseToAdd + "'}";
+		messageFromWasmToJS(baseToAddJSON, msgID);
+
+	}
+
 
 
 

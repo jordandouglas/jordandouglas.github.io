@@ -183,6 +183,7 @@ class Settings{
 
     	static void sortedPush(std::vector<int> &cont, int value);
     	static void sortedPush(std::vector<double> &cont, double value);
+    	static int indexOf(deque<int> arr, int val);
 
 };
 

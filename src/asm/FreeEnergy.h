@@ -39,8 +39,8 @@ class FreeEnergy{
 		static map<std::string, double> basepairingEnergy;
 		static vector<string> getHybridString(State* s);
 		static vector<string> getHybridStringOfTranscriptionBubble(int leftmostTemplatePos, int rightmostTemplatePos, int leftmostComplementPos, int rightmostComplementPos);
-		static vector<string> getHybridIntermediateString(vector<string> hybridStrings1, vector<string> hybridStrings2, int left1, int left2);
-		static list<string> getBasePairs(string templateString, string nascentString, int leftT);
+		static vector<string> getHybridIntermediateString(vector<string> hybridStrings1, vector<string> hybridStrings2, int leftTemplate1, int leftNascent1, int leftTemplate2, int leftNascent2);
+		static list<string> getBasePairs(string templateString, string nascentString, int leftT, int leftN);
 		static double getHybridFreeEnergy(string templateString, string nascentString, string templateType, string nascentType);
 		static double getFreeEnergyOfTranscriptionBubbleHybridString(string templateString, string complementString, string templateType);
 

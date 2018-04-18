@@ -166,7 +166,7 @@ void Plots::refreshPlotData(State* state){
 
 
 		// Initial distance and time for this simulation
-		int rightHybridBase = state->getRightBaseNumber();
+		int rightHybridBase = state->getRightTemplateBaseNumber();
 	
 		vector<double> distanceTime(3);
 		distanceTime.at(0) = rightHybridBase; // Distance (nt)
@@ -265,7 +265,7 @@ void Plots::updateParameterPlotData(State* state){
 void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) {
 
 
-	int rightHybridBase = state->getRightBaseNumber();
+	int rightHybridBase = state->getRightTemplateBaseNumber();
 	int numActions = sizeof(actionsToDo) / sizeof(actionsToDo[0]);
 	int lastAction = actionsToDo[numActions-1]; // The last element in the list was a kinetic action. 
 												// Reactions before it were all equilibrium ones
@@ -292,7 +292,6 @@ void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) 
 
 	if (thereWasATranslocation) {
 
-		//cout << "Updating plot data " << reactionTime << ", " << rightHybridBase << " state->getRightBaseNumber() " << state->getRightBaseNumber() << " state->get_mRNAPosInActiveSite() " << state->get_mRNAPosInActiveSite() << endl;
 		if (Plots::distanceVsTimeSize < Plots::distanceVsTimeSizeMax) { // Maximum size of the distance vs time object
 
 
@@ -740,7 +739,7 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 
 
 		// Initial distance and time for this simulation
-		int rightHybridBase = stateToInitFor->getRightBaseNumber();
+		int rightHybridBase = stateToInitFor->getRightTemplateBaseNumber();
 	
 		vector<double> distanceTime(3);
 		distanceTime.at(0) = rightHybridBase; // Distance (nt)

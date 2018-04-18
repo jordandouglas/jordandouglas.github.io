@@ -1015,7 +1015,7 @@ function getHybridString_WW(state){
 
 
 		// If we are interested in the rightmost base but NTP is bound then exit
-		if (Mbase == state["rightMBase"] && state["NTPbound"]) break;
+		//if (Mbase == state["rightMBase"] && state["NTPbound"]) break;
 		
 		var GbaseGroup = WW_JS.getBaseInSequenceAtPosition_WW("g" + Gbase);
 		
@@ -1439,7 +1439,7 @@ function getSlipRightLabel_WW(state, S){
 
 
 	if (state["terminated"]) label = "";
-	else if (allowMultipleBulges && state["partOfBulgeID"][S] != i && state["bulgePos"][ state["partOfBulgeID"][S] ] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) toReturn = {label: ""};
+	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) toReturn = {label: ""};
 	else if (allowMultipleBulges && state["partOfBulgeID"][S] != S) toReturn = {label: "Fissure"};
 	else if (!state["NTPbound"] && state["partOfBulgeID"][S] == S && state["bulgePos"][S] - Math.max(0, state["mRNAPosInActiveSite"]) == 1) toReturn = {label: "Absorb", title: "Absorb the bulge at the left end of the hybrid (ctrl + &rarr;)"};	
 	else if (allowMultipleBulges && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] - 1) != -1) toReturn = {label: "Fuse"};	

@@ -754,16 +754,26 @@ function getPlotData_controller(forceUpdate = false, resolve){
 function setNextBaseToAdd_controller(){
 
 
-	var setNTP_resolve = function(dict) { setNTP(dict["NTPtoAdd"]) };
+	var setNTP_resolve = function(dict) {
+		setNTP(dict["NTPtoAdd"]) 
+	};
 
 
 	if (WEB_WORKER == null) {
 		var toCall = () => new Promise((resolve) => WW_JS.setNextBaseToAdd_WW(resolve, null));
 		toCall().then((dict) => setNTP_resolve(dict));
 
-	}else{
+	}else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("WW_JS.setNextBaseToAdd_WW", [null], true);
 		var fnStr = res[0];
+		var msgID = res[1];
+		//console.log("Sending function: " + fnStr);
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall(fnStr).then((dict) => setNTP_resolve(dict));
+
+	}else{
+		var res = stringifyFunction("getNextBaseToAdd", [], true);
+		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -1638,28 +1648,30 @@ function slip_left_controller(S = 0, state = null, UPDATE_COORDS = true, resolve
 
 	var updateDOM = function(DOMupdates){
 
-		
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(-1, S);
 		renderObjects();
 
+		if (DOMupdates != null) {
 
-		// Create any new slippage landscapes that are required
-		for (var i = 0; i < DOMupdates["where_to_create_new_slipping_landscape"].length; i ++){
-			create_new_slipping_landscape(DOMupdates["where_to_create_new_slipping_landscape"][i]);
-		}
-
-
-		// Reset slippage landscapes
-		for (var i = 0; i < DOMupdates["landscapes_to_reset"].length; i ++){
-			reset_slipping_landscape(DOMupdates["landscapes_to_reset"][i]);
-		}
+			// Create any new slippage landscapes that are required
+			for (var i = 0; i < DOMupdates["where_to_create_new_slipping_landscape"].length; i ++){
+				create_new_slipping_landscape(DOMupdates["where_to_create_new_slipping_landscape"][i]);
+			}
 
 
-		// Delete slippage landscapes
-		for (var i = 0; i < DOMupdates["landscapes_to_delete"].length; i ++){
-			delete_slipping_landscape(DOMupdates["landscapes_to_delete"][i]);
+			// Reset slippage landscapes
+			for (var i = 0; i < DOMupdates["landscapes_to_reset"].length; i ++){
+				reset_slipping_landscape(DOMupdates["landscapes_to_reset"][i]);
+			}
+
+
+			// Delete slippage landscapes
+			for (var i = 0; i < DOMupdates["landscapes_to_delete"].length; i ++){
+				delete_slipping_landscape(DOMupdates["landscapes_to_delete"][i]);
+			}
+
 		}
 
 
@@ -1674,7 +1686,7 @@ function slip_left_controller(S = 0, state = null, UPDATE_COORDS = true, resolve
 
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("OPS_JS.slip_left_WW", [state, UPDATE_COORDS, S, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
@@ -1682,6 +1694,18 @@ function slip_left_controller(S = 0, state = null, UPDATE_COORDS = true, resolve
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => updateDOM(result));
 
+	}
+
+	else{
+		
+		var res = stringifyFunction("slipLeft", [S], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		//console.log("Sending function: " + fnStr);
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then(() => updateDOM());
+
+		
 	}
 
 
@@ -1704,21 +1728,26 @@ function slip_right_controller(S = 0, state = null, UPDATE_COORDS = true, resolv
 		update_slipping_curve(1, S);
 		renderObjects();
 
-		// Create any new slippage landscapes that are required
-		for (var i = 0; i < DOMupdates["where_to_create_new_slipping_landscape"].length; i ++){
-			create_new_slipping_landscape(DOMupdates["where_to_create_new_slipping_landscape"][i]);
-		}
+
+		if (DOMupdates != null) {
+
+			// Create any new slippage landscapes that are required
+			for (var i = 0; i < DOMupdates["where_to_create_new_slipping_landscape"].length; i ++){
+				create_new_slipping_landscape(DOMupdates["where_to_create_new_slipping_landscape"][i]);
+			}
 
 
-		// Reset slippage landscapes
-		for (var i = 0; i < DOMupdates["landscapes_to_reset"].length; i ++){
-			reset_slipping_landscape(DOMupdates["landscapes_to_reset"][i]);
-		}
+			// Reset slippage landscapes
+			for (var i = 0; i < DOMupdates["landscapes_to_reset"].length; i ++){
+				reset_slipping_landscape(DOMupdates["landscapes_to_reset"][i]);
+			}
 
 
-		// Delete slippage landscapes
-		for (var i = 0; i < DOMupdates["landscapes_to_delete"].length; i ++){
-			delete_slipping_landscape(DOMupdates["landscapes_to_delete"][i]);
+			// Delete slippage landscapes
+			for (var i = 0; i < DOMupdates["landscapes_to_delete"].length; i ++){
+				delete_slipping_landscape(DOMupdates["landscapes_to_delete"][i]);
+			}
+
 		}
 
 
@@ -1733,7 +1762,7 @@ function slip_right_controller(S = 0, state = null, UPDATE_COORDS = true, resolv
 
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("OPS_JS.slip_right_WW", [state, UPDATE_COORDS, S, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
@@ -1742,6 +1771,19 @@ function slip_right_controller(S = 0, state = null, UPDATE_COORDS = true, resolv
 		toCall().then((result) => updateDOM(result));
 
 	}
+
+	else {
+		
+		var res = stringifyFunction("slipRight", [S], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		//console.log("Sending function: " + fnStr);
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then(() => updateDOM());
+
+		
+	}
+
 
 
 }
@@ -2059,7 +2101,7 @@ function getSlippageCanvasData_controller(S = 0, resolve = function(result){}){
 		toCall().then((result) => resolve(result));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("FE_JS.getSlippageCanvasData_WW", [S, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
@@ -2068,6 +2110,14 @@ function getSlippageCanvasData_controller(S = 0, resolve = function(result){}){
 
 	}
 
+	else {
+		var res = stringifyFunction("getSlippageCanvasData", [S], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
+	}
 
 
 }
@@ -2184,7 +2234,7 @@ function startTrials_controller(){
 				
 				//drawPlotsFromData(result.plots);
 				drawPlots();
-
+				setNextBaseToAdd_controller();
 
 				var toDoAfterObjectRender = function() {
 

@@ -204,7 +204,7 @@ void Coordinates::generateAllCoordinates(State* state){
 	
 
 	// Coordinates of pol
-	double polX = 165 + 25*state->getLeftBaseNumber(); 
+	double polX = 165 + 25*state->getLeftNascentBaseNumber(); 
 	double polY = 81;
 
 	Coordinates::move_obj_absolute("pol", polX, polY);
@@ -626,6 +626,116 @@ void Coordinates::updateForceEquipment(double newForce, double oldForce){
 		Coordinates::remove_force_equipment();
 		Coordinates::add_force_equipment(newForce);
 	}
+
+
+}
+
+
+
+void Coordinates::position_bulge(int startBaseNum, int startBaseXVal, int bulgeSize, bool inPrimer, int skip){
+
+
+	
+	string thisStrandSymbol = inPrimer ? "m" : "g";
+	string otherStrandSymbol = inPrimer ? "g" : "m";
+	double yHeight = 155;
+	
+
+	
+	// Flip the bases so that the bulged bases are facing outwards and the pairing bases are facing inwards
+	if(skip == 0) Coordinates::flip_base((startBaseNum), thisStrandSymbol, thisStrandSymbol);
+	if(skip == 0) Coordinates::flip_base((startBaseNum+bulgeSize+1), thisStrandSymbol, thisStrandSymbol);
+	for (int bPos = startBaseNum + 1; bPos <= startBaseNum + bulgeSize; bPos ++){
+		Coordinates::flip_base(bPos, thisStrandSymbol, otherStrandSymbol);
+	}
+	
+	
+	if(skip == 0) Coordinates::move_nt_absolute(startBaseNum, thisStrandSymbol, startBaseXVal, yHeight);
+	else Coordinates::move_nt_absolute(startBaseNum, thisStrandSymbol, startBaseXVal, Coordinates::getNucleotide(startBaseNum, thisStrandSymbol)->getY()); // Move it to its correct x coordinate but leave at its y one
+	
+	if(skip == 0) Coordinates::move_nt_absolute(startBaseNum+bulgeSize+1, thisStrandSymbol, startBaseXVal+25, yHeight);
+	else Coordinates::move_nt_absolute(startBaseNum+bulgeSize+1, thisStrandSymbol, startBaseXVal+25, Coordinates::getNucleotide(startBaseNum+bulgeSize+1, thisStrandSymbol)->getY()); // Move it to its correct x coordinate but leave at its y one
+	
+
+	// Bulge size 1
+	if (bulgeSize == 1){
+		Coordinates::move_nt_absolute(startBaseNum+1, thisStrandSymbol, startBaseXVal+13, yHeight + 25);
+	}
+	
+	
+	// Bulge size 2
+	else if (bulgeSize == 2){
+		Coordinates::move_nt_absolute(startBaseNum+1, thisStrandSymbol, startBaseXVal+3, yHeight + 25);
+		Coordinates::move_nt_absolute(startBaseNum+2, thisStrandSymbol, startBaseXVal+22, yHeight + 25);
+	}
+	
+	
+	// Bulge size 3
+	else if (bulgeSize == 3){
+		Coordinates::move_nt_absolute(startBaseNum+1, thisStrandSymbol, startBaseXVal+2, yHeight + 25);
+		Coordinates::move_nt_absolute(startBaseNum+2, thisStrandSymbol, startBaseXVal+12, yHeight + 50);
+		Coordinates::move_nt_absolute(startBaseNum+3, thisStrandSymbol, startBaseXVal+23, yHeight + 25);
+	}
+	
+	
+	// Bulge size 4
+	else if (bulgeSize == 4){
+		Coordinates::move_nt_absolute(startBaseNum+1, thisStrandSymbol, startBaseXVal-5, yHeight + 25);
+		Coordinates::move_nt_absolute(startBaseNum+2, thisStrandSymbol, startBaseXVal+2, yHeight + 50);
+		Coordinates::move_nt_absolute(startBaseNum+3, thisStrandSymbol, startBaseXVal+23, yHeight + 50);
+		Coordinates::move_nt_absolute(startBaseNum+4, thisStrandSymbol, startBaseXVal+30, yHeight + 25);
+	}
+	
+	
+	// Bulge size 5
+	else if (bulgeSize == 5){
+		Coordinates::move_nt_absolute(startBaseNum+1, thisStrandSymbol, startBaseXVal-7, yHeight + 25);
+		Coordinates::move_nt_absolute(startBaseNum+2, thisStrandSymbol, startBaseXVal, yHeight + 48);
+		Coordinates::move_nt_absolute(startBaseNum+3, thisStrandSymbol, startBaseXVal+12, yHeight + 68);
+		Coordinates::move_nt_absolute(startBaseNum+4, thisStrandSymbol, startBaseXVal+25, yHeight + 48);
+		Coordinates::move_nt_absolute(startBaseNum+5, thisStrandSymbol, startBaseXVal+32, yHeight + 25);
+	}
+	
+	
+	// Bulge size 6
+	else if (bulgeSize == 6){
+		Coordinates::move_nt_absolute(startBaseNum+1, thisStrandSymbol, startBaseXVal, yHeight + 25);
+		Coordinates::move_nt_absolute(startBaseNum+2, thisStrandSymbol, startBaseXVal-7, yHeight + 48);
+		Coordinates::move_nt_absolute(startBaseNum+3, thisStrandSymbol, startBaseXVal, yHeight + 68);
+		Coordinates::move_nt_absolute(startBaseNum+4, thisStrandSymbol, startBaseXVal+25, yHeight + 68);
+		Coordinates::move_nt_absolute(startBaseNum+5, thisStrandSymbol, startBaseXVal+32, yHeight + 48);
+		Coordinates::move_nt_absolute(startBaseNum+6, thisStrandSymbol, startBaseXVal+25, yHeight + 25);
+	}
+	
+	
+	else if (bulgeSize > 6){
+		
+		Coordinates::move_nt_absolute(startBaseNum+1, thisStrandSymbol, startBaseXVal, yHeight + 25);
+		Coordinates::move_nt_absolute(startBaseNum+bulgeSize, thisStrandSymbol, startBaseXVal+25, yHeight + 25);
+		
+		for (int i = 1; i < floor((bulgeSize - 1) / 2); i ++){
+			Coordinates::move_nt_absolute(startBaseNum+1+i, thisStrandSymbol, startBaseXVal-7, yHeight + 25 + (20*i));
+			Coordinates::move_nt_absolute(startBaseNum+bulgeSize-i, thisStrandSymbol, startBaseXVal+32, yHeight + 25 + (20*i));
+		}
+		
+		// Even size
+		if (bulgeSize % 2 == 0){
+			
+			int tipOfBulge = floor((bulgeSize - 1) / 2) + 1;
+			Coordinates::move_nt_absolute(startBaseNum+tipOfBulge, thisStrandSymbol, startBaseXVal, yHeight + tipOfBulge*20);
+			Coordinates::move_nt_absolute(startBaseNum+tipOfBulge+1, thisStrandSymbol, startBaseXVal+25, yHeight + tipOfBulge*20);
+			
+			
+		}else{ // Odd size
+			
+			int tipOfBulge = floor((bulgeSize - 1) / 2) + 1;
+			Coordinates::move_nt_absolute(startBaseNum+tipOfBulge, thisStrandSymbol, startBaseXVal + 12, yHeight + tipOfBulge*20);
+			
+		}
+
+		
+	}
+
 
 
 }

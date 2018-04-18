@@ -26,6 +26,7 @@
 
 #include <string>
 #include <list>
+#include <deque>
 
 
 using namespace std;
@@ -38,12 +39,41 @@ class State{
 	int mRNAPosInActiveSite;
 	string boundNTP;
 	string NTPtoAdd;
+	bool activated;
+
 	bool terminated;
 	int nextTemplateBaseToCopy;
-	bool activated;
 
 	bool isGuiState;
 	bool thereHaveBeenMutations;
+
+
+	// Left and right base numbers in the hybrid. The template and nascent left / right may not be the same due to slippage
+	int leftTemplateBase;
+	int rightTemplateBase;
+	int leftNascentBase;
+	int rightNascentBase;
+
+
+	// Information on bulges
+	deque<int> bulgePos;
+	deque<int> bulgedBase;
+	deque<int> bulgeSize;
+	deque<int> partOfBulgeID;
+
+
+	// Private slippage
+	void diffuse_left(int S, string DOMupdates);
+	void diffuse_right(int S, string DOMupdates);
+	void form_bulge(int S, bool form_left, string DOMupdates);
+	void absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, string DOMupdates); 
+
+	// Bulge management
+	int create_new_slipping_params();
+	void reset_slipping_params(int S);
+	int delete_slipping_params(int S);
+	int get_fissure_landscape_of(int S);
+
 
 
     public:
@@ -54,6 +84,7 @@ class State{
     	State* setToInitialState();
     	State* transcribe(int N);
     	list<int> getTranscribeActions(int N);
+    	string toJSON();
 
 
     	// Reactions and their rates
@@ -78,6 +109,10 @@ class State{
 		State* cleave();
 		double calculateCleavageRate(bool ignoreStateRestrictions);
 
+		State* slipLeft(int S);
+		State* slipRight(int S);
+		string getSlipLeftLabel(int S);
+		string getSlipRightLabel(int S);
 
 
 		void setNextBaseToAdd(string baseToAdd);
@@ -93,16 +128,13 @@ class State{
 
 		int getLeftNascentBaseNumber();
 		int getLeftTemplateBaseNumber();
-		int getLeftBaseNumber();
 		int getRightNascentBaseNumber();
 		int getRightTemplateBaseNumber();
-		int getRightBaseNumber();
 
 		int get_nextTemplateBaseToCopy();
 		bool get_activated();
 
 
-		void set_mRNAPosInActiveSite(int newVal);
 		void set_terminated(bool newVal);
 
 		// Free energy calculations

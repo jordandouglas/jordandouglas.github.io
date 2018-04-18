@@ -558,6 +558,20 @@ userSetNextBaseToAdd = function(ntpToAdd, msgID = null){
 }
 
 
+// Gets the next base to add 
+getNextBaseToAdd = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	Module.ccall("getNextBaseToAdd", null, ["number"], [msgID]);
+
+
+}
+
+
 // Returns an object which contains the sizes of each object in the cache that can be cleared
 getCacheSizes = function(msgID = null){
 
@@ -794,6 +808,32 @@ cleaveNascentStrand = function(msgID = null){
 }
 
 
+// Form / diffuse / fuse / fissure / absorb bulge with id S to the left
+slipLeft = function(S = 0, msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(){
+		if (msgID != null) postMessage(msgID + "~X~done");
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	Module.ccall("slipLeft", null, ["number", "number"], [S, msgID]);
+
+}
+
+
+// Form / diffuse / fuse / fissure / absorb bulge with id S to the right
+slipRight = function(S = 0, msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(){
+		if (msgID != null) postMessage(msgID + "~X~done");
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	Module.ccall("slipRight", null, ["number", "number"], [S, msgID]);
+
+}
+
+
 
 // Returns all data needed to draw the translocation navigation canvas
 getTranslocationCanvasData = function(msgID = null){
@@ -850,6 +890,22 @@ getCleavageCanvasData = function(msgID = null){
 	Module.ccall("getCleavageCanvasData", null, ["number"], [msgID]);
 
 }
+
+
+// Returns all data needed to draw the slippage navigation canvas
+getSlippageCanvasData = function(S = 0, msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log("resultStr", resultStr);
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("getSlippageCanvasData", null, ["number", "number"], [S, msgID]);
+
+}
+
 
 
 

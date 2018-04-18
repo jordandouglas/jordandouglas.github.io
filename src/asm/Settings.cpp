@@ -772,4 +772,9 @@ void Settings::sortedPush(std::vector<double> &cont, double value) {
 }
 
 
-
+int Settings::indexOf(deque<int> arr, int val){
+	for (int i = 0; i < arr.size(); i ++){
+		if (arr.at(i) == val) return i;
+	}
+	return -1;
+}

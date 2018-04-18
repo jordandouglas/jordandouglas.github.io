@@ -35,6 +35,7 @@
 #include <locale>
 #include <algorithm>
 #include <iomanip>
+#include <deque>
 
 using namespace std;
 
@@ -74,6 +75,20 @@ State* State::setToInitialState(){
 	this->activated = true;
 	this->thereHaveBeenMutations = false;
 
+
+	// Which base number is on left and right side of hybrid
+	this->leftTemplateBase = 0;
+	this->rightTemplateBase = sequenceLength;
+	this->leftNascentBase = 0;
+	this->rightNascentBase = sequenceLength;
+
+
+	// Information on the position and size of each bulge, and the bases each bulge contains
+	this->bulgePos.push_back(0);
+	this->bulgedBase.push_back(-1);
+	this->bulgeSize.push_back(0);
+	this->partOfBulgeID.push_back(0);
+
 	
 	// Transcribe a few bases forward to avoid left bubble effects
 	this->transcribe(_nBasesToTranscribeInit + max(2, (int)(bubbleLeft->getVal())));
@@ -92,7 +107,46 @@ State* State::clone(){
 	s->activated = this->activated;
 	s->nextTemplateBaseToCopy = this->nextTemplateBaseToCopy;
 	s->thereHaveBeenMutations = this->thereHaveBeenMutations;
+	s->leftTemplateBase = this->leftTemplateBase;
+	s->rightTemplateBase = this->rightTemplateBase;
+	s->leftNascentBase = this->leftNascentBase;
+	s->rightNascentBase = this->rightNascentBase;
+
+
+	// Clone the vectors
+	s->bulgePos = bulgePos;
+	s->bulgedBase = bulgedBase;
+	s->bulgeSize = bulgeSize;
+	s->partOfBulgeID = partOfBulgeID;
+
+
 	return s;
+
+}
+
+string State::toJSON(){
+
+	string JSON = "{";
+
+	JSON += "'mRNAPosInActiveSite':" + to_string(this->mRNAPosInActiveSite) + ",";
+	JSON += "'leftTemplateBase':" + to_string(this->leftTemplateBase) + ",";
+	JSON += "'rightTemplateBase':" + to_string(this->rightTemplateBase) + ",";
+	JSON += "'leftNascentBase':" + to_string(this->leftNascentBase) + ",";
+	JSON += "'rightNascentBase':" + to_string(this->rightNascentBase) + ",";
+	JSON += "'NTPbound':" + string(this->NTPbound() ? "true" : "false") + ",";
+	JSON += "'activated':" + string(this->activated ? "true" : "false") + ",";
+	JSON += "'terminated':" + string(this->terminated ? "true" : "false") + ",";
+
+
+	JSON += "'bulgePos':[";
+	for (int i = 0; i < this->bulgePos.size(); i ++){
+		JSON += to_string(this->bulgePos.at(i));
+		if (i < this->bulgePos.size() - 1) JSON += ",";
+	}
+	JSON += "]";
+
+	JSON += "}";
+	return JSON;
 
 }
 
@@ -206,6 +260,19 @@ State* State::forward(){
 
 	//if (this->terminated) return this;
 
+
+	// If bulge will move too far to the left then absorb it
+	string DOMupdates = "";
+
+
+	for (int s = 0; s < this->bulgePos.size(); s++){
+		if (this->partOfBulgeID.at(s) != s) continue;
+		if (this->bulgePos.at(s) > 0 && this->bulgePos.at(s) == hybridLen->getVal() - 1) this->absorb_bulge(s, false, true, DOMupdates);
+		if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) ++;
+	}
+
+
+
 	// Update coordinates if this state is being displayed by the GUI (and not hidden mode)
 	if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden") {
 
@@ -214,9 +281,8 @@ State* State::forward(){
 		Coordinates::move_obj_from_id("pol", 25, 0);
 
 		double shiftBaseBy = -52/(bubbleLeft->getVal()+1);
-	
-		for (int i = this->getLeftBaseNumber(); i > this->getLeftBaseNumber() - (bubbleLeft->getVal()+1) && i >= 0; i--) {
-			if (i == this->getLeftBaseNumber() - (bubbleLeft->getVal()+1) + 1){
+		for (int i = this->getLeftTemplateBaseNumber(); i > this->getLeftTemplateBaseNumber() - (bubbleLeft->getVal()+1) && i >= 0; i--) {
+			if (i == this->getLeftTemplateBaseNumber() - (bubbleLeft->getVal()+1) + 1){
 				if (PrimerType.substr(0,2) != "ds") {
 					Coordinates::move_nt(i, "g", 0, shiftBaseBy);
 					Coordinates::move_nt(i, "o", 0, -shiftBaseBy/2);
@@ -237,9 +303,9 @@ State* State::forward(){
 
 
 		shiftBaseBy = 52/(bubbleRight->getVal()+1);
-		for (int i = this->getRightBaseNumber() + 1; i < this->getRightBaseNumber() + (bubbleRight->getVal()+1) + 1; i++) {
+		for (int i = this->getRightTemplateBaseNumber() + 1; i < this->getRightTemplateBaseNumber() + (bubbleRight->getVal()+1) + 1; i++) {
 
-			if (i == this->getRightBaseNumber() + (bubbleRight->getVal()+1)) {
+			if (i == this->getRightTemplateBaseNumber() + (bubbleRight->getVal()+1)) {
 				Coordinates::move_nt(i, "g", 0, shiftBaseBy);
 				Coordinates::move_nt(i, "o", 0, -shiftBaseBy/2);
 			}
@@ -256,8 +322,8 @@ State* State::forward(){
 
 
 		// Move mRNA bases
-		if (PrimerType.substr(0,2) != "ds") for (int i = this->getLeftBaseNumber(); i > this->getLeftBaseNumber() - (bubbleLeft->getVal()+1) && i >= 0; i--) Coordinates::move_nt(i, "m", 0, +52/(bubbleLeft->getVal()+1));
-		for (int i = this->getRightBaseNumber() + 1; i < this->getRightBaseNumber() + (bubbleRight->getVal()+1) + 1; i++) Coordinates::move_nt(i, "m", 0, -52/(bubbleRight->getVal()+1));
+		if (PrimerType.substr(0,2) != "ds") for (int i = this->getLeftNascentBaseNumber(); i > this->getLeftNascentBaseNumber() - (bubbleLeft->getVal()+1) && i >= 0; i--) Coordinates::move_nt(i, "m", 0, +52/(bubbleLeft->getVal()+1));
+		for (int i = this->getRightNascentBaseNumber() + 1; i < this->getRightNascentBaseNumber() + (bubbleRight->getVal()+1) + 1; i++) Coordinates::move_nt(i, "m", 0, -52/(bubbleRight->getVal()+1));
 	
 
 		// Remove NTP
@@ -277,8 +343,17 @@ State* State::forward(){
 
 	}
 
+	// Only move forward if NTP is not bound
+	if (!this->NTPbound()) {
 
-	if (!this->NTPbound()) this->mRNAPosInActiveSite ++; // Only move forward if NTP is not bound
+		this->mRNAPosInActiveSite ++; 
+		this->leftTemplateBase ++; 
+		this->rightTemplateBase ++; 
+		this->leftNascentBase ++; 
+		this->rightNascentBase ++; 
+
+	}
+
 	if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal()-1) ||
 		(this->mRNAPosInActiveSite <= 1 && this->mRNAPosInActiveSite + this->get_nascentLength() > templateSequence.length())) this->terminate();
 
@@ -368,7 +443,19 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 
 State* State::backward(){
 	//if (this->terminated) return this;
-	if (this->getLeftBaseNumber() < 1 || this->getLeftBaseNumber() - bubbleLeft->getVal() -1 <= 2) return this;
+	if (this->getLeftTemplateBaseNumber() < 1 || this->getLeftTemplateBaseNumber() - bubbleLeft->getVal() -1 <= 2) return this;
+
+
+
+	// If bulge will move too far to the left then absorb it
+	string DOMupdates = "";
+
+	for (int s = 0; s < this->bulgePos.size(); s++){
+		if (this->partOfBulgeID.at(s) != s) continue;
+		if (this->bulgedBase.at(s) == this->rightNascentBase - 1) this->absorb_bulge(s, true, true, DOMupdates);
+		if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) --;
+	}
+
 
 	// Update coordinates if this state is being displayed by the GUI
 	if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden") {
@@ -380,9 +467,9 @@ State* State::backward(){
 
 		// Move genome bases
 		double shiftBaseBy = 52/(bubbleLeft->getVal()+1);
-		for (int i = this->getLeftBaseNumber() - 1; i > this->getLeftBaseNumber() - (bubbleLeft->getVal()+1) - 1 && i >= 0; i--) {
+		for (int i = this->getLeftTemplateBaseNumber() - 1; i > this->getLeftTemplateBaseNumber() - (bubbleLeft->getVal()+1) - 1 && i >= 0; i--) {
 
-			if (i == this->getLeftBaseNumber() - (bubbleLeft->getVal()+1)) {
+			if (i == this->getLeftTemplateBaseNumber() - (bubbleLeft->getVal()+1)) {
 				if (PrimerType.substr(0,2) != "ds") Coordinates::move_nt(i, "g", 0, shiftBaseBy);
 				if (PrimerType.substr(0,2) != "ds") Coordinates::move_nt(i, "o", 0, -shiftBaseBy/2);
 			}
@@ -400,9 +487,9 @@ State* State::backward(){
 	
 		
 		shiftBaseBy = -52/(bubbleRight->getVal()+1);
-		for (int i = this->getRightBaseNumber(); i < this->getRightBaseNumber() + (bubbleRight->getVal()+1); i++) {
+		for (int i = this->getRightTemplateBaseNumber(); i < this->getRightTemplateBaseNumber() + (bubbleRight->getVal()+1); i++) {
 
-			if (i == this->getRightBaseNumber() + (bubbleRight->getVal()+1) - 1) {
+			if (i == this->getRightTemplateBaseNumber() + (bubbleRight->getVal()+1) - 1) {
 				Coordinates::move_nt(i, "g", 0, shiftBaseBy);
 				Coordinates::move_nt(i, "o", 0, -shiftBaseBy/2);
 			}
@@ -420,8 +507,8 @@ State* State::backward(){
 
 
 		// Move mRNA bases
-		if (PrimerType.substr(0,2) != "ds") for (int i = this->getLeftBaseNumber() - 1;i > this->getLeftBaseNumber() - (bubbleLeft->getVal()+1) - 1 && i >= 0; i--) Coordinates::move_nt(i, "m", 0, -52/(bubbleLeft->getVal()+1));
-		for (int i = this->getRightBaseNumber(); i < this->getRightBaseNumber() + (bubbleRight->getVal()+1); i++) Coordinates::move_nt(i, "m", 0, +52/(bubbleRight->getVal()+1));
+		if (PrimerType.substr(0,2) != "ds") for (int i = this->getLeftNascentBaseNumber() - 1;i > this->getLeftNascentBaseNumber() - (bubbleLeft->getVal()+1) - 1 && i >= 0; i--) Coordinates::move_nt(i, "m", 0, -52/(bubbleLeft->getVal()+1));
+		for (int i = this->getRightNascentBaseNumber(); i < this->getRightNascentBaseNumber() + (bubbleRight->getVal()+1); i++) Coordinates::move_nt(i, "m", 0, +52/(bubbleRight->getVal()+1));
 
 
 		// Remove NTP
@@ -441,7 +528,14 @@ State* State::backward(){
 	}
 
 
-	if (!this->NTPbound()) this->mRNAPosInActiveSite --; // Only move backwards if NTP is not bound
+	if (!this->NTPbound()) {  // Only move backwards if NTP is not bound
+
+		this->mRNAPosInActiveSite --;
+		this->leftTemplateBase --; 
+		this->rightTemplateBase --; 
+		this->leftNascentBase --; 
+		this->rightNascentBase --; 
+	}
 
 	return this;
 }
@@ -497,11 +591,11 @@ State* State::bindNTP(){
 
 		// Update coordinates if this state is being displayed by the GUI
 		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden") {
-			HTMLobject* nt = Coordinates::getNucleotide(this->nextTemplateBaseToCopy, "g");
+			HTMLobject* nt = Coordinates::getNucleotide(this->rightTemplateBase, "g");
 			if (nt != nullptr) {
 				double xCoord = nt->getX() + 10;
 				double yCoord = 165;
-				Coordinates::create_nucleotide(this->nextTemplateBaseToCopy, "m", xCoord, yCoord, this->boundNTP, this->boundNTP + "m", true);
+				Coordinates::create_nucleotide(this->get_nascentLength() + 1, "m", xCoord, yCoord, this->boundNTP, this->boundNTP + "m", true);
 			}
 
 		}
@@ -516,8 +610,8 @@ State* State::bindNTP(){
 
 		// Update coordinates if this state is being displayed by the GUI
 		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden") {
-		 	Coordinates::move_nt(this->getRightBaseNumber(), "m", -10, -10); // Move NTP into the sequence
-			Coordinates::set_TP_state(this->getRightBaseNumber(), "m", false); // Remove the TP
+		 	Coordinates::move_nt(this->get_nascentLength()+1, "m", -10, -10); // Move NTP into the sequence
+			Coordinates::set_TP_state(this->get_nascentLength()+1, "m", false); // Remove the TP
 		}
 
 
@@ -747,6 +841,510 @@ double State::calculateCleavageRate(bool ignoreStateRestrictions){
 }
 
 
+
+
+
+
+// Apply whichever operator is necessary to slip left at bulge S
+State* State::slipLeft(int S){
+
+
+	string DOMupdates = ""; // Need to create a new class which specifies new bulge landscapes to be created
+
+	if (!this->terminated){ // && !(PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] &&  state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] == PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1)) {
+		
+
+
+		// If this is part of a larger bulge, then split one base off to the left and leave the rest as it is (fissure). Do Not Return. It will be followed up by a 2nd operation.
+		//if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] != PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1 && state["partOfBulgeID"][S] != S) {
+			//OPS_JS.fissureBulgeLeft_WW(state, UPDATE_COORDS, S, DOMupdates);
+	//	}
+		
+
+		//var fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 1, 1));
+		//if (fuseWith == -1)	fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 2, 2));
+
+
+		// If there is another bulge 1 to the left then we fuse the two together
+		//if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] + 1) != -1) OPS_JS.fuseBulgeLeft_WW(state, UPDATE_COORDS, S, DOMupdates);
+		//else if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] == 0 && fuseWith != -1) OPS_JS.fuseBulgeLeft_WW(state, UPDATE_COORDS, S, DOMupdates);
+
+
+		/*else*/ if (this->bulgePos.at(S) > 0 && this->bulgePos.at(S) < hybridLen->getVal() - 1) this->diffuse_left(S, DOMupdates);
+		else if (!this->NTPbound() && this->bulgePos.at(S) == 0 && this->mRNAPosInActiveSite < hybridLen->getVal() - 2) this->form_bulge(S, true, DOMupdates);
+		else if (this->bulgePos.at(S) != 0 && this->bulgePos.at(S) == hybridLen->getVal() - 1) this->absorb_bulge(S, false, false, DOMupdates);
+
+
+
+	}
+
+	return this;
+}
+
+
+// Apply whichever operator is necessary to slip right at bulge S
+State* State::slipRight(int S){
+
+
+	string DOMupdates = ""; // Need to create a new class which specifies new bulge landscapes to be created
+
+	if (!this->terminated) {// && !(PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] - Math.max(0, state["mRNAPosInActiveSite"]) == 1)) {
+		
+
+		// Absorb bulge
+		if (!this->NTPbound() && this->partOfBulgeID.at(S) == S && this->bulgePos.at(S) - max(0, this->mRNAPosInActiveSite) == 1) this->absorb_bulge(S, true, false, DOMupdates);
+
+		else{
+		
+			// If this is part of a larger bulge, then split one base off to the right and leave the rest as it is (fissure). Do Not Return. It will be followed up by a 2nd operation.
+			//if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && this->bulgePos.at(S) - Math.max(0, this->mRNAPosInActiveSite) != 1 && this->partOfBulgeID.at(S) != S) {
+			//	OPS_JS.fissureBulgeRight_WW(state, UPDATE_COORDS, S, DOMupdates);
+			//}
+			
+			
+			//var canFuseWith = state["bulgePos"].indexOf(hybridLen->getVal() - 1);
+			//if (canFuseWith == -1)	canFuseWith = state["bulgePos"].indexOf(hybridLen->getVal() - 2);
+			
+
+			// If there is another bulge 1 to the right then we fuse the two together
+			//if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] &&  this->bulgePos.at(S) > 0 && state["bulgePos"].indexOf(this->bulgePos.at(S) - 1) != -1) OPS_JS.fuseBulgeRight_WW(state, UPDATE_COORDS, S, DOMupdates);
+			//else if (this->leftNascentBase > 1 && PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && this->bulgePos.at(S) == 0 && canFuseWith != -1 && state["bulgePos"].indexOf( this->bulgePos.at(canFuseWith) - 1) != -1)OPS_JS.fuseBulgeRight_WW(state, UPDATE_COORDS, S, DOMupdates);
+			/*else*/ if (this->bulgePos.at(S) < hybridLen->getVal() && this->bulgePos.at(S) > 1 && this->bulgePos.at(S) - max(0, this->mRNAPosInActiveSite) != 1) this->diffuse_right(S, DOMupdates);
+			else if (this->bulgePos.at(S) == 0 && this->leftNascentBase > 1) this->form_bulge(S, false, DOMupdates);
+		}
+
+	}
+
+	return this;
+}
+
+
+
+
+void State::diffuse_left(int S, string DOMupdates){
+	
+	if (this->bulgePos.at(S) > 0 && this->bulgePos.at(S) < hybridLen->getVal() - 1){
+		
+	    int leftBoundary = this->bulgedBase.at(S) - this->bulgeSize.at(S) - 1;
+
+	    if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
+			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary, "m")->getX(), this->bulgeSize.at(S), true, 0);
+		}
+
+		this->bulgePos.at(S) ++;
+		this->bulgedBase.at(S) --;
+		
+	}
+	
+}
+
+
+
+void State::diffuse_right(int S, string DOMupdates){
+	
+	if (this->bulgePos.at(S) > 1 && this->bulgePos.at(S) < hybridLen->getVal()){
+
+
+		this->bulgePos.at(S) --;
+		this->bulgedBase.at(S) ++;
+
+	    int leftBoundary = this->bulgedBase.at(S) - this->bulgeSize.at(S);
+	    if (this->NTPbound() && this->bulgePos.at(S) == 1) this->releaseNTP();
+
+	    if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
+			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary + this->bulgeSize.at(S), "m")->getX(), this->bulgeSize.at(S), true, 0);
+		}
+
+
+
+
+		
+	}
+
+	
+}
+
+void State::form_bulge(int S, bool form_left, string DOMupdates){
+
+
+	//console.log("forming", state, S);
+	if (form_left && !this->NTPbound() &&  this->bulgePos.at(S) == 0 && this->mRNAPosInActiveSite < hybridLen->getVal() - 2){
+		
+
+		if (this->NTPbound()) this->releaseNTP();
+
+		// Move 2nd last base to between the 2nd and 3rd to last positions, and last base into 2nd last position
+		this->bulgedBase.at(S) = this->rightNascentBase;
+		if (this->mRNAPosInActiveSite >= 0) {
+			this->bulgedBase.at(S) -= this->mRNAPosInActiveSite + 1;
+			this->bulgePos.at(S) = 2 + this->mRNAPosInActiveSite;
+		}
+
+		if (this->mRNAPosInActiveSite < 0){
+			this->bulgePos.at(S) = 1;
+		}
+		
+		this->bulgeSize.at(S) = 1;
+		int leftBoundary = this->bulgedBase.at(S) - this->bulgeSize.at(S);
+
+
+
+
+		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
+
+			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary, "m")->getX(), 1, true, 0);
+			for (int i = this->bulgedBase.at(S) + 2; i < this->get_nascentLength() + 1; i ++){
+			if (i > this->rightNascentBase && i-this->rightNascentBase <= (bubbleRight->getVal()+1)) Coordinates::move_nt(i, "m", -25, -52/(bubbleRight->getVal()+1));
+			else Coordinates::move_nt(i, "m", -25, 0);
+			}
+
+		}
+		
+
+
+		this->rightNascentBase ++;
+		this->mRNAPosInActiveSite ++;
+		this->nextTemplateBaseToCopy --;
+
+		//if (UPDATE_COORDS) WW_JS.setNextBaseToAdd_WW();
+
+		/*
+		if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) {
+			var graphID = OPS_JS.create_new_slipping_params_WW(state);
+			DOMupdates["where_to_create_new_slipping_landscape"].push(graphID);
+		}
+		*/
+
+
+
+		
+	}
+	
+	else if (!form_left && this->mRNAPosInActiveSite <= hybridLen->getVal() - 2 && this->bulgePos.at(S) == 0 && this->getLeftNascentBaseNumber() > 1) {
+		
+
+		this->bulgedBase.at(S) = PrimerType.substr(0,2) == "ss" ? this->leftNascentBase : 2;
+		this->bulgeSize.at(S) = 1;
+
+
+		int leftBoundary = this->bulgedBase.at(S) - 1;
+
+		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
+
+			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(this->bulgedBase.at(S), "m")->getX(), 1, true, 0);
+
+			if (PrimerType.substr(0,2) == "ss"){
+				for (int i = this->bulgedBase.at(S) - 2; i >= 0; i --){
+					if (this->bulgedBase.at(S)-i <= bubbleLeft->getVal()+1) Coordinates::move_nt(i, "m", 25, -52/(bubbleLeft->getVal()+1));
+					else Coordinates::move_nt(i, "m", 25, 0);
+				}
+			}
+
+			else{
+
+				// TODO: double stranded nascent
+				//WW_JS.move_nt_WW(0, "m", 25, 0);
+				//PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]--;
+
+			}
+
+		}
+
+	
+
+		this->bulgePos.at(S) = hybridLen->getVal() - 1;
+		leftNascentBase --;
+
+		/*
+		if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) {
+			var graphID = OPS_JS.create_new_slipping_params_WW(state);
+			DOMupdates["where_to_create_new_slipping_landscape"].push(graphID);
+		}
+		*/
+
+	}
+	
+}
+
+void State::absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, string DOMupdates){
+
+
+	if (!absorb_right && this->bulgeSize.at(S) > 0 && this->bulgePos.at(S) == hybridLen->getVal() - 1){
+		
+
+
+		this->leftNascentBase ++;
+		int leftBoundary = this->bulgedBase.at(S) - this->bulgeSize.at(S) + 1;
+
+		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
+
+			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary-1, "m")->getX(), this->bulgeSize.at(S)-1, true, 0);
+
+			if (PrimerType.substr(0,2) == "ss"){
+				for (int i = this->leftNascentBase - 1; i >= 0; i --){
+					if (this->leftNascentBase - i <= (bubbleLeft->getVal()+1)) Coordinates::move_nt(i, "m", -25, 52/(bubbleLeft->getVal()+1));
+					else Coordinates::move_nt(i, "m", -25, 0);
+				}		
+			}
+
+			else{
+
+				// TODO ds nascent
+				//Coordinates::move_nt(1, "m", -25, 0);
+				//Coordinates::move_nt(0, "m", -25, 0);
+				//hybridLen->getVal()++;
+			}
+
+		}
+
+		this->bulgeSize.at(S) --;
+		if (this->bulgeSize.at(S) == 0){
+
+			
+			if (Settings::indexOf(this->bulgePos, 0) != -1)	{
+				int toDelete = this->delete_slipping_params(S); // If there is already a form/absorb landscape then we can delete this one
+				//DOMupdates["landscapes_to_delete"].push(toDelete);
+			}
+			else {
+				this->reset_slipping_params(S);
+				//DOMupdates["landscapes_to_reset"].push(S);
+			}
+
+		}
+		
+		else if (this->bulgeSize.at(S) == 1){ // If the bulge went from size 2 to size 1, we find and delete its fissure landscape
+			int bulgeIDOfDonorFissure = this->get_fissure_landscape_of(S);
+			int toDelete = this->delete_slipping_params(bulgeIDOfDonorFissure);
+			//DOMupdates["landscapes_to_delete"].push(toDelete);
+		}
+
+
+		
+		if (destroy_entire_bulge){
+			this->absorb_bulge(S, absorb_right, destroy_entire_bulge, DOMupdates);
+		}
+		
+		//return true;
+	
+	}
+
+
+	// If backtracked, then bulge is absorbed when at position 1
+	// If not backtracked, then bulge is absorbed when at position 2
+	else if (absorb_right && !this->NTPbound() && this->bulgeSize.at(S) > 0 && this->bulgePos.at(S) - max(0, this->mRNAPosInActiveSite) == 1 && !(this->bulgePos.at(S) == 2 && this->NTPbound())){
+		
+		
+
+		int leftBoundary = this->bulgedBase.at(S) - this->bulgeSize.at(S);
+		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
+
+
+			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary, "m")->getX(), this->bulgeSize.at(S) - 1, true, 0);
+
+			// Shift every rightward base 1 to the right
+			for (int i = leftBoundary + this->bulgeSize.at(S) + 1; i < this->get_nascentLength() + 1; i ++){
+				if (i >= this->rightNascentBase && i-(leftBoundary + this->bulgeSize.at(S)) <= (bubbleRight->getVal()+1)) Coordinates::move_nt(i, "m", 25, 52/(1+bubbleRight->getVal()));
+				else Coordinates::move_nt(i, "m", 25, 0);
+			}	
+
+
+		}
+
+		
+		
+		this->bulgeSize.at(S) --;
+		this->bulgedBase.at(S) --;
+		this->mRNAPosInActiveSite --;
+		this->rightNascentBase --;
+		this->nextTemplateBaseToCopy ++;
+		
+		//if (UPDATE_COORDS) WW_JS.setNextBaseToAdd_WW();
+
+
+		if (this->bulgeSize.at(S) == 0){
+			if (Settings::indexOf(this->bulgePos, 0) != -1) {
+				int toDelete = this->delete_slipping_params(S); // If there is already a form/absorb landscape then we can delete this one
+				//DOMupdates["landscapes_to_delete"].push(toDelete);
+			}
+			else {
+				this->reset_slipping_params(S);
+				//DOMupdates["landscapes_to_reset"].push(S);
+			}
+		}
+		
+		else if (this->bulgeSize.at(S) == 1){ // If the bulge went from size 2 to size 1, we find and delete its fissure landscape
+			int bulgeIDOfDonorFissure = this->get_fissure_landscape_of(S);
+			int toDelete = this->delete_slipping_params(bulgeIDOfDonorFissure);
+			//DOMupdates["landscapes_to_delete"].push(toDelete);
+		}
+
+	
+
+			
+		if (destroy_entire_bulge){ // Recursively destroy bulges until there are none left
+			this->absorb_bulge(S, absorb_right, destroy_entire_bulge, DOMupdates);
+		}
+		
+		//return true;
+
+		
+	}
+	
+	//return false;
+
+}
+
+
+
+
+
+// Gets the button label associated with slipping right
+string State::getSlipRightLabel(int S) {
+
+
+	string toReturn = "{}";
+
+	bool allowMultipleBulges = true; // PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"];
+	int h = hybridLen->getVal();
+
+	int fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 1, 1));
+	if (fuseWith == -1)	fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 2, 2));
+
+
+
+	if (this->terminated) toReturn = "{'label': ''}";
+	else if (allowMultipleBulges && this->partOfBulgeID.at(S) != S && this->bulgePos.at( this->partOfBulgeID.at(S) ) - max(0, this->mRNAPosInActiveSite) == 1) toReturn = "{'label': ''}";
+	else if (allowMultipleBulges && this->partOfBulgeID.at(S) != S) toReturn = "{'label': 'Fissure'}";
+	else if (!this->NTPbound() && this->partOfBulgeID.at(S) == S && this->bulgePos.at(S) - max(0, this->mRNAPosInActiveSite) == 1) toReturn = "{'label': 'Absorb', 'title': 'Absorb the bulge at the left end of the hybrid (ctrl + &rarr;)'}";
+	else if (allowMultipleBulges && this->bulgePos.at(S) > 0 && Settings::indexOf(this->bulgePos, this->bulgePos.at(S) - 1) != -1) toReturn = "{'label': 'Fuse'}";
+	else if (this->leftNascentBase > 1 && allowMultipleBulges &&  this->bulgePos.at(S) == 0 && (Settings::indexOf(this->bulgePos, h - 1) != -1 || Settings::indexOf(this->bulgePos, h - 2) != -1)) toReturn = "{'label': 'Form', 'title': 'Create a bulge at the left end of the hybrid (ctrl + &rarr;)'}";
+	else if (this->bulgePos.at(S) < h && this->bulgePos.at(S) > 1 && this->bulgePos.at(S) - max(0, this->mRNAPosInActiveSite) != 1) toReturn = "{'label': 'Diffuse', 'title': 'Move the bulge one step to the right (ctrl + &rarr;)'}";
+	else if (this->bulgePos.at(S) == 0) toReturn = "{'label': 'Form', 'title': 'Create a bulge at the left end of the hybrid (ctrl + &rarr;)'}";
+
+
+	return toReturn;
+
+
+
+}
+
+
+// Gets the button label associated with slipping left
+string State::getSlipLeftLabel(int S) {
+
+	string toReturn = "{}";
+
+	bool allowMultipleBulges = true; //PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"];
+	int h = hybridLen->getVal();
+
+	int fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 1, 1));
+	if (fuseWith == -1)	fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 2, 2));
+
+
+	if (this->terminated) toReturn = "{'label': ''}";
+	else if (allowMultipleBulges && this->partOfBulgeID.at(S) != S && this->bulgePos.at( this->partOfBulgeID.at(S) ) == h - 1) toReturn = "{'label': ''}";
+	else if (allowMultipleBulges && this->partOfBulgeID.at(S) != S) toReturn = "{'label': 'Fissure'}";
+	else if (allowMultipleBulges && this->bulgePos.at(S) > 0 && Settings::indexOf(this->bulgePos, this->bulgePos.at(S) + 1) != -1) toReturn = "{'label': 'Fuse'}";
+	else if (allowMultipleBulges && this->bulgePos.at(S) == 0 && allowMultipleBulges && this->bulgePos.at(S) == 0 && fuseWith != -1) {
+		if (this->mRNAPosInActiveSite >= 0 && Settings::indexOf(this->bulgePos,  this->bulgePos.at(fuseWith) +1 ) != -1) toReturn = "{'label': ''}";
+		else toReturn = "{'label': 'Form', 'title': 'Create a bulge at the right end of the hybrid (ctrl + &larr;)'}";
+	}
+	else if (this->bulgePos.at(S) > 0 && this->bulgePos.at(S) < h - 1) toReturn = "{'label': 'Diffuse', 'title': 'Move the bulge one step to the left (ctrl + &larr;)'}";
+	else if (!this->NTPbound() && this->bulgePos.at(S) == 0 && this->mRNAPosInActiveSite != h - 1)  toReturn = "{'label': 'Form', 'title': 'Create a bulge at the right end of the hybrid (ctrl + &larr;)'}";
+	else if (this->bulgePos.at(S) == h - 1) toReturn = "{'label': 'Absorb', 'title': 'Absorb the bulge at the left end of the hybrid (ctrl + &larr;)'}";
+			
+	return toReturn;
+
+
+}
+
+
+
+
+
+
+int State::create_new_slipping_params() {
+
+
+	// if (!PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) return null;
+	
+	int graphID = this->bulgePos.size();
+	
+	// Create new elements in the lists
+	this->bulgePos.push_back(0);
+	this->bulgePos.push_back(-1);
+	this->bulgePos.push_back(0);
+	this->bulgePos.push_back(graphID);
+
+	return graphID;
+	
+
+
+}
+
+
+void State::reset_slipping_params(int S) {
+		
+	this->bulgePos.at(S) = 0;
+	this->bulgedBase.at(S) = -1;
+	this->bulgeSize.at(S) = 0;
+	this->partOfBulgeID.at(S) = S;
+	
+}
+
+
+int State::delete_slipping_params(int S) {
+
+
+	//if (!PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) return;
+
+	// Delete this element from all slippage related lists
+	std::deque<int>::iterator it = this->bulgePos.begin();
+	advance(it, S-1);
+	this->bulgePos.erase(it);
+
+	it = this->bulgedBase.begin();
+	advance(it, S-1);
+	this->bulgedBase.erase(it);
+
+	it = this->bulgeSize.begin();
+	advance(it, S-1);
+	this->bulgeSize.erase(it);
+
+	it = this->partOfBulgeID.begin();
+	advance(it, S-1);
+	this->partOfBulgeID.erase(it);
+
+	
+	// Pull down the indices where applicable
+	for (int s = 0; s < this->bulgePos.size(); s++){
+		if (this->partOfBulgeID.at(s) > S) {
+			this->partOfBulgeID.at(s) --;
+		}
+	}
+
+	return this->bulgePos.size();
+
+	
+}
+
+
+
+// Returns the index of the fissure landscape which applies to bulge index S
+int State::get_fissure_landscape_of(int S){
+	
+	for (int s = 0; s < this->bulgePos.size(); s++){
+		if (s == S) continue;
+		if (this->partOfBulgeID.at(s) == S) return s;
+	}
+
+	return -1;
+}
+
+
+
+
+
 void State::setNextBaseToAdd(string baseToAdd){
 	this->thereHaveBeenMutations = true;
 	this->NTPtoAdd = baseToAdd;
@@ -802,38 +1400,31 @@ int State::get_initialLength() {
 
 
 int State::getLeftNascentBaseNumber(){
-	return this->State::get_nascentLength() + this->State::get_mRNAPosInActiveSite() + 1 - (int)(hybridLen->getVal());
+	return this->leftNascentBase;
+	//return this->State::get_nascentLength() + this->State::get_mRNAPosInActiveSite() + 1 - (int)(hybridLen->getVal());
 }
 
 int State::getRightNascentBaseNumber(){
-	return this->State::get_nascentLength() + this->State::get_mRNAPosInActiveSite();
+	return this->rightNascentBase;
+	//return this->State::get_nascentLength() + this->State::get_mRNAPosInActiveSite();
 }
 
 
 int State::getLeftTemplateBaseNumber(){
-	return this->State::get_nascentLength() + this->State::get_mRNAPosInActiveSite() + 1 - (int)(hybridLen->getVal());
+	return this->leftTemplateBase;
+	//return this->State::get_nascentLength() + this->State::get_mRNAPosInActiveSite() + 1 - (int)(hybridLen->getVal());
 }
 
 int State::getRightTemplateBaseNumber(){
-	return this->State::get_nascentLength() + this->State::get_mRNAPosInActiveSite();
+	return this->rightTemplateBase;
+	//return this->State::get_nascentLength() + this->State::get_mRNAPosInActiveSite();
 }
 
-
-int State::getLeftBaseNumber(){
-	return this->State::get_nascentLength() + this->State::get_mRNAPosInActiveSite() + 1 - (int)(hybridLen->getVal());
-}
-
-int State::getRightBaseNumber(){
-	return this->State::get_nascentLength() + this->State::get_mRNAPosInActiveSite();
-}
 
 int State::get_nextTemplateBaseToCopy(){
 	return this->nextTemplateBaseToCopy;
 }
 
-void State::set_mRNAPosInActiveSite(int newVal){
-	this->mRNAPosInActiveSite = newVal;
-}
 
 
 
@@ -886,7 +1477,7 @@ double State::calculateBackwardTranslocationFreeEnergyBarrier(bool ignoreParamet
 	
 	
 	// Do not back translocate if it will cause the bubble to be open on the 3' end
-	if (this->getLeftBaseNumber() - bubbleLeft->getVal() -1 <= 2){
+	if (this->getLeftTemplateBaseNumber() - bubbleLeft->getVal() -1 <= 2){
 		return INF;
 	}
 

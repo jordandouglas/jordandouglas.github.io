@@ -533,7 +533,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				double k1_2 = s->calculateForwardRate(true, true);
 
 				// Move back to original position
-				s->set_mRNAPosInActiveSite(currentTranslocationPosition);
+				if (currentTranslocationPosition != s->get_mRNAPosInActiveSite()) s->backward();
 
 
 
@@ -591,7 +591,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				//double boltzmannG1 = exp(-(s->calculateTranslocationFreeEnergy(true)));
 
 				// Move back to original position
-				s->set_mRNAPosInActiveSite(currentTranslocationPosition);
+				if (currentTranslocationPosition != s->get_mRNAPosInActiveSite()) s->backward();
 
 
 				double boltzmannG0 = 0;
@@ -1115,7 +1115,7 @@ double Simulator::geometricBindingSampling(State* s){
 
 
 		// Move back to original position
-		s->set_mRNAPosInActiveSite(currentTranslocationPosition);
+		if (currentTranslocationPosition != s->get_mRNAPosInActiveSite()) s->backward();
 
 
 
