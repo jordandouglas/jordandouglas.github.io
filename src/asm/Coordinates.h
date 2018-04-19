@@ -31,7 +31,7 @@
 
 #include <string>
 #include <list>
-
+#include <deque>
 
 
 // This static class contains functions for generating and managing coordinates for rendering states onto the GUI 
@@ -39,7 +39,7 @@ class Coordinates{
 
 
 	static vector<HTMLobject*> TemplateSequenceHTMLObjects; // All nucleotides in the template sequence and their coordinates etc.
-	static vector<HTMLobject*> NascentSequenceHTMLObjects; // All nucleotides in the nascent sequence and their coordinates etc.
+	static deque<HTMLobject*> NascentSequenceHTMLObjects; // All nucleotides in the nascent sequence and their coordinates etc.
 	static vector<HTMLobject*> ComplementSequenceHTMLObjects; // All nucleotides in the complement sequence and their coordinates etc.
 	static list<HTMLobject*> HTMLobjects; // Other objects and their coordinates etc.
 

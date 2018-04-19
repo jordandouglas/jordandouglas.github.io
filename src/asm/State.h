@@ -82,9 +82,12 @@ class State{
     	State* clone();
     	State* print();
     	State* setToInitialState();
+    	string toJSON();
+
     	State* transcribe(int N);
     	list<int> getTranscribeActions(int N);
-    	string toJSON();
+    	State* stutter(int N);
+		list<int> getStutterActions(int N);
 
 
     	// Reactions and their rates

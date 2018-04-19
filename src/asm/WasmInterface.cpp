@@ -126,6 +126,47 @@ extern "C" {
 	}
 
 
+	// Returns the list of actions needed to transcribe 10 bases, and the animation speed
+	void EMSCRIPTEN_KEEPALIVE getStutterActions(int N, int msgID){
+
+		_GUI_STOP = false;
+		_applyingReactionsGUI = true;
+
+		int animationSpeed = Coordinates::getAnimationTime();
+
+		// Hidden mode
+		if (animationSpeed == 0){
+			_currentStateGUI->stutter(N);
+			messageFromWasmToJS("", msgID);
+		}
+
+		else{
+
+			// Do not perform all the actions immediately (unless hidden mode).
+			// Instead this function returns a list of actions to do. Then each action is
+			// performed one at a time, and is rendered on the DOM in between subsequent actions
+			list<int> actionsToDo = _currentStateGUI->getStutterActions(N);
+			string actionsJSON = "{'actions':[";
+			for (list<int>::iterator it= actionsToDo.begin(); it != actionsToDo.end(); ++it){
+				actionsJSON += to_string(*it) + ",";
+			}
+			if (actionsJSON.substr(actionsJSON.length()-1, 1) == ",") actionsJSON = actionsJSON.substr(0, actionsJSON.length() - 1);
+			actionsJSON += "],";
+
+			// Get animation speed
+			actionsJSON += "'animationTime':" + to_string(animationSpeed) + "}";
+
+			messageFromWasmToJS(actionsJSON, msgID);
+
+		}
+
+		_applyingReactionsGUI = false;
+
+
+	}
+
+
+
 
 
 	// Apply the specified reaction
@@ -143,6 +184,8 @@ extern "C" {
 			else if (reactionNumber == 5) _currentStateGUI->deactivate();
 			else if (reactionNumber == 6) _currentStateGUI->terminate();
 			else if (reactionNumber == 7) _currentStateGUI->cleave();
+			else if (reactionNumber == 8) _currentStateGUI->slipLeft(0);
+			else if (reactionNumber == 9) _currentStateGUI->slipRight(0);
 
 
 			_applyingReactionsGUI = false;
@@ -274,6 +317,7 @@ extern "C" {
 		ntpJSON += "'templateBaseBeingCopied':'" + templateSequence.substr(_currentStateGUI->get_nextTemplateBaseToCopy() + deltaBase - 1, 1) + "',";
 		ntpJSON += "'previousTemplateBase':'" + templateSequence.substr(_currentStateGUI->get_nextTemplateBaseToCopy() + deltaBase - 2, 1) + "',";
 		ntpJSON += "'previousNascentBase':'" + _currentStateGUI->get_NascentSequence().substr(_currentStateGUI->get_nascentLength() + deltaBase - 1, 1) + "',";
+		ntpJSON += "'terminated':" + string(_currentStateGUI->isTerminated() ? "true" : "false") + ",";
 		ntpJSON += "'activated':" + string(_currentStateGUI->get_activated() ? "true" : "false");
 		ntpJSON += "}";
 

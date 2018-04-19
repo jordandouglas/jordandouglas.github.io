@@ -253,6 +253,85 @@ list<int> State::getTranscribeActions(int N){
 
 
 
+State* State::stutter(int N){
+
+
+	//cout << "transcribing " << N << endl;
+
+	if (!this->activated) this->activate();
+
+	// Ensure that active site is open and NTP is not bound
+	if (this->NTPbound()) this->releaseNTP();
+
+	for (int i = this->bulgePos.at(0); i < hybridLen->getVal() && i > 0; i ++){
+		this->slipLeft(0);
+	}
+	for (int i = this->mRNAPosInActiveSite; i < 0; i ++){
+		this->forward();
+	}
+	for (int i = this->mRNAPosInActiveSite; i > 0; i --){
+		this->backward();
+	}
+
+	
+	// Stutter N times
+	for (int i = 0; i < N; i ++){
+		this->slipLeft(0);
+		this->slipLeft(0);
+		this->slipLeft(0);
+		this->bindNTP();
+		this->bindNTP();
+
+		for (int j = 0; i < hybridLen->getVal() - 4; j ++) this->slipLeft(0);
+
+	}
+	
+	return this;
+}
+
+
+// Returns a list of numbers corresponding to the actions which must be performed in order to transcribe N bases
+list<int> State::getStutterActions(int N){
+
+
+	list<int> actionsToDo;
+
+
+	// Ensure that active site is open and NTP is not bound
+	if (!this->activated) actionsToDo.push_back(4); // 4 = activate
+	if (this->NTPbound()) actionsToDo.push_back(2); // 2 = release
+	for (int i = this->bulgePos.at(0); i < hybridLen->getVal() && i > 0; i ++){
+		actionsToDo.push_back(8); // 8 = slipLeft(0)
+	}
+	for (int i = this->mRNAPosInActiveSite; i < 0; i ++){
+		actionsToDo.push_back(1); // 1 = forward
+	}
+	for (int i = this->mRNAPosInActiveSite; i > 0; i --){
+		actionsToDo.push_back(0); // 0 = backwards
+	}
+
+
+	// Stutter N times
+	for (int i = 0; i < N; i ++){
+		
+		actionsToDo.push_back(8); // 8 = slipLeft(0)
+		actionsToDo.push_back(8); // 8 = slipLeft(0)
+		actionsToDo.push_back(8); // 8 = slipLeft(0)
+		actionsToDo.push_back(3); // 3 = bind
+		actionsToDo.push_back(3); // 3 = catalyse
+
+		for (int j = 0; j < hybridLen->getVal() - 4; j ++) actionsToDo.push_back(8); // 8 = slip_left(0)
+
+	}
+
+
+
+	return actionsToDo;
+}
+
+
+
+
 
 
 State* State::forward(){
@@ -355,7 +434,7 @@ State* State::forward(){
 	}
 
 	if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal()-1) ||
-		(this->mRNAPosInActiveSite <= 1 && this->mRNAPosInActiveSite + this->get_nascentLength() > templateSequence.length())) this->terminate();
+		(this->mRNAPosInActiveSite <= 1 && this->rightTemplateBase > templateSequence.length())) this->terminate();
 
 
 	return this;
@@ -378,7 +457,6 @@ State* State::terminate(){
 				Coordinates::delete_nt(i, "m");
 			}
 		}
-
 		Plots::addCopiedSequence(this->nascentSequence);
 
 	}
@@ -586,6 +664,7 @@ State* State::bindNTP(){
 	
 	// Bind NTP
 	if (!this->NTPbound() && this->mRNAPosInActiveSite == 1){
+
 
 		this->boundNTP = this->NTPtoAdd != "" ? this->NTPtoAdd : Settings::complementSeq(templateSequence.substr(this->nextTemplateBaseToCopy-1, 1), PrimerType.substr(2) == "RNA");
 

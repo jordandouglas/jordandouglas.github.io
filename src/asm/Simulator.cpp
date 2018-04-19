@@ -381,7 +381,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 		// Arrest if timeout has been reached or if have gone beyond the end of the sequence
 		if ((arrestTime->getVal() != 0 && timeElapsedSinceLastCatalysis >= arrestTime->getVal()) ||
-			(s->get_mRNAPosInActiveSite() <= 1 && s->get_mRNAPosInActiveSite() + s->get_nascentLength() > templateSequence.length()) ||
+			(s->get_mRNAPosInActiveSite() <= 1 && s->get_mRNAPosInActiveSite() <= 1 && s->getRightTemplateBaseNumber() > templateSequence.length()) ||
 			(s->get_mRNAPosInActiveSite() == 0 && s->getRightTemplateBaseNumber() == templateSequence.length()) ){
 
 

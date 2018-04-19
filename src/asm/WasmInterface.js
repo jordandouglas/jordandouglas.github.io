@@ -685,7 +685,7 @@ applyReactions = function(actionsList, animationTime, resolve = null,  msgID = n
 }
 
 
-// Transcirbe N bases. This is done by first finding the actions to perform, and then allowing the controller to render one at a time
+// Transcribe N bases. This is done by first finding the actions to perform, and then allowing the controller to render one at a time
 transcribe = function(N, msgID = null){
 
 	// Create the callback function
@@ -710,6 +710,34 @@ transcribe = function(N, msgID = null){
 	Module.ccall("getTranscriptionActions", null, ["number", "number"], [N, msgID]);
 
 }
+
+
+// Stutter N times. This is done by first finding the actions to perform, and then allowing the controller to render one at a time
+stutter = function(N, msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+
+
+		// Hidden mode -> return to controller now
+		if (resultStr == "" || resultStr == "done"){
+			postMessage(msgID + "~X~done");
+			WASM_MESSAGE_LISTENER[msgID] = null;
+		}
+		// Animated mode -> animate each action one at a time
+		else{
+			var result = JSON.parse(resultStr);
+			//console.log("result", result, result.animationTime);
+			applyReactions(result.actions, result.animationTime, null, msgID);
+		}
+
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall, remove: false};
+
+	Module.ccall("getStutterActions", null, ["number", "number"], [N, msgID]);
+
+}
+
 
 // Move the polymerase forwards
 translocateForward = function(msgID = null){

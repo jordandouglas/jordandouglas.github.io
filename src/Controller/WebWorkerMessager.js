@@ -1191,6 +1191,7 @@ function transcribe_controller(nbasesToTranscribe = null, fastMode = false, reso
 		if (clickMisincorporation) $("#deactivateUponMisincorporation").click();
 		hideStopButtonAndShow("transcribe");
 		update_sliding_curve(0);
+		drawPlots();
 		resolve();
 
 	};
@@ -1246,6 +1247,7 @@ function stutter_controller(nbasesToStutter = null, fastMode = false, resolve = 
 		refreshNavigationCanvases();
 		hideStopButtonAndShow("stutter");
 		update_sliding_curve(0);
+		drawPlots();
 		resolve();
 	};
 
@@ -1261,9 +1263,22 @@ function stutter_controller(nbasesToStutter = null, fastMode = false, resolve = 
 
 
 	// If it is in asynchronous or hidden mode, then we keep going until the end
-	else{
+	else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("OPS_JS.stutter_WW", [nbasesToStutter, fastMode, null], true);
 		var fnStr = res[0];
+		var msgID = res[1];
+
+		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall(fnStr).then((x) => updateDOM(x));
+
+		renderObjectsUntilReceiveMessage(msgID);
+
+	}
+
+
+	else{
+		var res = stringifyFunction("stutter", [nbasesToStutter], true);
+		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));

@@ -277,7 +277,7 @@ function drawNTPcanvas(){
 		$(canvas).parent().find(".navArrow").remove();
 		$("#ntpCanvasDIV img").remove();
 
-		if (result == null || result["templateBaseBeingCopied"] == null) return;
+		if (result == null || result["templateBaseBeingCopied"] == null || result.terminated) return;
 
 		
 		var stateMargin = 2;

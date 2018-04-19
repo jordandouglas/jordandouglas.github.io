@@ -33,7 +33,7 @@ using namespace std;
 
 
 vector<HTMLobject*> Coordinates::TemplateSequenceHTMLObjects; // All nucleotides in the template sequence and their coordinates etc.
-vector<HTMLobject*> Coordinates::NascentSequenceHTMLObjects; // All nucleotides in the nascent sequence and their coordinates etc.
+deque<HTMLobject*> Coordinates::NascentSequenceHTMLObjects; // All nucleotides in the nascent sequence and their coordinates etc.
 vector<HTMLobject*> Coordinates::ComplementSequenceHTMLObjects; // All nucleotides in the complement sequence and their coordinates etc.
 list<HTMLobject*> Coordinates::HTMLobjects; // All other objects and their coordinates etc.
 
@@ -77,7 +77,7 @@ void Coordinates::resetToInitialState(){
 	// Set length of each vector as the length of the template sequence. Nascent sequence may need to later be expanded to account for insertions
 	// Add 1 for the 5 or 3 prime tag
 	Coordinates::TemplateSequenceHTMLObjects.resize(templateSequence.length() + 1);
-	Coordinates::NascentSequenceHTMLObjects.resize(templateSequence.length() + 1);
+	Coordinates::NascentSequenceHTMLObjects.resize(templateSequence.length() + 2); // Add 1 to allow for an insertion (will be increased dynamically)
 	Coordinates::ComplementSequenceHTMLObjects.resize(complementSequence.length() + 1);
 
 
@@ -341,7 +341,10 @@ void Coordinates::create_nucleotide(int pos, string whichSeq, double x, double y
 
 	// Must add this object to the right sequence vector
 	if (whichSeq == "g") Coordinates::TemplateSequenceHTMLObjects.at(pos) = nt;
-	else if (whichSeq == "m") Coordinates::NascentSequenceHTMLObjects.at(pos) = nt;
+	else if (whichSeq == "m") {
+		if (pos > Coordinates::NascentSequenceHTMLObjects.size()-2) Coordinates::NascentSequenceHTMLObjects.resize(pos+2); // This object has a dynamic length due to possible insertions. Always have 1 extra slot for safety
+		Coordinates::NascentSequenceHTMLObjects.at(pos) = nt;
+	}
 	else if (whichSeq == "o") Coordinates::ComplementSequenceHTMLObjects.at(pos) = nt;
 
 }
