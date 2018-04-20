@@ -577,7 +577,8 @@ function refresh(resolve = function(){}){
 		// Delete all extra slip landscapes
 		var s = 1;
 		while (true){
-			if (document.getElementById('slipCanvas' + s) == null) break
+			console.log("hmmm", s, $("#slippageTR" + s).length);
+			if ($("#slippageTR" + s).length == 0) break
 			delete_slipping_landscape(s);
 			s++;
 		}
@@ -1079,18 +1080,36 @@ function update_slipping_curve_timer(startTime, dir, S = 0){
 
 function create_new_slipping_landscape(graphID){
 	
-	if (!allowMultipleBulges) return;
-	
-	
-	
+	//if (!allowMultipleBulges) return;
+
+	//console.log("create_new_slipping_landscape", graphID);
+
+	/*
 	$("#primerSlipCanvasCellSpacer" + (graphID-1)).after('<td class="landscape" id="primerSlipCanvasCell' + graphID + '"> ' + get_slippage_cell_canvas_html(graphID) + ' </td> \
 	<td class="spacer" id="primerSlipCanvasCellSpacer' + graphID + '"></td>');
 	
 	$("#primerSlipBtnCellSpacer" + (graphID-1)).after('<td class="landscape" id="primerSlipBtnCell' + graphID + '"> ' + get_slippage_cell_btn_html(graphID) + ' </td>\
 	<td class="spacer" id="primerSlipBtnCellSpacer' + graphID + '"></td>');
-	
+	*/
 
-	
+
+
+	var canvasHTML = `
+	<td id="slippageTR` + graphID + `" style="width:25%; vertical-align:top" class="slippageCell">
+
+		<br><br>
+		<div style="font-size:18px; font-family:Arial; vertical-align:top">
+			Slippage
+		</div> <br><br>
+		<div id="slippageCanvasDIV` + graphID + `" style="position:relative; margin:auto; width: 450px">
+			<canvas id="slippageCanvas` + graphID + `" height=50 width=450></canvas>
+		</div><br>
+
+	</td>`;
+
+	$("#slippageTR" + (graphID-1)).after(canvasHTML);
+
+
 	/* Add back later
 	slippingPeakHeights.push(update_slippingPeakHeights(graphID));
 	slippingTroughHeights.push(update_slippingTroughHeights(graphID));
@@ -1122,12 +1141,17 @@ function get_slippage_cell_canvas_html(S){
 
 function delete_slipping_landscape(toDelete){
 	
-	console.log("Deleting landscape", toDelete);
+	//console.log("Deleting landscape", toDelete);
 
+	/*
 	$("#primerSlipBtnCell" + toDelete).remove();
 	$("#primerSlipBtnCellSpacer" + toDelete).remove();
 	$("#primerSlipCanvasCell" + toDelete).remove();
 	$("#primerSlipCanvasCellSpacer" + toDelete).remove();
+	*/
+
+
+	$("#slippageTR" + toDelete).remove();
 
 
 }
@@ -2487,9 +2511,7 @@ function closeNav() {
 			<span style="display:none"><br>&Delta;G<sub>bulge</sub> = <input class="variable"  type="number" title="Free energy change of having a bulge in the primer" name="GBulge" id="GBulge" value=0 style="vertical-align: middle; 
 			text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T</span>
 			
-				<div id="allowMultipleBulges_container">
-					<label style="cursor:pointer;"> <input class="variable" OnChange="update_this_parameter_controller(this)"  type="checkbox" style="cursor:pointer;" id="allowMultipleBulges">Allow multiple bulges</input> </label>
-				</div>
+				
 				
 			</div>
 		<br>
@@ -2804,17 +2826,17 @@ function closeNav() {
 
 
 
-								<tr style="text-align:center;">
+								<tr id="slippageLandscapesTR" style="text-align:center;">
 
 
-									<td style="width:25%; vertical-align:top">
+									<td id="slippageTR0" style="width:25%; vertical-align:top" class="slippageCell">
 
 										<br><br>
 										<div style="font-size:18px; font-family:Arial; vertical-align:top">
 											Slippage
 										</div> <br><br>
-										<div id="slippageCanvasDIV" style="position:relative; margin:auto; width: 450px">
-											<canvas id="slippageCanvas"  height=50 width=450></canvas>
+										<div id="slippageCanvasDIV0" style="position:relative; margin:auto; width: 450px">
+											<canvas id="slippageCanvas0"  height=50 width=450></canvas>
 										</div><br>
 
 
