@@ -81,6 +81,7 @@ State* State::setToInitialState(){
 	this->rightTemplateBase = sequenceLength;
 	this->leftNascentBase = 0;
 	this->rightNascentBase = sequenceLength;
+	this->changeInLeftBulgePosition =  0;
 
 
 	// Information on the position and size of each bulge, and the bases each bulge contains
@@ -111,6 +112,7 @@ State* State::clone(){
 	s->rightTemplateBase = this->rightTemplateBase;
 	s->leftNascentBase = this->leftNascentBase;
 	s->rightNascentBase = this->rightNascentBase;
+	s->changeInLeftBulgePosition = this->changeInLeftBulgePosition;
 
 
 	// Clone the vectors
@@ -341,16 +343,15 @@ State* State::forward(){
 
 
 	// If bulge will move too far to the left then absorb it
-	string DOMupdates = "";
+	SlippageLandscapes* DOMupdates = new SlippageLandscapes();
+
 
 
 	for (int s = 0; s < this->bulgePos.size(); s++){
 		if (this->partOfBulgeID.at(s) != s) continue;
 		if (this->bulgePos.at(s) > 0 && this->bulgePos.at(s) == hybridLen->getVal() - 1) this->absorb_bulge(s, false, true, DOMupdates);
-		if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) ++;
+		//if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) ++;
 	}
-
-
 
 	// Update coordinates if this state is being displayed by the GUI (and not hidden mode)
 	if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden") {
@@ -435,6 +436,11 @@ State* State::forward(){
 
 	if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal()-1) ||
 		(this->mRNAPosInActiveSite <= 1 && this->rightTemplateBase > templateSequence.length())) this->terminate();
+
+
+	// If this is GUI state then we will be applying these changes to the DOM 
+	if (this->isGuiState) _slippageLandscapesToSendToDOM = DOMupdates;
+	else delete DOMupdates; 
 
 
 	return this;
@@ -526,12 +532,12 @@ State* State::backward(){
 
 
 	// If bulge will move too far to the left then absorb it
-	string DOMupdates = "";
+	SlippageLandscapes* DOMupdates = new SlippageLandscapes();
 
 	for (int s = 0; s < this->bulgePos.size(); s++){
 		if (this->partOfBulgeID.at(s) != s) continue;
 		if (this->bulgedBase.at(s) == this->rightNascentBase - 1) this->absorb_bulge(s, true, true, DOMupdates);
-		if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) --;
+		//if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) --;
 	}
 
 
@@ -614,6 +620,11 @@ State* State::backward(){
 		this->leftNascentBase --; 
 		this->rightNascentBase --; 
 	}
+
+
+	// If this is GUI state then we will be applying these changes to the DOM 
+	if (this->isGuiState) _slippageLandscapesToSendToDOM = DOMupdates;
+	else delete DOMupdates; 
 
 	return this;
 }
@@ -926,36 +937,39 @@ double State::calculateCleavageRate(bool ignoreStateRestrictions){
 
 // Apply whichever operator is necessary to slip left at bulge S
 State* State::slipLeft(int S){
+	
+	//cout << "slip left" << S << endl;
+	SlippageLandscapes* DOMupdates = new SlippageLandscapes(); // Need to create a new class which specifies new bulge landscapes to be created
 
+	if (!this->terminated){ // && !(currentModel->get_allowMultipleBulges() &&  this->partOfBulgeID.at(S) != S && state["bulgePos"][ this->partOfBulgeID.at(S) ] == hybridLen->getval() - 1)) {
 
-	string DOMupdates = ""; // Need to create a new class which specifies new bulge landscapes to be created
-
-	if (!this->terminated){ // && !(PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] &&  state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] == PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1)) {
 		
 
 
 		// If this is part of a larger bulge, then split one base off to the left and leave the rest as it is (fissure). Do Not Return. It will be followed up by a 2nd operation.
-		//if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] != PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"] - 1 && state["partOfBulgeID"][S] != S) {
-			//OPS_JS.fissureBulgeLeft_WW(state, UPDATE_COORDS, S, DOMupdates);
-	//	}
+		if (currentModel->get_allowMultipleBulges() && this->bulgePos.at(S) != this->getLeftBulgeBoundary() && this->partOfBulgeID.at(S) != S) {
+			this->fissureBulgeLeft(S, DOMupdates);
+		}
 		
 
-		//var fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 1, 1));
-		//if (fuseWith == -1)	fuseWith = state["bulgePos"].indexOf(Math.max(state["mRNAPosInActiveSite"] + 2, 2));
+		int fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 1, 1));
+		if (fuseWith == -1)	fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 2, 2));
 
 
 		// If there is another bulge 1 to the left then we fuse the two together
-		//if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] > 0 && state["bulgePos"].indexOf(state["bulgePos"][S] + 1) != -1) OPS_JS.fuseBulgeLeft_WW(state, UPDATE_COORDS, S, DOMupdates);
-		//else if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["bulgePos"][S] == 0 && fuseWith != -1) OPS_JS.fuseBulgeLeft_WW(state, UPDATE_COORDS, S, DOMupdates);
-
-
-		/*else*/ if (this->bulgePos.at(S) > 0 && this->bulgePos.at(S) < hybridLen->getVal() - 1) this->diffuse_left(S, DOMupdates);
-		else if (!this->NTPbound() && this->bulgePos.at(S) == 0 && this->mRNAPosInActiveSite < hybridLen->getVal() - 2) this->form_bulge(S, true, DOMupdates);
-		else if (this->bulgePos.at(S) != 0 && this->bulgePos.at(S) == hybridLen->getVal() - 1) this->absorb_bulge(S, false, false, DOMupdates);
-
-
+		if (currentModel->get_allowMultipleBulges() && this->bulgePos.at(S) > 0 && Settings::indexOf(this->bulgePos, this->bulgePos.at(S) + 1) != -1) this->fuseBulgeLeft(S, DOMupdates);
+		else if (currentModel->get_allowMultipleBulges() && this->bulgePos.at(S) == 0 && fuseWith != -1) this->fuseBulgeLeft(S, DOMupdates);
+		else if (this->bulgePos.at(S) > 0 && this->bulgePos.at(S) < this->getLeftBulgeBoundary()) this->diffuse_left(S, DOMupdates);
+		else if (!this->NTPbound() && this->bulgePos.at(S) == 0 && this->mRNAPosInActiveSite < this->getLeftBulgeBoundary() - 1) this->form_bulge(S, true, DOMupdates);
+		else if (this->bulgePos.at(S) != 0 && this->bulgePos.at(S) == this->getLeftBulgeBoundary()) this->absorb_bulge(S, false, false, DOMupdates);
 
 	}
+
+	//cout << "Done slipping left" << endl;
+
+	// If this is GUI state then we will be applying these changes to the DOM 
+	if (this->isGuiState) _slippageLandscapesToSendToDOM = DOMupdates;
+	else delete DOMupdates; 
 
 	return this;
 }
@@ -964,10 +978,10 @@ State* State::slipLeft(int S){
 // Apply whichever operator is necessary to slip right at bulge S
 State* State::slipRight(int S){
 
+	//cout << "slip right" << S << endl;
+	SlippageLandscapes* DOMupdates = new SlippageLandscapes(); // Need to create a new class which specifies new bulge landscapes to be created
 
-	string DOMupdates = ""; // Need to create a new class which specifies new bulge landscapes to be created
-
-	if (!this->terminated) {// && !(PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && state["partOfBulgeID"][S] != S && state["bulgePos"][ state["partOfBulgeID"][S] ] - Math.max(0, state["mRNAPosInActiveSite"]) == 1)) {
+	if (!this->terminated) {// && !(currentModel->get_allowMultipleBulges() && this->partOfBulgeID.at(S) != S && state["bulgePos"][ this->partOfBulgeID.at(S) ] - Math.max(0, this->mRNAPosInActiveSite) == 1)) {
 		
 
 		// Absorb bulge
@@ -976,23 +990,30 @@ State* State::slipRight(int S){
 		else{
 		
 			// If this is part of a larger bulge, then split one base off to the right and leave the rest as it is (fissure). Do Not Return. It will be followed up by a 2nd operation.
-			//if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && this->bulgePos.at(S) - Math.max(0, this->mRNAPosInActiveSite) != 1 && this->partOfBulgeID.at(S) != S) {
-			//	OPS_JS.fissureBulgeRight_WW(state, UPDATE_COORDS, S, DOMupdates);
-			//}
+			if (currentModel->get_allowMultipleBulges() && this->bulgePos.at(S) - max(0, this->mRNAPosInActiveSite) != 1 && this->partOfBulgeID.at(S) != S) {
+				this->fissureBulgeRight(S, DOMupdates);
+			}
 			
 			
-			//var canFuseWith = state["bulgePos"].indexOf(hybridLen->getVal() - 1);
-			//if (canFuseWith == -1)	canFuseWith = state["bulgePos"].indexOf(hybridLen->getVal() - 2);
+			int canFuseWith = Settings::indexOf(this->bulgePos, this->getLeftBulgeBoundary());
+			if (canFuseWith == -1)	canFuseWith = Settings::indexOf(this->bulgePos, this->getLeftBulgeBoundary() - 1);
 			
 
 			// If there is another bulge 1 to the right then we fuse the two together
-			//if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] &&  this->bulgePos.at(S) > 0 && state["bulgePos"].indexOf(this->bulgePos.at(S) - 1) != -1) OPS_JS.fuseBulgeRight_WW(state, UPDATE_COORDS, S, DOMupdates);
-			//else if (this->leftNascentBase > 1 && PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"] && this->bulgePos.at(S) == 0 && canFuseWith != -1 && state["bulgePos"].indexOf( this->bulgePos.at(canFuseWith) - 1) != -1)OPS_JS.fuseBulgeRight_WW(state, UPDATE_COORDS, S, DOMupdates);
-			/*else*/ if (this->bulgePos.at(S) < hybridLen->getVal() && this->bulgePos.at(S) > 1 && this->bulgePos.at(S) - max(0, this->mRNAPosInActiveSite) != 1) this->diffuse_right(S, DOMupdates);
+			if (currentModel->get_allowMultipleBulges() &&  this->bulgePos.at(S) > 0 && Settings::indexOf(this->bulgePos, this->bulgePos.at(S) - 1) != -1) this->fuseBulgeRight(S, DOMupdates);
+			else if (this->leftNascentBase > 1 && currentModel->get_allowMultipleBulges() && this->bulgePos.at(S) == 0 && canFuseWith != -1) this->fuseBulgeRight(S, DOMupdates);
+			else if (this->bulgePos.at(S) < this->getLeftBulgeBoundary() + 1 && this->bulgePos.at(S) > 1 && this->bulgePos.at(S) - max(0, this->mRNAPosInActiveSite) != 1) this->diffuse_right(S, DOMupdates);
 			else if (this->bulgePos.at(S) == 0 && this->leftNascentBase > 1) this->form_bulge(S, false, DOMupdates);
 		}
 
 	}
+
+	//cout << "Done slipping right" << endl;
+
+
+	// If this is GUI state then we will be applying these changes to the DOM 
+	if (this->isGuiState) _slippageLandscapesToSendToDOM = DOMupdates;
+	else delete DOMupdates; 
 
 	return this;
 }
@@ -1000,9 +1021,10 @@ State* State::slipRight(int S){
 
 
 
-void State::diffuse_left(int S, string DOMupdates){
-	
-	if (this->bulgePos.at(S) > 0 && this->bulgePos.at(S) < hybridLen->getVal() - 1){
+void State::diffuse_left(int S, SlippageLandscapes* DOMupdates){
+
+	if (this->isGuiState) cout << "diffuse left" << S << endl;
+	if (this->bulgePos.at(S) > 0 && this->bulgePos.at(S) < this->getLeftBulgeBoundary()){
 		
 	    int leftBoundary = this->bulgedBase.at(S) - this->bulgeSize.at(S) - 1;
 
@@ -1019,9 +1041,10 @@ void State::diffuse_left(int S, string DOMupdates){
 
 
 
-void State::diffuse_right(int S, string DOMupdates){
-	
-	if (this->bulgePos.at(S) > 1 && this->bulgePos.at(S) < hybridLen->getVal()){
+void State::diffuse_right(int S, SlippageLandscapes* DOMupdates){
+
+	if (this->isGuiState) cout << "diffuse right" << S << endl;
+	if (this->bulgePos.at(S) > 1 && this->bulgePos.at(S) < this->getLeftBulgeBoundary() + 1){
 
 
 		this->bulgePos.at(S) --;
@@ -1043,13 +1066,12 @@ void State::diffuse_right(int S, string DOMupdates){
 	
 }
 
-void State::form_bulge(int S, bool form_left, string DOMupdates){
+void State::form_bulge(int S, bool form_left, SlippageLandscapes* DOMupdates){
 
 
-	//console.log("forming", state, S);
-	if (form_left && !this->NTPbound() &&  this->bulgePos.at(S) == 0 && this->mRNAPosInActiveSite < hybridLen->getVal() - 2){
+	if (form_left && !this->NTPbound() &&  this->bulgePos.at(S) == 0 && this->mRNAPosInActiveSite < this->getLeftBulgeBoundary() - 1){
 		
-
+		if (this->isGuiState) cout << "form left" << S << endl;
 		if (this->NTPbound()) this->releaseNTP();
 
 		// Move 2nd last base to between the 2nd and 3rd to last positions, and last base into 2nd last position
@@ -1073,8 +1095,8 @@ void State::form_bulge(int S, bool form_left, string DOMupdates){
 
 			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary, "m")->getX(), 1, true, 0);
 			for (int i = this->bulgedBase.at(S) + 2; i < this->get_nascentLength() + 1; i ++){
-			if (i > this->rightNascentBase && i-this->rightNascentBase <= (bubbleRight->getVal()+1)) Coordinates::move_nt(i, "m", -25, -52/(bubbleRight->getVal()+1));
-			else Coordinates::move_nt(i, "m", -25, 0);
+				if (i > this->rightNascentBase && i-this->rightNascentBase <= (bubbleRight->getVal()+1)) Coordinates::move_nt(i, "m", -25, -52/(bubbleRight->getVal()+1));
+				else Coordinates::move_nt(i, "m", -25, 0);
 			}
 
 		}
@@ -1084,24 +1106,25 @@ void State::form_bulge(int S, bool form_left, string DOMupdates){
 		this->rightNascentBase ++;
 		this->mRNAPosInActiveSite ++;
 		this->nextTemplateBaseToCopy --;
+		this->changeInLeftBulgePosition --;
 
 		//if (UPDATE_COORDS) WW_JS.setNextBaseToAdd_WW();
 
-		/*
-		if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) {
-			var graphID = OPS_JS.create_new_slipping_params_WW(state);
-			DOMupdates["where_to_create_new_slipping_landscape"].push(graphID);
+
+		if (currentModel->get_allowMultipleBulges()) {
+			int graphID = this->create_new_slipping_params();
+			DOMupdates->add_where_to_create_new_slipping_landscape(graphID);
 		}
-		*/
+
 
 
 
 		
 	}
 	
-	else if (!form_left && this->mRNAPosInActiveSite <= hybridLen->getVal() - 2 && this->bulgePos.at(S) == 0 && this->getLeftNascentBaseNumber() > 1) {
+	else if (!form_left && this->mRNAPosInActiveSite <= this->getLeftBulgeBoundary() - 1 && this->bulgePos.at(S) == 0 && this->getLeftNascentBaseNumber() > 1) {
 		
-
+		if (this->isGuiState) cout << "form right" << S << endl;
 		this->bulgedBase.at(S) = PrimerType.substr(0,2) == "ss" ? this->leftNascentBase : 2;
 		this->bulgeSize.at(S) = 1;
 
@@ -1120,43 +1143,41 @@ void State::form_bulge(int S, bool form_left, string DOMupdates){
 			}
 
 			else{
-
-				// TODO: double stranded nascent
-				//WW_JS.move_nt_WW(0, "m", 25, 0);
-				//PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]--;
+				// Double stranded
+				Coordinates::move_nt(0, "m", 25, 0);
 
 			}
 
 		}
 
 	
-
-		this->bulgePos.at(S) = hybridLen->getVal() - 1;
+		this->bulgePos.at(S) = this->getLeftBulgeBoundary();
 		leftNascentBase --;
+		//this->changeInLeftBulgePosition --;
 
-		/*
-		if (PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) {
-			var graphID = OPS_JS.create_new_slipping_params_WW(state);
-			DOMupdates["where_to_create_new_slipping_landscape"].push(graphID);
+		if (currentModel->get_allowMultipleBulges()) {
+			int graphID = this->create_new_slipping_params();
+			DOMupdates->add_where_to_create_new_slipping_landscape(graphID);
 		}
-		*/
+
 
 	}
 	
 }
 
-void State::absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, string DOMupdates){
 
+void State::absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, SlippageLandscapes* DOMupdates){
 
-	if (!absorb_right && this->bulgeSize.at(S) > 0 && this->bulgePos.at(S) == hybridLen->getVal() - 1){
+	
+	if (!absorb_right && this->bulgeSize.at(S) > 0 && this->bulgePos.at(S) == this->getLeftBulgeBoundary()){
 		
-
+		if (this->isGuiState) cout << "absorb left" << S << endl;
 
 		this->leftNascentBase ++;
-		int leftBoundary = this->bulgedBase.at(S) - this->bulgeSize.at(S) + 1;
 
 		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
 
+			int leftBoundary = this->bulgedBase.at(S) - this->bulgeSize.at(S) + 1;
 			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary-1, "m")->getX(), this->bulgeSize.at(S)-1, true, 0);
 
 			if (PrimerType.substr(0,2) == "ss"){
@@ -1168,25 +1189,27 @@ void State::absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, st
 
 			else{
 
-				// TODO ds nascent
-				//Coordinates::move_nt(1, "m", -25, 0);
-				//Coordinates::move_nt(0, "m", -25, 0);
-				//hybridLen->getVal()++;
+				// Double stranded
+				Coordinates::move_nt(1, "m", -25, 0);
+				Coordinates::move_nt(0, "m", -25, 0);
 			}
 
 		}
 
 		this->bulgeSize.at(S) --;
-		if (this->bulgeSize.at(S) == 0){
+		//this->changeInLeftBulgePosition ++;
 
+
+		if (this->bulgeSize.at(S) == 0){
 			
 			if (Settings::indexOf(this->bulgePos, 0) != -1)	{
 				int toDelete = this->delete_slipping_params(S); // If there is already a form/absorb landscape then we can delete this one
-				//DOMupdates["landscapes_to_delete"].push(toDelete);
+				DOMupdates->add_landscapes_to_delete(toDelete);
 			}
 			else {
+				
 				this->reset_slipping_params(S);
-				//DOMupdates["landscapes_to_reset"].push(S);
+				DOMupdates->add_landscapes_to_reset(S);
 			}
 
 		}
@@ -1194,9 +1217,8 @@ void State::absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, st
 		else if (this->bulgeSize.at(S) == 1){ // If the bulge went from size 2 to size 1, we find and delete its fissure landscape
 			int bulgeIDOfDonorFissure = this->get_fissure_landscape_of(S);
 			int toDelete = this->delete_slipping_params(bulgeIDOfDonorFissure);
-			//DOMupdates["landscapes_to_delete"].push(toDelete);
+			DOMupdates->add_landscapes_to_delete(toDelete);
 		}
-
 
 		
 		if (destroy_entire_bulge){
@@ -1204,7 +1226,7 @@ void State::absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, st
 		}
 		
 		//return true;
-	
+
 	}
 
 
@@ -1212,7 +1234,7 @@ void State::absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, st
 	// If not backtracked, then bulge is absorbed when at position 2
 	else if (absorb_right && !this->NTPbound() && this->bulgeSize.at(S) > 0 && this->bulgePos.at(S) - max(0, this->mRNAPosInActiveSite) == 1 && !(this->bulgePos.at(S) == 2 && this->NTPbound())){
 		
-		
+		if (this->isGuiState) cout << "absorb right" << S << endl;
 
 		int leftBoundary = this->bulgedBase.at(S) - this->bulgeSize.at(S);
 		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
@@ -1235,6 +1257,7 @@ void State::absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, st
 		this->bulgedBase.at(S) --;
 		this->mRNAPosInActiveSite --;
 		this->rightNascentBase --;
+		this->changeInLeftBulgePosition ++;
 		this->nextTemplateBaseToCopy ++;
 		
 		//if (UPDATE_COORDS) WW_JS.setNextBaseToAdd_WW();
@@ -1243,18 +1266,18 @@ void State::absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, st
 		if (this->bulgeSize.at(S) == 0){
 			if (Settings::indexOf(this->bulgePos, 0) != -1) {
 				int toDelete = this->delete_slipping_params(S); // If there is already a form/absorb landscape then we can delete this one
-				//DOMupdates["landscapes_to_delete"].push(toDelete);
+				DOMupdates->add_landscapes_to_delete(toDelete);
 			}
 			else {
 				this->reset_slipping_params(S);
-				//DOMupdates["landscapes_to_reset"].push(S);
+				DOMupdates->add_landscapes_to_reset(S);
 			}
 		}
 		
 		else if (this->bulgeSize.at(S) == 1){ // If the bulge went from size 2 to size 1, we find and delete its fissure landscape
 			int bulgeIDOfDonorFissure = this->get_fissure_landscape_of(S);
 			int toDelete = this->delete_slipping_params(bulgeIDOfDonorFissure);
-			//DOMupdates["landscapes_to_delete"].push(toDelete);
+			DOMupdates->add_landscapes_to_delete(toDelete);
 		}
 
 	
@@ -1277,14 +1300,354 @@ void State::absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, st
 
 
 
+
+
+
+void State::fissureBulgeLeft(int S, SlippageLandscapes* DOMupdates){
+
+
+	if (this->isGuiState) cout << "fiss left" << S << endl;
+	if (this->bulgePos.at(S) != this->getLeftBulgeBoundary() && this->partOfBulgeID.at(S) != S){
+	
+		
+		int fissureFrom = this->partOfBulgeID.at(S);
+		
+		
+		// Change the parameters of the base being moved
+		
+		// If there will still be a bulge, then create a new landscape for diffusing the new bulge
+		this->bulgePos.at(S) = this->bulgePos.at(fissureFrom);
+		this->bulgedBase.at(S) = this->bulgedBase.at(fissureFrom) - this->bulgeSize.at(fissureFrom) + 1;
+		this->bulgeSize.at(S) = 1;
+		this->partOfBulgeID.at(S) = S;
+		
+		// Create a new landscape to continue fission, if there is still a bulge
+		if (this->bulgeSize.at(fissureFrom) > 2){
+			int graphID = this->create_new_slipping_params();
+			DOMupdates->add_where_to_create_new_slipping_landscape(graphID);
+			int newIndex = this->bulgePos.size() - 1;
+			this->partOfBulgeID.at(newIndex) = fissureFrom;
+		}
+
+		this->bulgeSize.at(fissureFrom) --;
+
+
+		// Reduce the visual size of the bulge
+		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
+			int leftBoundary = this->bulgedBase.at(fissureFrom) - this->bulgeSize.at(fissureFrom);
+			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary-1, "m")->getX(), this->bulgeSize.at(fissureFrom), true, -1);
+		}
+
+
+		// Then exit. This action may be followed by a diffuse left or a fuse left.
+		//return true;
+		
+	}
+	
+	//return false;
+
+
+
+}
+
+void State::fissureBulgeRight(int S, SlippageLandscapes* DOMupdates){
+
+	if (this->isGuiState) cout << "fiss right" << S << endl;
+	if (this->bulgePos.at(S) - max(0, this->mRNAPosInActiveSite) != 1 && this->partOfBulgeID.at(S) != S){
+		
+		
+		int fissureFrom = this->partOfBulgeID.at(S);
+		
+
+		// Change the parameters of the base being moved
+		this->bulgePos.at(S) = this->bulgePos.at(fissureFrom);
+		this->bulgedBase.at(S) = this->bulgedBase.at(fissureFrom);
+		this->bulgeSize.at(S) = 1;
+		this->partOfBulgeID.at(S) = S;
+		
+		
+		// Create a new landscape to continue fission, if there is still a bulge
+		if (this->bulgeSize.at(fissureFrom) > 2){
+			int graphID = this->create_new_slipping_params();
+			DOMupdates->add_where_to_create_new_slipping_landscape(graphID);
+			int newIndex = this->bulgePos.size() - 1;
+			this->partOfBulgeID.at(newIndex) = fissureFrom;
+		}
+		
+
+		this->bulgedBase.at(fissureFrom)--;
+		this->bulgeSize.at(fissureFrom)--;
+
+		// Reduce the visual size of the bulge
+		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
+			int leftBoundary = this->bulgedBase.at(fissureFrom) - this->bulgeSize.at(fissureFrom);
+			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary, "m")->getX(), this->bulgeSize.at(fissureFrom), true, +1);
+		}
+
+
+		// Then exit. This action may be followed by a diffuse left or a fuse left.
+		//return true;
+		
+	}
+	
+	
+	//return false;
+	
+
+}
+
+void State::fuseBulgeLeft(int S, SlippageLandscapes* DOMupdates){
+
+	if (this->isGuiState) cout << "fuse left" << S << endl;
+	if (this->bulgePos.at(S) == 0 && (Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 1, 1)) != -1 || Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 2, 2)) != -1)) { // Form bulge first and then fuse them
+		
+		
+	
+		int fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 1, 1));
+		if (fuseWith == -1)	fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 2, 2));
+		
+		
+		// If there is a bulge 1 to the left of the bulge we will fuse into, then declare this operation impossible
+		if (this->mRNAPosInActiveSite >= 0 && Settings::indexOf(this->bulgePos,  this->bulgePos.at(fuseWith) +1 ) != -1) return;
+		if ( Settings::indexOf(this->bulgeSize,  this->bulgePos.at(fuseWith) ) >= 6 ) return;
+		
+		
+		//console.log("Creating and fusing bulge", S, "with bulge", fuseWith, "at pos", this->bulgePos.at(fuseWith), "mRNAPosInActiveSite=", mRNAPosInActiveSite);
+		
+		
+		if (this->NTPbound()) this->releaseNTP();
+
+		
+
+		// bulgePos and bulgedBase are the rightmost positions in the bulge
+		this->bulgeSize.at(fuseWith) ++;
+		if ( (this->mRNAPosInActiveSite >= 0 && this->bulgePos.at(fuseWith) == this->mRNAPosInActiveSite + 2 ) || (this->mRNAPosInActiveSite < 0)) this->bulgedBase.at(fuseWith) ++;
+		if ( this->mRNAPosInActiveSite >= 0 && this->bulgePos.at(fuseWith) != this->mRNAPosInActiveSite + 2 ) this->bulgePos.at(fuseWith) ++;
+		
+	
+
+
+		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
+
+			int leftBoundary = this->bulgedBase.at(fuseWith) - this->bulgeSize.at(fuseWith);
+			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary, "m")->getX(), this->bulgeSize.at(fuseWith), true, 0);
+
+			if (PrimerType.substr(0,2) == "ss"){
+				for (int i = leftBoundary + this->bulgeSize.at(fuseWith) + 2; i < this->get_nascentLength() + 1; i ++){
+					if (i>this->getRightNascentBaseNumber() && i-this->getRightNascentBaseNumber() <= bubbleRight->getVal()) Coordinates::move_nt(i, "m", -25, -52/bubbleRight->getVal());
+					else Coordinates::move_nt(i, "m", -25, 0);
+				}
+			}
+
+		}
+		
+		this->rightNascentBase ++;
+		this->mRNAPosInActiveSite ++;
+		this->nextTemplateBaseToCopy --;
+		this->changeInLeftBulgePosition --;
+
+		//if (UPDATE_COORDS) WW_JS.setNextBaseToAdd_WW();
+		
+		this->reset_slipping_params(S);
+		DOMupdates->add_landscapes_to_reset(S);
+		if (this->bulgeSize.at(fuseWith) <= 2) {
+			int graphID = this->create_new_slipping_params();
+			DOMupdates->add_where_to_create_new_slipping_landscape(graphID);
+			this->partOfBulgeID.at(S) = fuseWith;
+		}
+		
+
+
+		//return true;
+		
+	}
+	
+
+	else if (this->bulgePos.at(S) > 0 && Settings::indexOf(this->bulgePos, this->bulgePos.at(S) + 1) != -1){ // Fuse the 2 bulges
+			
+			
+		int fuseWith = Settings::indexOf(this->bulgePos, this->bulgePos.at(S) + 1);
+		
+		this->bulgeSize.at(fuseWith) ++; // bulgePos and bulgedBase are the rightmost positions in the bulge
+		this->bulgedBase.at(fuseWith) ++;
+
+
+		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
+			int leftBoundary = this->bulgedBase.at(fuseWith) - this->bulgeSize.at(fuseWith);
+			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary, "m")->getX(), this->bulgeSize.at(fuseWith), true, 0);
+
+			
+			this->bulgeSize.at(S) --;
+			if (this->bulgeSize.at(S) == 0) {
+				this->reset_slipping_params(S);
+				DOMupdates->add_landscapes_to_reset(S);
+			}
+			else if (this->bulgeSize.at(S) > 0){
+				leftBoundary = this->bulgedBase.at(S) - this->bulgeSize.at(S);
+				Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary, "m")->getX(), this->bulgeSize.at(S), true, 0);
+			}
+
+		}
+		
+		// If we fused together 2 bulges of size 1, we simply turn the donor's diffusion landscape into the acceptor's fission landscape
+		if (this->bulgeSize.at(S) == 0 && this->bulgeSize.at(fuseWith) == 2) {
+			this->partOfBulgeID.at(S) = fuseWith;
+		}
+
+		// If this created a bulge of size 2 and the donor bulge was of size > 1, then create a fissure landscape
+		else if (this->bulgeSize.at(S) > 0 && this->bulgeSize.at(fuseWith) == 2) {
+			int graphID = this->create_new_slipping_params();
+			DOMupdates->add_where_to_create_new_slipping_landscape(graphID);
+			this->partOfBulgeID.at(this->bulgePos.size()-1) = fuseWith; 
+		}
+		
+		// If the donor bulge has been destroyed, but the acceptor bulge is still large, then simply destroy this diffusion landscape
+		else if (this->bulgeSize.at(S) == 0 && this->bulgeSize.at(fuseWith) > 2) {
+			int toDelete = this->delete_slipping_params(S);
+			DOMupdates->add_landscapes_to_delete(toDelete);
+		}
+
+
+		// If the donor bulge went from size 2 down to 1, then we need to delete its fissure landscape
+		if (DOMupdates->get_landscapes_to_delete_size() == 0 && this->bulgeSize.at(S) == 1) {
+			int bulgeIDOfDonorFissure = this->get_fissure_landscape_of(S);
+			int toDelete = this->delete_slipping_params(bulgeIDOfDonorFissure);
+			DOMupdates->add_landscapes_to_delete(toDelete);
+		}
+
+
+		//return true;
+
+	}
+	
+	//return false;
+
+}
+
+void State::fuseBulgeRight(int S, SlippageLandscapes* DOMupdates){
+
+	if (this->isGuiState) cout << "fuse right" << S << endl;
+	if (this->getLeftNascentBaseNumber() > 1 && this->bulgePos.at(S) == 0 && ((Settings::indexOf(this->bulgePos, this->getLeftBulgeBoundary()) != -1) || Settings::indexOf(this->bulgePos, hybridLen->getVal() - 2) != -1)) { // Form bulge first and then fuse them
+		
+		
+		
+		int fuseWith = Settings::indexOf(this->bulgePos, this->getLeftBulgeBoundary());
+		if (fuseWith == -1)	fuseWith = Settings::indexOf(this->bulgePos, this->getLeftBulgeBoundary() - 1);
+		
+		if (Settings::indexOf(this->bulgeSize,  this->bulgePos.at(fuseWith) ) >= 6 ) return;
+		
+
+		this->bulgeSize.at(fuseWith) ++;
+		this->leftNascentBase --;
+		//this->changeInLeftBulgePosition --;
+
+
+		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
+			int leftBoundary = this->bulgedBase.at(fuseWith) - this->bulgeSize.at(fuseWith);
+			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary+1, "m")->getX(), this->bulgeSize.at(fuseWith), true, 0);
+			for (int i = leftBoundary - 1;  i >= 0; i --){
+				if (i > this->getLeftNascentBaseNumber() - (bubbleLeft->getVal()+1)) Coordinates::move_nt(i, "m", 25, -52/(bubbleLeft->getVal()+1));
+				else Coordinates::move_nt(i, "m", 25, 0);
+			}
+		}
+		
+		
+		this->reset_slipping_params(S);
+		DOMupdates->add_landscapes_to_reset(S);
+		if (this->bulgeSize.at(fuseWith) <= 2) {
+			int graphID = this->create_new_slipping_params();
+			DOMupdates->add_where_to_create_new_slipping_landscape(graphID);
+			this->partOfBulgeID.at(S) = fuseWith;
+		}
+		
+
+		
+
+	}
+	
+		
+
+	else if (this->bulgePos.at(S) > 0 && Settings::indexOf(this->bulgePos, this->bulgePos.at(S) - 1) != -1){ // Fuse the 2 bulges
+		
+		
+			
+		int fuseWith = Settings::indexOf(this->bulgePos, this->bulgePos.at(S) - 1);
+		
+
+		this->bulgeSize.at(fuseWith) ++; // bulgePos and bulgedBase are the rightmost positions in the bulge
+
+
+		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
+
+			int leftBoundary = this->bulgedBase.at(fuseWith) - this->bulgeSize.at(fuseWith);
+			if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
+				Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary+1, "m")->getX(), this->bulgeSize.at(fuseWith), true, 0);
+			}
+
+		}
+		
+		
+		this->bulgeSize.at(S) --;
+		if (this->bulgeSize.at(S) == 0){
+	 		this->reset_slipping_params(S);
+			DOMupdates->add_landscapes_to_reset(S);
+		}
+
+		else if (this->bulgeSize.at(S) > 0){ 
+			this->bulgedBase.at(S) --;
+			int leftBoundary = this->bulgedBase.at(S) - this->bulgeSize.at(S);
+			if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden") Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary+1, "m")->getX(), this->bulgeSize.at(S), true, 0);
+		}
+
+
+		// If we fused together 2 bulges of size 1, we simply turn the donor's diffusion landscape into the acceptor's fission landscape
+		if (this->bulgeSize.at(S) == 0 && this->bulgeSize.at(fuseWith) == 2) {
+			this->partOfBulgeID.at(S) = fuseWith;
+		}
+
+		// If this created a bulge of size 2 and the donor bulge was of size > 1, then create a fissure landscape
+		else if (this->bulgeSize.at(S) > 0 && this->bulgeSize.at(fuseWith) == 2) {
+			int graphID = this->create_new_slipping_params();
+			DOMupdates->add_where_to_create_new_slipping_landscape(graphID);
+			this->partOfBulgeID.at(this->bulgePos.size()-1) = fuseWith;
+		}
+		
+		// If the donor bulge has been destroyed, but the acceptor bulge is still large, then simply destroy this diffusion landscape
+		else if (this->bulgeSize.at(S) == 0 && this->bulgeSize.at(fuseWith) > 2) {
+			int toDelete = this->delete_slipping_params(S);
+			DOMupdates->add_landscapes_to_delete(toDelete);
+		}
+		
+		
+		// If the donor bulge went from size 2 down to 1, then we need to delete its fissure landscape
+
+		if (DOMupdates->get_landscapes_to_delete_size() == 0 && this->bulgeSize.at(S) == 1) {
+			int bulgeIDOfDonorFissure = get_fissure_landscape_of(S);
+			int toDelete = this->delete_slipping_params(bulgeIDOfDonorFissure);
+			DOMupdates->add_landscapes_to_delete(toDelete);
+		}
+
+
+	}
+	
+	//return false;
+
+}
+
+
+
+
+
+
+
 // Gets the button label associated with slipping right
 string State::getSlipRightLabel(int S) {
 
 
 	string toReturn = "{}";
 
-	bool allowMultipleBulges = true; // PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"];
-	int h = hybridLen->getVal();
+	bool allowMultipleBulges = currentModel->get_allowMultipleBulges();
+	int h = this->getLeftBulgeBoundary() + 1; //hybridLen->getVal();
 
 	int fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 1, 1));
 	if (fuseWith == -1)	fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 2, 2));
@@ -1313,8 +1676,8 @@ string State::getSlipLeftLabel(int S) {
 
 	string toReturn = "{}";
 
-	bool allowMultipleBulges = true; //PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"];
-	int h = hybridLen->getVal();
+	bool allowMultipleBulges = currentModel->get_allowMultipleBulges();
+	int h = this->getLeftBulgeBoundary() + 1; //hybridLen->getVal();
 
 	int fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 1, 1));
 	if (fuseWith == -1)	fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 2, 2));
@@ -1345,25 +1708,26 @@ string State::getSlipLeftLabel(int S) {
 int State::create_new_slipping_params() {
 
 
-	// if (!PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) return null;
+	// if (!currentModel->get_allowMultipleBulges()) return null;
 	
 	int graphID = this->bulgePos.size();
 	
 	// Create new elements in the lists
 	this->bulgePos.push_back(0);
-	this->bulgePos.push_back(-1);
-	this->bulgePos.push_back(0);
-	this->bulgePos.push_back(graphID);
+	this->bulgedBase.push_back(-1);
+	this->bulgeSize.push_back(0);
+	this->partOfBulgeID.push_back(graphID);
 
 	return graphID;
 	
-
-
 }
 
 
+
 void State::reset_slipping_params(int S) {
-		
+
+
+	//if (this->isGuiState) cout << "Resetting " << S;
 	this->bulgePos.at(S) = 0;
 	this->bulgedBase.at(S) = -1;
 	this->bulgeSize.at(S) = 0;
@@ -1375,32 +1739,36 @@ void State::reset_slipping_params(int S) {
 int State::delete_slipping_params(int S) {
 
 
-	//if (!PARAMS_JS.PHYSICAL_PARAMETERS["allowMultipleBulges"]["val"]) return;
+	//if (!currentModel->get_allowMultipleBulges()) return;
+	//if (this->isGuiState) cout << "Deleting " << S;
 
 	// Delete this element from all slippage related lists
 	std::deque<int>::iterator it = this->bulgePos.begin();
-	advance(it, S-1);
+	advance(it, S);
 	this->bulgePos.erase(it);
 
 	it = this->bulgedBase.begin();
-	advance(it, S-1);
+	advance(it, S);
 	this->bulgedBase.erase(it);
 
 	it = this->bulgeSize.begin();
-	advance(it, S-1);
+	advance(it, S);
 	this->bulgeSize.erase(it);
 
 	it = this->partOfBulgeID.begin();
-	advance(it, S-1);
+	advance(it, S);
 	this->partOfBulgeID.erase(it);
+
 
 	
 	// Pull down the indices where applicable
-	for (int s = 0; s < this->bulgePos.size(); s++){
+	for (int s = 0; s < this->partOfBulgeID.size(); s++){
 		if (this->partOfBulgeID.at(s) > S) {
 			this->partOfBulgeID.at(s) --;
 		}
 	}
+
+
 
 	return this->bulgePos.size();
 
@@ -1504,8 +1872,10 @@ int State::get_nextTemplateBaseToCopy(){
 	return this->nextTemplateBaseToCopy;
 }
 
-
-
+// Maximum value an element in bulgePos may take before the bulge will absorb if it goes any higher 
+int State::getLeftBulgeBoundary(){
+	return PrimerType.substr(0,2) == "ss" ? hybridLen->getVal() - 1 : this->rightNascentBase - 2 + this->changeInLeftBulgePosition;
+} 
 
 
 

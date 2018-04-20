@@ -24,6 +24,9 @@
 #ifndef STATE_H
 #define STATE_H
 
+
+#include "SlippageLandscapes.h"
+
 #include <string>
 #include <list>
 #include <deque>
@@ -53,6 +56,7 @@ class State{
 	int rightTemplateBase;
 	int leftNascentBase;
 	int rightNascentBase;
+	int changeInLeftBulgePosition;
 
 
 	// Information on bulges
@@ -63,10 +67,16 @@ class State{
 
 
 	// Private slippage
-	void diffuse_left(int S, string DOMupdates);
-	void diffuse_right(int S, string DOMupdates);
-	void form_bulge(int S, bool form_left, string DOMupdates);
-	void absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, string DOMupdates); 
+	void diffuse_left(int S, SlippageLandscapes* DOMupdates);
+	void diffuse_right(int S, SlippageLandscapes* DOMupdates);
+	void form_bulge(int S, bool form_left, SlippageLandscapes* DOMupdates);
+	void absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, SlippageLandscapes* DOMupdates); 
+	void fissureBulgeLeft(int S, SlippageLandscapes* DOMupdates);
+	void fissureBulgeRight(int S, SlippageLandscapes* DOMupdates);
+	void fuseBulgeLeft(int S, SlippageLandscapes* DOMupdates);
+	void fuseBulgeRight(int S, SlippageLandscapes* DOMupdates);
+
+
 
 	// Bulge management
 	int create_new_slipping_params();
@@ -118,6 +128,7 @@ class State{
 		string getSlipRightLabel(int S);
 
 
+
 		void setNextBaseToAdd(string baseToAdd);
 		string getNextBaseToAdd();
 		bool get_thereHaveBeenMutations();
@@ -134,6 +145,7 @@ class State{
 		int getRightNascentBaseNumber();
 		int getRightTemplateBaseNumber();
 
+		int getLeftBulgeBoundary(); 
 		int get_nextTemplateBaseToCopy();
 		bool get_activated();
 

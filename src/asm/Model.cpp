@@ -46,6 +46,8 @@ Model::Model(){
 	useFourNTPconcentrations = true;
 	assumeBindingEquilibrium = true;
 	assumeTranslocationEquilibrium = false;
+	allowMultipleBulges = true;
+	
 	//modelIsActive = false;
 
 
@@ -73,6 +75,7 @@ Model* Model::clone(){
 	clonedModel->assumeBindingEquilibrium = this->assumeBindingEquilibrium;
 	clonedModel->assumeTranslocationEquilibrium = this->assumeTranslocationEquilibrium;
 	clonedModel->currentTranslocationModel = this->currentTranslocationModel;
+	clonedModel->allowMultipleBulges = this->allowMultipleBulges;
 
 
 	return clonedModel;
@@ -182,6 +185,7 @@ string Model::toJSON(){
 	JSON += "'allowmRNAfolding':" + string(this->allowmRNAfolding ? "true" : "false") + ",";
 	JSON += "'allowMisincorporation':" + string(this->allowMisincorporation ? "true" : "false") + ",";
 	JSON += "'useFourNTPconcentrations':" + string(this->useFourNTPconcentrations ? "true" : "false") + ",";
+	JSON += "'allowMultipleBulges':" + string(this->allowMultipleBulges ? "true" : "false") + ",";
 	JSON += "'NTPbindingNParams':" + to_string(this->NTPbindingNParams) + ",";
 	JSON += "'currentTranslocationModel':'" + this->currentTranslocationModel + "',";
 	JSON += "'assumeBindingEquilibrium':" + string(this->assumeBindingEquilibrium ? "true" : "false") + ",";
@@ -210,6 +214,9 @@ void Model::print(){
 	cout << "currentTranslocationModel = " << this->currentTranslocationModel << endl;
 	cout << "assumeBindingEquilibrium = " << this->assumeBindingEquilibrium << endl;
 	cout << "assumeTranslocationEquilibrium = " << this->assumeTranslocationEquilibrium << endl;
+	cout << "allowMultipleBulges = " << this->allowMultipleBulges << endl;
+
+
 
 	for(std::map<string, int>::iterator iter = this->parameterInstanceMappings.begin(); iter != this->parameterInstanceMappings.end(); ++iter){
 		string paramID =  iter->first;
@@ -338,6 +345,15 @@ Model* Model::set_assumeTranslocationEquilibrium(bool val){
 }
 bool Model::get_assumeTranslocationEquilibrium(){
 	return this->assumeTranslocationEquilibrium;
+}
+
+
+Model* Model::set_allowMultipleBulges(bool val){
+	this->allowMultipleBulges = val;
+	return this;
+}
+bool Model::get_allowMultipleBulges(){
+	return this->allowMultipleBulges;
 }
 
 

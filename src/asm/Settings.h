@@ -30,6 +30,7 @@
 #include "Sequence.h"
 #include "Simulator.h"
 #include "Polymerase.h"
+#include "SlippageLandscapes.h"
 
 #include <random>
 #include <string>
@@ -110,6 +111,8 @@ extern string _animationSpeed;
 extern Simulator* _interfaceSimulator; // The simulator object being used by the GUI
 extern State* _currentStateGUI; // The current state displayed on the GUI and used in all GUI simulations
 extern chrono::system_clock::time_point _interfaceSimulation_startTime; // The start time of the GUI simulation
+extern SlippageLandscapes* _slippageLandscapesToSendToDOM;
+
 
 
 // Parameters

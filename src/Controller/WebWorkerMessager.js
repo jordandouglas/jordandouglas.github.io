@@ -1293,18 +1293,12 @@ function stutter_controller(nbasesToStutter = null, fastMode = false, resolve = 
 
 function forward_controller(state = null, UPDATE_COORDS = true, resolve = function() { }){
 
+
 	if (variableSelectionMode) return resolve(false);
 
 	if ($("#fwdBtn").css("cursor") == "not-allowed") return resolve(false);
 
 	var updateDOM = function(DOMupdates){
-		if(DOMupdates == null || DOMupdates["successfulOp"]){
-			
-			refreshNavigationCanvases();
-			update_sliding_curve(1);
-			update_slipping_curve(0);
-			renderObjects();
-		}
 
 
 		if (DOMupdates != null) {
@@ -1328,7 +1322,16 @@ function forward_controller(state = null, UPDATE_COORDS = true, resolve = functi
 
 		}
 
+
+		refreshNavigationCanvases();
+		update_sliding_curve(1);
+		update_slipping_curve(0);
+		renderObjects();
+		drawPlots();
+
+
 		resolve();
+
 
 	};
 
@@ -1354,7 +1357,7 @@ function forward_controller(state = null, UPDATE_COORDS = true, resolve = functi
 		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then(() => updateDOM());
+		toCall().then((result) => updateDOM(result));
 	}
 
 
@@ -1370,15 +1373,7 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 
 	var updateDOM = function(DOMupdates){
 
-		if (DOMupdates == null || DOMupdates["successfulOp"]){
-			
-			refreshNavigationCanvases();
-			update_sliding_curve(-1);
-			update_slipping_curve(0);
-			renderObjects();
-			$("#mRNAsvg").remove();
-			$("#bases").children().show(0);
-		}
+
 
 		if (DOMupdates != null) {
 		
@@ -1401,6 +1396,15 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 
 		}
 
+
+		refreshNavigationCanvases();
+		update_sliding_curve(-1);
+		update_slipping_curve(0);
+		renderObjects();
+		$("#mRNAsvg").remove();
+		$("#bases").children().show(0);
+
+	
 		resolve();
 
 	};
@@ -1425,7 +1429,7 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then(() => updateDOM());
+		toCall().then((result) => updateDOM(result));
 	}
 
 
@@ -1660,13 +1664,11 @@ function slip_left_controller(S = 0, state = null, UPDATE_COORDS = true, resolve
 
 	if (variableSelectionMode) return resolve(false);
 
+	//console.log("slip_left_controller", S);
 
 	var updateDOM = function(DOMupdates){
 
-		refreshNavigationCanvases();
-		update_sliding_curve(0);
-		update_slipping_curve(-1, S);
-		renderObjects();
+		
 
 		if (DOMupdates != null) {
 
@@ -1688,6 +1690,11 @@ function slip_left_controller(S = 0, state = null, UPDATE_COORDS = true, resolve
 			}
 
 		}
+
+		refreshNavigationCanvases();
+		update_sliding_curve(0);
+		update_slipping_curve(-1, S);
+		renderObjects();
 
 
 		resolve();
@@ -1718,7 +1725,7 @@ function slip_left_controller(S = 0, state = null, UPDATE_COORDS = true, resolve
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then(() => updateDOM());
+		toCall().then((result) => updateDOM(result));
 
 		
 	}
@@ -1734,16 +1741,11 @@ function slip_right_controller(S = 0, state = null, UPDATE_COORDS = true, resolv
 
 	if (variableSelectionMode) return resolve(false);
 
+	//console.log("slip_right_controller", S);
 
 	var updateDOM = function(DOMupdates){
 
 		
-		refreshNavigationCanvases();
-		update_sliding_curve(0);
-		update_slipping_curve(1, S);
-		renderObjects();
-
-
 		if (DOMupdates != null) {
 
 			// Create any new slippage landscapes that are required
@@ -1764,6 +1766,11 @@ function slip_right_controller(S = 0, state = null, UPDATE_COORDS = true, resolv
 			}
 
 		}
+
+		refreshNavigationCanvases();
+		update_sliding_curve(0);
+		update_slipping_curve(1, S);
+		renderObjects();
 
 
 		resolve();
@@ -1794,7 +1801,7 @@ function slip_right_controller(S = 0, state = null, UPDATE_COORDS = true, resolv
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then(() => updateDOM());
+		toCall().then((result) => updateDOM(result));
 
 		
 	}

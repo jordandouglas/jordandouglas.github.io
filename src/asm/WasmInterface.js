@@ -743,8 +743,8 @@ stutter = function(N, msgID = null){
 translocateForward = function(msgID = null){
 
 	// Create the callback function
-	var toDoAfterCall = function(){
-		if (msgID != null) postMessage(msgID + "~X~done");
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 	}
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 
@@ -756,8 +756,8 @@ translocateForward = function(msgID = null){
 translocateBackwards = function(msgID = null){
 
 	// Create the callback function
-	var toDoAfterCall = function(){
-		if (msgID != null) postMessage(msgID + "~X~done");
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 	}
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 
@@ -840,8 +840,8 @@ cleaveNascentStrand = function(msgID = null){
 slipLeft = function(S = 0, msgID = null){
 
 	// Create the callback function
-	var toDoAfterCall = function(){
-		if (msgID != null) postMessage(msgID + "~X~done");
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 	}
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 	Module.ccall("slipLeft", null, ["number", "number"], [S, msgID]);
@@ -853,8 +853,8 @@ slipLeft = function(S = 0, msgID = null){
 slipRight = function(S = 0, msgID = null){
 
 	// Create the callback function
-	var toDoAfterCall = function(){
-		if (msgID != null) postMessage(msgID + "~X~done");
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 	}
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 	Module.ccall("slipRight", null, ["number", "number"], [S, msgID]);

@@ -432,7 +432,7 @@ bool Coordinates::move_nt_absolute(int pos, string whichSeq, double newX, double
 
 	if (nt == nullptr) return false;
 
-
+	//if (pos == 0) newX -= 70;
 	double dx = newX - nt->getX();
 	double dy = newY - nt->getY();
 
@@ -491,6 +491,8 @@ void Coordinates::change_src_of_object_from_id(string id, string newSrc){
 
 void Coordinates::flip_base(int pos, string flipFrom, string flipTo){
 
+
+	if (pos <= 0) return; // Do not flip the 3 or 5' label
 	HTMLobject* nt;
 
 	// Get the nucleotide out of the sequence
@@ -642,7 +644,10 @@ void Coordinates::position_bulge(int startBaseNum, int startBaseXVal, int bulgeS
 	string thisStrandSymbol = inPrimer ? "m" : "g";
 	string otherStrandSymbol = inPrimer ? "g" : "m";
 	double yHeight = 155;
-	
+
+
+	int startBaseXValAdj = startBaseXVal;
+	//if (startBaseNum == 0) startBaseXValAdj -= 70;
 
 	
 	// Flip the bases so that the bulged bases are facing outwards and the pairing bases are facing inwards
@@ -653,8 +658,8 @@ void Coordinates::position_bulge(int startBaseNum, int startBaseXVal, int bulgeS
 	}
 	
 	
-	if(skip == 0) Coordinates::move_nt_absolute(startBaseNum, thisStrandSymbol, startBaseXVal, yHeight);
-	else Coordinates::move_nt_absolute(startBaseNum, thisStrandSymbol, startBaseXVal, Coordinates::getNucleotide(startBaseNum, thisStrandSymbol)->getY()); // Move it to its correct x coordinate but leave at its y one
+	if(skip == 0) Coordinates::move_nt_absolute(startBaseNum, thisStrandSymbol, startBaseXValAdj, yHeight);
+	else Coordinates::move_nt_absolute(startBaseNum, thisStrandSymbol, startBaseXValAdj, Coordinates::getNucleotide(startBaseNum, thisStrandSymbol)->getY()); // Move it to its correct x coordinate but leave at its y one
 	
 	if(skip == 0) Coordinates::move_nt_absolute(startBaseNum+bulgeSize+1, thisStrandSymbol, startBaseXVal+25, yHeight);
 	else Coordinates::move_nt_absolute(startBaseNum+bulgeSize+1, thisStrandSymbol, startBaseXVal+25, Coordinates::getNucleotide(startBaseNum+bulgeSize+1, thisStrandSymbol)->getY()); // Move it to its correct x coordinate but leave at its y one

@@ -199,18 +199,22 @@ extern "C" {
 
 	// Move the polymerase forwards
 	void EMSCRIPTEN_KEEPALIVE translocateForward(int msgID){
+		if (_slippageLandscapesToSendToDOM != nullptr) delete _slippageLandscapesToSendToDOM;
+		_slippageLandscapesToSendToDOM = new SlippageLandscapes();
 		_applyingReactionsGUI = true;
 		_currentStateGUI->forward();
 		_applyingReactionsGUI = false;
-		messageFromWasmToJS("", msgID);
+		messageFromWasmToJS(_slippageLandscapesToSendToDOM->toJSON(), msgID);
 	}
 
 	// Move the polymerase backwards
 	void EMSCRIPTEN_KEEPALIVE translocateBackwards(int msgID){
+		if (_slippageLandscapesToSendToDOM != nullptr) delete _slippageLandscapesToSendToDOM;
+		_slippageLandscapesToSendToDOM = new SlippageLandscapes();
 		_applyingReactionsGUI = true;
 		_currentStateGUI->backward();
 		_applyingReactionsGUI = false;
-		messageFromWasmToJS("", msgID);
+		messageFromWasmToJS(_slippageLandscapesToSendToDOM->toJSON(), msgID);
 	}
 
 	// Bind NTP or add it onto the chain if already bound
@@ -255,18 +259,22 @@ extern "C" {
 
 	// Form / diffuse / fuse / fissure / absorb bulge with id S to the left
 	void EMSCRIPTEN_KEEPALIVE slipLeft(int S, int msgID){
+		if (_slippageLandscapesToSendToDOM != nullptr) delete _slippageLandscapesToSendToDOM;
+		_slippageLandscapesToSendToDOM = new SlippageLandscapes();
 		_applyingReactionsGUI = true;
 		_currentStateGUI->slipLeft(S);
 		_applyingReactionsGUI = false;
-		messageFromWasmToJS("", msgID);
+		messageFromWasmToJS(_slippageLandscapesToSendToDOM->toJSON(), msgID);
 	}
 
 	// Form / diffuse / fuse / fissure / absorb bulge with id S to the right
 	void EMSCRIPTEN_KEEPALIVE slipRight(int S, int msgID){
+		if (_slippageLandscapesToSendToDOM != nullptr) delete _slippageLandscapesToSendToDOM;
+		_slippageLandscapesToSendToDOM = new SlippageLandscapes();
 		_applyingReactionsGUI = true;
 		_currentStateGUI->slipRight(S);
 		_applyingReactionsGUI = false;
-		messageFromWasmToJS("", msgID);
+		messageFromWasmToJS(_slippageLandscapesToSendToDOM->toJSON(), msgID);
 	}
 
 
@@ -357,6 +365,7 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE getSlippageCanvasData(int S, int msgID){
 
 
+
 		State* stateLeft = _currentStateGUI->clone();
 		State* stateRight = _currentStateGUI->clone();
 		stateLeft->slipLeft(S);
@@ -374,6 +383,9 @@ extern "C" {
 		slippageJSON += "'rightLabel':" + _currentStateGUI->getSlipRightLabel(S) + ",";
 		slippageJSON += "'hybridLen':" + to_string(hybridLen->getVal());
 		slippageJSON += "}";
+
+
+
 		messageFromWasmToJS(slippageJSON, msgID);
 
 	}

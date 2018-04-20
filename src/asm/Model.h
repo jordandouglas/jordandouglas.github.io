@@ -49,6 +49,7 @@ class Model{
 	bool useFourNTPconcentrations;
 	bool assumeBindingEquilibrium;
 	bool assumeTranslocationEquilibrium;
+	bool allowMultipleBulges;
 	string currentTranslocationModel;
 	int NTPbindingNParams;
 	//bool modelIsActive;
@@ -99,6 +100,10 @@ class Model{
 		bool get_assumeBindingEquilibrium();
 		Model* set_assumeTranslocationEquilibrium(bool val);
 		bool get_assumeTranslocationEquilibrium();
+		Model* set_allowMultipleBulges(bool val);
+		bool get_allowMultipleBulges();
+
+
 		Model* set_currentTranslocationModel(string val);
 		string get_currentTranslocationModel();
 		Model* set_NTPbindingNParams(int val);
