@@ -156,6 +156,7 @@ void Plots::init(){
 // Start new simulation
 void Plots::refreshPlotData(State* state){
 
+	if (state == nullptr || !_USING_GUI) return;
 
 	Plots::currentSimNumber ++;
 
@@ -219,7 +220,7 @@ void Plots::refreshPlotData(State* state){
 // At the end of every simulation update the parameter plot data
 void Plots::updateParameterPlotData(State* state){
 	
-
+	if (state == nullptr || !_USING_GUI) return;
 
 	if (Plots::catalysisTimesThisTrial.size() == 0) return; 
 	if (Plots::totaltimeElapsedThisTrial == 0) return;
@@ -264,6 +265,8 @@ void Plots::updateParameterPlotData(State* state){
 
 void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) {
 
+
+	if (state == nullptr || !_USING_GUI) return;
 
 	int rightHybridBase = state->getRightTemplateBaseNumber();
 	int numActions = sizeof(actionsToDo) / sizeof(actionsToDo[0]);
@@ -372,6 +375,7 @@ void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) 
 
 
 string Plots::getPlotDataAsJSON(){
+
 
 
 	if (_USING_GUI && Plots::plotsAreHidden) return "{}";

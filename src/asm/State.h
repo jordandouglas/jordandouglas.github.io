@@ -122,6 +122,11 @@ class State{
 		State* cleave();
 		double calculateCleavageRate(bool ignoreStateRestrictions);
 
+
+		// Fold mRNA and returns a JSON string with information on where to position the folded bases
+		string fold();
+		int findBondsRecurse(int index, string structureString, string& bonds);
+
 		State* slipLeft(int S);
 		State* slipRight(int S);
 		string getSlipLeftLabel(int S);

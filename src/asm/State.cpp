@@ -29,8 +29,10 @@
 #include "FreeEnergy.h"
 #include "Coordinates.h"
 #include "HTMLobject.h"
-
+#include "SimPol_vRNA_interface.h"
 #include "TranslocationRatesCache.h"
+
+
 #include <iostream>
 #include <locale>
 #include <algorithm>
@@ -1789,6 +1791,85 @@ int State::get_fissure_landscape_of(int S){
 }
 
 
+
+
+
+string State::fold(){
+
+	cout << "Calculating free energy" << endl;
+	char* structure = vRNA_compute_MFE(_currentStateGUI->get_NascentSequence().substr(0, this->leftNascentBase-1).c_str());
+	string structureString = string(structure);
+	cout << "Free energy: " << vRNA_MFE_value << "kBT with structure " << structureString << endl;
+
+	// Create bond objects between each consecutive base
+	string bonds = "'bonds':[";
+	string vertices = "'vertices':[";
+	string toHide = "'toHide':[";
+	double startX = 3 * Coordinates::getHTMLobject("pol")->getX() / 4;
+	double startY = 300;
+
+
+	vertices = vertices + "{'src':'5RNA', 'startX':" + to_string(startX) + ", 'startY':" + to_string(startY) + "}"; 
+	bonds = bonds + "{'source':0, 'target':1, 'terminal':true}"; 
+	toHide = toHide + "'#m0'";
+
+
+
+	//for (var i = 1; i < state["leftMBase"] - PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]; i ++){
+	for (int i = 1; i < this->leftNascentBase; i ++){
+		HTMLobject* node_i = Coordinates::getNucleotide(i, "m");
+		vertices = vertices + ",{'src':'" + node_i->getSrc() + "', 'startX':" + to_string(startX) + ", 'startY':" + to_string(startY) + "}"; 
+		bonds = bonds + ",{'source':" + to_string(i) + ", 'target':" + to_string(i+1) + "}"; 
+		toHide = toHide + ",'#" + node_i->getID() + "'";
+		
+	}
+
+
+	HTMLobject* anchoredNode = Coordinates::getNucleotide(this->leftNascentBase, "m");
+	vertices = vertices + ",{'src':'" + anchoredNode->getSrc() + "', 'fixed': true, 'startX':" + to_string(startX) + ", 'startY':" + to_string(startY) + ", 'fx':" + to_string(anchoredNode->getX() - startX) + ", 'fy':" + to_string(anchoredNode->getY() - 100 - startY) + "}"; 
+
+
+	
+	// Recursively add bonds as specified by the structure
+	this->findBondsRecurse(0, structureString, bonds);
+
+
+	vertices = vertices + "]"; 
+	bonds = bonds + "]";
+	toHide = toHide + "]";
+
+	return "{" + vertices + "," + bonds + "," + toHide + "}";
+
+}
+
+
+
+int State::findBondsRecurse(int index, string structureString, string& bonds){
+	
+	while (structureString.substr(index, 1) == ".") index ++;
+	
+	
+	if (structureString.substr(index, 1) == "("){
+		int bracketClosing = this->findBondsRecurse(index + 1, structureString, bonds);
+		bonds = bonds + ",{'source':" + to_string(index+1) + ", 'target':" + to_string(bracketClosing+1) + ", 'bp':true}"; 
+		//cout << "Adding bond between " << index+1 << " and " << bracketClosing+1 << endl;
+		index = bracketClosing + 1;
+		while (structureString.substr(index, 1) == ".") index ++;
+		
+		if (structureString.substr(index, 1) == "(") {
+			return this->findBondsRecurse(index, structureString, bonds);
+		}
+		
+	}
+
+	
+	if (structureString.substr(index, 1) == ")") return index;
+
+	//cout << "DONE" << endl;
+	return -1;
+	
+	
+}
 
 
 

@@ -33,9 +33,10 @@
 #include "SimulatorPthread.h"
 #include "BayesianCalculations.h"
 #include "PosteriorDistriutionSample.h"
+#include "SimPol_vRNA_interface.h"
 
 
-
+#include <dlfcn.h>
 #include <iostream>
 #include <string>
 #include <random>
@@ -75,10 +76,7 @@ int main(int argc, char** argv) {
 
 	
     cout << "Starting Simpol_cpp" << endl;
-
-	
 	auto startTime = std::chrono::system_clock::now();
-
 
 	// Parse arguments
 	bool doMCMC = false;
@@ -183,12 +181,20 @@ int main(int argc, char** argv) {
 		if (!succ) exit(1);
 
 	}
-	
+
+
+	cout << "AAAA" << endl;
+
 	Settings::sampleAll();
 	SimulatorPthread::init();
+
+	cout << "BBBB" << endl;
+
 	Plots::init();
 
+	vRNA_init();
 
+	cout << "CCCC" << endl;
     
     //complementSequence = Settings::complementSeq(templateSequence, TemplateType.substr(2) == "RNA");
 
@@ -240,6 +246,7 @@ int main(int argc, char** argv) {
 	// Just simulate
 	else{
 
+		cout << "DDDD" << endl;
 
    		double velocity = SimulatorPthread::performNSimulations(ntrials_sim, true);
 		cout << "Mean velocity: " << velocity << "bp/s" << endl;

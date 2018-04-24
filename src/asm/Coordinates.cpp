@@ -54,6 +54,19 @@ int Coordinates::getAnimationTime(){
 }
 
 
+HTMLobject* Coordinates::getHTMLobject(string id){
+
+	HTMLobject* obj;
+	for (list<HTMLobject*>::iterator it = Coordinates::HTMLobjects.begin(); it != Coordinates::HTMLobjects.end(); ++it){
+		if ((*it)->getID() == id){
+			obj = (*it);
+			return obj;
+		}
+	}
+	return obj;
+}
+
+
 // Return the nucleotide object at the specified position
 HTMLobject* Coordinates::getNucleotide(int pos, string whichSeq){
 
@@ -379,6 +392,8 @@ void Coordinates::move_obj_from_id(string id, double dx, double dy){
 
 	Coordinates::move_obj(obj, dx, dy);
 }
+
+
 
 
 void Coordinates::move_nt(int pos, string whichSeq, double dx, double dy){

@@ -115,6 +115,22 @@ getCppArrayFromDict = function(dict, dataType = "double"){
 */
 
 
+// Returns a JSON object containing how to fold the mRNA
+getMFESequenceBonds = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log("MFE", resultStr);
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	
+	Module.ccall("getMFESequenceBonds", null, ["number"], [msgID]);
+
+}
+
+
+
 
 // Returns a JSON string with all unrendered objects and removes these objects from the list
 getUnrenderedobjects = function(msgID = null){

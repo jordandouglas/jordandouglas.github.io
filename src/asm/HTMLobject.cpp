@@ -238,6 +238,10 @@ string HTMLobject::getBase(){
 	return this->baseStr;
 }
 
+string HTMLobject::getSrc(){
+	return this->src;
+}
+
 void HTMLobject::setAnimationTime(int animationTime){
 	this->animationTime = animationTime;
 }

@@ -78,6 +78,7 @@ class HTMLobject{
 
 		string getID();
 		string getBase();
+		string getSrc();
 		double getX();
 		double getY();
 		double getWidth();

@@ -40,6 +40,7 @@ TranslocationRatesCache::TranslocationRatesCache(){
 
 double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 
+
 	int h = (int)hybridLen->getVal();
 
 
@@ -150,6 +151,8 @@ void TranslocationRatesCache::buildTranslocationRateTable(string templSequence){
 
 
 	//cout << "Building translocation rate table..." << templSequence.length() << endl;
+
+	if (hybridLen == nullptr || (int)hybridLen->getVal() <= 0) return;
 	
 	int h = (int)hybridLen->getVal();
 	int nLengths = templSequence.length() - h + 1;
@@ -188,6 +191,9 @@ void TranslocationRatesCache::buildBacktrackRateTable(string templSequence){
 	// folding the 3' end of the nascent strand
 
 	//cout << "Building backtrack rate table..." << templSequence.length() << endl;
+
+	if (hybridLen == nullptr || (int)hybridLen->getVal() <= 0) return;
+
 
 	int h = (int)hybridLen->getVal();
 	if (templSequence.length() - h - 1 < 0) return;

@@ -65,7 +65,7 @@ class Coordinates{
 
 		// Returns a JSON string which contains information on what changes must be made (eg. on the next animation frame)
 		static string getUnrenderedObjectsJSON(bool clearList);
-		
+
 
 		// Creating objects
 		static void create_HTMLobject(string id, double x, double y, double width, double height, string src, int zIndex);
@@ -97,6 +97,8 @@ class Coordinates{
 		// Manipulating force equipment coordinates
 		static void updateForceEquipment(double newForce);
 		static void updateForceEquipment(double newForce, double oldForce);
+
+		static HTMLobject* getHTMLobject(string id);
 
 
 };

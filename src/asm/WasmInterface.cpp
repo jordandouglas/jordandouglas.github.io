@@ -30,6 +30,8 @@
 #include "Coordinates.h"
 
 
+
+
 #include <emscripten.h>
 #include <iostream>
 #include <string>
@@ -496,6 +498,23 @@ extern "C" {
 
 	}
 
+
+
+
+	// Returns a JSON object containing how to fold the mRNA
+	void EMSCRIPTEN_KEEPALIVE getMFESequenceBonds(int msgID){
+		auto timeStart = chrono::system_clock::now();
+		string foldJSON = _currentStateGUI->fold();
+		auto timeStop = chrono::system_clock::now();
+
+
+		chrono::duration<double> elapsed_seconds = timeStop - timeStart;
+		double time = elapsed_seconds.count();
+
+		cout << "Time to fold mRNA " << time << "s" << endl;
+
+		messageFromWasmToJS(foldJSON, msgID);
+	}
 
 
 
