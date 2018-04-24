@@ -42,6 +42,11 @@ BIBLIOGRAPHY["nudler1997rna"] = {name: `Nudler, Evgeny, et al. "The RNA–DNA hy
 BIBLIOGRAPHY["toulme2000grea"] = {name: `Toulmé, Francine, Christine Mosrin‐Huaman, Jason Sparkowski, Asis Das, Marc Leng, and A. Rachid Rahmouni. "GreA and GreB proteins revive backtracked RNA polymerase in vivo by promoting transcript trimming." The EMBO journal 19, no. 24 (2000): 6853-6859."`, DOI: "10.1093%2Femboj%2F19.24.6853"}; 
 
 
+BIBLIOGRAPHY["lorenz2011viennarna"] = {name: `Lorenz, R., Bernhart, S. H., Zu Siederdissen, C. H., Tafer, H., Flamm, C., Stadler, P. F., & Hofacker, I. L. (2011). ViennaRNA Package 2.0. Algorithms for Molecular Biology, 6(1), 26.`, DOI: "10.1186/1748-7188-6-26"};
+
+
+
+
 
 BIBLIOGRAPHY["imashimizu2013direct"] = {name: `Imashimizu, Masahiko, et al. "Direct assessment of transcription fidelity by high-resolution RNA sequencing." Nucleic acids research 41.19 (2013): 9090-9104.`, DOI: "10.1093%2Fnar%2Fgkt698"};
 BIBLIOGRAPHY["rosenberger1981estimate"] = {name: `Rosenberger, R. F., and Gillian Foskett. "An estimate of the frequency of in vivo transcriptional errors at a nonsense codon in Escherichia coli." Molecular and General Genetics MGG 183.3 (1981): 561-563.`, DOI: "10.1074%2Fjbc.M202059200"};
