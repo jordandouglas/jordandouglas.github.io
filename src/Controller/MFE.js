@@ -24,7 +24,7 @@
 function renderSecondaryStructure(data){
 	
 	
-		//console.log("data", data);
+		console.log("data", data);
 		//return;
 		if (data == null) return;
 

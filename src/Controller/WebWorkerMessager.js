@@ -2634,18 +2634,23 @@ function getMFESequenceBonds_controller(){
 		toCall().then((graphInfo) => updateDOM(graphInfo));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("MFE_JS.getMFESequenceBonds_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((graphInfo) => updateDOM(graphInfo));
-
-
 	}
 	
-	
+	else {
+		var res = stringifyFunction("getMFESequenceBonds", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((graphInfo) => updateDOM(graphInfo));
+	}
 	
 }
 
