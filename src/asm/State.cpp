@@ -43,8 +43,9 @@ using namespace std;
 
 State::State(bool init){
 
-	if (init) this->setToInitialState();
 	this->isGuiState = false;
+	if (init) this->setToInitialState();
+
 
 }
 
@@ -1797,7 +1798,7 @@ int State::get_fissure_landscape_of(int S){
 string State::fold(){
 
 	cout << "Calculating free energy" << endl;
-	char* structure = vRNA_compute_MFE(_currentStateGUI->get_NascentSequence().substr(0, this->leftNascentBase-1).c_str());
+	char* structure = vRNA_compute_MFE(this->get_NascentSequence().substr(0, this->leftNascentBase-1).c_str());
 	string structureString = string(structure);
 	cout << "Free energy: " << vRNA_MFE_value << "kBT with structure " << structureString << endl;
 
