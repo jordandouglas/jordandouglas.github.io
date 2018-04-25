@@ -659,8 +659,8 @@ function refresh(resolve = function(){}){
 
 			}
 			renderObjects(false, afterRender);
-	
 			refreshNavigationCanvases();
+			destroySecondaryStructure();
 
 			for (var i = 0; i < 10; i ++){
 				//console.log("rand", new Random().normal(10, 15));
@@ -2661,7 +2661,7 @@ function closeNav() {
 					<tr>
 
 						<td>
-							<div id="foldBtnDiv" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="getMFESequenceBonds_controller()" title="Fold the mRNA (using the ViennaRNA suite)"> <img  src="src/Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
+							<div id="foldBtnDiv" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="showFoldedRNA_controller()" title="Fold the mRNA (using the ViennaRNA suite)"> <img  src="src/Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
 						</td>
 
 						<td>
