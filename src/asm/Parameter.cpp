@@ -235,7 +235,7 @@ void Parameter::sample(){
 
 		this->val = Settings::rexp(distributionParameters["exponentialDistnVal"]);
 
-		bool withinRange = withinRange && this->val > this->distributionParameters["lowerVal"] && this->val < this->distributionParameters["upperVal"];
+		bool withinRange = this->val > this->distributionParameters["lowerVal"] && this->val < this->distributionParameters["upperVal"];
 		while (!withinRange) {
 			this->val = Settings::rexp(distributionParameters["exponentialDistnVal"]);
 			withinRange = this->val > this->distributionParameters["lowerVal"] && this->val < this->distributionParameters["upperVal"];
@@ -519,7 +519,6 @@ Parameter* Parameter::setDistributionParameter(string name, double value){
 	if (name == "uniformDistnLowerVal" && ((this->zeroTruncated == "exclusive" && value < 0) || (this->zeroTruncated == "inclusive" && value <  0))) return this;
 	if (name == "uniformDistnUpperVal" && ((this->zeroTruncated == "exclusive" && value < 0) || (this->zeroTruncated == "inclusive" && value <  0))) return this;
 	if (name == "normalSdVal" && value <= 0) return this;
-	if (name == "lognormalMeanVal" && value <= 0) return this;
 	if (name == "lognormalSdVal" && value <= 0) return this;
 	if (name == "exponentialDistnVal" && value <= 0) return this;
 	if (name == "gammaRateVal" && value <= 0) return this;
