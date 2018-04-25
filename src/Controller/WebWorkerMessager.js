@@ -1401,8 +1401,8 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 		update_sliding_curve(-1);
 		update_slipping_curve(0);
 		renderObjects();
-		$("#mRNAsvg").remove();
-		$("#bases").children().show(0);
+		destroySecondaryStructure();
+		
 
 	
 		resolve();
@@ -2615,17 +2615,60 @@ function getMisbindMatrix_controller(resolve = function(x) { }){
 
 }
 
+
+
+function showFoldedRNA_controller(){
+
+	
+	// No RNA secondary structure display on mobile phones beause svg is not well supported
+	if ($("#PreExp").val() == "hidden" || IS_MOBILE) return;
+	
+	var toDisplay = !$("#foldBtnDiv").hasClass("toolbarIconDisabled");
+
+	var updateDOM = function(graphInfo){
+		if (toDisplay) {
+			$("#foldBtnDiv").addClass("toolbarIconDisabled");
+			getMFESequenceBonds_controller();
+		}
+		else {
+			$("#foldBtnDiv").removeClass("toolbarIconDisabled");
+			destroySecondaryStructure();
+			renderObjects();
+		}
+		
+	};
+	
+	if (WEB_WORKER == null || WEB_WORKER_WASM == null) {
+		getMFESequenceBonds_controller();
+		return;
+	}
+	
+	else {
+
+		var res = stringifyFunction("showFoldedRNA", [toDisplay], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((graphInfo) => updateDOM(graphInfo));
+	}
+	
+}
+
+
+
 function getMFESequenceBonds_controller(){
 
 	
 	// No RNA secondary structure display on mobile phones beause svg is not well supported
 	if ($("#PreExp").val() == "hidden" || IS_MOBILE) return;
+	
 
 	var updateDOM = function(graphInfo){
 
-		console.log("graphInfo", graphInfo);
+		//console.log("graphInfo", graphInfo);
 		renderSecondaryStructure(graphInfo);
-		renderObjects();
+		//renderObjects();
 
 	};
 	
@@ -2644,6 +2687,8 @@ function getMFESequenceBonds_controller(){
 	}
 	
 	else {
+		
+
 		var res = stringifyFunction("getMFESequenceBonds", [], true);
 		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];

@@ -113,7 +113,7 @@ function renderTermination(result){
 		$("#bases").scrollLeft("0px");
 		$("#clearSeqs").show()
 		$("#downloadSeqs").show();
-		$("#mRNAsvg").remove();
+		destroySecondaryStructure();
 
 
 		// Initialise the buttons at the top of the sequence panel and the first row of the sequences table (if they have not already been created)
@@ -784,12 +784,12 @@ function renderObjects(override = false, resolve = function(){}){
 				removeSequenceLoadingHTML();
 				
 			//});
-
+			//getMFESequenceBonds_controller();
 			resolve();
 			
 		});
-
-
+	
+	
 
 	});
 

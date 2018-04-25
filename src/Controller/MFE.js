@@ -20,11 +20,18 @@
 -*/
 
 
+function destroySecondaryStructure(){
+		$("#mRNAsvg").remove();
+		$("#bases").height(300);
+		$("#bases").children().show(0);
+}
+
 
 function renderSecondaryStructure(data){
 	
 	
-		console.log("data", data);
+	
+		//console.log("data", data);
 		//return;
 		if (data == null) return;
 
@@ -33,9 +40,10 @@ function renderSecondaryStructure(data){
 			$(data["toHide"][i]).hide(0);
 		}
 	
+		$("#bases").height(800);
 		var yShift = 100;
 		var width = parseFloat($("#pol").offset().left) + $("#bases").scrollLeft();
-		var height = parseFloat($("#bases").height()) - yShift + 500;
+		var height = parseFloat($("#bases").height()) - yShift - 100;
 		
 		$("#mRNAsvg").remove();
 		$("#bases").append("<svg id=mRNAsvg width=" + width + " height=" + height + " style='left:" + 0 + "px; top:" + yShift + "px; position:absolute; z-index: 2'></svg>")
