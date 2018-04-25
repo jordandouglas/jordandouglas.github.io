@@ -139,6 +139,7 @@ bool _GUI_STOP = false;
 bool _needToReinitiateAnimation = false;
 bool _GUI_simulating = false;
 bool _applyingReactionsGUI = false;
+bool _showRNAfold_GUI = false;
 string _animationSpeed = "medium";
 Simulator* _interfaceSimulator; // The simulator object being used by the GUI
 State* _currentStateGUI; // The current state displayed on the GUI and used in all GUI simulations

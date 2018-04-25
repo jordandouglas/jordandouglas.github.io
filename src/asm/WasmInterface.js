@@ -115,6 +115,24 @@ getCppArrayFromDict = function(dict, dataType = "double"){
 */
 
 
+
+
+
+// Toggle between displaying or not displaying the folded mRNA
+showFoldedRNA = function(showFolding, msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log("MFE", resultStr);
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	
+	Module.ccall("showFoldedRNA", null, ["number", "number"], [showFolding, msgID]);
+
+}
+
+
 // Returns a JSON object containing how to fold the mRNA
 getMFESequenceBonds = function(msgID = null){
 

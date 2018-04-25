@@ -107,6 +107,7 @@ extern bool _GUI_STOP;
 extern bool _needToReinitiateAnimation;
 extern bool _GUI_simulating;
 extern bool _applyingReactionsGUI;
+extern bool _showRNAfold_GUI;
 extern string _animationSpeed;
 extern Simulator* _interfaceSimulator; // The simulator object being used by the GUI
 extern State* _currentStateGUI; // The current state displayed on the GUI and used in all GUI simulations

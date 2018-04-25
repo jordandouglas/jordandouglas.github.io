@@ -1806,7 +1806,8 @@ string State::fold(){
 	string bonds = "'bonds':[";
 	string vertices = "'vertices':[";
 	string toHide = "'toHide':[";
-	double startX = 3 * Coordinates::getHTMLobject("pol")->getX() / 4;
+	
+	double startX = Coordinates::getHTMLobject("pol")->getX() - 200;
 	double startY = 300;
 
 

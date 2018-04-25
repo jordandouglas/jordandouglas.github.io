@@ -499,10 +499,23 @@ extern "C" {
 	}
 
 
+	
+	
+	// Toggle between displaying or not displaying the folded mRNA
+	void EMSCRIPTEN_KEEPALIVE showFoldedRNA(bool showFolding, int msgID){
+		_showRNAfold_GUI = showFolding;
+		messageFromWasmToJS("", msgID);
+	}
 
 
 	// Returns a JSON object containing how to fold the mRNA
 	void EMSCRIPTEN_KEEPALIVE getMFESequenceBonds(int msgID){
+		
+		if (!_showRNAfold_GUI) {
+			messageFromWasmToJS("", msgID);
+			return;
+		}
+		
 		auto timeStart = chrono::system_clock::now();
 		string foldJSON = _currentStateGUI->fold();
 		auto timeStop = chrono::system_clock::now();
