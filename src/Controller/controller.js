@@ -1289,57 +1289,60 @@ function clearCache(){
 		console.log("stopped");
 
 		closeKineticCachePopup();
-		refresh(function(){
-			
+		setTimeout( function() { 
+			refresh(function(){
+				
 
-			if (distanceVsTime_cleardata){
-				DISTANCE_VS_TIME_CONTROLLER = [];
-				VELOCITIES = [];
-				haveShownDVTerrorMessage = false;
-			} 
+				if (distanceVsTime_cleardata){
+					DISTANCE_VS_TIME_CONTROLLER = [];
+					VELOCITIES = [];
+					haveShownDVTerrorMessage = false;
+				} 
 
-			if (timeHistogram_cleardata){
-				DWELL_TIMES_CONTROLLER = [];
-			}
-
-
-			if (ABC_cleardata) {
-				$("#ABCoutput").html("");
-				$("#downloadABC").hide(50);
-				$("#uploadABC").show(50);
-				$(".ABC_display").hide(50);
-				$(".RABC_display").hide(50);
-				$(".MCMC_display").hide(50);
-
-			}
-
-
-			deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata, function(plotData){
-
-				//console.log("plotData", plotData);
-
-
-
-				window.requestAnimationFrame(function(){
-					update_PLOT_DATA(plotData)
-					for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
-						if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "none" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom"  && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
-						else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
-					}
-				});
+				if (timeHistogram_cleardata){
+					DWELL_TIMES_CONTROLLER = [];
+				}
 
 
 				if (ABC_cleardata) {
-					ABClines = [];
-					ABClinesAcceptedOnly = [];
-					validateAllAbcDataInputs();
-					removeTracePlots();
+					$("#ABCoutput").html("");
+					$("#downloadABC").hide(50);
+					$("#uploadABC").show(50);
+					$(".ABC_display").hide(50);
+					$(".RABC_display").hide(50);
+					$(".MCMC_display").hide(50);
+
 				}
 
-				
+
+				deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata, function(plotData){
+
+					//console.log("plotData", plotData);
+
+
+
+					window.requestAnimationFrame(function(){
+						update_PLOT_DATA(plotData)
+						for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
+							if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "none" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom"  && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
+							else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
+						}
+					});
+
+
+					if (ABC_cleardata) {
+						ABClines = [];
+						ABClinesAcceptedOnly = [];
+						validateAllAbcDataInputs();
+						removeTracePlots();
+					}
+
+					
+				});
+
 			});
 
-		});
+		}, 20);
 		
 	});
 

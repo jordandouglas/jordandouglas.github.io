@@ -1,4 +1,4 @@
-﻿
+﻿﻿
 
 /* 
 	--------------------------------------------------------------------
@@ -3405,7 +3405,6 @@ function getPosteriorDistribution_controller(resolve = function(posterior) { }){
 
 
 }
-
 
 
 
