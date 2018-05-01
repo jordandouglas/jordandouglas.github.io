@@ -42,7 +42,8 @@
 <script language='JavaScript' type="text/javascript" src="src/Resources/hammer.js"></script>
 
 
-<script language='JavaScript' type='text/JavaScript' src='src/Resources/d3.v4.min.js'></script> 
+<!--<script language='JavaScript' type='text/JavaScript' src='src/Resources/d3.v4.min.js'></script> -->
+<script src="https://d3js.org/d3.v5.min.js"></script>
 <!--<script language='JavaScript' type='text/JavaScript' src='http://d3js.org/d3.v4.min.js'></script> -->
 <!-- <script language='JavaScript' type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.bundle.min.js"></script> -->
 <script language='JavaScript' type="text/javascript" src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.js"></script>
@@ -659,8 +660,8 @@ function refresh(resolve = function(){}){
 
 			}
 			renderObjects(false, afterRender);
+	
 			refreshNavigationCanvases();
-			destroySecondaryStructure();
 
 			for (var i = 0; i < 10; i ++){
 				//console.log("rand", new Random().normal(10, 15));
@@ -3398,7 +3399,7 @@ function closeNav() {
 
 
 				<div class="header">
-					SimPol, Lab of Structural Biology & Centre for Computational Evolution, University of Auckland
+					SimPol, Centre for Computational Evolution & School of Biological Sciences, University of Auckland
 				</div>
 
 
