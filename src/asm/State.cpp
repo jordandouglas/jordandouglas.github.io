@@ -1797,8 +1797,25 @@ int State::get_fissure_landscape_of(int S){
 
 string State::fold(){
 
+
+	if (PrimerType != "ssRNA") return "{}";
+
 	cout << "Calculating free energy" << endl;
-	char* structure = vRNA_compute_MFE(this->get_NascentSequence().substr(0, this->leftNascentBase-1).c_str());
+	const char* seq = this->get_NascentSequence().substr(0, this->leftNascentBase-1).c_str();
+	char* structure = vRNA_compute_MFE(seq);
+
+
+	float* XY = vRNA_get_coordinates(seq, structure);
+	int length = this->leftNascentBase;
+
+	/*
+	// Need to transform these coordinates to fit on the main canvas
+	for (int i = 0; i < length; i ++){
+		cout << "i = " << i << "X = " << XY[i] << ", Y = " << XY[i+length] << endl;
+	}
+	*/
+
+
 	string structureString = string(structure);
 	cout << "Free energy: " << vRNA_MFE_value << "kBT with structure " << structureString << endl;
 
@@ -1806,14 +1823,14 @@ string State::fold(){
 	string bonds = "'bonds':[";
 	string vertices = "'vertices':[";
 	string toHide = "'toHide':[";
-	
-	double startX = Coordinates::getHTMLobject("pol")->getX() - 200;
+	double startX = 3 * Coordinates::getHTMLobject("pol")->getX() / 4;
 	double startY = 300;
 
 
 	vertices = vertices + "{'src':'5RNA', 'startX':" + to_string(startX) + ", 'startY':" + to_string(startY) + "}"; 
 	bonds = bonds + "{'source':0, 'target':1, 'terminal':true}"; 
 	toHide = toHide + "'#m0'";
+
 
 
 

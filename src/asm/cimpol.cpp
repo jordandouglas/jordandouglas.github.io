@@ -36,6 +36,7 @@
 #include "SimPol_vRNA_interface.h"
 
 
+#include <dlfcn.h>
 #include <iostream>
 #include <string>
 #include <random>
@@ -68,7 +69,7 @@ using namespace std;
 							Otherwise will sample from the distributions specified in -xml xmlfile
 							This will be printed into terminal, or -logO file if specified
 
-				-marginal: if -summary is enabled then will print a marginal-model geometric median summary 
+				-marginal: if -summary is enabled then will print a marginal-model geometric median summary. Models 
 */
 
 int main(int argc, char** argv) { 
@@ -186,9 +187,9 @@ int main(int argc, char** argv) {
 	Settings::sampleAll();
 	SimulatorPthread::init();
 	Plots::init();
-	vRNA_init();
+	if (PrimerType == "ssRNA") vRNA_init(complementSequence.c_str());
 
-    
+
     //complementSequence = Settings::complementSeq(templateSequence, TemplateType.substr(2) == "RNA");
 
 	
@@ -206,7 +207,6 @@ int main(int argc, char** argv) {
 
 	// Perform MCMC
 	if (doMCMC){
-		cout << "Performing MCMC" << endl;
 		MCMC::beginMCMC();
 	}
 
@@ -239,8 +239,6 @@ int main(int argc, char** argv) {
 
 	// Just simulate
 	else{
-
-
    		double velocity = SimulatorPthread::performNSimulations(ntrials_sim, true);
 		cout << "Mean velocity: " << velocity << "bp/s" << endl;
 		cout << "Sequence length: " << templateSequence.length() << endl;

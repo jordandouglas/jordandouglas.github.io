@@ -40,7 +40,6 @@
 using namespace std;
 
 
-// TODO: garbage collection
 
 Simulator::Simulator(){
 
@@ -77,7 +76,6 @@ double Simulator::perform_N_Trials(int N, State* state, bool verbose){
 	//state->print();
 
 	//cout << "bck = " <<  state->calculateBackwardRate(true) << endl;
-
 
 	double meanMeanVelocity = 0;
 	double meanMeanTime = 0;

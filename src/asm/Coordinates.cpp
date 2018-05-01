@@ -45,7 +45,7 @@ list<HTMLobject*> Coordinates::unrenderedObjects; // A subset of the above 4 arr
 int Coordinates::getAnimationTime(){
 
 	// Slow, medium, fast only apply simulating and transcribing/stuttering. If user presses button then should animate slowly
-	if (!_GUI_simulating && !_applyingReactionsGUI) return 200;
+	if (_GUI_user_applying_reaction) return 200;
 
 	if (_animationSpeed == "slow") return 200;
 	if (_animationSpeed == "medium") return 60;

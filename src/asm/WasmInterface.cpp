@@ -28,7 +28,7 @@
 #include "TranslocationRatesCache.h"
 #include "Plots.h"
 #include "Coordinates.h"
-
+#include "SimPol_vRNA_interface.h"
 
 
 
@@ -188,8 +188,6 @@ extern "C" {
 			else if (reactionNumber == 7) _currentStateGUI->cleave();
 			else if (reactionNumber == 8) _currentStateGUI->slipLeft(0);
 			else if (reactionNumber == 9) _currentStateGUI->slipRight(0);
-
-
 			_applyingReactionsGUI = false;
 
 		}
@@ -203,9 +201,9 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE translocateForward(int msgID){
 		if (_slippageLandscapesToSendToDOM != nullptr) delete _slippageLandscapesToSendToDOM;
 		_slippageLandscapesToSendToDOM = new SlippageLandscapes();
-		_applyingReactionsGUI = true;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = true;
 		_currentStateGUI->forward();
-		_applyingReactionsGUI = false;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = false;
 		messageFromWasmToJS(_slippageLandscapesToSendToDOM->toJSON(), msgID);
 	}
 
@@ -213,49 +211,49 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE translocateBackwards(int msgID){
 		if (_slippageLandscapesToSendToDOM != nullptr) delete _slippageLandscapesToSendToDOM;
 		_slippageLandscapesToSendToDOM = new SlippageLandscapes();
-		_applyingReactionsGUI = true;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = true;
 		_currentStateGUI->backward();
-		_applyingReactionsGUI = false;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = false;
 		messageFromWasmToJS(_slippageLandscapesToSendToDOM->toJSON(), msgID);
 	}
 
 	// Bind NTP or add it onto the chain if already bound
 	void EMSCRIPTEN_KEEPALIVE bindOrCatalyseNTP(int msgID){
-		_applyingReactionsGUI = true;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = true;
 		_currentStateGUI->bindNTP();
-		_applyingReactionsGUI = false;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = false;
 		messageFromWasmToJS("", msgID);
 	}
 
 	// Release NTP or remove it from the chain if already added
 	void EMSCRIPTEN_KEEPALIVE releaseOrRemoveNTP(int msgID){
-		_applyingReactionsGUI = true;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = true;
 		_currentStateGUI->releaseNTP();
-		_applyingReactionsGUI = false;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = false;
 		messageFromWasmToJS("", msgID);
 	}
 
 	// Activate the polymerase from its catalytically inactive state
 	void EMSCRIPTEN_KEEPALIVE activatePolymerase(int msgID){
-		_applyingReactionsGUI = true;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = true;
 		_currentStateGUI->activate();
-		_applyingReactionsGUI = false;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = false;
 		messageFromWasmToJS("", msgID);
 	}
 
 	// Deactivate the polymerase by putting it into a catalytically inactive state
 	void EMSCRIPTEN_KEEPALIVE deactivatePolymerase(int msgID){
-		_applyingReactionsGUI = true;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = true;
 		_currentStateGUI->deactivate();
-		_applyingReactionsGUI = false;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = false;
 		messageFromWasmToJS("", msgID);
 	}
 
 	// Cleave the 3' end of the nascent strand if backtracked
 	void EMSCRIPTEN_KEEPALIVE cleaveNascentStrand(int msgID){
-		_applyingReactionsGUI = true;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = true;
 		_currentStateGUI->cleave();
-		_applyingReactionsGUI = false;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = false;
 		messageFromWasmToJS("", msgID);
 	}
 
@@ -263,9 +261,9 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE slipLeft(int S, int msgID){
 		if (_slippageLandscapesToSendToDOM != nullptr) delete _slippageLandscapesToSendToDOM;
 		_slippageLandscapesToSendToDOM = new SlippageLandscapes();
-		_applyingReactionsGUI = true;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = true;
 		_currentStateGUI->slipLeft(S);
-		_applyingReactionsGUI = false;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = false;
 		messageFromWasmToJS(_slippageLandscapesToSendToDOM->toJSON(), msgID);
 	}
 
@@ -273,9 +271,9 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE slipRight(int S, int msgID){
 		if (_slippageLandscapesToSendToDOM != nullptr) delete _slippageLandscapesToSendToDOM;
 		_slippageLandscapesToSendToDOM = new SlippageLandscapes();
-		_applyingReactionsGUI = true;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = true;
 		_currentStateGUI->slipRight(S);
-		_applyingReactionsGUI = false;
+		_GUI_user_applying_reaction = _applyingReactionsGUI = false;
 		messageFromWasmToJS(_slippageLandscapesToSendToDOM->toJSON(), msgID);
 	}
 
@@ -578,6 +576,12 @@ extern "C" {
 	}
 
 
+	// Get the speed (units of time)
+	double EMSCRIPTEN_KEEPALIVE getAnimationTime(){
+		return Coordinates::getAnimationTime();
+	}
+
+
 
 	// User selects which base to add next manually
 	void EMSCRIPTEN_KEEPALIVE userSetNextBaseToAdd(char* ntpToAdd, int msgID){
@@ -673,6 +677,8 @@ extern "C" {
 
 		//cout << "Returning " << parametersJSON << endl;
 
+
+
 		messageFromWasmToJS(parametersJSON, msgID);
 
 	}
@@ -690,6 +696,8 @@ extern "C" {
 		_currentStateGUI = new State(true, true);
 		Plots::init(); // Reinitialise plot data every time sequence changes
 
+		if (PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
+
 		return 1;
 
 	}
@@ -703,6 +711,7 @@ extern "C" {
 			delete _currentStateGUI;
 			_currentStateGUI = new State(true, true);
 			Plots::init(); // Reinitialise plot data every time sequence changes
+			if (PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
 		}
 
 	}
@@ -1226,7 +1235,6 @@ extern "C" {
 
 
 }
-
 
 
 

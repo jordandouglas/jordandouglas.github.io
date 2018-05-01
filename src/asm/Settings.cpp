@@ -140,6 +140,7 @@ bool _needToReinitiateAnimation = false;
 bool _GUI_simulating = false;
 bool _applyingReactionsGUI = false;
 bool _showRNAfold_GUI = false;
+bool _GUI_user_applying_reaction = false;
 string _animationSpeed = "medium";
 Simulator* _interfaceSimulator; // The simulator object being used by the GUI
 State* _currentStateGUI; // The current state displayed on the GUI and used in all GUI simulations
@@ -360,8 +361,6 @@ void Settings::initSequences(){
 
 	seq = new Sequence("Human Huntingtin poly(Q) region", "ssDNA", "dsDNA", "CAGGAAGGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTTGTCGGCGG");
 	sequences[seq->getID()] = seq;
-
-
 
 
 

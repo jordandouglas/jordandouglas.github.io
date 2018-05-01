@@ -31,25 +31,19 @@
 using namespace std;
 
 
+// Initialise the ViennaRNA suite for RNA folding. Call this everytime the sequence changes
+extern "C" void vRNA_init(const char* nascentSequence);
+
+// Contains the MFE of the most recently calculated MFE structure
 extern "C" float vRNA_MFE_value;
-extern "C" void vRNA_init();
+
+// Calls the ViennaRNA suite written in C and returns the MFE structure
 extern "C" char* vRNA_compute_MFE(const char* sequence);
 
+// Returns coordinates to position each RNA base on a plot
+extern "C"  float* vRNA_get_coordinates(const char* seq, const char* structure);
 
 
-/*
-class SimPol_vRNA_interface{
-
-	public:
-
-		// Calls the ViennaRNA suite written in C and returns the free energy of the MFE structure
-		// Dynamic programming data structures in vRNA will persist between subsequent calls of this function
-		static double compute_MFE(string sequence, string& structure_str);
-
-
-
-};
-*/
 
 
 #endif

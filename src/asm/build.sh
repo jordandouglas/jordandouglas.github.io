@@ -21,7 +21,7 @@ g++ -std=c++11 -fpermissive -pthread -o SimpolC cimpol.cpp HTMLobject.cpp Coordi
 	ViennaRNA/exterior_loops.c ViennaRNA/hairpin_loops.c \
 	ViennaRNA/interior_loops.c ViennaRNA/multibranch_loops.c ViennaRNA/boltzmann_sampling.c \
 	ViennaRNA/constraints_SHAPE.c ViennaRNA/constraints_hard.c ViennaRNA/constraints_soft.c \
-	ViennaRNA/alphabet.c ViennaRNA/equilibrium_probs.c ViennaRNA/file_formats_msa.c
+	ViennaRNA/alphabet.c ViennaRNA/equilibrium_probs.c ViennaRNA/file_formats_msa.c ViennaRNA/plot_structure.c ViennaRNA/plot_layouts.c
 
 
 echo "Done! Saved to SimpolC"

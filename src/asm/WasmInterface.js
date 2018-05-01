@@ -21,6 +21,7 @@
 -*/
 
 
+ANIMATION_TIME = 60;
 IS_MOBILE = false;
 self.importScripts('simpol_asm.js');
 WASM_MESSAGE_LISTENER = {};
@@ -434,7 +435,7 @@ startTrials = function(N, msgID = null){
 
 			// Animated mode. Perform the actions specified and then sample more actions 
 			if (result.animationTime > 0 && result.actions != null) {
-				applyReactions(result.actions, result.animationTime, function() { 
+				applyReactions(result.actions, function() { 
 					if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 					//resumeTrials(msgID);
 				}, null);
@@ -482,7 +483,7 @@ resumeTrials = function(msgID = null){
 				
 				// Animated mode. Perform the actions specified and then sample more actions 
 				if (result.animationTime > 0 && result.actions != null) {
-					applyReactions(result.actions, result.animationTime, function() { 
+					applyReactions(result.actions, function() { 
 						if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 						//resumeTrials(msgID);
 					}, null);
@@ -570,6 +571,8 @@ changeSpeed = function(speed, msgID = null){
 	var toDoAfterCall = function(resultStr){
 		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 	}
+
+	console.log("Changing speed to", speed);
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 
 	Module.ccall("changeSpeed", null, ["string", "number"], [speed, msgID]);
@@ -686,7 +689,7 @@ getStateDiagramInfo = function(msgID = null){
 
 
 // Recursively applies the actions in the list. Pauses in between actions to allow the DOM to animate the change
-applyReactions = function(actionsList, animationTime, resolve = null,  msgID = null){
+applyReactions = function(actionsList, resolve = null, msgID = null){
 
 	if (actionsList.length == 0){
 
@@ -704,6 +707,8 @@ applyReactions = function(actionsList, animationTime, resolve = null,  msgID = n
 
 
 	actionToDo = actionsList.shift();
+
+	var animationTime = Module.ccall("getAnimationTime", "number");
 	var toStop = Module.ccall("applyReaction", "number", ["number"], [actionToDo]);
 
 
@@ -712,7 +717,7 @@ applyReactions = function(actionsList, animationTime, resolve = null,  msgID = n
 
 	// Wait animationTime before proceeding
 	setTimeout(function() {
-		applyReactions(actionsList, animationTime, resolve, msgID);
+		applyReactions(actionsList, resolve, msgID);
 	}, animationTime + 2);
 
 
@@ -735,7 +740,7 @@ transcribe = function(N, msgID = null){
 		else{
 			var result = JSON.parse(resultStr);
 			//console.log("result", result, result.animationTime);
-			applyReactions(result.actions, result.animationTime, null, msgID);
+			applyReactions(result.actions, null, msgID);
 		}
 
 	}
@@ -762,7 +767,7 @@ stutter = function(N, msgID = null){
 		else{
 			var result = JSON.parse(resultStr);
 			//console.log("result", result, result.animationTime);
-			applyReactions(result.actions, result.animationTime, null, msgID);
+			applyReactions(result.actions, null, msgID);
 		}
 
 	}
@@ -1008,5 +1013,4 @@ onmessage = function(e) {
 	}
     //timedCount();
 };
-
 

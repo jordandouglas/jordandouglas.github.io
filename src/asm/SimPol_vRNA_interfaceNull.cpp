@@ -26,7 +26,7 @@ float vRNA_MFE_value = 0;
 
 
 
-void vRNA_init(){
+void vRNA_init(const char* templateSequence){
 
 }
 
