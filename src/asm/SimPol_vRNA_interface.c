@@ -38,7 +38,6 @@ const double vRNA_RT = 0.6156;
 float vRNA_MFE_value = 0;
 vrna_md_t md; // Model details
 vrna_fold_compound_t* vc; // Contains information on the sequence and the DP matrices
-float* XY; // Coordinates
 
 
 // Initialise the ViennaRNA suite for RNA folding
@@ -110,7 +109,7 @@ float vRNA_compute_MFE(char* sequence, char* structure){
 
 // Returns coordinates to position each RNA base on a plot. Modified from code in plot_structure.c -> vrna_file_PS_rnaplot_a()
 // Returns a float array XY where the first (length+1) are the X coordinates and the second (length+1) are the Y coordinates
-float* vRNA_get_coordinates(const char* structure){
+void vRNA_get_coordinates(char* structure, float* XY){
 
 
 	
@@ -121,9 +120,8 @@ float* vRNA_get_coordinates(const char* structure){
 
 	length = strlen(structure);
 
-	if (length == 0) return X;
+	if (length == 0) return;
 
-	//short* pair_table = vrna_ptable(structure);
 	short* pair_table_g = vrna_ptable(structure);
 
 
@@ -145,25 +143,16 @@ float* vRNA_get_coordinates(const char* structure){
 
 	i = naview_xy_coordinates(pair_table_g, X, Y);
 
-
-	if (XY) free(XY);
-	
-
-	XY = (float *) malloc(2*(length+1)*sizeof(float));
 	for (i = 0; i < length; i++) {
 		XY[i] = X[i];
 		XY[i+length] = Y[i];
 	}
 
 	// Clean-up
-	//free(str);
-	//free(pair_table);
+	free(l);
 	free(pair_table_g);
 	free(X); 
 	free(Y);
-	//free(structure);
-
-	return XY;
 
 }
 

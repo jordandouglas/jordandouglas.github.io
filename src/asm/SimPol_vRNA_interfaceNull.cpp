@@ -36,5 +36,5 @@ float vRNA_compute_MFE(char* sequence, char* structure){
 }
 
 
-float* vRNA_get_coordinates(char* structure){
+void vRNA_get_coordinates(char* structure, float* XY){
 }

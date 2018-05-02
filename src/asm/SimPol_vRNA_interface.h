@@ -41,7 +41,7 @@ extern "C" float vRNA_MFE_value;
 extern "C" float vRNA_compute_MFE(char* sequence, char* structure);
 
 // Returns coordinates to position each RNA base on a plot
-extern "C"  float* vRNA_get_coordinates(const char* structure);
+extern "C"  void vRNA_get_coordinates(char* structure, float* XY);
 
 
 

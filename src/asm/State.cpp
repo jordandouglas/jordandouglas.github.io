@@ -1798,7 +1798,7 @@ int State::get_fissure_landscape_of(int S){
 string State::fold(){
 
 
-	if (PrimerType != "ssRNA") return "{}";
+	if (PrimerType != "ssRNA" || this->leftNascentBase <= 3) return "{}";
 
 
 
@@ -1806,7 +1806,10 @@ string State::fold(){
 
 	int length = this->leftNascentBase-1;
 	char* seq = (char *) calloc(length, sizeof(char));
-	char* structure = (char *) calloc(length, sizeof(char));
+	char* structure = (char *) calloc(length+1, sizeof(char));
+	float* XY = (float *) calloc(2*length, sizeof(float));
+
+	//XY = (float *) malloc(2*(length+1)*sizeof(float));
 
 
 	strcpy(seq, this->get_NascentSequence().substr(0, length).c_str());
@@ -1818,21 +1821,27 @@ string State::fold(){
 
 	if (!MFE) {
 		cout << "Failed to fold RNA" << endl;
+
+		// Clean-up
+		delete XY;
+		delete seq;
+		delete structure;
 		return "";
 	}
 
 	cout << "seq2 " << string(seq) << endl;
 
 	string structureString = string(structure);
-	cout << "Free energy: " << MFE << "kBT with structure " << structureString << endl;
+	cout << "Free energy: " << MFE << "kBT with structure " << structure << endl;
 
-	//float* XY = vRNA_get_coordinates(structureString.c_str());
+	vRNA_get_coordinates(structure, XY);
 
-	//cout << "Got XY" << endl;
+	cout << "Got XY" << endl;
 
-	//for (int i = 0; i < length; i ++){
-		//cout << XY[i] << "," << XY[i+length] << endl;
-	//}
+
+	for (int i = 0; i < length; i ++){
+		cout << XY[i] << "," << XY[i+length] << endl;
+	}
 
 
 
@@ -1843,44 +1852,71 @@ string State::fold(){
 	string toHide = "'toHide':[";
 	double startX = 3 * Coordinates::getHTMLobject("pol")->getX() / 4;
 	double startY = 300;
+	double xWidth = 2 * Coordinates::getHTMLobject("pol")->getX() / 4;
+	double yHeight = 600;
 
 
-	vertices = vertices + "{'src':'5RNA', 'startX':" + to_string(startX) + ", 'startY':" + to_string(startY) + "}"; 
+	vertices = vertices + "{'src':'5RNA', 'x':" + to_string(startX) + ", 'y':" + to_string(startY) + "}"; 
 	bonds = bonds + "{'source':0, 'target':1, 'terminal':true}"; 
 	toHide = toHide + "'#m0'";
 
 
-	/*
+
+	// Normalise the X and Y coordinates into the appropriate svg range
+	int xmax = XY[0];
+	int xmin = XY[0];
+	int ymax = XY[length];
+	int ymin = XY[length];
+	for (int i = 1; i < length; i ++){
+
+		cout << i << endl;
+
+		if (XY[i] > xmax) xmax = XY[i];
+		else if (XY[i] < xmin) xmin = XY[i];
+
+		if (XY[i+length] > ymax) ymax = XY[i+length];
+		else if (XY[i+length] < ymin) ymin = XY[i+length];
+	}
+
+	for (int i = 0; i < length; i ++){
+		XY[i] = startX + xWidth * (XY[i] - xmin) / (xmax - xmin);
+		XY[i+length] = yHeight * (XY[i+length] - ymin) / (ymax - ymin);
+	}
+
+	//cout << "max: " << xmax << ",xmin: " << xmin << ",ymax: " << ymax << ", ymin: " << ymin << endl;
+
+
+
 	// Calculate mean x and y distance to move in order to have the structure centered at (startX, startY) 
 	double displX = 0;
 	double displY = 0;
+	/*
 	for (int i = 0; i < length; i ++){
 		displX += startX - XY[i];
 		displY += startY - XY[i+length];
-	}
+	}*/
 	displX /= length;
 	displY /= length;
-	*/
 
 
-	//for (var i = 1; i < state["leftMBase"] - PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]; i ++){
 	for (int i = 0; i < length; i ++){
 		HTMLobject* node_i = Coordinates::getNucleotide(i+1, "m");
-		//vertices = vertices + ",{'src':'" + node_i->getSrc() + "', 'startX':" + to_string(XY[i] + displX) + ", 'startY':" + to_string(XY[i+length] + displY) + "}"; 
-		vertices = vertices + ",{'src':'" + node_i->getSrc() + "', 'startX':" + to_string(startX) + ", 'startY':" + to_string(startY) + "}"; 
+		vertices = vertices + ",{'src':'" + node_i->getSrc() + "', 'x':" + to_string(XY[i] + displX) + ", 'y':" + to_string(XY[i+length] + displY) + "}"; 
+		//vertices = vertices + ",{'src':'" + node_i->getSrc() + "', 'startX':" + to_string(startX) + ", 'startY':" + to_string(startY) + "}"; 
 		bonds = bonds + ",{'source':" + to_string(i+1) + ", 'target':" + to_string(i+2) + "}"; 
 		toHide = toHide + ",'#" + node_i->getID() + "'";
 		
 	}
 
 
-	HTMLobject* anchoredNode = Coordinates::getNucleotide(this->leftNascentBase, "m");
-	vertices = vertices + ",{'src':'" + anchoredNode->getSrc() + "', 'fixed': true, 'startX':" + to_string(startX) + ", 'startY':" + to_string(startY) + ", 'fx':" + to_string(anchoredNode->getX() - startX) + ", 'fy':" + to_string(anchoredNode->getY() - 100 - startY) + "}"; 
+
+	HTMLobject* anchoredNode = Coordinates::getNucleotide(length+1, "m");
+	vertices = vertices + ",{'src':'" + anchoredNode->getSrc() + "', 'fixed': true,'x':" + to_string(anchoredNode->getX()) + ", 'y':" + to_string(anchoredNode->getY()) + ", 'fixedX':" + to_string(anchoredNode->getX()) + ", 'fixedY':" + to_string(anchoredNode->getY()) + "}"; 
 
 
-	
 	// Recursively add bonds as specified by the structure
 	this->findBondsRecurse(0, structureString, bonds);
+
 
 
 	vertices = vertices + "]"; 
@@ -1888,10 +1924,14 @@ string State::fold(){
 	toHide = toHide + "]";
 
 
+
 	// Clean-up
+	free(XY);
+	free(seq);
+	free(structure);
 	//delete XY;
-	delete seq;
-	delete structure;
+	//delete seq;
+	//delete structure;
 
 
 	return "{" + vertices + "," + bonds + "," + toHide + "}";
