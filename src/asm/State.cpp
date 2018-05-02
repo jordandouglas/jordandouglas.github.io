@@ -1838,11 +1838,11 @@ string State::fold(){
 
 	cout << "Got XY" << endl;
 
-
+	/*
 	for (int i = 0; i < length; i ++){
 		cout << XY[i] << "," << XY[i+length] << endl;
 	}
-
+	*/
 
 
 
@@ -1868,8 +1868,6 @@ string State::fold(){
 	int ymax = XY[length];
 	int ymin = XY[length];
 	for (int i = 1; i < length; i ++){
-
-		cout << i << endl;
 
 		if (XY[i] > xmax) xmax = XY[i];
 		else if (XY[i] < xmin) xmin = XY[i];
