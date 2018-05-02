@@ -27,6 +27,7 @@ function destroySecondaryStructure(){
 }
 
 
+
 function renderSecondaryStructure(data){
 	
 	
@@ -56,6 +57,11 @@ function renderSecondaryStructure(data){
 		var nodes = data["vertices"];
 		var edges = data["bonds"];
 
+		for (v in nodes) if (nodes[v].fixed) {
+			nodes[v].y -= yShift;
+			nodes[v].fixedY -= yShift;
+		}
+
 		var repulsionForce = -10;
 		var wallRepulsionForce = -5 * nodes.length;
 		var wallReplusionDistance = 100; // How close does something need to be to a wall to experience repulsion
@@ -67,15 +73,10 @@ function renderSecondaryStructure(data){
 		
 
 		var dist = function(d){
-			return d.bp ? 25 : d.terminal ? 50 : 20;
+			return d.bp ? 30 : d.terminal ? 50 : 20;
 		}
 		
-		var gravity = function(alpha) {
-		    return function(d) {
-		        d.y += (d.startY - d.y) * alpha;
-		        d.x += (d.startX - d.x) * alpha;
-		    };
-		}
+
 
 		 //var simulation = d3.forceSimulation()
 		     //.force("link", d3.forceLink())
@@ -108,9 +109,9 @@ function renderSecondaryStructure(data){
 		 var nodeImage = node.append("image")
 		     .attr("xlink:href", d => "src/Images/" + d.src + ".png")
 		     .attr("height", "22px")
-		     .attr("width", d => d.fixed ? 0 : d.src == "5RNA" ? "77px" : "22px" )
-		     .attr("x", d => d.fixed ? d.fx - $("#bases").scrollLeft() : d.startX)
-		     .attr("y", d => d.fixed ? d.fy : d.startY);
+		     .attr("width", d => d.fixed ? 5 : d.src == "5RNA" ? "77px" : "22px" )
+		     //.attr("x", d => d.fixed ? d.fx - $("#bases").scrollLeft() : d.x)
+		     //.attr("y", d => d.fixed ? d.fy : d.y);
 
 
 		
@@ -132,13 +133,13 @@ function renderSecondaryStructure(data){
 		
 		var dx = function(dvertex) {
 
-			if (dvertex.fixed) return dvertex.x = dvertex.fx;
-
+			if (dvertex.fixed) return dvertex.x = dvertex.fixedX;
+			return dvertex.x;
 
 
 			// Ensure that the item has not passed through the wall 
-			var distanceToLeftWall_start = dvertex.startX; // (dvertex.src == "5RNA" ? 38 : 11) - dvertex.startX; 
-			var distanceToRightWall_start = width  - (dvertex.src == "5RNA" ? 77 : 22) - dvertex.startX;
+			var distanceToLeftWall_start = dvertex.x; // (dvertex.src == "5RNA" ? 38 : 11) - dvertex.startX; 
+			var distanceToRightWall_start = width  - (dvertex.src == "5RNA" ? 77 : 22) - dvertex.x;
 			dvertex.x = Math.max(-distanceToLeftWall_start, Math.min(distanceToRightWall_start, dvertex.x)); 
 
 
@@ -147,7 +148,6 @@ function renderSecondaryStructure(data){
 			// Calculate wall repulsion force. Do not accept non-positive distances to the wall
 			var distanceToLeftWall_end = Math.max(distanceToLeftWall_start + dvertex.x, 1); 
 			var distanceToRightWall_end = Math.max(distanceToRightWall_start - dvertex.x, 1);
-
 			if (distanceToLeftWall_end < wallReplusionDistance) dvertex.x += -wallRepulsionForce / (distanceToLeftWall_end * distanceToLeftWall_end * distanceToLeftWall_end);
 			if (distanceToRightWall_end < wallReplusionDistance) dvertex.x += wallRepulsionForce / (distanceToRightWall_end * distanceToRightWall_end * distanceToRightWall_end);
 			*/
@@ -158,12 +158,12 @@ function renderSecondaryStructure(data){
 
 		};
 		var dy = function(dvertex) {
-			if (dvertex.fixed) return dvertex.y = dvertex.fy;
-
+			if (dvertex.fixed) return dvertex.y = dvertex.fixedY;
+			return dvertex.y;
 
 			// Ensure that the item has not passed through the wall 
-			var distanceToTopWall_start = dvertex.startY; // (dvertex.src == "5RNA" ? 38 : 11) - dvertex.startX; 
-			var distanceToBottomWall_start = height - 22 - dvertex.startY;
+			var distanceToTopWall_start = dvertex.y; // (dvertex.src == "5RNA" ? 38 : 11) - dvertex.startX; 
+			var distanceToBottomWall_start = height - 22 - dvertex.y;
 			dvertex.y = Math.max(-distanceToTopWall_start, Math.min(distanceToBottomWall_start, dvertex.y)); 
 
 
@@ -171,7 +171,6 @@ function renderSecondaryStructure(data){
 			// Calculate wall repulsion force. Do not accept non-positive distances to the wall
 			var distanceToTopWall_end = Math.max(distanceToTopWall_start + dvertex.y, 1); 
 			var distanceToBottomWall_end = Math.max(distanceToBottomWall_start - dvertex.y, 1);
-
 			if (distanceToTopWall_end < wallReplusionDistance) dvertex.y += -wallRepulsionForce / (distanceToTopWall_end * distanceToTopWall_end * distanceToTopWall_end);
 			if (distanceToBottomWall_end < wallReplusionDistance) dvertex.y += wallRepulsionForce / (distanceToBottomWall_end * distanceToBottomWall_end * distanceToBottomWall_end);
 			*/
@@ -197,21 +196,21 @@ function renderSecondaryStructure(data){
 			
 			
 		
-		
+
 			links.attr("x1", function(d) {
-			    return d.source.x + (d.src == "5RNA" ? 38 : 11) + d.source.startX;
+			    return d.source.x + (d.src == "5RNA" ? 38 : 11);// + d.source.startX;
 				//return Math.max(10, Math.min(width - 10, d.source.x));
 			 })
 			 .attr("y1", function(d) {
-			    return d.source.y + (d.src == "5RNA" ? 38 : 11) + d.source.startY;
+			    return d.source.y + (d.src == "5RNA" ? 38 : 11);// + d.source.startY;
 				//return Math.max(10, Math.min(height - 10, d.source.y));
 			 })
 			 .attr("x2", function(d) {
-			    return d.target.x + (d.src == "5RNA" ? 38 : 11) + d.target.startX;
+			    return d.target.x + (d.src == "5RNA" ? 38 : 11);// + d.target.startX;
 				//return Math.max(10, Math.min(width - 10, d.target.x));
 			 })
 			 .attr("y2", function(d) {
-			    return d.target.y + (d.src == "5RNA" ? 38 : 11) + d.target.startY;
+			    return d.target.y + (d.src == "5RNA" ? 38 : 11);// + d.target.startY;
 				//return Math.max(10, Math.min(height - 10, d.target.y));
 			 })
 
@@ -245,10 +244,3 @@ function renderSecondaryStructure(data){
 		 }
 	
 }
-
-
-
-
-
-
-
