@@ -711,7 +711,9 @@ extern "C" {
 			delete _currentStateGUI;
 			_currentStateGUI = new State(true, true);
 			Plots::init(); // Reinitialise plot data every time sequence changes
+			cout << "initialising vrna" << endl;
 			if (PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
+			cout << "done" << endl;
 		}
 
 	}

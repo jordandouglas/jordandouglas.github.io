@@ -38,10 +38,10 @@ extern "C" void vRNA_init(const char* nascentSequence);
 extern "C" float vRNA_MFE_value;
 
 // Calls the ViennaRNA suite written in C and returns the MFE structure
-extern "C" char* vRNA_compute_MFE(const char* sequence);
+extern "C" float vRNA_compute_MFE(char* sequence, char* structure);
 
 // Returns coordinates to position each RNA base on a plot
-extern "C"  float* vRNA_get_coordinates(const char* seq, const char* structure);
+extern "C"  float* vRNA_get_coordinates(const char* structure);
 
 
 

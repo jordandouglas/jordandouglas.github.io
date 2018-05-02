@@ -26,12 +26,15 @@ float vRNA_MFE_value = 0;
 
 
 
-void vRNA_init(const char* templateSequence){
+void vRNA_init(char* templateSequence){
 
 }
 
 
-char* vRNA_compute_MFE(const char* sequence){
-	return "";
+float vRNA_compute_MFE(char* sequence, char* structure){
+	return 0;
 }
 
+
+float* vRNA_get_coordinates(char* structure){
+}

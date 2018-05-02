@@ -1800,24 +1800,42 @@ string State::fold(){
 
 	if (PrimerType != "ssRNA") return "{}";
 
+
+
 	cout << "Calculating free energy" << endl;
-	const char* seq = this->get_NascentSequence().substr(0, this->leftNascentBase-1).c_str();
-	char* structure = vRNA_compute_MFE(seq);
+
+	int length = this->leftNascentBase-1;
+	char* seq = (char *) calloc(length, sizeof(char));
+	char* structure = (char *) calloc(length, sizeof(char));
 
 
-	float* XY = vRNA_get_coordinates(seq, structure);
-	int length = this->leftNascentBase;
+	strcpy(seq, this->get_NascentSequence().substr(0, length).c_str());
 
-	/*
-	// Need to transform these coordinates to fit on the main canvas
-	for (int i = 0; i < length; i ++){
-		cout << "i = " << i << "X = " << XY[i] << ", Y = " << XY[i+length] << endl;
+
+	cout << "seq1 " << string(seq) << endl;
+
+	float MFE = vRNA_compute_MFE(seq, structure);
+
+	if (!MFE) {
+		cout << "Failed to fold RNA" << endl;
+		return "";
 	}
-	*/
 
+	cout << "seq2 " << string(seq) << endl;
 
 	string structureString = string(structure);
-	cout << "Free energy: " << vRNA_MFE_value << "kBT with structure " << structureString << endl;
+	cout << "Free energy: " << MFE << "kBT with structure " << structureString << endl;
+
+	//float* XY = vRNA_get_coordinates(structureString.c_str());
+
+	//cout << "Got XY" << endl;
+
+	//for (int i = 0; i < length; i ++){
+		//cout << XY[i] << "," << XY[i+length] << endl;
+	//}
+
+
+
 
 	// Create bond objects between each consecutive base
 	string bonds = "'bonds':[";
@@ -1832,13 +1850,25 @@ string State::fold(){
 	toHide = toHide + "'#m0'";
 
 
+	/*
+	// Calculate mean x and y distance to move in order to have the structure centered at (startX, startY) 
+	double displX = 0;
+	double displY = 0;
+	for (int i = 0; i < length; i ++){
+		displX += startX - XY[i];
+		displY += startY - XY[i+length];
+	}
+	displX /= length;
+	displY /= length;
+	*/
 
 
 	//for (var i = 1; i < state["leftMBase"] - PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]; i ++){
-	for (int i = 1; i < this->leftNascentBase; i ++){
-		HTMLobject* node_i = Coordinates::getNucleotide(i, "m");
+	for (int i = 0; i < length; i ++){
+		HTMLobject* node_i = Coordinates::getNucleotide(i+1, "m");
+		//vertices = vertices + ",{'src':'" + node_i->getSrc() + "', 'startX':" + to_string(XY[i] + displX) + ", 'startY':" + to_string(XY[i+length] + displY) + "}"; 
 		vertices = vertices + ",{'src':'" + node_i->getSrc() + "', 'startX':" + to_string(startX) + ", 'startY':" + to_string(startY) + "}"; 
-		bonds = bonds + ",{'source':" + to_string(i) + ", 'target':" + to_string(i+1) + "}"; 
+		bonds = bonds + ",{'source':" + to_string(i+1) + ", 'target':" + to_string(i+2) + "}"; 
 		toHide = toHide + ",'#" + node_i->getID() + "'";
 		
 	}
@@ -1856,6 +1886,13 @@ string State::fold(){
 	vertices = vertices + "]"; 
 	bonds = bonds + "]";
 	toHide = toHide + "]";
+
+
+	// Clean-up
+	//delete XY;
+	delete seq;
+	delete structure;
+
 
 	return "{" + vertices + "," + bonds + "," + toHide + "}";
 
