@@ -1,4 +1,4 @@
-﻿﻿
+﻿
 
 /* 
 	--------------------------------------------------------------------
@@ -2897,6 +2897,26 @@ function loadSession_controller(XMLData, resolve = function() { }){
 	
 	
 	
+}
+
+
+
+
+
+// Show or hide sitewise plot
+function showSitewisePlot_controller(hidden){
+
+
+	if (WEB_WORKER == null) {
+		PLOTS_JS.showPlots_WW(hidden);
+	}else if (WEB_WORKER_WASM == null){
+
+	}else{
+		var fnStr = "wasm_" + stringifyFunction("showSitewisePlot", [hidden]);
+		callWebWorkerFunction(fnStr);
+	}
+
+
 }
 
 

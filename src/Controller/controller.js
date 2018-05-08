@@ -636,7 +636,6 @@ function renderObjects(override = false, resolve = function(){}){
 			while (unrenderedObjects_controller.length > 0){
 
 				var nt = unrenderedObjects_controller.shift();
-				//console.log(nt);
 
 				if (nt["id"] == "clear") {
 					$('#bases').html("");
@@ -733,7 +732,7 @@ function renderObjects(override = false, resolve = function(){}){
 
 
 					// Instant update
-					if (nt["animationTime"] == 1){
+					if (nt["animationTime"] <= 1){
 						//console.log("Need to instantly update", nt);
 						element.finish();
 						element.css("left", nt["x"] + "px");

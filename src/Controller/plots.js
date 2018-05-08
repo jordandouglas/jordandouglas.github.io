@@ -150,12 +150,16 @@ function drawPlotsFromData(plotData, resolve = function() { }){
 
 	update_PLOT_DATA(plotData)
 
-	//console.log("drawPlotsFromData");
+	//console.log("drawPlotsFromData", PLOT_DATA);
 	//console.trace();
 
 	window.requestAnimationFrame(function(){
 		for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
-			if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "none" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
+
+
+			if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "none") $("#plotCanvasContainer" + plt).html("");
+
+			else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
 			else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
 		}
 
@@ -239,7 +243,7 @@ function selectPlot(plotNum, deleteData = null){
 		
 		update_PLOT_DATA(plotData);
 
-		console.log(plotNum, value, "plotData", PLOT_DATA);
+		//console.log(plotNum, value, "plotData", PLOT_DATA);
 
 		// Delete the canvas and add it back later so it doesn't bug
 		$("#plotCanvas" + plotNum).remove();
@@ -282,12 +286,15 @@ function selectPlot(plotNum, deleteData = null){
 
 
 			// If there is a plot display the buttons
-			$("#plotDIV" + plotNum).show(300);
+			$("#plotDIV" + plotNum).slideDown(300);
 
 
 			if (plotNum == 4) {
-				showSitewisePlot(true);
 				$("#plot4Buttons").show(true);
+				showSitewisePlot(true);
+
+			
+
 			}
 			else{
 				showPlots(true);
@@ -301,14 +308,16 @@ function selectPlot(plotNum, deleteData = null){
 		}else{
 
 			// If no plot then hide the buttons
-			if (plotNum == 4) $("#plot4Buttons").hide(true);
+			if (plotNum == 4) {
+				showSitewisePlot(false);
+				$("#plot4Buttons").hide(true);
+			}
 			else{
 				$("#downloadPlot" + plotNum).hide(true);
 				$("#plotOptions" + plotNum).hide(true);
 				$("#helpPlot" + plotNum).hide(true);
-				$("#plotDIV" + plotNum).hide(true);
-
 			}
+			$("#plotDIV" + plotNum).slideUp(100);
 
 		}
 	
@@ -2319,7 +2328,10 @@ function add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLab
 
 // Create a graph above the simulation where each x value is a base and each y value is pause duration
 function plot_time_vs_site(){
-	
+
+	console.log("plot_time_vs_site");
+
+	if (PLOT_DATA["pauseTimePerSite"] == null) return;
 
 
 	// Find the canvas to print onto
@@ -3785,11 +3797,13 @@ function showSitewisePlot(setTo = null){
 
 		$("#showSitewisePlot").val("+");
 		$("#plotDIV4").slideUp(100);
+		showSitewisePlot_controller(true); // Inform the model that the sitewise plots is hidden so that it stops sending through data
 
 	}else{	// Show the sitewise plot
 
 		$("#showSitewisePlot").val("-");
 		$("#plotDIV4").slideDown(100);
+		showSitewisePlot_controller(false);
 
 		drawPlots();
 	}
