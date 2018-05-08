@@ -78,6 +78,7 @@ class Plots{
 	static double totaltimeElapsedThisTrial;
 	//static int nabortionSimulations;
 	//static int nMisincorporationSimulations;
+	static bool sitewisePlotHidden;
 	static bool plotsAreHidden;
 	static bool arrestTimeoutReached;
 	static double timeWaitedUntilNextTranslocation;
@@ -99,6 +100,9 @@ class Plots{
 		static void userSelectPlot(int plotNum, string value, bool deleteData);
 		static void savePlotSettings(int plotNum, string values_str);
 		static void updateParameterPlotData(State* state);
+
+
+		static void hideSitewisePlot(bool hide);
 		static void hideAllPlots(bool hide);
 		static string getCacheSizeJSON();
 		static void deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata, bool sequences_cleardata);

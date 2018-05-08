@@ -76,7 +76,7 @@ void vRNA_init(const char* nascentSequence){
 // Calls the ViennaRNA suite written in C and returns the MFE structure
 // External variable vRNA_MFE_value will contain the free energy
 // Dynamic programming data structures in vRNA will persist between subsequent calls of this function
-float vRNA_compute_MFE(char* sequence, char* structure){
+float vRNA_compute_MFE(char* sequence, char* structure, int length){
 
 
 	// Convert the string sequence into a vrna_fold_compound_t object
@@ -84,11 +84,9 @@ float vRNA_compute_MFE(char* sequence, char* structure){
 
 
 	// Set the length and sequence of vc to the current sequence
-	vc->length    = strlen(sequence);
+	vc->length    = length;
   	vc->sequence  = strdup(sequence);
 
-
-	int length = vc->length;
 
 
 	//if (structureGlobal) free(structureGlobal);
@@ -109,18 +107,15 @@ float vRNA_compute_MFE(char* sequence, char* structure){
 
 // Returns coordinates to position each RNA base on a plot. Modified from code in plot_structure.c -> vrna_file_PS_rnaplot_a()
 // Returns a float array XY where the first (length+1) are the X coordinates and the second (length+1) are the Y coordinates
-void vRNA_get_coordinates(char* structure, float* XY){
+void vRNA_get_coordinates(char* structure, float* XY, int length){
 
 
 	
 	//float  xmin, xmax, ymin, ymax;
-	int    i, length;
+	int    i;
 	int    ee, gb, ge, Lg, l[3];
 	float *X, *Y;
 
-	length = strlen(structure);
-
-	if (length == 0) return;
 
 	short* pair_table_g = vrna_ptable(structure);
 

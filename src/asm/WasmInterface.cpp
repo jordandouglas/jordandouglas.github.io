@@ -532,6 +532,11 @@ extern "C" {
 	// Refresh the current state
 	void EMSCRIPTEN_KEEPALIVE refresh(int msgID){
 
+
+		// Must reset coordinates here if hidden because the state will not do so if hidden 
+		if (_animationSpeed == "hidden") Coordinates::resetToInitialState();
+
+
 		// Reset state
 		delete _currentStateGUI;
 		_currentStateGUI = new State(true, true);
@@ -1166,6 +1171,12 @@ extern "C" {
 	}
 
 
+
+
+	// Show or hide the sitewise plot
+	void EMSCRIPTEN_KEEPALIVE showSitewisePlot(int hidden){
+		Plots::hideSitewisePlot(hidden == 1);
+	}
 
 	// User shows or hides all plots
 	void EMSCRIPTEN_KEEPALIVE showPlots(int hidden){

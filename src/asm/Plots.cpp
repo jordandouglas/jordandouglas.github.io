@@ -77,6 +77,7 @@ double Plots::velocity = 0;
 int Plots::totalDisplacement = 0;
 double Plots::totaltimeElapsed = 0;
 double Plots::totaltimeElapsedThisTrial = 0;
+bool Plots::sitewisePlotHidden = false;
 bool Plots::plotsAreHidden = false;
 bool Plots::arrestTimeoutReached = false;
 double Plots::timeWaitedUntilNextTranslocation = 0;
@@ -378,7 +379,8 @@ string Plots::getPlotDataAsJSON(){
 
 
 
-	if (_USING_GUI && Plots::plotsAreHidden) return "{}";
+	if (_USING_GUI && Plots::plotsAreHidden && Plots::sitewisePlotHidden) return "{}";
+
 
 	string plotDataJSON = "{";
 
@@ -396,28 +398,28 @@ string Plots::getPlotDataAsJSON(){
 	bool parameterHeatmap_needsData = false;
 	bool terminatedSequences_needsData = true;
 	for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
-		if (Plots::plotSettings.at(pltNum) != nullptr && (Plots::plotSettings.at(pltNum)->getName() == "distanceVsTime" || Plots::plotSettings.at(pltNum)->getName() == "velocityHistogram")) distanceVsTime_needsData = true;
-		else if (Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->getName() == "pauseHistogram") pauseHistogram_needsData = true;
-		else if (Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->getName() == "pauseSite") pausePerSite_needsData = true;
-		else if (Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->getName() == "parameterHeatmap") parameterHeatmap_needsData = true;
+		if (!Plots::plotsAreHidden && Plots::plotSettings.at(pltNum) != nullptr && (Plots::plotSettings.at(pltNum)->getName() == "distanceVsTime" || Plots::plotSettings.at(pltNum)->getName() == "velocityHistogram")) distanceVsTime_needsData = true;
+		else if (!Plots::plotsAreHidden && Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->getName() == "pauseHistogram") pauseHistogram_needsData = true;
+		else if (!Plots::plotsAreHidden && Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->getName() == "parameterHeatmap") parameterHeatmap_needsData = true;
+		else if (!Plots::sitewisePlotHidden && Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->getName() == "pauseSite") pausePerSite_needsData = true;
+		
 	}
 
 
 
 	if (distanceVsTime_needsData) {
 
-		//cout << "1" << endl;
 	
 		// Turn unsent distance versus time object into a JSON
 		string distanceVsTimeDataUnsent_JSON = "'DVT_UNSENT':{";
-		int nruns = 0;
 		for (list<list<vector<double>>>::iterator it = Plots::distanceVsTimeDataUnsent.begin(); it != Plots::distanceVsTimeDataUnsent.end(); ++it){
 
-			nruns++;
 			//cout << "a#" << nruns << endl;
 
 			// Simulation number of this simulation
 			list<vector<double>> simulationList = (*it);
+
+			if (simulationList.size() == 0) continue;
 
 
 			int simulationNum = 0;
@@ -430,8 +432,6 @@ string Plots::getPlotDataAsJSON(){
 
 			//cout << distanceVsTimeDataUnsent_JSON << endl;
 			//cout << "size of this " << simulationList.size() << "size of parent " << Plots::distanceVsTimeDataUnsent.size() << endl;
-			//cout << "b#" << nruns << endl;
-			int nrunsb = 0;
 			for (list<vector<double>>::iterator j = simulationList.begin(); j != simulationList.end(); ++j){
 
 				vector<double> distanceTime = (*j);
@@ -446,15 +446,13 @@ string Plots::getPlotDataAsJSON(){
 
 			}
 
-			//cout << "c#" << nruns << endl;
 
-			nrunsb = 0;
+
 			for (list<vector<double>>::iterator j = simulationList.begin(); j != simulationList.end(); ++j){
-				nrunsb++;
 				vector<double> distanceTime = (*j);
-        		delete &distanceTime;
+				distanceTime.clear();
+        		//delete &distanceTime;
 			}
-
 
 
 			if (distances.substr(distances.length()-1, 1) == ",") distances = distances.substr(0, distances.length() - 1);
@@ -464,7 +462,7 @@ string Plots::getPlotDataAsJSON(){
 
 			if (distances == "[]" || times == "[]") continue;
 
-			//cout << "d#" << nruns << endl;
+
 			distanceVsTimeDataUnsent_JSON += "'" + to_string(simulationNum) + "':{'sim':" + to_string(simulationNum);
 			distanceVsTimeDataUnsent_JSON += ",'distances':" + distances + ",'times':" + times + "}";
 
@@ -474,18 +472,18 @@ string Plots::getPlotDataAsJSON(){
     		}
     		--it;
 
+
     		//cout << "distanceVsTimeDataUnsent_JSON length " << distanceVsTimeDataUnsent_JSON.length() << endl;
 
     		//cout << distanceVsTimeDataUnsent_JSON << endl;
 
 
 			simulationList.clear();
-			delete &simulationList;
+			//delete &simulationList;
 
 
 		}
 
-		//cout << "2" << endl;
 
 		distanceVsTimeDataUnsent_JSON += "}";
 
@@ -522,7 +520,6 @@ string Plots::getPlotDataAsJSON(){
     	}
 
 
-    	//cout << "3" << endl;
 
 				
 	}
@@ -532,6 +529,9 @@ string Plots::getPlotDataAsJSON(){
 	// Catalysis time histogram
 	if (pauseHistogram_needsData) {
 
+
+		//cout << "Asking for Catalysis time" << endl;
+
 		// Turn unsent catalysis times object into a JSON
 		string catalysisTimeDataUnsent_JSON = "'DWELL_TIMES_UNSENT':{";
 		int nruns = 0;
@@ -540,28 +540,27 @@ string Plots::getPlotDataAsJSON(){
 			
 			// Simulation number of this simulation
 			list<double> simulationList = (*it);
+			if (simulationList.size() == 0) continue;
 			int simulationNum = (int)simulationList.front(); // First element is the simulation number
 
-			catalysisTimeDataUnsent_JSON += "'" + to_string(simulationNum) + "':[";
+
+			string times = "[";
 
 			for (list<double>::iterator j = simulationList.begin(); j != simulationList.end(); ++j){
 
-
 				if (j == simulationList.begin()) continue;
-
 				double catalysisTime = (*j);
-				catalysisTimeDataUnsent_JSON += to_string(catalysisTime);
-
-				// Add commas if there is another element in the list
-				if (++j != simulationList.end()){
-        			catalysisTimeDataUnsent_JSON += ",";	
-        		}
-        		--j;
-
+				times += to_string(catalysisTime) + ",";
 
 			}
 
-			catalysisTimeDataUnsent_JSON += "]";
+
+
+			if (times.substr(times.length()-1, 1) == ",") times = times.substr(0, times.length() - 1);
+			times += "]";
+			if (times == "[]") continue;
+
+			catalysisTimeDataUnsent_JSON += "'" + to_string(simulationNum) + "':" + times;
 
 			// Add commas if there is another element in the list
 			if (++it != Plots::catalysisTimesUnsent.end()){
@@ -590,9 +589,10 @@ string Plots::getPlotDataAsJSON(){
 		Plots::catalysisTimesUnsent.push_back(catalysisTimesTrial);
 
 
+		cout << "Got it " << catalysisTimeDataUnsent_JSON << endl;
+
 
 	}
-
 
 
 	// Sitewise pause time long plot
@@ -612,6 +612,7 @@ string Plots::getPlotDataAsJSON(){
 
 	}
 
+
 	
 
 	// Parameter heatmap data. This is stored in the settings for each individual plot (and will be added to the JSON in the section below)
@@ -623,6 +624,7 @@ string Plots::getPlotDataAsJSON(){
 		}
 
 	}
+
 
 
 	// Send through a list of terminated sequences which have not yet been sent through
@@ -660,11 +662,14 @@ string Plots::getPlotDataAsJSON(){
 		if (Plots::plotSettings.at(pltNum) != nullptr) plotSettingsJSON += "'" + to_string(pltNum+1) + "':{" +  Plots::plotSettings.at(pltNum)->toJSON() + "},";
 	}
 
+
+
 	if (plotSettingsJSON.substr(plotSettingsJSON.length()-1, 1) == ",") plotSettingsJSON = plotSettingsJSON.substr(0, plotSettingsJSON.length() - 1);
 	plotSettingsJSON += "}";
 	plotDataJSON += "," + plotSettingsJSON;
 
 	//cout << "plotDataJSON " << plotDataJSON << endl;
+	//cout << "C" << endl;
 
 	return plotDataJSON + "}";
 
@@ -695,6 +700,13 @@ void Plots::savePlotSettings(int plotNum, string values_str){
 
 	if (Plots::plotSettings.at(plotNum - 1) != nullptr) Plots::plotSettings.at(plotNum - 1)->savePlotSettings(values_str);
 
+}
+
+
+
+// Determine whether to stop sending data through to the controller
+void Plots::hideSitewisePlot(bool toHide){
+	Plots::sitewisePlotHidden = toHide;
 }
 
 

@@ -92,7 +92,7 @@ PlotSettings::PlotSettings(int plotNumber, string name){
 
 
 	else {
-		cout << "Cannot find plot " << this->name << endl;
+		if (this->name != "none") cout << "Cannot find plot " << this->name << endl;
 
 	}
 
@@ -134,8 +134,11 @@ void PlotSettings::updateHeatmapData(list<ParameterHeatmapData*> heatmapData){
 // Converts these plot settings into a JSON
 string PlotSettings::toJSON(){
 
-	string settingsJSON = "'name':'" + this->name + "',";
-	settingsJSON += "'plotFunction':'" + this->plotFunction + "',";
+
+	string settingsJSON = "'name':'" + this->name + "'";
+	if (this->name == "none") return settingsJSON;
+
+	settingsJSON += ",'plotFunction':'" + this->plotFunction + "',";
 
 
 	if (this->name == "distanceVsTime"){

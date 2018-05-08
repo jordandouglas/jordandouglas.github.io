@@ -31,10 +31,10 @@ void vRNA_init(char* templateSequence){
 }
 
 
-float vRNA_compute_MFE(char* sequence, char* structure){
+float vRNA_compute_MFE(char* sequence, char* structure, int length){
 	return 0;
 }
 
 
-void vRNA_get_coordinates(char* structure, float* XY){
+void vRNA_get_coordinates(char* structure, float* XY, int length){
 }

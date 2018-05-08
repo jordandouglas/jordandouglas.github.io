@@ -1805,9 +1805,9 @@ string State::fold(){
 	cout << "Calculating free energy" << endl;
 
 	int length = this->leftNascentBase-1;
-	char* seq = (char *) calloc(length, sizeof(char));
+	char* seq = (char *) calloc(length+1, sizeof(char));
 	char* structure = (char *) calloc(length+1, sizeof(char));
-	float* XY = (float *) calloc(2*length, sizeof(float));
+	float* XY = (float *) calloc(2*length+1, sizeof(float));
 
 	//XY = (float *) malloc(2*(length+1)*sizeof(float));
 
@@ -1817,7 +1817,7 @@ string State::fold(){
 
 	cout << "seq1 " << string(seq) << endl;
 
-	float MFE = vRNA_compute_MFE(seq, structure);
+	float MFE = vRNA_compute_MFE(seq, structure, length);
 
 	if (!MFE) {
 		cout << "Failed to fold RNA" << endl;
@@ -1834,7 +1834,7 @@ string State::fold(){
 	string structureString = string(structure);
 	cout << "Free energy: " << MFE << "kBT with structure " << structure << endl;
 
-	vRNA_get_coordinates(structure, XY);
+	vRNA_get_coordinates(structure, XY, length);
 
 	cout << "Got XY" << endl;
 
@@ -1888,11 +1888,11 @@ string State::fold(){
 	// Calculate mean x and y distance to move in order to have the structure centered at (startX, startY) 
 	double displX = 0;
 	double displY = 0;
-	/*
+
 	for (int i = 0; i < length; i ++){
-		displX += startX - XY[i];
-		displY += startY - XY[i+length];
-	}*/
+		//displX += startX - XY[i];
+		//displY += startY - XY[i+length];
+	}
 	displX /= length;
 	displY /= length;
 

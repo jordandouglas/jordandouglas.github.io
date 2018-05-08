@@ -556,11 +556,18 @@ savePlotSettings = function(plotNum, values, msgID = null) {
 }
 
 
+
+
+// Show or hide the sitewise plot
+showSitewisePlot = function(hidden){
+	Module.ccall("showSitewisePlot", null, ["number"], [(hidden ? 1 : 0)]);
+}
+
+
+
 // Show or hide all current plots. While all plots of a given type are hidden then data will no longer be sent to the controller
 showPlots = function(hidden){
-
 	Module.ccall("showPlots", null, ["number"], [(hidden ? 1 : 0)]);
-
 }
 
 
