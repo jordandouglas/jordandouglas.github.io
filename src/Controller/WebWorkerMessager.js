@@ -335,7 +335,7 @@ function stop_controller(resolve = function() { }){
 		var msgID = res[1];
 		
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall(fnStr).then(() => resolve());
+		toCall(fnStr).then(() => setTimeout( function() { resolve(); }, 50) );
 		
 	}
 

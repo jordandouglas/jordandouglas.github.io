@@ -175,6 +175,8 @@ function drawPlotsFromData(plotData, resolve = function() { }){
 
 function update_PLOT_DATA(plotData){
 
+	//console.log("update_PLOT_DATA");
+
 	PLOT_DATA = plotData;
 
 	if (PLOT_DATA.sequences != null) {
@@ -197,12 +199,14 @@ function sequenceChangeRefresh(){
 
 	console.log("sequenceChangeRefresh");
 
-	resetAllPlots();
 
-	PLOT_DATA = {};
+
 	DWELL_TIMES_CONTROLLER = [];
 	VELOCITIES = [];
 	DISTANCE_VS_TIME_CONTROLLER = [];
+
+	resetAllPlots();
+	PLOT_DATA = {};
 	
 
 	
