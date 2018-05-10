@@ -35,6 +35,8 @@ using namespace std;
 
 
 
+size_t const Plots::maximumBytesJSON = 33554432; // 34 MB should be long enough to handle most datasets
+string Plots::plotDataJSON = "";
 
 // Distance versus time plot data (and velocity histogram data)
 int Plots::currentSimNumber = 0;
@@ -93,6 +95,12 @@ vector<PlotSettings*> Plots::plotSettings(4);
 
 // Must call this function when the sequence changes
 void Plots::init(){
+
+
+
+	// Restrict the data flow by only disallowing the JSON string to exceed a certain number of megabytes at a time. This is to avoid memory errors
+	Plots::plotDataJSON.reserve(Plots::maximumBytesJSON);
+
 
 	Plots::currentSimNumber = 0;
 
@@ -157,7 +165,12 @@ void Plots::init(){
 // Start new simulation
 void Plots::refreshPlotData(State* state){
 
+
+
 	if (state == nullptr || !_USING_GUI) return;
+
+
+	//cout << "Refreshing plot data" << endl;
 
 	Plots::currentSimNumber ++;
 
@@ -220,7 +233,8 @@ void Plots::refreshPlotData(State* state){
 
 // At the end of every simulation update the parameter plot data
 void Plots::updateParameterPlotData(State* state){
-	
+
+
 	if (state == nullptr || !_USING_GUI) return;
 
 	if (Plots::catalysisTimesThisTrial.size() == 0) return; 
@@ -374,21 +388,15 @@ void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) 
 
 
 
-
+// Returns all unsent plot data as a JSON string and removes unsent data from memory
+// Using '+=' instead of '+' a a string concatenator inside hot loops (see https://stackoverflow.com/questions/18892281/most-optimized-way-of-concatenation-in-strings)  
 string Plots::getPlotDataAsJSON(){
 
 
 
 	if (_USING_GUI && Plots::plotsAreHidden && Plots::sitewisePlotHidden) return "{}";
 
-
-	string plotDataJSON = "{";
-
-	plotDataJSON += "'timeElapsed':" + to_string(Plots::totaltimeElapsedThisTrial);
-	plotDataJSON += ",'velocity':" + to_string(Plots::velocity);
-	plotDataJSON += ",'templateSeq':'" + currentSequence->get_templateSequence() + "'";
-	plotDataJSON += ",'nbases':" + to_string(currentSequence->get_templateSequence().length());
-
+	cout << "getPlotDataAsJSON" << endl;
 
 
 	// Determine which types of data must be sent through to the controller (don't send everything or it may slow things down)
@@ -396,7 +404,7 @@ string Plots::getPlotDataAsJSON(){
 	bool pauseHistogram_needsData = false;
 	bool pausePerSite_needsData = false;
 	bool parameterHeatmap_needsData = false;
-	bool terminatedSequences_needsData = true;
+	bool terminatedSequences_needsData = Plots::unsentCopiedSequences.size() > 0;
 	for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
 		if (!Plots::plotsAreHidden && Plots::plotSettings.at(pltNum) != nullptr && (Plots::plotSettings.at(pltNum)->getName() == "distanceVsTime" || Plots::plotSettings.at(pltNum)->getName() == "velocityHistogram")) distanceVsTime_needsData = true;
 		else if (!Plots::plotsAreHidden && Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->getName() == "pauseHistogram") pauseHistogram_needsData = true;
@@ -406,20 +414,45 @@ string Plots::getPlotDataAsJSON(){
 	}
 
 
+	if (!distanceVsTime_needsData && !pauseHistogram_needsData && !pausePerSite_needsData && !parameterHeatmap_needsData && !terminatedSequences_needsData) return "{}";
+
+
+
+	Plots::plotDataJSON = "{";
+
+	Plots::plotDataJSON += "'timeElapsed':" + to_string(Plots::totaltimeElapsedThisTrial);
+	Plots::plotDataJSON += ",'velocity':" + to_string(Plots::velocity);
+	Plots::plotDataJSON += ",'templateSeq':'" + currentSequence->get_templateSequence() + "'";
+	Plots::plotDataJSON += ",'nbases':" + to_string(currentSequence->get_templateSequence().length());
+
+
 
 	if (distanceVsTime_needsData) {
 
 	
 		// Turn unsent distance versus time object into a JSON
-		string distanceVsTimeDataUnsent_JSON = "'DVT_UNSENT':{";
-		for (list<list<vector<double>>>::iterator it = Plots::distanceVsTimeDataUnsent.begin(); it != Plots::distanceVsTimeDataUnsent.end(); ++it){
+		Plots::plotDataJSON += ",'DVT_UNSENT':{";
+		string distances;
+		string times;
+		list<vector<double>> simulationList;
+		int nElements = 0;
+		int exceededStringLengthAt_i = -1;
+		int exceededStringLengthAt_j = -1;
+		int distanceTimeNumber = 0;
+		list<list<vector<double>>>::iterator it;
+		list<vector<double>>::iterator j;
+		for (it = Plots::distanceVsTimeDataUnsent.begin(); it != Plots::distanceVsTimeDataUnsent.end(); ++it){
 
-			//cout << "a#" << nruns << endl;
+
+			nElements++;
 
 			// Simulation number of this simulation
-			list<vector<double>> simulationList = (*it);
+			simulationList = (*it);
 
-			if (simulationList.size() == 0) continue;
+			if (simulationList.size() < 2) continue;
+
+
+			//cout << "a" << nElements << endl;
 
 
 			int simulationNum = 0;
@@ -427,32 +460,50 @@ string Plots::getPlotDataAsJSON(){
 
 
 			// Get all distances and times in this simulation
-			string distances = "[";
-			string times = "[";
+			distances = "[";
+			times = "[";
+
+
+
 
 			//cout << distanceVsTimeDataUnsent_JSON << endl;
 			//cout << "size of this " << simulationList.size() << "size of parent " << Plots::distanceVsTimeDataUnsent.size() << endl;
-			for (list<vector<double>>::iterator j = simulationList.begin(); j != simulationList.end(); ++j){
+			exceededStringLengthAt_j = -1;
+			distanceTimeNumber = 0;
+			for (j = simulationList.begin(); j != simulationList.end(); ++j){
 
-				vector<double> distanceTime = (*j);
-				if (distanceTime.size() < 2 || int(distanceTime.at(0)) <= 0) continue;
-				distances += to_string(int(distanceTime.at(0)));
-				times += to_string(distanceTime.at(1));
+				if ((*j).size() < 2 || int((*j).at(0)) <= 0) continue;
+				distances += to_string(int((*j).at(0)));
+				times += to_string((*j).at(1));
 
     			distances += ",";	
     			times += ",";	
+
+
+    			distanceTimeNumber ++;
         		//distanceTime.clear();
         		//delete &distanceTime;
 
+        		if (Plots::plotDataJSON.length() + distances.length() + times.length() >= Plots::maximumBytesJSON - 1000) {
+        			exceededStringLengthAt_j = distanceTimeNumber;
+        			cout << "Maximum string size exceeded." << endl;
+        			break;
+        		}
+
+
+
 			}
 
 
-
-			for (list<vector<double>>::iterator j = simulationList.begin(); j != simulationList.end(); ++j){
-				vector<double> distanceTime = (*j);
-				distanceTime.clear();
-        		//delete &distanceTime;
+			// Delete all distance time objects up until the entry which caused memory to exceed 
+			distanceTimeNumber = 0;
+			for (j = simulationList.begin(); j != simulationList.end(); ++j){
+				distanceTimeNumber ++;
+				if (exceededStringLengthAt_j != -1 && distanceTimeNumber > exceededStringLengthAt_j) break;
+				(*j).clear();
 			}
+
+			if (exceededStringLengthAt_j != -1) exceededStringLengthAt_i = nElements;
 
 
 			if (distances.substr(distances.length()-1, 1) == ",") distances = distances.substr(0, distances.length() - 1);
@@ -463,14 +514,18 @@ string Plots::getPlotDataAsJSON(){
 			if (distances == "[]" || times == "[]") continue;
 
 
-			distanceVsTimeDataUnsent_JSON += "'" + to_string(simulationNum) + "':{'sim':" + to_string(simulationNum);
-			distanceVsTimeDataUnsent_JSON += ",'distances':" + distances + ",'times':" + times + "}";
+			Plots::plotDataJSON += "'";
+			Plots::plotDataJSON += to_string(simulationNum);
+			Plots::plotDataJSON += "':{'sim':";
+			Plots::plotDataJSON += to_string(simulationNum);
 
-			// Add commas if there is another element in the list
-			if (++it != Plots::distanceVsTimeDataUnsent.end()){
-    			distanceVsTimeDataUnsent_JSON += ",";	
-    		}
-    		--it;
+
+			Plots::plotDataJSON += ",'distances':";
+			Plots::plotDataJSON += distances;
+			Plots::plotDataJSON += ",'times':";
+			Plots::plotDataJSON += times;
+			Plots::plotDataJSON += "}";
+			Plots::plotDataJSON += ",";	
 
 
     		//cout << "distanceVsTimeDataUnsent_JSON length " << distanceVsTimeDataUnsent_JSON.length() << endl;
@@ -478,46 +533,90 @@ string Plots::getPlotDataAsJSON(){
     		//cout << distanceVsTimeDataUnsent_JSON << endl;
 
 
-			simulationList.clear();
+    		if (exceededStringLengthAt_j != -1) {
+    			list<vector<double>>::iterator finalElementToDelete = (*it).begin();
+    			advance(finalElementToDelete, exceededStringLengthAt_j);
+    			//cout << "Erasing first elements " << exceededStringLengthAt_j << endl;
+
+    			//cout << "length before " << (*it).size() << endl;
+
+    			(*it).erase((*it).begin(), finalElementToDelete);
+
+    			//cout << "length after " << (*it).size() << endl;
+
+    			// Stop adding elements to the string now that we have gone past the maximum length
+    			break;
+
+    		}
+			else simulationList.clear();
 			//delete &simulationList;
+
+			//cout << "c" << nElements << endl;
+
+
 
 
 		}
 
 
-		distanceVsTimeDataUnsent_JSON += "}";
+
+		if (Plots::plotDataJSON.substr(Plots::plotDataJSON.length()-1, 1) == ",") Plots::plotDataJSON = Plots::plotDataJSON.substr(0, Plots::plotDataJSON.length() - 1);
+		Plots::plotDataJSON += "}";
+
+
+
 
 		//cout << distanceVsTimeDataUnsent_JSON << endl;
-		plotDataJSON += "," + distanceVsTimeDataUnsent_JSON;
+
+
 
 
 		// Include median distance travelled
 		if (Plots::distancesTravelledOnEachTemplate.size() > 0){
 			int middleDistanceIndex = Plots::distancesTravelledOnEachTemplate.size() / 2;
-			plotDataJSON += ",'medianDistanceTravelledPerTemplate':" + to_string(Plots::distancesTravelledOnEachTemplate.at(middleDistanceIndex));
+			//cout << middleDistanceIndex << endl;
+			Plots::plotDataJSON += ",'medianDistanceTravelledPerTemplate':" + to_string(Plots::distancesTravelledOnEachTemplate.at(middleDistanceIndex));
 		}
 
 		// Include median time travelled
 		if (Plots::timesSpentOnEachTemplate.size() > 0){
 			int middleTimeIndex = Plots::timesSpentOnEachTemplate.size() / 2;
-			plotDataJSON += ",'medianTimeSpentOnATemplate':" + to_string(Plots::timesSpentOnEachTemplate.at(middleTimeIndex));
+			//cout << middleTimeIndex << endl;
+			Plots::plotDataJSON += ",'medianTimeSpentOnATemplate':" + to_string(Plots::timesSpentOnEachTemplate.at(middleTimeIndex));
 		}
 
 
+		// Erase all unsent elements which were successfully added to the string before memory was exceeded
+		if (exceededStringLengthAt_i != -1) {
+			if (exceededStringLengthAt_i > 0){
+				list<list<vector<double>>>::iterator finalElementToDelete = Plots::distanceVsTimeDataUnsent.begin();
+				advance(finalElementToDelete, exceededStringLengthAt_i-1);
+				//cout << "Erasing upto element " << exceededStringLengthAt_i-1 << endl;
 
-		Plots::distanceVsTimeDataUnsent.clear();
+				//cout << "length before " << Plots::distanceVsTimeDataUnsent.size() << endl;
+    			
 
+				Plots::distanceVsTimeDataUnsent.erase(Plots::distanceVsTimeDataUnsent.begin(), finalElementToDelete);
 
-		// Reinitialise the unsent data structure
-		if (Plots::distanceVsTimeSize < Plots::distanceVsTimeSizeMax) {
-			vector<double> distanceTimeUnsent(3);
-			//distanceTimeUnsent.at(0) = 0; // Distance (nt);
-			//distanceTimeUnsent.at(1) = Plots::timeWaitedUntilNextTranslocation; // Time (s)
-			distanceTimeUnsent.at(2) = Plots::currentSimNumber;
-	    	list<vector<double>> distanceTimeThisSimulation;
-			distanceTimeThisSimulation.push_back(distanceTimeUnsent);
-	    	Plots::distanceVsTimeDataUnsent.push_back(distanceTimeThisSimulation);
-    	}
+				//cout << "length after " << Plots::distanceVsTimeDataUnsent.size() << endl;
+			}
+		}
+		else {
+
+			Plots::distanceVsTimeDataUnsent.clear();
+
+			// Reinitialise the unsent data structure
+			if (Plots::distanceVsTimeSize < Plots::distanceVsTimeSizeMax) {
+				vector<double> distanceTimeUnsent(3);
+				//distanceTimeUnsent.at(0) = 0; // Distance (nt);
+				//distanceTimeUnsent.at(1) = Plots::timeWaitedUntilNextTranslocation; // Time (s)
+				distanceTimeUnsent.at(2) = Plots::currentSimNumber;
+		    	list<vector<double>> distanceTimeThisSimulation;
+				distanceTimeThisSimulation.push_back(distanceTimeUnsent);
+		    	Plots::distanceVsTimeDataUnsent.push_back(distanceTimeThisSimulation);
+	    	}
+
+	    }
 
 
 
@@ -535,6 +634,7 @@ string Plots::getPlotDataAsJSON(){
 		// Turn unsent catalysis times object into a JSON
 		string catalysisTimeDataUnsent_JSON = "'DWELL_TIMES_UNSENT':{";
 		int nruns = 0;
+		string times = "[";
 		for (list<list<double>>::iterator it = Plots::catalysisTimesUnsent.begin(); it != Plots::catalysisTimesUnsent.end(); ++it){
 
 			
@@ -544,13 +644,12 @@ string Plots::getPlotDataAsJSON(){
 			int simulationNum = (int)simulationList.front(); // First element is the simulation number
 
 
-			string times = "[";
+			times = "[";
 
 			for (list<double>::iterator j = simulationList.begin(); j != simulationList.end(); ++j){
 
 				if (j == simulationList.begin()) continue;
-				double catalysisTime = (*j);
-				times += to_string(catalysisTime) + ",";
+				times += to_string((*j)) + ",";
 
 			}
 
@@ -560,21 +659,26 @@ string Plots::getPlotDataAsJSON(){
 			times += "]";
 			if (times == "[]") continue;
 
-			catalysisTimeDataUnsent_JSON += "'" + to_string(simulationNum) + "':" + times;
-
-			// Add commas if there is another element in the list
-			if (++it != Plots::catalysisTimesUnsent.end()){
-    			catalysisTimeDataUnsent_JSON += ",";	
-    		}
-    		--it;
+			catalysisTimeDataUnsent_JSON += "'";
+			catalysisTimeDataUnsent_JSON += to_string(simulationNum);
+			catalysisTimeDataUnsent_JSON += "':";
+			catalysisTimeDataUnsent_JSON += times;
+			catalysisTimeDataUnsent_JSON += ",";	
 
 			simulationList.clear();
 			delete &simulationList;
 
 		}
 
+		if (catalysisTimeDataUnsent_JSON.substr(catalysisTimeDataUnsent_JSON.length()-1, 1) == ",") catalysisTimeDataUnsent_JSON = catalysisTimeDataUnsent_JSON.substr(0, catalysisTimeDataUnsent_JSON.length() - 1);
 		catalysisTimeDataUnsent_JSON += "}";
-		plotDataJSON += "," + catalysisTimeDataUnsent_JSON;
+
+		if (Plots::plotDataJSON.length() + catalysisTimeDataUnsent_JSON.length() < Plots::maximumBytesJSON){
+			Plots::plotDataJSON += "," + catalysisTimeDataUnsent_JSON;
+			catalysisTimeDataUnsent_JSON = "";
+		} else{
+			cout << "Maximum string size exceeded. Cannot display time histogram data." << endl;
+		}
 
 
 
@@ -589,7 +693,6 @@ string Plots::getPlotDataAsJSON(){
 		Plots::catalysisTimesUnsent.push_back(catalysisTimesTrial);
 
 
-		cout << "Got it " << catalysisTimeDataUnsent_JSON << endl;
 
 
 	}
@@ -599,16 +702,16 @@ string Plots::getPlotDataAsJSON(){
 	if (pausePerSite_needsData) {
 
 
-		plotDataJSON += ",'npauseSimulations':" + to_string(Plots::npauseSimulations);
-		plotDataJSON += ",'pauseTimePerSite':[";
+		Plots::plotDataJSON += ",'npauseSimulations':" + to_string(Plots::npauseSimulations);
+		Plots::plotDataJSON += ",'pauseTimePerSite':[";
 
 
 		for (int baseNum = 0; baseNum < Plots::pauseTimePerSite.size(); baseNum ++){
-			plotDataJSON += to_string(Plots::pauseTimePerSite.at(baseNum));
-			if (baseNum < Plots::pauseTimePerSite.size()-1) plotDataJSON += ",";
+			Plots::plotDataJSON += to_string(Plots::pauseTimePerSite.at(baseNum));
+			if (baseNum < Plots::pauseTimePerSite.size()-1) Plots::plotDataJSON += ",";
 		}
 
-		plotDataJSON += "]";
+		Plots::plotDataJSON += "]";
 
 	}
 
@@ -630,23 +733,23 @@ string Plots::getPlotDataAsJSON(){
 	// Send through a list of terminated sequences which have not yet been sent through
 	if (terminatedSequences_needsData) {
 
-		plotDataJSON += ",'sequences':[";
+		Plots::plotDataJSON += ",'sequences':[";
 
 		for (list<string>::iterator it = Plots::unsentCopiedSequences.begin(); it != Plots::unsentCopiedSequences.end(); ++it){
 
-			plotDataJSON += "'" + (*it) + "'";
+			Plots::plotDataJSON += "'" + (*it) + "'";
 
 
 			// Add commas if there is another element in the list
 			if (++it != Plots::unsentCopiedSequences.end()){
-    			plotDataJSON += ",";	
+    			Plots::plotDataJSON += ",";	
     		}
     		--it;
 
 		}
 
 
-		plotDataJSON += "]";
+		Plots::plotDataJSON += "]";
 		Plots::unsentCopiedSequences.clear();
 
 
@@ -654,7 +757,7 @@ string Plots::getPlotDataAsJSON(){
 
 
 
-	//cout << "Plots JSON = " << plotDataJSON << endl;
+	//cout << "Plots JSON = " << Plots::plotDataJSON << endl;
 
 	// Plot settings. Parameter heatmap data will be added onto the whichPlotInWhichCanvas object
 	string plotSettingsJSON = "'whichPlotInWhichCanvas':{";
@@ -666,12 +769,12 @@ string Plots::getPlotDataAsJSON(){
 
 	if (plotSettingsJSON.substr(plotSettingsJSON.length()-1, 1) == ",") plotSettingsJSON = plotSettingsJSON.substr(0, plotSettingsJSON.length() - 1);
 	plotSettingsJSON += "}";
-	plotDataJSON += "," + plotSettingsJSON;
+	Plots::plotDataJSON += "," + plotSettingsJSON;
 
-	//cout << "plotDataJSON " << plotDataJSON << endl;
+	//cout << "Plots::plotDataJSON " << Plots::plotDataJSON << endl;
 	//cout << "C" << endl;
 
-	return plotDataJSON + "}";
+	return Plots::plotDataJSON + "}";
 
 
 }

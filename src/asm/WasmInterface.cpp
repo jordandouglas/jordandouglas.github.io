@@ -703,13 +703,16 @@ extern "C" {
 
 		if (PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
 
+
+		messageFromWasmToJS("", msgID);
+
 		return 1;
 
 	}
 
 
 	// Set the sequence to one in the list
-	void EMSCRIPTEN_KEEPALIVE userSelectSequence(char* seqID){
+	void EMSCRIPTEN_KEEPALIVE userSelectSequence(char* seqID, int msgID){
 		bool succ = Settings::setSequence(string(seqID));
 		if (!succ) cout << "Cannot find sequence " << seqID << "." << endl;
 		else {
@@ -720,6 +723,8 @@ extern "C" {
 			if (PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
 			cout << "done" << endl;
 		}
+
+		messageFromWasmToJS("", msgID);
 
 	}
 

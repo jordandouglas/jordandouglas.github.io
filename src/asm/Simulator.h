@@ -55,6 +55,7 @@ class Simulator{
 	// Store the number of trials remaining and the current state for GUI purposes
 	int nTrialsTotalGUI;
 	int nTrialsCompletedGUI;
+	int niterationsUntilLastTimeoutCheck;
 	double simulateForSeconds;
 	double inSimulationTimeElapsedCurrentSimulation; // Time elapsed in the current simulation (for GUI)
 

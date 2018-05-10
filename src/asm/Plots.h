@@ -38,6 +38,10 @@ class Plots{
 
 	static int currentSimNumber;
 
+
+	static const size_t maximumBytesJSON;
+	static string plotDataJSON;
+
 	// Distance versus time plot data
 	static int distanceVsTimeSize;
 	static const int distanceVsTimeSizeMax;

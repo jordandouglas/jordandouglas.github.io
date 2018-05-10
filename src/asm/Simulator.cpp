@@ -134,6 +134,7 @@ void Simulator::initialise_GUI_simulation(int N, double msUntilStop){
 	this->nTrialsTotalGUI = N;
 	this->nTrialsCompletedGUI = 0;
 	this->simulateForSeconds = msUntilStop / 1000;
+	this->niterationsUntilLastTimeoutCheck = 0;
 
 }
 
@@ -344,7 +345,6 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
 	// GUI timeout function
-	int niterationsUntilLastTimeoutCheck = 0;
 	int checkTimeoutEveryNIterations = 10000;
 	
 	while(!s->isTerminated()){
@@ -352,11 +352,11 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 		// Check if GUI timeout has been reached (if there is a timeout)
 		if (simulateForSeconds != -1 && _animationSpeed == "hidden"){
-			niterationsUntilLastTimeoutCheck ++;
+			this->niterationsUntilLastTimeoutCheck ++;
 
 			// Make time comparison only once in a while because this operation is slow
-			if (niterationsUntilLastTimeoutCheck >= checkTimeoutEveryNIterations){
-				niterationsUntilLastTimeoutCheck = 0;
+			if (this->niterationsUntilLastTimeoutCheck >= checkTimeoutEveryNIterations){
+				this->niterationsUntilLastTimeoutCheck = 0;
 				chrono::duration<double> elapsed_seconds = chrono::system_clock::now() - _interfaceSimulation_startTime;
 				double time = elapsed_seconds.count();
 				if (time >= simulateForSeconds){

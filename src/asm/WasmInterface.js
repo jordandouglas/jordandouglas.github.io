@@ -241,9 +241,19 @@ getSequences = function(msgID = null) {
 userInputSequence = function(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent, msgID = null){
 
 
-	var result = Module.ccall("userInputSequence", "number", ["string", "string", "string", "number", "number"],  [newSeq, newTemplateType, newPrimerType, (inputSequenceIsNascent ? 1 : 0), msgID]); 
-	var toReturn = {succ: result == 1}; 
-	postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+
+	// Create the callback function
+	var toDoAfterCall = function(){
+		//console.log("Returning", JSON.parse(resultStr));
+		if (msgID != null) {
+			var toReturn = {succ: true}; 
+			postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+		}
+
+	}
+
+
+	Module.ccall("userInputSequence", null, ["string", "string", "string", "number", "number"],  [newSeq, newTemplateType, newPrimerType, (inputSequenceIsNascent ? 1 : 0), msgID]); 
 
 
 }
@@ -252,17 +262,19 @@ userInputSequence = function(newSeq, newTemplateType, newPrimerType, inputSequen
 userSelectSequence = function(newSequenceID, msgID = null){
 
 	// Create the callback function
-	var toDoAfterCall = function(resultStr){
+	var toDoAfterCall = function(){
 		//console.log("Returning", JSON.parse(resultStr));
-		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+		if (msgID != null) {
+			var toReturn = {succ: true}; 
+			postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+		}
+
 	}
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 
 
-	Module.ccall("userSelectSequence", null, ["string"],  [newSequenceID]); 
+	Module.ccall("userSelectSequence", null, ["string", "number"],  [newSequenceID, msgID]); 
 
-	var toReturn = {succ: true}; 
-	postMessage(msgID + "~X~" + JSON.stringify(toReturn));
 
 }
 
@@ -515,7 +527,7 @@ getPlotData = function(msgID = null){
 
 	// Create the callback function
 	var toDoAfterCall = function(resultStr){
-		//console.log("plotdata", JSON.parse(resultStr));
+		//console.log("plotdata", resultStr);
 		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 
 	}
