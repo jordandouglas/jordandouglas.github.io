@@ -157,7 +157,13 @@ function onWebWorkerReceiveMessage(event, resolveAfterWebassemblyInitialised = f
 	else{
 		// Otherwise we continue with the callback but with the JSON-parsed parameter
 		//console.log("result", id, result);
-		result = JSON.parse(result);
+		try {
+			var resultTemp = JSON.parse(result);
+			result = resultTemp;
+		}catch(e){
+			console.log("Could not parse", result);
+			return;
+		}
 
 		//console.log("Returning JSON ", result);
 		obj["resolve"](result);

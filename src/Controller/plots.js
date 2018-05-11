@@ -153,19 +153,33 @@ function drawPlotsFromData(plotData, resolve = function() { }){
 	//console.log("drawPlotsFromData", PLOT_DATA);
 	//console.trace();
 
-	window.requestAnimationFrame(function(){
-		for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
+
+	// If more data is available from the model then get it all before drawing the plots
+
+	//else {
+
+		window.requestAnimationFrame(function(){
+			for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
 
 
-			if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "none") $("#plotCanvasContainer" + plt).html("");
+				if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "none") $("#plotCanvasContainer" + plt).html("");
 
-			else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
-			else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
-		}
+				else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
+				else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
+			}
 
-		resolve();
+			if (plotData.moreData) {
+				console.log("Need more data");
+				drawPlots(false, resolve);
+			}
 
-	});
+			else resolve();
+
+		});
+
+	//}
+
+
 	
 
 }
@@ -699,7 +713,7 @@ function plotTimeChart(){
 	}
 
 
-	//console.log("DISTANCE_VS_TIME_CONTROLLER", DISTANCE_VS_TIME_CONTROLLER);
+	console.log("DISTANCE_VS_TIME_CONTROLLER", DISTANCE_VS_TIME_CONTROLLER);
 	//console.log("medianTimeSpentOnATemplate", PLOT_DATA["medianTimeSpentOnATemplate"], "medianDistanceTravelledPerTemplate", PLOT_DATA["medianDistanceTravelledPerTemplate"]);
 
 	var index = DISTANCE_VS_TIME_CONTROLLER.length-1; // Index of the last list in the list
