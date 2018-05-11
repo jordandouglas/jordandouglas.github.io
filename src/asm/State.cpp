@@ -345,7 +345,7 @@ State* State::forward(){
 	//if (this->terminated) return this;
 
 
-	/*
+
 	SlippageLandscapes* DOMupdates;
 	if (this->isGuiState && _animationSpeed != "hidden") {
 
@@ -361,7 +361,7 @@ State* State::forward(){
 			//if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) ++;
 		}
 
-	}*/
+	}
 
 	// Update coordinates if this state is being displayed by the GUI (and not hidden mode)
 	if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden") {
@@ -447,13 +447,13 @@ State* State::forward(){
 	if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal()-1) ||
 		(this->mRNAPosInActiveSite <= 1 && this->rightTemplateBase > templateSequence.length())) this->terminate();
 
-	/*
+	
 	// If this is GUI state then we will be applying these changes to the DOM 
 	if (this->isGuiState && _animationSpeed != "hidden") {
 		 _slippageLandscapesToSendToDOM = DOMupdates;
 	}
 	else delete DOMupdates; 
-	*/
+
 
 	return this;
 }
@@ -546,7 +546,7 @@ State* State::backward(){
 	//if (this->terminated) return this;
 	if (this->getLeftTemplateBaseNumber() < 1 || this->getLeftTemplateBaseNumber() - bubbleLeft->getVal() -1 <= 2) return this;
 
-	/*
+
 	SlippageLandscapes* DOMupdates;
 	if (this->isGuiState && _animationSpeed != "hidden") {
 
@@ -559,7 +559,7 @@ State* State::backward(){
 			//if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) --;
 		}
 
-	}*/
+	}
 
 
 	// Update coordinates if this state is being displayed by the GUI
@@ -642,12 +642,12 @@ State* State::backward(){
 		this->rightNascentBase --; 
 	}
 
-	/*
+
 	// If this is GUI state then we will be applying these changes to the DOM 
 	if (this->isGuiState && _animationSpeed != "hidden") {
 		 _slippageLandscapesToSendToDOM = DOMupdates;
 	}else delete DOMupdates; 
-	*/
+
 	return this;
 }
 
