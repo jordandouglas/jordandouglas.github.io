@@ -76,6 +76,8 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 
 
 		if (rates[0] != -1) {
+			if (rates[0] >= INF || rates[1] >= INF || forceGradientFwd >= INF || forceGradientBck >= INF || GDagRateModifier >= INF)
+				cout << "rates[0]: " << rates[0] << ", rates[1]: " << rates[1] << ", forceGradientFwd: " << forceGradientFwd << " forceGradientBck: " << forceGradientBck << " GDagRateModifier: " << GDagRateModifier << endl;
 			if (fwd) return rates[1] * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd;
 			else return rates[0] * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck;
 		}
@@ -128,6 +130,12 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		double kfwd = state->calculateForwardRate(false, false);
 		backtrackRateTable[indexNum][0] = kbck;
 		backtrackRateTable[indexNum][1] = kfwd;
+
+
+
+		if (rates[0] >= INF || rates[1] >= INF || forceGradientFwd >= INF || forceGradientBck >= INF || GDagRateModifier >= INF)
+			cout << "b rates[0]: " << rates[0] << ", rates[1]: " << rates[1] << ", forceGradientFwd: " << forceGradientFwd << " forceGradientBck: " << forceGradientBck << " GDagRateModifier: " << GDagRateModifier << endl;
+			
 
 		if (fwd) return kfwd * GDagRateModifier * forceGradientFwd;
 		else return kbck * GDagRateModifier * forceGradientBck;

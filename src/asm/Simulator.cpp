@@ -223,7 +223,6 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
 			Plots::updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
 			delete _currentStateGUI;
 			_currentStateGUI = new State(true, true);
-			Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
 		}
 
 	}
@@ -689,6 +688,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			double runifNum = runif() * rateSum; //runif() * rateSum;
 			double cumsum = 0;
 			int reactionToDo = -1;
+
 			
 			
 			for (int i = 0; i < numReactions; i ++) {
@@ -698,11 +698,24 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 					break;
 				}
 			}
+
+			//if (s->get_nascentLength() == 3984 && s->get_mRNAPosInActiveSite() == 0 && this->nTrialsCompletedGUI > 1400){
+				//cout << nTrialsCompletedGUI << ": reactionToDo " << reactionToDo << ", bck:" << rates[0] << ", fwd:" << rates[1] << ", rel:" << rates[2] << ", cat:" << rates[3] << endl;
+			//}
 			
 			
 			double reactionTime = rexp(rateSum); // Random exponential
 			
 			//cout << "sampled reaction " << reactionToDo  << ", time elapsed = " << timeElapsed << endl;
+
+			if (reactionToDo == -1){
+				cout << nTrialsCompletedGUI << ", runifNum:" << runifNum << ", reactionToDo " << reactionToDo << ", bck:" << rates[0] << ", fwd:" << kFwd << ", rel:" << rates[2] << ", cat:" << rates[3] << endl;
+				cout << "GDagSlide->getVal() " << GDagSlide->getVal() << " exp(-GDagSlide->getVal()) " << exp(-GDagSlide->getVal()) << " exp(-9.079) " << exp(-9.079) <<  endl;
+
+				cout << HUGE_VAL << endl;
+			}
+			
+
 
 			int actionsToDoList[3] = {reactionToDo, -2, -2};
 
@@ -1256,6 +1269,7 @@ void Simulator::executeAction(State* s, int reactionToDo) {
 
 	switch (reactionToDo) {
 		case -1:
+			s->print();
 			cout << "Error: sampled action -1" << endl;
 			exit(0);
 			break;

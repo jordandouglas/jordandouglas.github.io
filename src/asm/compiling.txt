@@ -29,14 +29,14 @@ emcc -s WASM=1 -o Vienna.bc -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap'
 
 
 // Compile the main SimPol module with emscripten
-emcc -s WASM=1 -o simpol_asm.html -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'Pointer_stringify']" -O1 -O2 -O3 -std=c++11 -fpermissive  -s ALLOW_MEMORY_GROWTH=1 -s WASM_MEM_MAX=1073741824   -s NO_EXIT_RUNTIME=1  cimpol.cpp WasmInterface.cpp  WasmMessenger.cpp  Plots.cpp Sequence.cpp Parameter.cpp HTMLobject.cpp Coordinates.cpp MCMC.cpp ExperimentalData.cpp Polymerase.cpp PosteriorDistriutionSample.cpp XMLparser.cpp Model.cpp Simulator.cpp State.cpp Settings.cpp FreeEnergy.cpp PlotSettings.cpp SlippageLandscapes.cpp ParameterHeatmapData.cpp TranslocationRatesCache.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp SimulatorPthread.cpp BayesianCalculations.cpp Vienna.bc
+emcc -s WASM=1 -o simpol_asm.html -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'Pointer_stringify']" -O1 -O2 -O3 -std=c++11 -fpermissive  -s ALLOW_MEMORY_GROWTH=1 -s WASM_MEM_MAX=2147483648 -s NO_EXIT_RUNTIME=1  cimpol.cpp WasmInterface.cpp  WasmMessenger.cpp  Plots.cpp Sequence.cpp Parameter.cpp HTMLobject.cpp Coordinates.cpp MCMC.cpp ExperimentalData.cpp Polymerase.cpp PosteriorDistriutionSample.cpp XMLparser.cpp Model.cpp Simulator.cpp State.cpp Settings.cpp FreeEnergy.cpp PlotSettings.cpp SlippageLandscapes.cpp ParameterHeatmapData.cpp TranslocationRatesCache.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp SimulatorPthread.cpp BayesianCalculations.cpp Vienna.bc
 
 
 
 
 
 
-
+-s WASM_MEM_MAX=1073741824
 -s ALLOW_MEMORY_GROWTH=1 
 -s USE_PTHREADS=1  
 -s WASM_MEM_MAX=1073741824 

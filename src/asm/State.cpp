@@ -345,16 +345,23 @@ State* State::forward(){
 	//if (this->terminated) return this;
 
 
-	// If bulge will move too far to the left then absorb it
-	SlippageLandscapes* DOMupdates = new SlippageLandscapes();
+	/*
+	SlippageLandscapes* DOMupdates;
+	if (this->isGuiState && _animationSpeed != "hidden") {
+
+
+		// If bulge will move too far to the left then absorb it
+		DOMupdates = new SlippageLandscapes();
 
 
 
-	for (int s = 0; s < this->bulgePos.size(); s++){
-		if (this->partOfBulgeID.at(s) != s) continue;
-		if (this->bulgePos.at(s) > 0 && this->bulgePos.at(s) == hybridLen->getVal() - 1) this->absorb_bulge(s, false, true, DOMupdates);
-		//if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) ++;
-	}
+		for (int s = 0; s < this->bulgePos.size(); s++){
+			if (this->partOfBulgeID.at(s) != s) continue;
+			if (this->bulgePos.at(s) > 0 && this->bulgePos.at(s) == hybridLen->getVal() - 1) this->absorb_bulge(s, false, true, DOMupdates);
+			//if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) ++;
+		}
+
+	}*/
 
 	// Update coordinates if this state is being displayed by the GUI (and not hidden mode)
 	if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden") {
@@ -440,11 +447,13 @@ State* State::forward(){
 	if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal()-1) ||
 		(this->mRNAPosInActiveSite <= 1 && this->rightTemplateBase > templateSequence.length())) this->terminate();
 
-
+	/*
 	// If this is GUI state then we will be applying these changes to the DOM 
-	if (this->isGuiState) _slippageLandscapesToSendToDOM = DOMupdates;
+	if (this->isGuiState && _animationSpeed != "hidden") {
+		 _slippageLandscapesToSendToDOM = DOMupdates;
+	}
 	else delete DOMupdates; 
-
+	*/
 
 	return this;
 }
@@ -507,7 +516,9 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 
 
 
-		return _translocationRatesCache->getTranslocationRates(this, true);
+		double rate = _translocationRatesCache->getTranslocationRates(this, true);
+		if (rate >= INF) cout << "a kfwd = infinity" << endl;
+		return rate;
 
 	}
 	
@@ -522,7 +533,10 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 	
 	// Calculate rate
 	//cout << "rate = " << groundEnergy << " - " << forwardHeight << " = " << _preExp * exp(-(forwardHeight - groundEnergy)) << endl;
-	return _preExp * exp(-(forwardHeight - groundEnergy));
+
+	double rate = _preExp * exp(-(forwardHeight - groundEnergy));
+	if (rate >= INF) cout << "b kfwd = infinity" << endl;
+	return rate;
 	
 
 }
@@ -532,16 +546,20 @@ State* State::backward(){
 	//if (this->terminated) return this;
 	if (this->getLeftTemplateBaseNumber() < 1 || this->getLeftTemplateBaseNumber() - bubbleLeft->getVal() -1 <= 2) return this;
 
+	/*
+	SlippageLandscapes* DOMupdates;
+	if (this->isGuiState && _animationSpeed != "hidden") {
 
+		// If bulge will move too far to the left then absorb it
+		DOMupdates = new SlippageLandscapes();
 
-	// If bulge will move too far to the left then absorb it
-	SlippageLandscapes* DOMupdates = new SlippageLandscapes();
+		for (int s = 0; s < this->bulgePos.size(); s++){
+			if (this->partOfBulgeID.at(s) != s) continue;
+			if (this->bulgedBase.at(s) == this->rightNascentBase - 1) this->absorb_bulge(s, true, true, DOMupdates);
+			//if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) --;
+		}
 
-	for (int s = 0; s < this->bulgePos.size(); s++){
-		if (this->partOfBulgeID.at(s) != s) continue;
-		if (this->bulgedBase.at(s) == this->rightNascentBase - 1) this->absorb_bulge(s, true, true, DOMupdates);
-		//if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) --;
-	}
+	}*/
 
 
 	// Update coordinates if this state is being displayed by the GUI
@@ -624,11 +642,12 @@ State* State::backward(){
 		this->rightNascentBase --; 
 	}
 
-
+	/*
 	// If this is GUI state then we will be applying these changes to the DOM 
-	if (this->isGuiState) _slippageLandscapesToSendToDOM = DOMupdates;
-	else delete DOMupdates; 
-
+	if (this->isGuiState && _animationSpeed != "hidden") {
+		 _slippageLandscapesToSendToDOM = DOMupdates;
+	}else delete DOMupdates; 
+	*/
 	return this;
 }
 

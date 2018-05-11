@@ -591,7 +591,7 @@ changeSpeed = function(speed, msgID = null){
 		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 	}
 
-	console.log("Changing speed to", speed);
+	//console.log("Changing speed to", speed);
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 
 	Module.ccall("changeSpeed", null, ["string", "number"], [speed, msgID]);
