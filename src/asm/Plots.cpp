@@ -35,7 +35,7 @@ using namespace std;
 
 
 
-size_t const Plots::maximumBytesJSON = 33554432; // 34 MB should be long enough to handle most datasets
+size_t const Plots::maximumBytesJSON = 8388608; // 8MB 33554432; // 34 MB
 string Plots::plotDataJSON = "";
 
 // Distance versus time plot data (and velocity histogram data)
