@@ -26,6 +26,10 @@ body {
 	%background-color:#ebe9e7;
 }
 
+optgroup {
+	color:black;
+}
+
 canvas {
 	Vertical-align: middle;
 }
