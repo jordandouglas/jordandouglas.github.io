@@ -4700,11 +4700,20 @@ function customPlotSelectParameterTemplate(){
 		<legend><b>Variable (x-axis)</b></legend>
 		<select class="dropdown" onChange="updateParameterPlotSettings()" title="What do you want to show on the x-axis?" id = "customParamX" style="vertical-align: middle; text-align:right;">
 			<option value="none">Select a parameter...</option>
-			<option value="velocity">Mean velocity (bp/s)</option>
-			<option value="catalyTime">Mean catalysis time (s)</option>
-			<option value="totalTime">Mean transcription time (s)</option>
-			<option value="nascentLen">Nascent strand length (nt)</option>
-			<option value="logLikelihood">Chi-squared test statistic</option>
+			
+			<optgroup label="Measured variables">
+				<option value="velocity" style="color:white">Mean velocity (bp/s)</option>
+				<option value="catalyTime" style="color:white">Mean catalysis time (s)</option>
+				<option value="totalTime" style="color:white">Mean transcription time (s)</option>
+				<option value="nascentLen" style="color:white">Nascent strand length (nt)</option>
+				<option value="logLikelihood" style="color:white">Chi-squared test statistic</option>
+			</optgroup>
+			
+			<optgroup label="Parameters" id="customParamX_params">
+			
+			</optgroup>
+			
+			
 		</select><br>
 		Calculated per trial.
 	`;
@@ -4718,11 +4727,21 @@ function customPlotSelectPropertyTemplate(){
 		<legend><b>Variable (y-axis)</b></legend>
 		<select class="dropdown" onChange="updateParameterPlotSettings()" title="What do you want to show on the y-axis?" id = "customParamY" style="vertical-align: middle; text-align:right;">
 			<option value="probability">Probability</option>
-			<option value="velocity">Mean velocity (bp/s)</option>
-			<option value="catalyTime">Mean catalysis time (s)</option>
-			<option value="totalTime">Total transcription time (s)</option>
-			<option value="nascentLen">Nascent strand length (nt)</option>
-			<option value="logLikelihood">Chi-squared test statistic</option>
+
+			
+			<optgroup label="Measured variables">
+				<option value="velocity" style="color:white">Mean velocity (bp/s)</option>
+				<option value="catalyTime" style="color:white">Mean catalysis time (s)</option>
+				<option value="totalTime" style="color:white">Mean transcription time (s)</option>
+				<option value="nascentLen" style="color:white">Nascent strand length (nt)</option>
+				<option value="logLikelihood" style="color:white">Chi-squared test statistic</option>
+			</optgroup>
+			
+			<optgroup label="Parameters" id="customParamY_params">
+			
+			</optgroup>
+			
+			
 		</select><br>
 		Calculated per trial.
 	`;
@@ -4736,11 +4755,19 @@ function parameterHeatmapZAxisTemplate(){
 		<legend><b>Variable (z-axis)</b></legend>
 		<select class="dropdown" onChange="updateParameterPlotSettings()" title="What do you want to show on the z-axis?" id = "customParamZ" style="vertical-align: middle; text-align:right;">
 			<option value="none">Select a parameter...</option>
-			<option value="velocity">Mean velocity (bp/s)</option>
-			<option value="catalyTime">Mean catalysis time (s)</option>
-			<option value="totalTime">Mean transcription time (s)</option>
-			<option value="nascentLen">Nascent strand length (nt)</option>
-			<option value="logLikelihood">Chi-squared test statistic</option>
+
+			<optgroup label="Measured variables">
+				<option value="velocity" style="color:white">Mean velocity (bp/s)</option>
+				<option value="catalyTime" style="color:white">Mean catalysis time (s)</option>
+				<option value="totalTime" style="color:white">Mean transcription time (s)</option>
+				<option value="nascentLen" style="color:white">Nascent strand length (nt)</option>
+				<option value="logLikelihood" style="color:white">Chi-squared test statistic</option>
+			</optgroup>
+			
+			<optgroup label="Parameters" id="customParamZ_params">
+			
+			</optgroup>
+			
 		</select><br>
 		Calculated per trial.
 	`;
@@ -4980,9 +5007,9 @@ function plotOptions(plotNum){
 				console.log("params",params, params.length);
 				for (var paramID in params){
 					if (!params[paramID]["hidden"] && !params[paramID]["binary"] && params[paramID].name != null) {
-						$("#customParamX").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
-						$("#customParamY").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
-						$("#customParamZ").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
+						$("#customParamX_params").append(`<option value="` + paramID + `" style="color:white"> ` + params[paramID]["name"] + `</option>`);
+						$("#customParamY_params").append(`<option value="` + paramID + `" style="color:white"> ` + params[paramID]["name"] + `</option>`);
+						$("#customParamZ_params").append(`<option value="` + paramID + `" style="color:white"> ` + params[paramID]["name"] + `</option>`);
 					}
 				}
 
