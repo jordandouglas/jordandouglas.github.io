@@ -32,7 +32,7 @@ function renderSecondaryStructure(data){
 	
 	
 	
-		//console.log("data", data);
+		console.log("data", data);
 		//return;
 		if (data == null || data.vertices == null) return;
 
@@ -43,7 +43,7 @@ function renderSecondaryStructure(data){
 	
 		$("#bases").height(800);
 		var yShift = 100;
-		var width = parseFloat($("#pol").offset().left) + parseFloat($("#pol").width()) + $("#bases").scrollLeft();
+		var width = parseFloat($("#pol").offset().left) + parseFloat($("#pol").width()) + $("#bases").scrollLeft() + 300;
 		var height = parseFloat($("#bases").height()) - yShift - 100;
 		
 		$("#mRNAsvg").remove();

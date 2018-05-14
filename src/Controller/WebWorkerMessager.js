@@ -162,6 +162,7 @@ function onWebWorkerReceiveMessage(event, resolveAfterWebassemblyInitialised = f
 			result = resultTemp;
 		}catch(e){
 			console.log("Could not parse", result);
+			JSON.parse(result);
 			return;
 		}
 
@@ -2173,7 +2174,6 @@ function startTrials_controller(){
 	hideButtonAndShowStopButton("simulate");
 
 
-	
 	// If the sequence is big and WebWorker is connected then switch to hidden mode for efficiency
 	getTemplateSequenceLength_controller(function(result) {
 
@@ -2187,8 +2187,11 @@ function startTrials_controller(){
 		changeSpeed_controller();
 
 		$("#numSimSpan").hide(0);
-		$("#progressSimSpan").html("<span id='counterProgress'>0</span> / " + ntrials);
+		//$("#progressSimSpan").html("<span id='counterProgress'>0</span> / " + ntrials);
+		$("#progressSimSpan").html("<span id='counterProgress'>0</span>%");
 		$("#progressSimSpan").show(0);
+		$("#progressSimCanvas").show(0);
+		//$("progressToolbarCell").css("background-color", "#424f4f");
 		lockTheScrollbar("#bases");
 
 
@@ -2209,6 +2212,12 @@ function startTrials_controller(){
 			$("#numSimSpan").show(0);
 			$("#progressSimSpan").html("");
 			$("#progressSimSpan").hide(0);
+			$("#progressSimCanvas").hide(0);
+			$("#progressSimCanvas").attr("title", "");
+			//$("progressToolbarCell").css("background-color", "");
+			var canvas = document.getElementById("progressSimCanvas");
+			var ctx = canvas.getContext("2d");
+			ctx.clearRect(0, 0, 90, 22);
 			unlockTheScrollbar("#bases");
 
 
@@ -2276,7 +2285,16 @@ function startTrials_controller(){
 							renderParameters(); // Update parameters at the end of each trial
 						}
 
-						$("#counterProgress").html(Math.floor(result.N));
+						var progressProportion = result.N / ntrials;
+						$("#counterProgress").html(Math.floor(progressProportion * 100));
+
+						$("#progressSimCanvas").attr("title", "Completed " + result.N + " out of " + ntrials + " simulations");
+						var canvas = document.getElementById("progressSimCanvas");
+						var ctx = canvas.getContext("2d");
+						ctx.fillStyle = "#858280"; 
+						ctx.fillRect(0,0,progressProportion*90,22); 
+						ctx.fill();
+
 						//$("#output_asm").append("<div style='padding:5 5'>Velocity: " + roundToSF(result.meanVelocity, 4) + "bp/s; Time taken: " + roundToSF(result.realTime, 4) + "s; n complete = " + result.N + "</div>"); 
 
 
@@ -2418,12 +2436,11 @@ function saveSettings_controller(){
 
 		case "pauseSite": // Save the y-axis variable
 			values.push($('input[name=Yaxis]:checked').val());
-			console.log("input[name=Yaxis]:checked", $('input[name=Yaxis]:checked').val());
+			values.push($('input[name=pauseSiteYVariable]:checked').val());
+			//console.log("input[name=Yaxis]:checked", $('input[name=Yaxis]:checked').val());
 			functionToCallAfterSaving  = function() { plot_time_vs_site(); };
 			break;
 
-
-	
 
 		case "parameterHeatmap":
 
@@ -2479,10 +2496,16 @@ function saveSettings_controller(){
 			
 	}
 	
-	var updateDom = function(whichPlotInWhichCanvas){
+	var updateDom = function(result){
+
+		
+		if (result.whichPlotInWhichCanvas != null) {
+			drawPlotsFromData(result);
+
+		}
+		else PLOT_DATA["whichPlotInWhichCanvas"] = result;
 
 
-		PLOT_DATA["whichPlotInWhichCanvas"] = whichPlotInWhichCanvas;
 		functionToCallAfterSaving();
 		closePlotSettingsPopup();
 	};
@@ -2509,15 +2532,14 @@ function saveSettings_controller(){
 		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((whichPlotInWhichCanvas) => updateDom(whichPlotInWhichCanvas));
+		toCall().then((result) => updateDom(result));
 
 
 	}
 	
 
-
-
 }
+
 
 
 
