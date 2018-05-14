@@ -395,55 +395,55 @@ function submitCustomSequence(resolveAfterRefresh = function() { }){
 	if (newSeq == "") return;
 
 
-	stop_controller();
+	stop_controller(function() {
 
 
-	var templateType = $("#SelectTemplateType").val();
-	var primerType = $("#SelectPrimerType").val();
-	var inputSequenceIsNascent = $('input[name="inputSeqType"][value="inputNascentSeq"]').prop("checked");
+		var templateType = $("#SelectTemplateType").val();
+		var primerType = $("#SelectPrimerType").val();
+		var inputSequenceIsNascent = $('input[name="inputSeqType"][value="inputNascentSeq"]').prop("checked");
 
 
-	var toCall = (newSequenceID, newTemplateType, newPrimerType) => new Promise((resolve) => userInputSequence_controller(newSequenceID, newTemplateType, primerType, inputSequenceIsNascent, resolve));
-	toCall(newSeq, templateType, primerType, inputSequenceIsNascent).then((result) => {
-	
-		if (!result.succ) return;
+		var toCall = (newSequenceID, newTemplateType, newPrimerType) => new Promise((resolve) => userInputSequence_controller(newSequenceID, newTemplateType, primerType, inputSequenceIsNascent, resolve));
+		toCall(newSeq, templateType, primerType, inputSequenceIsNascent).then((result) => {
 
-		var refr = () => new Promise((resolve) => refresh(resolve));
-		var sequenceChangeRefreshTemp = function(){
-			sequenceChangeRefresh();
-			refreshPlotDataSequenceChangeOnly_controller(function(){
+			if (!result.succ) return;
 
-				$("#translocationSummaryContainer").hide(100);
-				$("#ABCoutput").html("");
-				$("#downloadABC").hide(50);
-				$("#uploadABC").show(50);
-				$("#ABCacceptancePercentage_span").hide(50);
-				$("#ABC_showRejectedParameters_span").hide(50);
-				$("#nRowsToDisplayABC").hide(50);
-				$("#ABCacceptance_span").hide(50);
-				resolveAfterRefresh();
-				drawPlots(true);
+			var refr = () => new Promise((resolve) => refresh(resolve));
+			var sequenceChangeRefreshTemp = function(){
+				sequenceChangeRefresh();
+				refreshPlotDataSequenceChangeOnly_controller(function(){
 
-				
-			});
+					$("#translocationSummaryContainer").hide(100);
+					$("#ABCoutput").html("");
+					$("#downloadABC").hide(50);
+					$("#uploadABC").show(50);
+					$("#ABCacceptancePercentage_span").hide(50);
+					$("#ABC_showRejectedParameters_span").hide(50);
+					$("#nRowsToDisplayABC").hide(50);
+					$("#ABCacceptance_span").hide(50);
+					resolveAfterRefresh();
+					drawPlots(true);
+					
+				});
 
 
-		};
-		refr().then(() => sequenceChangeRefreshTemp());
-		
-		
-		refreshNTP();
-		clearSequences();
-		barchart(true);
-		
-		if (document.getElementById("SelectPrimerType").value.substring(2) == "RNA") $("#ntpT").val("U");
-		else $("#ntpT").val("T");
+			};
+			refr().then(() => sequenceChangeRefreshTemp());
+			
+			
+			refreshNTP();
+			clearSequences();
+			
+			if (document.getElementById("SelectPrimerType").value.substring(2) == "RNA") $("#ntpT").val("U");
+			else $("#ntpT").val("T");
 
 
 
-		if ($("#SelectPrimerType").val().substring(2) == "DNA") $("#mRNAFoldingBg").hide(true);
-		else $("#mRNAFoldingBg").show(true);
+			if ($("#SelectPrimerType").val().substring(2) == "DNA") $("#mRNAFoldingBg").hide(true);
+			else $("#mRNAFoldingBg").show(true);
 
+
+		});
 
 	});
 
@@ -688,9 +688,9 @@ function changeInputSequenceType(){
 
 
 	if ($('input[name="inputSeqType"][value="inputTemplateSeq"]').prop("checked")){
-		$("#UserSequence").attr("placeholder", "Input template sequence 3' to 5'...");
+		$("#UserSequence").attr("placeholder", "Input template sequence 3' to 5' and then Submit...");
 	}else{
-		$("#UserSequence").attr("placeholder", "Input nascent sequence 5' to 3'...");
+		$("#UserSequence").attr("placeholder", "Input nascent sequence 5' to 3' and then Submit...");
 	}
 
 }
@@ -1627,7 +1627,7 @@ function closeNav() {
 				
 			<br> 
 				<div id="userChangeSequence" style="display:none"> <br>
-					<textarea id="UserSequence" title="Please submit a sequence" style="max-width: 350px; width: 350px; height: 100px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input template sequence 3' to 5'..."></textarea> 
+					<textarea id="UserSequence" title="Please submit a sequence" style="max-width: 350px; width: 350px; height: 100px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input template sequence 3' to 5' and then Submit..."></textarea> 
 						&nbsp;&nbsp;
 						<div style="width:100%; margin:auto; text-align:center; line-height:25px; font-family:Arial;  vertical-align:bottom">
 						
@@ -2677,10 +2677,18 @@ function closeNav() {
 
 					<tr>
 						<td colspan=2>
-							<div class="toolbarIcon" style="width:90px; height:22px; vertical-align:middle"> 
-								<span id="progressSimSpan" style="font-size: 16px; display:none; cursor: auto;"></span> 
+							<div id="progressToolbarCell" class="toolbarIcon" style="width:90px; height:22px; vertical-align:middle; background-color:#424f4f; color:white"> 
+
+
+								<div style="position:relative">
+									<canvas id="progressSimCanvas" style="display:none; z-index:1; position:absolute; left:0" width="90px" height="22px"></canvas>
+									<span id="progressSimSpan" style="font-size: 16px; display:none; cursor:auto; z-index:2; color:white; text-align:center; position:absolute; left:0; width:100%"></span> 
+								</div>
+
 								<span id="numSimSpan" title="Number of simulations to perform (if you press simulate), or number of bases to copy (if you press copy), or number of times to stutter (if you press stutter)"> 
-										<b>N=</b><input type="number" name="nbasesToSimulate" min="1" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:left; width: 60px; background-color: #008CBA; color:white"> </span> </div>
+									<b>N = </b><input type="number" name="nbasesToSimulate" min="1" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:left; width: 60px; background-color: #858280; color:white"> 
+								</span> 
+							</div>
 						</td>
 
 					</tr>
@@ -2893,7 +2901,7 @@ function closeNav() {
 						&nbsp;&nbsp;&nbsp;
 						<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot4" OnChange="selectPlot(4);" style="vertical-align: middle; text-align:right;">
 								  <option value="none">Display a sitewise plot...</option>
-								  <option value="pauseSite">Dwell time per site</option>
+								  <option value="pauseSite">Time per site</option>
 								  <!--<option value="abortionSite">Arrest probability per site</option>-->
 								  <!--<option value="misincorporationSite">Misincorporations per site</option>-->
 						</select>
