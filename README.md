@@ -1,6 +1,6 @@
 # SimPol
 
-An interactive graphical simulator of nucleic acid polymerases. SimPol is written in JavaScript and C++, and uses WebAssembly to run its C++ module on a web browser. SimPol is currently in pre-release and is not yet complete. Overview:
+An interactive graphical simulator of nucleic acid polymerases. SimPol is written in JavaScript and C++. The C++ module was compiled into WebAssembly to enable high performance computing within the web browser. SimPol is currently in pre-release and contains known bugs. Overview:
 
   - Visualise and control polymerase translocation, NTP binding, NTP incorporation, NTP misincorporation and slippage during transcription
   - Simulate transcription elongation as a Markov process and visualise in real-time
@@ -15,4 +15,4 @@ For instructions on running the SimPol C++ module from the command line see http
 
 
 
-Written by Jordan Douglas, University of Auckland, New Zealand, 2017
+Written by Jordan Douglas, University of Auckland, New Zealand, 2017-present
