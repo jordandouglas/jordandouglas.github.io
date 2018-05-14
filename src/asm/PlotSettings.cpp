@@ -66,11 +66,13 @@ PlotSettings::PlotSettings(int plotNumber, string name){
 	}
 
 
-	// Pause time per site plot
+	// Dwell time per site plot
 	else if (this->name == "pauseSite"){
+		this->pauseSiteYVariable = "catalysisTimes";
 		this->plotFunction = "plot_time_vs_site";
 		this->yAxis = "timePercentage";
 	}
+
 
 
 	// Parameter heatmap
@@ -104,6 +106,11 @@ PlotSettings::PlotSettings(int plotNumber, string name){
 // Returns the id of this plot type
 string PlotSettings::getName(){
 	return this->name;
+}
+
+
+string PlotSettings::get_pauseSiteYVariable(){
+	return this->pauseSiteYVariable;
 }
 
 
@@ -161,10 +168,13 @@ string PlotSettings::toJSON(){
 	}
 
 
-	// Pause time per site plot
+	// Dwell time per site plot
 	else if (this->name == "pauseSite"){
 		settingsJSON += "'yAxis':'" + this->yAxis + "',";
+		settingsJSON += "'pauseSiteYVariable':'" + this->pauseSiteYVariable + "',";
 	}
+
+
 
 
 	// Parameter heatmap
@@ -326,9 +336,10 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 
 
 
-	// Pause time per site plot
+	// Dwell time per site plot
 	else if (this->name == "pauseSite"){
 		this->yAxis = values.at(0);
+		this->pauseSiteYVariable = values.at(1);
 	}
 
 

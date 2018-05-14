@@ -105,6 +105,58 @@ float vRNA_compute_MFE(char* sequence, char* structure, int length){
 }
 
 
+// Calls the ViennaRNA suite written in C and returns the MFE structure
+// Will not make use of any cached DP structures
+float vRNA_compute_MFE_no_cache(char* sequence, char* structure, int length){
+
+
+
+
+	// Allocate memory to fold the current sequence
+	vrna_fold_compound_t*  vc_temp = vrna_fold_compound(sequence, &md, 1);
+
+	// Set the length and sequence of vc to the current sequence
+	vc_temp->length    = length;
+  	vc_temp->sequence  = strdup(sequence);
+
+
+	// Default all entries in the DP matrices to infinity so that we know they have not yet been set
+	// Modified from the code in dp_matrices.c -> mfe_matrices_alloc_default()
+	int i;
+	int n, m;
+	n = m = vc_temp->length;
+	int size          = ((n + 1) * (m + 2)) / 2;
+ 	int lin_size      = n + 2;
+
+	if (vc_temp->matrices->f5) for (i = 0; i < lin_size; i ++) vc_temp->matrices->f5[i] = INF;
+	if (vc_temp->matrices->f3) for (i = 0; i < lin_size; i ++) vc_temp->matrices->f3[i] = INF;
+	if (vc_temp->matrices->fc) for (i = 0; i < lin_size; i ++) vc_temp->matrices->fc[i] = INF;
+	if (vc_temp->matrices->c) for (i = 0; i < size; i ++) vc_temp->matrices->c[i] = INF;
+	if (vc_temp->matrices->fML) for (i = 0; i < size; i ++) vc_temp->matrices->fML[i] = INF;
+	if (vc_temp->matrices->fM1) for (i = 0; i < size; i ++) vc_temp->matrices->fM1[i] = INF;
+	if (vc_temp->matrices->fM2) for (i = 0; i < lin_size; i ++) vc_temp->matrices->fM2[i] = INF;
+
+
+	// Compute MFE structure
+	vRNA_MFE_value = (double) vrna_mfe(vc_temp, structure) / vRNA_RT;
+
+
+	//free(sequence);
+
+
+	// Clean up
+    vrna_fold_compound_free(vc_temp);
+
+
+	return vRNA_MFE_value;
+	
+}
+
+
+
+
+
+
 // Returns coordinates to position each RNA base on a plot. Modified from code in plot_structure.c -> vrna_file_PS_rnaplot_a()
 // Returns a float array XY where the first (length+1) are the X coordinates and the second (length+1) are the Y coordinates
 void vRNA_get_coordinates(char* structure, float* XY, int length){

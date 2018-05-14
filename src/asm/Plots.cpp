@@ -35,7 +35,7 @@ using namespace std;
 
 
 
-size_t const Plots::maximumBytesJSON = 8388608; // 8MB 33554432; // 34 MB
+size_t const Plots::maximumBytesJSON = 8388608; // 8MB
 string Plots::plotDataJSON = "";
 
 // Distance versus time plot data (and velocity histogram data)
@@ -60,7 +60,8 @@ list<double> Plots::catalysisTimesThisTrial;
 
 // Pause time per site
 int Plots::npauseSimulations = 0;
-vector<double> Plots::pauseTimePerSite;
+vector<double> Plots::timeToCatalysisPerSite;
+vector<double> Plots::dwellTimePerSite;
 
 
 
@@ -70,6 +71,8 @@ list<ParameterHeatmapData*> Plots::parametersPlotData;
 
 // Copied sequences (only the ones that have not been sent to the controller)
 list<string> Plots::unsentCopiedSequences;
+int const Plots::maxNumberCopiedSequences = 500;
+int Plots::numberCopiedSequences = 0;
 
 
 
@@ -114,17 +117,27 @@ void Plots::init(){
 
 
 
-
 	// Catalysis time histogram
 	Plots::catalysisTimesSize = 0;
 
 
 	// Pause time per site plot
 	Plots::npauseSimulations = 0;
-	Plots::pauseTimePerSite.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
-	for (int baseNum = 0; baseNum < Plots::pauseTimePerSite.size(); baseNum ++) {
-		Plots::pauseTimePerSite.at(baseNum) = 0.0;
+	Plots::timeToCatalysisPerSite.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
+	for (int baseNum = 0; baseNum < Plots::timeToCatalysisPerSite.size(); baseNum ++) {
+		Plots::timeToCatalysisPerSite.at(baseNum) = 0.0;
 	}
+
+
+	// Dwell time per site plot
+	Plots::npauseSimulations = 0;
+	Plots::dwellTimePerSite.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
+	for (int baseNum = 0; baseNum < Plots::dwellTimePerSite.size(); baseNum ++) {
+		Plots::dwellTimePerSite.at(baseNum) = 0.0;
+	}
+
+
+
 
 
 	// Parameter heatmap data. Need to add recorded metrics as well as the values of the parameters
@@ -144,6 +157,8 @@ void Plots::init(){
 
 	// Copied sequences
 	Plots::unsentCopiedSequences.clear();
+	Plots::numberCopiedSequences = 0;
+
 
 	// Miscellaneous information
 	Plots::totalDisplacement = 0;
@@ -336,8 +351,8 @@ void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) 
 		    }
 
 
-			// Pause time per site plot
-			Plots::pauseTimePerSite.at(rightHybridBase) += Plots::timeWaitedUntilNextTranslocation;
+			// Dwell time per site plot
+			Plots::dwellTimePerSite.at(rightHybridBase) += Plots::timeWaitedUntilNextTranslocation;
 
 
     		Plots::timeWaitedUntilNextTranslocation = 0;
@@ -377,6 +392,9 @@ void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) 
 
 
 		}
+
+
+		Plots::timeToCatalysisPerSite.at(rightHybridBase) += Plots::timeWaitedUntilNextCatalysis;
 		
 		Plots::timeWaitedUntilNextCatalysis = 0;
 
@@ -392,7 +410,7 @@ void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) 
 string Plots::getPlotDataAsJSON(){
 
 
-	if (_USING_GUI && Plots::plotsAreHidden && Plots::sitewisePlotHidden) return "{}";
+	if (_USING_GUI && Plots::plotsAreHidden && Plots::sitewisePlotHidden) return "{'moreData':false}";
 
 	//cout << "getPlotDataAsJSON" << endl;
 
@@ -407,12 +425,14 @@ string Plots::getPlotDataAsJSON(){
 		if (!Plots::plotsAreHidden && Plots::plotSettings.at(pltNum) != nullptr && (Plots::plotSettings.at(pltNum)->getName() == "distanceVsTime" || Plots::plotSettings.at(pltNum)->getName() == "velocityHistogram")) distanceVsTime_needsData = true;
 		else if (!Plots::plotsAreHidden && Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->getName() == "pauseHistogram") pauseHistogram_needsData = true;
 		else if (!Plots::plotsAreHidden && Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->getName() == "parameterHeatmap") parameterHeatmap_needsData = true;
-		else if (!Plots::sitewisePlotHidden && Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->getName() == "pauseSite") pausePerSite_needsData = true;
+		else if (!Plots::sitewisePlotHidden && Plots::plotSettings.at(pltNum) != nullptr && 
+							(Plots::plotSettings.at(pltNum)->getName() == "pauseSite" || Plots::plotSettings.at(pltNum)->getName() == "catalysisTimeSite")) pausePerSite_needsData = true;
 		
+			
 	}
 
 
-	if (!distanceVsTime_needsData && !pauseHistogram_needsData && !pausePerSite_needsData && !parameterHeatmap_needsData && !terminatedSequences_needsData) return "{}";
+	if (!distanceVsTime_needsData && !pauseHistogram_needsData && !pausePerSite_needsData && !parameterHeatmap_needsData && !terminatedSequences_needsData) return "{'moreData':false}";
 
 
 	// If at some point the JSON string reaches its maximum capacity then we will inform the controller that more data must be requested
@@ -474,6 +494,8 @@ string Plots::getPlotDataAsJSON(){
 			distanceTimeNumber = 0;
 			for (j = simulationList.begin(); j != simulationList.end(); ++j){
 
+
+				distanceTimeNumber ++;
 				if ((*j).size() < 2 || int((*j).at(0)) <= 0) continue;
 				distances += to_string(int((*j).at(0)));
 				times += to_string((*j).at(1));
@@ -481,10 +503,6 @@ string Plots::getPlotDataAsJSON(){
     			distances += ",";	
     			times += ",";	
 
-
-    			distanceTimeNumber ++;
-        		//distanceTime.clear();
-        		//delete &distanceTime;
 
         		if (Plots::plotDataJSON.length() + distances.length() + times.length() >= Plots::maximumBytesJSON - 1000) {
         			exceededStringLengthAt_j = distanceTimeNumber;
@@ -513,17 +531,21 @@ string Plots::getPlotDataAsJSON(){
     			advance(finalElementToDelete, exceededStringLengthAt_j);
     			(*it).erase((*it).begin(), finalElementToDelete);
 
+
+    			exceededStringLengthAt_i = nElements;
+				stringLengthHasBeenExceeded = true;
+
+
+				// Ensure that the next element (that has not been deleted) contains the simulation number
+				list<vector<double>>::iterator newFirstElement = (*it).begin();
+				(*newFirstElement).resize(3);
+				(*newFirstElement).at(2) = simulationNum;
+
     		}
-			else simulationList.clear();
+			else (*it).clear();
 			//delete &simulationList;
 
 
-
-
-			if (exceededStringLengthAt_j != -1) {
-				exceededStringLengthAt_i = nElements;
-				stringLengthHasBeenExceeded = true;
-			}
 
 
 			if (distances.substr(distances.length()-1, 1) == ",") distances = distances.substr(0, distances.length() - 1);
@@ -531,7 +553,7 @@ string Plots::getPlotDataAsJSON(){
 			distances += "]";
 			times += "]";
 
-			if (distances == "[]" || times == "[]") continue;
+			//if (distances == "[]" || times == "[]") continue;
 
 
 			Plots::plotDataJSON += "'";
@@ -602,9 +624,8 @@ string Plots::getPlotDataAsJSON(){
 				//cout << "Erasing upto element " << exceededStringLengthAt_i-1 << endl;
 
 				//cout << "length before " << Plots::distanceVsTimeDataUnsent.size() << endl;
-    			
-
 				Plots::distanceVsTimeDataUnsent.erase(Plots::distanceVsTimeDataUnsent.begin(), finalElementToDelete);
+				
 
 				//cout << "length after " << Plots::distanceVsTimeDataUnsent.size() << endl;
 			}
@@ -750,22 +771,42 @@ string Plots::getPlotDataAsJSON(){
 	}
 
 
-	// Sitewise pause time long plot. Should need approximately 10L bytes to store this in the string 
+	// Sitewise pause time long plot. Only send the y-axis values that are required. Should need approximately 10L bytes to store this in the string 
 	if (pausePerSite_needsData) {
 
 
-		if (Plots::plotDataJSON.length() + 10 * Plots::pauseTimePerSite.size() < Plots::maximumBytesJSON){
+		if (Plots::plotDataJSON.length() + 10 * Plots::dwellTimePerSite.size() < Plots::maximumBytesJSON){
 
 			Plots::plotDataJSON += ",'npauseSimulations':" + to_string(Plots::npauseSimulations);
-			Plots::plotDataJSON += ",'pauseTimePerSite':[";
 
 
-			for (int baseNum = 0; baseNum < Plots::pauseTimePerSite.size(); baseNum ++){
-				Plots::plotDataJSON += to_string(Plots::pauseTimePerSite.at(baseNum));
-				if (baseNum < Plots::pauseTimePerSite.size()-1) Plots::plotDataJSON += ",";
+
+
+			if (Plots::plotSettings.at(3)->get_pauseSiteYVariable() == "catalysisTimes") {
+
+				// Time to catalysis per site
+				Plots::plotDataJSON += ",'pauseTimePerSite':[";
+				for (int baseNum = 0; baseNum < Plots::timeToCatalysisPerSite.size(); baseNum ++){
+					Plots::plotDataJSON += to_string(Plots::timeToCatalysisPerSite.at(baseNum));
+					if (baseNum < Plots::timeToCatalysisPerSite.size()-1) Plots::plotDataJSON += ",";
+				}
+				Plots::plotDataJSON += "]";
 			}
 
-			Plots::plotDataJSON += "]";
+			else if (Plots::plotSettings.at(3)->get_pauseSiteYVariable() == "dwellTimes") {
+
+				// Dwell time per site
+				Plots::plotDataJSON += ",'pauseTimePerSite':[";
+				for (int baseNum = 0; baseNum < Plots::dwellTimePerSite.size(); baseNum ++){
+					Plots::plotDataJSON += to_string(Plots::dwellTimePerSite.at(baseNum));
+					if (baseNum < Plots::dwellTimePerSite.size()-1) Plots::plotDataJSON += ",";
+				}
+				Plots::plotDataJSON += "]";
+			}
+
+
+
+
 
 		}else{
 			stringLengthHasBeenExceeded = true;
@@ -971,11 +1012,19 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 
 	if (timePerSite_cleardata){
 
-		// Pause time per site plot
+		// Time to catalysis per site plot
 		Plots::npauseSimulations = 1;
-		Plots::pauseTimePerSite.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
-		for (int baseNum = 0; baseNum < Plots::pauseTimePerSite.size(); baseNum ++) {
-			Plots::pauseTimePerSite.at(baseNum) = 0.0;
+		Plots::timeToCatalysisPerSite.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
+		for (int baseNum = 0; baseNum < Plots::timeToCatalysisPerSite.size(); baseNum ++) {
+			Plots::timeToCatalysisPerSite.at(baseNum) = 0.0;
+		}
+
+
+		// Dwell time per site plot
+		Plots::npauseSimulations = 1;
+		Plots::dwellTimePerSite.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
+		for (int baseNum = 0; baseNum < Plots::dwellTimePerSite.size(); baseNum ++) {
+			Plots::dwellTimePerSite.at(baseNum) = 0.0;
 		}
 
 
@@ -986,6 +1035,7 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 	// Clear the list of unsent sequences
 	if (sequences_cleardata){
 		Plots::unsentCopiedSequences.clear();
+		Plots::numberCopiedSequences = 0;
 	}
 
 
@@ -1004,6 +1054,9 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 
 
 void Plots::addCopiedSequence(string sequence){
-	Plots::unsentCopiedSequences.push_back(sequence);
+	if (Plots::numberCopiedSequences < Plots::maxNumberCopiedSequences) {
+		Plots::numberCopiedSequences ++;
+		Plots::unsentCopiedSequences.push_back(sequence);
+	}
 }
 

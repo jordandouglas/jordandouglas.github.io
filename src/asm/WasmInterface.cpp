@@ -515,7 +515,7 @@ extern "C" {
 		}
 		
 		auto timeStart = chrono::system_clock::now();
-		string foldJSON = _currentStateGUI->fold();
+		string foldJSON = _currentStateGUI->fold(true, true);
 		auto timeStop = chrono::system_clock::now();
 
 
@@ -690,10 +690,13 @@ extern "C" {
 
 
 	// User enter their own sequence. Return whether or not it worked
-	int EMSCRIPTEN_KEEPALIVE userInputSequence(char* newSeq, char* newTemplateType, char* newPrimerType, int inputSequenceIsNascent, int msgID){
+	void EMSCRIPTEN_KEEPALIVE userInputSequence(char* newSeq, char* newTemplateType, char* newPrimerType, int inputSequenceIsNascent, int msgID){
 
 		string seq = inputSequenceIsNascent == 1 ? Settings::complementSeq(string(newSeq), string(newTemplateType).substr(2) == "RNA") : string(newSeq);
-		if (seq.length() < hybridLen->getVal() + 2) return 0;
+		if (seq.length() < hybridLen->getVal() + 2) {
+			messageFromWasmToJS("{'succ':false}", msgID);
+			return;
+		}
 		Sequence* newSequence = new Sequence("$user", string(newTemplateType), string(newPrimerType), seq); 
 		sequences["$user"] = newSequence;
 		Settings::setSequence("$user");
@@ -704,9 +707,9 @@ extern "C" {
 		if (PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
 
 
-		messageFromWasmToJS("", msgID);
+		messageFromWasmToJS("{'succ':true}", msgID);
 
-		return 1;
+		return;
 
 	}
 

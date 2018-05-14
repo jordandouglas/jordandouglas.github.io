@@ -63,7 +63,8 @@ class Plots{
 
 	// Pause time per site plot data
 	static int npauseSimulations;
-	static vector<double> pauseTimePerSite;
+	static vector<double> timeToCatalysisPerSite;
+	static vector<double> dwellTimePerSite;
 
 
 	// Parameter heatmap data
@@ -72,6 +73,8 @@ class Plots{
 
 	// Copied sequences (only the ones that have not been sent to the controller)
 	static list<string> unsentCopiedSequences;
+	static const int maxNumberCopiedSequences;
+	static int numberCopiedSequences;
 
 
 	// Miscellaneous information

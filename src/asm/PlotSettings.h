@@ -51,6 +51,7 @@ class PlotSettings{
 
 	// Long pause plot only
 	string yAxis; 
+	string pauseSiteYVariable;
 
 
 	// Parameter heatmap only
@@ -71,6 +72,7 @@ class PlotSettings{
 		void savePlotSettings(string plotSettingStr);
 		string getName();
 		string toJSON();
+		string get_pauseSiteYVariable();
 		void updateHeatmapData(list<ParameterHeatmapData*> heatmapData);
 
 

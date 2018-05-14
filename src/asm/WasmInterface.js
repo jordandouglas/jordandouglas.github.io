@@ -243,14 +243,13 @@ userInputSequence = function(newSeq, newTemplateType, newPrimerType, inputSequen
 
 
 	// Create the callback function
-	var toDoAfterCall = function(){
+	var toDoAfterCall = function(toReturn){
 		//console.log("Returning", JSON.parse(resultStr));
 		if (msgID != null) {
-			var toReturn = {succ: true}; 
-			postMessage(msgID + "~X~" + JSON.stringify(toReturn));
+			postMessage(msgID + "~X~" + toReturn);
 		}
-
 	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 
 
 	Module.ccall("userInputSequence", null, ["string", "string", "string", "number", "number"],  [newSeq, newTemplateType, newPrimerType, (inputSequenceIsNascent ? 1 : 0), msgID]); 
@@ -544,8 +543,8 @@ savePlotSettings = function(plotNum, values, msgID = null) {
 	
 	// Create the callback function
 	var toDoAfterCall = function(resultStr){
-		var whichPlotInWhichCanvas = JSON.parse(resultStr).whichPlotInWhichCanvas
-		if (msgID != null) postMessage(msgID + "~X~" + JSON.stringify(whichPlotInWhichCanvas));
+		//var whichPlotInWhichCanvas = JSON.parse(resultStr).whichPlotInWhichCanvas
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 
 	}
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};

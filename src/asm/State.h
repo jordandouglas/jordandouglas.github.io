@@ -124,8 +124,8 @@ class State{
 
 
 		// Fold mRNA and returns a JSON string with information on where to position the folded bases
-		string fold();
-		int findBondsRecurse(int index, string structureString, string& bonds);
+		string fold(bool fold5Prime, bool fold3Prime);
+		int findBondsRecurse(int index, string structureString, string& bonds, int index0BaseNumber);
 
 		State* slipLeft(int S);
 		State* slipRight(int S);
