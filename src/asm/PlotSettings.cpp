@@ -89,6 +89,18 @@ PlotSettings::PlotSettings(int plotNumber, string name){
 		this->xData = "";
 		this->yData = "";
 		this->zData = "";
+		this->sitesToRecordX = "allSites";
+		this->sitesToRecordY = "allSites";
+		this->sitesToRecordZ = "allSites";
+		this->timeToCatalysisThisTrial_X = 0;
+		this->timeToCatalysisThisTrial_Y = 0;
+		this->timeToCatalysisThisTrial_Z = 0;
+		this->sitesToRecordX_vector.resize(0);
+		this->sitesToRecordY_vector.resize(0);
+		this->sitesToRecordZ_vector.resize(0);
+		this->siteRecordingX = nullptr;
+		this->siteRecordingY = nullptr;
+		this->siteRecordingZ = nullptr;
 
 	}
 
@@ -115,6 +127,96 @@ string PlotSettings::get_pauseSiteYVariable(){
 
 
 
+// Send through the current site and the time to catalysis at that site
+// This object will determine whether or not to store that number
+void PlotSettings::recordSite(int siteThatWasJustCatalysed, double timeToCatalysis){
+
+
+	// If this is not a heatmap displaying a catalysis time then this function is not applicable
+	if (this->name != "parameterHeatmap") return;
+
+
+	// Check if the site is on any of the recording lists
+	if (this->customParamX == "catalyTime" && this->sitesToRecordX != "allSites"){
+		for (int i = 0; i < this->sitesToRecordX_vector.size(); i ++){
+			if (siteThatWasJustCatalysed == this->sitesToRecordX_vector.at(i)){
+				//cout << "X Recording site " << siteThatWasJustCatalysed << " time " << timeToCatalysis << endl;
+				this->timeToCatalysisThisTrial_X += timeToCatalysis;
+				break;
+			} 
+		}
+	}
+
+	if (this->customParamY == "catalyTime" && this->sitesToRecordY != "allSites"){
+		for (int i = 0; i < this->sitesToRecordY_vector.size(); i ++){
+			if (siteThatWasJustCatalysed == this->sitesToRecordY_vector.at(i)){
+				//cout << "Y Recording site " << siteThatWasJustCatalysed << " time " << timeToCatalysis << endl;
+				this->timeToCatalysisThisTrial_Y += timeToCatalysis;
+				break;
+			} 
+		}
+	}
+
+	if (this->metricZ == "catalyTime" && this->sitesToRecordZ != "allSites"){
+		for (int i = 0; i < this->sitesToRecordZ_vector.size(); i ++){
+			if (siteThatWasJustCatalysed == this->sitesToRecordZ_vector.at(i)){
+				//cout << "Z Recording site " << siteThatWasJustCatalysed << " time " << timeToCatalysis << endl;
+				this->timeToCatalysisThisTrial_Z += timeToCatalysis;
+				break;
+			} 
+		}
+	}
+
+
+}
+
+
+// Delete all site recording information
+void PlotSettings::deleteSiteRecordings(){
+
+	if (this->name != "parameterHeatmap") return;
+
+
+	if (this->siteRecordingX || this->siteRecordingX != nullptr) this->siteRecordingX->deleteValues();
+	if (this->siteRecordingY || this->siteRecordingY != nullptr) this->siteRecordingY->deleteValues();
+	if (this->siteRecordingZ || this->siteRecordingZ != nullptr) this->siteRecordingZ->deleteValues();
+
+	this->timeToCatalysisThisTrial_X = 0;
+	this->timeToCatalysisThisTrial_Y = 0;
+	this->timeToCatalysisThisTrial_Z = 0;
+
+
+
+
+}
+
+
+// Called whenever a trial is ended and the parameter heatmap data is being updated
+void PlotSettings::trialEnd(){
+
+	if (this->name != "parameterHeatmap") return;
+
+	// Inform the X, Y, and Z site recordings that the simulation has finished and therefore send through the mean site-specific catalysis times
+	if (this->customParamX == "catalyTime" && this->sitesToRecordX != "allSites"){
+		this->siteRecordingX->addValue(this->timeToCatalysisThisTrial_X / this->sitesToRecordX_vector.size());
+	}
+
+	if (this->customParamY == "catalyTime" && this->sitesToRecordY != "allSites"){
+		this->siteRecordingY->addValue(this->timeToCatalysisThisTrial_Y / this->sitesToRecordY_vector.size());
+	}
+
+	if (this->metricZ == "catalyTime" && this->sitesToRecordZ != "allSites"){
+		this->siteRecordingZ->addValue(this->timeToCatalysisThisTrial_Z / this->sitesToRecordZ_vector.size());
+	}
+
+	this->timeToCatalysisThisTrial_X = 0;
+	this->timeToCatalysisThisTrial_Y = 0;
+	this->timeToCatalysisThisTrial_Z = 0;
+
+}
+
+
+
 // Send through a list of parameter/metric recordings and save as a string under x, y and zdata
 void PlotSettings::updateHeatmapData(list<ParameterHeatmapData*> heatmapData){
 
@@ -134,6 +236,12 @@ void PlotSettings::updateHeatmapData(list<ParameterHeatmapData*> heatmapData){
 	}
 
 
+	// Overwrite the above if the parameter is catalysis time and is set to recording specified sites 
+	if (this->customParamX == "catalyTime" && this->sitesToRecordX != "allSites") this->xData = this->siteRecordingX->toJSON();
+	if (this->customParamY == "catalyTime" && this->sitesToRecordY != "allSites") this->yData = this->siteRecordingY->toJSON();
+	if (this->metricZ == "catalyTime" && this->sitesToRecordZ != "allSites") this->zData = this->siteRecordingZ->toJSON();
+
+
 }
 
 
@@ -141,6 +249,7 @@ void PlotSettings::updateHeatmapData(list<ParameterHeatmapData*> heatmapData){
 // Converts these plot settings into a JSON
 string PlotSettings::toJSON(){
 
+	cout << "Plot settings toJSON" << endl;
 
 	string settingsJSON = "'name':'" + this->name + "'";
 	if (this->name == "none") return settingsJSON;
@@ -190,9 +299,9 @@ string PlotSettings::toJSON(){
 		settingsJSON += "'xData':" + this->xData + ",";
 		settingsJSON += "'yData':" + this->yData + ",";
 		settingsJSON += "'zData':" + this->zData + ",";
-
-
-
+		settingsJSON += "'sitesToRecordX':'" + this->sitesToRecordX + "',";
+		settingsJSON += "'sitesToRecordY':'" + this->sitesToRecordY + "',";
+		settingsJSON += "'sitesToRecordZ':'" + this->sitesToRecordZ + "',";
 	
 
 	}
@@ -428,6 +537,47 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 
 		// Value at index 7 is whether or not to plot from the posterior distribution
 		this->plotFromPosterior = values.at(7) == "true";
+
+
+
+		// Values at index 8, 9 and 10 are site specific constraints for each variable
+		// Store the actual sites in vectors but still keep the strings as these are periodically returned to the view
+		if (this->sitesToRecordX != values.at(8)){
+			this->sitesToRecordX = values.at(8);
+			if (this->sitesToRecordX == "") this->sitesToRecordX = "allSites";
+			this->sitesToRecordX_vector.clear();
+			if (this->siteRecordingX || this->siteRecordingX != nullptr) delete this->siteRecordingX;
+			if (this->sitesToRecordX != "allSites") {
+				this->sitesToRecordX_vector = Settings::split_int(this->sitesToRecordX, ','); 
+				this->siteRecordingX = new ParameterHeatmapData("catalyTime", "Mean cat. time at sites (s)");
+			}
+		}
+
+
+		if (this->sitesToRecordY != values.at(9)){
+			this->sitesToRecordY = values.at(9);
+			if (this->sitesToRecordY == "") this->sitesToRecordY = "allSites";
+			this->sitesToRecordY_vector.clear();
+			if (this->siteRecordingY || this->siteRecordingY != nullptr) delete this->siteRecordingY;
+			if (this->sitesToRecordY != "allSites") {
+				this->sitesToRecordY_vector = Settings::split_int(this->sitesToRecordY, ','); 
+				this->siteRecordingY = new ParameterHeatmapData("catalyTime", "Mean cat. time at sites (s)");
+			}
+		}
+
+
+		if (this->sitesToRecordZ != values.at(10)){
+			this->sitesToRecordZ = values.at(10);
+			if (this->sitesToRecordZ == "") this->sitesToRecordZ = "allSites";
+			this->sitesToRecordZ_vector.clear();
+			if (this->siteRecordingZ || this->siteRecordingZ != nullptr) delete this->siteRecordingZ;
+			if (this->sitesToRecordZ != "allSites") {
+				this->sitesToRecordZ_vector = Settings::split_int(this->sitesToRecordZ, ','); 
+				this->siteRecordingZ = new ParameterHeatmapData("catalyTime", "Mean cat. time at sites (s)");
+			}
+		}
+
+
 
 
 

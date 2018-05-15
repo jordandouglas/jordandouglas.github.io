@@ -124,7 +124,7 @@ Parameter* Kdiss = new Parameter("Kdiss", false, "exclusive", "KD (\u03bcM)", "D
 Parameter* RateBind = new Parameter("RateBind", false, "inclusive", "Rate of binding  (\u03bcM\u207B\u00B9 s\u207B\u00B9)", "Second order rate constant of binding the correct NTP", "k_{bind} (\u03bcM^{\u22121} s^{\u22121\u2009})");
 
 Parameter* RateActivate = new Parameter("kA", false, "inclusive", "Rate of activation (s\u207B\u00B9)", "Rate constant of polymerase leaving the catalytically unactive state", "k_[A]  (s^[\u22121\u2009])");
-Parameter* RateDeactivate = new Parameter("kU", false, "inclusive", "Rate of inactivation (s\u207B\u00B9)", "Rate constant of polymerase entering the catalytically unactive state", "k_[cleave]  (s^[\u22121\u2009])");
+Parameter* RateDeactivate = new Parameter("kU", false, "inclusive", "Rate of inactivation (s\u207B\u00B9)", "Rate constant of polymerase entering the catalytically unactive state", "k_[U]  (s^[\u22121\u2009])");
 Parameter* RateCleave = new Parameter("RateCleave", false, "inclusive", "Rate of cleavage (s\u207B\u00B9)", "Rate constant of cleaving the dangling 3\u2032 end of the nascent strand when backtracked", "k_[cleave]  (s^[\u22121\u2009])");
 
 
@@ -676,8 +676,8 @@ Parameter* Settings::getParameterByName(string paramID){
 	if (paramID == "NTPconc") return NTPconc;
 	if (paramID == "ATPconc") return ATPconc;
 	if (paramID == "CTPconc") return CTPconc;
-	if (paramID == "NTPconc") return NTPconc;
 	if (paramID == "GTPconc") return GTPconc;
+	if (paramID == "UTPconc") return UTPconc;
 	if (paramID == "FAssist") return FAssist;
 
 	if (paramID == "hybridLen") return hybridLen;
@@ -739,6 +739,21 @@ void Settings::setModel(string modelID){
 }
 
 
+
+
+
+vector<int> Settings::split_int(const std::string& s, char delimiter){
+	cout << "Splitting " << s << endl;
+	std::vector<int> tokens;
+	std::string token;
+	std::istringstream tokenStream(s);
+	while (std::getline(tokenStream, token, delimiter))
+	{
+		if (Settings::strIsNumber(token)) tokens.push_back(stoi(token));
+	}
+	cout << "Done s" << endl;
+	return tokens;
+}
 
 
 vector<std::string> Settings::split(const std::string& s, char delimiter){

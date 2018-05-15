@@ -57,6 +57,10 @@ void ParameterHeatmapData::addValue(double val){
 	this->values.push_back(val);
 }
 
+// Delete all values
+void ParameterHeatmapData::deleteValues(){
+	this->values.clear();
+}
 
 list<double> ParameterHeatmapData::getVals(){
 	return this->values;

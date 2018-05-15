@@ -933,6 +933,10 @@ State* State::cleave(){
 				Coordinates::delete_nt(baseNum, "m");
 			}
 
+
+			// Reset the 'time until catalysis' or this will make the interpretation of the time to catalysis sitewise plot less meaningful 
+			Plots::resetTimeToCatalysis();
+
 		}
 
 		this->nextTemplateBaseToCopy -= nbasesCleaved;

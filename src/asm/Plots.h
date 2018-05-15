@@ -102,17 +102,18 @@ class Plots{
 		
 		static void init();
 		static void refreshPlotData(State* state); // Prepare for the next simulation
-		static void updatePlotData(State* state, int* actionsToDo, double reactionTime); // Sends through information from the current simulation into the plot
+		static void updatePlotData(State* state, int lastAction, int* actionsToDo, double reactionTime); // Sends through information from the current simulation into the plot
 		static string getPlotDataAsJSON(); // Returns the plot data in JSON format. Will modify the class
 		static void userSelectPlot(int plotNum, string value, bool deleteData);
 		static void savePlotSettings(int plotNum, string values_str);
 		static void updateParameterPlotData(State* state);
-
+		static void resetTimeToCatalysis();
 
 		static void hideSitewisePlot(bool hide);
 		static void hideAllPlots(bool hide);
 		static string getCacheSizeJSON();
 		static void deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata, bool sequences_cleardata);
+		static void recordSite(int siteThatWasJustCatalysed, double timeToCatalysis);
 		static void addCopiedSequence(string sequence);
 
 };

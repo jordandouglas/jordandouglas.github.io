@@ -794,7 +794,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				if (actionsToDoList[i] == -2) break;
 
 				// Update the plots immediately before the final reaction in the list has been applied
-				if ((_USING_GUI || _plotFolderName != "") && (i == 2 || actionsToDoList[i+1] == -2)) Plots::updatePlotData(s, actionsToDoList, reactionTime);
+				if ((_USING_GUI || _plotFolderName != "") && (i == 2 || actionsToDoList[i+1] == -2)) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, reactionTime);
 
 				if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
 				else this->actionsToReturn.push_back(actionsToDoList[i]);
@@ -939,7 +939,7 @@ double Simulator::geometricTranslocationSampling(State* s){
 		if (actionsToDoList[i] == -2) break;
 
 		// Update the plots immediately before the final reaction in the list has been applied
-		if ((_USING_GUI || _plotFolderName != "") && (i == 1 || actionsToDoList[i+1] == -2)) Plots::updatePlotData(s, actionsToDoList, totalReactionTime);
+		if ((_USING_GUI || _plotFolderName != "") && (i == 1 || actionsToDoList[i+1] == -2)) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, totalReactionTime);
 
 		if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
 		else this->actionsToReturn.push_back(actionsToDoList[i]);
@@ -1062,7 +1062,7 @@ double Simulator::geometricTranslocationBindingSampling(State* s){
 		if (actionsToDoList[i] == -2) break;
 
 		// Update the plots immediately before the final reaction in the list has been applied
-		if ((_USING_GUI || _plotFolderName != "") && (i == 1 || actionsToDoList[i+1] == -2)) Plots::updatePlotData(s, actionsToDoList, totalReactionTime);
+		if ((_USING_GUI || _plotFolderName != "") && (i == 1 || actionsToDoList[i+1] == -2)) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, totalReactionTime);
 
 		if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
 		else this->actionsToReturn.push_back(actionsToDoList[i]);
@@ -1251,7 +1251,7 @@ double Simulator::geometricBindingSampling(State* s){
 		if (actionsToDoList[i] == -2) break;
 
 		// Update the plots immediately before the final reaction in the list has been applied
-		if ((_USING_GUI || _plotFolderName != "") && (i == 2 || actionsToDoList[i+1] == -2)) Plots::updatePlotData(s, actionsToDoList, totalReactionTime);
+		if ((_USING_GUI || _plotFolderName != "") && (i == 2 || actionsToDoList[i+1] == -2)) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, totalReactionTime);
 
 		if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
 		else this->actionsToReturn.push_back(actionsToDoList[i]);

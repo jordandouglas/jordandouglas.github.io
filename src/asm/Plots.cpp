@@ -268,6 +268,7 @@ void Plots::updateParameterPlotData(State* state){
 
 
 
+
 	for (list<ParameterHeatmapData*>::iterator it = Plots::parametersPlotData.begin(); it != Plots::parametersPlotData.end(); ++it){
 
 		// Update metric 
@@ -287,11 +288,26 @@ void Plots::updateParameterPlotData(State* state){
 
 	}
 
+
+	// Inform any site specific recordings that the current simulation has finished
+	for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
+		if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->trialEnd();
+	}
+
+
+
+
 }
 
 
 
-void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) {
+// Reset the time until the next catalysis event to 0. This is necessary when the 3' end of the nascent strand is cleaved
+void Plots::resetTimeToCatalysis(){
+	Plots::timeWaitedUntilNextCatalysis = 0;
+}
+
+
+void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, double reactionTime) {
 
 
 
@@ -299,8 +315,7 @@ void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) 
 
 	int rightHybridBase = state->getRightTemplateBaseNumber();
 	int numActions = sizeof(actionsToDo) / sizeof(actionsToDo[0]);
-	int lastAction = actionsToDo[numActions-1]; // The last element in the list was a kinetic action. 
-												// Reactions before it were all equilibrium ones
+
 
 	Plots::totaltimeElapsed += reactionTime;
 	Plots::timeWaitedUntilNextTranslocation += reactionTime;
@@ -366,7 +381,7 @@ void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) 
 
 
 	// If this is a catalysis event, add it to the pause histogram and if it is a misincorporation then add to misincorportion plot
-	//cout << "lastAction " << lastAction << "state->NTPbound()" << state->NTPbound() << endl;
+	//cout << "lastAction " << lastAction << " state->NTPbound() " << state->NTPbound() << endl;
 	bool thereWasACatalysis = lastAction == 3 && (state->NTPbound() || currentModel->get_assumeBindingEquilibrium());
 	if (thereWasACatalysis) {
 
@@ -393,8 +408,12 @@ void Plots::updatePlotData(State* state, int* actionsToDo, double reactionTime) 
 
 		}
 
-
+		//cout << "thereWasACatalysis " << rightHybridBase << " , " << Plots::timeToCatalysisPerSite.at(rightHybridBase) << endl;
 		Plots::timeToCatalysisPerSite.at(rightHybridBase) += Plots::timeWaitedUntilNextCatalysis;
+
+
+		// Site specificity recording
+		Plots::recordSite(rightHybridBase, Plots::timeWaitedUntilNextCatalysis);
 		
 		Plots::timeWaitedUntilNextCatalysis = 0;
 
@@ -991,20 +1010,17 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 
 	if (customPlot_cleardata){
 
-		// Parameter heatmap data. Need to add recorded metrics as well as the values of the parameters
-		Plots::parametersPlotData.clear();
-		Plots::parametersPlotData.push_back(new ParameterHeatmapData("probability", "Probability density"));
-		Plots::parametersPlotData.push_back(new ParameterHeatmapData("velocity", "Mean velocity (bp/s)"));
-		Plots::parametersPlotData.push_back(new ParameterHeatmapData("catalyTime", "Mean catalysis time (s)"));
-		Plots::parametersPlotData.push_back(new ParameterHeatmapData("totalTime", "Total transcription time (s)"));
-		Plots::parametersPlotData.push_back(new ParameterHeatmapData("nascentLen", "Final nascent length (nt)"));
-		Plots::parametersPlotData.push_back(new ParameterHeatmapData("logLikelihood", "Chi-squared test statistic", "X^2"));
 
-		// Add all parameters to the list
-		for (int i = 0; i < Settings::paramList.size(); i ++){
-			Plots::parametersPlotData.push_back(new ParameterHeatmapData(Settings::paramList.at(i)->getID(), Settings::paramList.at(i)->getName(), Settings::paramList.at(i)->getLatexName()));
+		// Reset the values in all lists
+		for (list<ParameterHeatmapData*>::iterator it = Plots::parametersPlotData.begin(); it != Plots::parametersPlotData.end(); ++it){
+			(*it)->deleteValues();
 		}
 
+		// Delete all site recordings data 
+		for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
+			if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->deleteSiteRecordings();
+		}
+	
 
 	}
 
@@ -1050,7 +1066,13 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 }
 
 
-
+// Send through the current site and the time to catalysis at that site
+// Each plot will determine whether or not to store that number
+void Plots::recordSite(int siteThatWasJustCatalysed, double timeToCatalysis){
+	for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
+		if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->recordSite(siteThatWasJustCatalysed, timeToCatalysis);
+	}
+}
 
 
 void Plots::addCopiedSequence(string sequence){

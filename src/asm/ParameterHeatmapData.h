@@ -46,6 +46,7 @@ class ParameterHeatmapData{
 		ParameterHeatmapData(string id, string name);
 		ParameterHeatmapData(string id, string name, string latexName);
 		void addValue(double val);
+		void deleteValues();
 		string getID();
 		string toJSON();
 		list<double> getVals();

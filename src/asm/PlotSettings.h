@@ -65,6 +65,20 @@ class PlotSettings{
 	string yData;
 	string zData;
 
+	// Recording sites for parameter heatmap
+	string sitesToRecordX;
+	string sitesToRecordY;
+	string sitesToRecordZ;
+	ParameterHeatmapData* siteRecordingX;
+	ParameterHeatmapData* siteRecordingY;
+	ParameterHeatmapData* siteRecordingZ;
+	vector<int> sitesToRecordX_vector;
+	vector<int> sitesToRecordY_vector;
+	vector<int> sitesToRecordZ_vector;
+	double timeToCatalysisThisTrial_X;
+	double timeToCatalysisThisTrial_Y;
+	double timeToCatalysisThisTrial_Z;
+
 
 
 	public:
@@ -73,7 +87,10 @@ class PlotSettings{
 		string getName();
 		string toJSON();
 		string get_pauseSiteYVariable();
+		void trialEnd();
 		void updateHeatmapData(list<ParameterHeatmapData*> heatmapData);
+		void recordSite(int siteThatWasJustCatalysed, double timeToCatalysis);
+		void deleteSiteRecordings();
 
 
 };

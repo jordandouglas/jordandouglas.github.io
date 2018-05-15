@@ -177,6 +177,7 @@ class Settings{
 
 		// Utilities
 		static vector<string> split(const std::string& s, char delimiter);
+		static vector<int> split_int(const std::string& s, char delimiter);
 		static bool strIsNumber(const string& s);
     	static double rexp(double rate);
     	static double runif();
