@@ -2347,7 +2347,7 @@ function add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLab
 // Create a graph above the simulation where each x value is a base and each y value is pause duration
 function plot_time_vs_site(){
 
-	//console.log("plot_time_vs_site");
+	//console.log("plot_time_vs_site", PLOT_DATA["pauseTimePerSite"]);
 
 	if (PLOT_DATA["pauseTimePerSite"] == null) return;
 
@@ -2372,18 +2372,18 @@ function plot_time_vs_site(){
 		var ymin = 1000000;
 		var labelFn = function(site, val){
 
-
+			var preString = PLOT_DATA["whichPlotInWhichCanvas"][4].pauseSiteYVariable == "catalysisTimes" ? "time to catalysis" : "time";
 			switch (PLOT_DATA["whichPlotInWhichCanvas"][4]["yAxis"]){
 				case "timePercentage":
 					if (val <= 0) return "";
-					return "Total time at " + site + ": " + roundToSF(val / pauseSum * 100) + "%";
+					return "Total " + preString + " at " + site + ": " + roundToSF(val / pauseSum * 100) + "%";
 				case "timeSeconds":
 					if (val <= 0) return "";
-					return "Mean time at " + site + ": " + roundToSF(val / PLOT_DATA["npauseSimulations"]) + "s";
+					return "Mean " + preString + " at " + site + ": " + roundToSF(val / PLOT_DATA["npauseSimulations"]) + "s";
 				case "logTimeSeconds":
 					if (val <= ymin) return "";
 					//console.log("Log time", pauseSum, "normal time", 
-					return "Mean time at " + site + ": " + roundToSF(Math.exp(val) / PLOT_DATA["npauseSimulations"]) + "s";
+					return "Mean " + preString + " at " + site + ": " + roundToSF(Math.exp(val) / PLOT_DATA["npauseSimulations"]) + "s";
 			}
 		
 		}
@@ -3190,7 +3190,7 @@ function plot_parameter_heatmap(plotNumCustom = null){
 		var yvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["vals"];
 		var zvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"] == null ? null : PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["vals"];
 
-		console.log("xLab", xLab, "ylab", yLab, PLOT_DATA["whichPlotInWhichCanvas"]);
+		//console.log("xLab", xLab, "ylab", yLab, PLOT_DATA["whichPlotInWhichCanvas"]);
 
 
 
@@ -4407,7 +4407,7 @@ function getPlotOptionsTemplate(){
 
 
 	return `
-		<div id='settingsPopup' style='background-color:008cba; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:20vh; z-index:5' plotNum="XX_plotNum_XX">
+		<div id='settingsPopup' style='background-color:008cba; padding: 10 10; position:fixed; width: 36vw; left:32vw; top:10vh; z-index:5' plotNum="XX_plotNum_XX">
 			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> XX_plotName_XX settings </span>
 				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closePlotSettingsPopup()'>&times;</span>
@@ -4455,8 +4455,11 @@ function getPlotOptionsTemplate(){
 					</tr>
 					
 				</table>
-				
-				<input type=button id='submitDistn' class="operation" onClick=saveSettings_controller() value='Save' title="Submit your changes" style="width:60px; float:right"></input>
+
+				<span style="float:right">
+					<input type=button id='deleteDistn' class="operation" onClick="deletePlots_controller(false, false, false, true, false, false, function() { saveSettings_controller(); });" value='Delete Data and Save' title="You must delete all parameter plot data before you save these settings (because you added a site-specific time recording)" style="width:220px; display:none"></input>
+					<input type=button id='submitDistn' class="operation" onClick="saveSettings_controller()" value='Save' title="Submit your changes" style="width:60px;"></input>
+				</span>
 			</div>
 		</div>
 	`;
@@ -4709,13 +4712,16 @@ function pauseSiteOptionsTemplate(){
 
 
 
-function customPlotSiteConstraintTemplate(){
+function parameterPlotSiteSpecificTemplate(varID){
 
 	return `
-		<legend><b>Constrain to the following sites</b></legend>
-		<label style="cursor:pointer"> <input type="radio" name="sitesToRecord" onclick="disableTextbox('#sitesToRecord_textbox')" value="allSites">All sites<br> </label>
-		<label style="cursor:pointer"> <input type="radio" name="sitesToRecord" onclick="enableTextbox('#sitesToRecord_textbox')"  value="specifySites">Just these ones: </label>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" class="textboxBlue" placeholder="eg. 1,2,5-10" style="width:250px" id="sitesToRecord_textbox">
+		<div id="sitesToRecord_div` + varID + `" style="width:100%; display:none">
+			<br>
+			<legend>Constrain to the following sites:</legend>
+			<label style="cursor:pointer"> <input type="radio" name="sitesToRecord` + varID + `" onChange="updateParameterPlotSettings()" onclick="disableTextbox('#sitesToRecord_textbox` + varID + `')" value="allSites">All sites<br> </label>
+			<label style="cursor:pointer"  title="Enabling this will mean that only the specified template positions will be displayed in the plot. You may need to run the simulations again to acquire this data."> <input onChange="updateParameterPlotSettings()" type="radio" name="sitesToRecord` + varID + `" onclick="enableTextbox('#sitesToRecord_textbox` + varID + `')"  value="specifySites">Just these ones: 
+				&nbsp;&nbsp;<input onfocusout="updateParameterPlotSettings()" onclick="updateParameterPlotSettings(true);" type="text" placeholder="eg. 10,13,20-30" style="width:150px; padding: 5 5" id="sitesToRecord_textbox` + varID + `"> </label>
+		</div>
 	`;
 
 
@@ -4744,6 +4750,10 @@ function customPlotSelectParameterTemplate(){
 			
 		</select><br>
 		Calculated per trial.
+
+
+		` + parameterPlotSiteSpecificTemplate("X") + `
+
 	`;
 	
 }
@@ -4772,6 +4782,9 @@ function customPlotSelectPropertyTemplate(){
 			
 		</select><br>
 		Calculated per trial.
+
+		` + parameterPlotSiteSpecificTemplate("Y") + `
+
 	`;
 	
 }
@@ -4798,6 +4811,8 @@ function parameterHeatmapZAxisTemplate(){
 			
 		</select><br>
 		Calculated per trial.
+
+		` + parameterPlotSiteSpecificTemplate("Z") + `
 	`;
 
 
@@ -4859,7 +4874,7 @@ function plus100Sites(){
 
 
 
-function updateParameterPlotSettings(){
+function updateParameterPlotSettings(forceDeleteDistnToShow = false){
 
 
 	// Only show the y-axis selection box when the x-axis variable has been selected 
@@ -4898,6 +4913,39 @@ function updateParameterPlotSettings(){
 		$("#settingCell7").hide(0);
 	}
 
+
+
+
+	// Show the sites to record textbox if transcription time or catalysis time have been selected
+	if ($("#customParamX").val() == "catalyTime") $("#sitesToRecord_divX").show(300);
+	else $("#sitesToRecord_divX").hide(0);
+
+	if ($("#customParamY").val() == "catalyTime") $("#sitesToRecord_divY").show(300);
+	else $("#sitesToRecord_divY").hide(0);
+
+	if ($("#customParamZ").val() == "catalyTime") $("#sitesToRecord_divZ").show(300);
+	else $("#sitesToRecord_divZ").hide(0);
+
+
+	// Grey out the submit button and show the delete button if the sites to record are new / different
+
+	var xSiteRecordingUnchanged = ($("#sitesToRecord_textboxX").attr("oldvals") == null && $('input[name="sitesToRecordX"][value="allSites"]').prop("checked"))
+								|| ($('input[name="sitesToRecordX"][value="specifySites"]').prop("checked") && $("#sitesToRecord_textboxX").val() == $("#sitesToRecord_textboxX").attr("oldvals"));
+	
+	var ySiteRecordingUnchanged = ($("#sitesToRecord_textboxY").attr("oldvals") == null && $('input[name="sitesToRecordY"][value="allSites"]').prop("checked"))
+								|| ($('input[name="sitesToRecordY"][value="specifySites"]').prop("checked") && $("#sitesToRecord_textboxY").val() == $("#sitesToRecord_textboxY").attr("oldvals"));
+
+	var zSiteRecordingUnchanged = ($("#sitesToRecord_textboxZ").attr("oldvals") == null && $('input[name="sitesToRecordZ"][value="allSites"]').prop("checked"))
+								|| ($('input[name="sitesToRecordZ"][value="specifySites"]').prop("checked") && $("#sitesToRecord_textboxZ").val() == $("#sitesToRecord_textboxZ").attr("oldvals"));
+	
+	if (forceDeleteDistnToShow || !xSiteRecordingUnchanged || !ySiteRecordingUnchanged || !zSiteRecordingUnchanged){// || ySiteRecordingHasChanged || zSiteRecordingHasChanged){
+		$("#deleteDistn").show(300);
+		$("#submitDistn").hide(300);
+	}else{
+		$("#deleteDistn").hide(300);
+		$("#submitDistn").show(300);
+	}
+	
 
 }
 
@@ -5046,62 +5094,91 @@ function plotOptions(plotNum){
 				$("#customParamX").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamX"]);
 				$("#customParamY").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamY"]);
 				$("#customParamZ").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["metricZ"]);
-				updateParameterPlotSettings();
+				//updateParameterPlotSettings();
+
+
+				// Z-axis
+				$("#settingCell6").html(distanceVsTimeOptionsTemplate3().replace("ZMINDEFAULT", 0).replace("ZMAXDEFAULT", 1));
+
+
+				// Z axis colouring
+				$("#settingCell7").html(heatmapZAxisLegend());
+				$("#zColouring").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zColouring"]);
+
+
+				// Y-axis attribute
+				$("#settingCell2").html(distanceVsTimeOptionsTemplate1().replace("Time range", "X-axis range").replace("XUNITS", "").replace("XUNITS", ""));
+				$("#settingCell4").html(distanceVsTimeOptionsTemplate2().replace("Distance range", "Y-axis range").replace("YUNITS", "").replace("YUNITS", "").replace("YMINDEFAULT", 0).replace("YMAXDEFAULT", 1));
+				$("#pauseXRow").remove();
+				$("#shortPauseXRow").remove();
+
+
+				// Set xmax and xmin
+				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"] == "automaticX") $('input[name="xRange"][value="automaticX"]').click()
+				else {
+					$('input[name="xRange"][value="specifyX"]').click()
+					$("#xMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][0]);
+					$("#xMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][1]);
+				}
+
+
+				// Set ymax and ymin
+				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"] == "automaticY") $('input[name="yRange"][value="automaticY"]').click()
+				else {
+					$('input[name="yRange"][value="specifyY"]').click()
+					$("#yMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][0]);
+					$("#yMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][1]);
+				}
+
+
+
+				// Set zmax and zmin
+				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"] == "automaticZ") $('input[name="zRange"][value="automaticZ"]').click()
+				else {
+					$('input[name="zRange"][value="specifyZ"]').click()
+					$("#zMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][0]);
+					$("#zMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][1]);
+				}
+
+
+
+				$("#settingCell8").html(getPosteriorCheckboxTemplate());
+				//if (!PLOT_DATA["thereExistsPosteriorDistribution"]) {
+				//	$("#plotFromPosterior").css("cursor", "auto");
+					//$("#plotFromPosterior").attr("disabled", "disabled");
+				//}
+				$("#plotFromPosterior").prop("checked", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFromPosterior"]);
+
+
+
+				// Site specific constraints. Set the html attr 'oldvals' to what it was when the settings dialog loaded
+				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordX"] == "allSites") $('input[name="sitesToRecordX"][value="allSites"]').click();
+				else {
+					$('input[name="sitesToRecordX"][value="specifySites"]').click();
+					var recordingString = convertListToCommaString(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordX"])
+					$("#sitesToRecord_textboxX").val(recordingString);
+					$("#sitesToRecord_textboxX").attr("oldvals", recordingString);
+				}
+
+				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordY"] == "allSites") $('input[name="sitesToRecordY"][value="allSites"]').click();
+				else {
+					$('input[name="sitesToRecordY"][value="specifySites"]').click();
+					var recordingString = convertListToCommaString(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordY"])
+					$("#sitesToRecord_textboxY").val(recordingString);
+					$("#sitesToRecord_textboxY").attr("oldvals", recordingString);
+				}
+
+				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordZ"] == "allSites") $('input[name="sitesToRecordZ"][value="allSites"]').click();
+				else {
+					$('input[name="sitesToRecordZ"][value="specifySites"]').click();
+					var recordingString = convertListToCommaString(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordZ"])
+					$("#sitesToRecord_textboxZ").val(recordingString);
+					$("#sitesToRecord_textboxZ").attr("oldvals", recordingString);
+				}
+
 
 			});
 
-
-			// Z-axis
-			$("#settingCell6").html(distanceVsTimeOptionsTemplate3().replace("ZMINDEFAULT", 0).replace("ZMAXDEFAULT", 1));
-
-
-			// Z axis colouring
-			$("#settingCell7").html(heatmapZAxisLegend());
-			$("#zColouring").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zColouring"]);
-
-
-			// Y-axis attribute
-			$("#settingCell2").html(distanceVsTimeOptionsTemplate1().replace("Time range", "X-axis range").replace("XUNITS", "").replace("XUNITS", ""));
-			$("#settingCell4").html(distanceVsTimeOptionsTemplate2().replace("Distance range", "Y-axis range").replace("YUNITS", "").replace("YUNITS", "").replace("YMINDEFAULT", 0).replace("YMAXDEFAULT", 1));
-			$("#pauseXRow").remove();
-			$("#shortPauseXRow").remove();
-
-
-			// Set xmax and xmin
-			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"] == "automaticX") $('input[name="xRange"][value="automaticX"]').click()
-			else {
-				$('input[name="xRange"][value="specifyX"]').click()
-				$("#xMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][0]);
-				$("#xMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][1]);
-			}
-
-
-			// Set ymax and ymin
-			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"] == "automaticY") $('input[name="yRange"][value="automaticY"]').click()
-			else {
-				$('input[name="yRange"][value="specifyY"]').click()
-				$("#yMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][0]);
-				$("#yMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][1]);
-			}
-
-
-
-			// Set zmax and zmin
-			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"] == "automaticZ") $('input[name="zRange"][value="automaticZ"]').click()
-			else {
-				$('input[name="zRange"][value="specifyZ"]').click()
-				$("#zMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][0]);
-				$("#zMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][1]);
-			}
-
-
-
-			$("#settingCell8").html(getPosteriorCheckboxTemplate());
-			//if (!PLOT_DATA["thereExistsPosteriorDistribution"]) {
-			//	$("#plotFromPosterior").css("cursor", "auto");
-				//$("#plotFromPosterior").attr("disabled", "disabled");
-			//}
-			$("#plotFromPosterior").prop("checked", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFromPosterior"]);
 
 			break;
 			
@@ -5202,7 +5279,8 @@ function perTemplateDeselected(){
 // Output: string: "1,2,5-10"
 function convertListToCommaString(list){
 
-	console.log("Pasring list", list);
+	if (typeof list === "string") list = list = JSON.parse("[" + list + "]");
+	//console.log("Parsing list", list);
 	var string = "";
 	for (var i = 0; i < list.length; i ++){
 		var thisNum = list[i];

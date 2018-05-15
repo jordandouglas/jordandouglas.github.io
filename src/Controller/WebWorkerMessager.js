@@ -1065,7 +1065,7 @@ function submitDistribution_controller(resolve = function() {}){
 function update_this_parameter_controller(element){
 
 
-
+	
 
 	var paramID = $(element).attr("id");
 	// Special case for the assisting force 
@@ -1085,7 +1085,7 @@ function update_this_parameter_controller(element){
 			if (result["val"] == null) result = result[paramID];
 
 			// If this is an NTP concentration or an NTP binding parameter then we also need to resample the next NTP addition event
-			if (paramID.substring(3) == "conc" || paramID == "RateBind" || paramID == "RateMisbind" || paramID == "TransitionTransversionRatio") setNextBaseToAdd_controller();
+			//if (paramID.substring(3) == "conc" || paramID == "RateBind" || paramID == "RateMisbind" || paramID == "TransitionTransversionRatio") setNextBaseToAdd_controller();
 			
 			$(element).val(result["val"]);
 			update_sliding_curve(0);
@@ -1096,6 +1096,9 @@ function update_this_parameter_controller(element){
 
 
 		var val = parseFloat($(element).val());
+
+
+
 		if ($("#" + paramID).attr("type") == "checkbox") val = $("#" + paramID).is(":checked");
 
 		if (WEB_WORKER == null) {
@@ -1114,7 +1117,7 @@ function update_this_parameter_controller(element){
 
 		else {
 		
-			callWebWorkerFunction(stringifyFunction("PARAMS_JS.update_this_parameter_WW", [paramID, val]));
+			//callWebWorkerFunction(stringifyFunction("PARAMS_JS.update_this_parameter_WW", [paramID, val]));
 
 			// Send to WebAssembly webworker
 			var res = stringifyFunction("saveParameterDistribution", [paramID, "Fixed", {fixedDistnVal: val}], true);
@@ -2419,6 +2422,7 @@ function saveSettings_controller(){
 			functionToCallAfterSaving  = function() { plot_pause_distribution(); };
 			break;
 
+
 		case "velocityHistogram": // Save the proportion of values to display
 			values.push(parseFloat($("#windowSizeInput").val()));
 
@@ -2433,6 +2437,7 @@ function saveSettings_controller(){
 
 			functionToCallAfterSaving  = function() { plot_velocity_distribution(); };
 			break;
+
 
 		case "pauseSite": // Save the y-axis variable
 			values.push($('input[name=Yaxis]:checked').val());
@@ -2468,6 +2473,25 @@ function saveSettings_controller(){
 
 			values.push($("#plotFromPosterior").prop("checked"));
 
+
+			// Site specific constraints for X, Y and Z
+			if ($('input[name="sitesToRecordX"][value="allSites"]').prop("checked")) values.push("allSites");
+			else {
+				values.push(convertCommaStringToList($("#sitesToRecord_textboxX").val()));
+			}
+
+			if ($('input[name="sitesToRecordY"][value="allSites"]').prop("checked")) values.push("allSites");
+			else {
+				values.push(convertCommaStringToList($("#sitesToRecord_textboxY").val()));
+			}
+
+			if ($('input[name="sitesToRecordZ"][value="allSites"]').prop("checked")) values.push("allSites");
+			else {
+				values.push(convertCommaStringToList($("#sitesToRecord_textboxZ").val()));
+			}
+
+
+			console.log("values", values);
 
 			functionToCallAfterSaving  = function() { plot_parameter_heatmap(plotNum); };
 			break;
@@ -3112,7 +3136,7 @@ function getCacheSizes_controller(resolve = function(){}){
 
 
 
-function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata, resolve){
+function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata, resolve = function() { }){
 
 
 
