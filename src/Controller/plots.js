@@ -84,6 +84,13 @@ function update_DISTANCE_VS_TIME(DISTANCE_VS_TIME_UNSENT){
 		if (VELOCITIES[simNum-1] == null) VELOCITIES[simNum-1] = {sim: simNum, times: [], distances: []};
 		var DVT = DISTANCE_VS_TIME_CONTROLLER[simNum-1];
 		var VELO = VELOCITIES[simNum-1];
+
+		// Ensure that the list starts out at time zero
+		if (DVT.times.length > 0 && DVT.times[0] != 0){
+			DVT.times.unshift(0);
+			DVT.distances.unshift(DVT.distances[0]);
+		}
+
 		for (var j = 0; j < DISTANCE_VS_TIME_UNSENT[simNum]["times"].length; j ++){
 
 
@@ -735,7 +742,7 @@ function plotTimeChart(){
 		var ymax = 0;
 		var ymin = 0;
 		if (index >=0 && PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["yRange"] == "automaticY"){
-
+			
 			//console.log("Looking for index", index, "DISTANCE_VS_TIME_CONTROLLER", DISTANCE_VS_TIME_CONTROLLER);
 			ymin = 0;
 
@@ -748,8 +755,6 @@ function plotTimeChart(){
 
 			ymax = roundToSF(ymax, 2, "ceil");
 			if (ymin == ymax) ymax++;
-
-
 
 
 		}else{
@@ -854,21 +859,6 @@ function download_distanceVsTimeTSV(){
 	download("distance_vs_time.tsv", tsv);
 
 }
-
-
-
-// Remove periodic datapoints so that the total list does not go beyond a certain length
-// This is to make displaying the data more efficient
-function pruneStepPlotData(xvals, yvals){
-	
-	
-	
-	//var timeUnitsPerPixel = 
-	
-	
-	
-}
-
 
 
 

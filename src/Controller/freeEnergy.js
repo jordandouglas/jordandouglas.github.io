@@ -458,6 +458,7 @@ function viewModel(){
 	getElongationModels_controller(function(result){
 
 
+		//console.log(result);
 
 		if (WEB_WORKER_WASM != null) ELONGATION_MODEL_TEMP = result;
 		else ELONGATION_MODEL_TEMP = result["ELONGATION_MODELS"][result["currentElongationModel"]];
@@ -1012,7 +1013,7 @@ function drawModelDiagramCanvas_givenParams(canvasID, kineticStateDescriptionID,
 	
 
 	var canvas = $("#" + canvasID)[0];
-	
+
 	
 	if (canvas == null) return;
 	var stateHoverEvents = [];
