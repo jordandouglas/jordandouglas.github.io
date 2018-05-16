@@ -249,7 +249,6 @@ void PlotSettings::updateHeatmapData(list<ParameterHeatmapData*> heatmapData){
 // Converts these plot settings into a JSON
 string PlotSettings::toJSON(){
 
-	cout << "Plot settings toJSON" << endl;
 
 	string settingsJSON = "'name':'" + this->name + "'";
 	if (this->name == "none") return settingsJSON;
@@ -302,7 +301,7 @@ string PlotSettings::toJSON(){
 		settingsJSON += "'sitesToRecordX':'" + this->sitesToRecordX + "',";
 		settingsJSON += "'sitesToRecordY':'" + this->sitesToRecordY + "',";
 		settingsJSON += "'sitesToRecordZ':'" + this->sitesToRecordZ + "',";
-	
+		
 
 	}
 

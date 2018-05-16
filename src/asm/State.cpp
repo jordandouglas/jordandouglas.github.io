@@ -192,7 +192,7 @@ State* State::print(){
 		cout << startingBase << this->nascentSequence.substr(start, stop-start) << endl;
 	}
 	
-	cout << "[" << this->get_nascentLength() << ","  << this->mRNAPosInActiveSite << "," << this->NTPbound() << "," << this->terminated << "]\n" << endl;
+	cout << "[" << this->get_nascentLength() << ","  << this->mRNAPosInActiveSite << "," << this->NTPbound() << "," << this->activated << "," << this->terminated << "]\n" << endl;
 	return this;
 
 }
@@ -343,8 +343,6 @@ State* State::forward(){
 
 
 	//if (this->terminated) return this;
-
-
 
 	SlippageLandscapes* DOMupdates;
 	if (this->isGuiState && _animationSpeed != "hidden") {
@@ -526,7 +524,7 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 	double groundEnergy = this->calculateTranslocationFreeEnergy(true);
 	double forwardHeight = this->calculateForwardTranslocationFreeEnergyBarrier(true);
 
-	//cout << "forwardHeight " << forwardHeight << ", groundEnergy = " << groundEnergy << ", diff = " << (forwardHeight - groundEnergy) << endl;
+	//cout << "forwardHeight " << forwardHeight << ", groundEnergy = " << groundEnergy << endl;
 
 	if (forwardHeight >= INF) return 0;
 	
@@ -2221,6 +2219,8 @@ double State::calculateForwardTranslocationFreeEnergyBarrier(bool ignoreParamete
 	}
 
 	delete stateAfterForwardtranslocation;
+
+
 	return barrierHeight;
 
 

@@ -882,25 +882,28 @@ extern "C" {
 
 		string stateDiagramJSON = "{";
 
+
+		State* stateToCalculateFor = _currentStateGUI->clone();
+
 		// Current state
-		stateDiagramJSON += "'NTPbound':" + string(_currentStateGUI->NTPbound() ? "true" : "false") + ",";
-		stateDiagramJSON += "'activated':" + string(_currentStateGUI->get_activated() ? "true" : "false") + ",";
-		stateDiagramJSON += "'mRNAPosInActiveSite':" + to_string(_currentStateGUI->get_mRNAPosInActiveSite()) + ",";
-		stateDiagramJSON += "'mRNALength':" + to_string(_currentStateGUI->get_nascentLength()) + ",";
+		stateDiagramJSON += "'NTPbound':" + string(stateToCalculateFor->NTPbound() ? "true" : "false") + ",";
+		stateDiagramJSON += "'activated':" + string(stateToCalculateFor->get_activated() ? "true" : "false") + ",";
+		stateDiagramJSON += "'mRNAPosInActiveSite':" + to_string(stateToCalculateFor->get_mRNAPosInActiveSite()) + ",";
+		stateDiagramJSON += "'mRNALength':" + to_string(stateToCalculateFor->get_nascentLength()) + ",";
 
 
 		// Calculate all rates for the state (from backtrack -2 to hypertranslocated +3) 
-		State* stateToCalculateFor = _currentStateGUI->clone();
-		stateToCalculateFor->releaseNTP();
+		if (stateToCalculateFor->NTPbound()) stateToCalculateFor->releaseNTP();
 		stateToCalculateFor->deactivate(); // Set to deactivated so we can backtrack
 
 
+
 		// Get the state into backtracked (m = -2)
-		for (int i = stateToCalculateFor->get_mRNAPosInActiveSite(); i < -2; i ++){
-			stateToCalculateFor->forward();
-		}
 		for (int i = stateToCalculateFor->get_mRNAPosInActiveSite(); i > -2; i --){
 			stateToCalculateFor->backward();
+		}
+		for (int i = stateToCalculateFor->get_mRNAPosInActiveSite(); i < -2; i ++){
+			stateToCalculateFor->forward();
 		}
 
 
@@ -920,6 +923,7 @@ extern "C" {
 		stateDiagramJSON += "'k 0,+1':" + to_string(currentModel->get_assumeTranslocationEquilibrium() ? 0 : stateToCalculateFor->calculateForwardRate(true, false)) + ","; // From pretranslocated to posttranslocated
 
 
+
 		// State m = 1
 		stateToCalculateFor->forward();
 		double k_10 = stateToCalculateFor->calculateBackwardRate(true, true);
@@ -931,6 +935,7 @@ extern "C" {
 		stateDiagramJSON += "'KD':" + to_string(Kdiss->getVal()) + ","; // Dissociation constant
 		stateDiagramJSON += "'Kt':" + to_string(k_10 == 0 || k_01 == 0 ? 0 : k_10 / k_01) + ","; // Translocation constant
 		//cout << "k_10 " << k_10 << " k_01 " << k_01 << endl;
+
 
 
 		// State m = 2
@@ -948,9 +953,11 @@ extern "C" {
 		stateDiagramJSON += "'kU':" + to_string(stateToCalculateFor->calculateDeactivateRate(true)); // Rate of ianctivation
 
 		stateDiagramJSON += "}";
-		messageFromWasmToJS(stateDiagramJSON, msgID);
+
 
 		delete stateToCalculateFor;
+		messageFromWasmToJS(stateDiagramJSON, msgID);
+
 
 	}
 

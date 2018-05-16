@@ -185,7 +185,7 @@ void Plots::refreshPlotData(State* state){
 
 
 	//cout << "Refreshing plot data: " << Plots::currentSimNumber << endl;
-
+	Plots::currentSimNumber ++;
 
 
 	// Start new distance vs time entry
@@ -237,7 +237,7 @@ void Plots::refreshPlotData(State* state){
 	Plots::timeWaitedUntilNextTranslocation = 0;
 	Plots::timeWaitedUntilNextCatalysis = 0;
 
-	Plots::currentSimNumber ++;
+
 
 }
 

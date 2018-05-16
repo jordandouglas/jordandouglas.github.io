@@ -382,6 +382,9 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			(s->get_mRNAPosInActiveSite() == 0 && s->getRightTemplateBaseNumber() == templateSequence.length()) ){
 
 
+		//		if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal()-1) ||
+	//	(this->mRNAPosInActiveSite <= 1 && this->rightTemplateBase > templateSequence.length())) this->terminate();
+
 			if (!this->animatingGUI) {
 				s->terminate();
 				break;
