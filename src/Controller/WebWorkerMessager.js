@@ -1001,6 +1001,12 @@ function submitDistribution_controller(resolve = function() {}){
 	// Function to call when webworker has responded
 	var updateDOM = function(PHYSICAL_PARAMETERS_LOCAL){
 		closePriorDistributionPopup();
+
+
+		if (PHYSICAL_PARAMETERS_LOCAL["refreshDOM"]){
+			refresh();
+			return;
+		}
 		
 		
 		// If the value has changed and this parameter requires refreshing on change, then refresh

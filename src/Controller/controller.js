@@ -104,7 +104,7 @@ function renderTermination(result){
 
 	var primerSeq = result["primerSeq"];
 	var insertPositions = result["insertPositions"]; // Has there been an insertion due to slippage?
-
+	$(".triphosphate").remove();
 
 	//console.log("primerSeq", primerSeq);
 	if (terminatedSequences.length < maxNumberTerminatedSequences){
@@ -833,6 +833,7 @@ function add_triphosphate(pos, x, y){
 	img.css("height", "20px");
 	img.css("position", "absolute");
 	img.css("z-index", "1");
+	img.addClass("triphosphate");
 
 	$("#bases").append(img);
 
