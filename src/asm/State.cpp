@@ -394,16 +394,16 @@ State* State::forward(){
 		for (int i = this->getRightTemplateBaseNumber() + 1; i < this->getRightTemplateBaseNumber() + (bubbleRight->getVal()+1) + 1; i++) {
 
 			if (i == this->getRightTemplateBaseNumber() + (bubbleRight->getVal()+1)) {
-				Coordinates::move_nt(i, "g", 0, shiftBaseBy);
+				if (!(PrimerType.substr(0,2) == "ds" && TemplateType.substr(0,2) == "ss")) Coordinates::move_nt(i, "g", 0, shiftBaseBy);
 				Coordinates::move_nt(i, "o", 0, -shiftBaseBy/2);
 			}
 			else {
-				Coordinates::move_nt(i, "g", 0, +52/(bubbleRight->getVal()+1));
+				if (!(PrimerType.substr(0,2) == "ds" && TemplateType.substr(0,2) == "ss")) Coordinates::move_nt(i, "g", 0, +52/(bubbleRight->getVal()+1));
 				Coordinates::move_nt(i, "o", 0, -26/(bubbleRight->getVal()+1));
 			}
 		
 			if (i > 0 && TemplateType.substr(0,2) == "ds") {
-				Coordinates::flip_base(i, "g", "g"); 
+				if (!(PrimerType.substr(0,2) == "ds" && TemplateType.substr(0,2) == "ss")) Coordinates::flip_base(i, "g", "g"); 
 				if (PrimerType.substr(0,2) == "ds") Coordinates::flip_base(i, "o", "m"); 
 			}
 		}
@@ -411,7 +411,7 @@ State* State::forward(){
 
 		// Move mRNA bases
 		if (PrimerType.substr(0,2) != "ds") for (int i = this->getLeftNascentBaseNumber(); i > this->getLeftNascentBaseNumber() - (bubbleLeft->getVal()+1) && i >= 0; i--) Coordinates::move_nt(i, "m", 0, +52/(bubbleLeft->getVal()+1));
-		for (int i = this->getRightNascentBaseNumber() + 1; i < this->getRightNascentBaseNumber() + (bubbleRight->getVal()+1) + 1; i++) Coordinates::move_nt(i, "m", 0, -52/(bubbleRight->getVal()+1));
+		if (PrimerType.substr(0,2) != "ds") for (int i = this->getRightNascentBaseNumber() + 1; i < this->getRightNascentBaseNumber() + (bubbleRight->getVal()+1) + 1; i++) Coordinates::move_nt(i, "m", 0, -52/(bubbleRight->getVal()+1));
 	
 
 		// Remove NTP
@@ -496,7 +496,7 @@ State* State::terminate(){
 }
 
 double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestrictions){
-	
+
 	if (!ignoreStateRestrictions){
 		if (this->terminated || this->NTPbound()) return 0;
 		//if (currentModel->get_assumeTranslocationEquilibrium() && this->mRNAPosInActiveSite == 0) return 0;
@@ -593,16 +593,16 @@ State* State::backward(){
 		for (int i = this->getRightTemplateBaseNumber(); i < this->getRightTemplateBaseNumber() + (bubbleRight->getVal()+1); i++) {
 
 			if (i == this->getRightTemplateBaseNumber() + (bubbleRight->getVal()+1) - 1) {
-				Coordinates::move_nt(i, "g", 0, shiftBaseBy);
+				if (!(PrimerType.substr(0,2) == "ds" && TemplateType.substr(0,2) == "ss")) Coordinates::move_nt(i, "g", 0, shiftBaseBy);
 				Coordinates::move_nt(i, "o", 0, -shiftBaseBy/2);
 			}
 			else {
-				Coordinates::move_nt(i, "g", 0, -52/(bubbleRight->getVal()+1));
+				if (!(PrimerType.substr(0,2) == "ds" && TemplateType.substr(0,2) == "ss")) Coordinates::move_nt(i, "g", 0, -52/(bubbleRight->getVal()+1));
 				Coordinates::move_nt(i, "o", 0, +26/(bubbleRight->getVal()+1));
 			}
 	
 			if (i > 0 && TemplateType.substr(0,2) == "ds") {
-				Coordinates::flip_base(i, "g", "m"); 
+				if (!(PrimerType.substr(0,2) == "ds" && TemplateType.substr(0,2) == "ss")) Coordinates::flip_base(i, "g", "m"); 
 				if (PrimerType.substr(0,2) == "ds") Coordinates::flip_base(i, "o", "g"); 
 			}
 		}
@@ -611,7 +611,7 @@ State* State::backward(){
 
 		// Move mRNA bases
 		if (PrimerType.substr(0,2) != "ds") for (int i = this->getLeftNascentBaseNumber() - 1;i > this->getLeftNascentBaseNumber() - (bubbleLeft->getVal()+1) - 1 && i >= 0; i--) Coordinates::move_nt(i, "m", 0, -52/(bubbleLeft->getVal()+1));
-		for (int i = this->getRightNascentBaseNumber(); i < this->getRightNascentBaseNumber() + (bubbleRight->getVal()+1); i++) Coordinates::move_nt(i, "m", 0, +52/(bubbleRight->getVal()+1));
+		if (PrimerType.substr(0,2) != "ds") for (int i = this->getRightNascentBaseNumber(); i < this->getRightNascentBaseNumber() + (bubbleRight->getVal()+1); i++) Coordinates::move_nt(i, "m", 0, +52/(bubbleRight->getVal()+1));
 
 
 		// Remove NTP
@@ -1098,41 +1098,54 @@ void State::form_bulge(int S, bool form_left, SlippageLandscapes* DOMupdates){
 		if (this->isGuiState) cout << "form left" << S << endl;
 		if (this->NTPbound()) this->releaseNTP();
 
-		// Move 2nd last base to between the 2nd and 3rd to last positions, and last base into 2nd last position
-		this->bulgedBase.at(S) = this->rightNascentBase;
-		if (this->mRNAPosInActiveSite >= 0) {
-			this->bulgedBase.at(S) -= this->mRNAPosInActiveSite + 1;
-			this->bulgePos.at(S) = 2 + this->mRNAPosInActiveSite;
-		}
 
-		if (this->mRNAPosInActiveSite < 0){
-			this->bulgePos.at(S) = 1;
-		}
-		
-		this->bulgeSize.at(S) = 1;
-		int leftBoundary = this->bulgedBase.at(S) - this->bulgeSize.at(S);
+		//if (PrimerType.substr(0, 2) == "ss"){
 
-
-
-
-		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
-
-			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary, "m")->getX(), 1, true, 0);
-			for (int i = this->bulgedBase.at(S) + 2; i < this->get_nascentLength() + 1; i ++){
-				if (i > this->rightNascentBase && i-this->rightNascentBase <= (bubbleRight->getVal()+1)) Coordinates::move_nt(i, "m", -25, -52/(bubbleRight->getVal()+1));
-				else Coordinates::move_nt(i, "m", -25, 0);
+			// Move 2nd last base to between the 2nd and 3rd to last positions, and last base into 2nd last position
+			this->bulgedBase.at(S) = this->rightNascentBase;
+			if (this->mRNAPosInActiveSite >= 0) {
+				this->bulgedBase.at(S) -= this->mRNAPosInActiveSite + 1;
+				this->bulgePos.at(S) = 2 + this->mRNAPosInActiveSite;
 			}
 
-		}
-		
+			if (this->mRNAPosInActiveSite < 0){
+				this->bulgePos.at(S) = 1;
+			}
+			
+			this->bulgeSize.at(S) = 1;
+			int leftBoundary = this->bulgedBase.at(S) - this->bulgeSize.at(S);
 
 
-		this->rightNascentBase ++;
-		this->mRNAPosInActiveSite ++;
-		this->nextTemplateBaseToCopy --;
-		this->changeInLeftBulgePosition --;
 
-		//if (UPDATE_COORDS) WW_JS.setNextBaseToAdd_WW();
+			if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
+
+				Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary, "m")->getX(), 1, true, 0);
+				for (int i = this->bulgedBase.at(S) + 2; i < this->get_nascentLength() + 1; i ++){
+					if (PrimerType.substr(0,2) == "ss" && i > this->rightNascentBase && i-this->rightNascentBase <= (bubbleRight->getVal()+1)) Coordinates::move_nt(i, "m", -25, -52/(bubbleRight->getVal()+1));
+					else Coordinates::move_nt(i, "m", -25, 0);
+				}
+
+			}
+			
+
+
+			this->rightNascentBase ++;
+			this->mRNAPosInActiveSite ++;
+			this->nextTemplateBaseToCopy --;
+			this->changeInLeftBulgePosition --;
+
+			//if (UPDATE_COORDS) WW_JS.setNextBaseToAdd_WW();
+
+		//}
+
+		// Bulge in the double stranded nascent strand should start at the end of the hybrid
+		//else{
+			
+			//this->bulgedBase.at(S) = this->rightNascentBase;
+
+
+
+		//}
 
 
 		if (currentModel->get_allowMultipleBulges()) {
@@ -1456,14 +1469,16 @@ void State::fuseBulgeLeft(int S, SlippageLandscapes* DOMupdates){
 			int leftBoundary = this->bulgedBase.at(fuseWith) - this->bulgeSize.at(fuseWith);
 			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary, "m")->getX(), this->bulgeSize.at(fuseWith), true, 0);
 
-			if (PrimerType.substr(0,2) == "ss"){
-				for (int i = leftBoundary + this->bulgeSize.at(fuseWith) + 2; i < this->get_nascentLength() + 1; i ++){
-					if (i>this->getRightNascentBaseNumber() && i-this->getRightNascentBaseNumber() <= bubbleRight->getVal()) Coordinates::move_nt(i, "m", -25, -52/bubbleRight->getVal());
-					else Coordinates::move_nt(i, "m", -25, 0);
-				}
+			//if (PrimerType.substr(0,2) == "ss"){
+			for (int i = leftBoundary + this->bulgeSize.at(fuseWith) + 2; i < this->get_nascentLength() + 1; i ++){
+				if (PrimerType.substr(0,2) == "ss" && i>this->getRightNascentBaseNumber() && i-this->getRightNascentBaseNumber() <= bubbleRight->getVal()) Coordinates::move_nt(i, "m", -25, -52/bubbleRight->getVal());
+				else Coordinates::move_nt(i, "m", -25, 0);
 			}
+			//}
 
 		}
+
+
 		
 		this->rightNascentBase ++;
 		this->mRNAPosInActiveSite ++;

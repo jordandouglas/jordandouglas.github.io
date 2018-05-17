@@ -310,8 +310,8 @@ void Plots::resetTimeToCatalysis(){
 void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, double reactionTime) {
 
 
-
 	if (state == nullptr || !_USING_GUI) return;
+
 
 	int rightHybridBase = state->getRightTemplateBaseNumber();
 	int numActions = sizeof(actionsToDo) / sizeof(actionsToDo[0]);
@@ -367,7 +367,7 @@ void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, doubl
 
 
 			// Dwell time per site plot
-			Plots::dwellTimePerSite.at(rightHybridBase) += Plots::timeWaitedUntilNextTranslocation;
+			if (rightHybridBase < Plots::dwellTimePerSite.size()) Plots::dwellTimePerSite.at(rightHybridBase) += Plots::timeWaitedUntilNextTranslocation;
 
 
     		Plots::timeWaitedUntilNextTranslocation = 0;
@@ -409,7 +409,7 @@ void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, doubl
 		}
 
 		//cout << "thereWasACatalysis " << rightHybridBase << " , " << Plots::timeToCatalysisPerSite.at(rightHybridBase) << endl;
-		Plots::timeToCatalysisPerSite.at(rightHybridBase) += Plots::timeWaitedUntilNextCatalysis;
+		if (rightHybridBase < Plots::timeToCatalysisPerSite.size()) Plots::timeToCatalysisPerSite.at(rightHybridBase) += Plots::timeWaitedUntilNextCatalysis;
 
 
 		// Site specificity recording
@@ -418,6 +418,7 @@ void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, doubl
 		Plots::timeWaitedUntilNextCatalysis = 0;
 
 	}
+
 
 
 }

@@ -151,10 +151,10 @@ list<int> Simulator::sample_action_GUI(){
 	if (_currentStateGUI->isTerminated()) {
 
 		Plots::updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
+		Settings::sampleAll(); // Resample the parameters
 		delete _currentStateGUI;
 		_currentStateGUI = new State(true, true);
 		this->nTrialsCompletedGUI++;
-		Settings::sampleAll(); // Resample the parameters
 		Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
 		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
 
@@ -197,7 +197,7 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
 		result[0] = 0;
 		result[1] = 0;
 		result[2] = 0;
-		Settings::sampleAll(); // Resample the parameters
+
 		Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
 		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
 		performSimulation(_currentStateGUI, result);
@@ -220,7 +220,9 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
 			meanMeanVelocity += result[0];
 			meanMeanTime += result[1];
 
+
 			Plots::updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
+			Settings::sampleAll(); // Resample the parameters
 			delete _currentStateGUI;
 			_currentStateGUI = new State(true, true);
 		}
@@ -282,13 +284,14 @@ void Simulator::resume_trials_GUI(double* toReturn){
 
 		// Restart from initial state for the next simulation
 		Plots::updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
+		Settings::sampleAll(); // Resample the parameters
 		delete _currentStateGUI;
 		_currentStateGUI = new State(true, true);
 		result[0] = 0;
 		result[1] = 0;
 		result[2] = 0;
 
-		Settings::sampleAll(); // Resample the parameters
+
 		Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
 		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
 
@@ -349,6 +352,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 	while(!s->isTerminated()){
 
 
+
 		// Check if GUI timeout has been reached (if there is a timeout)
 		if (simulateForSeconds != -1 && _animationSpeed == "hidden"){
 			this->niterationsUntilLastTimeoutCheck ++;
@@ -396,8 +400,6 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 		}
 
 
-
-
 		// If NTP is not bound and we are in posttranslocated state, and user has requested to assume binding equilibrium but NOT translocation
 		bool justBindingEquilibrium =     currentModel->get_assumeBindingEquilibrium() 
 								 && !currentModel->get_assumeTranslocationEquilibrium() 
@@ -424,6 +426,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 		bool beforeEndOfTemplate = s->get_nascentLength() + 1 < templateSequence.length();
 		bool afterStartOfTemplate = s->get_nascentLength() > s->get_initialLength();
 		double geometricTime = -1;
+
 
 		// Geometric speed boost whereby the number of cycles spent in a set of states is sampled from the geometric distribution. 
 		// This is faster because the inner loop is smaller, especially when the back and forth rate is very high eg. NTP binding/release
@@ -452,6 +455,8 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 		}
 
 
+
+
 		// Geometric sampling was a success. End of trial
 		if (geometricTime != -1){
 
@@ -474,6 +479,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 		if (geometricTime == -1) {
 
 
+
 			// Calculate the initial rates (these may be modified if any equilibirum assumptions are made)
 			double kBck = s->calculateBackwardRate(true, false);
 			double kFwd = s->calculateForwardRate(true, false);
@@ -482,6 +488,8 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			double kActivate = s->calculateActivateRate(false);
 			double kDeactivate = s->calculateDeactivateRate(false);
 			double kCleave = s->calculateCleavageRate(false); // Can only cleave if backtracked in which case equilibrium assumptions do not apply
+
+
 
 
 			// Assume equilbirium between bound and unbound states but NOT pre and post translocated states
@@ -644,7 +652,6 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
 
-
 				double normalisationZ = boltzmannG0 + boltzmannG1 + boltzmannGN;
 
 				double probabilityPretranslocated = boltzmannG0 / normalisationZ;
@@ -668,6 +675,8 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			}
 
 
+			
+
 			double rates[] = { kBck, kFwd, kRelease, kBindOrCat, kActivate, kDeactivate, 0, kCleave };
 			int numReactions = (sizeof(rates)/sizeof(*rates));
 
@@ -677,6 +686,8 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				rateSum += rates[i];
 			}
 			//cout << endl;
+
+			
 
 			
 			if (rateSum <= 0){
@@ -702,6 +713,9 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				}
 			}
 
+
+			
+
 			//if (s->get_nascentLength() == 3984 && s->get_mRNAPosInActiveSite() == 0 && this->nTrialsCompletedGUI > 1400){
 				//cout << nTrialsCompletedGUI << ": reactionToDo " << reactionToDo << ", bck:" << rates[0] << ", fwd:" << rates[1] << ", rel:" << rates[2] << ", cat:" << rates[3] << endl;
 			//}
@@ -711,13 +725,12 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			
 			//cout << "sampled reaction " << reactionToDo  << ", time elapsed = " << timeElapsed << endl;
 
-			if (reactionToDo == -1){
-				cout << nTrialsCompletedGUI << ", runifNum:" << runifNum << ", reactionToDo " << reactionToDo << ", bck:" << rates[0] << ", fwd:" << kFwd << ", rel:" << rates[2] << ", cat:" << rates[3] << endl;
-				cout << "GDagSlide->getVal() " << GDagSlide->getVal() << " exp(-GDagSlide->getVal()) " << exp(-GDagSlide->getVal()) << " exp(-9.079) " << exp(-9.079) <<  endl;
+			//if (reactionToDo == -1){
+				//cout << nTrialsCompletedGUI << ", runifNum:" << runifNum << ", reactionToDo " << reactionToDo << ", bck:" << rates[0] << ", fwd:" << kFwd << ", rel:" << rates[2] << ", cat:" << rates[3] << endl;
+				//cout << "GDagSlide->getVal() " << GDagSlide->getVal() << " exp(-GDagSlide->getVal()) " << exp(-GDagSlide->getVal()) << " exp(-9.079) " << exp(-9.079) <<  endl;
+			//}
 
-				cout << HUGE_VAL << endl;
-			}
-			
+
 
 
 			int actionsToDoList[3] = {reactionToDo, -2, -2};
@@ -790,8 +803,6 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
 
-
-
 			// Apply the reaction(s) unless in animation mode
 			for (int i = 0; i < 3; i ++){
 				if (actionsToDoList[i] == -2) break;
@@ -805,8 +816,10 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			}
 
 
+
 			// Return now if in animation mode
 			if (this->animatingGUI) return;
+
 
 
 			timeElapsed += reactionTime;

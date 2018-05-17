@@ -155,6 +155,7 @@ void Coordinates::resetToInitialState(){
 		}else{
 
 			double dy = 52 - std::min(52.0, (index - (hybridLen->getVal()-1)) * 52/(bubbleRight->getVal()+1));
+			if (PrimerType.substr(0,2) == "ds" && TemplateType.substr(0,2) == "ss") dy = 52;
 			if (TemplateType.substr(0,2) == "ds") {
 				Coordinates::create_nucleotide(index, "g", startX, startY + dy, baseToAdd, baseToAdd + "m", false);
 			}
@@ -807,7 +808,7 @@ void Coordinates::add_force_equipment(double force){
 		Coordinates::create_HTMLobject("rightBead", pol->getX() + pol->getWidth() - 10, pol->getY() + std::ceil((pol->getHeight() - 150) / 2), 150, 150, "bead", 0);
 
 		// Add the string/tweezers
-		Coordinates::create_HTMLobject("tweezer",  pol->getX() + pol->getWidth() + 140 - 10, pol->getY() + 75, finalBaseXpos - pol->getX() - pol->getWidth(), 15, "string", 0);
+		Coordinates::create_HTMLobject("tweezer",  pol->getX() + pol->getWidth() + 140 - 10, pol->getY() + 75, finalBaseXpos - pol->getX() - pol->getWidth() + 100, 15, "string", 0);
 		
 		// Add the arrows
 		Coordinates::create_HTMLobject("forceArrow1", pol->getX() + pol->getWidth() + 140 - 10,               pol->getY() + 83 - 0.5*arrowSize, arrowSize, arrowSize, "rightForce", 0);

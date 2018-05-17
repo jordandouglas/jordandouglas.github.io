@@ -537,13 +537,15 @@ extern "C" {
 		if (_animationSpeed == "hidden") Coordinates::resetToInitialState();
 
 
+
+		// Sample parameters
+		Settings::sampleAll();
+
+
 		// Reset state
 		delete _currentStateGUI;
 		_currentStateGUI = new State(true, true);
 
-
-		// Sample parameters
-		Settings::sampleAll();
 
 		// Refresh plot
 		Plots::refreshPlotData(_currentStateGUI);
@@ -777,7 +779,10 @@ extern "C" {
 
 			param->sample();
 
+
 		}
+
+
 		
 		
 
