@@ -59,7 +59,6 @@ function update_sliding_curve(dir){
 	var updateHeights = function(dict){
 
 		// Update the true heights
-		//console.log("Height object", dict);
 		trueSlidingPeakHeights = dict["slidingPeakHeights"];
 		trueSlidingTroughHeights = dict["slidingTroughHeights"];
 
@@ -168,6 +167,7 @@ function update_sliding_curve_horizontal_sync(startTime, dir, animationTimeLands
 function updateModelDOM(elongation_model_temp){
 
 
+
 	for (var modelSettingID in elongation_model_temp){
 		if ($("#" + modelSettingID).length == 0) continue;
 
@@ -206,7 +206,7 @@ function updateModelDOM(elongation_model_temp){
 	//if(elongation_model_temp["allowHypertranslocation"]) $("#DGHyperDag_container").show(300);
 	//else  $("#DGHyperDag_container").hide(0);
 	
-	
+	// Pausing and inactivation
 	if (elongation_model_temp["allowInactivation"]) {
 		$("#kU_container").show(100);
 		$("#kA_container").show(100);
@@ -215,6 +215,22 @@ function updateModelDOM(elongation_model_temp){
 		$("#kU_container").hide(0);
 		$("#kA_container").hide(0);
 	}
+
+
+	// DNA bending
+	if (elongation_model_temp["allowDNAbending"]) {
+		$("#upstreamCurvatureCoeff_container").show(100);
+		$("#downstreamCurvatureCoeff_container").show(100);
+		$("#downstreamWindow_container").show(100);
+		$("#upstreamWindow_container").show(100);
+	}
+	else {
+		$("#upstreamCurvatureCoeff_container").hide(0);
+		$("#downstreamCurvatureCoeff_container").hide(0);
+		$("#downstreamWindow_container").hide(0);
+		$("#upstreamWindow_container").hide(0);
+	}
+
 
 
 
@@ -459,6 +475,7 @@ function viewModel(){
 	getElongationModels_controller(function(result){
 
 
+		//console.log(result);
 
 		if (WEB_WORKER_WASM != null) ELONGATION_MODEL_TEMP = result;
 		else ELONGATION_MODEL_TEMP = result["ELONGATION_MODELS"][result["currentElongationModel"]];
@@ -1013,7 +1030,7 @@ function drawModelDiagramCanvas_givenParams(canvasID, kineticStateDescriptionID,
 	
 
 	var canvas = $("#" + canvasID)[0];
-	
+
 	
 	if (canvas == null) return;
 	var stateHoverEvents = [];

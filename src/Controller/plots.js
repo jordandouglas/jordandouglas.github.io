@@ -84,6 +84,13 @@ function update_DISTANCE_VS_TIME(DISTANCE_VS_TIME_UNSENT){
 		if (VELOCITIES[simNum-1] == null) VELOCITIES[simNum-1] = {sim: simNum, times: [], distances: []};
 		var DVT = DISTANCE_VS_TIME_CONTROLLER[simNum-1];
 		var VELO = VELOCITIES[simNum-1];
+
+		// Ensure that the list starts out at time zero
+		if (DVT.times.length > 0 && DVT.times[0] != 0){
+			DVT.times.unshift(0);
+			DVT.distances.unshift(DVT.distances[0]);
+		}
+
 		for (var j = 0; j < DISTANCE_VS_TIME_UNSENT[simNum]["times"].length; j ++){
 
 
@@ -150,18 +157,36 @@ function drawPlotsFromData(plotData, resolve = function() { }){
 
 	update_PLOT_DATA(plotData)
 
-	//console.log("drawPlotsFromData");
+	//console.log("drawPlotsFromData", PLOT_DATA);
 	//console.trace();
 
-	window.requestAnimationFrame(function(){
-		for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
-			if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "none" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
-			else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
-		}
 
-		resolve();
+	// If more data is available from the model then get it all before drawing the plots
 
-	});
+	//else {
+
+		window.requestAnimationFrame(function(){
+			for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
+
+
+				if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "none") $("#plotCanvasContainer" + plt).html("");
+
+				else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
+				else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
+			}
+
+			if (plotData.moreData) {
+				console.log("Need more data");
+				drawPlots(false, resolve);
+			}
+
+			else resolve();
+
+		});
+
+	//}
+
+
 	
 
 }
@@ -170,6 +195,8 @@ function drawPlotsFromData(plotData, resolve = function() { }){
 
 
 function update_PLOT_DATA(plotData){
+
+	//console.log("update_PLOT_DATA");
 
 	PLOT_DATA = plotData;
 
@@ -193,12 +220,14 @@ function sequenceChangeRefresh(){
 
 	console.log("sequenceChangeRefresh");
 
-	resetAllPlots();
 
-	PLOT_DATA = {};
+
 	DWELL_TIMES_CONTROLLER = [];
 	VELOCITIES = [];
 	DISTANCE_VS_TIME_CONTROLLER = [];
+
+	resetAllPlots();
+	PLOT_DATA = {};
 	
 
 	
@@ -239,7 +268,7 @@ function selectPlot(plotNum, deleteData = null){
 		
 		update_PLOT_DATA(plotData);
 
-		console.log(plotNum, value, "plotData", PLOT_DATA);
+		//console.log(plotNum, value, "plotData", PLOT_DATA);
 
 		// Delete the canvas and add it back later so it doesn't bug
 		$("#plotCanvas" + plotNum).remove();
@@ -282,12 +311,15 @@ function selectPlot(plotNum, deleteData = null){
 
 
 			// If there is a plot display the buttons
-			$("#plotDIV" + plotNum).show(300);
+			$("#plotDIV" + plotNum).slideDown(300);
 
 
 			if (plotNum == 4) {
-				showSitewisePlot(true);
 				$("#plot4Buttons").show(true);
+				showSitewisePlot(true);
+
+			
+
 			}
 			else{
 				showPlots(true);
@@ -301,14 +333,16 @@ function selectPlot(plotNum, deleteData = null){
 		}else{
 
 			// If no plot then hide the buttons
-			if (plotNum == 4) $("#plot4Buttons").hide(true);
+			if (plotNum == 4) {
+				showSitewisePlot(false);
+				$("#plot4Buttons").hide(true);
+			}
 			else{
 				$("#downloadPlot" + plotNum).hide(true);
 				$("#plotOptions" + plotNum).hide(true);
 				$("#helpPlot" + plotNum).hide(true);
-				$("#plotDIV" + plotNum).hide(true);
-
 			}
+			$("#plotDIV" + plotNum).slideUp(100);
 
 		}
 	
@@ -708,7 +742,7 @@ function plotTimeChart(){
 		var ymax = 0;
 		var ymin = 0;
 		if (index >=0 && PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["yRange"] == "automaticY"){
-
+			
 			//console.log("Looking for index", index, "DISTANCE_VS_TIME_CONTROLLER", DISTANCE_VS_TIME_CONTROLLER);
 			ymin = 0;
 
@@ -721,8 +755,6 @@ function plotTimeChart(){
 
 			ymax = roundToSF(ymax, 2, "ceil");
 			if (ymin == ymax) ymax++;
-
-
 
 
 		}else{
@@ -827,21 +859,6 @@ function download_distanceVsTimeTSV(){
 	download("distance_vs_time.tsv", tsv);
 
 }
-
-
-
-// Remove periodic datapoints so that the total list does not go beyond a certain length
-// This is to make displaying the data more efficient
-function pruneStepPlotData(xvals, yvals){
-	
-	
-	
-	//var timeUnitsPerPixel = 
-	
-	
-	
-}
-
 
 
 
@@ -2319,7 +2336,101 @@ function add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLab
 
 // Create a graph above the simulation where each x value is a base and each y value is pause duration
 function plot_time_vs_site(){
+
+	//console.log("plot_time_vs_site", PLOT_DATA["pauseTimePerSite"]);
+
+	if (PLOT_DATA["pauseTimePerSite"] == null) return;
+
+
+	// Find the canvas to print onto
+	var canvasesToPrintTo = [];
+	for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
+		if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "pauseSite") canvasesToPrintTo.push(plt);
+	}
 	
+	if (canvasesToPrintTo.length == 0) return;
+	
+	for (var canvasNum = 0; canvasNum < canvasesToPrintTo.length; canvasNum ++){
+		
+
+
+		var pauseSum = PLOT_DATA["pauseTimePerSite"].reduce(function(a, b) { return a + b; }, 0);
+		//basesToDisplayTimes100 = 1;
+
+
+		// Create label function. Depends on what y-axis the user wants to see
+		var ymin = 1000000;
+		var labelFn = function(site, val){
+
+			var preString = PLOT_DATA["whichPlotInWhichCanvas"][4].pauseSiteYVariable == "catalysisTimes" ? "time to catalysis" : "time";
+			switch (PLOT_DATA["whichPlotInWhichCanvas"][4]["yAxis"]){
+				case "timePercentage":
+					if (val <= 0) return "";
+					return "Total " + preString + " at " + site + ": " + roundToSF(val / pauseSum * 100) + "%";
+				case "timeSeconds":
+					if (val <= 0) return "";
+					return "Mean " + preString + " at " + site + ": " + roundToSF(val / PLOT_DATA["npauseSimulations"]) + "s";
+				case "logTimeSeconds":
+					if (val <= ymin) return "";
+					//console.log("Log time", pauseSum, "normal time", 
+					return "Mean " + preString + " at " + site + ": " + roundToSF(Math.exp(val) / PLOT_DATA["npauseSimulations"]) + "s";
+			}
+		
+		}
+	
+
+		var valuesToPlot = [];
+		if (PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["yAxis"] == "logTimeSeconds"){
+
+			// Find the minimum value
+			ymin = 1000000;
+			for (var i = 0; i < PLOT_DATA["pauseTimePerSite"].length; i ++){
+				if (PLOT_DATA["pauseTimePerSite"][i] > 0) ymin = Math.min(Math.log(PLOT_DATA["pauseTimePerSite"][i]), ymin);
+			}
+
+			// Set all values to either their log value or ymin if the time is zero
+			for (var i = 0; i < PLOT_DATA["pauseTimePerSite"].length; i ++){
+				if (PLOT_DATA["pauseTimePerSite"][i] > 0) valuesToPlot.push(Math.log(PLOT_DATA["pauseTimePerSite"][i]));
+				else valuesToPlot.push(ymin);
+			}
+		}else valuesToPlot = PLOT_DATA["pauseTimePerSite"];
+
+		var ylab = PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["yAxis"] == "timePercentage" ? "Time (%)" : PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["yAxis"] == "timeSeconds" ? "Time (s)" : "log time(s)";
+
+	
+		//var pauseTimes = [0, 0.001, 0.01, 0.5, 10, 0.2, 3, 0.001, 0.01, 0.5, 10, 0.2, 3, 0.001, 0.01, 0.5, 10, 0.2, 3, 10, 0];
+		if ($("#plotDIV" + canvasesToPrintTo[canvasNum]).is( ":hidden" )) return;
+			sitewise_plot("plotCanvas" + canvasesToPrintTo[canvasNum], "plotCanvasContainer" + canvasesToPrintTo[canvasNum], "plotDIV" + canvasesToPrintTo[canvasNum], valuesToPlot, ylab, labelFn, PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["canvasSizeMultiplier"]);
+
+		
+	}
+	
+
+	
+}
+
+
+// Download the previous plot data as .tsv
+function download_pauseSiteTSV(){
+
+	var tsv = "Site\tAveragePauseTime(s)\tDateTime "  + getFormattedDateAndTime() + "\n";
+	for (var i = 0; i < PLOT_DATA["pauseTimePerSite"].length; i ++){
+		tsv += (i+1) + "\t" + PLOT_DATA["pauseTimePerSite"][i] + "\n";
+	}
+
+	download("pause_times.tsv", tsv);
+
+
+}
+
+
+
+// Create a graph above the simulation where each x value is a base and each y value is pause duration
+function plot_catalysis_time_vs_site(){
+
+	console.log("plot_time_vs_site");
+
+	if (PLOT_DATA["pauseTimePerSite"] == null) return;
 
 
 	// Find the canvas to print onto
@@ -2381,89 +2492,12 @@ function plot_time_vs_site(){
 		//var pauseTimes = [0, 0.001, 0.01, 0.5, 10, 0.2, 3, 0.001, 0.01, 0.5, 10, 0.2, 3, 0.001, 0.01, 0.5, 10, 0.2, 3, 10, 0];
 		if ($("#plotDIV" + canvasesToPrintTo[canvasNum]).is( ":hidden" )) return;
 			sitewise_plot("plotCanvas" + canvasesToPrintTo[canvasNum], "plotCanvasContainer" + canvasesToPrintTo[canvasNum], "plotDIV" + canvasesToPrintTo[canvasNum], valuesToPlot, ylab, labelFn, PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["canvasSizeMultiplier"]);
-
 		
 	}
 	
-
 	
 }
 
-// Download the previous plot data as .tsv
-function download_pauseSiteTSV(){
-
-	var tsv = "Site\tAveragePauseTime(s)\tDateTime "  + getFormattedDateAndTime() + "\n";
-	for (var i = 0; i < PLOT_DATA["pauseTimePerSite"].length; i ++){
-		tsv += (i+1) + "\t" + PLOT_DATA["pauseTimePerSite"][i] + "\n";
-	}
-
-	download("pause_times.tsv", tsv);
-
-
-}
-
-
-
-
-
-
-
-function plot_abortion_vs_site(){
-
-
-
-	// Find the canvas to print onto
-	var canvasesToPrintTo = [];
-	for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
-		if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "abortionSite") canvasesToPrintTo.push(plt);
-	}
-	
-	if (canvasesToPrintTo.length == 0) return;
-	
-	for (var canvasNum = 0; canvasNum < canvasesToPrintTo.length; canvasNum ++){
-
-		console.log("CanvasNum", canvasesToPrintTo[canvasNum]);
-
-		if (PLOT_DATA["abortionCounts"] == null) continue;
-		//basesToDisplayTimes100 = 1;
-	
-
-
-		var abortionProbs = new Array(PLOT_DATA["abortionCounts"].length);
-		for (var i = 0; i < abortionProbs.length; i ++) abortionProbs[i] = PLOT_DATA["abortionCounts"][i] / PLOT_DATA["nabortionSimulations"];
-
-
-
-
-		// Create label function
-		var labelFn = function(site, val){
-			return "Arrest probability at " + site + ": " + roundToSF(val);
-		}
-	
-		console.log("Plotting", canvasesToPrintTo[canvasNum]);
-
-		sitewise_plot("plotCanvas" + canvasesToPrintTo[canvasNum], "plotCanvasContainer" + canvasesToPrintTo[canvasNum], "plotDIV" + canvasesToPrintTo[canvasNum], abortionProbs, "P(Arrest)", labelFn, PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["canvasSizeMultiplier"]);
-
-
-	}
-
-}
-
-
-function download_abortionSiteTSV(){
-
-	var tsv = "Site\tProbabilityArrest\tDateTime "  + getFormattedDateAndTime() + "\n";
-	var abortionProbs = new Array(PLOT_DATA["abortionCounts"].length);
-	for (var i = 0; i < abortionProbs.length; i ++) abortionProbs[i] = PLOT_DATA["abortionCounts"][i] / PLOT_DATA["nabortionSimulations"];
-
-	for (var i = 0; i < abortionProbs.length; i ++){
-		tsv += (i+1) + "\t" + abortionProbs[i] + "\n";
-	}
-
-	download("arrest_probabilities.tsv", tsv);
-
-
-}
 
 
 
@@ -2512,8 +2546,9 @@ function sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab = "
 
 
 		// Disable the plus button if we cannot increase from here
-		var max = Math.ceil(PLOT_DATA["nbases"] / 100);
-		if (PLOT_DATA["nbases"] % 100 <= 20) max--;
+		console.log("nbases", PLOT_DATA["nbases"]);
+		var max = Math.ceil(parseFloat(PLOT_DATA["nbases"]) / 100);
+		//if (PLOT_DATA["nbases"] % 100 <= 20) max--;
 		if (basesToDisplayTimes100 == max){
 			$("#plus100Sites").addClass("dropdown-disabled");
 			$("#plus100Sites").prop("disabled", true);
@@ -3146,6 +3181,9 @@ function plot_parameter_heatmap(plotNumCustom = null){
 		var yvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["vals"];
 		var zvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"] == null ? null : PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["vals"];
 
+		//console.log("xLab", xLab, "ylab", yLab, PLOT_DATA["whichPlotInWhichCanvas"]);
+
+
 
 		// If y is probability make a histogram 
 		if (xvals != null && PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParamY"] == "probability"){
@@ -3568,7 +3606,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	var xlabYPos = canvas.height - axisGap / 3 - 7*canvasSizeMultiplier;
 	ctx.fillStyle = "black";
 	//ctx.fillText(xlab, xlabXPos, xlabYPos);
-	writeLatexLabelOnCanvas(ctx, xlab, xlabXPos, xlabYPos, 20 * canvasSizeMultiplier);
+	writeLatexLabelOnCanvas(ctx, xlab, xlabXPos, xlabYPos, 24 * canvasSizeMultiplier);
 
 	
 	// Y label
@@ -3580,7 +3618,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	ctx.rotate(-Math.PI/2);
 	ctx.fillStyle = "black";
 	//ctx.fillText(ylab, 0 ,0);
-	writeLatexLabelOnCanvas(ctx, ylab, 0, 0, 20 * canvasSizeMultiplier);
+	writeLatexLabelOnCanvas(ctx, ylab, 0, 0, 24 * canvasSizeMultiplier);
 	ctx.restore();
 
 
@@ -3595,7 +3633,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 		ctx.translate(zlabXPos, zlabYPos);
 		ctx.rotate(-Math.PI/2);
 		ctx.fillStyle = "black";
-		writeLatexLabelOnCanvas(ctx, zlab, 0, 0, 14 * canvasSizeMultiplier);
+		writeLatexLabelOnCanvas(ctx, zlab, 0, 0, 16 * canvasSizeMultiplier);
 		//ctx.fillText(zlab, 0 ,0);
 		ctx.restore();
 
@@ -3782,11 +3820,13 @@ function showSitewisePlot(setTo = null){
 
 		$("#showSitewisePlot").val("+");
 		$("#plotDIV4").slideUp(100);
+		showSitewisePlot_controller(true); // Inform the model that the sitewise plots is hidden so that it stops sending through data
 
 	}else{	// Show the sitewise plot
 
 		$("#showSitewisePlot").val("-");
 		$("#plotDIV4").slideDown(100);
+		showSitewisePlot_controller(false);
 
 		drawPlots();
 	}
@@ -3947,9 +3987,6 @@ function downloadPlotInFormat(){
 		}
 		else if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] == "pauseSite") {	
 			download_pauseSiteTSV();
-		}
-		else if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] == "abortionSite") {	
-			download_abortionSiteTSV();
 		}
 		else if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] == "misincorporationSite") {	
 			download_misincorporationSiteTSV();
@@ -4270,8 +4307,9 @@ function plot_probability_distribution(distn_fn, xmin, xmax, canvasID, xlab = ""
 	ctx.textAlign="center"; 
 	ctx.textBaseline="top"; 
 	var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
-	var xlabYPos = canvas.height - 0.5*axisGap;
-	ctx.fillText(xlab, xlabXPos, xlabYPos);
+	var xlabYPos = canvas.height - 0.65*axisGap;
+	//ctx.fillText(xlab, xlabXPos, xlabYPos);
+	writeLatexLabelOnCanvas(ctx, xlab, xlabXPos, xlabYPos, 20);
 	
 	// Y label
 	ctx.font = "14px Arial";
@@ -4360,7 +4398,7 @@ function getPlotOptionsTemplate(){
 
 
 	return `
-		<div id='settingsPopup' style='background-color:008cba; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:20vh; z-index:5' plotNum="XX_plotNum_XX">
+		<div id='settingsPopup' style='background-color:008cba; padding: 10 10; position:fixed; width: 36vw; left:32vw; top:10vh; z-index:5' plotNum="XX_plotNum_XX">
 			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> XX_plotName_XX settings </span>
 				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closePlotSettingsPopup()'>&times;</span>
@@ -4408,8 +4446,11 @@ function getPlotOptionsTemplate(){
 					</tr>
 					
 				</table>
-				
-				<input type=button id='submitDistn' class="operation" onClick=saveSettings_controller() value='Save' title="Submit your changes" style="width:60px; float:right"></input>
+
+				<span style="float:right">
+					<input type=button id='deleteDistn' class="operation" onClick="deletePlots_controller(false, false, false, true, false, false, function() { saveSettings_controller(); });" value='Delete Data and Save' title="You must delete all parameter plot data before you save these settings (because you added a site-specific time recording)" style="width:220px; display:none"></input>
+					<input type=button id='submitDistn' class="operation" onClick="saveSettings_controller()" value='Save' title="Submit your changes" style="width:60px;"></input>
+				</span>
 			</div>
 		</div>
 	`;
@@ -4633,10 +4674,22 @@ function workerNumberTemplate(){
 
 
 
+function pauseSiteYVariableTemplate(){
+
+	return `
+		<legend><b>Variable (y-axis)</b></legend>
+		<label style="cursor:pointer"> <input type="radio" name="pauseSiteYVariable" value="catalysisTimes">Time to catalysis<br> </label>
+		<label style="cursor:pointer"> <input type="radio" name="pauseSiteYVariable" value="dwellTimes">Time spent at site<br> </label>
+	`;
+
+}
+
+
+
 function pauseSiteOptionsTemplate(){
 
 	return `
-		<legend><b>Y-axis</b></legend>
+		<legend><b>Units</b></legend>
 		<label style="cursor:pointer"> <input type="radio" name="Yaxis" value="timePercentage">Time (%)<br> </label>
 		<label style="cursor:pointer"> <input type="radio" name="Yaxis" value="timeSeconds">Time (s)<br> </label>
 		<label style="cursor:pointer"> <input type="radio" name="Yaxis" value="logTimeSeconds">log time(s)<br> </label>
@@ -4645,13 +4698,21 @@ function pauseSiteOptionsTemplate(){
 }
 
 
-function customPlotSiteConstraintTemplate(){
+
+
+
+
+
+function parameterPlotSiteSpecificTemplate(varID){
 
 	return `
-		<legend><b>Constrain to the following sites</b></legend>
-		<label style="cursor:pointer"> <input type="radio" name="sitesToRecord" onclick="disableTextbox('#sitesToRecord_textbox')" value="allSites">All sites<br> </label>
-		<label style="cursor:pointer"> <input type="radio" name="sitesToRecord" onclick="enableTextbox('#sitesToRecord_textbox')"  value="specifySites">Just these ones: </label>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" class="textboxBlue" placeholder="eg. 1,2,5-10" style="width:250px" id="sitesToRecord_textbox">
+		<div id="sitesToRecord_div` + varID + `" style="width:100%; display:none">
+			<br>
+			<legend>Constrain to the following sites:</legend>
+			<label style="cursor:pointer"> <input type="radio" name="sitesToRecord` + varID + `" onChange="updateParameterPlotSettings()" onclick="disableTextbox('#sitesToRecord_textbox` + varID + `')" value="allSites">All sites<br> </label>
+			<label style="cursor:pointer"  title="Enabling this will mean that only the specified template positions will be displayed in the plot. You may need to run the simulations again to acquire this data."> <input onChange="updateParameterPlotSettings()" type="radio" name="sitesToRecord` + varID + `" onclick="enableTextbox('#sitesToRecord_textbox` + varID + `')"  value="specifySites">Just these ones: 
+				&nbsp;&nbsp;<input onfocusout="updateParameterPlotSettings()" onclick="updateParameterPlotSettings(true);" type="text" placeholder="eg. 10,13,20-30" style="width:150px; padding: 5 5" id="sitesToRecord_textbox` + varID + `"> </label>
+		</div>
 	`;
 
 
@@ -4663,14 +4724,27 @@ function customPlotSelectParameterTemplate(){
 	return `
 		<legend><b>Variable (x-axis)</b></legend>
 		<select class="dropdown" onChange="updateParameterPlotSettings()" title="What do you want to show on the x-axis?" id = "customParamX" style="vertical-align: middle; text-align:right;">
-			<option value="none">Select a parameter...</option>
-			<option value="velocity">Mean velocity (bp/s)</option>
-			<option value="catalyTime">Mean catalysis time (s)</option>
-			<option value="totalTime">Mean transcription time (s)</option>
-			<option value="nascentLen">Nascent strand length (nt)</option>
-			<option value="logLikelihood">Chi-squared test statistic</option>
+			<option value="none">Select a variable...</option>
+			
+			<optgroup label="Measurements">
+				<option value="velocity" style="color:white">Mean velocity (bp/s)</option>
+				<option value="catalyTime" style="color:white">Mean catalysis time (s)</option>
+				<option value="totalTime" style="color:white">Mean transcription time (s)</option>
+				<option value="nascentLen" style="color:white">Nascent strand length (nt)</option>
+				<option value="logLikelihood" style="color:white">Chi-squared test statistic</option>
+			</optgroup>
+			
+			<optgroup label="Parameters" id="customParamX_params">
+			
+			</optgroup>
+			
+			
 		</select><br>
 		Calculated per trial.
+
+
+		` + parameterPlotSiteSpecificTemplate("X") + `
+
 	`;
 	
 }
@@ -4682,13 +4756,26 @@ function customPlotSelectPropertyTemplate(){
 		<legend><b>Variable (y-axis)</b></legend>
 		<select class="dropdown" onChange="updateParameterPlotSettings()" title="What do you want to show on the y-axis?" id = "customParamY" style="vertical-align: middle; text-align:right;">
 			<option value="probability">Probability</option>
-			<option value="velocity">Mean velocity (bp/s)</option>
-			<option value="catalyTime">Mean catalysis time (s)</option>
-			<option value="totalTime">Total transcription time (s)</option>
-			<option value="nascentLen">Nascent strand length (nt)</option>
-			<option value="logLikelihood">Chi-squared test statistic</option>
+
+			
+			<optgroup label="Measurements">
+				<option value="velocity" style="color:white">Mean velocity (bp/s)</option>
+				<option value="catalyTime" style="color:white">Mean catalysis time (s)</option>
+				<option value="totalTime" style="color:white">Mean transcription time (s)</option>
+				<option value="nascentLen" style="color:white">Nascent strand length (nt)</option>
+				<option value="logLikelihood" style="color:white">Chi-squared test statistic</option>
+			</optgroup>
+			
+			<optgroup label="Parameters" id="customParamY_params">
+			
+			</optgroup>
+			
+			
 		</select><br>
 		Calculated per trial.
+
+		` + parameterPlotSiteSpecificTemplate("Y") + `
+
 	`;
 	
 }
@@ -4699,14 +4786,24 @@ function parameterHeatmapZAxisTemplate(){
 	return `
 		<legend><b>Variable (z-axis)</b></legend>
 		<select class="dropdown" onChange="updateParameterPlotSettings()" title="What do you want to show on the z-axis?" id = "customParamZ" style="vertical-align: middle; text-align:right;">
-			<option value="none">Select a parameter...</option>
-			<option value="velocity">Mean velocity (bp/s)</option>
-			<option value="catalyTime">Mean catalysis time (s)</option>
-			<option value="totalTime">Mean transcription time (s)</option>
-			<option value="nascentLen">Nascent strand length (nt)</option>
-			<option value="logLikelihood">Chi-squared test statistic</option>
+			<option value="none">Select a variable...</option>
+
+			<optgroup label="Measurements">
+				<option value="velocity" style="color:white">Mean velocity (bp/s)</option>
+				<option value="catalyTime" style="color:white">Mean catalysis time (s)</option>
+				<option value="totalTime" style="color:white">Mean transcription time (s)</option>
+				<option value="nascentLen" style="color:white">Nascent strand length (nt)</option>
+				<option value="logLikelihood" style="color:white">Chi-squared test statistic</option>
+			</optgroup>
+			
+			<optgroup label="Parameters" id="customParamZ_params">
+			
+			</optgroup>
+			
 		</select><br>
 		Calculated per trial.
+
+		` + parameterPlotSiteSpecificTemplate("Z") + `
 	`;
 
 
@@ -4759,7 +4856,7 @@ function plus100Sites(){
 
 
 	var max = Math.ceil(PLOT_DATA["nbases"] / 100);
-	if (PLOT_DATA["nbases"] % 100 <= 20) max--;
+	//if (PLOT_DATA["nbases"] % 100 <= 20) max--;
 	if (basesToDisplayTimes100 == max) return;
 	basesToDisplayTimes100++;
 	eval(PLOT_DATA["whichPlotInWhichCanvas"][4]["plotFunction"])(); // Draw the plot again
@@ -4768,7 +4865,7 @@ function plus100Sites(){
 
 
 
-function updateParameterPlotSettings(){
+function updateParameterPlotSettings(forceDeleteDistnToShow = false){
 
 
 	// Only show the y-axis selection box when the x-axis variable has been selected 
@@ -4807,6 +4904,39 @@ function updateParameterPlotSettings(){
 		$("#settingCell7").hide(0);
 	}
 
+
+
+
+	// Show the sites to record textbox if transcription time or catalysis time have been selected
+	if ($("#customParamX").val() == "catalyTime") $("#sitesToRecord_divX").show(300);
+	else $("#sitesToRecord_divX").hide(0);
+
+	if ($("#customParamY").val() == "catalyTime") $("#sitesToRecord_divY").show(300);
+	else $("#sitesToRecord_divY").hide(0);
+
+	if ($("#customParamZ").val() == "catalyTime") $("#sitesToRecord_divZ").show(300);
+	else $("#sitesToRecord_divZ").hide(0);
+
+
+	// Grey out the submit button and show the delete button if the sites to record are new / different
+
+	var xSiteRecordingUnchanged = ($("#sitesToRecord_textboxX").attr("oldvals") == null && $('input[name="sitesToRecordX"][value="allSites"]').prop("checked"))
+								|| ($('input[name="sitesToRecordX"][value="specifySites"]').prop("checked") && $("#sitesToRecord_textboxX").val() == $("#sitesToRecord_textboxX").attr("oldvals"));
+	
+	var ySiteRecordingUnchanged = ($("#sitesToRecord_textboxY").attr("oldvals") == null && $('input[name="sitesToRecordY"][value="allSites"]').prop("checked"))
+								|| ($('input[name="sitesToRecordY"][value="specifySites"]').prop("checked") && $("#sitesToRecord_textboxY").val() == $("#sitesToRecord_textboxY").attr("oldvals"));
+
+	var zSiteRecordingUnchanged = ($("#sitesToRecord_textboxZ").attr("oldvals") == null && $('input[name="sitesToRecordZ"][value="allSites"]').prop("checked"))
+								|| ($('input[name="sitesToRecordZ"][value="specifySites"]').prop("checked") && $("#sitesToRecord_textboxZ").val() == $("#sitesToRecord_textboxZ").attr("oldvals"));
+	
+	if (forceDeleteDistnToShow || !xSiteRecordingUnchanged || !ySiteRecordingUnchanged || !zSiteRecordingUnchanged){// || ySiteRecordingHasChanged || zSiteRecordingHasChanged){
+		$("#deleteDistn").show(300);
+		$("#submitDistn").hide(300);
+	}else{
+		$("#deleteDistn").hide(300);
+		$("#submitDistn").show(300);
+	}
+	
 
 }
 
@@ -4925,8 +5055,10 @@ function plotOptions(plotNum){
 		case "pauseSite":
 
 			
-			$("#settingCell1").html(pauseSiteOptionsTemplate());
+			$("#settingCell1").html(pauseSiteYVariableTemplate());
+			$("#settingCell2").html(pauseSiteOptionsTemplate());
 
+			$('input[name="pauseSiteYVariable"][value="' + PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["pauseSiteYVariable"] + '"]').prop('checked', true)
 			$('input[name="Yaxis"][value="' + PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yAxis"] + '"]').prop('checked', true)
 			break;
 
@@ -4944,71 +5076,100 @@ function plotOptions(plotNum){
 				console.log("params",params, params.length);
 				for (var paramID in params){
 					if (!params[paramID]["hidden"] && !params[paramID]["binary"] && params[paramID].name != null) {
-						$("#customParamX").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
-						$("#customParamY").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
-						$("#customParamZ").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
+						$("#customParamX_params").append(`<option value="` + paramID + `" style="color:white"> ` + params[paramID]["name"] + `</option>`);
+						$("#customParamY_params").append(`<option value="` + paramID + `" style="color:white"> ` + params[paramID]["name"] + `</option>`);
+						$("#customParamZ_params").append(`<option value="` + paramID + `" style="color:white"> ` + params[paramID]["name"] + `</option>`);
 					}
 				}
 
 				$("#customParamX").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamX"]);
 				$("#customParamY").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamY"]);
 				$("#customParamZ").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["metricZ"]);
-				updateParameterPlotSettings();
+				//updateParameterPlotSettings();
+
+
+				// Z-axis
+				$("#settingCell6").html(distanceVsTimeOptionsTemplate3().replace("ZMINDEFAULT", 0).replace("ZMAXDEFAULT", 1));
+
+
+				// Z axis colouring
+				$("#settingCell7").html(heatmapZAxisLegend());
+				$("#zColouring").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zColouring"]);
+
+
+				// Y-axis attribute
+				$("#settingCell2").html(distanceVsTimeOptionsTemplate1().replace("Time range", "X-axis range").replace("XUNITS", "").replace("XUNITS", ""));
+				$("#settingCell4").html(distanceVsTimeOptionsTemplate2().replace("Distance range", "Y-axis range").replace("YUNITS", "").replace("YUNITS", "").replace("YMINDEFAULT", 0).replace("YMAXDEFAULT", 1));
+				$("#pauseXRow").remove();
+				$("#shortPauseXRow").remove();
+
+
+				// Set xmax and xmin
+				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"] == "automaticX") $('input[name="xRange"][value="automaticX"]').click()
+				else {
+					$('input[name="xRange"][value="specifyX"]').click()
+					$("#xMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][0]);
+					$("#xMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][1]);
+				}
+
+
+				// Set ymax and ymin
+				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"] == "automaticY") $('input[name="yRange"][value="automaticY"]').click()
+				else {
+					$('input[name="yRange"][value="specifyY"]').click()
+					$("#yMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][0]);
+					$("#yMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][1]);
+				}
+
+
+
+				// Set zmax and zmin
+				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"] == "automaticZ") $('input[name="zRange"][value="automaticZ"]').click()
+				else {
+					$('input[name="zRange"][value="specifyZ"]').click()
+					$("#zMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][0]);
+					$("#zMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][1]);
+				}
+
+
+
+				$("#settingCell8").html(getPosteriorCheckboxTemplate());
+				//if (!PLOT_DATA["thereExistsPosteriorDistribution"]) {
+				//	$("#plotFromPosterior").css("cursor", "auto");
+					//$("#plotFromPosterior").attr("disabled", "disabled");
+				//}
+				$("#plotFromPosterior").prop("checked", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFromPosterior"]);
+
+
+
+				// Site specific constraints. Set the html attr 'oldvals' to what it was when the settings dialog loaded
+				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordX"] == "allSites") $('input[name="sitesToRecordX"][value="allSites"]').click();
+				else {
+					$('input[name="sitesToRecordX"][value="specifySites"]').click();
+					var recordingString = convertListToCommaString(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordX"])
+					$("#sitesToRecord_textboxX").val(recordingString);
+					$("#sitesToRecord_textboxX").attr("oldvals", recordingString);
+				}
+
+				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordY"] == "allSites") $('input[name="sitesToRecordY"][value="allSites"]').click();
+				else {
+					$('input[name="sitesToRecordY"][value="specifySites"]').click();
+					var recordingString = convertListToCommaString(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordY"])
+					$("#sitesToRecord_textboxY").val(recordingString);
+					$("#sitesToRecord_textboxY").attr("oldvals", recordingString);
+				}
+
+				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordZ"] == "allSites") $('input[name="sitesToRecordZ"][value="allSites"]').click();
+				else {
+					$('input[name="sitesToRecordZ"][value="specifySites"]').click();
+					var recordingString = convertListToCommaString(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordZ"])
+					$("#sitesToRecord_textboxZ").val(recordingString);
+					$("#sitesToRecord_textboxZ").attr("oldvals", recordingString);
+				}
+
 
 			});
 
-
-			// Z-axis
-			$("#settingCell6").html(distanceVsTimeOptionsTemplate3().replace("ZMINDEFAULT", 0).replace("ZMAXDEFAULT", 1));
-
-
-			// Z axis colouring
-			$("#settingCell7").html(heatmapZAxisLegend());
-			$("#zColouring").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zColouring"]);
-
-
-			// Y-axis attribute
-			$("#settingCell2").html(distanceVsTimeOptionsTemplate1().replace("Time range", "X-axis range").replace("XUNITS", "").replace("XUNITS", ""));
-			$("#settingCell4").html(distanceVsTimeOptionsTemplate2().replace("Distance range", "Y-axis range").replace("YUNITS", "").replace("YUNITS", "").replace("YMINDEFAULT", 0).replace("YMAXDEFAULT", 1));
-			$("#pauseXRow").remove();
-			$("#shortPauseXRow").remove();
-
-
-			// Set xmax and xmin
-			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"] == "automaticX") $('input[name="xRange"][value="automaticX"]').click()
-			else {
-				$('input[name="xRange"][value="specifyX"]').click()
-				$("#xMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][0]);
-				$("#xMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][1]);
-			}
-
-
-			// Set ymax and ymin
-			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"] == "automaticY") $('input[name="yRange"][value="automaticY"]').click()
-			else {
-				$('input[name="yRange"][value="specifyY"]').click()
-				$("#yMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][0]);
-				$("#yMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][1]);
-			}
-
-
-
-			// Set zmax and zmin
-			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"] == "automaticZ") $('input[name="zRange"][value="automaticZ"]').click()
-			else {
-				$('input[name="zRange"][value="specifyZ"]').click()
-				$("#zMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][0]);
-				$("#zMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][1]);
-			}
-
-
-
-			$("#settingCell8").html(getPosteriorCheckboxTemplate());
-			//if (!PLOT_DATA["thereExistsPosteriorDistribution"]) {
-			//	$("#plotFromPosterior").css("cursor", "auto");
-				//$("#plotFromPosterior").attr("disabled", "disabled");
-			//}
-			$("#plotFromPosterior").prop("checked", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFromPosterior"]);
 
 			break;
 			
@@ -5109,7 +5270,8 @@ function perTemplateDeselected(){
 // Output: string: "1,2,5-10"
 function convertListToCommaString(list){
 
-	console.log("Pasring list", list);
+	if (typeof list === "string") list = list = JSON.parse("[" + list + "]");
+	//console.log("Parsing list", list);
 	var string = "";
 	for (var i = 0; i < list.length; i ++){
 		var thisNum = list[i];
