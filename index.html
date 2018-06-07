@@ -42,8 +42,7 @@
 <script language='JavaScript' type="text/javascript" src="src/Resources/hammer.js"></script>
 
 
-<!--<script language='JavaScript' type='text/JavaScript' src='src/Resources/d3.v4.min.js'></script> -->
-<script src="https://d3js.org/d3.v5.min.js"></script>
+<script language='JavaScript' type='text/JavaScript' src='src/Resources/d3.v4.min.js'></script> 
 <!--<script language='JavaScript' type='text/JavaScript' src='http://d3js.org/d3.v4.min.js'></script> -->
 <!-- <script language='JavaScript' type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.bundle.min.js"></script> -->
 <script language='JavaScript' type="text/javascript" src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.js"></script>
@@ -205,8 +204,6 @@ function init(){
 							}
 							
 						};
-
-
 						loadSessionFromURL(sessionFileLocation, toDoAfterLoadSession);
 					}
 
@@ -395,55 +392,55 @@ function submitCustomSequence(resolveAfterRefresh = function() { }){
 	if (newSeq == "") return;
 
 
-	stop_controller(function() {
+	stop_controller();
 
 
-		var templateType = $("#SelectTemplateType").val();
-		var primerType = $("#SelectPrimerType").val();
-		var inputSequenceIsNascent = $('input[name="inputSeqType"][value="inputNascentSeq"]').prop("checked");
+	var templateType = $("#SelectTemplateType").val();
+	var primerType = $("#SelectPrimerType").val();
+	var inputSequenceIsNascent = $('input[name="inputSeqType"][value="inputNascentSeq"]').prop("checked");
 
 
-		var toCall = (newSequenceID, newTemplateType, newPrimerType) => new Promise((resolve) => userInputSequence_controller(newSequenceID, newTemplateType, primerType, inputSequenceIsNascent, resolve));
-		toCall(newSeq, templateType, primerType, inputSequenceIsNascent).then((result) => {
+	var toCall = (newSequenceID, newTemplateType, newPrimerType) => new Promise((resolve) => userInputSequence_controller(newSequenceID, newTemplateType, primerType, inputSequenceIsNascent, resolve));
+	toCall(newSeq, templateType, primerType, inputSequenceIsNascent).then((result) => {
+	
+		if (!result.succ) return;
 
-			if (!result.succ) return;
+		var refr = () => new Promise((resolve) => refresh(resolve));
+		var sequenceChangeRefreshTemp = function(){
+			sequenceChangeRefresh();
+			refreshPlotDataSequenceChangeOnly_controller(function(){
 
-			var refr = () => new Promise((resolve) => refresh(resolve));
-			var sequenceChangeRefreshTemp = function(){
-				sequenceChangeRefresh();
-				refreshPlotDataSequenceChangeOnly_controller(function(){
+				$("#translocationSummaryContainer").hide(100);
+				$("#ABCoutput").html("");
+				$("#downloadABC").hide(50);
+				$("#uploadABC").show(50);
+				$("#ABCacceptancePercentage_span").hide(50);
+				$("#ABC_showRejectedParameters_span").hide(50);
+				$("#nRowsToDisplayABC").hide(50);
+				$("#ABCacceptance_span").hide(50);
+				resolveAfterRefresh();
+				drawPlots(true);
 
-					$("#translocationSummaryContainer").hide(100);
-					$("#ABCoutput").html("");
-					$("#downloadABC").hide(50);
-					$("#uploadABC").show(50);
-					$("#ABCacceptancePercentage_span").hide(50);
-					$("#ABC_showRejectedParameters_span").hide(50);
-					$("#nRowsToDisplayABC").hide(50);
-					$("#ABCacceptance_span").hide(50);
-					resolveAfterRefresh();
-					drawPlots(true);
-					
-				});
-
-
-			};
-			refr().then(() => sequenceChangeRefreshTemp());
-			
-			
-			refreshNTP();
-			clearSequences();
-			
-			if (document.getElementById("SelectPrimerType").value.substring(2) == "RNA") $("#ntpT").val("U");
-			else $("#ntpT").val("T");
+				
+			});
 
 
+		};
+		refr().then(() => sequenceChangeRefreshTemp());
+		
+		
+		refreshNTP();
+		clearSequences();
+		barchart(true);
+		
+		if (document.getElementById("SelectPrimerType").value.substring(2) == "RNA") $("#ntpT").val("U");
+		else $("#ntpT").val("T");
 
-			if ($("#SelectPrimerType").val().substring(2) == "DNA") $("#mRNAFoldingBg").hide(true);
-			else $("#mRNAFoldingBg").show(true);
 
 
-		});
+		if ($("#SelectPrimerType").val().substring(2) == "DNA") $("#mRNAFoldingBg").hide(true);
+		else $("#mRNAFoldingBg").show(true);
+
 
 	});
 
@@ -461,13 +458,13 @@ function userChangeSequence(resolveAfterRefresh = function() { }){
 		$("#SelectPrimerType").removeClass("dropdown-disabled");
 		
 		refreshNTP();
-		//barchart(true);
+		barchart(true);
 
 
 
 	}else{
-		
-		
+
+
 		console.log("Changing sequence");
 		$("#userChangeSequence").hide(300);
 
@@ -482,9 +479,8 @@ function userChangeSequence(resolveAfterRefresh = function() { }){
 
 			var refr = () => new Promise((resolve) => refresh(resolve));
 			var sequenceChangeRefreshTemp = function(){
-				
+				sequenceChangeRefresh();
 				refreshPlotDataSequenceChangeOnly_controller(function(){
-					sequenceChangeRefresh();
 					$("#translocationSummaryContainer").hide(100);
 					$("#ABCoutput").html("");
 					$("#downloadABC").hide(50);
@@ -501,7 +497,7 @@ function userChangeSequence(resolveAfterRefresh = function() { }){
 
 			refreshNTP();
 			clearSequences();
-			//barchart(true);
+			barchart(true);
 			
 			if (document.getElementById("SelectPrimerType").value.substring(2) == "RNA") $("#ntpT").val("U");
 			else $("#ntpT").val("T");
@@ -526,7 +522,7 @@ function userChangeSequence(resolveAfterRefresh = function() { }){
 
 
 function resetBtn(){
-	stop_controller(function() { refresh(); });
+	stop_controller(function() { setTimeout( function() { refresh(); }, 20); });
 }
 
 
@@ -581,8 +577,7 @@ function refresh(resolve = function(){}){
 		// Delete all extra slip landscapes
 		var s = 1;
 		while (true){
-			console.log("hmmm", s, $("#slippageTR" + s).length);
-			if ($("#slippageTR" + s).length == 0) break
+			if (document.getElementById('slipCanvas' + s) == null) break
 			delete_slipping_landscape(s);
 			s++;
 		}
@@ -674,7 +669,7 @@ function refresh(resolve = function(){}){
 
 
 		var toCall = () => new Promise((resolve) => refresh_controller(resolve));
-		toCall().then(() => toDoAfterRefresh());
+		toCall().then((uselessVar) => toDoAfterRefresh());
 
 
 		//toDoAfterRefresh();
@@ -688,9 +683,9 @@ function changeInputSequenceType(){
 
 
 	if ($('input[name="inputSeqType"][value="inputTemplateSeq"]').prop("checked")){
-		$("#UserSequence").attr("placeholder", "Input template sequence 3' to 5' and then Submit...");
+		$("#UserSequence").attr("placeholder", "Input template sequence 3' to 5'...");
 	}else{
-		$("#UserSequence").attr("placeholder", "Input nascent sequence 5' to 3' and then Submit...");
+		$("#UserSequence").attr("placeholder", "Input nascent sequence 5' to 3'...");
 	}
 
 }
@@ -1084,36 +1079,18 @@ function update_slipping_curve_timer(startTime, dir, S = 0){
 
 function create_new_slipping_landscape(graphID){
 	
-	//if (!allowMultipleBulges) return;
-
-	//console.log("create_new_slipping_landscape", graphID);
-
-	/*
+	if (!allowMultipleBulges) return;
+	
+	
+	
 	$("#primerSlipCanvasCellSpacer" + (graphID-1)).after('<td class="landscape" id="primerSlipCanvasCell' + graphID + '"> ' + get_slippage_cell_canvas_html(graphID) + ' </td> \
 	<td class="spacer" id="primerSlipCanvasCellSpacer' + graphID + '"></td>');
 	
 	$("#primerSlipBtnCellSpacer" + (graphID-1)).after('<td class="landscape" id="primerSlipBtnCell' + graphID + '"> ' + get_slippage_cell_btn_html(graphID) + ' </td>\
 	<td class="spacer" id="primerSlipBtnCellSpacer' + graphID + '"></td>');
-	*/
+	
 
-
-
-	var canvasHTML = `
-	<td id="slippageTR` + graphID + `" style="width:25%; vertical-align:top" class="slippageCell">
-
-		<br><br>
-		<div style="font-size:18px; font-family:Arial; vertical-align:top">
-			Slippage
-		</div> <br><br>
-		<div id="slippageCanvasDIV` + graphID + `" style="position:relative; margin:auto; width: 450px">
-			<canvas id="slippageCanvas` + graphID + `" height=50 width=450></canvas>
-		</div><br>
-
-	</td>`;
-
-	$("#slippageTR" + (graphID-1)).after(canvasHTML);
-
-
+	
 	/* Add back later
 	slippingPeakHeights.push(update_slippingPeakHeights(graphID));
 	slippingTroughHeights.push(update_slippingTroughHeights(graphID));
@@ -1145,17 +1122,12 @@ function get_slippage_cell_canvas_html(S){
 
 function delete_slipping_landscape(toDelete){
 	
-	//console.log("Deleting landscape", toDelete);
+	console.log("Deleting landscape", toDelete);
 
-	/*
 	$("#primerSlipBtnCell" + toDelete).remove();
 	$("#primerSlipBtnCellSpacer" + toDelete).remove();
 	$("#primerSlipCanvasCell" + toDelete).remove();
 	$("#primerSlipCanvasCellSpacer" + toDelete).remove();
-	*/
-
-
-	$("#slippageTR" + toDelete).remove();
 
 
 }
@@ -1607,17 +1579,17 @@ function closeNav() {
 				</div>
 
 
-			 <br> Select sequence: <select class="dropdown" style="width: 350px;" name="SelectSequence" id = "SelectSequence" title="Select a sequence" OnChange="stop_controller(function() { userChangeSequence(); }); ">
+			 <br> Select sequence: <select class="dropdown" style="width: 350px;" name="SelectSequence" id = "SelectSequence" title="Select a sequence" OnChange="stop_controller(); userChangeSequence()">
 			</select>
 				
-			Template: <select class="dropdown" name="SelectTemplateType" id="SelectTemplateType" OnChange="stop_controller(function() { submitCustomSequence(); });">
+			Template: <select class="dropdown" name="SelectTemplateType" id="SelectTemplateType" OnChange="submitCustomSequence();">
 					  <option value="ssRNA">ssRNA</option>
 					  <option value="ssDNA">ssDNA</option>
 					  <option value="dsRNA">dsRNA</option>
 					  <option value="dsDNA">dsDNA</option>
 				</select>
 				
-				&nbsp;Nascent type: <select class="dropdown" name="SelectPrimerType" id="SelectPrimerType" OnChange="stop_controller(function() { submitCustomSequence(); });">
+				&nbsp;Nascent type: <select class="dropdown" name="SelectPrimerType" id="SelectPrimerType" OnChange="submitCustomSequence();">
 					  <option value="ssRNA">ssRNA</option>
 					  <option value="ssDNA">ssDNA</option>
 					  <option value="dsRNA">dsRNA</option>
@@ -1627,7 +1599,7 @@ function closeNav() {
 				
 			<br> 
 				<div id="userChangeSequence" style="display:none"> <br>
-					<textarea id="UserSequence" title="Please submit a sequence" style="max-width: 350px; width: 350px; height: 100px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input template sequence 3' to 5' and then Submit..."></textarea> 
+					<textarea id="UserSequence" title="Please submit a sequence" style="max-width: 350px; width: 350px; height: 100px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input template sequence 3' to 5'..."></textarea> 
 						&nbsp;&nbsp;
 						<div style="width:100%; margin:auto; text-align:center; line-height:25px; font-family:Arial;  vertical-align:bottom">
 						
@@ -1670,7 +1642,7 @@ function closeNav() {
 
 						 
 						 
-						<td style="text-align:right; font-size:13px">
+						<td style="text-align:right;">
 				 			1 concentration  
 				 		</td>
 						 
@@ -1679,7 +1651,7 @@ function closeNav() {
 						 		 <input class="modelSetting" type="checkbox" id="useFourNTPconcentrations" OnChange="userInputModel_controller()"> </input>
 						 		 <span class="slider round notboolean"></span>
 							</label> 
-							<span style="font-size:13px; vertical-align:middle" >4 concentrations</span>
+							<span style="font-size:15px; vertical-align:middle" >4 concentrations</span>
 				 		</td>
 						
 
@@ -1963,7 +1935,7 @@ function closeNav() {
 				 		</td>
 
 						<td style="text-align:right; width:110px">
-				 			&Delta;G<sup>&dagger;</sup><sub>&#120591;</sub> = 
+				 			&Delta;&Delta;G<sup>&dagger;</sup><sub>t</sub> = 
 				 		</td>
 
 				 		<td>
@@ -1986,7 +1958,7 @@ function closeNav() {
 				 		</td>
 
 						<td style="text-align:right; width:110px">
-				 			&Delta;G<sub>&#120591;1</sub> = 
+				 			&Delta;&Delta;G<sub>t1</sub> = 
 				 		</td>
 
 				 		<td>
@@ -2515,7 +2487,9 @@ function closeNav() {
 			<span style="display:none"><br>&Delta;G<sub>bulge</sub> = <input class="variable"  type="number" title="Free energy change of having a bulge in the primer" name="GBulge" id="GBulge" value=0 style="vertical-align: middle; 
 			text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T</span>
 			
-				
+				<div id="allowMultipleBulges_container">
+					<label style="cursor:pointer;"> <input class="variable" OnChange="update_this_parameter_controller(this)"  type="checkbox" style="cursor:pointer;" id="allowMultipleBulges">Allow multiple bulges</input> </label>
+				</div>
 				
 			</div>
 		<br>
@@ -2665,7 +2639,7 @@ function closeNav() {
 					<tr>
 
 						<td>
-							<div id="foldBtnDiv" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="showFoldedRNA_controller()" title="Fold the mRNA (using the ViennaRNA suite)"> <img  src="src/Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
+							<div id="foldBtnDiv" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="getMFESequenceBonds_controller()" title="Fold the mRNA"> <img  src="src/Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
 						</td>
 
 						<td>
@@ -2677,18 +2651,10 @@ function closeNav() {
 
 					<tr>
 						<td colspan=2>
-							<div id="progressToolbarCell" class="toolbarIcon" style="width:90px; height:22px; vertical-align:middle; background-color:#424f4f; color:white"> 
-
-
-								<div style="position:relative">
-									<canvas id="progressSimCanvas" style="display:none; z-index:1; position:absolute; left:0" width="90px" height="22px"></canvas>
-									<span id="progressSimSpan" style="font-size: 16px; display:none; cursor:auto; z-index:2; color:white; text-align:center; position:absolute; left:0; width:100%"></span> 
-								</div>
-
+							<div class="toolbarIcon" style="width:90px; height:22px; vertical-align:middle"> 
+								<span id="progressSimSpan" style="font-size: 16px; display:none; cursor: auto;"></span> 
 								<span id="numSimSpan" title="Number of simulations to perform (if you press simulate), or number of bases to copy (if you press copy), or number of times to stutter (if you press stutter)"> 
-									<b>N = </b><input type="number" name="nbasesToSimulate" min="1" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:left; width: 60px; background-color: #858280; color:white"> 
-								</span> 
-							</div>
+										<b>N=</b><input type="number" name="nbasesToSimulate" min="1" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:left; width: 60px; background-color: #008CBA; color:white"> </span> </div>
 						</td>
 
 					</tr>
@@ -2770,7 +2736,7 @@ function closeNav() {
 									<td style="width:25%; vertical-align:top">
 
 										<div style="font-size:18px; font-family:Arial;">
-											Translocation
+											Translocation reactions
 										</div>
 
 										<div id="translocationCanvasDIV" style="position:relative; margin:auto; width: 350px">
@@ -2786,7 +2752,7 @@ function closeNav() {
 										<div style="width:100%;">
 										
 											<div style="font-size:18px; font-family:Arial; vertical-align:top">
-												Nucleotide incorporation
+												Nucleotide incorporation reactions
 											</div> <br>
 
 											<div id="ntpCanvasDIV" style="position:relative; margin:auto; width: 350px">
@@ -2807,7 +2773,7 @@ function closeNav() {
 									<td style="width:25%; vertical-align:top">
 
 										<div style="font-size:18px; font-family:Arial; vertical-align:top">
-											Deactivation
+											Deactivation reactions
 										</div> <br>
 										<div id="deactivationCanvasDIV" style="position:relative; margin:auto; width: 300px">
 											<canvas id="deactivationCanvas"  height=70 width=300></canvas>
@@ -2822,7 +2788,7 @@ function closeNav() {
 
 
 										<div style="font-size:18px; font-family:Arial; vertical-align:top">
-											Cleavage
+											Cleavage reaction
 										</div> <br>
 										<div id="cleavageCanvasDIV"  style="position:relative; margin:auto; width: 300px">
 											<canvas id="cleavageCanvas"  height=70 width=300></canvas>
@@ -2838,17 +2804,17 @@ function closeNav() {
 
 
 
-								<tr id="slippageLandscapesTR" style="text-align:center;">
+								<tr style="text-align:center;">
 
 
-									<td id="slippageTR0" style="width:25%; vertical-align:top" class="slippageCell">
+									<td style="width:25%; vertical-align:top">
 
 										<br><br>
 										<div style="font-size:18px; font-family:Arial; vertical-align:top">
-											Slippage
+											Slippage reactions
 										</div> <br><br>
-										<div id="slippageCanvasDIV0" style="position:relative; margin:auto; width: 450px">
-											<canvas id="slippageCanvas0"  height=50 width=450></canvas>
+										<div id="slippageCanvasDIV" style="position:relative; margin:auto; width: 450px">
+											<canvas id="slippageCanvas"  height=50 width=450></canvas>
 										</div><br>
 
 
@@ -2901,7 +2867,7 @@ function closeNav() {
 						&nbsp;&nbsp;&nbsp;
 						<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot4" OnChange="selectPlot(4);" style="vertical-align: middle; text-align:right;">
 								  <option value="none">Display a sitewise plot...</option>
-								  <option value="pauseSite">Time per site</option>
+								  <option value="pauseSite">Dwell time per site</option>
 								  <!--<option value="abortionSite">Arrest probability per site</option>-->
 								  <!--<option value="misincorporationSite">Misincorporations per site</option>-->
 						</select>
@@ -3392,6 +3358,8 @@ function closeNav() {
 
 
 
+			
+
 
 			<div id="output_asm" style="margin-left:130px; width:100%; height: 100px; overflow-y: scroll; background-color:black; color:white; display:none">
 				
@@ -3408,7 +3376,7 @@ function closeNav() {
 
 
 				<div class="header">
-					SimPol, Centre for Computational Evolution & School of Biological Sciences, University of Auckland
+					SimPol, Lab of Structural Biology & Centre for Computational Evolution, University of Auckland
 				</div>
 
 
