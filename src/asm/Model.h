@@ -44,6 +44,7 @@ class Model{
 	bool allowBacktrackWithoutInactivation;
 	bool deactivateUponMisincorporation;
 	bool allowGeometricCatalysis;
+	bool allowDNAbending;
 	bool allowmRNAfolding;
 	bool allowMisincorporation;
 	bool useFourNTPconcentrations;
@@ -90,6 +91,8 @@ class Model{
 		bool get_deactivateUponMisincorporation();
 		Model* set_allowGeometricCatalysis(bool val);
 		bool get_allowGeometricCatalysis();
+		Model* set_allowDNAbending(bool val);
+		bool get_allowDNAbending();
 		Model* set_allowmRNAfolding(bool val);
 		bool get_allowmRNAfolding();
 		Model* set_allowMisincorporation(bool val);

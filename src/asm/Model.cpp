@@ -47,6 +47,7 @@ Model::Model(){
 	assumeBindingEquilibrium = true;
 	assumeTranslocationEquilibrium = false;
 	allowMultipleBulges = true;
+	allowDNAbending = false;
 	
 	//modelIsActive = false;
 
@@ -76,6 +77,9 @@ Model* Model::clone(){
 	clonedModel->assumeTranslocationEquilibrium = this->assumeTranslocationEquilibrium;
 	clonedModel->currentTranslocationModel = this->currentTranslocationModel;
 	clonedModel->allowMultipleBulges = this->allowMultipleBulges;
+	clonedModel->allowDNAbending = this->allowDNAbending;
+
+
 
 
 	return clonedModel;
@@ -189,7 +193,9 @@ string Model::toJSON(){
 	JSON += "'NTPbindingNParams':" + to_string(this->NTPbindingNParams) + ",";
 	JSON += "'currentTranslocationModel':'" + this->currentTranslocationModel + "',";
 	JSON += "'assumeBindingEquilibrium':" + string(this->assumeBindingEquilibrium ? "true" : "false") + ",";
+	JSON += "'allowDNAbending':" + string(this->allowDNAbending ? "true" : "false") + ",";
 	JSON += "'assumeTranslocationEquilibrium':" + string(this->assumeTranslocationEquilibrium ? "true" : "false");
+
 	
 	return JSON;
 	
@@ -208,6 +214,7 @@ void Model::print(){
 	cout << "deactivateUponMisincorporation = " << this->deactivateUponMisincorporation << endl;
 	cout << "allowGeometricCatalysis = " << this->allowGeometricCatalysis << endl;
 	cout << "allowmRNAfolding = " << this->allowmRNAfolding << endl;
+	cout << "allowDNAbending = " << this->allowDNAbending << endl;
 	cout << "allowMisincorporation = " << this->allowMisincorporation << endl;
 	cout << "useFourNTPconcentrations = " << this->useFourNTPconcentrations << endl;
 	cout << "NTPbindingNParams = " << this->NTPbindingNParams << endl;
@@ -303,6 +310,15 @@ bool Model::get_allowGeometricCatalysis(){
 	return this->allowGeometricCatalysis;
 }
 
+
+
+Model* Model::set_allowDNAbending(bool val){
+	this->allowDNAbending = val;
+	return this;
+}
+bool Model::get_allowDNAbending(){
+	return this->allowDNAbending;
+}
 
 Model* Model::set_allowmRNAfolding(bool val){
 	this->allowmRNAfolding = val;

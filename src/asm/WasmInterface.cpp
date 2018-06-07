@@ -29,7 +29,7 @@
 #include "Plots.h"
 #include "Coordinates.h"
 #include "SimPol_vRNA_interface.h"
-
+#include "SimPol_bendit_interface.h"
 
 
 #include <emscripten.h>
@@ -800,6 +800,114 @@ extern "C" {
 
 	}
 
+	// Calculate the DNA curvature
+	void EMSCRIPTEN_KEEPALIVE bendDNA(int msgID) {
+
+
+		string bendJSON = "{";
+		string scale_str = "Consensus";
+		const char* scale = scale_str.c_str();
+
+		if (currentModel->get_allowDNAbending()) {
+
+
+			// Upstream window
+			if (_currentStateGUI->getLeftTemplateBaseNumber() - 12 - upstreamWindow->getVal() > 0){
+
+				string upstreamSequence = templateSequence.substr(_currentStateGUI->getLeftTemplateBaseNumber() - upstreamWindow->getVal() - 6, upstreamWindow->getVal() + 11);
+				char* seq = (char *) calloc(upstreamSequence.length()+1, sizeof(char));
+				double* curve = (double *) calloc(upstreamSequence.length()+1, sizeof(double));
+				double* bend = (double *) calloc(upstreamSequence.length()+1, sizeof(double));
+				double* gc = (double *) calloc(upstreamSequence.length()+1, sizeof(double));
+				strcpy(seq, upstreamSequence.c_str());
+
+
+
+				bendit_curvature(seq, upstreamSequence.length(), curve, bend, gc, scale, upstreamWindow->getVal(), upstreamWindow->getVal());
+
+
+				string nextNum;
+				bendJSON += "'upstreamCurve':[";
+				for (int i = 0; i < upstreamSequence.length(); i ++){
+					if (curve[i] >= 360) nextNum = "'inf'";
+					else nextNum = to_string(curve[i]);
+					bendJSON += nextNum;
+					if (i < upstreamSequence.length() - 1) bendJSON += ",";
+				}
+				bendJSON += "],'upstreamBend':[";
+				for (int i = 0; i < upstreamSequence.length(); i ++){
+					if (bend[i] >= 100000) nextNum = "'inf'";
+					else nextNum = to_string(bend[i]);
+					bendJSON += nextNum;
+					if (i < upstreamSequence.length() - 1) bendJSON += ",";
+				}
+				bendJSON += "],'upstreamSequence':'" + upstreamSequence + "',";
+
+
+				free(curve);
+				free(bend);
+				free(gc);
+				free(seq);
+
+			}
+
+
+
+			// Downstream window
+			if (_currentStateGUI->getRightTemplateBaseNumber() + 12 + downstreamWindow->getVal() < templateSequence.length()){
+
+				string downstreamSequence = templateSequence.substr(_currentStateGUI->getRightTemplateBaseNumber(), downstreamWindow->getVal() + 11);
+				char* seq = (char *) calloc(downstreamSequence.length()+1, sizeof(char));
+				double* curve = (double *) calloc(downstreamSequence.length()+1, sizeof(double));
+				double* bend = (double *) calloc(downstreamSequence.length()+1, sizeof(double));
+				double* gc = (double *) calloc(downstreamSequence.length()+1, sizeof(double));
+
+				strcpy(seq, downstreamSequence.c_str());
+
+				bendit_curvature(seq, downstreamSequence.length(), curve, bend, gc, scale, downstreamWindow->getVal(), downstreamWindow->getVal());
+
+
+				string nextNum;
+				bendJSON += "'downstreamCurve':[";
+				for (int i = 0; i < downstreamSequence.length(); i ++){
+					if (curve[i] >= 360) nextNum = "'inf'";
+					else nextNum = to_string(curve[i]);
+					bendJSON += nextNum;
+					if (i < downstreamSequence.length() - 1) bendJSON += ",";
+				}
+				bendJSON += "],'downstreamBend':[";
+				for (int i = 0; i < downstreamSequence.length(); i ++){
+					if (bend[i] >= 100000) nextNum = "'inf'";
+					else nextNum = to_string(bend[i]);
+					bendJSON += nextNum;
+					if (i < downstreamSequence.length() - 1) bendJSON += ",";
+				}
+				bendJSON += "],'downstreamSequence':'" + downstreamSequence + "',";
+
+
+				free(curve);
+				free(bend);
+				free(gc);
+				free(seq);
+
+			}
+
+
+
+		}
+
+
+		if (bendJSON.substr(bendJSON.length()-1, 1) == ",") bendJSON = bendJSON.substr(0, bendJSON.length() - 1);
+
+		bendJSON += "}";
+
+
+		messageFromWasmToJS(bendJSON, msgID);
+
+	}
+
+
+
 
 	// Returns all information of all parameters in JSON format
 	void EMSCRIPTEN_KEEPALIVE getAllParameters(int msgID){
@@ -846,6 +954,7 @@ extern "C" {
 			else if (setting == "allowInactivation") currentModel->set_allowInactivation(val == "true");
 			else if (setting == "allowBacktrackWithoutInactivation") currentModel->set_allowBacktrackWithoutInactivation(val == "true");
 			else if (setting == "allowGeometricCatalysis") currentModel->set_allowGeometricCatalysis(val == "true");
+			else if (setting == "allowDNAbending") currentModel->set_allowDNAbending(val == "true");
 			else if (setting == "allowmRNAfolding") currentModel->set_allowmRNAfolding(val == "true");
 			else if (setting == "allowMisincorporation") currentModel->set_allowMisincorporation(val == "true");
 			else if (setting == "useFourNTPconcentrations") currentModel->set_useFourNTPconcentrations(val == "true");

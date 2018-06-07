@@ -142,6 +142,11 @@ extern Parameter *RateActivate;
 extern Parameter *RateDeactivate;
 extern Parameter *RateCleave;
 
+extern Parameter *upstreamCurvatureCoeff;
+extern Parameter *downstreamCurvatureCoeff;
+extern Parameter *upstreamWindow;
+extern Parameter *downstreamWindow;
+
 
 
 class Settings{

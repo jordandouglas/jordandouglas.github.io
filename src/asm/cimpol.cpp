@@ -167,7 +167,7 @@ int main(int argc, char** argv) {
 		cout << "ABC" << endl;
 		Settings::init();
 		currentModel = new Model();
-		Settings::activatePolymerase("RNAP");
+		Settings::activatePolymerase("polII");
 		Settings::sampleAll();
 		Settings::initSequences();
 	}

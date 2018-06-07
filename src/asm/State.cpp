@@ -2217,8 +2217,14 @@ double State::calculateForwardTranslocationFreeEnergyBarrier(bool ignoreParamete
 	State* stateAfterForwardtranslocation = this->clone()->forward();
 
 
+	// Absolute model: absolute free energy barrier height is constant
+	if (currentModel->get_currentTranslocationModel() == "absoluteBarriers") {
+		// barrierHeight += 0;
+	} 
+
+
 	// Midpoint model: free energy barrier is halfway between the two on either side
-	if (currentModel->get_currentTranslocationModel() == "midpointBarriers"){
+	else if (currentModel->get_currentTranslocationModel() == "midpointBarriers"){
 		barrierHeight += (this->calculateTranslocationFreeEnergy(true) + stateAfterForwardtranslocation->calculateTranslocationFreeEnergy(true)) / 2;
 	}
 
@@ -2259,8 +2265,13 @@ double State::calculateBackwardTranslocationFreeEnergyBarrier(bool ignoreParamet
 	State* stateAfterBackwardtranslocation = this->clone()->backward();
 
 
+	// Absolute model: absolute free energy barrier height is constant
+	if (currentModel->get_currentTranslocationModel() == "absoluteBarriers") {
+		// barrierHeight += 0;
+	} 
+
 	// Midpoint model: free energy barrier is halfway between the two on either side
-	if (currentModel->get_currentTranslocationModel() == "midpointBarriers"){
+	else if (currentModel->get_currentTranslocationModel() == "midpointBarriers"){
 		barrierHeight += (this->calculateTranslocationFreeEnergy(true) + stateAfterBackwardtranslocation->calculateTranslocationFreeEnergy(true)) / 2;
 	}
 

@@ -41,7 +41,41 @@ map<std::string, double> FreeEnergy::basepairingEnergy;
 double FreeEnergy::getFreeEnergyOfHybrid(State* state){
 
 	vector<string> hybridStrings = FreeEnergy::getHybridString(state);
+	double danglingEndMultipler = 0.5 * (state->get_mRNAPosInActiveSite() == 1);
 	double hybridFreeEnergy = FreeEnergy::getHybridFreeEnergy(hybridStrings.at(0), hybridStrings.at(1), TemplateType.substr(2), PrimerType.substr(2));
+
+	// Account for a dangling base by 1) assuming that the danglng base was paired, and then 2) multiplying the free energy of this doublet by "danglingEndMultipler"
+	if (danglingEndMultipler != 0) {
+		
+		string leftTemplateBase = hybridStrings.at(0).substr(hybridStrings.at(0).length()-1);
+		string leftNascentBase = hybridStrings.at(1).substr(hybridStrings.at(1).length()-1);
+		string rightTemplateBase = templateSequence.substr(state->getRightTemplateBaseNumber()-1, 1);
+		string rightNascentBase = Settings::complementSeq(rightTemplateBase, PrimerType.substr(2) == "RNA");
+
+		if (TemplateType.substr(2) == "DNA"){
+			leftTemplateBase = "d" + leftTemplateBase;
+			rightTemplateBase = "d" + rightTemplateBase;
+		}
+		if (PrimerType.substr(2) == "DNA"){
+			leftNascentBase = "d" + leftNascentBase;
+			rightNascentBase = "d" + rightNascentBase;
+		}
+
+
+
+		string dictKey = leftNascentBase + rightNascentBase + leftTemplateBase + rightTemplateBase;
+		double energy = basepairingEnergy[dictKey];
+
+		//cout << "Multiplying dangle by " << danglingEndMultipler << " | dangle: " << dictKey << " | energy: " << energy << endl;
+		
+		
+		//cout << "Looking for " << dictKey << " found " << energy << endl;
+		if (basepairingEnergy.find(dictKey) == basepairingEnergy.end()) hybridFreeEnergy += 1; // TODO: need to find dGU basepairing parameters 
+		else hybridFreeEnergy += energy * danglingEndMultipler;
+
+
+	}
+
 	return hybridFreeEnergy;
 
 }
@@ -76,6 +110,52 @@ double FreeEnergy::getFreeEnergyOfIntermediateState(State* state1, State* state2
 	vector<string> intermediateString = FreeEnergy::getHybridIntermediateString(hybridStrings1, hybridStrings2, state1->getLeftTemplateBaseNumber(), state1->getLeftNascentBaseNumber(), state2->getLeftTemplateBaseNumber(), state2->getLeftNascentBaseNumber());
 
 	freeEnergy = getHybridFreeEnergy(intermediateString.at(0), intermediateString.at(1), TemplateType.substr(2), PrimerType.substr(2));
+
+
+	// Account for a dangling base by 1) assuming that the danglng base was paired, and then 2) multiplying the free energy of this doublet by "danglingEndMultipler"
+	double danglingEndMultipler = 0.5 * ( (state1->get_mRNAPosInActiveSite() == 1 && state2->get_mRNAPosInActiveSite() == 0) || (state1->get_mRNAPosInActiveSite() == 0 && state2->get_mRNAPosInActiveSite() == 1));
+	if (danglingEndMultipler != 0) {
+		
+		string leftTemplateBase, leftNascentBase, rightTemplateBase, rightNascentBase;
+
+		// State 1 is posttranslocated
+		if (state1->get_mRNAPosInActiveSite() == 1){
+			leftTemplateBase = hybridStrings1.at(0).substr(hybridStrings1.at(0).length()-1);
+			leftNascentBase = hybridStrings1.at(1).substr(hybridStrings1.at(1).length()-1);
+			rightTemplateBase = templateSequence.substr(state1->getRightTemplateBaseNumber()-1, 1);
+		}
+
+		// State 2 is posttranslocated
+		else{
+			leftTemplateBase = hybridStrings2.at(0).substr(hybridStrings2.at(0).length()-1);
+			leftNascentBase = hybridStrings2.at(1).substr(hybridStrings2.at(1).length()-1);
+			rightTemplateBase = templateSequence.substr(state2->getRightTemplateBaseNumber()-1, 1);
+		}
+
+		rightNascentBase = Settings::complementSeq(rightTemplateBase, PrimerType.substr(2) == "RNA");
+		
+
+
+		if (TemplateType.substr(2) == "DNA"){
+			leftTemplateBase = "d" + leftTemplateBase;
+			rightTemplateBase = "d" + rightTemplateBase;
+		}
+		if (PrimerType.substr(2) == "DNA"){
+			leftNascentBase = "d" + leftNascentBase;
+			rightNascentBase = "d" + rightNascentBase;
+		}
+
+
+		string dictKey = leftNascentBase + rightNascentBase + leftTemplateBase + rightTemplateBase;
+		double energy = basepairingEnergy[dictKey];
+
+		//cout << "Multiplying dangle by " << danglingEndMultipler << " | dangle: " << dictKey << " | energy: " << energy << endl;
+		
+		//cout << "Looking for " << dictKey << " found " << energy << endl;
+		if (basepairingEnergy.find(dictKey) == basepairingEnergy.end()) freeEnergy += 1; // TODO: need to find dGU basepairing parameters 
+		else freeEnergy += energy * danglingEndMultipler;
+
+	}
 	
 	
 	return freeEnergy;
@@ -130,8 +210,8 @@ vector<string> FreeEnergy::getHybridString(State *state){
 	for (int hybridPos = 0; hybridPos < stopWhenAt; hybridPos++){
 			
 
-		int templateBaseNum = state->getRightTemplateBaseNumber() - (hybridPos + templatePastBulge);
-		int nascentBaseNum = state->getRightNascentBaseNumber() - (hybridPos + nascentPastBulge);
+		int templateBaseNum = state->getRightTemplateBaseNumber() - (hybridPos + templatePastBulge) + 1;
+		int nascentBaseNum = state->getRightNascentBaseNumber() - (hybridPos + nascentPastBulge) + 1;
 
 		//int baseNum = rightBase - hybridPos;
 
@@ -154,6 +234,8 @@ vector<string> FreeEnergy::getHybridString(State *state){
 		
 	}
 
+
+	//cout << "Found hybrid strings " << templateString << "/" << nascentString << endl;
 
 	vector<string> hybridStrings(2);
 	hybridStrings.at(0) = templateString;
@@ -272,6 +354,8 @@ vector<string> FreeEnergy::getHybridIntermediateString(vector<string> hybridStri
 	// Find the basepairs which are in both sets (ie. the intersection)
 	list<string> basepairsIntermediate = getListIntersection(basepairs1, basepairs2);
 
+	//list<string> basepairsIntermediate = getListUnion(basepairs1, basepairs2);
+
 
 	string strIntermediateT = "";
 	string strIntermediateN = "";
@@ -279,8 +363,12 @@ vector<string> FreeEnergy::getHybridIntermediateString(vector<string> hybridStri
 	
 
 	// Convert the intermediate basepairs back into a string
+	string Tbase;
+	string Nbase;
 	for (list<string>::iterator it = basepairsIntermediate.begin(); it != basepairsIntermediate.end(); ++it){
 		
+
+		//cout << "Intermediate string " << *it << endl;
 
 		// Split string by _
 		vector<string> split_vector = Settings::split(*it, '_');
@@ -288,9 +376,13 @@ vector<string> FreeEnergy::getHybridIntermediateString(vector<string> hybridStri
 		
 		int template_baseNum = atoi(split_vector.at(0).c_str());
 		int nascent_baseNum = atoi(split_vector.at(1).c_str());
-		
-		string Tbase = hybridStrings1.at(0).substr(template_baseNum - leftTemplate1, 1); // Intersection means that either string1 or string2 can be used
-		string Nbase = hybridStrings1.at(1).substr(nascent_baseNum - leftNascent1, 1);
+
+
+		if (template_baseNum - leftTemplate1 < hybridStrings1.at(0).length()) Tbase = hybridStrings1.at(0).substr(template_baseNum - leftTemplate1, 1);
+		else Tbase = hybridStrings2.at(0).substr(template_baseNum - leftTemplate2, 1);
+
+		if (nascent_baseNum - leftNascent1 < hybridStrings1.at(1).length()) Nbase = hybridStrings1.at(1).substr(nascent_baseNum - leftNascent1, 1);
+		else Nbase = hybridStrings2.at(1).substr(nascent_baseNum - leftNascent2, 1);
 		
 		strIntermediateT += Tbase;
 		strIntermediateN += Nbase;
@@ -363,6 +455,7 @@ list<string> FreeEnergy::getBasePairs(string templateString, string nascentStrin
 double FreeEnergy::getHybridFreeEnergy(string templateString, string nascentString, string templateType, string nascentType){
 
 
+	//cout << "Looking at hybrid " << templateString << "/" << nascentString << endl;
 
 	double freeEnergy = 0;
 
@@ -392,7 +485,8 @@ double FreeEnergy::getHybridFreeEnergy(string templateString, string nascentStri
 		else freeEnergy += energy;
 		
 	}
-	
+
+
 	
 	return freeEnergy / _RT;
 		

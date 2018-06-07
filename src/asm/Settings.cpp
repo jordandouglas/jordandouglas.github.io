@@ -112,8 +112,8 @@ Parameter* UTPconc = new Parameter("UTPconc", false, "inclusive", " [UTP] (\u03b
 Parameter* FAssist = new Parameter("FAssist", false, "false", "Force  (pN)", "Assisting force applied to the polymerase during single-molecule experiments.");
 
 Parameter* hybridLen = new Parameter("hybridLen", true, "exclusive", "Hybrid length (bp)", "Number of base pairs inside the polymerase", "h (bp)");
-Parameter* bubbleLeft = new Parameter("bubbleLeft", true, "exclusive", "Bubble length left (bp)", "Number of unpaired template bases 3\u2032 of the hybrid", "\u03B2_{1} (bp)");
-Parameter* bubbleRight = new Parameter("bubbleRight", true, "exclusive", "Bubble length right (bp)", "Number of unpaired template bases 5\u2032 of the hybrid", "\u03B2_{2} (bp)");
+Parameter* bubbleLeft = new Parameter("bubbleLeft", true, "inclusive", "Bubble length left (bp)", "Number of unpaired template bases 3\u2032 of the hybrid", "\u03B2_{1} (bp)");
+Parameter* bubbleRight = new Parameter("bubbleRight", true, "inclusive", "Bubble length right (bp)", "Number of unpaired template bases 5\u2032 of the hybrid", "\u03B2_{2} (bp)");
 
 Parameter* GDagSlide = new Parameter("GDagSlide", false, "false", "\u0394G\u2020\U0001D70F", "Free energy barrier height of translocation", "\u0394G_{\U0001D70F}^{\u2020}  (k_{B}T)");
 Parameter* DGPost = new Parameter("DGPost", false, "false", "\u0394G\U0001D70F1", "Free energy added on to posttranslocated ground state", "\u0394G_{\U0001D70F1}  (k_{B}T)");
@@ -127,8 +127,15 @@ Parameter* RateActivate = new Parameter("kA", false, "inclusive", "Rate of activ
 Parameter* RateDeactivate = new Parameter("kU", false, "inclusive", "Rate of inactivation (s\u207B\u00B9)", "Rate constant of polymerase entering the catalytically unactive state", "k_[U]  (s^[\u22121\u2009])");
 Parameter* RateCleave = new Parameter("RateCleave", false, "inclusive", "Rate of cleavage (s\u207B\u00B9)", "Rate constant of cleaving the dangling 3\u2032 end of the nascent strand when backtracked", "k_[cleave]  (s^[\u22121\u2009])");
 
+Parameter* upstreamCurvatureCoeff = new Parameter("upstreamCurvatureCoeff", false, "false", "3\u2032 DNA curvature coeff.", "Change in free energy of translocation associated with DNA upstream from the hybrid, per degree of curvature", "\u0394G_{3\u2032bend}  (k_{B}T)");
+Parameter* downstreamCurvatureCoeff = new Parameter("downstreamCurvatureCoeff", false, "false", "5\u2032 DNA curvature coeff.", "Change in free energy of translocation associated with DNA downstream from the hybrid, per degree of curvature", "\u0394G_{5\u2032bend}  (k_{B}T)");
+Parameter* upstreamWindow = new Parameter("upstreamWindow", true, "exclusive", "3\u2032 DNA curvature window", "Window size to calculate the upstream DNA curvature", "3\u2032 bend window (bp)");
+Parameter* downstreamWindow = new Parameter("downstreamWindow", true, "exclusive", "5\u2032 DNA curvature window", "Window size to calculate the downstream DNA curvature", "5\u2032 bend window (bp)");
+
+
 
 vector<Parameter*> Settings::paramList(19);
+//vector<Parameter*> Settings::paramList(23);
 
 CRandomMersenne* Settings::SFMT;
 
@@ -184,6 +191,18 @@ void Settings::init(){
 	RateDeactivate->setDistributionParameter("fixedDistnVal", 0.1);
 	RateCleave->setDistributionParameter("fixedDistnVal", 0);
 
+	upstreamCurvatureCoeff->setDistributionParameter("fixedDistnVal", 0);
+	downstreamCurvatureCoeff->setDistributionParameter("fixedDistnVal", 0);
+	upstreamWindow->setDistributionParameter("fixedDistnVal", 8);
+	downstreamWindow->setDistributionParameter("fixedDistnVal", 8);
+
+
+	upstreamCurvatureCoeff->hide();
+	downstreamCurvatureCoeff->hide();
+	upstreamWindow->hide();
+	downstreamWindow->hide();
+
+
 
 	
 	// Populate the list of parameters
@@ -207,6 +226,13 @@ void Settings::init(){
 	paramList.at(16) = RateActivate;
 	paramList.at(17) = RateDeactivate;
 	paramList.at(18) = RateCleave;
+
+	/*
+	paramList.at(19) = upstreamCurvatureCoeff;
+	paramList.at(20) = downstreamCurvatureCoeff;
+	paramList.at(21) = upstreamWindow;
+	paramList.at(22) = downstreamWindow;
+	*/
 
 
 
@@ -240,6 +266,9 @@ void Settings::initPolymerases(){
 	ecoliPol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 25.56));
 	ecoliPol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 1.8));
 	ecoliPol->setParameter(RateBind->clone()->setDistributionParameter("fixedDistnVal", 0.5448));
+	ecoliPol->setParameter(hybridLen->clone()->setDistributionParameter("fixedDistnVal", 10));
+	ecoliPol->setParameter(bubbleLeft->clone()->setDistributionParameter("fixedDistnVal", 0));
+	ecoliPol->setParameter(bubbleRight->clone()->setDistributionParameter("fixedDistnVal", 0));
 
 	// S. cerevisiae parameters
 	yeastPol->setParameter(GDagSlide->clone()->setDistributionParameter("fixedDistnVal", 8.536));
@@ -247,11 +276,17 @@ void Settings::initPolymerases(){
 	yeastPol->setParameter(barrierPos->clone()->setDistributionParameter("fixedDistnVal", 2.889));
 	yeastPol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 29.12));
 	yeastPol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 72));
+	yeastPol->setParameter(hybridLen->clone()->setDistributionParameter("fixedDistnVal", 10));
+	yeastPol->setParameter(bubbleLeft->clone()->setDistributionParameter("fixedDistnVal", 2));
+	yeastPol->setParameter(bubbleRight->clone()->setDistributionParameter("fixedDistnVal", 2));
 
 	// T7 parameters
 	T7pol->setParameter(DGPost->clone()->setDistributionParameter("fixedDistnVal", -4.709));
 	T7pol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 127.3));
 	T7pol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 105));
+	T7pol->setParameter(hybridLen->clone()->setDistributionParameter("fixedDistnVal", 8));
+	T7pol->setParameter(bubbleLeft->clone()->setDistributionParameter("fixedDistnVal", 1));
+	T7pol->setParameter(bubbleRight->clone()->setDistributionParameter("fixedDistnVal", 1));
 
 
 	// Choose the default model settings
@@ -265,8 +300,8 @@ void Settings::initPolymerases(){
 	_polymerases.at(2) = T7pol;
 
 
-	// Activate the E. coli polymerase as the default
-	if (_currentPolymerase == "") Settings::activatePolymerase("RNAP");
+	// Activate the Yeast polymerase II as the default
+	if (_currentPolymerase == "") Settings::activatePolymerase("polII");
 
 }
 
@@ -330,9 +365,17 @@ void Settings::setParameterList(vector<Parameter*> params){
 	RateDeactivate = paramList.at(17);
 	RateCleave = paramList.at(18);
 
+	/*
+	upstreamCurvatureCoeff = paramList.at(19);
+	downstreamCurvatureCoeff = paramList.at(20);
+	upstreamWindow = paramList.at(21);
+	downstreamWindow = paramList.at(22);
+	*/
+
 
 
 }
+
 
 
 void Settings::initSequences(){
@@ -347,14 +390,18 @@ void Settings::initSequences(){
 	seq = new Sequence("E.coli rpoB KP670789", "dDNA", "ssRNA", "TACCAAATGAGGATATGGCTCTTTTTTGCATAAGCATTCCTAAAACCATTTGCAGGTGTTCAAGACCTACATGGAATAGAGGAAAGATAGGTCGAACTGAGCAAAGTCTTTAAATAGCTCGTTCTAGGACTTCCCGTCATACCAGACCTTCGACGAAAGGCAAGGCATAAGGGCTAAGTCTCGATGTCGCCATTAAGGCTCGACGTTATGCAGTCGATGGCGGAACCGCTTGGCCACAAACTGCAGGTCCTTACAGTTTAGGCACCGCACTGGATAAGGCGTGGCGACGCGCAATTTGACGCAGACCACTAGATACTCGCGCTTCGCGGCCTTCCGTGGCATTTTCTGTAATTTCTTGTTCTTCAGATGTACCCGCTTTAAGGCGAGTACTGTCTGTTGCCATGGAAACAATAGTTGCCATGACTCGCACAATAGCAAAGGGTCGACGTGGCATCAGGCCCGCAGAAGAAACTGAGGCTGTTTCCATTTTGGGTGAGAAGCCCATTTCACGACATATTGCGCGCATAGTAGGGAATGGCACCAAGGACCGACCTGAAGCTTAAGCTAGGCTTCCTGTTGGACAAGCATGCATAGCTGGCAGCGGCATTTGACGGACGCTGGTAGTAAGACGCGCGGGACTTGATGTGGTGTCTCGTCTAGGAGCTGGACAAGAAACTTTTTCAATAGAAACTTTAGGCACTATTGTTCGACGTCTACCTTGACCACGGCCTTGCGGACGCACCACTTTGGCGTAGAAAACTGTAGCTTCGATTGCCATTTCACATGCATCTTTTTCCGGCGGCATAGTGACGCGCGGTGTAAGCGGTCGACCTTTTTCTGCTGCAGTTTGACTAGCTTCAGGGCCAACTCATGTAGCGTCCATTTCACCAACGATTTCTGATATAACTACTCAGATGGCCGCTCGACTAGACGCGTCGCTTGTACCTCGACTCGGACCTAGACGACCGATTCGACTCGGTCAGACCAGTGTTCGCATAGCTTTGCGACAAGTGGTTGCTAGACCTAGTGCCGGGTATATAGAGACTTTGGAATGCACAGCTGGGTTGATTGCTGGCAGACTCGCGTGACCATCTTTAGATGGCGTACTACGCGGGACCGCTCGGCGGCTGAGCACTTCGTCGACTTTCGGACAAGCTCTTGGACAAGAAGAGGCTTCTGGCAATACTGAACAGACGCCAACCAGCATACTTCAAGTTGGCAAGAGACGACGCGCTTCTTTAGCTTCCAAGGCCATAGGACTCGTTTCTGCTGTAGTAACTACAATACTTTTTCGAGTAGCTATAGGCATTGCCATTTCCGCTTCAGCTACTATAGCTGGTGGAGCCGTTGGCAGCATAGGCAAGGCAACCGCTTTACCGCCTTTTGGTCAAGGCGCAACCGGACCATGCACATCTCGCACGCCACTTTCTCGCAGACAGAGACCCGCTAGACCTATGGGACTACGGTGTCCTATACTAGTTGCGGTTCGGCTAAAGGCGTCGTCACTTTCTCAAGAAGCCAAGGTCGGTCGACAGAGTCAAATACCTGGTCTTGTTGGGCGACAGACTCTAATGCGTGTTTGCAGCATAGAGGCGTGAGCCGGGTCCGCCAGACTGGGCACTTGCACGTCCGAAGCTTCAAGCTCTGCATGTGGGCTGAGTGATGCCAGCGCATACAGGTTAGCTTTGGGGACTTCCAGGCTTGTAGCCAGACTAGTTGAGAGACAGGCACATGCGTGTCTGATTGCTTATGCCGAAGGAACTCTGAGGCATAGCATTTCACTGGCTGCCACAACATTGACTGCTTTAAGTGATGGACAGACGATAGCTTCTTCCGTTGATGCAATAGCGGGTCCGCTTGAGGTTGAACCTACTTCTTCCGGTGAAGCATCTTCTGGACCATTGAACGGCATCGTTTCCGCTTAGGTCGAACAAGTCGGCGCTGGTCCAACTGATGTACCTGCATAGGTGGGTCGTCCACCATAGGCAGCCACGCAGGGACTAGGGCAAGGACCTTGTGCTACTGCGGTTGGCACGTAACTACCCACGCTTGTACGTTGCAGTCCGGCAAGGCTGAGACGCGCGACTATTCGGCGACCAACCATGACCATACCTTGCACGACAACGGCAACTGAGGCCACATTGACGCCATCGATTTGCACCACCACAGCAAGTCATGCACCTACGAAGGGCATAGCAATAGTTTCAATTGCTTCTGCTCTACATAGGCCCACTTCGTCCATAGCTGTAGATGTTGGACTGGTTTATGTGGGCAAGATTGGTCTTGTGGACATAGTTGGTCTACGGCACACACAGAGACCCACTTGGCCAACTTGCACCGCTGCACGACCGTCTGCCAGGCAGGTGGCTGGAGCCACTTGACCGCGAACCAGTCTTGTACGCGCATCGCAAGTACGGCACCTTACCAATGTTGAAGCTTCTGAGGTAGGAGCATAGGCTCGCACAACAAGTCCTTCTGGCAAAGTGGTGGTAGGTGTAAGTCCTTGACCGCACACACAGGGCACTGTGGTTCGACCCAGGCCTTCTCTAGTGGCGACTGTAGGGCTTGCACCCACTTCGACGCGAGAGGTTTGACCTACTTAGGCCATAGCAAATGTAACCACGCCTTCACTGGCCACCGCTGTAAGACCAACCATTCCATTGCGGCTTTCCACTTTGAGTCGACTGGGGTCTTCTTTTTGACGACGCACGCTAGAAGCCACTCTTTCGGAGACTGCAATTTCTGAGAAGAGACGCGCATGGTTTGCCACATAGGCCATGCCAATAGCTGCAAGTCCAGAAATGAGCGCTACCGCATCTTTTTCTGTTTGCACGCGACCTTTAGCTTCTTTACGTCGAGTTTGTCCGCTTCTTTCTGGACAGACTTCTTGACGTCTAGGAGCTTCGCCCAGACAAGTCGGCATAGGCACGACACGACCATCGGCCACCGCAACTTCGACTCTTCGAGCTGTTTGACGGCGCGCTAGCGACCGACCTCGACCCGGACTGTCTGCTTCTCTTTGTTTTAGTCGACCTTGTCGACCGACTCGTCATACTGCTTGACTTTGTGCTCAAGCTCTTCTTTGAGCTTCGCTTTGCGGCGTTTTAGTGGGTCCCGCTGCTAGACCGTGGCCCGCACGACTTCTAACAATTCCATATAGACCGCCAATTTGCGGCATAGGTCGGACCACTGTTCTACCGTCCAGCAGTGCCATTGTTCCCACATTAAAGATTCTAGTTGGGCTAGCTTCTATACGGAATGCTACTTTTGCCATGCGGCCATCTGTAGCATGACTTGGGCGACCCGCATGGCAGAGCATACTTGTAGCCAGTCTAGGAGCTTTGGGTGGACCCATACCGACGCTTTCCATAGCCGCTGTTCTAGTTGCGGTACGACTTTGTCGTCGTTCTTCAGCGCTTTGACGCGCTTAAGTAGGTCGCACGCATGCTAGACCCGCGACTGCAAGCAGTCTTTCAACTGGACTCATGGAAGTCGCTACTTCTTCAATACGCAGACCGACTTTTGGACGCGTTTCCATACGGTTAGCGTTGCGGCCACAAGCTGCCACGCTTTCTTCGTCTTTAATTTCTCGACGACTTTGAACCGCTGGACGGCTGAAGGCCAGTCTAGGCGGACATGCTACCAGCGTGACCACTTGTCAAGCTCGCAGGCCATTGGCAACCAATGTACATGTACGACTTTGACTTGGTGGACCAGCTGCTGTTCTACGTGCGCGCAAGGTGGCCAAGAATGTCGGACCAATGAGTCGTCGGCGACCCACCATTCCGTGTCAAGCCACCAGTCGCAAAGCCCCTCTACCTTCACACCCGCGACCTTCGTATGCCGCGTCGTATGTGGGACGTCCTTTACGAGTGGCAATTCAGACTACTGCACTTGCCAGCATGGTTCTACATATTTTTGTAGCACCTGCCGTTGGTAGTCTACCTCGGCCCGTACGGTCTTAGGAAGTTGCATAACAACTTTCTCTAAGCAAGCGACCCATAGTTGTAGCTTGACCTTCTGCTCATT");
 	sequences[seq->getID()] = seq;
 
-	seq = new Sequence("HIV-1 LTR WT", "dsDNA", "ssRNA", "CCCAGAGAGACCAATCTGGTCTAGACTCGGACCCTCGAGAGACCGATCGATCCCTTGGGTGACGAATTCGGAGTTATTTCGAA");
+	seq = new Sequence("HIV-1 LTR WT", "dsDNA", "ssRNA", "CCCAGAGAGACCAATCTGGTCTAGACTCGGACCCTCGAGAGACCGATCGATCCCTTGGGTGACGAATTCGGAGTTATTTCGAACGTACGGACGTCTCC");
 	sequences[seq->getID()] = seq;
 
-	seq = new Sequence("HIV-1 LTR 50", "dsDNA", "ssRNA", "CCCAGAGAGACCAATCTGGTCTAGACTCGGACCCTCGAGAGACCGATCGATCCCTTGGGTGACGGCAAAAAAGCGATTTCGAA");
+	seq = new Sequence("HIV-1 LTR 50", "dsDNA", "ssRNA", "CCCAGAGAGACCAATCTGGTCTAGACTCGGACCCTCGAGAGACCGATCGATCCCTTGGGTGACGGCAAAAAAGCGATTTCGAACGTACGGACGTCTCC");
 	sequences[seq->getID()] = seq;
 
-	seq = new Sequence("HIV-1 LTR 52", "dsDNA", "ssRNA", "CCCAGAGAGACCAATCTGGTCTAGACTCGGACCCTCGAGAGACCGATCGATCCCTTGGGTGACGGCTTTTTTGCGATTTCGAA");
+	seq = new Sequence("HIV-1 LTR 52", "dsDNA", "ssRNA", "CCCAGAGAGACCAATCTGGTCTAGACTCGGACCCTCGAGAGACCGATCGATCCCTTGGGTGACGGCTTTTTTGCGATTTCGAACGTACGGACGTCTCC");
 	sequences[seq->getID()] = seq;
+
+	seq = new Sequence("HIV-1 LTR B10", "dsDNA", "ssRNA", "CCCAGAGAGACCAATCTGGTCTAGACTCGGACCCTCGAGAGACCGATCGATTAAGGCCCTGACGAATTCGGAGTTATTTCGAACGTACGGACGTCTCC");
+	sequences[seq->getID()] = seq;
+
 
 	seq = new Sequence("Haemoglobin subunit &beta; 100bp", "ssDNA", "dsDNA", "TGTAAACGAAGACTGTGTTGACACAAGTGATCGTTGGAGTTTGTCTGTGGTACCACGTAGACTGAGGACTCCTCTTCAGACGGCAATGACGGGACACCCC");
 	sequences[seq->getID()] = seq;
@@ -467,6 +514,13 @@ void Settings::print(){
 	RateActivate->print();
 	RateDeactivate->print();
 	RateCleave->print();
+
+	upstreamCurvatureCoeff->print();
+	downstreamCurvatureCoeff->print();
+	upstreamWindow->print();
+	downstreamWindow->print();
+
+
 
 	cout << endl << endl;
 
@@ -634,6 +688,12 @@ void Settings::clearParameterHardcodings(){
 	RateActivate->stopHardcoding();
 	RateDeactivate->stopHardcoding();
 	RateCleave->stopHardcoding();
+	upstreamCurvatureCoeff->stopHardcoding();
+	downstreamCurvatureCoeff->stopHardcoding();
+	upstreamWindow->stopHardcoding();
+	downstreamWindow->stopHardcoding();
+
+
 
 }
 
@@ -662,6 +722,13 @@ void Settings::sampleAll(){
 	RateActivate->sample();
 	RateDeactivate->sample();
 	RateCleave->sample();
+	upstreamCurvatureCoeff->sample();
+	downstreamCurvatureCoeff->sample();
+	upstreamWindow->sample();
+	downstreamWindow->sample();
+
+
+
 
 
 	// Samples a model
@@ -693,6 +760,13 @@ Parameter* Settings::getParameterByName(string paramID){
 	if (paramID == "kA") return RateActivate;
 	if (paramID == "kU") return RateDeactivate;
 	if (paramID == "RateCleave") return RateCleave;
+	if (paramID == "upstreamCurvatureCoeff") return upstreamCurvatureCoeff;
+	if (paramID == "downstreamCurvatureCoeff") return downstreamCurvatureCoeff;
+	if (paramID == "upstreamWindow") return upstreamWindow;
+	if (paramID == "downstreamWindow") return downstreamWindow;
+
+
+
 
 	return nullptr;
 }

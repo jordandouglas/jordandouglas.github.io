@@ -43,7 +43,10 @@ vrna_fold_compound_t* vc; // Contains information on the sequence and the DP mat
 // Initialise the ViennaRNA suite for RNA folding
 void vRNA_init(const char* nascentSequence){
 
+
+
 	// Initialise the model details
+	vrna_md_defaults_gquad(1);
 	set_model_details(&md);
 
 	// Clean up
@@ -176,6 +179,7 @@ void vRNA_get_coordinates(char* structure, float* XY, int length){
 	while ((ee = parse_gquad(structure + ge, &Lg, l)) > 0) {
 		ge += ee;
 		gb = ge - Lg*4 - l[0] - l[1] - l[2] + 1;
+
 		// Add pseudo-base pair encloding gquad
 		for (i=0; i < Lg; i++) {
 			pair_table_g[ge-i] = gb+i;

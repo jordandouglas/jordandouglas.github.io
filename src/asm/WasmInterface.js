@@ -340,6 +340,25 @@ saveParameterDistribution = function(paramID, distributionName, distributionPara
 
 
 
+
+
+bendDNA = function(msgID = null){
+	
+	
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log("Returning", JSON.parse(resultStr));
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	
+	Module.ccall("bendDNA", null, ["number"],  [msgID]); 
+
+
+	
+}
+
+
 setModelSettings = function(tosend, msgID = null){
 	
 	var array_cpp = getCppArrayFromDict(tosend, "string");
