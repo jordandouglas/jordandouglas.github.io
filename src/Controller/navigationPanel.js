@@ -26,15 +26,95 @@ function refreshNavigationCanvases(){
 	drawTranslocationCanvas();
 	drawNTPcanvas();
 	drawDeactivationCanvas();
+	drawSlippageCanvas();
 	drawCleavageCanvas();
-
-	var numSlippageLandscapes = $(".slippageCell").length;
-	//console.log("numSlippageLandscapes", numSlippageLandscapes);
-	for (var s = 0; s < numSlippageLandscapes; s ++) drawSlippageCanvas(s);
-
 
 }
 
+
+
+function plotArrow_navigationPanel(ctx, fromx, fromy, direction, label = "", rate, spacingBetweenStates, hovering = false, reactionApplicable = true){
+	
+
+	ctx.globalAlpha = 1;
+	var headlen = 10;
+	var toy, tox;
+	var arrowSpace = 5;
+	switch(direction) {
+	    case "left":
+	    	toy = fromy;
+	    	tox = fromx - spacingBetweenStates + 3*arrowSpace;
+	        break;
+   	    case "right":
+	    	toy = fromy;
+	    	tox = fromx + spacingBetweenStates - 3*arrowSpace;
+	        break;
+	}
+
+
+    //variables to be used when creating the arrow
+    var angle = Math.atan2(toy-fromy,tox-fromx);
+
+    var arrowSize = 22;
+
+	// Clear the area
+	ctx.clearRect(Math.min(tox, fromx), 0, Math.abs(fromx - tox), 100);
+
+
+
+    //starting path of the arrow from the start square to the end square and drawing the stroke
+    ctx.beginPath();
+    ctx.moveTo(fromx, fromy);
+    ctx.lineTo(tox, toy);
+    ctx.strokeStyle = !hovering ? "#008cba" : "white";
+    ctx.strokeStyle = reactionApplicable ? ctx.strokeStyle : "#708090";
+    ctx.lineWidth = arrowSize;
+    ctx.stroke();
+
+    //starting a new path from the head of the arrow to one of the sides of the point
+    ctx.beginPath();
+    ctx.moveTo(tox, toy);
+    ctx.lineTo(tox-headlen*Math.cos(angle-Math.PI/7),toy-headlen*Math.sin(angle-Math.PI/7));
+
+    //path from the side point of the arrow, to the other side point
+    ctx.lineTo(tox-headlen*Math.cos(angle+Math.PI/7),toy-headlen*Math.sin(angle+Math.PI/7));
+
+    //path from the side point back to the tip of the arrow, and then again to the opposite side point
+    ctx.lineTo(tox, toy);
+    ctx.lineTo(tox-headlen*Math.cos(angle-Math.PI/7),toy-headlen*Math.sin(angle-Math.PI/7));
+
+    //draws the paths created above
+    ctx.lineWidth = arrowSize;
+    ctx.stroke();
+    ctx.fillStyle = !hovering ? "#008cba" : "white";
+    ctx.fillStyle = reactionApplicable ? ctx.fillStyle : "#708090";
+    ctx.fill();
+
+
+    // Label
+    var xLabPos = fromx + (direction == "left" ? -3 : 3);
+	var yLabPos = fromy;
+	ctx.textAlign = direction == "left" ? "right" : "left";
+	ctx.textBaseline="middle";
+	ctx.fillStyle = hovering ? "#008cba" : "white";
+	ctx.font = "16px Arial";
+	ctx.fillText(label, xLabPos, yLabPos);
+
+
+
+	// Rate under label
+	if(rate != null){
+		ctx.textAlign = direction == "left" ? "right" : "left";
+		ctx.textBaseline="middle";
+		ctx.fillStyle = "black";
+		ctx.font = "16px Arial";
+		ctx.fillText(roundToSF(rate, 3) + "s\u207B\u00B9", xLabPos, yLabPos - 1.25*arrowSize);
+	}
+
+
+	return {tox: tox, toy: toy, headlen: headlen};
+
+}
 
 
 
@@ -42,7 +122,7 @@ function removeArrow(ele){
 	$(ele).remove();
 }
 
-function plotArrowButton_navigationPanel(ctx, id, fromx, fromy, direction, label = "", rate, onClick = "", hoverTitle = "", spacingBetweenStates, canvas, reactionApplicable = true){
+function plotArrowButton_navigationPanel(ctx, fromx, fromy, direction, label = "", rate, onClick = "", hoverTitle = "", spacingBetweenStates, canvas, reactionApplicable = true){
 
 
 	var arrowPadding = IS_MOBILE ? 12 : 0;
@@ -59,8 +139,8 @@ function plotArrowButton_navigationPanel(ctx, id, fromx, fromy, direction, label
 
 
 	var arrowHTML = `
-		<input type="image" id="` + id + `" class="navArrow ` + cssclass + `" src="` + src + `" title="` + hoverTitle + `" onclick="if (!simulating)` + onClick + `;" style = "padding:` + arrowPadding + `; cursor:` + cursorClass + `;position:absolute; width:` + arrowWidth + `px; height:` + arrowHeight + `px; top:` + arrowTop + `px; left:` + arrowLeft + `px; z-index:2 ">
-		<div class="navArrow noselect" onclick="if (!simulating) ` + onClick + `;" title="` + hoverTitle + `" style="cursor:` + cursorClass + `; vertical-align:middle; color:white; font-family:Arial; text-align:` + textAlign + `; position:absolute; font-size:15px; top:` + labelY + `px; left:` + labelX + `px; width:` + arrowWidth + `px; z-index:2">&nbsp;` + label + `&nbsp;</div>
+		<input type="image" class="navArrow ` + cssclass + `" src="` + src + `" title="` + hoverTitle + `" onclick="if (!simulating)` + onClick + `();" style = "padding:` + arrowPadding + `; cursor:` + cursorClass + `;position:absolute; width:` + arrowWidth + `px; height:` + arrowHeight + `px; top:` + arrowTop + `px; left:` + arrowLeft + `px; z-index:2 ">
+		<div class="navArrow noselect" onclick="if (!simulating) ` + onClick + `();" title="` + hoverTitle + `" style="cursor:` + cursorClass + `; vertical-align:middle; color:white; font-family:Arial; text-align:` + textAlign + `; position:absolute; font-size:15px; top:` + labelY + `px; left:` + labelX + `px; width:` + arrowWidth + `px; z-index:2">&nbsp;` + label + `&nbsp;</div>
 
 	`;
 
@@ -68,7 +148,7 @@ function plotArrowButton_navigationPanel(ctx, id, fromx, fromy, direction, label
 	if(rate != null){
 
 		var rateHTML = `
-			<div class="navArrow" style="color:black; font-family:Arial; text-align:` + textAlign + `; position:absolute; font-size:18px; top:` + (arrowTop - 25) + `px; left:` + arrowLeft + `px; width:` + arrowWidth + `px">` + roundToSF(rate, 3) + `s<sup>-1</sup></div>
+			<div class="navArrow" style="color:black; font-family:Arial; text-align:` + textAlign + `; position:absolute; font-size:14px; top:` + (arrowTop - 5) + `px; left:` + arrowLeft + `px; width:` + arrowWidth + `px">` + roundToSF(rate, 3) + `s<sup>-1</sup></div>
 		`;
 
 		arrowHTML += rateHTML;
@@ -149,7 +229,7 @@ function drawTranslocationCanvas(){
 		var fromX = canvas.width / 2 - 25;
 		var kBck = result["kBck"];
 
-		plotArrowButton_navigationPanel(ctx, "bckBtn", fromX, canvas.height/2 + 20, "left", "Backwards", kBck, "backwards_controller()", "Translocate the polymerase backwards (&larr; key)", spacingBetweenStates, canvas, result["bckBtnActive"]);
+		plotArrowButton_navigationPanel(ctx, fromX, canvas.height/2, "left", "Backwards", kBck, "backwards_controller", "Translocate the polymerase backwards (&larr; key)", spacingBetweenStates, canvas, result["bckBtnActive"]);
 
 
 
@@ -157,7 +237,7 @@ function drawTranslocationCanvas(){
 		var fromX = canvas.width / 2 + 25;
 		var kFwd = result["kFwd"];
 
-		plotArrowButton_navigationPanel(ctx, "fwdBtn", fromX, canvas.height/2 + 20, "right", result["fwdBtnLabel"], kFwd, "forward_controller()", "Translocate the polymerase forwards (&rarr; key)", spacingBetweenStates, canvas, result["fwdBtnActive"]);
+		plotArrowButton_navigationPanel(ctx, fromX, canvas.height/2, "right", result["fwdBtnLabel"], kFwd, "forward_controller", "Translocate the polymerase forwards (&rarr; key)", spacingBetweenStates, canvas, result["fwdBtnActive"]);
 
 
 	});
@@ -197,7 +277,7 @@ function drawNTPcanvas(){
 		$(canvas).parent().find(".navArrow").remove();
 		$("#ntpCanvasDIV img").remove();
 
-		if (result == null || result["templateBaseBeingCopied"] == null || result.terminated) return;
+		if (result == null || result["templateBaseBeingCopied"] == null) return;
 
 		
 		var stateMargin = 2;
@@ -274,22 +354,22 @@ function drawNTPcanvas(){
 		// Unbound or bound state
 		if (result["mRNAPosInActiveSite"] >= 1){
 			var bindOrReleaseRate = result["NTPbound"] ? result["kRelease"] : result["kBind"];
-			var onClickLeft = result["NTPbound"] && result["mRNAPosInActiveSite"] == 1 ? "releaseNTP_controller()" : "bindNTP_controller()";
+			var onClickLeft = result["NTPbound"] && result["mRNAPosInActiveSite"] == 1 ? "releaseNTP_controller" : "bindNTP_controller";
 
 			var arrowX = result["NTPbound"] ? middleStateX - 10: leftStateX + 50;
 			var bindingOrReleasingApplicable = result["mRNAPosInActiveSite"] == 1 && result["activated"];
 			if (!bindingOrReleasingApplicable) bindOrReleaseRate = 0;
-			plotArrowButton_navigationPanel(ctx, "bindBtn", arrowX, plotHeight / 2, result["NTPbound"] ? "left" : "right", result["NTPbound"] ? "Release" : "Bind", bindOrReleaseRate, onClickLeft, result["NTPbound"] ? "Release the NTP (shift + &larr;)" : "Bind an NTP molecule (shift + &rarr;)", spacingBetweenStates, canvas, bindingOrReleasingApplicable);
+			plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, result["NTPbound"] ? "left" : "right", result["NTPbound"] ? "Release" : "Bind", bindOrReleaseRate, onClickLeft, result["NTPbound"] ? "Release the NTP (shift + &larr;)" : "Bind an NTP molecule (shift + &rarr;)", spacingBetweenStates, canvas, bindingOrReleasingApplicable);
 
 
 
 			// NTP bound state
 			if (result["NTPbound"]){
 
-				var onClickRight = "bindNTP_controller()";
+				var onClickRight = "bindNTP_controller";
 
 				var arrowX = middleStateX + 55;
-				plotArrowButton_navigationPanel(ctx, "catBtn", arrowX, plotHeight / 2, "right", "Catalyse", result["kCat"], onClickRight, "Add the bound NTP onto the end of the nascent strand (shift + &rarr;)", spacingBetweenStates, canvas, true);
+				plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "right", "Catalyse", result["kCat"], onClickRight, "Add the bound NTP onto the end of the nascent strand (shift + &rarr;)", spacingBetweenStates, canvas, true);
 
 
 			}
@@ -303,11 +383,11 @@ function drawNTPcanvas(){
 		else if (!result["NTPbound"] && result["mRNAPosInActiveSite"] <= 0){
 
 			var decayRate = 0;
-			var onClickLeft = "releaseNTP_controller()";
+			var onClickLeft = "releaseNTP_controller";
 
 			var arrowX = rightStateX - 10;
 			var decayApplicable = result["mRNAPosInActiveSite"] == 0 && result["activated"];
-			plotArrowButton_navigationPanel(ctx, "catBtn", arrowX, plotHeight / 2, "left", "Lysis", decayRate, onClickLeft, "Pyrophosphorylysis; remove the most recently added base from the chain (shift + &larr;)", spacingBetweenStates, canvas, decayApplicable);
+			plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "left", "Lysis", decayRate, onClickLeft, "Pyrophosphorylysis; remove the most recently added base from the chain (shift + &larr;)", spacingBetweenStates, canvas, decayApplicable);
 
 
 		}
@@ -428,10 +508,10 @@ function drawDeactivationCanvas(){
 		// Arrow from current state to other state
 		var fromX = (activated ?  plotWidth * 0.35 + currentStateMargin : plotWidth * 0.65 - currentStateMargin);
 		var rate = activated ? kU : kA;
-		var onClick = activated ? "deactivate_controller()" : "activate_controller()";
+		var onClick = activated ? "deactivate_controller" : "activate_controller";
 
 		if (NTPbound || !result.allowDeactivation) rate = 0; // Cannot deactivate if NTP bound
-		plotArrowButton_navigationPanel(ctx, "activBtn", fromX, plotHeight / 2, activated ? "right" : "left", activated ? "Deactivate" : "Activate", rate, onClick, activated ? "Send the polymerase into a catalytically inactive state" : "Bring the polymerase back into its catalytically active form", spacingBetweenStates, canvas, !NTPbound);
+		plotArrowButton_navigationPanel(ctx, fromX, plotHeight / 2, activated ? "right" : "left", activated ? "Deactivate" : "Activate", rate, onClick, activated ? "Send the polymerase into a catalytically inactive state" : "Bring the polymerase back into its catalytically active form", spacingBetweenStates, canvas, !NTPbound);
 
 
 
@@ -487,13 +567,44 @@ function drawCleavageCanvas(){
 		$("#cleavageCanvasDIV").append(leftHTML);
 		$("#cleavageCanvasDIV").append(rightHTML);
 		
+		/*
+		ctx.fillStyle = "#b3b3b3";
+		ctx.beginPath();
+		ctx_ellipse(ctx, leftPolXCoord, polYCoord, polWidthRad, polHeightRad, 0, 0, 2*Math.PI);
+		ctx.fill();
+
+
+		ctx.beginPath();
+		ctx_ellipse(ctx, rightPolXCoord, polYCoord, polWidthRad, polHeightRad, 0, 0, 2*Math.PI);
+		ctx.fill();
+
+
+
+
+		// Rectangle to denote hybrid
+		var rectHeight = (plotHeight - currentStateMargin) * 0.4;
+		var rectWidth = polWidthRad*1.5;
+		var rectYPos = (plotHeight-currentStateMargin) * 0.3 + currentStateMargin/2;
+		var leftRectXPos = rectWidth * 1/6 + currentStateMargin;
+		var rightRectXPos = plotWidth * 0.65 + rectWidth * 1/6;
+
+
+		ctx.fillStyle = "#e6e6e6";
+		ctx.fillRect(leftRectXPos, rectYPos, rectWidth, rectHeight);
+		ctx.fillRect(rightRectXPos, rectYPos, rectWidth, rectHeight);
+
+
+		ctx.globalAlpha = 1;
+*/
+
+
 
 		// Arrow from current state to other state
 		var fromX = plotWidth * 0.35 + currentStateMargin;
 		var rate = result.kcleave;
-		var onClick = "cleave_controller()";
+		var onClick = "cleave_controller";
 
-		plotArrowButton_navigationPanel(ctx, "cleaveBtn", fromX, plotHeight / 2, "right", "Cleave", rate, onClick, "Cleave the 3\u2032 end of the nascent strand to break the pause", spacingBetweenStates, canvas, result.canCleave);
+		plotArrowButton_navigationPanel(ctx, fromX, plotHeight / 2, "right", "Cleave", rate, onClick, "Cleave the 3\u2032 end of the nascent strand to break the pause", spacingBetweenStates, canvas, result.canCleave);
 
 
 
@@ -512,9 +623,8 @@ function drawSlippageCanvas(S = 0){
 	//$("#deactivationCanvas").remove();
 	//$("#deactivationCanvasDIV").html('<canvas id="deactivationCanvas" height=70 width=350></canvas>');
 
-	//console.log("Drawing slippage landscape", S);
 
-	var canvas = $("#slippageCanvas" + S)[0];
+	var canvas = $("#slippageCanvas")[0];
 	if (canvas == null) return;
 
 
@@ -625,19 +735,19 @@ function drawSlippageCanvas(S = 0){
 
 		// Slip left 
 		var decayRate = 0;
-		var onClickLeft = "slip_left_controller(" + S + ")";
+		var onClickLeft = "slip_left_controller";
 		var arrowX = middleStateX - 5;
 		//var decayApplicable = result["mRNAPosInActiveSite"] == 0 && result["activated"];
-		plotArrowButton_navigationPanel(ctx, "slipLeftBtn" + S, arrowX, plotHeight / 2, "left", result.leftLabel.label, null, onClickLeft, result.leftLabel.title, spacingBetweenStates, canvas, result["leftLabel"].label != "");
+		plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "left", result.leftLabel.label, null, onClickLeft, result.leftLabel.title, spacingBetweenStates, canvas, result["leftLabel"].label != "");
 
 
 
 		// Slip right 
 		var decayRate = 0;
-		var onClickRight = "slip_right_controller(" + S + ")";
+		var onClickRight = "slip_right_controller";
 		var arrowX = middleStateX + stateWidth + 5;
 		//var decayApplicable = result["mRNAPosInActiveSite"] == 0 && result["activated"];
-		plotArrowButton_navigationPanel(ctx, "slipRightBtn" + S, arrowX, plotHeight / 2, "right", result.rightLabel.label, null, onClickRight, result.rightLabel.title, spacingBetweenStates, canvas, result["rightLabel"].label != "");
+		plotArrowButton_navigationPanel(ctx, arrowX, plotHeight / 2, "right", result.rightLabel.label, null, onClickRight, result.rightLabel.title, spacingBetweenStates, canvas, result["rightLabel"].label != "");
 
 
 

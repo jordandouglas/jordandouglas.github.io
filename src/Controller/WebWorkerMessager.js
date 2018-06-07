@@ -157,14 +157,7 @@ function onWebWorkerReceiveMessage(event, resolveAfterWebassemblyInitialised = f
 	else{
 		// Otherwise we continue with the callback but with the JSON-parsed parameter
 		//console.log("result", id, result);
-		try {
-			var resultTemp = JSON.parse(result);
-			result = resultTemp;
-		}catch(e){
-			console.log("Could not parse", result);
-			JSON.parse(result);
-			return;
-		}
+		result = JSON.parse(result);
 
 		//console.log("Returning JSON ", result);
 		obj["resolve"](result);
@@ -342,7 +335,7 @@ function stop_controller(resolve = function() { }){
 		var msgID = res[1];
 		
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall(fnStr).then(() => setTimeout( function() { resolve(); }, 50) );
+		toCall(fnStr).then(() => resolve());
 		
 	}
 
@@ -761,26 +754,16 @@ function getPlotData_controller(forceUpdate = false, resolve){
 function setNextBaseToAdd_controller(){
 
 
-	var setNTP_resolve = function(dict) {
-		setNTP(dict["NTPtoAdd"]) 
-	};
+	var setNTP_resolve = function(dict) { setNTP(dict["NTPtoAdd"]) };
 
 
 	if (WEB_WORKER == null) {
 		var toCall = () => new Promise((resolve) => WW_JS.setNextBaseToAdd_WW(resolve, null));
 		toCall().then((dict) => setNTP_resolve(dict));
 
-	}else if (WEB_WORKER_WASM == null) {
+	}else{
 		var res = stringifyFunction("WW_JS.setNextBaseToAdd_WW", [null], true);
 		var fnStr = res[0];
-		var msgID = res[1];
-		//console.log("Sending function: " + fnStr);
-		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall(fnStr).then((dict) => setNTP_resolve(dict));
-
-	}else{
-		var res = stringifyFunction("getNextBaseToAdd", [], true);
-		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -806,18 +789,9 @@ function userSetNextBaseToAdd_controller(ntpType){
 		toCall().then((result) => updateDOM(result));
 	}
 
-	else if (WEB_WORKER_WASM == null) {
+	else{
 		var res = stringifyFunction("WW_JS.userSetNextBaseToAdd_WW", [ntpType, null], true);
 		var fnStr = res[0];
-		var msgID = res[1];
-		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((result) => updateDOM(result));
-
-	}
-
-	else {
-		var res = stringifyFunction("userSetNextBaseToAdd", [ntpType], true);
-		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => updateDOM(result));
@@ -1001,12 +975,6 @@ function submitDistribution_controller(resolve = function() {}){
 	// Function to call when webworker has responded
 	var updateDOM = function(PHYSICAL_PARAMETERS_LOCAL){
 		closePriorDistributionPopup();
-
-
-		if (PHYSICAL_PARAMETERS_LOCAL["refreshDOM"]){
-			refresh();
-			return;
-		}
 		
 		
 		// If the value has changed and this parameter requires refreshing on change, then refresh
@@ -1071,7 +1039,7 @@ function submitDistribution_controller(resolve = function() {}){
 function update_this_parameter_controller(element){
 
 
-	
+
 
 	var paramID = $(element).attr("id");
 	// Special case for the assisting force 
@@ -1091,7 +1059,7 @@ function update_this_parameter_controller(element){
 			if (result["val"] == null) result = result[paramID];
 
 			// If this is an NTP concentration or an NTP binding parameter then we also need to resample the next NTP addition event
-			//if (paramID.substring(3) == "conc" || paramID == "RateBind" || paramID == "RateMisbind" || paramID == "TransitionTransversionRatio") setNextBaseToAdd_controller();
+			if (paramID.substring(3) == "conc" || paramID == "RateBind" || paramID == "RateMisbind" || paramID == "TransitionTransversionRatio") setNextBaseToAdd_controller();
 			
 			$(element).val(result["val"]);
 			update_sliding_curve(0);
@@ -1102,9 +1070,6 @@ function update_this_parameter_controller(element){
 
 
 		var val = parseFloat($(element).val());
-
-
-
 		if ($("#" + paramID).attr("type") == "checkbox") val = $("#" + paramID).is(":checked");
 
 		if (WEB_WORKER == null) {
@@ -1123,7 +1088,7 @@ function update_this_parameter_controller(element){
 
 		else {
 		
-			//callWebWorkerFunction(stringifyFunction("PARAMS_JS.update_this_parameter_WW", [paramID, val]));
+			callWebWorkerFunction(stringifyFunction("PARAMS_JS.update_this_parameter_WW", [paramID, val]));
 
 			// Send to WebAssembly webworker
 			var res = stringifyFunction("saveParameterDistribution", [paramID, "Fixed", {fixedDistnVal: val}], true);
@@ -1207,7 +1172,6 @@ function transcribe_controller(nbasesToTranscribe = null, fastMode = false, reso
 		if (clickMisincorporation) $("#deactivateUponMisincorporation").click();
 		hideStopButtonAndShow("transcribe");
 		update_sliding_curve(0);
-		drawPlots();
 		resolve();
 
 	};
@@ -1263,7 +1227,6 @@ function stutter_controller(nbasesToStutter = null, fastMode = false, resolve = 
 		refreshNavigationCanvases();
 		hideStopButtonAndShow("stutter");
 		update_sliding_curve(0);
-		drawPlots();
 		resolve();
 	};
 
@@ -1279,22 +1242,9 @@ function stutter_controller(nbasesToStutter = null, fastMode = false, resolve = 
 
 
 	// If it is in asynchronous or hidden mode, then we keep going until the end
-	else if (WEB_WORKER_WASM == null) {
+	else{
 		var res = stringifyFunction("OPS_JS.stutter_WW", [nbasesToStutter, fastMode, null], true);
 		var fnStr = res[0];
-		var msgID = res[1];
-
-		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall(fnStr).then((x) => updateDOM(x));
-
-		renderObjectsUntilReceiveMessage(msgID);
-
-	}
-
-
-	else{
-		var res = stringifyFunction("stutter", [nbasesToStutter], true);
-		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -1309,12 +1259,17 @@ function stutter_controller(nbasesToStutter = null, fastMode = false, resolve = 
 
 function forward_controller(state = null, UPDATE_COORDS = true, resolve = function() { }){
 
-
 	if (variableSelectionMode) return resolve(false);
 
-	if ($("#fwdBtn").css("cursor") == "not-allowed") return resolve(false);
 
 	var updateDOM = function(DOMupdates){
+		if(DOMupdates == null || DOMupdates["successfulOp"]){
+			
+			refreshNavigationCanvases();
+			update_sliding_curve(1);
+			update_slipping_curve(0);
+			renderObjects();
+		}
 
 
 		if (DOMupdates != null) {
@@ -1338,16 +1293,7 @@ function forward_controller(state = null, UPDATE_COORDS = true, resolve = functi
 
 		}
 
-
-		refreshNavigationCanvases();
-		update_sliding_curve(1);
-		update_slipping_curve(0);
-		renderObjects();
-		drawPlots();
-
-
 		resolve();
-
 
 	};
 
@@ -1373,7 +1319,7 @@ function forward_controller(state = null, UPDATE_COORDS = true, resolve = functi
 		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((result) => updateDOM(result));
+		toCall().then(() => updateDOM());
 	}
 
 
@@ -1385,11 +1331,18 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 
 	if (variableSelectionMode) return resolve(false);
 
-	if ($("#bckBtn").css("cursor") == "not-allowed") return resolve(false);
 
 	var updateDOM = function(DOMupdates){
 
-
+		if (DOMupdates == null || DOMupdates["successfulOp"]){
+			
+			refreshNavigationCanvases();
+			update_sliding_curve(-1);
+			update_slipping_curve(0);
+			renderObjects();
+			$("#mRNAsvg").remove();
+			$("#bases").children().show(0);
+		}
 
 		if (DOMupdates != null) {
 		
@@ -1412,15 +1365,6 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 
 		}
 
-
-		refreshNavigationCanvases();
-		update_sliding_curve(-1);
-		update_slipping_curve(0);
-		renderObjects();
-		destroySecondaryStructure();
-		
-
-	
 		resolve();
 
 	};
@@ -1445,7 +1389,7 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((result) => updateDOM(result));
+		toCall().then(() => updateDOM());
 	}
 
 
@@ -1680,37 +1624,32 @@ function slip_left_controller(S = 0, state = null, UPDATE_COORDS = true, resolve
 
 	if (variableSelectionMode) return resolve(false);
 
-	//console.log("slip_left_controller", S);
 
 	var updateDOM = function(DOMupdates){
 
 		
-
-		if (DOMupdates != null) {
-
-			// Create any new slippage landscapes that are required
-			for (var i = 0; i < DOMupdates["where_to_create_new_slipping_landscape"].length; i ++){
-				create_new_slipping_landscape(DOMupdates["where_to_create_new_slipping_landscape"][i]);
-			}
-
-
-			// Reset slippage landscapes
-			for (var i = 0; i < DOMupdates["landscapes_to_reset"].length; i ++){
-				reset_slipping_landscape(DOMupdates["landscapes_to_reset"][i]);
-			}
-
-
-			// Delete slippage landscapes
-			for (var i = 0; i < DOMupdates["landscapes_to_delete"].length; i ++){
-				delete_slipping_landscape(DOMupdates["landscapes_to_delete"][i]);
-			}
-
-		}
-
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(-1, S);
 		renderObjects();
+
+
+		// Create any new slippage landscapes that are required
+		for (var i = 0; i < DOMupdates["where_to_create_new_slipping_landscape"].length; i ++){
+			create_new_slipping_landscape(DOMupdates["where_to_create_new_slipping_landscape"][i]);
+		}
+
+
+		// Reset slippage landscapes
+		for (var i = 0; i < DOMupdates["landscapes_to_reset"].length; i ++){
+			reset_slipping_landscape(DOMupdates["landscapes_to_reset"][i]);
+		}
+
+
+		// Delete slippage landscapes
+		for (var i = 0; i < DOMupdates["landscapes_to_delete"].length; i ++){
+			delete_slipping_landscape(DOMupdates["landscapes_to_delete"][i]);
+		}
 
 
 		resolve();
@@ -1724,7 +1663,7 @@ function slip_left_controller(S = 0, state = null, UPDATE_COORDS = true, resolve
 
 	}
 
-	else if (WEB_WORKER_WASM == null) {
+	else{
 		var res = stringifyFunction("OPS_JS.slip_left_WW", [state, UPDATE_COORDS, S, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
@@ -1732,18 +1671,6 @@ function slip_left_controller(S = 0, state = null, UPDATE_COORDS = true, resolve
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => updateDOM(result));
 
-	}
-
-	else{
-		
-		var res = stringifyFunction("slipLeft", [S], true);
-		var fnStr = "wasm_" + res[0];
-		var msgID = res[1];
-		//console.log("Sending function: " + fnStr);
-		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((result) => updateDOM(result));
-
-		
 	}
 
 
@@ -1757,36 +1684,31 @@ function slip_right_controller(S = 0, state = null, UPDATE_COORDS = true, resolv
 
 	if (variableSelectionMode) return resolve(false);
 
-	//console.log("slip_right_controller", S);
 
 	var updateDOM = function(DOMupdates){
 
 		
-		if (DOMupdates != null) {
-
-			// Create any new slippage landscapes that are required
-			for (var i = 0; i < DOMupdates["where_to_create_new_slipping_landscape"].length; i ++){
-				create_new_slipping_landscape(DOMupdates["where_to_create_new_slipping_landscape"][i]);
-			}
-
-
-			// Reset slippage landscapes
-			for (var i = 0; i < DOMupdates["landscapes_to_reset"].length; i ++){
-				reset_slipping_landscape(DOMupdates["landscapes_to_reset"][i]);
-			}
-
-
-			// Delete slippage landscapes
-			for (var i = 0; i < DOMupdates["landscapes_to_delete"].length; i ++){
-				delete_slipping_landscape(DOMupdates["landscapes_to_delete"][i]);
-			}
-
-		}
-
 		refreshNavigationCanvases();
 		update_sliding_curve(0);
 		update_slipping_curve(1, S);
 		renderObjects();
+
+		// Create any new slippage landscapes that are required
+		for (var i = 0; i < DOMupdates["where_to_create_new_slipping_landscape"].length; i ++){
+			create_new_slipping_landscape(DOMupdates["where_to_create_new_slipping_landscape"][i]);
+		}
+
+
+		// Reset slippage landscapes
+		for (var i = 0; i < DOMupdates["landscapes_to_reset"].length; i ++){
+			reset_slipping_landscape(DOMupdates["landscapes_to_reset"][i]);
+		}
+
+
+		// Delete slippage landscapes
+		for (var i = 0; i < DOMupdates["landscapes_to_delete"].length; i ++){
+			delete_slipping_landscape(DOMupdates["landscapes_to_delete"][i]);
+		}
 
 
 		resolve();
@@ -1800,7 +1722,7 @@ function slip_right_controller(S = 0, state = null, UPDATE_COORDS = true, resolv
 
 	}
 
-	else if (WEB_WORKER_WASM == null){
+	else{
 		var res = stringifyFunction("OPS_JS.slip_right_WW", [state, UPDATE_COORDS, S, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
@@ -1809,19 +1731,6 @@ function slip_right_controller(S = 0, state = null, UPDATE_COORDS = true, resolv
 		toCall().then((result) => updateDOM(result));
 
 	}
-
-	else {
-		
-		var res = stringifyFunction("slipRight", [S], true);
-		var fnStr = "wasm_" + res[0];
-		var msgID = res[1];
-		//console.log("Sending function: " + fnStr);
-		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((result) => updateDOM(result));
-
-		
-	}
-
 
 
 }
@@ -1928,20 +1837,9 @@ function getSlidingHeights_controller(ignoreModelOptions = false, resolve = func
 		toCall().then((result) => resolve(result));
 	}
 
-	else if (WEB_WORKER_WASM == null) {
+	else{
 		var res = stringifyFunction("FE_JS.getSlidingHeights_WW", [true, ignoreModelOptions, null], true);
 		var fnStr = res[0];
-		var msgID = res[1];
-		//console.log("Sending function: " + fnStr);
-		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((result) => resolve(result));
-
-	}
-
-	else {
-
-		var res = stringifyFunction("getTranslocationEnergyLandscape", [], true);
-		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -1985,26 +1883,16 @@ function getStateDiagramInfo_controller(resolve = function(state) { }){
 
 
 
-function getTemplateSequenceLength_controller(resolve = function(state) { }){
+function getCurrentState_controller(resolve = function(state) { }){
 
 	if (WEB_WORKER == null) {
-		var toCall = () => new Promise((resolve) => WW_JS.getTemplateSequenceLength_WW(resolve));
+		var toCall = () => new Promise((resolve) => WW_JS.getCurrentState_WW(resolve));
 		toCall().then((result) => resolve(result));
-	}
-
-	else if (WEB_WORKER_WASM == null) {
-		var res = stringifyFunction("WW_JS.getTemplateSequenceLength_WW", [null], true);
-		var fnStr = res[0];
-		var msgID = res[1];
-		//console.log("Sending function: " + fnStr);
-		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((result) => resolve(result));
-
 	}
 
 	else{
-		var res = stringifyFunction("getTemplateSequenceLength", [], true);
-		var fnStr = "wasm_" + res[0];
+		var res = stringifyFunction("WW_JS.getCurrentState_WW", [null], true);
+		var fnStr = res[0];
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -2139,7 +2027,7 @@ function getSlippageCanvasData_controller(S = 0, resolve = function(result){}){
 		toCall().then((result) => resolve(result));
 	}
 
-	else if (WEB_WORKER_WASM == null) {
+	else{
 		var res = stringifyFunction("FE_JS.getSlippageCanvasData_WW", [S, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
@@ -2148,14 +2036,6 @@ function getSlippageCanvasData_controller(S = 0, resolve = function(result){}){
 
 	}
 
-	else {
-		var res = stringifyFunction("getSlippageCanvasData", [S], true);
-		var fnStr = "wasm_" + res[0];
-		var msgID = res[1];
-		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((result) => resolve(result));
-
-	}
 
 
 }
@@ -2183,11 +2063,14 @@ function startTrials_controller(){
 	hideButtonAndShowStopButton("simulate");
 
 
+	
 	// If the sequence is big and WebWorker is connected then switch to hidden mode for efficiency
-	getTemplateSequenceLength_controller(function(result) {
+	getCurrentState_controller(function(result) {
 
+		var currentState = result["state"];
 		
-		if ($("#PreExp").val() != "hidden" && WEB_WORKER != null && result["nbases"] > 1000) changeToHiddenModeAndShowNotification();
+		if ($("#PreExp").val() != "hidden" && WEB_WORKER != null && currentState["nbases"] > 500) changeToHiddenModeAndShowNotification();
+		
 		
 		
 		disable_all_buttons();
@@ -2196,11 +2079,8 @@ function startTrials_controller(){
 		changeSpeed_controller();
 
 		$("#numSimSpan").hide(0);
-		//$("#progressSimSpan").html("<span id='counterProgress'>0</span> / " + ntrials);
-		$("#progressSimSpan").html("<span id='counterProgress'>0</span>%");
+		$("#progressSimSpan").html("<span id='counterProgress'>0</span> / " + ntrials);
 		$("#progressSimSpan").show(0);
-		$("#progressSimCanvas").show(0);
-		//$("progressToolbarCell").css("background-color", "#424f4f");
 		lockTheScrollbar("#bases");
 
 
@@ -2221,12 +2101,6 @@ function startTrials_controller(){
 			$("#numSimSpan").show(0);
 			$("#progressSimSpan").html("");
 			$("#progressSimSpan").hide(0);
-			$("#progressSimCanvas").hide(0);
-			$("#progressSimCanvas").attr("title", "");
-			//$("progressToolbarCell").css("background-color", "");
-			var canvas = document.getElementById("progressSimCanvas");
-			var ctx = canvas.getContext("2d");
-			ctx.clearRect(0, 0, 90, 22);
 			unlockTheScrollbar("#bases");
 
 
@@ -2280,7 +2154,7 @@ function startTrials_controller(){
 				
 				//drawPlotsFromData(result.plots);
 				drawPlots();
-				setNextBaseToAdd_controller();
+
 
 				var toDoAfterObjectRender = function() {
 
@@ -2294,16 +2168,7 @@ function startTrials_controller(){
 							renderParameters(); // Update parameters at the end of each trial
 						}
 
-						var progressProportion = result.N / ntrials;
-						$("#counterProgress").html(Math.floor(progressProportion * 100));
-
-						$("#progressSimCanvas").attr("title", "Completed " + result.N + " out of " + ntrials + " simulations");
-						var canvas = document.getElementById("progressSimCanvas");
-						var ctx = canvas.getContext("2d");
-						ctx.fillStyle = "#858280"; 
-						ctx.fillRect(0,0,progressProportion*90,22); 
-						ctx.fill();
-
+						$("#counterProgress").html(Math.floor(result.N));
 						//$("#output_asm").append("<div style='padding:5 5'>Velocity: " + roundToSF(result.meanVelocity, 4) + "bp/s; Time taken: " + roundToSF(result.realTime, 4) + "s; n complete = " + result.N + "</div>"); 
 
 
@@ -2428,7 +2293,6 @@ function saveSettings_controller(){
 			functionToCallAfterSaving  = function() { plot_pause_distribution(); };
 			break;
 
-
 		case "velocityHistogram": // Save the proportion of values to display
 			values.push(parseFloat($("#windowSizeInput").val()));
 
@@ -2444,14 +2308,14 @@ function saveSettings_controller(){
 			functionToCallAfterSaving  = function() { plot_velocity_distribution(); };
 			break;
 
-
 		case "pauseSite": // Save the y-axis variable
 			values.push($('input[name=Yaxis]:checked').val());
-			values.push($('input[name=pauseSiteYVariable]:checked').val());
-			//console.log("input[name=Yaxis]:checked", $('input[name=Yaxis]:checked').val());
+			console.log("input[name=Yaxis]:checked", $('input[name=Yaxis]:checked').val());
 			functionToCallAfterSaving  = function() { plot_time_vs_site(); };
 			break;
 
+
+	
 
 		case "parameterHeatmap":
 
@@ -2480,25 +2344,6 @@ function saveSettings_controller(){
 			values.push($("#plotFromPosterior").prop("checked"));
 
 
-			// Site specific constraints for X, Y and Z
-			if ($('input[name="sitesToRecordX"][value="allSites"]').prop("checked")) values.push("allSites");
-			else {
-				values.push(convertCommaStringToList($("#sitesToRecord_textboxX").val()));
-			}
-
-			if ($('input[name="sitesToRecordY"][value="allSites"]').prop("checked")) values.push("allSites");
-			else {
-				values.push(convertCommaStringToList($("#sitesToRecord_textboxY").val()));
-			}
-
-			if ($('input[name="sitesToRecordZ"][value="allSites"]').prop("checked")) values.push("allSites");
-			else {
-				values.push(convertCommaStringToList($("#sitesToRecord_textboxZ").val()));
-			}
-
-
-			console.log("values", values);
-
 			functionToCallAfterSaving  = function() { plot_parameter_heatmap(plotNum); };
 			break;
 			
@@ -2526,16 +2371,10 @@ function saveSettings_controller(){
 			
 	}
 	
-	var updateDom = function(result){
-
-		
-		if (result.whichPlotInWhichCanvas != null) {
-			drawPlotsFromData(result);
-
-		}
-		else PLOT_DATA["whichPlotInWhichCanvas"] = result;
+	var updateDom = function(whichPlotInWhichCanvas){
 
 
+		PLOT_DATA["whichPlotInWhichCanvas"] = whichPlotInWhichCanvas;
 		functionToCallAfterSaving();
 		closePlotSettingsPopup();
 	};
@@ -2562,14 +2401,15 @@ function saveSettings_controller(){
 		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((result) => updateDom(result));
+		toCall().then((whichPlotInWhichCanvas) => updateDom(whichPlotInWhichCanvas));
 
 
 	}
 	
 
-}
 
+
+}
 
 
 
@@ -2673,60 +2513,17 @@ function getMisbindMatrix_controller(resolve = function(x) { }){
 
 }
 
-
-
-function showFoldedRNA_controller(){
-
-	
-	// No RNA secondary structure display on mobile phones beause svg is not well supported
-	if ($("#PreExp").val() == "hidden" || IS_MOBILE) return;
-	
-	var toDisplay = !$("#foldBtnDiv").hasClass("toolbarIconDisabled");
-
-	var updateDOM = function(graphInfo){
-		if (toDisplay) {
-			$("#foldBtnDiv").addClass("toolbarIconDisabled");
-			getMFESequenceBonds_controller();
-		}
-		else {
-			$("#foldBtnDiv").removeClass("toolbarIconDisabled");
-			destroySecondaryStructure();
-			renderObjects();
-		}
-		
-	};
-	
-	if (WEB_WORKER == null || WEB_WORKER_WASM == null) {
-		getMFESequenceBonds_controller();
-		return;
-	}
-	
-	else {
-
-		var res = stringifyFunction("showFoldedRNA", [toDisplay], true);
-		var fnStr = "wasm_" + res[0];
-		var msgID = res[1];
-
-		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((graphInfo) => updateDOM(graphInfo));
-	}
-	
-}
-
-
-
 function getMFESequenceBonds_controller(){
 
 	
 	// No RNA secondary structure display on mobile phones beause svg is not well supported
 	if ($("#PreExp").val() == "hidden" || IS_MOBILE) return;
-	
 
 	var updateDOM = function(graphInfo){
 
-		//console.log("graphInfo", graphInfo);
+		console.log("graphInfo", graphInfo);
 		renderSecondaryStructure(graphInfo);
-		//renderObjects();
+		renderObjects();
 
 	};
 	
@@ -2735,25 +2532,18 @@ function getMFESequenceBonds_controller(){
 		toCall().then((graphInfo) => updateDOM(graphInfo));
 	}
 
-	else if (WEB_WORKER_WASM == null) {
+	else{
 		var res = stringifyFunction("MFE_JS.getMFESequenceBonds_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((graphInfo) => updateDOM(graphInfo));
+
+
 	}
 	
-	else {
-		
-
-		var res = stringifyFunction("getMFESequenceBonds", [], true);
-		var fnStr = "wasm_" + res[0];
-		var msgID = res[1];
-
-		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((graphInfo) => updateDOM(graphInfo));
-	}
+	
 	
 }
 
@@ -2958,26 +2748,6 @@ function loadSession_controller(XMLData, resolve = function() { }){
 }
 
 
-
-
-
-// Show or hide sitewise plot
-function showSitewisePlot_controller(hidden){
-
-
-	if (WEB_WORKER == null) {
-		PLOTS_JS.showPlots_WW(hidden);
-	}else if (WEB_WORKER_WASM == null){
-
-	}else{
-		var fnStr = "wasm_" + stringifyFunction("showSitewisePlot", [hidden]);
-		callWebWorkerFunction(fnStr);
-	}
-
-
-}
-
-
 // Show or hide all plots
 function showPlots_controller(hidden){
 
@@ -3142,7 +2912,7 @@ function getCacheSizes_controller(resolve = function(){}){
 
 
 
-function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata, resolve = function() { }){
+function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata, resolve){
 
 
 
@@ -3483,6 +3253,7 @@ function getPosteriorDistribution_controller(resolve = function(posterior) { }){
 
 
 }
+
 
 
 

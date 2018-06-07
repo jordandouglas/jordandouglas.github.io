@@ -104,7 +104,7 @@ function renderTermination(result){
 
 	var primerSeq = result["primerSeq"];
 	var insertPositions = result["insertPositions"]; // Has there been an insertion due to slippage?
-	$(".triphosphate").remove();
+
 
 	//console.log("primerSeq", primerSeq);
 	if (terminatedSequences.length < maxNumberTerminatedSequences){
@@ -113,7 +113,7 @@ function renderTermination(result){
 		$("#bases").scrollLeft("0px");
 		$("#clearSeqs").show()
 		$("#downloadSeqs").show();
-		destroySecondaryStructure();
+		$("#mRNAsvg").remove();
 
 
 		// Initialise the buttons at the top of the sequence panel and the first row of the sequences table (if they have not already been created)
@@ -131,10 +131,9 @@ function renderTermination(result){
 
 
 	// Update progress bar
-	if (WEB_WORKER_WASM == null){
-		var progressElement = $("#counterProgress");
-		if (progressElement != null) progressElement.html(parseFloat(progressElement.html()) + 1);
-	}
+	var progressElement = $("#counterProgress");
+	if (progressElement != null) progressElement.html(parseFloat(progressElement.html()) + 1);
+
 
 
 }
@@ -636,6 +635,7 @@ function renderObjects(override = false, resolve = function(){}){
 			while (unrenderedObjects_controller.length > 0){
 
 				var nt = unrenderedObjects_controller.shift();
+				//console.log(nt);
 
 				if (nt["id"] == "clear") {
 					$('#bases').html("");
@@ -732,7 +732,7 @@ function renderObjects(override = false, resolve = function(){}){
 
 
 					// Instant update
-					if (nt["animationTime"] <= 1){
+					if (nt["animationTime"] == 1){
 						//console.log("Need to instantly update", nt);
 						element.finish();
 						element.css("left", nt["x"] + "px");
@@ -783,12 +783,12 @@ function renderObjects(override = false, resolve = function(){}){
 				removeSequenceLoadingHTML();
 				
 			//});
-			//getMFESequenceBonds_controller();
+
 			resolve();
 			
 		});
-	
-	
+
+
 
 	});
 
@@ -833,7 +833,6 @@ function add_triphosphate(pos, x, y){
 	img.css("height", "20px");
 	img.css("position", "absolute");
 	img.css("z-index", "1");
-	img.addClass("triphosphate");
 
 	$("#bases").append(img);
 
@@ -1289,60 +1288,57 @@ function clearCache(){
 		console.log("stopped");
 
 		closeKineticCachePopup();
-		setTimeout( function() { 
-			refresh(function(){
-				
+		refresh(function(){
+			
 
-				if (distanceVsTime_cleardata){
-					DISTANCE_VS_TIME_CONTROLLER = [];
-					VELOCITIES = [];
-					haveShownDVTerrorMessage = false;
-				} 
+			if (distanceVsTime_cleardata){
+				DISTANCE_VS_TIME_CONTROLLER = [];
+				VELOCITIES = [];
+				haveShownDVTerrorMessage = false;
+			} 
 
-				if (timeHistogram_cleardata){
-					DWELL_TIMES_CONTROLLER = [];
-				}
+			if (timeHistogram_cleardata){
+				DWELL_TIMES_CONTROLLER = [];
+			}
+
+
+			if (ABC_cleardata) {
+				$("#ABCoutput").html("");
+				$("#downloadABC").hide(50);
+				$("#uploadABC").show(50);
+				$(".ABC_display").hide(50);
+				$(".RABC_display").hide(50);
+				$(".MCMC_display").hide(50);
+
+			}
+
+
+			deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata, function(plotData){
+
+				//console.log("plotData", plotData);
+
+
+
+				window.requestAnimationFrame(function(){
+					update_PLOT_DATA(plotData)
+					for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
+						if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "none" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom"  && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
+						else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
+					}
+				});
 
 
 				if (ABC_cleardata) {
-					$("#ABCoutput").html("");
-					$("#downloadABC").hide(50);
-					$("#uploadABC").show(50);
-					$(".ABC_display").hide(50);
-					$(".RABC_display").hide(50);
-					$(".MCMC_display").hide(50);
-
+					ABClines = [];
+					ABClinesAcceptedOnly = [];
+					validateAllAbcDataInputs();
+					removeTracePlots();
 				}
 
-
-				deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata, function(plotData){
-
-					//console.log("plotData", plotData);
-
-
-
-					window.requestAnimationFrame(function(){
-						update_PLOT_DATA(plotData)
-						for (var plt in PLOT_DATA["whichPlotInWhichCanvas"]){
-							if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "none" && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "custom"  && PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])();
-							else if (PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "custom" || PLOT_DATA["whichPlotInWhichCanvas"][plt]["name"] == "parameterHeatmap") eval(PLOT_DATA["whichPlotInWhichCanvas"][plt]["plotFunction"])(plt);
-						}
-					});
-
-
-					if (ABC_cleardata) {
-						ABClines = [];
-						ABClinesAcceptedOnly = [];
-						validateAllAbcDataInputs();
-						removeTracePlots();
-					}
-
-					
-				});
-
+				
 			});
 
-		}, 20);
+		});
 		
 	});
 
