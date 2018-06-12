@@ -56,7 +56,6 @@ double SimulatorPthread::performNSimulations(int N, bool verbose){
 	double meanVelocity = 0;
 
 
-
 	// Allocate number of simulations to each thread
 	// Each worker has same number of simulations, and if there are n remainders these are distributed equally among the first n threads 
 	vector<int> nSimsPerThread(N_THREADS);
@@ -107,11 +106,15 @@ double SimulatorPthread::performNSimulations(int N, bool verbose){
 
 void SimulatorPthread::createThreadAndSimulate(int threadNum, int nsims, double* toReturn, bool verbose){
 
+
+
     State* initialState = new State(true);
+
    	double velocity = SimulatorPthread::simulators.at(threadNum-1)->perform_N_Trials(nsims, initialState, verbose);
    	delete initialState;
 	//cout << "Velocity " << velocity << endl;
    	toReturn[0] = velocity;
+
 
 }
 

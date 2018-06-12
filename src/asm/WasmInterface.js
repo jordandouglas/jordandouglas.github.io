@@ -1,4 +1,3 @@
-
 /* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
@@ -174,6 +173,8 @@ loadSessionFromXML = function(xmlData, msgID = null){
 		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 	}
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+
 	
 	Module.ccall("loadSessionFromXML", null, ["string", "number"], [xmlData, msgID]);
 }
@@ -323,8 +324,8 @@ saveParameterDistribution = function(paramID, distributionName, distributionPara
 
 	Module.ccall("saveParameterDistribution", // name of C++ function 
                          null, // return type
-                         ["string", "string", "string", "number", "number", "number"], // argument types
-                         [paramID, distributionName, array_cpp.keys, array_cpp.vals, array_cpp.len, msgID]); // arguments
+                         ["string", "string", "string", "number", "number"], // argument types
+                         [paramID, distributionName, array_cpp.keys, array_cpp.vals, array_cpp.len]); // arguments
 
 
 
@@ -356,6 +357,70 @@ bendDNA = function(msgID = null){
 
 
 	
+}
+
+
+
+
+// Initialise ABC for the first time
+initABC = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		console.log("Returning", resultStr);
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("initABC", null, ["number"], [msgID]); 
+
+
+}
+
+
+
+
+
+
+// Begin/resume ABC with the specified settings
+resumeABC = function(msgID = null){
+
+
+
+
+	// Pause for a bit in case user requests to stop
+	setTimeout(function(){
+
+
+		// Create the callback function
+		var toDoAfterCall = function(resultStr){
+			//console.log("Returning", resultStr);
+			var result = JSON.parse(resultStr);
+
+			// Exit now
+			if (result.stop){
+				if (msgID != null) {
+					postMessage(msgID + "~X~" + resultStr);
+					WASM_MESSAGE_LISTENER[msgID] = null;
+				}
+			}
+
+			else{
+
+				// Resume the trials and tell the messenger to not delete the message
+				if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+				//resumeABC(msgID);
+
+			}
+		}
+
+
+		WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall, remove: false};
+		Module.ccall("resumeABC", null, ["number"], [msgID]); 
+
+	}, 1);
+
+
 }
 
 

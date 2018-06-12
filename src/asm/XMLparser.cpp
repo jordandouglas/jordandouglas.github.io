@@ -83,7 +83,6 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 	//model->print();
 
-
 	TiXmlElement *sessionEle = doc.FirstChildElement("session");
 	if (sessionEle){
 
@@ -147,6 +146,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 				}
 
 			}
+
 
 		}
 
@@ -230,12 +230,19 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 					}
 				}
 			}
+
+
+
 		}
+
+
 
 
 		// Parse ABC settings
 		TiXmlElement *abcEle = sessionEle->FirstChildElement("ABC");
 		if (abcEle) {
+
+			
 
 			_numExperimentalObservations = 0;
 			inferenceMethod = abcEle->Attribute("inferenceMethod") ? abcEle->Attribute("inferenceMethod") : inferenceMethod;
@@ -247,6 +254,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 			_chiSqthreshold_gamma = abcEle->Attribute("chiSqthreshold_gamma") ? atof(abcEle->Attribute("chiSqthreshold_gamma")) : _chiSqthreshold_gamma;
 			burnin = abcEle->Attribute("burnin") ? atoi(abcEle->Attribute("burnin")) : burnin;
 			logEvery = abcEle->Attribute("logEvery") ? atoi(abcEle->Attribute("logEvery")) : logEvery;
+
 
 
 			// Parse experimental datasets
@@ -323,6 +331,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 				experiments.push_back(experiment);
 
 			}
+
 
 		}
 
@@ -411,6 +420,8 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 			}
 
 
+
+
 			// Normalise prior weights into probabilities
 			for (list<Model>::iterator it=modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
 				(*it).setPriorProb((*it).getPriorProb() / weightSum);
@@ -424,9 +435,9 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 		} else modelsToEstimate.push_back(*currentModel);
 
 
-
-
 	}
+
+
 
 
 	//complementSequence = Settings::complementSeq(templateSequence, TemplateType.substr(2) == "RNA");

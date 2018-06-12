@@ -30,6 +30,7 @@
 #include "Coordinates.h"
 #include "SimPol_vRNA_interface.h"
 #include "SimPol_bendit_interface.h"
+#include "MCMC.h"
 
 
 #include <emscripten.h>
@@ -41,6 +42,7 @@
 #include <random>
 #include <functional>
 #include <thread>
+
 
 
 using namespace std;
@@ -622,15 +624,18 @@ extern "C" {
 		Settings::init();
 	
 		// Reinitialise the modeltimer_start
-		delete currentModel;
-		currentModel = new Model();
+		//delete currentModel;
+		//currentModel = new Model();
+		modelsToEstimate.clear();
 		
 		XMLparser::parseXMLFromString(XMLdata);
+
 		Settings::sampleAll();
 		Settings::initSequences();
 
 		// Send the globals settings back to the DOM 
 		string parametersJSON = "{" + Settings::toJSON() + "}";
+
 		messageFromWasmToJS(parametersJSON, msgID);
 		
 
@@ -907,6 +912,86 @@ extern "C" {
 	}
 
 
+
+	// Initialise ABC
+	void EMSCRIPTEN_KEEPALIVE initABC(int msgID){
+
+
+		_GUI_STOP = false;
+		_GUI_simulating = true;
+
+		// Output string
+		_ABCoutputToPrint.str("");
+		_ABCoutputToPrint.clear();
+
+
+		Settings::print();
+
+		// Initialise MCMC
+		MCMC::initMCMC();
+
+
+		string toReturnJSON = "{'stop':" + string(_GUI_STOP ?  "true" : "false") + ",";
+		toReturnJSON += "'newLines':'" + _ABCoutputToPrint.str() + "'}";
+
+
+		messageFromWasmToJS(toReturnJSON, msgID);
+
+
+	}
+
+
+
+	// Begin ABC with the specified settings
+	void EMSCRIPTEN_KEEPALIVE resumeABC(int msgID){
+
+		
+
+		// Start timer
+		_interfaceSimulation_startTime = chrono::system_clock::now();
+
+		// Output string
+		_ABCoutputToPrint.str("");
+		_ABCoutputToPrint.clear();
+
+		if (!_GUI_STOP){
+
+			// Stop timer
+			auto endTime = chrono::system_clock::now();
+			chrono::duration<double> elapsed_seconds = endTime - _interfaceSimulation_startTime;
+			double time = elapsed_seconds.count();
+
+			cout << "Starting trial " << MCMC::getPreviousStateNumber() + 1 << endl;
+
+			while(time < 1) {
+			
+
+
+				// Start MCMC and return to the DOM every 1000 ms
+				MCMC::perform_1_iteration(MCMC::getPreviousStateNumber() + 1);
+
+
+				
+				endTime = chrono::system_clock::now();
+				elapsed_seconds = endTime - _interfaceSimulation_startTime;
+				time = elapsed_seconds.count();
+
+
+			}
+
+
+		}
+
+
+		string toReturnJSON = "{'stop':" + string(_GUI_STOP ?  "true" : "false") + ",";
+		toReturnJSON += "'newLines':'" + _ABCoutputToPrint.str() + "'}";
+
+
+		messageFromWasmToJS(toReturnJSON, msgID);
+
+
+
+	}
 
 
 	// Returns all information of all parameters in JSON format

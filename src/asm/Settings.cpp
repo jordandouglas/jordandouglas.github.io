@@ -153,7 +153,7 @@ Simulator* _interfaceSimulator; // The simulator object being used by the GUI
 State* _currentStateGUI; // The current state displayed on the GUI and used in all GUI simulations
 chrono::system_clock::time_point _interfaceSimulation_startTime = chrono::system_clock::now();
 SlippageLandscapes* _slippageLandscapesToSendToDOM;
-
+ostringstream _ABCoutputToPrint;
 
 
 void Settings::init(){
@@ -336,6 +336,7 @@ vector<Parameter*> Settings::getParamListClone(){
 	return paramListClone;
 
 }
+
 
 
 void Settings::setParameterList(vector<Parameter*> params){

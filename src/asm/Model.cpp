@@ -80,8 +80,6 @@ Model* Model::clone(){
 	clonedModel->allowDNAbending = this->allowDNAbending;
 
 
-
-
 	return clonedModel;
 
 }
@@ -176,7 +174,10 @@ void Model::activateModel(){
 
 // Converts the model settings into a JSON string for use by javascript (not wrapped in { })
 string Model::toJSON(){
-	
+
+
+	//cout << "Getting translocation model " << this->currentTranslocationModel << "." << endl;
+
 	
 	string JSON = "'id':'simpleBrownian','name':'Simple Brownian ratchet model',";
 	
@@ -376,9 +377,11 @@ bool Model::get_allowMultipleBulges(){
 Model* Model::set_currentTranslocationModel(string val){
 	if (val != this->currentTranslocationModel) Settings::resetRateTables(); // Need to reset the translocation rate cache when this is changed
 	this->currentTranslocationModel = val;
+	//cout << "Setting translocation model to " << val << "." << " aka " <<  this->currentTranslocationModel << endl;
 	return this;
 }
 string Model::get_currentTranslocationModel(){
+	//cout << "get_currentTranslocationModel " << this->currentTranslocationModel << "." << endl;
 	return this->currentTranslocationModel;
 }
 

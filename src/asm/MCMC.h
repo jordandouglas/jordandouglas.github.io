@@ -46,11 +46,25 @@ class MCMC{
 	static double calculateLogPriorProbability();
 	static void tryToEstimateParameter(Parameter* param);
 
+	static PosteriorDistriutionSample* previousMCMCstate;
+	static PosteriorDistriutionSample* currentMCMCstate;
+
+
+	static int nacceptances;
+	static int nTrialsUntilBurnin;
+	static int initialStateNum;
+
+
+	
 
 	public:
 
 
+		static void initMCMC();
 		static void beginMCMC();
+		static void perform_1_iteration(int n);
+		static int getPreviousStateNumber();
+		
 
 		// Experimental data
 		static bool resetExperiment();

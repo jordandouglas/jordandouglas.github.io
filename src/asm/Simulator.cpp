@@ -57,6 +57,8 @@ Simulator::Simulator(){
 // Returns the mean velocity acros N trials
 double Simulator::perform_N_Trials(int N, State* state, bool verbose){
 
+
+
 	// Generate plots?
 	if (_plotFolderName != "") Plots::init();
 
@@ -64,6 +66,8 @@ double Simulator::perform_N_Trials(int N, State* state, bool verbose){
 	//currentModel->print();
 	simulateForSeconds = -1; 
 	this->animatingGUI = false;
+
+
 	
 	if (verbose) {
 		cout << "Performing " << N << " trials" << endl;

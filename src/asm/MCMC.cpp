@@ -46,11 +46,19 @@ bool MCMC::hasAchievedBurnin;
 bool MCMC::hasAchievedPreBurnin;
 double MCMC::epsilon = 0;
 
+int MCMC::nacceptances = 0;
+int MCMC::nTrialsUntilBurnin = 0;
+int MCMC::initialStateNum = 0;
 
-void MCMC::beginMCMC(){
+
+PosteriorDistriutionSample* MCMC::previousMCMCstate;
+PosteriorDistriutionSample* MCMC::currentMCMCstate;
+
+
+void MCMC::initMCMC(){
 
 	cout << "\nInitialising MCMC..." << endl;
-
+	bool printToFile = outputFilename != "";
 
 
 	// Sample parameters and model
@@ -74,25 +82,22 @@ void MCMC::beginMCMC(){
 
 
 	// 2 states stored in memory
-	PosteriorDistriutionSample* previousMCMCstate = new PosteriorDistriutionSample(0);
-	PosteriorDistriutionSample* currentMCMCstate;
-	bool printToFile = outputFilename != "";
-	
-
+	MCMC::previousMCMCstate = new PosteriorDistriutionSample(0);
+	// MCMC::currentMCMCstate = new PosteriorDistriutionSample(0);
 
 	// Load initial state from file
 	if (_resumeFromLogfile){
-		previousMCMCstate->loadFromLogFile(outputFilename);
-		previousMCMCstate->setParametersFromState();
+		MCMC::previousMCMCstate->loadFromLogFile(outputFilename);
+		MCMC::previousMCMCstate->setParametersFromState();
 	}
 
 
 	// Otherwise perform the first MCMC trial on the initial state
 	else{
 
-		MCMC::metropolisHastings(0, previousMCMCstate, nullptr);
-		previousMCMCstate->printHeader(printToFile);
-		previousMCMCstate->print(printToFile);
+		MCMC::metropolisHastings(0, MCMC::previousMCMCstate, nullptr);
+		MCMC::previousMCMCstate->printHeader(printToFile);
+		MCMC::previousMCMCstate->print(printToFile);
 
 	}
 
@@ -104,128 +109,144 @@ void MCMC::beginMCMC(){
 	cout << endl;
 
 
-
+	MCMC::nacceptances = 0;
+	MCMC::nTrialsUntilBurnin = 0;
 
 
 	// Intialise epsilon to the initial threshold value
-	int initialStateNum = previousMCMCstate->getStateNumber() + 1;
-	MCMC::epsilon = max(_chiSqthreshold_0 * pow(_chiSqthreshold_gamma, initialStateNum-1), _chiSqthreshold_min);
+	MCMC::initialStateNum = MCMC::previousMCMCstate->getStateNumber() + 1;
+	MCMC::epsilon = max(_chiSqthreshold_0 * pow(_chiSqthreshold_gamma, MCMC::initialStateNum-1), _chiSqthreshold_min);
 
 
-	// Iterate
-	int nacceptances = 0;
-	int nTrialsUntilBurnin = 0;
-	bool accepted;
+}
+
+
+void MCMC::beginMCMC(){
+
+
 	//Settings::print();
-	for (int n = initialStateNum; n <= ntrials_abc; n ++){
-		
-		if (n == initialStateNum || n % logEvery == 0){
-			cout << "Performing MCMC trial " << n << "; epsilon = " << MCMC::epsilon << "; Acceptance rate = " << ((double)nacceptances/(n - nTrialsUntilBurnin - initialStateNum + 1)) <<  endl;
-		}
-
-
-		//Settings::print();
-
-		// Update threshold epsilon
-		if (MCMC::epsilon > _chiSqthreshold_min){
-			MCMC::epsilon = max(MCMC::epsilon * _chiSqthreshold_gamma, _chiSqthreshold_min);
-		}
-
-
-		// If almost at epsilon then switch to the large number of tests per datapoint
-		if (!MCMC::hasAchievedPreBurnin && MCMC::epsilon <= _chiSqthreshold_min * 2){
-			MCMC::hasAchievedPreBurnin = true;
-			cout << "------- Pre-burn-in reached. Number of trials per datapoint = " << testsPerData << " -------" << endl;
-		}
-		
-		
-		// See if burnin has been achieved. Once it has, print it out in console and reset the acceptance rate
-		if (!MCMC::hasAchievedBurnin && MCMC::epsilon <= _chiSqthreshold_min && previousMCMCstate->get_chiSquared() <= MCMC::epsilon){
-			MCMC::hasAchievedBurnin = true;
-			nTrialsUntilBurnin = n - initialStateNum + 1;
-			nacceptances = 0;
-			cout << "------- Burn-in achieved. Resetting acceptance rate. -------" << endl;
-		}
-		
-		
-		// Temp HACK: if burnin has not been achieved but it should have then exit
-		if (!MCMC::hasAchievedBurnin && MCMC::epsilon <= _chiSqthreshold_min && previousMCMCstate->get_chiSquared() > MCMC::epsilon){
-			
-			// Wait 500 states after convergence has failed until exiting
-			double cutoff = log(_chiSqthreshold_min / _chiSqthreshold_0) / log(_chiSqthreshold_gamma) + 500;
-			if (n > cutoff){
-				cout << "------- Burn-in failed. Exiting now. -------" << endl;
-				exit(0);
-			}
-		}
-		
-
-
-		// Make proposal and alter the parameters to those of the new state
-		makeProposal();
-
-
-		// Accept or reject
-		currentMCMCstate = new PosteriorDistriutionSample(n);
-		accepted = MCMC::metropolisHastings(n, currentMCMCstate, previousMCMCstate);
-
-		//currentMCMCstate->print(false);
-
-		// Accept
-		if (accepted){
-			
-			nacceptances ++;
-			//cout << "Accept" << endl;
-			delete previousMCMCstate;
-			previousMCMCstate = currentMCMCstate;
-
-			//currentMCMCstate->print(false);
-
-			// Reset all parameters to make their new value final
-			for (list<Parameter*>::iterator it = parametersToEstimate.begin(); it != parametersToEstimate.end(); ++it){
-				(*it)->acceptProposal();
-			}
-		}
-
-		// If reject then restore parameters to those of the previous state
-		// This code has no knowledge of which parameter was changed
-		else{
-
-			//cout << "Reject" << endl;
-
-			delete currentMCMCstate;
-			currentMCMCstate = previousMCMCstate;
-			currentMCMCstate->setStateNumber(n);
-			if (MCMC::estimatingModel) Settings::setModel(currentMCMCstate->get_modelIndicator());
-
-			// Revert all parameters to their cached previous values
-			for (list<Parameter*>::iterator it = parametersToEstimate.begin(); it != parametersToEstimate.end(); ++it){
-				(*it)->rejectProposal();
-			}
-			currentModel->activateModel();
-
-		}
-
-
-		// Log
-		if (n % logEvery == 0){
-			currentMCMCstate->print(printToFile);
-		}
-
-		/*
-		cout << "\nEstimating the following " << parametersToEstimate.size() << " parameters:" << endl;
-		cout << "Model id = " << currentModel->getID() << endl;
-		for (list<Parameter*>::iterator it = parametersToEstimate.begin(); it != parametersToEstimate.end(); ++it){
-			(*it)->print();
-		}
-		cout << endl << endl;
-		*/
-
-
+	for (int n = MCMC::initialStateNum; n <= ntrials_abc; n ++){
+		MCMC::perform_1_iteration(n);
 	}
 
 }
 
+
+
+
+void MCMC::perform_1_iteration(int n){
+
+	if ((n == MCMC::initialStateNum || n % logEvery == 0) && !_USING_GUI){
+		cout << "Performing MCMC trial " << n << "; epsilon = " << MCMC::epsilon << "; Acceptance rate = " << ((double)MCMC::nacceptances/(n - MCMC::nTrialsUntilBurnin - MCMC::initialStateNum + 1)) <<  endl;
+	}
+
+
+	// Update threshold epsilon
+	if (MCMC::epsilon > _chiSqthreshold_min){
+		MCMC::epsilon = max(MCMC::epsilon * _chiSqthreshold_gamma, _chiSqthreshold_min);
+	}
+
+
+	// If almost at epsilon then switch to the large number of tests per datapoint
+	if (!MCMC::hasAchievedPreBurnin && MCMC::epsilon <= _chiSqthreshold_min * 2){
+		MCMC::hasAchievedPreBurnin = true;
+		cout << "------- Pre-burn-in reached. Number of trials per datapoint = " << testsPerData << " -------" << endl;
+	}
+	
+	
+	// See if burnin has been achieved. Once it has, print it out in console and reset the acceptance rate
+	if (!MCMC::hasAchievedBurnin && MCMC::epsilon <= _chiSqthreshold_min && MCMC::previousMCMCstate->get_chiSquared() <= MCMC::epsilon){
+		MCMC::hasAchievedBurnin = true;
+		MCMC::nTrialsUntilBurnin = n - MCMC::initialStateNum + 1;
+		MCMC::nacceptances = 0;
+		cout << "------- Burn-in achieved. Resetting acceptance rate. -------" << endl;
+	}
+	
+	
+	// Temp HACK: if burnin has not been achieved but it should have then exit
+	if (!MCMC::hasAchievedBurnin && MCMC::epsilon <= _chiSqthreshold_min && MCMC::previousMCMCstate->get_chiSquared() > MCMC::epsilon){
+		
+		// Wait 500 states after convergence has failed until exiting
+		double cutoff = log(_chiSqthreshold_min / _chiSqthreshold_0) / log(_chiSqthreshold_gamma) + 500;
+		if (n > cutoff){
+			cout << "------- Burn-in failed. Exiting now. -------" << endl;
+			exit(0);
+		}
+	}
+	
+
+
+	// Make proposal and alter the parameters to those of the new state
+	makeProposal();
+
+
+
+	// Accept or reject
+	MCMC::currentMCMCstate = new PosteriorDistriutionSample(n);
+	bool accepted = MCMC::metropolisHastings(n, MCMC::currentMCMCstate, MCMC::previousMCMCstate);
+
+	//currentMCMCstate->print(false);
+
+
+
+	// Accept
+	if (accepted){
+		
+		MCMC::nacceptances ++;
+		//cout << "Accept" << endl;
+
+
+		delete MCMC::previousMCMCstate;
+		MCMC::previousMCMCstate = MCMC::currentMCMCstate;
+
+
+
+		//currentMCMCstate->print(false);
+
+		// Reset all parameters to make their new value final
+		for (list<Parameter*>::iterator it = parametersToEstimate.begin(); it != parametersToEstimate.end(); ++it){
+			(*it)->acceptProposal();
+		}
+	}
+
+	// If reject then restore parameters to those of the previous state
+	// This code has no knowledge of which parameter was changed
+	else{
+
+		//cout << "Reject" << endl;
+
+
+
+		delete MCMC::currentMCMCstate;
+		MCMC::currentMCMCstate = MCMC::previousMCMCstate;
+		MCMC::currentMCMCstate->setStateNumber(n);
+		if (MCMC::estimatingModel) Settings::setModel(MCMC::currentMCMCstate->get_modelIndicator());
+
+
+
+		// Revert all parameters to their cached previous values
+		for (list<Parameter*>::iterator it = parametersToEstimate.begin(); it != parametersToEstimate.end(); ++it){
+			(*it)->rejectProposal();
+		}
+		currentModel->activateModel();
+
+	}
+
+
+	// Log
+	if (n % logEvery == 0){
+		MCMC::currentMCMCstate->print(outputFilename != "");
+	}
+
+}
+
+
+
+
+
+int MCMC::getPreviousStateNumber(){
+	return MCMC::previousMCMCstate->getStateNumber();
+}
 
 
 
@@ -275,7 +296,7 @@ void MCMC::makeProposal(){
 // The PosteriorDistriutionSample object parsed will be overwritten and populated with the appropriate details
 // Returns true if accept, false if reject
 // If the sampleNum is 0, it will always be accepted
-bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCMCState, PosteriorDistriutionSample* prevMCMCState){
+bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* this_MCMCState, PosteriorDistriutionSample* prev_MCMCState){
 	
 
 
@@ -288,20 +309,20 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 
 	// Cache the parameter values in posterior row object
 	for (list<Parameter*>::iterator it = parametersToEstimate.begin(); it != parametersToEstimate.end(); ++it){
-		thisMCMCState->addParameterEstimate((*it)->getID(), (*it)->getTrueVal());
+		this_MCMCState->addParameterEstimate((*it)->getID(), (*it)->getTrueVal());
 	}
-	if (MCMC::estimatingModel) thisMCMCState->set_modelIndicator(currentModel->getID());
+	if (MCMC::estimatingModel) this_MCMCState->set_modelIndicator(currentModel->getID());
 
 
 
 	// Calculate prior probability
-	thisMCMCState->set_logPriorProb(MCMC::calculateLogPriorProbability());
+	this_MCMCState->set_logPriorProb(MCMC::calculateLogPriorProbability());
 
 
 	// Efficiency: sample from the Metropolis prior-ratio now instead of after the simulation. If rejected then don't bother simulating
 	if (sampleNum > 0){
 		double runifNum = Settings::runif();
-		double priorRatio = exp(thisMCMCState->get_logPriorProb() - prevMCMCState->get_logPriorProb());
+		double priorRatio = exp(this_MCMCState->get_logPriorProb() - prev_MCMCState->get_logPriorProb());
 
 		// Reject
 		if (runifNum > priorRatio){
@@ -319,8 +340,8 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 	// Run simulations and stop if it exceeds threshold (unless this is the first trial)
 	int ntrialsPerDatapoint = MCMC::getNTrials();
 	double simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
-	thisMCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
-	if (thisMCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
+	this_MCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
+	if (this_MCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
 		return false;
 	}
 
@@ -330,8 +351,8 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 		// Run simulations and stop if it exceeds threshold (unless this is the first trial)
 		ntrialsPerDatapoint = MCMC::getNTrials();
 		simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
-		thisMCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
-		if (thisMCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
+		this_MCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
+		if (this_MCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
 			return false;
 		}
 
@@ -339,8 +360,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCM
 
 
 	// Exceeds threshold -> reject
-	if (thisMCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) return false;
-
+	if (this_MCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) return false;
 
 
 	return true;

@@ -38,6 +38,7 @@
 #include <chrono>
 #include <ctime>
 #include <thread>
+#include <sstream>
 
 
 using namespace std;
@@ -114,7 +115,7 @@ extern Simulator* _interfaceSimulator; // The simulator object being used by the
 extern State* _currentStateGUI; // The current state displayed on the GUI and used in all GUI simulations
 extern chrono::system_clock::time_point _interfaceSimulation_startTime; // The start time of the GUI simulation
 extern SlippageLandscapes* _slippageLandscapesToSendToDOM;
-
+extern ostringstream _ABCoutputToPrint;
 
 
 // Parameters

@@ -24,7 +24,6 @@
 #include "PosteriorDistriutionSample.h"
 #include "WasmMessenger.h"
 
-
 #include <iostream>
 #include <vector>
 #include <string>
@@ -154,6 +153,10 @@ void PosteriorDistriutionSample::printHeader(bool toFile){
 	// Send to javascript if using WASM
 	string WASM_string = "";
 
+	// Using ampersand instead of tab and exclaimation mark instead of new line when sending to the DOMS
+	string gapUnit = _USING_GUI ? "&" : "\t";
+	string endLine = _USING_GUI ? "!" : "\n";
+
 
 	// Attempt to open up file if applicable. Do not append
 	ofstream* logFile;
@@ -166,30 +169,30 @@ void PosteriorDistriutionSample::printHeader(bool toFile){
 	}
 
 	if (isWASM) WASM_string += "State\t";
-	else (toFile ? (*logFile) : cout) << "State\t";
+	else (toFile ? (*logFile) : _USING_GUI ? _ABCoutputToPrint : cout) << "State" << gapUnit;
 
 	// Print model indicator
 	if (this->modelIndicator != ""){
-		if (isWASM) WASM_string += "Model\t";
-		else (toFile ? (*logFile) : cout) << "Model\t";
+		if (isWASM) WASM_string += "Model" + gapUnit;
+		else (toFile ? (*logFile) : _USING_GUI ? _ABCoutputToPrint : cout) << "Model" << gapUnit;
 	}
 
 	// Print parameter names
 	for(std::map<string, double>::iterator iter = this->parameterEstimates.begin(); iter != this->parameterEstimates.end(); ++ iter){
 		string paramID =  iter->first;
-		if (isWASM) WASM_string += paramID + "\t";
-		else (toFile ? (*logFile) : cout) << paramID << "\t";
+		if (isWASM) WASM_string += paramID + gapUnit;
+		else (toFile ? (*logFile) : _USING_GUI ? _ABCoutputToPrint : cout) << paramID << gapUnit;
 	}
 
 	// Print 'V'N for each observation 
 	for (int i = 0; i < this->simulatedValues.size(); i ++){
-		if (isWASM) WASM_string += "V" + to_string(i+1) + "\t";
-		else (toFile ? (*logFile) : cout) << "V" << (i+1) << "\t";
+		if (isWASM) WASM_string += "V" + to_string(i+1) + gapUnit;
+		else (toFile ? (*logFile) : _USING_GUI ? _ABCoutputToPrint : cout) << "V" << (i+1) << gapUnit;
 	}
 
 	// Print prior and chi-squared
-	if (isWASM) WASM_string += "logPrior\tchiSquared\n";
-	else (toFile ? (*logFile) : cout) << "logPrior\tchiSquared" << endl;
+	if (isWASM) WASM_string += "logPrior" + gapUnit + "chiSquared\n";
+	else (toFile ? (*logFile) : _USING_GUI ? _ABCoutputToPrint : cout) << "logPrior" + gapUnit + "chiSquared" + endLine;
 	
 	
 	if (toFile) logFile->close();
@@ -211,6 +214,10 @@ void PosteriorDistriutionSample::print(bool toFile){
 	// Send to javascript if using WASM
 	string WASM_string = "";
 
+	// Using ampersand instead of tab and exclaimation mark instead of new line when sending to the DOMS
+	string gapUnit = _USING_GUI ? "&" : "\t";
+	string endLine = _USING_GUI ? "!" : "\n";
+
 	
 	// Attempt to open up file if applicable. Append to end of file
 	ofstream logFile;
@@ -226,32 +233,32 @@ void PosteriorDistriutionSample::print(bool toFile){
 		logFile.setf(ios::showpoint); 
 	}
 	
-	if (isWASM) WASM_string += to_string(this->sampleNum) + "\t";
-	else (toFile ? logFile : cout) << this->sampleNum << "\t";
+	if (isWASM) WASM_string += to_string(this->sampleNum) + gapUnit;
+	else (toFile ? logFile  : _USING_GUI ? _ABCoutputToPrint  : cout) << this->sampleNum << gapUnit;
 
 	// Print model indicator
 	if (this->modelIndicator != "") {
-		if (isWASM) WASM_string += this->modelIndicator + "\t";
-		else (toFile ? logFile : cout) << this->modelIndicator << "\t";
+		if (isWASM) WASM_string += this->modelIndicator + gapUnit;
+		else (toFile ? logFile  : _USING_GUI ? _ABCoutputToPrint  : cout) << this->modelIndicator << gapUnit;
 		
 	}
 
 	// Print parameter values
 	for(std::map<string, double>::iterator iter = this->parameterEstimates.begin(); iter != this->parameterEstimates.end(); ++ iter){
 		double value = iter->second;
-		if (isWASM) WASM_string += to_string(value) + "\t";
-		else (toFile ? logFile : cout) << value << "\t";
+		if (isWASM) WASM_string += to_string(value) + gapUnit;
+		else (toFile ? logFile  : _USING_GUI ? _ABCoutputToPrint  : cout) << value << gapUnit;
 	}
 	
 	// Print simulated values
 	for (int i = 0; i < this->simulatedValues.size(); i ++){
-		if (isWASM) WASM_string += to_string(simulatedValues.at(i)) + "\t";
-		else (toFile ? logFile : cout) << simulatedValues.at(i) << "\t";
+		if (isWASM) WASM_string += to_string(simulatedValues.at(i)) + gapUnit;
+		else (toFile ? logFile  : _USING_GUI ? _ABCoutputToPrint  : cout) << simulatedValues.at(i) << gapUnit;
 	}
 
 	// Print prior and chi-squared values
-	if (isWASM) WASM_string += to_string(this->priorProb) + "\t" + to_string(this->chiSquared) + "\n";
-	else (toFile ? logFile : cout) << this->priorProb << "\t" << this->chiSquared << endl;
+	if (isWASM) WASM_string += to_string(this->priorProb) + gapUnit + to_string(this->chiSquared) + "\n";
+	else (toFile ? logFile  : _USING_GUI ? _ABCoutputToPrint  : cout) << this->priorProb << gapUnit << this->chiSquared << endLine;
 	
 	
 	if (toFile) logFile.close();

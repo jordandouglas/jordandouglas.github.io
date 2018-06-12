@@ -33,6 +33,7 @@
 #include "TranslocationRatesCache.h"
 
 
+#include <cstring>
 #include <iostream>
 #include <locale>
 #include <algorithm>
@@ -64,6 +65,8 @@ State::State(bool init, bool guiState){
 
 State* State::setToInitialState(){
 
+
+
 	if (this->isGuiState) _applyingReactionsGUI = true;
 	this->nascentSequence = "";
 	int sequenceLength = (int)(hybridLen->getVal()-1);
@@ -87,16 +90,20 @@ State* State::setToInitialState(){
 	this->changeInLeftBulgePosition =  0;
 
 
+
 	// Information on the position and size of each bulge, and the bases each bulge contains
 	this->bulgePos.push_back(0);
 	this->bulgedBase.push_back(-1);
 	this->bulgeSize.push_back(0);
 	this->partOfBulgeID.push_back(0);
 
+
 	
 	// Transcribe a few bases forward to avoid left bubble effects
 	this->transcribe(_nBasesToTranscribeInit + max(2, (int)(bubbleLeft->getVal())));
 	if (this->isGuiState) _applyingReactionsGUI = false;
+
+
 	return this;
 }
 
@@ -207,13 +214,16 @@ State* State::transcribe(int N){
 
 	// Ensure that active site is open and NTP is not bound
 	if (this->NTPbound()) this->releaseNTP();
+
+
 	for (int i = this->mRNAPosInActiveSite; i < 1; i ++){
 		this->forward();
 	}
 	for (int i = this->mRNAPosInActiveSite; i > 1; i --){
 		this->backward();
 	}
-	
+
+
 	
 	// Transcribe N bases
 	for (int i = 0; i < N; i ++){
@@ -344,7 +354,7 @@ State* State::forward(){
 
 	//if (this->terminated) return this;
 
-	SlippageLandscapes* DOMupdates;
+	SlippageLandscapes* DOMupdates = NULL;
 	if (this->isGuiState && _animationSpeed != "hidden") {
 
 
@@ -445,12 +455,14 @@ State* State::forward(){
 	if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal()-1) ||
 		(this->mRNAPosInActiveSite <= 1 && this->rightTemplateBase > templateSequence.length())) this->terminate();
 
-	
+
+
+
 	// If this is GUI state then we will be applying these changes to the DOM 
 	if (this->isGuiState && _animationSpeed != "hidden") {
 		 _slippageLandscapesToSendToDOM = DOMupdates;
 	}
-	else delete DOMupdates; 
+	else if (DOMupdates != NULL) delete DOMupdates; 
 
 
 	return this;
@@ -545,7 +557,7 @@ State* State::backward(){
 	if (this->getLeftTemplateBaseNumber() < 1 || this->getLeftTemplateBaseNumber() - bubbleLeft->getVal() -1 <= 2) return this;
 
 
-	SlippageLandscapes* DOMupdates;
+	SlippageLandscapes* DOMupdates = NULL;
 	if (this->isGuiState && _animationSpeed != "hidden") {
 
 		// If bulge will move too far to the left then absorb it
@@ -644,7 +656,7 @@ State* State::backward(){
 	// If this is GUI state then we will be applying these changes to the DOM 
 	if (this->isGuiState && _animationSpeed != "hidden") {
 		 _slippageLandscapesToSendToDOM = DOMupdates;
-	}else delete DOMupdates; 
+	}else if (DOMupdates != NULL) delete DOMupdates; 
 
 	return this;
 }
@@ -1869,12 +1881,6 @@ string State::fold(bool fold5Prime, bool fold3Prime){
 			vRNA_get_coordinates(structure_5prime, XY, length_5prime);
 
 
-			/*
-			for (int i = 0; i < length; i ++){
-				cout << XY[i] << "," << XY[i+length] << endl;
-			}
-			*/
-
 
 
 			// Create bond objects between each consecutive base in the 5' structure
@@ -1982,11 +1988,6 @@ string State::fold(bool fold5Prime, bool fold3Prime){
 			vRNA_get_coordinates(structure_3prime, XY, length_3prime);
 
 
-			/*
-			for (int i = 0; i < length; i ++){
-				cout << XY[i] << "," << XY[i+length] << endl;
-			}
-			*/
 
 
 
@@ -2079,6 +2080,8 @@ string State::fold(bool fold5Prime, bool fold3Prime){
 
 
 	return "{" + vertices + "," + bonds + "," + toHide + "}";
+
+
 
 }
 
