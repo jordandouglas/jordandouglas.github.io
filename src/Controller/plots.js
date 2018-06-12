@@ -1972,20 +1972,20 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 		}
 		
 		
-			// Add mouse hover event
-			canvas.onmousemove = function(e) { 
+		// Add mouse hover event
+		canvas.onmousemove = function(e) { 
 
-				if (simulating) return;
+			if (simulating) return;
 
-				var rect = this.getBoundingClientRect(),
-			        x = e.clientX - rect.left,
-			        y = e.clientY - rect.top;
-				
-				histogram_mouse_over(x, y, canvas, ctx, binID, nbins, heightScale, widthScale, barHeights, minVal, ymax, col, binGap, axisGap, binSize, canvasSizeMultiplier); 
-				add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbins, widthScale, heightScale, binGap, ymax, canvasSizeMultiplier);
-				add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLabels, canvasSizeMultiplier * 20, canvasSizeMultiplier * 3);
-				
-			};
+			var rect = this.getBoundingClientRect(),
+		        x = e.clientX - rect.left,
+		        y = e.clientY - rect.top;
+			
+			histogram_mouse_over(x, y, canvas, ctx, binID, nbins, heightScale, widthScale, barHeights, minVal, ymax, col, binGap, axisGap, binSize, canvasSizeMultiplier); 
+			add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbins, widthScale, heightScale, binGap, ymax, canvasSizeMultiplier);
+			add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLabels, canvasSizeMultiplier * 20, canvasSizeMultiplier * 3);
+			
+		};
 
 
 

@@ -880,7 +880,34 @@ function getFormattedDateAndTime(){
 // Using classes from XMLWriter.js   https://github.com/flesler/XMLWriter
 function saveSession(){
 	
+
+	var currentdate = new Date(); 
+	var datetime = 
+			currentdate.getFullYear() + "_"
+			+ (currentdate.getMonth()+1)  + "_" 
+			+ currentdate.getDate() + "-"
+            + currentdate.getHours() + "."  
+            + currentdate.getMinutes() + "." 
+            + currentdate.getSeconds();
+
+	var toCall = () => new Promise((resolve) => getXMLstringOfSession(datetime, resolve));
+	toCall().then((str) => {
+
+		console.log("datetime2", datetime);
+		download("SimPol-" + datetime + ".xml", str);
+
+
+	});
 	
+
+
+}
+
+
+function getXMLstringOfSession(datetime = "", callback = function(str) { }){
+
+
+
 	var toCall = () => new Promise((resolve) => getSaveSessionData_controller(resolve));
 	toCall().then((result) => {
 
@@ -895,17 +922,11 @@ function saveSession(){
 		var saveXML = new XMLWriter();
 		saveXML.writeStartDocument();
 		
-		var currentdate = new Date(); 
-		var datetime = 
-				currentdate.getFullYear() + "_"
-				+ (currentdate.getMonth()+1)  + "_" 
-				+ currentdate.getDate() + "-"
-                + currentdate.getHours() + "."  
-                + currentdate.getMinutes() + "." 
-                + currentdate.getSeconds();
+
+
 		
 		saveXML.writeStartElement('session');
-		saveXML.writeAttributeString('datetime', datetime);
+		if (datetime != "") saveXML.writeAttributeString('datetime', datetime);
 		saveXML.writeAttributeString("N", $("#nbasesToSimulate").val());
 		saveXML.writeAttributeString('speed', $("#PreExp").val());
 		if (POLYMERASE != null) saveXML.writeAttributeString('polymerase', POLYMERASE);
@@ -1071,17 +1092,10 @@ function saveSession(){
 		saveXML.writeEndDocument();
 		
 		//console.log( saveXML.flush());
+		callback(saveXML.flush());
 		
-		
-		
-		download("SimPol-" + datetime + ".xml", saveXML.flush());
 		
 	});
-	
-	
-	
-
-	
 
 
 }

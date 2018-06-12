@@ -51,7 +51,7 @@ function beginABC(){
 	var which = $("#ABC_useMCMC").val() == 1 ? "ABC" : $("#ABC_useMCMC").val() == 2 ? "MCMC" : "NS-ABC"
 	var abcDataObjectForModel = getAbcDataObject(which)
 
-	console.log("Sending object", abcDataObjectForModel);
+	console.log("Sending object", abcDataObjectForModel, $("#ABC_useMCMC").val());
 
 
 	// Set to hidden mode and prevent user from changing to regular mode
@@ -86,7 +86,10 @@ function beginABC(){
 	//$("#ABC_chiSq").attr("disabled", "disabled");
 
 
-	onABCStart(which);
+
+
+	// Add the trace plots if MCMC
+	if (which == "MCMC") addTracePlots();
 
 
 
@@ -94,7 +97,7 @@ function beginABC(){
 
 
 
-function onABCStart(which){
+function onABCStart(){
 
 
 
@@ -106,10 +109,6 @@ function onABCStart(which){
 	$("#nRowsToDisplayABC").show(50);
 	$("#ABCacceptance_val").html("0");
 
-
-
-	// Add the trace plots if MCMC
-	if (which == "MCMC") addTracePlots();
 
 
 }
@@ -155,7 +154,8 @@ function removeTracePlots(){
 
 
 function getAbcDataObject(which = "ABC"){
-	
+
+	console.log("getAbcDataObject", which);
 	
 	var curveTables = $(".ABCcurveRow");
 	var abcDataObjectForModel = {};
@@ -272,7 +272,8 @@ function validateExperimentalDataInput(ele){
 	var valid = true;
 
 	var dataType =  $(ele).attr("id").indexOf("forceVelocity") != -1 ? "forceVelocity" : 
-					$(ele).attr("id").indexOf("ntpVelocity") != -1 ? "ntpVelocity" : null;
+					$(ele).attr("id").indexOf("ntpVelocity") != -1 ? "ntpVelocity" :
+					$(ele).attr("id").indexOf("timeGel") != -1 ?  "timeGel" : null;
 
 
 	// Ensure that the values in this textbox are in the format force, velocity with lines separating observations
@@ -281,8 +282,29 @@ function validateExperimentalDataInput(ele){
 	if (splitValues.length == 0) valid = false;
 	var thereExistsOnePairOfNumbers = false;
 	var X_axis_values = []; // Ensure no duplicate X_axis_values
-	var velocities = [];
+	var Y_axis_values = [];
+	var timeGelData = [];
 	for (var lineNum = 0; lineNum < splitValues.length; lineNum++){
+
+
+		if (splitValues[lineNum].trim() == "") continue;
+
+		// New time category in gel data
+		if (dataType == "timeGel" && splitValues[lineNum].trim().substring(0, 2) == "t="){
+			var splitLine = splitValues[lineNum].split("=");
+			if (splitLine.length != 2) {
+				valid = false;
+				break;
+			}
+			var time = parseFloat(splitLine[1]);
+			X_axis_values = [];
+			Y_axis_values = [];
+			timeGelData.push({t: time, lengths: X_axis_values, densities: Y_axis_values})
+			continue;
+
+		}
+
+
 		var splitLine = splitValues[lineNum].split(",");
 		if (splitLine.length == 1 && splitLine[0].trim() == "") continue;
 
@@ -293,8 +315,8 @@ function validateExperimentalDataInput(ele){
 
 		// Check that these are numbers
 		var X_axis_value = parseFloat(splitLine[0]);
-		var velocity = parseFloat(splitLine[1]);
-		if (isNaN(X_axis_value) || isNaN(velocity)){
+		var Y_axis_value = parseFloat(splitLine[1]);
+		if (isNaN(X_axis_value) || isNaN(Y_axis_value)){
 			valid = false;
 			break;
 		}
@@ -307,18 +329,21 @@ function validateExperimentalDataInput(ele){
 		}
 
 
-		// Check that NTP concentration is positive
-		if (dataType == "ntpVelocity" && X_axis_value <= 0){
+		// Check that NTP concentration or length is positive
+		if ((dataType == "ntpVelocity" || dataType == "timeGel") && X_axis_value <= 0){
 			valid = false;
 			break;
 		}
 
 
+
+
 		X_axis_values.push(X_axis_value);
-		velocities.push(velocity);
+		Y_axis_values.push(Y_axis_value);
 		thereExistsOnePairOfNumbers = true;
 
 	}
+
 
 
 	// If there are no observations and only empty lines then valid is set to false
@@ -327,8 +352,12 @@ function validateExperimentalDataInput(ele){
 
 	if (valid) {
 		var fitID = $(ele).attr("id").split("_")[1];
-		if (dataType == "forceVelocity") drawForceVelocityCurveCanvas(fitID, X_axis_values, velocities);
-		else if (dataType == "ntpVelocity") drawNtpVelocityCurveCanvas(fitID, X_axis_values, velocities);
+		if (dataType == "forceVelocity") drawForceVelocityCurveCanvas(fitID, X_axis_values, Y_axis_values);
+		else if (dataType == "ntpVelocity") drawNtpVelocityCurveCanvas(fitID, X_axis_values, Y_axis_values);
+		else if (dataType == "timeGel") drawTimeGelPlotCanvas(fitID, timeGelData);
+
+
+
 	}
 
 
@@ -389,12 +418,14 @@ function updateABCpanel(){
 
 
 
-function highlightABCoutputRow(element){
+function highlightABCoutputRow(element, forceShow = false){
 
+
+	//if (element == null) return;
 
 
 	// If already highlighted, remove it
-	if(element.className.indexOf("ABC_output_highlighted") != -1){
+	if(!forceShow && element.className.indexOf("ABC_output_highlighted") != -1){
 		$(element).removeClass("ABC_output_highlighted");
 	}
 
@@ -439,6 +470,8 @@ function getNewCurveButtonsTemplate(){
 					<br><br>
 					<input type=button onClick='addNewABCData("ntpVelocity")' value='+ [NTP]-velocity curve' title="Add [NTP]-velocity experimental data" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
 					<br><br>
+					<input type=button onClick='addNewABCData("timeGel")' value='+ Time gel' title="Upload a gel of transcript lengths over time" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
+					<br><br>
 					
 				</div>
 
@@ -448,6 +481,9 @@ function getNewCurveButtonsTemplate(){
 	`;
 
 }
+
+// <input type=button onClick='addNewABCData("pauseSite")' value='+ Pause sites' title="Add pause site locations" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
+// <br><br>
 
 
 function addNewABCData(type = "forceVelocity"){
@@ -465,6 +501,17 @@ function addNewABCData(type = "forceVelocity"){
 		case "ntpVelocity":
 			HTMLtemplate = getABCntpVelocityCurveTemplate(fitID);
 			break;
+
+		case "pauseSite":
+			HTMLtemplate = getABCpauseSiteTemplate(fitID);
+			break;
+
+		case "timeGel":
+			HTMLtemplate = getTimeGelTemplate(fitID);
+			break;
+
+
+
 	}
 
 	
@@ -487,6 +534,11 @@ function addNewABCData(type = "forceVelocity"){
 		case "ntpVelocity":
 			drawNtpVelocityCurveCanvas(fitID);
 			break;
+
+		case "timeGel":
+			drawTimeGelPlotCanvas(fitID);
+			break;
+
 	}
 
 
@@ -609,11 +661,7 @@ function getABCforceVelocityCurveTemplate(fitID){
 					</div> <br> <br>
 
 
-					<div class="rejection_ABC_chiSq">
-						Mean chiSq threshold:
-							<input type="number" id="ABC_chiSq_` + fitID + `" value=3 title="Accept parameters into the posterior distribution only if the mean residual sum of squares (chiSq) for this dataset is less than this threshold"
-								 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA">
-					</div>
+
 			</td>
 
 		</tr>
@@ -740,10 +788,120 @@ function getABCntpVelocityCurveTemplate(fitID){
 
 
 
+			</td>
 
-					Mean chiSq threshold:
-						<input type="number" id="ABC_chiSq_` + fitID + `" value=3 title="Accept parameters into the posterior distribution only if the mean residual sum of squares (chiSq) for this dataset is less than this threshold"
-							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA">
+		</tr>
+
+
+
+	`;
+}
+
+
+
+function getABCpauseSiteTemplate(fitID){
+	return `
+		<tr fitID="` + fitID + `" class="ABCcurveRow ntpVelocityRow"> <!-- style="background-color:#b3b3b3;"> -->
+
+
+			<td class="` + fitID + `" style="width:500px; text-align:center; vertical-align:top">
+				<div style="font-size:20px;">
+					Pause site experimental data
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+						
+				</div>
+
+
+					<textarea class="ABCinputData ntpVelocityInputData" id="ntpVelocityInputData_` + fitID + `" onChange="validateAllAbcDataInputs()" style="font-size:14px; padding: 5 10;  width: 400px; height: 200px; max-width:400px; max-height:500px; min-height:100px; min-width:200px"  
+					title="Input pause site locations in the specified format" placeholder="Example.                                                   28                                                           49,5.4,0.41                                                        101,8.6,0.21"></textarea>
+					<br><br>
+					<span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
+						Input observed pause site locations. On each line specify the site number that the pause occurred at. Optional: Emax followed by the halflife of the pause (units s), seperated with commas.
+					</span>
+
+			</td>
+
+
+
+
+			<td class="` + fitID + `" style="text-align:center; vertical-align:top">
+
+					<input type=button id='deleteExperiment_` + fitID + `' class='minimise' style='float:right'  value='&times;' onClick=deleteExperiment("` + fitID + `") title='Delete this experiment'>
+
+					<br><br>
+					Force:
+						<input type="number" id="ABC_force_` + fitID + `" value=0 title="The force (pN) applied during this experiment"
+							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA">pN <br> <br>
+
+					
+
+						<table style="width:250px; margin:auto">
+
+
+						<tr>
+							<td colspan=2 style="text-align:center;">
+
+								<div style="font-size:18px;">NTP Concentrations</div>
+							</td>
+
+						</tr>
+
+						<tr>
+							<td style="text-align:right;">
+					 			[ATP] = 
+					 		</td>
+
+					 		<td>
+					 			<input class="variable" value=1000   type="number" id="ATPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
+							</td>
+					 	</tr>
+
+
+					 	<tr>
+							<td style="text-align:right;">
+					 			[CTP] = 
+					 		</td>
+
+					 		<td>
+					 			<input class="variable" value=1000  type="number"  id="CTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+							</td>
+					 	</tr>
+
+
+
+
+					 	<tr>
+							<td style="text-align:right;">
+					 			[GTP] = 
+					 		</td>
+
+					 		<td>
+								<input class="variable" value=1000 type="number"  id="GTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+							</td>
+					 	</tr>
+
+
+
+					 	<tr>
+							<td style="text-align:right;">
+					 			[UTP] = 
+					 		</td>
+
+					 		<td>
+								<input class="variable" value=1000 type="number" id="UTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
+							</td>
+					 	</tr>
+
+
+
+					 </table>
+
+					 <br>
+					 <div style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
+						Enter the NTP concentrations for this experiment.
+					</div> <br> <br>
+
+
 
 			</td>
 
@@ -753,6 +911,133 @@ function getABCntpVelocityCurveTemplate(fitID){
 
 	`;
 }
+
+
+
+
+
+
+
+
+
+
+function getTimeGelTemplate(fitID){
+	return `
+		<tr fitID="` + fitID + `" class="ABCcurveRow timeGelRow"> <!-- style="background-color:#b3b3b3;"> -->
+
+
+			<td class="` + fitID + `" style="width:200px; text-align:center; vertical-align:top">
+				<br><br>
+				<div style="font-size:18px;">Time gel experimental data</div>
+
+
+					<textarea class="ABCinputData ntpVelocityInputData" id="timeGelInputData_` + fitID + `" onChange="validateAllAbcDataInputs()" style="font-size:14px; padding: 5 10;  width: 200px; height: 200px; max-width:200px; max-height:500px; min-height:100px; min-width:200px"  
+					title="Input time gel data in the specified format" placeholder="Example.                                      t=5                                        10, 0.5                                 11, 0.5                                t=10                                 20, 3"></textarea>
+					<br><br>
+					<span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
+						Input transcript length (nt) and relative density observations. Separate length and density values with a comma and separate observations with a line break. 
+						Ensure there are no duplicate lengths.
+					</span>
+
+			</td>
+
+
+			<td class="` + fitID + `" style="width:300px; text-align:center; vertical-align:top">
+
+				<div style="font-size:20px;">
+					Gel electrophoresis of transcript lengths over time
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+						
+				</div>
+
+					
+					<canvas id="timeGelPlot_` + fitID + `" width=300 height=300> </canvas>
+
+			</td>
+
+
+
+			<td class="` + fitID + `" style="text-align:center; vertical-align:top">
+
+					<input type=button id='deleteExperiment_` + fitID + `' class='minimise' style='float:right'  value='&times;' onClick=deleteExperiment("` + fitID + `") title='Delete this experiment'>
+
+
+
+					<table style="width:250px; margin:auto">
+
+						<tr>
+							<td colspan=2 style="text-align:center;">
+								<br>
+								<div style="font-size:18px;">NTP Concentrations</div>
+							</td>
+
+						</tr>
+
+						<tr>
+							<td style="text-align:right;">
+					 			[ATP] = 
+					 		</td>
+
+					 		<td>
+					 			<input class="variable" value=100   type="number" id="ATPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
+							</td>
+					 	</tr>
+
+
+					 	<tr>
+							<td style="text-align:right;">
+					 			[CTP] = 
+					 		</td>
+
+					 		<td>
+					 			<input class="variable" value=100  type="number"  id="CTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+							</td>
+					 	</tr>
+
+
+
+
+					 	<tr>
+							<td style="text-align:right;">
+					 			[GTP] = 
+					 		</td>
+
+					 		<td>
+								<input class="variable" value=100 type="number"  id="GTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+							</td>
+					 	</tr>
+
+
+
+					 	<tr>
+							<td style="text-align:right;">
+					 			[UTP] = 
+					 		</td>
+
+					 		<td>
+								<input class="variable" value=100 type="number" id="UTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
+							</td>
+					 	</tr>
+
+
+
+					 </table>
+
+					 <br>
+					
+
+
+
+			</td>
+
+		</tr>
+
+
+
+	`;
+}
+
+
 
 
 
@@ -1200,6 +1485,217 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 
 
 
+
+
+// Draw the gel electrophoresis
+function drawTimeGelPlotCanvas(fitID, timeGelData = null){
+
+
+	var canvas = $("#timeGelPlot_" + fitID)[0];
+	if (canvas == null) return;
+
+	var ctx = canvas.getContext('2d');
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.globalAlpha = 1;
+
+
+	var canvasSizeMultiplier = 1;
+	var laneLabelHeight = 20 * canvasSizeMultiplier;
+	var axisGap = 30 * canvasSizeMultiplier;
+	var laneWidth = 40 * canvasSizeMultiplier;
+	var laneGap = 5 * canvasSizeMultiplier;
+
+	ctx.fillStyle = "white";
+	ctx.fillRect(0, laneLabelHeight, canvas.width, canvas.height-laneLabelHeight);
+	ctx.fillStyle = "black";
+	
+
+
+	// Add + and - symbols
+	ctx.font = 18 * canvasSizeMultiplier + "px Arial";
+	ctx.textAlign= "right"; // Top left
+	ctx.textBaseline="bottom"; 
+	ctx.fillText("-", 2/3*axisGap, 2/3*axisGap + laneLabelHeight); 
+	ctx.textAlign= "left"; // Top right
+	ctx.fillText("-", canvas.width - 2/3*axisGap, 2/3*axisGap + laneLabelHeight); 
+	ctx.textAlign= "right"; // Bottom left
+	ctx.textBaseline="top"; 
+	ctx.fillText("+", 2/3*axisGap, canvas.height - 2/3*axisGap); 
+	ctx.textAlign= "left"; // Bottom right
+	ctx.fillText("+", canvas.width - 2/3*axisGap, canvas.height - 2/3*axisGap); 
+
+
+	if (timeGelData == null) return;
+
+	// Hover events
+	var stateHoverEvents = [];
+
+
+	// Normalise the densities and determine band y-coordinates
+	var maxDensity = 0;
+	var lowestBand = 10000000;
+	var highestBand = 1;
+	for (var laneNumber = 1; laneNumber <= timeGelData.length; laneNumber++){
+
+
+		var lengths = timeGelData[laneNumber-1].lengths;
+		var densities = timeGelData[laneNumber-1].densities;
+
+
+		// Find largest density
+		for (var i = 0; i < densities.length; i ++) maxDensity = Math.max(densities[i], maxDensity);
+
+
+		// Determine y height of the min and max band. Small molecules at the bottom
+		for (var i = 0; i < lengths.length; i ++) lowestBand = Math.min(lengths[i], lowestBand);
+		for (var i = 0; i < lengths.length; i ++) highestBand = Math.max(lengths[i], highestBand);
+
+	}
+
+
+	highestBand ++;
+	if (lowestBand > 1) lowestBand --;
+	var heightScale = (canvas.height - 2*axisGap - laneLabelHeight) / (1/(1 + Math.log(lowestBand)) - 1/(1 + Math.log(highestBand)));
+	var bandHeight = 5;
+
+	for (var laneNumber = 1; laneNumber <= timeGelData.length; laneNumber++){
+
+
+		var time = timeGelData[laneNumber-1].t;
+		var lengths = timeGelData[laneNumber-1].lengths;
+		var densities = timeGelData[laneNumber-1].densities;
+		var lanePosX = laneGap + (2*laneGap + laneWidth)*(laneNumber-1);
+
+
+		// Plot the lane name
+		ctx.globalAlpha = 1;
+		ctx.font = 18 * canvasSizeMultiplier + "px Arial";
+		ctx.textAlign= "center"; // Top left
+		ctx.textBaseline="bottom"; 
+		ctx.fillText(time, lanePosX + 0.5*laneWidth, laneLabelHeight); 
+
+
+		// Normalise the densities so that the largest is 1
+		for (var i = 0; i < densities.length; i ++) densities[i] /= maxDensity;
+
+		// Plot the bands
+		for (var i = 0; i < lengths.length; i ++){
+
+
+			var transcriptLength = lengths[i];
+			var relativeDensity = densities[i]; 
+			var migrationDistance = 1 / (1 + Math.log(transcriptLength)) - 1 / (1 + Math.log(highestBand)); // Add 1 so we don't divide by 0
+			var migrationDistanceY = heightScale * migrationDistance + axisGap + laneLabelHeight; // Add 1 so we don't divide by 0
+
+
+
+			// Plot the band at the appropriate density and migration distance
+			ctx.globalAlpha = relativeDensity;
+			ctx.fillRect(lanePosX, migrationDistanceY - 0.5*bandHeight, laneWidth, bandHeight);
+
+
+
+		    // Mouseover event
+			addTimeGelHoverEvents(ctx, stateHoverEvents, laneWidth, bandHeight, canvas, transcriptLength, relativeDensity, canvasSizeMultiplier, lanePosX, migrationDistanceY, axisGap);
+
+
+		}
+	}
+
+
+
+
+
+	// Activate hover events
+	canvas.onmousemove = function(e) { 
+
+		var rect = this.getBoundingClientRect();
+		var mouseHover = false;
+		for (var i = 0; i < stateHoverEvents.length; i++){
+			//console.log("stateHoverEvents", stateHoverEvents.length, i);
+			if (stateHoverEvents[i](e, rect)){
+				mouseHover = true;
+				break;
+			}
+
+		}
+
+		if (mouseHover){
+			$("#timeGelPlot_" + fitID).css('cursor','pointer');
+		}
+
+		else{
+
+			if ($("#timeGelPlot_" + fitID).css('cursor') == "pointer") {
+				drawTimeGelPlotCanvas(fitID, timeGelData)
+				$("#timeGelPlot_" + fitID).css('cursor','auto');
+			}
+
+		}
+
+	};
+
+
+	canvas.onmouseleave = function(e){
+		drawTimeGelPlotCanvas(fitID, timeGelData)
+	};
+
+
+}
+
+
+// Hover over a band to read its description
+function addTimeGelHoverEvents(ctx, stateHoverEvents, laneWidth, bandHeight, canvas, transcriptLength, relativeDensity, canvasSizeMultiplier, lanePosX, migrationDistanceY, axisGap){
+
+
+
+	
+	stateHoverEvents.push(function(e, rect) {
+
+		//console.log("mouse in band?", transcriptLength);
+		
+
+        var mouseX = e.clientX - rect.left;
+		var mouseY = e.clientY - rect.top;
+
+
+		var mouseInBand = lanePosX <= mouseX && mouseX <= lanePosX + laneWidth && migrationDistanceY - 0.5*bandHeight <= mouseY && mouseY <= migrationDistanceY + 0.5*bandHeight;
+		
+
+		if (mouseInBand){
+			var textbox = transcriptLength + " nt with relative density " + roundToSF(relativeDensity, 2);
+
+			ctx.font = 16 * canvasSizeMultiplier + "px Arial";
+			ctx.textAlign= "left";
+			ctx.globalAlpha = 1;
+			ctx.fillStyle = "#1e1e1e";
+
+
+		
+			ctx.fillRect(axisGap, canvas.height - 0.75*axisGap - 4, ctx.measureText(textbox).width+6, 22);
+
+			ctx.globalAlpha = 1;
+			ctx.fillStyle = "#ebe9e7";
+			ctx.textBaseline="top"; 
+			ctx.fillText(textbox, axisGap + 3, canvas.height - 0.75*axisGap);
+
+			return true;
+
+		}
+
+		return false;
+
+
+	});
+
+
+}
+
+
+
+
+
+
 // Loads a session from the XML file stored at url
 function uploadABCFromURL(url){
 	
@@ -1449,41 +1945,60 @@ function downloadABC(){
 
 function addNewABCRows(lines){
 
-
 	if (lines.length == 0) return;
 
+	var padded = "&&&&&&&&&&&&&&";
 	//console.log("lines", lines);
+	
 
 	for (var i = 0; i < lines.length; i++){
 
 
-		var paddedLine = null;
+		var lineWithNBSPpadding = null;
 		var rejected = false;
-		if (lines[i].trim() == "") paddedLine = "<br>";
+		if (lines[i].trim() == "" || lines[i].trim() == "&") {
+			//lineWithNBSPpadding = "<br>";
+		}
 
 		else{
 
 			// Replace all the & with a space
-			if (lines[i].split("|").length > 1) rejected = rejected || lines[i].split("|")[1].trim() == "false";
-			var paddedLine = "<div linenum='" + ABClines.length + "' onclick='highlightABCoutputRow(this)'>";
+			//if (lines[i].split("|").length > 1) rejected = rejected || lines[i].split("|")[1].trim() == "false";
+			var lineWithNBSPpadding = "<div class='' linenum='" + ABClines.length + "' onclick='highlightABCoutputRow(this)'>";
 			
 
-			var openPipe = true; // | (pipes) denote coloured font
-			for (var j = 0; j < lines[i].length; j ++){
+			// consoleLine += (ABC_JS.paddingString + value).slice(-ABC_JS.paddingString.length);
+			var lineSplit = lines[i].split("&");
+			var lineWithAmpersandPadding = "";
+			for (var j = 0; j < lineSplit.length; j++){
 
-				if (lines[i][j] == "|") {
-					paddedLine += openPipe ? "<span style='color:red'>" : "</span>"; 
-					openPipe = !openPipe;
-				}
-				else if (lines[i][j] == "&") paddedLine += "&nbsp";
-				else paddedLine += lines[i][j];
+				var paddedLineSplit = (padded + lineSplit[j]).slice(-padded.length);
+				lineWithAmpersandPadding += paddedLineSplit;
 
 			}
+
+
+
+
+			//var openPipe = true; // | (pipes) denote coloured font
+			for (var j = 0; j < lineWithAmpersandPadding.length; j ++){
+
+				//if (lines[i][j] == "|") {
+					//paddedLine += openPipe ? "<span style='color:red'>" : "</span>"; 
+					//openPipe = !openPipe;
+				//}
+				if (lineWithAmpersandPadding[j] == "&") lineWithNBSPpadding += "&nbsp";
+				else lineWithNBSPpadding += lineWithAmpersandPadding[j];
+
+			}
+
+			lineWithNBSPpadding += "<br></div>";
+			ABClines.push(lineWithNBSPpadding);
+			if (!rejected) ABClinesAcceptedOnly.push(lineWithNBSPpadding);
+
 		}
 
-		paddedLine += "<br></div>";
-		ABClines.push(paddedLine);
-		if (!rejected) ABClinesAcceptedOnly.push(paddedLine);
+
 
 	}
 
@@ -1503,22 +2018,41 @@ function renderABCoutput(){
 
 	var ABCoutputHTML = "";
 
+	var rowsToHighlight = [];
 
 	// Always print the top 3 rows (header)
-	if ($("[linenum='2']").length == 0) ABCoutputHTML += "<br><br>" + linesToUse[2];
+	/*if ($("[linenum='2']").length == 0)*/ 
+	ABCoutputHTML += "<br><br>" + linesToUse[0];
+
+	if ($("[linenum='0']").hasClass("ABC_output_highlighted")) rowsToHighlight.push($("[linenum='0']")[0]);
+
 
 
 	var startRow = (nTimes30ABCrowsToDisplay-1)*30 + 1;
 	var stopRow = startRow + 29;
 	var numRowsDisplayed = 0;
+
+
+
+
 	for (var rowNum = startRow; rowNum <= stopRow; rowNum ++){
 		
-		var rowIndex = rowNum -1 + 3;
-		if (linesToUse[rowIndex] == null) break;
+		if (linesToUse[rowNum] == null) continue;
 		numRowsDisplayed ++;
 
-		// Don't add back if already displayed
-		if ($("[linenum='" + rowIndex + "']").length == 0) ABCoutputHTML += linesToUse[rowIndex];
+
+		var jQuery_selector = $("[linenum='" + rowNum + "']");
+		if (jQuery_selector.hasClass("ABC_output_highlighted")) {
+
+			linesToUse[rowNum] = linesToUse[rowNum].replace("class=''", "class='ABC_output_highlighted'");
+
+			//rowsToHighlight.push(jQuery_selector[0]);
+		}else{
+			linesToUse[rowNum] = linesToUse[rowNum].replace("class='ABC_output_highlighted'", "class=''");
+		}
+
+
+		ABCoutputHTML += linesToUse[rowNum];
 
 
 
@@ -1529,8 +2063,20 @@ function renderABCoutput(){
 	$("#numABCrowsGenerated").html(linesToUse.length - 3);
 
 
+
 	// Add the new lines to the output
-	if (ABCoutputHTML.trim() != "") $("#ABCoutput").html($("#ABCoutput").html() + ABCoutputHTML);
+	$("#ABCoutput").html(ABCoutputHTML).after(function(){
+
+		setTimeout(function() {
+			// Highlight the rows which need to be highlighted
+			for (var i = 0; i < rowsToHighlight.length; i ++){
+				//highlightABCoutputRow(rowsToHighlight[i], true);
+				//rowsToHighlight[i].click();
+			}
+		}, 20);
+
+	});
+
 
 
 

@@ -2800,8 +2800,9 @@ function getAllSequences_controller(resolve = function(allSeqs) { }){
 }
 
 function loadSession_controller(XMLData, resolve = function() { }){
-	
 
+
+	console.log("XMLData", XMLData);
 	var updateDom = function(result){
 
 		console.log("updateDom", result);
@@ -2965,7 +2966,7 @@ function loadSession_controller(XMLData, resolve = function() { }){
 
 	else{
 
-		callWebWorkerFunction(stringifyFunction("XML_JS.loadSession_WW", [XMLData]));
+		//callWebWorkerFunction(stringifyFunction("XML_JS.loadSession_WW", [XMLData]));
 
 		var res = stringifyFunction("loadSessionFromXML", [XMLData], true);
 		var fnStr = "wasm_" + res[0];
@@ -3260,8 +3261,9 @@ function uploadABC_controller(TSVstring){
 function beginABC_controller(abcDataObjectForModel){
 
 
+	var showRejectedParameters = $("#ABC_showRejectedParameters").prop("checked");
 	running_ABC = true;
-	var updateDOM = function(){
+	var restoreDOM = function(){
 
 
 		hideStopButtonAndShow("simulate");
@@ -3288,15 +3290,15 @@ function beginABC_controller(abcDataObjectForModel){
 
 	if (WEB_WORKER == null) {
 		var toCall = () => new Promise((resolve) => ABC_JS.beginABC_WW(abcDataObjectForModel, resolve));
-		toCall().then(() => updateDOM());
+		toCall().then(() => restoreDOM());
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("ABC_JS.beginABC_WW", [abcDataObjectForModel, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then(() => updateDOM());
+		toCall().then(() => restoreDOM());
 
 
 		if ($("#PreExp").val() != "ultrafast" && $("#PreExp").val() != "hidden") {
@@ -3308,6 +3310,110 @@ function beginABC_controller(abcDataObjectForModel){
 		else{
 			simulationRenderingController = false;
 		}
+
+
+	}
+
+
+	else{
+
+		$("#PreExp").val("hidden");
+		simulationRenderingController = false;
+
+
+
+
+
+
+		// Convert all current settings into XML format and then upload them to set the MCMC settings
+		var toCall = () => new Promise((resolve) => getXMLstringOfSession("", resolve));
+		toCall().then((XMLData) => {
+
+
+			loadSession_controller(XMLData.replace(/(\r\n|\n|\r)/gm,""), function() {
+
+
+				onABCStart();
+
+				// To do in between MCMC trials
+				var updateDOMbetweenTrials = function(result){
+					
+					drawPlots();
+
+					//console.log("updateDOMbetweenTrials", result);
+
+					if (result.stop) {
+						restoreDOM();
+						MESSAGE_LISTENER[msgID] = null;
+					}
+					else{
+
+
+						// Update the counter
+						var nTrialsToGo = parseFloat(result["nTrialsToGo"]);
+						if (nTrialsToGo != parseFloat($("#ABCntrials").val()) && !isNaN(nTrialsToGo)) {
+							$("#ABCntrials").val(nTrialsToGo);
+							$("#MCMCntrials").val(nTrialsToGo);
+						}
+
+
+						if (result["newLines"] != null) {
+
+
+							/*
+							// Update the numbers of accepted values
+							var acceptanceNumber = result["acceptanceNumber"];
+							if (acceptanceNumber != null) $("#ABCacceptance_val").html(roundToSF(acceptanceNumber));
+
+
+							// Update the acceptance percentage
+							var acceptancePercentage = result["acceptancePercentage"];
+							if (acceptancePercentage != null) $("#ABCacceptancePercentage_val").html(roundToSF(acceptancePercentage));
+							
+							// Update ESS
+							var ESS = result["ESS"];
+							if (ESS != null) $("#ABC_ESS_val").html(roundToSF(ESS));
+							*/
+
+							// Update the ABC output
+							addNewABCRows(result["newLines"].split("!"));
+
+						}
+
+
+						// Hide all the rejected rows if required
+						if (showRejectedParameters) $(".ABCrejected").show(0);
+						else $(".ABCrejected").hide(0);
+
+
+						validateAllAbcDataInputs();
+
+
+						//console.log("resumeABC1");
+
+						// Go back to the model when done
+						var resumeABCFnStr = "wasm_" + stringifyFunction("resumeABC", [msgID]);
+						//callWebWorkerFunction(resumeABCFnStr, null, null, false);
+						var toCall_resume = () => new Promise((resolve) => callWebWorkerFunction(resumeABCFnStr, resolve, msgID, false));
+						toCall_resume().then((result) => updateDOMbetweenTrials(result));
+
+
+					}
+
+				};
+
+
+
+				// Start the ABC
+				var res = stringifyFunction("initABC", [], true);
+				var fnStr = "wasm_" + res[0];
+				var msgID = res[1];
+				var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID, false));
+				toCall().then((result) => updateDOMbetweenTrials(result));
+
+			});
+		});
+
 
 
 	}
