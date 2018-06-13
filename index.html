@@ -3472,11 +3472,28 @@ function closeNav() {
 
 						<div style="padding: 5 10">
 
-							<div id="nRowsToDisplayABC" style="margin-left:10px;">
+							<span id="nRowsToDisplayABC" style="margin-left:10px;">
 								<input type=button id='minusABCrows' class='minimise dropdown-disabled' style='width:40px'  value='&larr;30' onClick=minusABCrows() title='See previous 30 rows'>
 								&nbsp;Displaying lines <span id='numABCrowsDisplayed'>0</span> out of <span id='numABCrowsGenerated'>0</span>&nbsp;
 								<input type=button id='plusABCrows' class='minimise dropdown-disabled' style='width:40px'  value='30&rarr;' onClick=plusABCrows() title='See next 30 rows'>
-							</div>
+							</span>
+
+							&nbsp;&nbsp;
+							<span id="ABCacceptanceDIV" style="display:none" title="Accumulative acceptance probability. This value is reset once burn-in has been achieved (if using MCMC).">
+								Acceptance rate: <span id="ABCacceptanceVal"> </span>%
+							</span>
+
+
+							&nbsp;&nbsp;
+							<span id="currentEpsilonDIV" style="display:none" title="Current value of epsilon. Convergence can only be achieved after the current epsilon is equal to the minimum epsilon.">
+								&epsilon; = <span id="currentEpsilonVal">  </span>
+							</span>
+
+							&nbsp;&nbsp;
+							<span id="burninStatusDIV" style="display:none">
+								Status: <span id="burninStatusVal" style="color:red">  </span>
+							</span>
+
 							<br>
 
 							<div id="ABCoutput" style="width:95%; font-family:'Courier New'; background-color:white; color: black; font-size: 14px; padding: 10 20; height: 600px; overflow-y:scroll; overflow-x:scroll">
