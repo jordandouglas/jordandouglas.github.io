@@ -1326,6 +1326,25 @@ function clearCache(){
 					$(".RABC_display").hide(50);
 					$(".MCMC_display").hide(50);
 
+					// Acceptance
+					$("#ABCacceptanceDIV").hide(50);
+					$("#ABCacceptanceVal").html("0");
+
+
+					// Status
+					$("#burninStatusDIV").hide(0);
+					$("#burninStatusVal").html("");
+
+
+					// Epsilon
+					$("#currentEpsilonDIV").hide(0);
+					$("#currentEpsilonVal").html("");
+					
+
+					$("#beginMCMC_btn").val("Begin MCMC-ABC");
+					$("#beginABC_btn").val("Begin ABC");
+					nTimes30ABCrowsToDisplay = 1;
+
 				}
 
 

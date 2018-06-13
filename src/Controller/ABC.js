@@ -28,6 +28,19 @@ function initABCpanel(){
 	$(".beginABC_btn").css("background-color", "#858280");
 	$(".beginABC_btn").attr("disabled", "disabled");
 
+	// Acceptance
+	$("#ABCacceptanceDIV").hide(0);
+	$("#ABCacceptanceVal").html("0");
+
+	// Status
+	$("#burninStatusDIV").hide(0);
+	$("#burninStatusVal").html("");
+
+	// Epsilon
+	$("#currentEpsilonDIV").hide(0);
+	$("#currentEpsilonVal").html("");
+
+
 	$("#ABCPanelTable1").html("");
 	$("#ABCPanelTable2").html("");
 
@@ -104,8 +117,15 @@ function onABCStart(){
 	$("#downloadABC").show(50);
 	$("#uploadABC").hide(50);
 
+	$("#ABCacceptanceDIV").show(50);
+
+	// Status
+	$("#burninStatusDIV").show(50);
+
+	// Epsilon
+	$("#currentEpsilonDIV").show(50);
 	
-	$("#ABCacceptancePercentage_val").html("0");
+	//$("#ABCacceptancePercentage_val").html("0");
 	$("#nRowsToDisplayABC").show(50);
 	$("#ABCacceptance_val").html("0");
 

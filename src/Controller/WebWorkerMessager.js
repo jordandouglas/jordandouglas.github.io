@@ -3267,8 +3267,8 @@ function beginABC_controller(abcDataObjectForModel){
 
 
 		hideStopButtonAndShow("simulate");
-		$("#beginABC_btn").val("Begin ABC");
-		$("#beginMCMC_btn").val("Begin MCMC-ABC");
+		$("#beginABC_btn").val("Resume ABC");
+		$("#beginMCMC_btn").val("Resume MCMC-ABC");
 		$(".beginABC_btn").attr("onclick", "beginABC()");
 		$("#ABCntrials").css("cursor", "");
 		$("#ABCntrials").css("background-color", "#663399");
@@ -3342,6 +3342,10 @@ function beginABC_controller(abcDataObjectForModel){
 
 					//console.log("updateDOMbetweenTrials", result);
 
+					$("#ABCacceptanceVal").html(roundToSF(result.acceptanceRate));
+					$("#burninStatusVal").html(result.status);
+					$("#currentEpsilonVal").html(roundToSF(result.epsilon), 6);
+
 					if (result.stop) {
 						restoreDOM();
 						MESSAGE_LISTENER[msgID] = null;
@@ -3358,6 +3362,9 @@ function beginABC_controller(abcDataObjectForModel){
 
 
 						if (result["newLines"] != null) {
+
+
+
 
 
 							/*
