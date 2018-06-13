@@ -932,6 +932,9 @@ extern "C" {
 
 
 		string toReturnJSON = "{'stop':" + string(_GUI_STOP ?  "true" : "false") + ",";
+		toReturnJSON += "'acceptanceRate':0,";
+		toReturnJSON += "'status':'" + MCMC::getStatus() + "',";
+		toReturnJSON += "'epsilon':'" + to_string(MCMC::getEpsilon()) + "',";
 		toReturnJSON += "'newLines':'" + _ABCoutputToPrint.str() + "'}";
 
 
@@ -954,16 +957,20 @@ extern "C" {
 		_ABCoutputToPrint.str("");
 		_ABCoutputToPrint.clear();
 
-		if (!_GUI_STOP){
+		// Stop when user presses stop button or when all trials completed
+		bool stop = MCMC::getPreviousStateNumber() > ntrials_abc || MCMC::get_hasFailedBurnin() || _GUI_STOP;
+		_RUNNING_ABC = !stop;
+
+		if (!stop){
 
 			// Stop timer
 			auto endTime = chrono::system_clock::now();
 			chrono::duration<double> elapsed_seconds = endTime - _interfaceSimulation_startTime;
 			double time = elapsed_seconds.count();
 
-			cout << "Starting trial " << MCMC::getPreviousStateNumber() + 1 << endl;
+			//cout << "Starting trial " << MCMC::getPreviousStateNumber() + 1 << endl;
 
-			while(time < 1) {
+			while(time < 1 && !stop) {
 			
 
 
@@ -976,6 +983,8 @@ extern "C" {
 				elapsed_seconds = endTime - _interfaceSimulation_startTime;
 				time = elapsed_seconds.count();
 
+				stop = MCMC::getPreviousStateNumber() > ntrials_abc || MCMC::get_hasFailedBurnin() || _GUI_STOP;
+
 
 			}
 
@@ -983,7 +992,10 @@ extern "C" {
 		}
 
 
-		string toReturnJSON = "{'stop':" + string(_GUI_STOP ?  "true" : "false") + ",";
+		string toReturnJSON = "{'stop':" + string(stop ?  "true" : "false") + ",";
+		toReturnJSON += "'acceptanceRate':" + to_string(MCMC::getAcceptanceRate() * 100) + ",";
+		toReturnJSON += "'status':'" + MCMC::getStatus() + "',";
+		toReturnJSON += "'epsilon':'" + to_string(MCMC::getEpsilon()) + "',";
 		toReturnJSON += "'newLines':'" + _ABCoutputToPrint.str() + "'}";
 
 
@@ -1410,6 +1422,11 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE deletePlots(bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata, bool sequences_cleardata, int msgID){
 
 		Plots::deletePlotData(_currentStateGUI, distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata);
+
+		if (ABC_cleardata){
+			MCMC::cleanup();
+		}
+
 		string plotsJSON = Plots::getPlotDataAsJSON();
 		messageFromWasmToJS(plotsJSON, msgID);
 	}

@@ -91,6 +91,7 @@ double _chiSqthreshold_gamma = 0.999;
 int burnin = 10; 
 int logEvery = 100;
 int N_THREADS = 1;
+bool _RUNNING_ABC = false;
 
 
 // Experimental data

@@ -40,6 +40,8 @@ class MCMC{
 	static double epsilon; // The current chi-squared threshold
 	static bool hasAchievedBurnin;
 	static bool hasAchievedPreBurnin;
+	static bool hasFailedBurnin;
+	static bool initialised;
 
 	static void makeProposal();
 	static bool metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCMCState, PosteriorDistriutionSample* prevMCMCState);
@@ -64,7 +66,12 @@ class MCMC{
 		static void beginMCMC();
 		static void perform_1_iteration(int n);
 		static int getPreviousStateNumber();
-		
+		static void cleanup();
+		static double getAcceptanceRate(); // Decimal not percentage
+		static string getStatus();
+		static bool get_hasFailedBurnin();
+		static double getEpsilon();
+
 
 		// Experimental data
 		static bool resetExperiment();

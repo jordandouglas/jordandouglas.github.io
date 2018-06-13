@@ -44,6 +44,8 @@ list<Parameter*> MCMC::parametersToEstimate;
 bool MCMC::estimatingModel;
 bool MCMC::hasAchievedBurnin;
 bool MCMC::hasAchievedPreBurnin;
+bool MCMC::hasFailedBurnin;
+bool MCMC::initialised;
 double MCMC::epsilon = 0;
 
 int MCMC::nacceptances = 0;
@@ -57,6 +59,9 @@ PosteriorDistriutionSample* MCMC::currentMCMCstate;
 
 void MCMC::initMCMC(){
 
+
+	if (MCMC::initialised) return;
+
 	cout << "\nInitialising MCMC..." << endl;
 	bool printToFile = outputFilename != "";
 
@@ -69,6 +74,7 @@ void MCMC::initMCMC(){
 	MCMC::parametersToEstimate.clear();
 	MCMC::hasAchievedBurnin = false;
 	MCMC::hasAchievedPreBurnin = false;
+	MCMC::hasFailedBurnin = false;
 
 	MCMC::tryToEstimateParameter(hybridLen);
 	MCMC::tryToEstimateParameter(bubbleLeft);
@@ -118,16 +124,46 @@ void MCMC::initMCMC(){
 	MCMC::epsilon = max(_chiSqthreshold_0 * pow(_chiSqthreshold_gamma, MCMC::initialStateNum-1), _chiSqthreshold_min);
 
 
+	MCMC::initialised = true;
+
+
+}
+
+// Reverse-initialisation
+void MCMC::cleanup(){
+	
+	MCMC::initialised = false;
+	delete previousMCMCstate;
+	delete currentMCMCstate;
+
+
+	MCMC::parametersToEstimate.clear();
+	MCMC::estimatingModel = false;
+	MCMC::hasAchievedBurnin = false;
+	MCMC::hasAchievedPreBurnin = false;
+	MCMC::hasFailedBurnin = false;
+	MCMC::epsilon = 0;
+	MCMC::nacceptances = 0;
+	MCMC::nTrialsUntilBurnin = 0;
+	MCMC::initialStateNum = 0;
+
+	
 }
 
 
 void MCMC::beginMCMC(){
 
 
+	_RUNNING_ABC = true;
+
+
 	//Settings::print();
 	for (int n = MCMC::initialStateNum; n <= ntrials_abc; n ++){
 		MCMC::perform_1_iteration(n);
 	}
+
+
+	_RUNNING_ABC = false;
 
 }
 
@@ -169,8 +205,9 @@ void MCMC::perform_1_iteration(int n){
 		// Wait 500 states after convergence has failed until exiting
 		double cutoff = log(_chiSqthreshold_min / _chiSqthreshold_0) / log(_chiSqthreshold_gamma) + 500;
 		if (n > cutoff){
+			MCMC::hasFailedBurnin = true;
 			cout << "------- Burn-in failed. Exiting now. -------" << endl;
-			exit(0);
+			if (!_USING_GUI) exit(0);
 		}
 	}
 	
@@ -241,12 +278,6 @@ void MCMC::perform_1_iteration(int n){
 }
 
 
-
-
-
-int MCMC::getPreviousStateNumber(){
-	return MCMC::previousMCMCstate->getStateNumber();
-}
 
 
 
@@ -466,5 +497,30 @@ int MCMC::getNTrialsPostBurnin(){
 
 }
 
+double MCMC::getAcceptanceRate(){
+	return ((double)MCMC::nacceptances/((MCMC::getPreviousStateNumber()+1) - MCMC::nTrialsUntilBurnin - MCMC::initialStateNum + 1));
+}
 
 
+
+int MCMC::getPreviousStateNumber(){
+	return MCMC::previousMCMCstate->getStateNumber();
+}
+
+
+bool MCMC::get_hasFailedBurnin(){
+	return MCMC::hasFailedBurnin;
+}
+
+string MCMC::getStatus(){
+
+	if (MCMC::hasFailedBurnin) return "Convergence failed.";
+	if (MCMC::hasAchievedBurnin) return "Convergence achieved.";
+	if (MCMC::hasAchievedPreBurnin) return "Approaching convergence.";
+	return "Searching.";
+
+}
+
+double MCMC::getEpsilon(){
+	return MCMC::epsilon;
+}

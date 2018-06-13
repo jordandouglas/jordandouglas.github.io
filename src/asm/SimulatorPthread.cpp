@@ -87,7 +87,10 @@ double SimulatorPthread::performNSimulations(int N, bool verbose){
    	for (int i = 0; i < N_THREADS; i++){
    		meanVelocity += (velocities.at(i)[0] * nSimsPerThread.at(i)) / N;
    		//cout << velocities.at(i)[0] << endl;
+   		delete velocities.at(i);
+   		delete threads.at(i);
    	}
+
 
 	
 	nSimsPerThread.clear();

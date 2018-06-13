@@ -90,6 +90,7 @@ extern double _chiSqthreshold_gamma;
 extern int burnin; // Percentage
 extern int logEvery;
 extern int N_THREADS;
+extern bool _RUNNING_ABC;
 
 
 // Experimental data
