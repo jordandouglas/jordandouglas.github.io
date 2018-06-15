@@ -40,18 +40,21 @@ using namespace std;
 
 
 // Loads all states in the logfile (post-burnin only)
-vector<PosteriorDistriutionSample*> BayesianCalculations::loadLogFile(string logFileName, double epsilon){
+vector<PosteriorDistributionSample*> BayesianCalculations::loadLogFile(string logFileName, double epsilon){
 
 	
 	ifstream logfile;
 	string line;
     logfile.open(logFileName);
-    list<PosteriorDistriutionSample*> states;
+    list<PosteriorDistributionSample*> states;
     if(logfile.is_open()) {
 
-    	
+
+
+
 		// Parse header
     	getline(logfile, line);
+    	while (line != "") getline(logfile, line);
     	vector<string> headerLineSplit = Settings::split(line, '\t');
 
     	//cout << "line: " << line << endl;
@@ -59,14 +62,17 @@ vector<PosteriorDistriutionSample*> BayesianCalculations::loadLogFile(string log
     	//cout << headerLineSplit.at(54) << endl;
 
     	// Iterate through states in logfile and build list of burnin states
+    	vector<string> splitLine;
         while(getline(logfile, line)) {
-
-
+        	
+        	
         	if (line == "") continue;
 
+
         	// Parse state
-          	PosteriorDistriutionSample* state = new PosteriorDistriutionSample(0);
-        	state->parseFromLogFileLine(line, headerLineSplit);
+          	PosteriorDistributionSample* state = new PosteriorDistributionSample(0);
+          	splitLine = Settings::split(line, '\t');
+        	state->parseFromLogFileLine(splitLine, headerLineSplit);
 
 
 
@@ -91,9 +97,7 @@ vector<PosteriorDistriutionSample*> BayesianCalculations::loadLogFile(string log
 
 
 
-
-
-        vector<PosteriorDistriutionSample*> states_vector{ std::begin(states), std::end(states) };
+        vector<PosteriorDistributionSample*> states_vector{ std::begin(states), std::end(states) };
 
         states_vector.at(5)->printHeader(false);
         states_vector.at(5)->print(false);
@@ -112,7 +116,7 @@ vector<PosteriorDistriutionSample*> BayesianCalculations::loadLogFile(string log
 
 
 // Calculate and print number of times each model appears in the posterior distribution 
-void BayesianCalculations::printModelFrequencies(vector<PosteriorDistriutionSample*> posteriorDistribution){
+void BayesianCalculations::printModelFrequencies(vector<PosteriorDistributionSample*> posteriorDistribution){
 
 	if (modelsToEstimate.size()) {
 
@@ -143,7 +147,7 @@ void BayesianCalculations::printModelFrequencies(vector<PosteriorDistriutionSamp
 
 
 // Partition the posterior distribution into models and calculate the geometric median for each
-void BayesianCalculations::printMarginalGeometricMedians(vector<PosteriorDistriutionSample*> states){
+void BayesianCalculations::printMarginalGeometricMedians(vector<PosteriorDistributionSample*> states){
 
 	
 
@@ -153,7 +157,7 @@ void BayesianCalculations::printMarginalGeometricMedians(vector<PosteriorDistriu
 		for (list<Model>::iterator model = modelsToEstimate.begin(); model != modelsToEstimate.end(); ++model){
 
 			// Compile a list of states which use this model
-			list<PosteriorDistriutionSample*> statesThisModel;
+			list<PosteriorDistributionSample*> statesThisModel;
 			for (int j = 0; j < states.size(); j++) {
 				if (states.at(j)->get_modelIndicator() == (*model).getID()) statesThisModel.push_back(states.at(j));
 			}
@@ -163,12 +167,12 @@ void BayesianCalculations::printMarginalGeometricMedians(vector<PosteriorDistriu
 
 
 			// Convert list into vector
-			vector<PosteriorDistriutionSample*> statesThisModel_vector{ std::begin(statesThisModel), std::end(statesThisModel) };
+			vector<PosteriorDistributionSample*> statesThisModel_vector{ std::begin(statesThisModel), std::end(statesThisModel) };
 
 
 			// Print geometric median
 			cout << "\n------ Calculating geometric median for Model " << (*model).getID() << "------" << endl;
-			BayesianCalculations::printGeometricMedian(statesThisModel_vector, false);
+			BayesianCalculations::getGeometricMedian(statesThisModel_vector, true, false);
 			cout << "------------------------------------------------------\n" << endl;
 
 		}
@@ -181,24 +185,26 @@ void BayesianCalculations::printMarginalGeometricMedians(vector<PosteriorDistriu
 
 
 
-// Calculate and print geometric median for each parameter
-PosteriorDistriutionSample* BayesianCalculations::printGeometricMedian(vector<PosteriorDistriutionSample*> states, bool printBanners){
+// Calculate and print geometric median for each parameter. If print is true then will print
+PosteriorDistributionSample* BayesianCalculations::getGeometricMedian(vector<PosteriorDistributionSample*> states, bool print, bool printBanners){
 
-	if (printBanners) cout << "\n------ Calculating geometric median ------" << endl;
+
+
+	if (print & printBanners) cout << "\n------ Calculating geometric median ------" << endl;
 
 	if (states.size() == 0){
 		cout << "Cannot calculate geometric median for 0 states" << endl;
 		return nullptr;
 	}
 
-	cout << "Number of states: " << states.size() << endl;
+	if (print) cout << "Number of states: " << states.size() << endl;
 
 	// Get list of parameters
 	vector<string> paramIDs = states.at(0)->getParameterNames();
 
 
 	// Normalise each parameter into a z-score
-	vector<PosteriorDistriutionSample*> normalisedStates(states.size());
+	vector<PosteriorDistributionSample*> normalisedStates(states.size());
 	for (int j = 0; j < states.size(); j++) normalisedStates.at(j) = states.at(j)->clone(true);
 
 
@@ -235,11 +241,11 @@ PosteriorDistriutionSample* BayesianCalculations::printGeometricMedian(vector<Po
 
 	// For each state j
 	for (int j = 0; j < states.size(); j++) {
-		PosteriorDistriutionSample* state_j = normalisedStates.at(j);
+		PosteriorDistributionSample* state_j = normalisedStates.at(j);
 
 		// For each state k>j
 		for (int k = j+1; k < states.size(); k++) {
-			PosteriorDistriutionSample* state_k = normalisedStates.at(k);
+			PosteriorDistributionSample* state_k = normalisedStates.at(k);
 
 			// For each parameter
 			double distance = 0;
@@ -279,22 +285,23 @@ PosteriorDistriutionSample* BayesianCalculations::printGeometricMedian(vector<Po
 
 
 	// Print out the (unnormalised) state which has the shortest distance. This state is the geometric median
-	PosteriorDistriutionSample* geometricMedian = states.at(stateWithShortestDistance);
+	PosteriorDistributionSample* geometricMedian = states.at(stateWithShortestDistance);
 
-	cout << "The geometric median is state " <<  geometricMedian->getStateNumber() << endl;
-	if (geometricMedian->get_modelIndicator() != "") cout << "Model " << geometricMedian->get_modelIndicator() << endl;
-	for (int i = 0; i < paramIDs.size(); i ++){
-		string paramID = paramIDs.at(i);
-		cout << paramID << " = " <<  geometricMedian->getParameterEstimate(paramID) << endl;
+	if (print) {
+		cout << "The geometric median is state " <<  geometricMedian->getStateNumber() << endl;
+		if (geometricMedian->get_modelIndicator() != "") cout << "Model " << geometricMedian->get_modelIndicator() << endl;
+		for (int i = 0; i < paramIDs.size(); i ++){
+			string paramID = paramIDs.at(i);
+			cout << paramID << " = " <<  geometricMedian->getParameterEstimate(paramID) << endl;
+		}
+		cout << "logPrior = " << geometricMedian->get_logPriorProb() << endl;
+		cout << "X2 = " << geometricMedian->get_chiSquared() << endl;
+		cout << "Mean (z-score normalised) Euclidean distance to all other states = " << meanDistance << endl;
 	}
-	cout << "logPrior = " << geometricMedian->get_logPriorProb() << endl;
-	cout << "X2 = " << geometricMedian->get_chiSquared() << endl;
-	cout << "Mean (z-score normalised) Euclidean distance to all other states = " << meanDistance << endl;
-
 	//geometricMedian->print(false);
 
 
-	if (printBanners) cout << "-------------------------------------------\n" << endl;
+	if (print && printBanners) cout << "-------------------------------------------\n" << endl;
 
 
 	return geometricMedian;
@@ -305,7 +312,7 @@ PosteriorDistriutionSample* BayesianCalculations::printGeometricMedian(vector<Po
 
 
 // Simulate N trials times under each experimental setting. If posteriorDistribution is not parsed then will sample from the prior
-void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistriutionSample*> posteriorDistribution){
+void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistributionSample*> posteriorDistribution){
 
 
 	bool samplingFromPosterior = posteriorDistribution.size() > 0;
@@ -317,13 +324,13 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistriutionSample
 	for (int n = 1; n <= ntrials_sim; n ++){
 
 
-		PosteriorDistriutionSample* state = new PosteriorDistriutionSample(n);
+		PosteriorDistributionSample* state = new PosteriorDistributionSample(n);
 
 		// Sample parameters from posterior distribution
 		if (samplingFromPosterior) {
 
 			int stateToSample = std::floor(Settings::runif() * posteriorDistribution.size());
-			PosteriorDistriutionSample* posteriorSample = posteriorDistribution.at(stateToSample);
+			PosteriorDistributionSample* posteriorSample = posteriorDistribution.at(stateToSample);
 			posteriorSample->setParametersFromState();
 
 			// Clone the state but not the simulation results
@@ -385,7 +392,47 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistriutionSample
 
 
 
+// Returns the GUI posterior distribution in a format where it can be printed on a heatmap
+list<ParameterHeatmapData*> BayesianCalculations::getPosteriorDistributionAsHeatmap(){
 
 
+	// The posterior distribution is stored as rows, while the heatmap is stored as columns
+	list<ParameterHeatmapData*> heatMapData;
+	if (_GUI_posterior.size() == 0) return heatMapData;
+
+
+	// One heatmap object for each parameter in the posterior + chiSq + prior + histogram probability
+	heatMapData.push_back(new ParameterHeatmapData("probability", "Probability density"));
+	heatMapData.push_back(new ParameterHeatmapData("logPrior", "Log Prior"));
+	heatMapData.push_back(new ParameterHeatmapData("chiSq", "Chi-squared", "X^{2}"));
+	heatMapData.push_back(new ParameterHeatmapData("state", "State number", "X^{2}"));
+	for (int i = 0; i < _GUI_posterior.front()->getParameterNames().size(); i++){
+		string paramID = _GUI_posterior.front()->getParameterNames().at(i);
+		Parameter* param = Settings::getParameterByName(paramID);
+		if (param == nullptr) continue;
+		heatMapData.push_back(new ParameterHeatmapData(paramID, param->getName(), param->getLatexName()));
+	}
+
+
+	// Iterate through each column and populate it with estimates from the rows
+	for (list<ParameterHeatmapData*>::iterator col = heatMapData.begin(); col != heatMapData.end(); ++col){
+
+		string paramID = (*col)->getID();
+		if (paramID == "probability") continue;
+
+		for (list<PosteriorDistributionSample*>::iterator row = _GUI_posterior.begin(); row != _GUI_posterior.end(); ++row){
+			if (paramID == "chiSq") (*col)->addValue( (*row)->get_chiSquared() );
+			else if (paramID == "logPrior") (*col)->addValue( (*row)->get_logPriorProb() );
+			else if (paramID == "state") (*col)->addValue( (*row)->getStateNumber() );
+			else (*col)->addValue( (*row)->getParameterEstimate(paramID) );
+		}
+
+	}
+
+
+
+	return heatMapData;
+
+}
 
 

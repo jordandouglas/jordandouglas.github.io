@@ -32,7 +32,7 @@
 #include "MCMC.h"
 #include "SimulatorPthread.h"
 #include "BayesianCalculations.h"
-#include "PosteriorDistriutionSample.h"
+#include "PosteriorDistributionSample.h"
 #include "SimPol_vRNA_interface.h"
 
 
@@ -214,12 +214,12 @@ int main(int argc, char** argv) {
 
 	// Sample from the posterior
 	else if (_sampleFromLikelihood){
-		vector<PosteriorDistriutionSample*> statesPostBurnin(0);
+		vector<PosteriorDistributionSample*> statesPostBurnin(0);
 		if (_inputLogFileName != "") statesPostBurnin = BayesianCalculations::loadLogFile(_inputLogFileName, _chiSqthreshold_min);
 		if (_printSummary && statesPostBurnin.size() > 0) { // Use geometric median as the single state to sample from 
 			statesPostBurnin.resize(1);
 			BayesianCalculations::printModelFrequencies(statesPostBurnin);
-			statesPostBurnin.at(0) = BayesianCalculations::printGeometricMedian(statesPostBurnin, true);
+			statesPostBurnin.at(0) = BayesianCalculations::getGeometricMedian(statesPostBurnin, true, true);
 			cout << "Sampling new data using geometric median parameters" << endl;
 		}
 		else if (!_printSummary && statesPostBurnin.size() > 0) cout << "Sampling new data using parameters in posterior distribution " << _inputLogFileName << endl;
@@ -230,11 +230,11 @@ int main(int argc, char** argv) {
 
 	// Read in log file and print a summary to the terminal
 	else if (_printSummary){
-		vector<PosteriorDistriutionSample*> statesPostBurnin = BayesianCalculations::loadLogFile(_inputLogFileName, _chiSqthreshold_min);
+		vector<PosteriorDistributionSample*> statesPostBurnin = BayesianCalculations::loadLogFile(_inputLogFileName, _chiSqthreshold_min);
 		BayesianCalculations::printModelFrequencies(statesPostBurnin);
 
 		if (_marginalModel) BayesianCalculations::printMarginalGeometricMedians(statesPostBurnin);
-		else BayesianCalculations::printGeometricMedian(statesPostBurnin, true);
+		else BayesianCalculations::getGeometricMedian(statesPostBurnin, true, true);
 	}
 
 

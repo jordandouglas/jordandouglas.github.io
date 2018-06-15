@@ -24,6 +24,7 @@
 #include "Settings.h"
 #include "Plots.h"
 #include "State.h"
+#include "BayesianCalculations.h"
 
 
 #include <string>
@@ -444,7 +445,7 @@ string Plots::getPlotDataAsJSON(){
 	for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
 		if (!Plots::plotsAreHidden && Plots::plotSettings.at(pltNum) != nullptr && (Plots::plotSettings.at(pltNum)->getName() == "distanceVsTime" || Plots::plotSettings.at(pltNum)->getName() == "velocityHistogram")) distanceVsTime_needsData = true;
 		else if (!Plots::plotsAreHidden && Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->getName() == "pauseHistogram") pauseHistogram_needsData = true;
-		else if (!Plots::plotsAreHidden && Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->getName() == "parameterHeatmap") parameterHeatmap_needsData = true;
+		else if (!Plots::plotsAreHidden && Plots::plotSettings.at(pltNum) != nullptr && (Plots::plotSettings.at(pltNum)->getName() == "parameterHeatmap" || Plots::plotSettings.at(pltNum)->getName() == "tracePlot")) parameterHeatmap_needsData = true;
 		else if (!Plots::sitewisePlotHidden && Plots::plotSettings.at(pltNum) != nullptr && 
 							(Plots::plotSettings.at(pltNum)->getName() == "pauseSite" || Plots::plotSettings.at(pltNum)->getName() == "catalysisTimeSite")) pausePerSite_needsData = true;
 		
@@ -842,8 +843,19 @@ string Plots::getPlotDataAsJSON(){
 	// But here we update the plot settings to include the new data 
 	if (parameterHeatmap_needsData) {
 
+
+		// If a plot needs access to the posterior distribution then convert the GUI posterior distribution into the appropriate format
+		bool aPlotNeedsPosteriorDistribution = false;
+		list<ParameterHeatmapData*> heatMapDataToSend = Plots::parametersPlotData;
+		for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++) {
+			if (Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->get_plotFromPosterior()) aPlotNeedsPosteriorDistribution = true;
+		}
+		if (aPlotNeedsPosteriorDistribution) heatMapDataToSend = BayesianCalculations::getPosteriorDistributionAsHeatmap();
+
+
+		// Send through either simulated data or posterior data
 		for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
-			if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->updateHeatmapData(Plots::parametersPlotData);
+			if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->updateHeatmapData(heatMapDataToSend);
 		}
 
 	}
@@ -909,13 +921,15 @@ string Plots::getPlotDataAsJSON(){
 void Plots::userSelectPlot(int plotNum, string value, bool deleteData){
 
 
-
 	PlotSettings* newPlotSettings = new PlotSettings(plotNum, value);
 
 	// Delete the PlotSettings which this one is replacing
 	PlotSettings* toDelete = Plots::plotSettings.at(plotNum - 1);
 	delete toDelete;
 	Plots::plotSettings.at(plotNum - 1) = newPlotSettings;
+
+	// If ABC has been running then set to posterior distribution
+	Plots::plotSettings.at(plotNum - 1)->set_plotFromPosterior(true);
 
 
 
@@ -1056,9 +1070,13 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 	}
 
 
-	// Clear the data saved in the ABC output, and the posterior distribution
+	// Set non posterior distribution as the default option for all plots
 	if (ABC_cleardata) {
 
+		
+		for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
+			if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->set_plotFromPosterior(false);
+		}
 
 	}
 	
@@ -1083,3 +1101,13 @@ void Plots::addCopiedSequence(string sequence){
 	}
 }
 
+
+void Plots::prepareForABC(){
+
+
+	// Set posterior distribution as the default option for all plots
+	for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
+		if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->set_plotFromPosterior(true);
+	}
+
+}

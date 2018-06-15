@@ -31,6 +31,7 @@
 #include "Simulator.h"
 #include "Polymerase.h"
 #include "SlippageLandscapes.h"
+#include "PosteriorDistributionSample.h"
 
 #include <random>
 #include <string>
@@ -117,6 +118,7 @@ extern State* _currentStateGUI; // The current state displayed on the GUI and us
 extern chrono::system_clock::time_point _interfaceSimulation_startTime; // The start time of the GUI simulation
 extern SlippageLandscapes* _slippageLandscapesToSendToDOM;
 extern ostringstream _ABCoutputToPrint;
+extern list<PosteriorDistributionSample*> _GUI_posterior;
 
 
 // Parameters

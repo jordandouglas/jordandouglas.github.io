@@ -91,6 +91,8 @@ class PlotSettings{
 		void updateHeatmapData(list<ParameterHeatmapData*> heatmapData);
 		void recordSite(int siteThatWasJustCatalysed, double timeToCatalysis);
 		void deleteSiteRecordings();
+		bool get_plotFromPosterior();
+		void set_plotFromPosterior(bool val);
 
 
 };

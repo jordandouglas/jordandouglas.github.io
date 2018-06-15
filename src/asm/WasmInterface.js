@@ -424,6 +424,54 @@ resumeABC = function(msgID = null){
 }
 
 
+// Get posterior distribution summary (geometric medians etc)
+getPosteriorSummaryData = function(msgID = null){
+	
+	
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		console.log("Returning getPosteriorSummaryData", JSON.parse(resultStr));
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	
+	Module.ccall("getPosteriorSummaryData", null, ["number"],  [msgID]); 
+
+}
+
+// Generate the full ABC output
+getABCoutput = function(msgID = null){
+	
+	
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	
+	Module.ccall("getABCoutput", null, ["number"],  [msgID]); 
+
+}
+
+
+// Upload the ABC file
+uploadABC = function(TSVfile, msgID = null){
+	
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		console.log("uploadABC", resultStr);
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	// Clear all ABC data first
+	Module.ccall("uploadABC", null, ["string", "number"],  [TSVfile, msgID]); 
+
+
+}
+
+
 setModelSettings = function(tosend, msgID = null){
 	
 	var array_cpp = getCppArrayFromDict(tosend, "string");

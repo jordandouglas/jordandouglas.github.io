@@ -26,7 +26,7 @@
 #include "ExperimentalData.h"
 #include "Parameter.h"
 #include "Simulator.h"
-#include "PosteriorDistriutionSample.h"
+#include "PosteriorDistributionSample.h"
 
 #include <list>
 #include <string>
@@ -44,12 +44,12 @@ class MCMC{
 	static bool initialised;
 
 	static void makeProposal();
-	static bool metropolisHastings(int sampleNum, PosteriorDistriutionSample* thisMCMCState, PosteriorDistriutionSample* prevMCMCState);
+	static bool metropolisHastings(int sampleNum, PosteriorDistributionSample* thisMCMCState, PosteriorDistributionSample* prevMCMCState);
 	static double calculateLogPriorProbability();
 	static void tryToEstimateParameter(Parameter* param);
 
-	static PosteriorDistriutionSample* previousMCMCstate;
-	static PosteriorDistriutionSample* currentMCMCstate;
+	static PosteriorDistributionSample* previousMCMCstate;
+	static PosteriorDistributionSample* currentMCMCstate;
 
 
 	static int nacceptances;
@@ -71,6 +71,7 @@ class MCMC{
 		static string getStatus();
 		static bool get_hasFailedBurnin();
 		static double getEpsilon();
+		static void setPreviousState(PosteriorDistributionSample* state);
 
 
 		// Experimental data

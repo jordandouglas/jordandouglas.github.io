@@ -53,8 +53,8 @@ int MCMC::nTrialsUntilBurnin = 0;
 int MCMC::initialStateNum = 0;
 
 
-PosteriorDistriutionSample* MCMC::previousMCMCstate;
-PosteriorDistriutionSample* MCMC::currentMCMCstate;
+PosteriorDistributionSample* MCMC::previousMCMCstate;
+PosteriorDistributionSample* MCMC::currentMCMCstate;
 
 
 void MCMC::initMCMC(){
@@ -64,6 +64,10 @@ void MCMC::initMCMC(){
 
 	cout << "\nInitialising MCMC..." << endl;
 	bool printToFile = outputFilename != "";
+
+
+	// Reset GUI list of posterior distribution samples
+	if(_USING_GUI) _GUI_posterior.clear();
 
 
 	// Sample parameters and model
@@ -88,8 +92,8 @@ void MCMC::initMCMC(){
 
 
 	// 2 states stored in memory
-	MCMC::previousMCMCstate = new PosteriorDistriutionSample(0);
-	// MCMC::currentMCMCstate = new PosteriorDistriutionSample(0);
+	MCMC::previousMCMCstate = new PosteriorDistributionSample(0);
+	// MCMC::currentMCMCstate = new PosteriorDistributionSample(0);
 
 	// Load initial state from file
 	if (_resumeFromLogfile){
@@ -106,6 +110,9 @@ void MCMC::initMCMC(){
 		MCMC::previousMCMCstate->print(printToFile);
 
 	}
+
+
+	if(_USING_GUI) _GUI_posterior.push_back(MCMC::previousMCMCstate->clone(true));
 
 
 	cout << "Estimating the following " << parametersToEstimate.size() << " parameters:" << endl;
@@ -131,7 +138,17 @@ void MCMC::initMCMC(){
 
 // Reverse-initialisation
 void MCMC::cleanup(){
+
+
 	
+
+
+	// Reset GUI list of posterior distribution samples
+	for (list<PosteriorDistributionSample*>::iterator it = _GUI_posterior.begin(); it != _GUI_posterior.end(); ++it){
+		delete *it;
+	}
+	if(_USING_GUI) _GUI_posterior.clear();
+
 	MCMC::initialised = false;
 	delete previousMCMCstate;
 	delete currentMCMCstate;
@@ -219,7 +236,7 @@ void MCMC::perform_1_iteration(int n){
 
 
 	// Accept or reject
-	MCMC::currentMCMCstate = new PosteriorDistriutionSample(n);
+	MCMC::currentMCMCstate = new PosteriorDistributionSample(n);
 	bool accepted = MCMC::metropolisHastings(n, MCMC::currentMCMCstate, MCMC::previousMCMCstate);
 
 	//currentMCMCstate->print(false);
@@ -273,6 +290,7 @@ void MCMC::perform_1_iteration(int n){
 	// Log
 	if (n % logEvery == 0){
 		MCMC::currentMCMCstate->print(outputFilename != "");
+		if(_USING_GUI) _GUI_posterior.push_back(MCMC::currentMCMCstate->clone(true));
 	}
 
 }
@@ -324,10 +342,10 @@ void MCMC::makeProposal(){
 
 
 // Apply a trial and accept / reject the newly proposed parameters
-// The PosteriorDistriutionSample object parsed will be overwritten and populated with the appropriate details
+// The PosteriorDistributionSample object parsed will be overwritten and populated with the appropriate details
 // Returns true if accept, false if reject
 // If the sampleNum is 0, it will always be accepted
-bool MCMC::metropolisHastings(int sampleNum, PosteriorDistriutionSample* this_MCMCState, PosteriorDistriutionSample* prev_MCMCState){
+bool MCMC::metropolisHastings(int sampleNum, PosteriorDistributionSample* this_MCMCState, PosteriorDistributionSample* prev_MCMCState){
 	
 
 
@@ -523,4 +541,12 @@ string MCMC::getStatus(){
 
 double MCMC::getEpsilon(){
 	return MCMC::epsilon;
+}
+
+
+void MCMC::setPreviousState(PosteriorDistributionSample* state){
+
+	MCMC::previousMCMCstate = state;
+	MCMC::epsilon = max(_chiSqthreshold_0 * pow(_chiSqthreshold_gamma, (_chiSqthreshold_0 - state->getStateNumber())), _chiSqthreshold_min);
+
 }

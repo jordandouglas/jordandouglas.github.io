@@ -1,7 +1,7 @@
-g++ -std=c++11 -o tempexe cimpol.cpp Parameter.cpp PlotSettings.cpp  XMLparser.cpp Model.cpp MCMC.cpp ExperimentalData.cpp PosteriorDistriutionSample.cpp Simulator.cpp Plots.cpp State.cpp Settings.cpp FreeEnergy.cpp TranslocationRatesCache.cpp ParameterHeatmapData.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp 
+g++ -std=c++11 -o tempexe cimpol.cpp Parameter.cpp PlotSettings.cpp  XMLparser.cpp Model.cpp MCMC.cpp ExperimentalData.cpp PosteriorDistributionSample.cpp Simulator.cpp Plots.cpp State.cpp Settings.cpp FreeEnergy.cpp TranslocationRatesCache.cpp ParameterHeatmapData.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp 
 
 
-cl  /EHsc /O2 /Ot /Oi /Ob2 cimpol.cpp HTMLobject.cpp Coordinates.cpp SimPol_vRNA_interfaceNull.cpp Parameter.cpp SlippageLandscapes.cpp XMLparser.cpp ParameterHeatmapData.cpp Plots.cpp PlotSettings.cpp BayesianCalculations.cpp Model.cpp MCMC.cpp ExperimentalData.cpp WasmMessengerNull.cpp SimulatorPthread.cpp PosteriorDistriutionSample.cpp Simulator.cpp State.cpp Sequence.cpp Settings.cpp FreeEnergy.cpp TranslocationRatesCache.cpp Polymerase.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp  
+cl  /EHsc /O2 /Ot /Oi /Ob2 cimpol.cpp HTMLobject.cpp Coordinates.cpp SimPol_vRNA_interfaceNull.cpp Parameter.cpp SlippageLandscapes.cpp XMLparser.cpp ParameterHeatmapData.cpp Plots.cpp PlotSettings.cpp BayesianCalculations.cpp Model.cpp MCMC.cpp ExperimentalData.cpp WasmMessengerNull.cpp SimulatorPthread.cpp PosteriorDistributionSample.cpp Simulator.cpp State.cpp Sequence.cpp Settings.cpp FreeEnergy.cpp TranslocationRatesCache.cpp Polymerase.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp  
 
 
 Read https://dzone.com/articles/webassembly-web-workers for webworkers and webassembly
@@ -35,7 +35,7 @@ emcc -s WASM=1 -o bendit.bc -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap'
 
 
 // Compile the main SimPol module with emscripten
-emcc -s WASM=1 -o simpol_asm.html -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'Pointer_stringify']" -O1 -O2 -O3 -std=c++11 -fpermissive  -s ALLOW_MEMORY_GROWTH=1 -s WASM_MEM_MAX=1073741824 -s NO_EXIT_RUNTIME=1  cimpol.cpp WasmInterface.cpp  WasmMessenger.cpp  Plots.cpp Sequence.cpp Parameter.cpp HTMLobject.cpp Coordinates.cpp MCMC.cpp ExperimentalData.cpp Polymerase.cpp PosteriorDistriutionSample.cpp XMLparser.cpp Model.cpp Simulator.cpp State.cpp Settings.cpp FreeEnergy.cpp PlotSettings.cpp SlippageLandscapes.cpp ParameterHeatmapData.cpp TranslocationRatesCache.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp SimulatorPthread.cpp BayesianCalculations.cpp Vienna.bc bendit.bc
+emcc -s WASM=1 -o simpol_asm.html -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'Pointer_stringify']" -O1 -O2 -O3 -std=c++11 -fpermissive  -s ALLOW_MEMORY_GROWTH=1 -s WASM_MEM_MAX=1073741824 -s NO_EXIT_RUNTIME=1  cimpol.cpp WasmInterface.cpp  WasmMessenger.cpp  Plots.cpp Sequence.cpp Parameter.cpp HTMLobject.cpp Coordinates.cpp MCMC.cpp ExperimentalData.cpp Polymerase.cpp PosteriorDistributionSample.cpp XMLparser.cpp Model.cpp Simulator.cpp State.cpp Settings.cpp FreeEnergy.cpp PlotSettings.cpp SlippageLandscapes.cpp ParameterHeatmapData.cpp TranslocationRatesCache.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp SimulatorPthread.cpp BayesianCalculations.cpp Vienna.bc bendit.bc
 
 
 

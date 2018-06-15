@@ -115,6 +115,7 @@ class Plots{
 		static void deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata, bool sequences_cleardata);
 		static void recordSite(int siteThatWasJustCatalysed, double timeToCatalysis);
 		static void addCopiedSequence(string sequence);
+		static void prepareForABC();
 
 };
 

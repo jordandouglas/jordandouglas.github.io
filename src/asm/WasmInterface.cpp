@@ -31,6 +31,8 @@
 #include "SimPol_vRNA_interface.h"
 #include "SimPol_bendit_interface.h"
 #include "MCMC.h"
+#include "BayesianCalculations.h"
+#include "PosteriorDistributionSample.h"
 
 
 #include <emscripten.h>
@@ -925,7 +927,8 @@ extern "C" {
 		_ABCoutputToPrint.clear();
 
 
-		Settings::print();
+		Plots::prepareForABC();
+		//Settings::print();
 
 		// Initialise MCMC
 		MCMC::initMCMC();
@@ -1004,6 +1007,154 @@ extern "C" {
 
 
 	}
+
+
+	// Get posterior distribution summary (geometric medians etc)
+	void EMSCRIPTEN_KEEPALIVE getPosteriorSummaryData(int msgID){
+
+		// Find the geometric median state
+		vector<PosteriorDistributionSample*> GUI_posterior_vec{ std::begin(_GUI_posterior), std::end(_GUI_posterior) };
+
+		// If no posterior distribution then return
+		if (GUI_posterior_vec.size() == 0) {
+			messageFromWasmToJS("{}", msgID);
+			return;
+		}
+
+		PosteriorDistributionSample* geometricMedian = BayesianCalculations::getGeometricMedian(GUI_posterior_vec, false, false);
+
+
+
+		// Convert to JSON
+		string toReturnJSON = "{'state':" + to_string(geometricMedian->getStateNumber()) + ",";
+		toReturnJSON += "'chiSquared':" + to_string(geometricMedian->get_chiSquared()) + ",";
+		toReturnJSON += "'paramNamesAndMedians':{";
+
+
+
+		// Iteratet through each parameter in the gemoetric median
+		for (int i = 0; i < geometricMedian->getParameterNames().size(); i++){
+			string paramID = geometricMedian->getParameterNames().at(i);
+			cout << "param " << paramID << endl;
+			Parameter* param = Settings::getParameterByName(paramID);
+			if (param == nullptr) continue;
+			string name = param->getName();
+			double val = geometricMedian->getParameterEstimate(paramID);
+
+			toReturnJSON += "'" + paramID + "':{";
+			toReturnJSON += "'name':'" + name + "',";
+			toReturnJSON += "'estimate':" + to_string(val);
+			toReturnJSON += "},";
+		}
+
+
+		if (toReturnJSON.substr(toReturnJSON.length()-1, 1) == ",") toReturnJSON = toReturnJSON.substr(0, toReturnJSON.length() - 1);
+		toReturnJSON += "}}";
+
+
+		messageFromWasmToJS(toReturnJSON, msgID);
+		
+	}
+
+
+	// Generate the full ABC output
+	void EMSCRIPTEN_KEEPALIVE getABCoutput(int msgID){
+
+		// Output string
+		_ABCoutputToPrint.str("");
+		_ABCoutputToPrint.clear();
+
+		_GUI_posterior.front()->printHeader(false);
+		for (list<PosteriorDistributionSample*>::iterator it = _GUI_posterior.begin(); it != _GUI_posterior.end(); ++ it){
+			(*it)->print(false);
+		}
+
+
+		string toReturnJSON = "{'lines':'" + _ABCoutputToPrint.str() + "'}";
+
+		messageFromWasmToJS(toReturnJSON, msgID);
+
+
+
+	}
+
+
+	// Upload the ABC file
+	void EMSCRIPTEN_KEEPALIVE uploadABC(char* tsvInput, int msgID){
+
+
+		cout << "uploadABC" << endl;
+		MCMC::initMCMC();
+		
+		vector<string> lines = Settings::split(string(tsvInput), '!');
+		bool success = false;
+		vector<string> headerLineSplit;
+		vector<string> lineSplit;
+		if (lines.size() > 1) {
+
+
+			// Get the header line
+			int lineNum = 0;
+			for (lineNum = 0; lineNum < lines.size(); lineNum ++){
+
+				cout << "line" << lineNum << ":" << lines.at(lineNum) << endl;
+
+				if (lines.at(lineNum) == "") continue;
+				headerLineSplit = Settings::split(lines.at(lineNum), '&');
+				break;
+
+			}
+
+			cout << 1 << endl;
+
+			if (headerLineSplit.size() > 0) {
+
+				// Will add all states to the posterior distribution list
+				_GUI_posterior.clear();
+
+
+				// All other lines 
+				for (lineNum = lineNum + 1; lineNum < lines.size(); lineNum ++){
+
+
+
+					if (lines.at(lineNum) == "") continue;
+
+					PosteriorDistributionSample* state = new PosteriorDistributionSample(0);
+					lineSplit = Settings::split(lines.at(lineNum), '&');
+	        		state->parseFromLogFileLine(lineSplit, headerLineSplit);
+	        		_GUI_posterior.push_back(state);
+
+				}
+
+
+				// Set the last state as the new MCMC state
+				if (_GUI_posterior.size() > 1) {
+
+					MCMC::setPreviousState(_GUI_posterior.back()->clone(true));
+					success = true;
+				}
+
+			}
+
+        }
+
+		string toReturnJSON = "{'success':" + string(success ? "true" : "false") + ",";
+		toReturnJSON += "'inferenceMethod':'" + inferenceMethod + "'";
+		toReturnJSON += "}";
+
+
+
+		// Clear the output string
+		_ABCoutputToPrint.str("");
+		_ABCoutputToPrint.clear();
+
+		messageFromWasmToJS(toReturnJSON, msgID);
+
+
+
+	}
+
 
 
 	// Returns all information of all parameters in JSON format

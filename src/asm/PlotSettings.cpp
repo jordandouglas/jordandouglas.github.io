@@ -40,7 +40,8 @@ PlotSettings::PlotSettings(int plotNumber, string name){
 
 	this->plotNumber = plotNumber;
 	this->name = name;
-
+	this->plotFromPosterior = false;
+	
 
 	// Distance vs time plot
 	if (this->name == "distanceVsTime"){
@@ -85,10 +86,9 @@ PlotSettings::PlotSettings(int plotNumber, string name){
 		this->customParamY = "probability";
 		this->metricZ = "none";
 		this->zColouring = "blue";
-		this->plotFromPosterior = false;
-		this->xData = "";
-		this->yData = "";
-		this->zData = "";
+		this->xData = "{}";
+		this->yData = "{}";
+		this->zData = "{}";
 		this->sitesToRecordX = "allSites";
 		this->sitesToRecordY = "allSites";
 		this->sitesToRecordZ = "allSites";
@@ -103,6 +103,19 @@ PlotSettings::PlotSettings(int plotNumber, string name){
 		this->siteRecordingZ = nullptr;
 
 	}
+
+
+	// MCMC trace
+	else if (this->name == "tracePlot"){
+		this->plotFunction = "plot_MCMC_trace";
+		this->customParamY = "chiSq";
+		this->xRange = "automaticX";
+		this->yRange = "automaticY";
+		this->xData = "{}"; // State number
+		this->yData = "{}"; // Custom Y variable
+		this->plotFromPosterior = true;
+	}
+
 
 
 	else {
@@ -220,26 +233,48 @@ void PlotSettings::trialEnd(){
 // Send through a list of parameter/metric recordings and save as a string under x, y and zdata
 void PlotSettings::updateHeatmapData(list<ParameterHeatmapData*> heatmapData){
 
-	if (this->name != "parameterHeatmap") return;
 
-	this->xData = "{}";
-	this->yData = "{}";
-	this->zData = "{}";
+	// If parameter heatmap then save upto all 3 variables 
+	if (this->name == "parameterHeatmap") {
 
-	// Cache the the data which we are interested in (in JSON format)
-	for (list<ParameterHeatmapData*>::iterator it = heatmapData.begin(); it != heatmapData.end(); ++it){
+		this->xData = "{}";
+		this->yData = "{}";
+		this->zData = "{}";
 
-		if ((*it)->getID() == this->customParamX) this->xData = (*it)->toJSON();
-		if ((*it)->getID() == this->customParamY) this->yData = (*it)->toJSON();
-		if ((*it)->getID() == this->metricZ) this->zData = (*it)->toJSON();
+		// Cache the the data which we are interested in (in JSON format)
+		for (list<ParameterHeatmapData*>::iterator it = heatmapData.begin(); it != heatmapData.end(); ++it){
+
+			if ((*it)->getID() == this->customParamX) this->xData = (*it)->toJSON();
+			if ((*it)->getID() == this->customParamY) this->yData = (*it)->toJSON();
+			if ((*it)->getID() == this->metricZ) this->zData = (*it)->toJSON();
+
+		}
+
+
+		// Overwrite the above if the parameter is catalysis time and is set to recording specified sites 
+		if (this->customParamX == "catalyTime" && this->sitesToRecordX != "allSites") this->xData = this->siteRecordingX->toJSON();
+		if (this->customParamY == "catalyTime" && this->sitesToRecordY != "allSites") this->yData = this->siteRecordingY->toJSON();
+		if (this->metricZ == "catalyTime" && this->sitesToRecordZ != "allSites") this->zData = this->siteRecordingZ->toJSON();
 
 	}
 
 
-	// Overwrite the above if the parameter is catalysis time and is set to recording specified sites 
-	if (this->customParamX == "catalyTime" && this->sitesToRecordX != "allSites") this->xData = this->siteRecordingX->toJSON();
-	if (this->customParamY == "catalyTime" && this->sitesToRecordY != "allSites") this->yData = this->siteRecordingY->toJSON();
-	if (this->metricZ == "catalyTime" && this->sitesToRecordZ != "allSites") this->zData = this->siteRecordingZ->toJSON();
+	// If MCMC trace then save just the state number and y variable
+	else if (this->name == "tracePlot") {
+
+		this->xData = "{}";
+		this->yData = "{}";
+
+
+		// Cache the the data which we are interested in (in JSON format)
+		for (list<ParameterHeatmapData*>::iterator it = heatmapData.begin(); it != heatmapData.end(); ++it){
+			if ((*it)->getID() == "state") this->xData = (*it)->toJSON();
+			if ((*it)->getID() == this->customParamY) this->yData = (*it)->toJSON();
+		}
+
+
+
+	}
 
 
 }
@@ -303,6 +338,16 @@ string PlotSettings::toJSON(){
 		settingsJSON += "'sitesToRecordZ':'" + this->sitesToRecordZ + "',";
 		
 
+	}
+
+	// MCMC trace
+	else if (this->name == "tracePlot"){
+		settingsJSON += "'customParamY':'" + this->customParamY + "',";
+		settingsJSON += "'xRange':'" + this->xRange + "',";
+		settingsJSON += "'yRange':'" + this->yRange + "',";
+		settingsJSON += "'xData':" + this->xData + ",";
+		settingsJSON += "'yData':" + this->yData + ",";
+		settingsJSON += "'burnin':" + to_string(burnin) + ",";
 	}
 
 
@@ -598,4 +643,74 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 
 
 
+	// MCMC trace
+	else if (this->name == "tracePlot"){
+
+		// Y axis value
+		this->customParamY = values.at(0);
+
+
+
+		// X axis range at index 1
+		if (values.at(1) == "automaticX") this->xRange = "automaticX";
+		else{
+
+			vector<string> tuple = Settings::split(values.at(1), ','); 
+
+
+			// Do not accept negative values or non strings
+			if (tuple.size() < 2 || !Settings::strIsNumber(tuple.at(0)) || !Settings::strIsNumber(tuple.at(1))) this->xRange = "automaticX";
+			else{
+
+				double xMin = stod(tuple.at(0));
+				double xMax = stod(tuple.at(1));
+				if (xMax <= xMin) xMax = xMin + 0.1;
+
+
+				if (! (xMax < 0 || xMin < 0)) this->xRange = "[" + to_string(xMin) + "," + to_string(xMax) + "]";
+			}
+
+		}
+
+
+		// Y axis range at index 2
+		if (values.at(2) == "automaticY") this->yRange = "automaticY";
+		else{
+
+			vector<string> tuple = Settings::split(values.at(2), ','); 
+
+
+			// Do not accept non strings
+			if (tuple.size() < 2 || !Settings::strIsNumber(tuple.at(0)) || !Settings::strIsNumber(tuple.at(1))) this->yRange = "automaticY";
+			else{
+
+				double yMin = stod(tuple.at(0));
+				double yMax = stod(tuple.at(1));
+				if (yMax <= yMin) yMax = yMin + 0.1;
+
+
+				this->yRange = "[" + to_string(yMin) + "," + to_string(yMax) + "]";
+			}
+
+		}
+
+
+
+	}
+
+
+
+}
+
+
+bool PlotSettings::get_plotFromPosterior(){
+	return this->plotFromPosterior;
+}
+
+
+void PlotSettings::set_plotFromPosterior(bool val){
+	if (this->name == "parameterHeatmap"){
+		this->plotFromPosterior = val;
+		cout << "Posterior activated" << val << endl;
+	}
 }

@@ -24,8 +24,8 @@
 #define BAYESIANCALCULATIONS_H
 
 
-
-#include "PosteriorDistriutionSample.h"
+#include "ParameterHeatmapData.h"
+#include "PosteriorDistributionSample.h"
 #include <string>
 #include <vector>
 #include <list>
@@ -37,11 +37,12 @@ class BayesianCalculations{
 
 
 	public:
-		static vector<PosteriorDistriutionSample*> loadLogFile(string outputFilename, double epsilon);
-		static PosteriorDistriutionSample* printGeometricMedian(vector<PosteriorDistriutionSample*> states, bool printBanners);
-		static void printMarginalGeometricMedians(vector<PosteriorDistriutionSample*> states);
-		static void sampleFromPosterior(vector<PosteriorDistriutionSample*> posteriorDistribution);
-		static void printModelFrequencies(vector<PosteriorDistriutionSample*> posteriorDistribution);
+		static vector<PosteriorDistributionSample*> loadLogFile(string outputFilename, double epsilon);
+		static PosteriorDistributionSample* getGeometricMedian(vector<PosteriorDistributionSample*> states, bool print, bool printBanners);
+		static void printMarginalGeometricMedians(vector<PosteriorDistributionSample*> states);
+		static void sampleFromPosterior(vector<PosteriorDistributionSample*> posteriorDistribution);
+		static void printModelFrequencies(vector<PosteriorDistributionSample*> posteriorDistribution);
+		static list<ParameterHeatmapData*>  getPosteriorDistributionAsHeatmap();
 };
 
 #endif

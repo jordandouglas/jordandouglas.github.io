@@ -155,6 +155,7 @@ State* _currentStateGUI; // The current state displayed on the GUI and used in a
 chrono::system_clock::time_point _interfaceSimulation_startTime = chrono::system_clock::now();
 SlippageLandscapes* _slippageLandscapesToSendToDOM;
 ostringstream _ABCoutputToPrint;
+list<PosteriorDistributionSample*> _GUI_posterior;
 
 
 void Settings::init(){
