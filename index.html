@@ -3293,7 +3293,7 @@ function closeNav() {
 										<tr>
 											<td>
 												Number of MCMC iterations:
-												<input type="number" id="MCMCntrials" min=0 value=10000 title="Number of iterations to run the MCMC chain for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
+												<input type="number" id="MCMCntrials" min=0 value=10000 title="Number of iterations to run the MCMC chain for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 
@@ -3302,7 +3302,7 @@ function closeNav() {
 										<tr>
 											<td>
 												Number of trials per data point:
-												<input type="number" id="MCMC_ntestsperdata" min=1 value=5 title="Number of tests to perform at each force/NTP setting. The mean velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
+												<input type="number" id="MCMC_ntestsperdata" min=1 value=5 title="Number of tests to perform at each force/NTP setting. The mean velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 									
@@ -3320,21 +3320,21 @@ function closeNav() {
 										<tr>
 											<td>
 												&isin;<sub>min</sub> =
-												<input type="number" id="MCMC_chiSqthreshold_min" min=0 value=12 title="Chi-squared threshold which must be met to accept a point into the posterior" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#663399">
+												<input type="number" id="MCMC_chiSqthreshold_min" min=0 value=12 title="Chi-squared threshold which must be met to accept a point into the posterior" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 										
 										<tr>
 											<td>
 												&isin;<sub>0</sub> =
-												<input type="number" id="MCMC_chiSqthreshold_0" min=0 value=1000 title="Initial chi-squared threshold. This will be decreased every iteration until reaching the minimum threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#663399">
+												<input type="number" id="MCMC_chiSqthreshold_0" min=0 value=1000 title="Initial chi-squared threshold. This will be decreased every iteration until reaching the minimum threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 										
 										<tr>
 											<td>
 												&gamma; =
-												<input type="number" id="MCMC_chiSqthreshold_gamma" min=0 max=1 value=0.999 title="Exponential decrease in chi-squared threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#663399">
+												<input type="number" id="MCMC_chiSqthreshold_gamma" min=0 max=1 value=0.999 title="Exponential decrease in chi-squared threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 
@@ -3352,14 +3352,14 @@ function closeNav() {
 										<tr>
 											<td>
 												Burn-in (%):
-												<input type="number" id="MCMC_burnin" onChange="validateAllAbcDataInputs(); update_burnin_controller(); drawPlots()" min=0 max=100 value=10 title="Percentage of points to throw away before reaching the posterior distribution" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#663399">
+												<input type="number" id="MCMC_burnin" onChange="validateAllAbcDataInputs(); update_burnin_controller(); drawPlots()" min=0 max=100 value=-1 title="Percentage of points to throw away before reaching the posterior distribution. Set to -1 to allow Simpol to select burn-in automatically" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 										
 										<tr>
 											<td>
 												Log every (states):
-												<input type="number" id="MCMC_logevery" min=1 value=20 title="How often do you want to log the current position" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#663399">
+												<input type="number" id="MCMC_logevery" min=1 value=20 title="How often do you want to log the current position" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 										
@@ -3378,14 +3378,14 @@ function closeNav() {
 										<tr>
 
 											<td>
-												<input type=button id="beginMCMC_btn" onClick="beginABC()" value='Begin MCMC-ABC' title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="operation beginABC_btn" style="background-color:#663399; width: 150px"> 
+												<input type=button id="beginMCMC_btn" onClick="beginABC()" value='Begin MCMC-ABC' title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="operation beginABC_btn" style="background-color:#008cba; width: 180px"> 
 												
 
 											</td>
 
 
 											<td>
-												<input type=image id="uploadABC" class="rotate180" title="Upload an ABC output in .log format" onClick=uploadABC() src="src/Images/download.png" style="cursor: pointer; vertical-align: middle; height:20px; ">  
+												<input type=image id="uploadABC" class="rotate180" title="Upload an ABC output in .log format" onClick="uploadABC();" src="src/Images/download.png" style="cursor: pointer; vertical-align: middle; height:20px; ">  
 													<input style="display:none" type="file" id="uploadABCinput" accept=".log"> 
 												<input type=image id="downloadABC" title="Download the ABC output (displayed below) in .log format" onClick=downloadABC() src="src/Images/download.png" style="cursor: pointer; display:none; vertical-align: middle; height:20px; ">  
 											</td>
@@ -3399,31 +3399,10 @@ function closeNav() {
 
 
 
-								<td class="ABC_display" style="vertical-align:top; display:none; text-align:right">
+								<td style="vertical-align:top; text-align:right">
 
 									<table style="text-align:right">
-										<tr class="ABC_display" style="display:none; vertical-align: middle;"  title="Number of sampled parameters which have been added to the posterior distribution" >
-
-											<td>
-												Accepted:
-												<span id="ABCacceptance_val">
-													0
-												</span>.
-											</td>
-										</tr>
-
-
-										<tr class="ABC_display" style="display:none; vertical-align: middle;"  title="Percentage of sampled parameters which are accepted by the posterior distribution" >
-
-											<td>
-												Acceptance rate:
-												<span id="ABCacceptancePercentage_val">
-													0
-												</span>%
-											</td>
-										</tr>
-
-
+										
 
 										<tr class="MCMC_display" style="display:none; vertical-align: middle;"  title="Effective sample size" >
 
@@ -3440,26 +3419,12 @@ function closeNav() {
 										<tr class="MCMC_display" style="display:none; vertical-align: middle;"  >
 
 											<td>
-													<input type=button id="posteriorSummary_btn" onClick="posteriorSummary()" value='Posterior Summary' title="Extract values from the posterior distribution" class="operation beginABC_btn" style="background-color:#663399; width: 200px"> 
+													<input type=button id="posteriorSummary_btn" onClick="posteriorSummary()" value='Posterior Summary' title="Extract values from the posterior distribution" class="operation" style="background-color:#008cba; width: 200px"> 
 											</td>
 										</tr>
 										
-										
-										
-									
 
 
-										<tr class="RABC_display" style="display:none; vertical-align: middle;"  title="Percentage of sampled parameters which are accepted by the posterior distribution" >
-
-											<td>
-												<label class="switch">
-											 		<input type="checkbox" id="ABC_showRejectedParameters" OnChange="toggleAcceptedOrRejected()"> </input>
-											 	 	<span class="slider round"></span>
-
-												</label> 
-												Show rejected parameters</span>
-											</td>
-										</tr>
 
 										
 									</table>
