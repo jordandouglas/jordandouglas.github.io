@@ -2542,7 +2542,6 @@ function saveSettings_controller(){
 				values.push([$("#yMin_textbox").val(), $("#yMax_textbox").val()]);
 			}
 			
-			values.push($("#workerNumberInput").val());
 
 			functionToCallAfterSaving  = function() { plot_MCMC_trace(); };
 			break;
@@ -3205,6 +3204,9 @@ function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardat
 function uploadABC_controller(TSVstring){
 
 
+
+	//console.log("TSVstring", TSVstring);
+
 	updateABCExperimentalData_controller();
 	var updateDOM = function(result){
 
@@ -3212,14 +3214,26 @@ function uploadABC_controller(TSVstring){
 		var success = result["success"];
 		if (success){
 
-			console.log("Rendering");
-			//$("#ABCoutput").html("");
-			onABCStart();
-			get_unrendered_ABCoutput_controller();
-			validateAllAbcDataInputs();
-			drawPlots(true);
 
-			if (result.inferenceMethod == "MCMC") addTracePlots();
+			get_ABCoutput_controller(function(linesResult) {
+
+				console.log("Rendering");
+
+				//$("#ABCoutput").html("");
+				$("#beginMCMC_btn").val("Resume MCMC-ABC");
+				addNewABCRows(linesResult.lines.split("!"));
+
+
+				onABCStart();
+				get_unrendered_ABCoutput_controller();
+				validateAllAbcDataInputs();
+				drawPlots(true);
+
+				if (result.inferenceMethod == "MCMC") addTracePlots();
+				
+			});
+
+
 
 
 		}else{
@@ -3235,12 +3249,31 @@ function uploadABC_controller(TSVstring){
 		toCall().then((result) => updateDOM(result));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("ABC_JS.uploadABC_WW", [TSVstring, null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((result) => updateDOM(result));
+
+	}
+
+	else{
+
+
+
+		deletePlots_controller(false, false, false, false, true, false, function() {
+
+			var res = stringifyFunction("uploadABC", [TSVstring], true);
+			var fnStr = "wasm_" + res[0];
+			var msgID = res[1];
+			var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+			toCall().then((lines) => updateDOM(lines));
+
+
+		});
+
+
 
 
 	}
@@ -3260,7 +3293,7 @@ function uploadABC_controller(TSVstring){
 
 function beginABC_controller(abcDataObjectForModel){
 
-
+	hideButtonAndShowStopButton("simulate");
 	var showRejectedParameters = $("#ABC_showRejectedParameters").prop("checked");
 	running_ABC = true;
 	var restoreDOM = function(){
@@ -3271,10 +3304,10 @@ function beginABC_controller(abcDataObjectForModel){
 		$("#beginMCMC_btn").val("Resume MCMC-ABC");
 		$(".beginABC_btn").attr("onclick", "beginABC()");
 		$("#ABCntrials").css("cursor", "");
-		$("#ABCntrials").css("background-color", "#663399");
+		$("#ABCntrials").css("background-color", "#008cba");
 		$("#ABCntrials").attr("disabled", false);
 		$("#MCMCntrials").css("cursor", "");
-		$("#MCMCntrials").css("background-color", "#663399");
+		$("#MCMCntrials").css("background-color", "#008cba");
 		$("#MCMCntrials").attr("disabled", false);
 		$("#PreExp").attr("disabled", false);
 		$("#PreExp").css("cursor", "");
@@ -3346,57 +3379,57 @@ function beginABC_controller(abcDataObjectForModel){
 					$("#burninStatusVal").html(result.status);
 					$("#currentEpsilonVal").html(roundToSF(result.epsilon), 6);
 
+
+
+					// Update the counter
+					var nTrialsToGo = parseFloat(result["nTrialsToGo"]);
+					if (nTrialsToGo != parseFloat($("#ABCntrials").val()) && !isNaN(nTrialsToGo)) {
+						$("#ABCntrials").val(nTrialsToGo);
+						$("#MCMCntrials").val(nTrialsToGo);
+					}
+
+
+					if (result["newLines"] != null) {
+
+
+
+						/*
+						// Update the numbers of accepted values
+						var acceptanceNumber = result["acceptanceNumber"];
+						if (acceptanceNumber != null) $("#ABCacceptance_val").html(roundToSF(acceptanceNumber));
+
+
+						// Update the acceptance percentage
+						var acceptancePercentage = result["acceptancePercentage"];
+						if (acceptancePercentage != null) $("#ABCacceptancePercentage_val").html(roundToSF(acceptancePercentage));
+						
+						// Update ESS
+						var ESS = result["ESS"];
+						if (ESS != null) $("#ABC_ESS_val").html(roundToSF(ESS));
+						*/
+
+						// Update the ABC output
+						addNewABCRows(result["newLines"].split("!"));
+
+					}
+
+
+					// Hide all the rejected rows if required
+					if (showRejectedParameters) $(".ABCrejected").show(0);
+					else $(".ABCrejected").hide(0);
+
+
+					validateAllAbcDataInputs();
+
+
+					//console.log("resumeABC1");
+
 					if (result.stop) {
 						restoreDOM();
 						MESSAGE_LISTENER[msgID] = null;
 					}
-					else{
 
-
-						// Update the counter
-						var nTrialsToGo = parseFloat(result["nTrialsToGo"]);
-						if (nTrialsToGo != parseFloat($("#ABCntrials").val()) && !isNaN(nTrialsToGo)) {
-							$("#ABCntrials").val(nTrialsToGo);
-							$("#MCMCntrials").val(nTrialsToGo);
-						}
-
-
-						if (result["newLines"] != null) {
-
-
-
-
-
-							/*
-							// Update the numbers of accepted values
-							var acceptanceNumber = result["acceptanceNumber"];
-							if (acceptanceNumber != null) $("#ABCacceptance_val").html(roundToSF(acceptanceNumber));
-
-
-							// Update the acceptance percentage
-							var acceptancePercentage = result["acceptancePercentage"];
-							if (acceptancePercentage != null) $("#ABCacceptancePercentage_val").html(roundToSF(acceptancePercentage));
-							
-							// Update ESS
-							var ESS = result["ESS"];
-							if (ESS != null) $("#ABC_ESS_val").html(roundToSF(ESS));
-							*/
-
-							// Update the ABC output
-							addNewABCRows(result["newLines"].split("!"));
-
-						}
-
-
-						// Hide all the rejected rows if required
-						if (showRejectedParameters) $(".ABCrejected").show(0);
-						else $(".ABCrejected").hide(0);
-
-
-						validateAllAbcDataInputs();
-
-
-						//console.log("resumeABC1");
+					else {
 
 						// Go back to the model when done
 						var resumeABCFnStr = "wasm_" + stringifyFunction("resumeABC", [msgID]);
@@ -3404,12 +3437,14 @@ function beginABC_controller(abcDataObjectForModel){
 						var toCall_resume = () => new Promise((resolve) => callWebWorkerFunction(resumeABCFnStr, resolve, msgID, false));
 						toCall_resume().then((result) => updateDOMbetweenTrials(result));
 
-
 					}
+
+
+					
 
 				};
 
-
+				hideButtonAndShowStopButton("simulate");
 
 				// Start the ABC
 				var res = stringifyFunction("initABC", [], true);
@@ -3515,12 +3550,23 @@ function get_ABCoutput_controller(resolve = function(lines) { }){
 		toCall().then((lines) => resolve(lines));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("ABC_JS.get_ABCoutput_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((lines) => resolve(lines));
+
+	}
+
+	else{
+
+		var res = stringifyFunction("getABCoutput", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((lines) => resolve(lines));
+
 
 	}
 
@@ -3588,12 +3634,23 @@ function getPosteriorSummaryData_controller(resolve = function() { }){
 		toCall().then((posterior) => resolve(posterior));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("ABC_JS.getPosteriorSummaryData_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((posterior) => resolve(posterior));
+
+	}
+
+	else{
+
+		var res = stringifyFunction("getPosteriorSummaryData", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((posterior) => resolve(posterior));
+
 
 	}
 	
@@ -3608,7 +3665,7 @@ function getPosteriorDistribution_controller(resolve = function(posterior) { }){
 		toCall().then((posterior) => resolve(posterior));
 	}
 
-	else{
+	else {// if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("ABC_JS.getPosteriorDistribution_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
@@ -3617,6 +3674,19 @@ function getPosteriorDistribution_controller(resolve = function(posterior) { }){
 
 	}
 
+	/*
+	else{
+
+
+		var res = stringifyFunction("getPosteriorDistribution", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((posterior) => resolve(posterior));
+
+
+	}
+	*/
 
 }
 

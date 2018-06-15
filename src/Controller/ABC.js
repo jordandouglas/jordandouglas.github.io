@@ -27,6 +27,7 @@ function initABCpanel(){
 	$(".beginABC_btn").css("cursor", "auto");
 	$(".beginABC_btn").css("background-color", "#858280");
 	$(".beginABC_btn").attr("disabled", "disabled");
+	$("#uploadABC").show(50);
 
 	// Acceptance
 	$("#ABCacceptanceDIV").hide(0);
@@ -47,6 +48,7 @@ function initABCpanel(){
 	nFits = 0;
 	ABCtableToUse = 1; // Alternate between the left (1) and right (2) tables
 	addNewCurveButtons();
+	toggleMCMC();
 
 }
 
@@ -80,7 +82,6 @@ function beginABC(){
 	// Update the DOM so that we can see that ABC is running
 	$(".beginABC_btn").val("Stop ABC");
 	$(".beginABC_btn").attr("onclick", "stop_controller()");
-	hideButtonAndShowStopButton("simulate");
 
 
 	// Disable the ntrials textboxes
@@ -136,13 +137,16 @@ function onABCStart(){
 
 function addTracePlots(){
 
-	var option = `<option value="tracePlot">MCMC trace</option>`;
-	$("#selectPlot1").append(option);
-	$("#selectPlot2").append(option);
-	$("#selectPlot3").append(option);
+	if ($(".MCMCtraceOption").length == 0){
+		var option = `<option value="tracePlot" class="MCMCtraceOption">MCMC trace</option>`;
+		$("#selectPlot1").append(option);
+		$("#selectPlot2").append(option);
+		$("#selectPlot3").append(option);
+	}
 
 	// Open a trace plot
 	for (var i = 1; i <=3; i ++){
+		if ($("#selectPlot" + i).val() == "tracePlot") break;
 		if ($("#selectPlot" + i).val() == "none"){
 			$("#selectPlot" + i).val("tracePlot");
 			selectPlot(i);
@@ -277,7 +281,7 @@ function validateAllAbcDataInputs(){
 	// Else activate it
 	else{
 		$(".beginABC_btn").css("cursor", "pointer");
-		$(".beginABC_btn").css("background-color", "#663399");
+		$(".beginABC_btn").css("background-color", "#008cba");
 		$(".beginABC_btn").attr("disabled", false);
 	}
 
@@ -1724,10 +1728,11 @@ function uploadABCFromURL(url){
 	xhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 		  
-		   if (xhttp == null || xhttp.responseXML == "") return;
+		    if (xhttp == null || xhttp.responseXML == "") return;
 		   
-		   //console.log("xhttp.responseText", xhttp.responseText);
-			var TSVstring = xhttp.responseText.replace(/(\r\n|\n|\r)/gm,"|");
+		    //console.log("xhttp.responseText", xhttp.responseText);
+			var TSVstring = e.target.result.replace(/(\r\n|\n|\r)/gm,"!");
+			TSVstring = TSVstring.replace(/(\t)/gm, "&");
 			
 		   uploadABC_controller(TSVstring);
 		   
@@ -1761,7 +1766,8 @@ function uploadABC(){
 				return function(e) {
 
 					if (e == null || e.target.result == "") return;
-					var TSVstring = e.target.result.replace(/(\r\n|\n|\r)/gm,"|");
+					var TSVstring = e.target.result.replace(/(\r\n|\n|\r)/gm,"!");
+					TSVstring = TSVstring.replace(/(\t)/gm, "&");
 
 					//console.log("Sending TSVstring", TSVstring);
 
@@ -1802,8 +1808,9 @@ function getPosteriorSummaryTemplate(){
 
 
 	return `
-		<div id='posteriorSummaryPopup' style='background-color:adadad; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:20vh; z-index:5'>
-			<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+
+		<div id='posteriorSummaryPopup' style='background-color:#008cba; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:20vh; z-index:5'>
+			<div style='background-color:white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> Posterior Distribution Summary </span>
 
 
@@ -1814,23 +1821,31 @@ function getPosteriorSummaryTemplate(){
 					<tr>
 						<td style="vertical-align:top" title="The geometric median is the posterior sample which is closest in Euclidean space to all other posterior samples. The parameters are first normalised into z-scores."> 
 							<b>Geometric median:</b>
-							<table id="geometricMedianTable" style="width:100%" cellpadding=2 cellspacing=2>
-							
-								<tr style="background-color:#b3b3b3">
-									<td style="width:100%">
-										Parameter
-									</td>
-									
-									<td style="width:100%">
-										Estimate
-									</td>
+
+
+							<div id="geometricMedianDIV" style="display:none">
+								<br>
+								State: <span id="geometricMedianStateVal"></span> &nbsp;&nbsp;&nbsp;
+								X<sup>2</sup> = <span id="geometricMedianX2Val"></span>
+
+								<table id="geometricMedianTable" style="width:100%" cellpadding=5 cellspacing=2>
 								
-								</tr>
+									<tr style="background-color:#b3b3b3">
+										<td style="width:100%">
+											Parameter
+										</td>
+										
+										<td style="width:100%">
+											Estimate
+										</td>
+									
+									</tr>
+								
+								</table>
+								
+							</td>
+						</div>
 							
-							</table>
-							
-						</td>
-						
 						<td  style="vertical-align:top"> 
 							<b>Sample from posterior:</b>
 							
@@ -1870,8 +1885,20 @@ function posteriorSummary(){
 	getPosteriorSummaryData_controller(function(result){
 		
 		var paramNamesAndMedians = result.paramNamesAndMedians;
+
+
+		$("#geometricMedianDIV").show(50);
+		if (result.state == null) {
+			$("#geometricMedianDIV").html("No information is available at this time.");
+			return;
+		}
+
+		$("#geometricMedianStateVal").html(result.state);
+		$("#geometricMedianX2Val").html(roundToSF(result.chiSquared, 4));
+
+
 		for (var paramID in paramNamesAndMedians){
-			
+
 			var name = paramNamesAndMedians[paramID].name;
 			var estimate = roundToSF(paramNamesAndMedians[paramID].estimate, 4);
 			$("#geometricMedianTable").append(`
@@ -1920,40 +1947,20 @@ function posteriorSummary(){
 
 function downloadABC(){
 
-	get_ABCoutput_controller(function(result){
 
+	stop_controller(function() { 
 
-		var lines = result["lines"];
-		if (lines.length == 0) return;
-		var stringToPrint = "# Posterior distribution\n";
-		for (var i = 0; i < lines.length; i++){
+		get_ABCoutput_controller(function(result){
 
+			if (result.lines.length == 0) return;
+
+			var stringToPrint = result.lines;
+			stringToPrint = stringToPrint.split("&").join("\t").split("!").join("\n");
+
+			download("posterior.log", stringToPrint);
 			
 
-			// Replace all the &&&&& blocks with a single tab
-			var tabbedLine = "";
-			var addedTab = false;
-			for (var j = 0; j < lines[i].length; j ++){
-
-				if (lines[i][j] == "|") continue; // Ignore pipes. They denote coloured font
-
-				if (lines[i][j] == "&" && !addedTab) { // Replace & with a tab (unless you have already replaced a touching & with a tab)
-					tabbedLine += "\t";
-					addedTab = true;
-				}
-				else if(lines[i][j] != "&") {	// Add the normal character to the string
-					tabbedLine += lines[i][j];
-					addedTab = false;
-				}
-			}
-
-			stringToPrint += tabbedLine + "\n";
-
-		}
-
-
-		download("posterior.log", stringToPrint);
-		
+		});
 
 	});
 
@@ -2080,7 +2087,7 @@ function renderABCoutput(){
 
 
 	if (numRowsDisplayed > 0 && ABCoutputHTML.trim() != "") $("#numABCrowsDisplayed").html(startRow + "-" + (startRow + numRowsDisplayed - 1));
-	$("#numABCrowsGenerated").html(linesToUse.length - 3);
+	$("#numABCrowsGenerated").html(linesToUse.length - 1);
 
 
 
@@ -2159,3 +2166,25 @@ function toggleAcceptedOrRejected(){
 
 
 
+function toggleMCMC(){
+
+
+	// Rejection ABC
+	if ($("#ABC_useMCMC").val() == 1){
+
+		$(".ABC_display").show(50);
+		$(".MCMC_display").hide(0);
+
+	}
+
+	// MCMC ABC
+	else if ($("#ABC_useMCMC").val() == 2){
+
+		$(".ABC_display").hide(0);
+		$(".MCMC_display").show(50);
+
+
+	}
+
+
+}

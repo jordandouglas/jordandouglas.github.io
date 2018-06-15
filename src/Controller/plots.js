@@ -1142,6 +1142,7 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 
 function plot_MCMC_trace(){
 
+	console.log("plot_MCMC_trace", PLOT_DATA["whichPlotInWhichCanvas"]);
 
 	// Find the canvas to print onto
 	var canvasesToPrintTo = [];
@@ -1155,40 +1156,37 @@ function plot_MCMC_trace(){
 
 		var pltNum = canvasesToPrintTo[j];
 
-		var yVar = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].yVariable; //"logLikelihood";
+		var yVar = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].customParamY; 
 		
 
-		var xVals = [];
-		var yVals = [];
-		var workerNum = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].workerNum;
-		for (var postNum = 0; postNum < PLOT_DATA.POSTERIOR_DISTRIBUTION.length; postNum++){
+		var xVals = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].xData.vals;
+		var yVals = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].yData.vals;
+
+		/*
+		for (var postNum = 0; postNum < PLOT_DATA["whichPlotInWhichCanvas"][pltNum].xData.length; postNum++){
 
 
-			// Get the trial number
-			var trialNum = "" + PLOT_DATA.POSTERIOR_DISTRIBUTION[postNum].sample;
-			if (workerNum != null){
-				if (trialNum.split(":")[0] != "" + workerNum) continue; // Skip this entry if it is from the wrong thread
-				trialNum = trialNum.split(":")[1];
-			}
+			// Get the sample number
+			var trialNum = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].xData.vals;
 			xVals.push(parseFloat(trialNum));
 
 
 			// Get the y-axis value
-			var yVal = PLOT_DATA.POSTERIOR_DISTRIBUTION[postNum][yVar];
-			if (yVal.val != null) yVal = yVal.val;
-			else if (yVal.priorVal != null) yVal = yVal.priorVal;
+			var yVal = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].yData.vals;
+			//if (yVal.val != null) yVal = yVal.val;
+			//else if (yVal.priorVal != null) yVal = yVal.priorVal;
 
 			yVals.push(yVal);
 
 
 		}
-
+		*/
 
 
 		// Xmax and xmin
-		var xmax = 1;
+		var xmax = 1000;
 		var xmin = 0;
-		if (PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["xRange"] == "automaticX"){
+		if (PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["xRange"] == "automaticX" && xVals.length > 0){
 
 			xmin = xVals[0];
 			xmax = xVals[xVals.length-1];
@@ -1205,7 +1203,7 @@ function plot_MCMC_trace(){
 		// Ymax and ymin
 		var ymax = 1;
 		var ymin = 0;
-		if (PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["yRange"] == "automaticY"){
+		if (PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["yRange"] == "automaticY"  && yVals.length > 0){
 
 			ymin = minimumFromList(yVals);
 			ymax = maximumFromList(yVals);
@@ -1223,7 +1221,7 @@ function plot_MCMC_trace(){
 
 		// Epsilon decrease over time
 		var epsilon = null;
-		if (PLOT_DATA.ABC_EXPERIMENTAL_DATA !=null && yVar == "logLikelihood"){
+		if (PLOT_DATA.ABC_EXPERIMENTAL_DATA !=null && yVar == "chiSq"){
 			var epsilon_min = -PLOT_DATA.ABC_EXPERIMENTAL_DATA.chiSqthreshold_min;
 			var epsilon_0 = -PLOT_DATA.ABC_EXPERIMENTAL_DATA.chiSqthreshold_0;
 			var epsilon_gamma = PLOT_DATA.ABC_EXPERIMENTAL_DATA.chiSqthreshold_gamma;
@@ -1239,7 +1237,8 @@ function plot_MCMC_trace(){
 
 		//console.log("Values", xVals, yVals);
 
-		var ylab = PLOT_DATA.POSTERIOR_DISTRIBUTION.length > 0 ? PLOT_DATA.POSTERIOR_DISTRIBUTION[0][yVar].name : "chiSq";
+		var ylab = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].xData.name != null ? PLOT_DATA["whichPlotInWhichCanvas"][pltNum].xData.name : "chiSq";
+		var burnin = Math.floor(parseFloat(PLOT_DATA["whichPlotInWhichCanvas"][pltNum].burnin) / 100 * xVals.length);
 		trace_plot(xVals, yVals, range, epsilon, "plotCanvas" + pltNum, "plotCanvasContainer" + pltNum, "State", ylab, PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["canvasSizeMultiplier"]);
 
 	}
@@ -1252,7 +1251,7 @@ function plot_MCMC_trace(){
 
 
 // Produce a line plot where the y axis takes discrete values
-function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, xlab = "", ylab = "", canvasSizeMultiplier = 1) {
+function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, burnin, xlab = "", ylab = "", canvasSizeMultiplier = 1) {
 
 
 	if ($("#" + canvasDivID).is( ":hidden" )) return;
@@ -1380,8 +1379,6 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, xlab =
 		var first = true;
 
 
-
-		var burnin = Math.floor(parseFloat($("#MCMC_burnin").val()) / 100 * xVals.length);
 
 		//var currentTimePixel = 0; 		// We do not want to plot every single value because it is wasteful (and crashes the program). 
 		//var currentDistancePixel = 0; 	// So only plot values which will occupy a new pixel
@@ -3163,6 +3160,9 @@ function plot_parameter_heatmap(plotNumCustom = null){
 
 	if (plotNumCustom != 5 && $("#plotDIV" + plotNumCustom).is( ":hidden" )) return;
 
+	//console.log('PLOT_DATA["whichPlotInWhichCanvas"]', PLOT_DATA["whichPlotInWhichCanvas"]);
+	
+
 	
 	// Empty plot
 	if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParamX"] == "none" || PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParamY"] == "none"){
@@ -3182,7 +3182,6 @@ function plot_parameter_heatmap(plotNumCustom = null){
 		var zvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"] == null ? null : PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]["vals"];
 
 		//console.log("xLab", xLab, "ylab", yLab, PLOT_DATA["whichPlotInWhichCanvas"]);
-
 
 
 		// If y is probability make a histogram 
@@ -4663,16 +4662,6 @@ function windowSizeOptionsTemplate(){
 }
 
 
-function workerNumberTemplate(){
-	
-	return `
-		<b>Chain number:</b>  <input id="workerNumberInput" type="number" class="textboxBlue" title="Which MCMC chain do you want to show?" style="width:50px; text-align:right"></input>
-	`;
-	
-}
-
-
-
 
 function pauseSiteYVariableTemplate(){
 
@@ -4731,7 +4720,7 @@ function customPlotSelectParameterTemplate(){
 				<option value="catalyTime" style="color:white">Mean catalysis time (s)</option>
 				<option value="totalTime" style="color:white">Mean transcription time (s)</option>
 				<option value="nascentLen" style="color:white">Nascent strand length (nt)</option>
-				<option value="logLikelihood" style="color:white">Chi-squared test statistic</option>
+				<option value="chiSq" style="color:white">Chi-squared test statistic</option>
 			</optgroup>
 			
 			<optgroup label="Parameters" id="customParamX_params">
@@ -4763,7 +4752,7 @@ function customPlotSelectPropertyTemplate(){
 				<option value="catalyTime" style="color:white">Mean catalysis time (s)</option>
 				<option value="totalTime" style="color:white">Mean transcription time (s)</option>
 				<option value="nascentLen" style="color:white">Nascent strand length (nt)</option>
-				<option value="logLikelihood" style="color:white">Chi-squared test statistic</option>
+				<option value="chiSq" style="color:white">Chi-squared test statistic</option>
 			</optgroup>
 			
 			<optgroup label="Parameters" id="customParamY_params">
@@ -4793,7 +4782,7 @@ function parameterHeatmapZAxisTemplate(){
 				<option value="catalyTime" style="color:white">Mean catalysis time (s)</option>
 				<option value="totalTime" style="color:white">Mean transcription time (s)</option>
 				<option value="nascentLen" style="color:white">Nascent strand length (nt)</option>
-				<option value="logLikelihood" style="color:white">Chi-squared test statistic</option>
+				<option value="chiSq" style="color:white">Chi-squared test statistic</option>
 			</optgroup>
 			
 			<optgroup label="Parameters" id="customParamZ_params">
@@ -4816,7 +4805,7 @@ function getTracePlotDropdownTemplate(){
 	return `
 		<legend><b>Y-axis variable</b></legend>
 		<select class="dropdown" title="What do you want to show on the y-axis?" id = "traceVariableY" style="vertical-align: middle; text-align:right;">
-			<option value="logLikelihood">chiSq</option>
+			<option value="chiSq">chiSq</option>
 			<option value="logPrior">log prior</option>
 		</select><br>
 		Calculated per trial.
@@ -5185,7 +5174,7 @@ function plotOptions(plotNum){
 				for (var paramID in params){
 					$("#traceVariableY").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
 				}
-				$("#traceVariableY").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum].yVariable);
+				$("#traceVariableY").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum].customParamY);
 
 			});
 			
@@ -5211,14 +5200,6 @@ function plotOptions(plotNum){
 				$("#yMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][1]);
 			}
 			
-			
-			// Worker number
-			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum].workerNum != null){
-				$("#settingCell3").html("<br>" + workerNumberTemplate());
-				$("#workerNumberInput").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum].workerNum);
-				$("#workerNumberInput").attr("min", PLOT_DATA["whichPlotInWhichCanvas"][plotNum].workerNumRange[0]);
-				$("#workerNumberInput").attr("max", PLOT_DATA["whichPlotInWhichCanvas"][plotNum].workerNumRange[1]);
-			}
 
 			break;
 
