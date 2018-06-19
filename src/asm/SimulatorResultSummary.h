@@ -1,5 +1,4 @@
-﻿
-/* 
+﻿/*  
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
 	This file is part of SimPol.
@@ -21,35 +20,42 @@
 -*/
 
 
-#ifndef SIMULATOR_PTHREAD_H
-#define SIMULATOR_PTHREAD_H
-
-
-#include "Settings.h"
-#include "Simulator.h"
-#include "SimulatorResultSummary.h"
+#ifndef SIMULATORRESULTSUMMARY_H
+#define SIMULATORRESULTSUMMARY_H
 
 #include <string>
-#include <iostream>
-#include <vector>
-#include <thread>
+#include <list>
+
 
 using namespace std;
 
-class SimulatorPthread{
 
-	static void createThreadAndSimulate(int threadNum, SimulatorResultSummary* summary, bool verbose);
-	static vector<Simulator*> simulators;
+// Contains information on the results of a series of simulations
+class SimulatorResultSummary{
 
+	int ntrials;
+	double meanVelocity;
+	double meanTimeElapsed;
+	list<int> transcriptLengths;
 
 	public:
-		static void init();
-		static SimulatorResultSummary* performNSimulations(int N, bool verbose);
 
+		SimulatorResultSummary(int ntrials);
+		void set_meanVelocity(double v);
+		void set_meanTimeElapsed(double t);
+		void add_transcriptLength(int l);
+		void add_transcriptLengths(list<int> l);
+		void clear();
+
+
+		int get_ntrials();
+		double get_meanVelocity();
+		double get_meanTimeElapsed();
+		list<int> get_transcriptLengths();
 
 };
 
 
-
-
 #endif
+
+

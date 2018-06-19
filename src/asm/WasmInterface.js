@@ -439,6 +439,22 @@ getPosteriorSummaryData = function(msgID = null){
 
 }
 
+
+// Get posterior distribution list
+getPosteriorDistribution = function(msgID = null){
+	
+	
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	
+	Module.ccall("getPosteriorDistribution", null, ["number"],  [msgID]); 
+
+}
+
+
 // Generate the full ABC output
 getABCoutput = function(msgID = null){
 	
@@ -471,6 +487,14 @@ uploadABC = function(TSVfile, msgID = null){
 
 }
 
+
+
+// Change the burn-in
+update_burnin = function(burnin){
+
+	Module.ccall("update_burnin", null, ["number"],  [burnin]); 
+
+}
 
 setModelSettings = function(tosend, msgID = null){
 	

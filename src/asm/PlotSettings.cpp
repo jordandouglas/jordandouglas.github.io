@@ -24,7 +24,7 @@
 #include "Settings.h"
 #include "Plots.h"
 #include "ParameterHeatmapData.h"
-
+#include "MCMC.h"
 
 
 #include <string>
@@ -237,6 +237,8 @@ void PlotSettings::updateHeatmapData(list<ParameterHeatmapData*> heatmapData){
 	// If parameter heatmap then save upto all 3 variables 
 	if (this->name == "parameterHeatmap") {
 
+
+
 		this->xData = "{}";
 		this->yData = "{}";
 		this->zData = "{}";
@@ -336,6 +338,7 @@ string PlotSettings::toJSON(){
 		settingsJSON += "'sitesToRecordX':'" + this->sitesToRecordX + "',";
 		settingsJSON += "'sitesToRecordY':'" + this->sitesToRecordY + "',";
 		settingsJSON += "'sitesToRecordZ':'" + this->sitesToRecordZ + "',";
+		if (plotFromPosterior) settingsJSON += "'burnin':" + to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
 		
 
 	}
@@ -347,7 +350,7 @@ string PlotSettings::toJSON(){
 		settingsJSON += "'yRange':'" + this->yRange + "',";
 		settingsJSON += "'xData':" + this->xData + ",";
 		settingsJSON += "'yData':" + this->yData + ",";
-		settingsJSON += "'burnin':" + to_string(burnin) + ",";
+		settingsJSON += "'burnin':" + to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
 	}
 
 

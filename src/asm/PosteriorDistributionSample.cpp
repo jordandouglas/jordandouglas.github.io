@@ -23,6 +23,7 @@
 #include "Settings.h"
 #include "PosteriorDistributionSample.h"
 #include "WasmMessenger.h"
+#include "GelLaneData.h"
 
 #include <iostream>
 #include <vector>
@@ -128,19 +129,103 @@ vector<string> PosteriorDistributionSample::getParameterNames(){
 
 
 // Cache the simulated value, and use the simulated and observed values to update the chi squared test statistic
-void PosteriorDistributionSample::addSimulatedAndObservedValue(double simVal, double obsVal){
+void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSummary* simulated, ExperimentalData* observed){
+
+
+
+//void PosteriorDistributionSample::addSimulatedAndObservedValue(double simVal, double obsVal){
 
 
 	if (this->currentObsNum >= this->simulatedValues.size()) return;
-	this->simulatedValues.at(this->currentObsNum) = simVal;
+	
+
+	// If time gel then compare distribution of lengths
+	if (observed->getDataType() == "timeGel"){
+
+		//cout << "Lengths l = " << simulated->get_transcriptLengths().size() << endl;
+
+		// Count the number of molecules at each simulated band
+		vector<int> lengthCounts( templateSequence.length()+1 );
+		list<int> simulatedLengths = simulated->get_transcriptLengths();
+		for (list<int>::iterator it = simulatedLengths.begin(); it != simulatedLengths.end(); ++it){
+			//cout << "Transcript length: " << (*it) << "nt" << endl;
+			lengthCounts.at((*it)) ++;
+		}
+
+
+		// Normalise so it has a mean of 0 and var of 1
+		vector<int> simulatedDensities( lengthCounts.size() );
+		double mu = 0;
+		double sigma2 = 0;
+		for (int i = 0; i < lengthCounts.size(); i ++) mu += lengthCounts.at(i);
+		mu /= lengthCounts.size();
+		for (int i = 0; i < lengthCounts.size(); i ++) sigma2 += pow(lengthCounts.at(i) - mu, 2);
+		sigma2 /= lengthCounts.size();
+		for (int i = 0; i < lengthCounts.size(); i ++) simulatedDensities.at(i) = (lengthCounts.at(i) - mu) / sigma2;
+
+
+		// We don't want to divide by zero so will use a fudge factor
+		double fudge = 0.0001;
+		for (int i = 0; i < simulatedDensities.size(); i ++) {
+			if (simulatedDensities.at(i) >= 0 && simulatedDensities.at(i) < fudge) simulatedDensities.at(i) = fudge;
+			else if (simulatedDensities.at(i) < 0 && simulatedDensities.at(i) > -fudge) simulatedDensities.at(i) = -fudge;
+		}
+
+
+		// Compute chi-squared in specified lag range. Lag refers to how far the observed is behind the simulated
+		// Lag = 1:
+		// Sim:		1	2	3	4	5
+		// Obs:			1	2	3	4	5
+		int minLag = -3;
+		int maxLag = 3;
+		GelLaneData* currentLane = observed->getCurrentLane();
+		double chiSqLane = 0;
+		for (int lag = minLag; lag <= maxLag; lag++){
+
+			// Compute X2 at current lag
+			for (int i = max(lag, 0); i < min(simulatedDensities.size() + lag, simulatedDensities.size()); i ++){
+				double simVal = simulatedDensities.at(i);
+				double obsVal = currentLane->get_densityAt(i-lag);
+
+
+				// Calculate accumulative chi-squared. Want to ensure that 0/0 = 0 and not infinity
+				double chiSqTop = pow(simVal - obsVal, 2);
+				if (chiSqTop != 0) chiSqLane += chiSqTop; // / abs(simVal);
+
+				//cout << "Comparing position s" << i << " with o" << (i-lag) << " | X2 = " << chiSqTop / simVal << endl; 
+				
+
+			}
+
+		}
+
+		this->simulatedValues.at(this->currentObsNum) = chiSqLane;
+		this->chiSquared += chiSqLane;
+
+
+
+	}
+
+	// Otherwise compare simulated and observed velocities
+	else {
+		
+		
+		double simVal = simulated->get_meanVelocity();
+		double obsVal = observed->getObservation();
+
+		this->simulatedValues.at(this->currentObsNum) = simVal;
+
+		// Calculate accumulative chi-squared. Want to ensure that 0/0 = 0 and not infinity
+		double chiSqTop = pow(simVal - obsVal, 2);
+		if (chiSqTop != 0) this->chiSquared += chiSqTop / abs(simVal);
+
+		//Settings::print();
+		//cout << "Simval " << simVal << "; obsVal " << obsVal << "; X2 " << this->chiSquared << endl;
+
+	}
+
 	this->currentObsNum ++;
-
-
-	// Calculate accumulative chi-squared
-	this->chiSquared += pow(simVal - obsVal, 2) / simVal;
-
-	//Settings::print();
-	//cout << "Simval " << simVal << "; obsVal " << obsVal << "; X2 " << this->chiSquared << endl;
+	
 
 }
 
@@ -267,6 +352,24 @@ void PosteriorDistributionSample::print(bool toFile){
 	if (isWASM) {
 		WasmMessenger::printLogFileLine(WASM_string, true);
 	}
+
+}
+
+
+string PosteriorDistributionSample::toJSON(){
+
+	string JSON = "{";
+
+	// Simulated values
+	JSON += "'simulatedValues':[";
+	for (int i = 0; i < this->simulatedValues.size(); i ++){
+		JSON += to_string(this->simulatedValues.at(i)) + ",";
+	}
+	if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
+
+	JSON += "]";
+	JSON += "}";
+	return JSON;
 
 }
 

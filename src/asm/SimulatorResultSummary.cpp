@@ -1,5 +1,4 @@
-﻿
-/* 
+﻿/* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
 	This file is part of SimPol.
@@ -21,35 +20,66 @@
 -*/
 
 
-#ifndef SIMULATOR_PTHREAD_H
-#define SIMULATOR_PTHREAD_H
-
-
-#include "Settings.h"
-#include "Simulator.h"
 #include "SimulatorResultSummary.h"
 
-#include <string>
 #include <iostream>
-#include <vector>
-#include <thread>
+#include <list>
+
 
 using namespace std;
 
-class SimulatorPthread{
 
-	static void createThreadAndSimulate(int threadNum, SimulatorResultSummary* summary, bool verbose);
-	static vector<Simulator*> simulators;
-
-
-	public:
-		static void init();
-		static SimulatorResultSummary* performNSimulations(int N, bool verbose);
-
-
-};
+SimulatorResultSummary::SimulatorResultSummary(int ntrials){
+	this->ntrials = ntrials;
+}
 
 
 
 
-#endif
+int SimulatorResultSummary::get_ntrials(){
+	return this->ntrials;
+}
+
+
+
+
+void SimulatorResultSummary::set_meanVelocity(double v){
+	this->meanVelocity = v;
+}
+
+double SimulatorResultSummary::get_meanVelocity(){
+	return this->meanVelocity;
+}
+
+
+
+
+void SimulatorResultSummary::set_meanTimeElapsed(double t){
+	this->meanTimeElapsed = t;
+}
+
+double SimulatorResultSummary::get_meanTimeElapsed(){
+	return this->meanTimeElapsed;
+}
+
+
+
+
+void SimulatorResultSummary::add_transcriptLength(int l){
+	this->transcriptLengths.push_back(l);
+}
+
+void SimulatorResultSummary::add_transcriptLengths(list<int> l){
+	this->transcriptLengths.merge(l);
+}
+
+list<int> SimulatorResultSummary::get_transcriptLengths(){
+	return this->transcriptLengths;
+}
+
+
+void SimulatorResultSummary::clear(){
+	this->transcriptLengths.clear();
+}
+
+

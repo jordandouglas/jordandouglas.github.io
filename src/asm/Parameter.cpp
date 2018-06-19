@@ -144,7 +144,6 @@ void Parameter::setVal(double val){
 
 void Parameter::setPriorDistribution(string distributionName){
 	if (this->isMetaParameter) this->instances.at(this->currentInstance)->setPriorDistribution(distributionName);
-
 	else this->distributionName = distributionName;
 }
 

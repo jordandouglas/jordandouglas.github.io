@@ -54,10 +54,11 @@ Simulator::Simulator(){
 
 
 
-// Returns the mean velocity acros N trials
-double Simulator::perform_N_Trials(int N, State* state, bool verbose){
+// Performs the number of trials specified in summary and populates the object with summary statistics of the simulations 
+void Simulator::perform_N_Trials(SimulatorResultSummary* summary, State* state, bool verbose){
 
 
+	int N = summary->get_ntrials();
 
 	// Generate plots?
 	if (_plotFolderName != "" && !_RUNNING_ABC) Plots::init();
@@ -81,6 +82,7 @@ double Simulator::perform_N_Trials(int N, State* state, bool verbose){
 
 	//cout << "bck = " <<  state->calculateBackwardRate(true) << endl;
 
+
 	double meanMeanVelocity = 0;
 	double meanMeanTime = 0;
 	State* clonedState;
@@ -95,12 +97,19 @@ double Simulator::perform_N_Trials(int N, State* state, bool verbose){
 		if (_plotFolderName != "" && !_RUNNING_ABC) Plots::refreshPlotData(clonedState); // New simulation -> refresh plot data
 		performSimulation(clonedState, result);
 		if (!_RUNNING_ABC) Plots::updateParameterPlotData(clonedState); // Update parameter plot before starting next trial
+
+		//cout << "Finished trial and length is " << clonedState->get_nascentLength() << endl;
+		summary->add_transcriptLength(clonedState->get_nascentLength());
+		//cout << "Added length " << clonedState->get_nascentLength() << endl;
+
 		delete clonedState;
 		meanMeanVelocity += result[0] / N;
 		meanMeanTime += result[1] / N;
 		//velocities.at(n-1) = result[0];
 		//times.at(n-1) = result[1];
 	}
+
+
 
 
 
@@ -126,7 +135,9 @@ double Simulator::perform_N_Trials(int N, State* state, bool verbose){
 	}
 
 	_GUI_simulating = false;
-	return meanMeanVelocity;
+
+	summary->set_meanVelocity(meanMeanVelocity);
+	summary->set_meanTimeElapsed(meanMeanTime);
 
 
 }
@@ -341,7 +352,7 @@ int Simulator::getNtrialsCompleted_GUI(){
 void Simulator::performSimulation(State* s, double* toReturn) {
 
 
-
+	//cout << "Beginning" << endl;
 
 	double timeElapsed = 0;
 
@@ -379,6 +390,23 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				} 
 
 			}
+
+		} 
+
+
+
+
+
+		// Check if in-simulation time limit has been exceeded
+		if (_inSimulationTimeLimit > 0 && timeElapsed >= _inSimulationTimeLimit) {
+
+			//cout << "In-simulation timeout reached " << timeElapsed << endl;
+
+			// If timeout has been reached then return the current time elapsed
+			toReturn[0] = s->get_nascentLength(); // Returns the final transcript length instead of velocity
+			toReturn[1] += timeElapsed; // Total time taken
+			toReturn[2] = 1; // Success
+			return;
 
 		} 
 
@@ -432,6 +460,8 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 		double geometricTime = -1;
 
 
+
+
 		// Geometric speed boost whereby the number of cycles spent in a set of states is sampled from the geometric distribution. 
 		// This is faster because the inner loop is smaller, especially when the back and forth rate is very high eg. NTP binding/release
 		if (currentModel->get_allowGeometricCatalysis() && beforeEndOfTemplate && afterStartOfTemplate && s->get_activated() && !bindingAndTranslocationEquilibrium && (s->get_mRNAPosInActiveSite() == 0 || s->get_mRNAPosInActiveSite() == 1)){
@@ -461,6 +491,9 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
 
+
+
+
 		// Geometric sampling was a success. End of trial
 		if (geometricTime != -1){
 
@@ -480,7 +513,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
 		// Geometric sampling did not apply. Do it the normal way
-		if (geometricTime == -1) {
+		else if (geometricTime == -1) {
 
 
 
@@ -492,7 +525,6 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			double kActivate = s->calculateActivateRate(false);
 			double kDeactivate = s->calculateDeactivateRate(false);
 			double kCleave = s->calculateCleavageRate(false); // Can only cleave if backtracked in which case equilibrium assumptions do not apply
-
 
 
 
@@ -679,7 +711,6 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			}
 
 
-			
 
 			double rates[] = { kBck, kFwd, kRelease, kBindOrCat, kActivate, kDeactivate, 0, kCleave };
 			int numReactions = (sizeof(rates)/sizeof(*rates));
@@ -692,7 +723,6 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			//cout << endl;
 
 			
-
 			
 			if (rateSum <= 0){
 				cout << "No operations to apply" << endl;
@@ -836,10 +866,14 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
 		}
+
+
 		
 		//s.print();
 	}
 
+
+	//cout << "Done" << endl;
 
 	// Total time taken
 	toReturn[1] += timeElapsed;

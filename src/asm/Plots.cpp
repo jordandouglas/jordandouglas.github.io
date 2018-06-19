@@ -100,7 +100,7 @@ vector<PlotSettings*> Plots::plotSettings(4);
 // Must call this function when the sequence changes
 void Plots::init(){
 
-
+	if (!_USING_GUI) return;
 
 	// Restrict the data flow by only disallowing the JSON string to exceed a certain number of megabytes at a time. This is to avoid memory errors
 	Plots::plotDataJSON.reserve(Plots::maximumBytesJSON);
@@ -921,6 +921,8 @@ string Plots::getPlotDataAsJSON(){
 void Plots::userSelectPlot(int plotNum, string value, bool deleteData){
 
 
+	if (!_USING_GUI) return;
+
 	PlotSettings* newPlotSettings = new PlotSettings(plotNum, value);
 
 	// Delete the PlotSettings which this one is replacing
@@ -938,6 +940,8 @@ void Plots::userSelectPlot(int plotNum, string value, bool deleteData){
 
 // Save the settings for a given plot
 void Plots::savePlotSettings(int plotNum, string values_str){
+
+	if (!_USING_GUI) return;
 
 	if (Plots::plotSettings.at(plotNum - 1) != nullptr) Plots::plotSettings.at(plotNum - 1)->savePlotSettings(values_str);
 
@@ -961,6 +965,8 @@ void Plots::hideAllPlots(bool toHide){
 // Returns a JSON string which contains information on all the cache sizes
 string Plots::getCacheSizeJSON(){
 
+	if (!_USING_GUI) return "";
+
 	int parameterPlotSize = Plots::parametersPlotData.size() * Plots::parametersPlotData.back()->getVals().size();
 
 	string JSON = "{";
@@ -978,6 +984,7 @@ string Plots::getCacheSizeJSON(){
 
 void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata, bool sequences_cleardata){
 
+	if (!_USING_GUI) return;
 
 	if (distanceVsTime_cleardata) {
 
@@ -1088,6 +1095,7 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 // Send through the current site and the time to catalysis at that site
 // Each plot will determine whether or not to store that number
 void Plots::recordSite(int siteThatWasJustCatalysed, double timeToCatalysis){
+	if (!_USING_GUI) return;
 	for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
 		if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->recordSite(siteThatWasJustCatalysed, timeToCatalysis);
 	}
@@ -1095,6 +1103,7 @@ void Plots::recordSite(int siteThatWasJustCatalysed, double timeToCatalysis){
 
 
 void Plots::addCopiedSequence(string sequence){
+	if (!_USING_GUI) return;
 	if (Plots::numberCopiedSequences < Plots::maxNumberCopiedSequences) {
 		Plots::numberCopiedSequences ++;
 		Plots::unsentCopiedSequences.push_back(sequence);
@@ -1104,6 +1113,7 @@ void Plots::addCopiedSequence(string sequence){
 
 void Plots::prepareForABC(){
 
+	if (!_USING_GUI) return;
 
 	// Set posterior distribution as the default option for all plots
 	for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){

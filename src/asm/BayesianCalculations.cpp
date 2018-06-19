@@ -369,16 +369,16 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistributionSampl
 		int ntrialsPerDatapoint = MCMC::getNTrialsPostBurnin();
 
 
-		double simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
-		state->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
+		SimulatorResultSummary* simulationResults = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
+		state->addSimulatedAndObservedValue(simulationResults, MCMC::getCurrentExperiment());
 
 
 		while (MCMC::nextExperiment()){
 
 			// Run simulations and stop if it exceeds threshold (unless this is the first trial)
 			ntrialsPerDatapoint = MCMC::getNTrialsPostBurnin();
-			simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
-			state->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
+			simulationResults = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
+			state->addSimulatedAndObservedValue(simulationResults, MCMC::getCurrentExperiment());
 
 		}
 
@@ -414,13 +414,17 @@ list<ParameterHeatmapData*> BayesianCalculations::getPosteriorDistributionAsHeat
 	}
 
 
+
+
 	// Iterate through each column and populate it with estimates from the rows
 	for (list<ParameterHeatmapData*>::iterator col = heatMapData.begin(); col != heatMapData.end(); ++col){
 
 		string paramID = (*col)->getID();
 		if (paramID == "probability") continue;
 
+
 		for (list<PosteriorDistributionSample*>::iterator row = _GUI_posterior.begin(); row != _GUI_posterior.end(); ++row){
+
 			if (paramID == "chiSq") (*col)->addValue( (*row)->get_chiSquared() );
 			else if (paramID == "logPrior") (*col)->addValue( (*row)->get_logPriorProb() );
 			else if (paramID == "state") (*col)->addValue( (*row)->getStateNumber() );
@@ -428,6 +432,8 @@ list<ParameterHeatmapData*> BayesianCalculations::getPosteriorDistributionAsHeat
 		}
 
 	}
+
+
 
 
 

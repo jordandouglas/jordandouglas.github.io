@@ -42,38 +42,37 @@ void SimulatorPthread::init(){
 
 
 // Performs N simulations over N_THREADS threads and returns the mean velocity
-double SimulatorPthread::performNSimulations(int N, bool verbose){
+SimulatorResultSummary* SimulatorPthread::performNSimulations(int N, bool verbose){
 
 
 	// No threading
 	if (N_THREADS == 1){
-		double result[1];
-		SimulatorPthread::createThreadAndSimulate(1, N, result, verbose);
-		double velocity = result[0];
-		return velocity;
+		SimulatorResultSummary* result = new SimulatorResultSummary(N);
+		SimulatorPthread::createThreadAndSimulate(1, result, verbose);
+		return result;
 	}
 
-	double meanVelocity = 0;
+
+	SimulatorResultSummary* mergedResult = new SimulatorResultSummary(N); // Returning this object
 
 
 	// Allocate number of simulations to each thread
 	// Each worker has same number of simulations, and if there are n remainders these are distributed equally among the first n threads 
-	vector<int> nSimsPerThread(N_THREADS);
 	int simsFloor = floor(N / N_THREADS);
 	int simsRemain = N % N_THREADS;
+   	vector<thread*> threads(N_THREADS);
+   	vector<SimulatorResultSummary*> results(N_THREADS);
 	for (int i = 0; i < N_THREADS; i ++){
-		nSimsPerThread.at(i) = simsFloor;
-		if (i < simsRemain) nSimsPerThread.at(i)++;
+		int nSims = simsFloor;
+		if (i < simsRemain) nSims ++;
+		results.at(i) = new SimulatorResultSummary(nSims);
 	}
 
 
 
 	// Create threads
-   	vector<thread*> threads(N_THREADS);
-   	vector<double*> velocities(N_THREADS);
    	for (int i = 0; i < N_THREADS; i++){
-   		velocities.at(i) = new double[1];
-   		threads.at(i) = new thread(SimulatorPthread::createThreadAndSimulate, i+1, nSimsPerThread.at(i), velocities.at(i), verbose);
+   		threads.at(i) = new thread(SimulatorPthread::createThreadAndSimulate, i+1, results.at(i), verbose);
    	}
 
 
@@ -83,40 +82,47 @@ double SimulatorPthread::performNSimulations(int N, bool verbose){
    	}
 
 
-   	// Calculate mean velocity
+   	// Merge results into a single mean result
+	double meanVelocity = 0;
+	double meanTime = 0;
    	for (int i = 0; i < N_THREADS; i++){
-   		meanVelocity += (velocities.at(i)[0] * nSimsPerThread.at(i)) / N;
+   		meanVelocity += (results.at(i)->get_meanVelocity() * results.at(i)->get_ntrials()) / N;
+   		meanTime += (results.at(i)->get_meanTimeElapsed() * results.at(i)->get_ntrials()) / N;
+   		mergedResult->add_transcriptLengths(results.at(i)->get_transcriptLengths());
+
+
    		//cout << velocities.at(i)[0] << endl;
-   		delete velocities.at(i);
    		delete threads.at(i);
+   		//results.at(i).clear();
+   		delete results.at(i);
+
+
    	}
 
 
 	
-	nSimsPerThread.clear();
-	velocities.clear();
+	results.clear();
 	threads.clear();
 
    	//cout << "Mean velocity = " << meanVelocity << endl;
 
+   	mergedResult->set_meanVelocity(meanVelocity);
+	mergedResult->set_meanTimeElapsed(meanTime);
 
-   	return meanVelocity;
+
+   	return mergedResult;
 }
 
 
 
 
-
-void SimulatorPthread::createThreadAndSimulate(int threadNum, int nsims, double* toReturn, bool verbose){
-
+// Perform the number of simulations specified in the SimulatorResultSummary object and populate this object with a summary of the results
+void SimulatorPthread::createThreadAndSimulate(int threadNum, SimulatorResultSummary* summary, bool verbose){
 
 
     State* initialState = new State(true);
-
-   	double velocity = SimulatorPthread::simulators.at(threadNum-1)->perform_N_Trials(nsims, initialState, verbose);
+    SimulatorPthread::simulators.at(threadNum-1)->perform_N_Trials(summary, initialState, verbose);
    	delete initialState;
-	//cout << "Velocity " << velocity << endl;
-   	toReturn[0] = velocity;
 
 
 }

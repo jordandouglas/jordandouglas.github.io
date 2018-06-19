@@ -34,7 +34,7 @@ using namespace std;
 
 class MCMC{
 
-	static list<ExperimentalData>::iterator currentExperiment;
+	static list<ExperimentalData*>::iterator currentExperiment;
 	static list<Parameter*> parametersToEstimate;
 	static bool estimatingModel;
 	static double epsilon; // The current chi-squared threshold
@@ -54,6 +54,7 @@ class MCMC{
 
 	static int nacceptances;
 	static int nTrialsUntilBurnin;
+	static int nStatesUntilBurnin;
 	static int initialStateNum;
 
 
@@ -72,6 +73,7 @@ class MCMC{
 		static bool get_hasFailedBurnin();
 		static double getEpsilon();
 		static void setPreviousState(PosteriorDistributionSample* state);
+		static int get_nStatesUntilBurnin();
 
 
 		// Experimental data
@@ -80,6 +82,7 @@ class MCMC{
 		static double getExperimentalVelocity();
 		static int getNTrials();
 		static int getNTrialsPostBurnin();
+		static ExperimentalData* getCurrentExperiment();
 		
 
 };

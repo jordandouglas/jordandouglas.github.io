@@ -88,14 +88,15 @@ int _testsPerData_preburnin = -1; // Number of trials per datapoint prior to ach
 double _chiSqthreshold_min = 10;
 double _chiSqthreshold_0 = 1000;
 double _chiSqthreshold_gamma = 0.999;
-int burnin = 10; 
+double burnin = 10; 
 int logEvery = 100;
 int N_THREADS = 1;
 bool _RUNNING_ABC = false;
+double _inSimulationTimeLimit = -1; // Number of seconds to run simulations for until returning (in-simulation time, not clock time). Set to -1 for unlimited
 
 
 // Experimental data
-list<ExperimentalData> experiments;
+list<ExperimentalData*> experiments;
 int _numExperimentalObservations = 0;
 
 
@@ -465,7 +466,35 @@ string Settings::toJSON(){
 		parametersJSON += _polymerases.at(i)->toJSON();
 		if (i < _polymerases.size()-1) parametersJSON += ",";
 	}
-	parametersJSON += "}, 'currentPolymerase':'" + _currentPolymerase + "'";
+	parametersJSON += "}, 'currentPolymerase':'" + _currentPolymerase + "',";
+
+
+	// ABC
+	parametersJSON += "'ABC_EXPERIMENTAL_DATA':{";
+	parametersJSON += "'inferenceMethod':'" + inferenceMethod + "',";
+	parametersJSON += "'ntrials':" + to_string(ntrials_abc) + ",";
+	parametersJSON += "'testsPerData':" + to_string(testsPerData) + ",";
+
+	parametersJSON += "'burnin':" + to_string(burnin) + ",";
+	parametersJSON += "'logEvery':" + to_string(logEvery) + ",";
+	parametersJSON += "'chiSqthreshold_min':" + to_string(_chiSqthreshold_min) + ",";
+	parametersJSON += "'chiSqthreshold_0':" + to_string(_chiSqthreshold_0) + ",";
+	parametersJSON += "'chiSqthreshold_gamma':" + to_string(_chiSqthreshold_gamma) + ",";
+
+		// Experimental data
+		parametersJSON += "'fits':{";
+
+
+		for (list<ExperimentalData*>::iterator it = experiments.begin(); it != experiments.end(); ++it){
+			parametersJSON += (*it)->toJSON();
+			parametersJSON += ",";
+		}	
+
+		if (parametersJSON.substr(parametersJSON.length()-1, 1) == ",") parametersJSON = parametersJSON.substr(0, parametersJSON.length() - 1);
+		parametersJSON += "}";
+
+	parametersJSON += "}";
+
 
 
 	return parametersJSON;
@@ -530,8 +559,8 @@ void Settings::print(){
 
 
 	cout << "ABC settings: ntrials = " << ntrials_abc << "; testsPerData = " << testsPerData << "; testsPerData_preburnin = " << _testsPerData_preburnin << "; _chiSqthreshold_min = " << _chiSqthreshold_min << "; _chiSqthreshold_0 = " << _chiSqthreshold_0 << "; _chiSqthreshold_gamma = " << _chiSqthreshold_gamma << "; burnin = " << burnin << "; logEvery = " << logEvery << endl;
-	for (list<ExperimentalData>::iterator it=experiments.begin(); it != experiments.end(); ++it){
-    	(*it).print();
+	for (list<ExperimentalData*>::iterator it=experiments.begin(); it != experiments.end(); ++it){
+    	(*it)->print();
     }
 
 
@@ -729,9 +758,6 @@ void Settings::sampleAll(){
 	downstreamCurvatureCoeff->sample();
 	upstreamWindow->sample();
 	downstreamWindow->sample();
-
-
-
 
 
 	// Samples a model

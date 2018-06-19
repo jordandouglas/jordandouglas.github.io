@@ -1,5 +1,4 @@
-﻿
-/* 
+﻿/*  
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
 	This file is part of SimPol.
@@ -21,35 +20,38 @@
 -*/
 
 
-#ifndef SIMULATOR_PTHREAD_H
-#define SIMULATOR_PTHREAD_H
-
-
-#include "Settings.h"
-#include "Simulator.h"
-#include "SimulatorResultSummary.h"
+#ifndef GELLANEDATA_H
+#define GELLANEDATA_H
 
 #include <string>
-#include <iostream>
 #include <vector>
-#include <thread>
+
 
 using namespace std;
 
-class SimulatorPthread{
 
-	static void createThreadAndSimulate(int threadNum, SimulatorResultSummary* summary, bool verbose);
-	static vector<Simulator*> simulators;
+// Contains positions and intensities of bands in a lane
+class GelLaneData{
+
+
+	int laneNum;
+	int currentBandNum;
+	double time;
+	vector<double> transcriptLengths;
+	vector<double> densities;
 
 
 	public:
-		static void init();
-		static SimulatorResultSummary* performNSimulations(int N, bool verbose);
 
+		GelLaneData(int laneNum, double time, int nObs);
+		void addNewBand(double len, double den);
+		string toJSON();
+
+		double get_time();
+		double get_densityAt(int len);
 
 };
 
 
-
-
 #endif
+

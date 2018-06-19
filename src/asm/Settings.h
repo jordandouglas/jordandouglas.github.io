@@ -88,14 +88,15 @@ extern int _testsPerData_preburnin;
 extern double _chiSqthreshold_min;
 extern double _chiSqthreshold_0;
 extern double _chiSqthreshold_gamma;
-extern int burnin; // Percentage
+extern double burnin; // Percentage
 extern int logEvery;
 extern int N_THREADS;
 extern bool _RUNNING_ABC;
+extern double _inSimulationTimeLimit;
 
 
 // Experimental data
-extern list<ExperimentalData> experiments;
+extern list<ExperimentalData*> experiments;
 extern int _numExperimentalObservations;
 
 
@@ -119,6 +120,8 @@ extern chrono::system_clock::time_point _interfaceSimulation_startTime; // The s
 extern SlippageLandscapes* _slippageLandscapesToSendToDOM;
 extern ostringstream _ABCoutputToPrint;
 extern list<PosteriorDistributionSample*> _GUI_posterior;
+
+
 
 
 // Parameters

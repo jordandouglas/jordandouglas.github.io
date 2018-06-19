@@ -23,7 +23,8 @@
 #ifndef POSTERIOR_DISTRIBUTION_SAMPLE_H
 #define POSTERIOR_DISTRIBUTION_SAMPLE_H
 
-
+#include "SimulatorResultSummary.h"
+#include "ExperimentalData.h"
 
 #include <string>
 #include <iostream>
@@ -59,11 +60,14 @@ class PosteriorDistributionSample {
     	void addParameterEstimate(string paramID, double val);
     	double getParameterEstimate(string paramID);
     	vector<string> getParameterNames();
-    	void addSimulatedAndObservedValue(double simVal, double obsVal);
+    	//void addSimulatedAndObservedValue(double simVal, double obsVal);
+    	void addSimulatedAndObservedValue(SimulatorResultSummary* simulated, ExperimentalData* observed);
     	void parseFromLogFileLine(vector<string> splitLine, vector<string> headerLineSplit);
+
 		
     	void print(bool toFile);
     	void printHeader(bool toFile);
+    	string toJSON();
     	void loadFromLogFile(string filename);
     	void setParametersFromState();
 

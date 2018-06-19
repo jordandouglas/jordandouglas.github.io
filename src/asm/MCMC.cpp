@@ -27,7 +27,7 @@
 #include "Parameter.h"
 #include "SimulatorPthread.h"
 #include "Settings.h"
-
+#include "SimulatorResultSummary.h"
 
 
 
@@ -39,7 +39,7 @@
 using namespace std;
 
 
-list<ExperimentalData>::iterator MCMC::currentExperiment;
+list<ExperimentalData*>::iterator MCMC::currentExperiment;
 list<Parameter*> MCMC::parametersToEstimate;
 bool MCMC::estimatingModel;
 bool MCMC::hasAchievedBurnin;
@@ -51,6 +51,7 @@ double MCMC::epsilon = 0;
 int MCMC::nacceptances = 0;
 int MCMC::nTrialsUntilBurnin = 0;
 int MCMC::initialStateNum = 0;
+int MCMC::nStatesUntilBurnin = -1;
 
 
 PosteriorDistributionSample* MCMC::previousMCMCstate;
@@ -95,6 +96,8 @@ void MCMC::initMCMC(){
 	MCMC::previousMCMCstate = new PosteriorDistributionSample(0);
 	// MCMC::currentMCMCstate = new PosteriorDistributionSample(0);
 
+
+
 	// Load initial state from file
 	if (_resumeFromLogfile){
 		MCMC::previousMCMCstate->loadFromLogFile(outputFilename);
@@ -112,6 +115,8 @@ void MCMC::initMCMC(){
 	}
 
 
+	cout << "done metropolisHastings" << endl;
+
 	if(_USING_GUI) _GUI_posterior.push_back(MCMC::previousMCMCstate->clone(true));
 
 
@@ -124,6 +129,7 @@ void MCMC::initMCMC(){
 
 	MCMC::nacceptances = 0;
 	MCMC::nTrialsUntilBurnin = 0;
+	MCMC::nStatesUntilBurnin = -1;
 
 
 	// Intialise epsilon to the initial threshold value
@@ -162,6 +168,7 @@ void MCMC::cleanup(){
 	MCMC::epsilon = 0;
 	MCMC::nacceptances = 0;
 	MCMC::nTrialsUntilBurnin = 0;
+	MCMC::nStatesUntilBurnin = -1;
 	MCMC::initialStateNum = 0;
 
 	
@@ -290,7 +297,10 @@ void MCMC::perform_1_iteration(int n){
 	// Log
 	if (n % logEvery == 0){
 		MCMC::currentMCMCstate->print(outputFilename != "");
-		if(_USING_GUI) _GUI_posterior.push_back(MCMC::currentMCMCstate->clone(true));
+		if(_USING_GUI) {
+			_GUI_posterior.push_back(MCMC::currentMCMCstate->clone(true));
+			if (MCMC::hasAchievedBurnin && MCMC::nStatesUntilBurnin == -1) MCMC::nStatesUntilBurnin = _GUI_posterior.size() - 1;
+		}
 	}
 
 }
@@ -347,13 +357,12 @@ void MCMC::makeProposal(){
 // If the sampleNum is 0, it will always be accepted
 bool MCMC::metropolisHastings(int sampleNum, PosteriorDistributionSample* this_MCMCState, PosteriorDistributionSample* prev_MCMCState){
 	
-
+	
 
 	if (!MCMC::resetExperiment()){
 		cout << "Could not initialise experiment" << endl;
 		exit(0);
 	}
-
 
 
 	// Cache the parameter values in posterior row object
@@ -383,13 +392,14 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistributionSample* this_M
 	}
 
 
-
-	// Iterate through all experimental settings and perform simulations at each setting. The velocities generated are cached in the posterior object
+	// Iterate through all experimental settings and perform simulations at each setting. The velocities/densities generated are cached in the posterior object
 
 	// Run simulations and stop if it exceeds threshold (unless this is the first trial)
 	int ntrialsPerDatapoint = MCMC::getNTrials();
-	double simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
-	this_MCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
+	SimulatorResultSummary* simulationResults = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
+	this_MCMCState->addSimulatedAndObservedValue(simulationResults, (*currentExperiment));
+	delete simulationResults;
+
 	if (this_MCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
 		return false;
 	}
@@ -399,8 +409,10 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistributionSample* this_M
 
 		// Run simulations and stop if it exceeds threshold (unless this is the first trial)
 		ntrialsPerDatapoint = MCMC::getNTrials();
-		simulatedVelocity = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
-		this_MCMCState->addSimulatedAndObservedValue(simulatedVelocity, MCMC::getExperimentalVelocity());
+		simulationResults = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
+		this_MCMCState->addSimulatedAndObservedValue(simulationResults, (*currentExperiment));
+		delete simulationResults;
+
 		if (this_MCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
 			return false;
 		}
@@ -455,7 +467,7 @@ bool MCMC::resetExperiment(){
 	// Apply settings
 	Settings::clearParameterHardcodings();
 	currentModel->activateModel();
-	(*currentExperiment).reset();
+	(*currentExperiment)->reset();
 
 	return true;
 
@@ -469,7 +481,7 @@ bool MCMC::nextExperiment(){
 	// Attempt to apply the settings of the next observation in the current experiment
 	Settings::clearParameterHardcodings();
 	currentModel->activateModel();
-	if ((*currentExperiment).next()) {
+	if ((*currentExperiment)->next()) {
 		//cout << "Next setting" << endl;
 		//Settings::print();
 		return true;
@@ -479,7 +491,7 @@ bool MCMC::nextExperiment(){
 	++currentExperiment;
 	if (currentExperiment == experiments.end()) return false;
 
-	(*currentExperiment).reset();
+	(*currentExperiment)->reset();
 
 	//cout << "Next experiment" << endl;
 	//Settings::print();
@@ -491,7 +503,7 @@ bool MCMC::nextExperiment(){
 
 // Returns the velocity of the current experiment
 double MCMC::getExperimentalVelocity(){
-	return (*currentExperiment).getObservation();
+	return (*currentExperiment)->getObservation();
 }
 
 
@@ -499,7 +511,7 @@ double MCMC::getExperimentalVelocity(){
 // Returns the number of trials to perform for the current experimrnt
 int MCMC::getNTrials(){
 
-	if ((*currentExperiment).getNTrials() != 0) return (*currentExperiment).getNTrials();
+	if ((*currentExperiment)->getNTrials() != 0) return (*currentExperiment)->getNTrials();
 
 	// Run a different number of trials pre- and post- pre-burnin
 	return MCMC::hasAchievedPreBurnin || _testsPerData_preburnin < 0 ? testsPerData : _testsPerData_preburnin; 
@@ -510,7 +522,7 @@ int MCMC::getNTrials(){
 // Returns the number of trials to perform for the current experimrnt
 int MCMC::getNTrialsPostBurnin(){
 
-	if ((*currentExperiment).getNTrials() != 0) return (*currentExperiment).getNTrials();
+	if ((*currentExperiment)->getNTrials() != 0) return (*currentExperiment)->getNTrials();
 	return testsPerData; 
 
 }
@@ -549,4 +561,14 @@ void MCMC::setPreviousState(PosteriorDistributionSample* state){
 	MCMC::previousMCMCstate = state;
 	MCMC::epsilon = max(_chiSqthreshold_0 * pow(_chiSqthreshold_gamma, (_chiSqthreshold_0 - state->getStateNumber())), _chiSqthreshold_min);
 
+}
+
+
+int MCMC::get_nStatesUntilBurnin(){
+	return MCMC::nStatesUntilBurnin;
+}
+
+
+ExperimentalData* MCMC::getCurrentExperiment(){
+	return (*currentExperiment);
 }

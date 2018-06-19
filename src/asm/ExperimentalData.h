@@ -23,6 +23,9 @@
 #ifndef EXPERIMENTALDATA_H
 #define EXPERIMENTALDATA_H
 
+
+#include "GelLaneData.h"
+
 #include <string>
 #include <vector>
 
@@ -44,10 +47,12 @@ class ExperimentalData{
 	string sequenceID; // Use a separate sequence for this dataset? Optional 
 
 	int currentExperiment;
-	vector<double> settingsX; // eg. forces, NTP concentrations
-	vector<double> observationsY; // eg. velocity
+	vector<double> settingsX; // eg. forces, NTP concentrations, lengths
+	vector<double> observationsY; // eg. velocity, densities
 	vector<int> ntrials; // Number of simulations to perform per observation (optional) 
 
+	vector<GelLaneData*> lanes; // For time gels only
+	
 
 	public:
 		
@@ -57,9 +62,14 @@ class ExperimentalData{
 		bool next(); // Moves on to the next experimental settings
 		int getNTrials(); // Returns the number of trials to perform on the current observation (will return 0 if this has not been set)
 		double getObservation(); // Return the current observation
+		string getDataType();
+		GelLaneData* getCurrentLane();
+		void addTimeGelLane(int laneNum, double time, int nObs);
+		void addTimeGelBand(double len, double density);
 		void addDatapoint(double setting, double observation);
 		void addDatapoint(double setting, double observation, int n);
 		void print();
+		string toJSON();
 
 
 		void set_ATPconc(double val);

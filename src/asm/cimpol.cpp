@@ -34,6 +34,7 @@
 #include "BayesianCalculations.h"
 #include "PosteriorDistributionSample.h"
 #include "SimPol_vRNA_interface.h"
+#include "SimulatorResultSummary.h"
 
 
 #include <dlfcn.h>
@@ -164,7 +165,6 @@ int main(int argc, char** argv) {
 	FreeEnergy::init_BP_parameters();
 	
 	if (!isWASM){
-		cout << "ABC" << endl;
 		Settings::init();
 		currentModel = new Model();
 		Settings::activatePolymerase("polII");
@@ -183,9 +183,9 @@ int main(int argc, char** argv) {
 	}
 
 
-
 	Settings::sampleAll();
-	SimulatorPthread::init();
+	currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
+	SimulatorPthread::init(); 
 	Plots::init();
 	if (PrimerType == "ssRNA") vRNA_init(complementSequence.c_str());
 
@@ -240,15 +240,9 @@ int main(int argc, char** argv) {
 
 	// Just simulate
 	else{
-   		double velocity = SimulatorPthread::performNSimulations(ntrials_sim, true);
-		cout << "Mean velocity: " << velocity << "bp/s" << endl;
+   		SimulatorResultSummary* resultsSummary = SimulatorPthread::performNSimulations(ntrials_sim, true);
+		cout << "Mean velocity: " << resultsSummary->get_meanVelocity() << "bp/s" << endl;
 		cout << "Sequence length: " << templateSequence.length() << endl;
-
-		if (_plotFolderName != "") {
-			string JSON = Plots::getPlotDataAsJSON();
-			cout << "JSON " << JSON;
-		}
-
    	}
 
 	

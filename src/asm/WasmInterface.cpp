@@ -639,9 +639,9 @@ extern "C" {
 		string parametersJSON = "{" + Settings::toJSON() + "}";
 
 		messageFromWasmToJS(parametersJSON, msgID);
-		
 
 	}
+
 
 	// Provides all information necessary to construct an XML string so the user can download the current session
 	void EMSCRIPTEN_KEEPALIVE getSaveSessionData(int msgID){
@@ -1057,6 +1057,25 @@ extern "C" {
 	}
 
 
+	// Get posterior distribution list
+	void EMSCRIPTEN_KEEPALIVE getPosteriorDistribution(int msgID){
+
+		string toReturnJSON = "{";
+		toReturnJSON += "'burnin':" + to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
+		toReturnJSON += "'posterior':[";
+
+		for (list<PosteriorDistributionSample*>::iterator it = _GUI_posterior.begin(); it != _GUI_posterior.end(); ++ it){
+			toReturnJSON += (*it)->toJSON() + ",";
+		}
+		if (toReturnJSON.substr(toReturnJSON.length()-1, 1) == ",") toReturnJSON = toReturnJSON.substr(0, toReturnJSON.length() - 1);
+		toReturnJSON += "]";
+		toReturnJSON += "}";
+
+		messageFromWasmToJS(toReturnJSON, msgID);
+
+	}
+
+
 	// Generate the full ABC output
 	void EMSCRIPTEN_KEEPALIVE getABCoutput(int msgID){
 
@@ -1153,6 +1172,12 @@ extern "C" {
 
 
 
+	}
+
+
+	// Change the burn-in
+	void EMSCRIPTEN_KEEPALIVE update_burnin(double burnin_new){
+		burnin = burnin_new;
 	}
 
 

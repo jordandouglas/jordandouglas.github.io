@@ -42,22 +42,52 @@ ExperimentalData::ExperimentalData(int id, string dataType, int nObs){
 	this->CTPconc_local = CTPconc->getVal();
 	this->GTPconc_local = GTPconc->getVal();
 	this->UTPconc_local = UTPconc->getVal();
-	this->currentExperiment = 0;
+	this->currentExperiment = -1;
 	this->sequenceID = _seqID;
 
-	settingsX.resize(nObs); 
-	observationsY.resize(nObs);
+
 	ntrials.resize(nObs);
+	if (dataType == "timeGel") {
+		lanes.resize(nObs);
+	}
+	else {
+		settingsX.resize(nObs); 
+		observationsY.resize(nObs);
+	}
+}
+
+
+
+// Create a new lane in the time gel
+void ExperimentalData::addTimeGelLane(int laneNum, double time, int nObs){
+
+
+	if (currentExperiment+1 < lanes.size()){
+		currentExperiment ++;
+		lanes.at(currentExperiment) = new GelLaneData(laneNum, time, nObs);
+	}
+
+
+}
+
+
+// Add a new band to the current time gel lane
+void ExperimentalData::addTimeGelBand(double len, double density){
+
+	if (currentExperiment < lanes.size()){
+		lanes.at(currentExperiment)->addNewBand(len, density);
+	}
+
 
 }
 
 
 void ExperimentalData::addDatapoint(double setting, double observation){
 
-	if (currentExperiment < settingsX.size()){
+	if (currentExperiment+1 < settingsX.size()){
+		currentExperiment ++;
 		settingsX.at(currentExperiment) = setting;
 		observationsY.at(currentExperiment) = observation;
-		currentExperiment ++;
 	}
 
 }
@@ -65,11 +95,11 @@ void ExperimentalData::addDatapoint(double setting, double observation){
 
 void ExperimentalData::addDatapoint(double setting, double observation, int n){
 
-	if (currentExperiment < settingsX.size()){
+	if (currentExperiment+1 < settingsX.size()){
+		currentExperiment ++;
 		settingsX.at(currentExperiment) = setting;
 		observationsY.at(currentExperiment) = observation;
 		ntrials.at(currentExperiment) = n;
-		currentExperiment ++;
 	}
 
 }
@@ -90,12 +120,61 @@ void ExperimentalData::print(){
 
 }
 
+string ExperimentalData::toJSON(){
+
+
+	string JSON = "'fit" + to_string(this->id) + "':{";
+	JSON += "'dataType':'" + this->dataType + "',";
+	JSON += "'ATPconc':" + to_string(this->ATPconc_local) + ",";
+	JSON += "'CTPconc':" + to_string(this->CTPconc_local) + ",";
+	JSON += "'GTPconc':" + to_string(this->GTPconc_local) + ",";
+	JSON += "'UTPconc':" + to_string(this->UTPconc_local) + ",";
+	JSON += "'force':" + to_string(this->force) + ",";
+	JSON += "'vals':[";
+
+	// Iterate through all observed values
+	int nobservations = this->dataType == "timeGel" ? this->lanes.size() : settingsX.size();
+	for (int i = 0; i < nobservations; i ++){
+
+
+		JSON += "{";
+
+		if (this->dataType == "forceVelocity"){
+			JSON += "'force':" + to_string(settingsX.at(i)) + ",";
+			JSON += "'velocity':" + to_string(observationsY.at(i));
+		}
+
+		else if (this->dataType == "ntpVelocity"){
+			JSON += "'ntp':" + to_string(settingsX.at(i)) + ",";
+			JSON += "'velocity':" + to_string(observationsY.at(i));
+		}
+
+
+		else if (this->dataType == "timeGel"){
+			JSON += this->lanes.at(i)->toJSON();
+		}
+
+		JSON += "},";
+		
+
+	}
+
+	if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
+
+	JSON += "]}";
+
+	return JSON;
+
+}
+
 
 // Changes the global settings to reflect the settings described by the first experiment in settingsX
 bool ExperimentalData::reset() {
 
 	this->currentExperiment = 0;
-	if (this->settingsX.size() == 0) return false;
+	if (this->settingsX.size() == 0 && this->dataType != "timeGel") return false;
+	if (this->lanes.size() == 0 && this->dataType == "timeGel") return false;
+
 
 	// Change the settings
 	applySettings();
@@ -123,12 +202,14 @@ int ExperimentalData::getNTrials(){
 	return this->ntrials.at(this->currentExperiment);
 }
 
-
-
+string ExperimentalData::getDataType(){
+	return this->dataType;
+}
 
 
 // Applies the current experimental settings to the model ie. NTP concentration and force
 void ExperimentalData::applySettings(){
+
 
 
 	//cout << "Changing settings to experiment " << this->id << " obs " << this->currentExperiment << endl;
@@ -138,24 +219,42 @@ void ExperimentalData::applySettings(){
 	Settings::setSequence(this->sequenceID);
 
 
-	double currentXVal = this->settingsX.at(this->currentExperiment);
 	if (this->dataType == "forceVelocity"){
+		double currentXVal = this->settingsX.at(this->currentExperiment);
 		ATPconc->hardcodeValue(this->ATPconc_local);
 		CTPconc->hardcodeValue(this->CTPconc_local);
 		GTPconc->hardcodeValue(this->GTPconc_local);
 		UTPconc->hardcodeValue(this->UTPconc_local);
 		FAssist->hardcodeValue(currentXVal);
+		_inSimulationTimeLimit = -1;
 	}
 
+
 	else if (this->dataType == "ntpVelocity"){
+		double currentXVal = this->settingsX.at(this->currentExperiment);
 		ATPconc->hardcodeValue(this->ATPconc_local * currentXVal);
 		CTPconc->hardcodeValue(this->CTPconc_local * currentXVal);
 		GTPconc->hardcodeValue(this->GTPconc_local * currentXVal);
 		UTPconc->hardcodeValue(this->UTPconc_local * currentXVal);
 		FAssist->hardcodeValue(this->force);
+		_inSimulationTimeLimit = -1;
 	}
 
+
+	else if (this->dataType == "timeGel"){
+		ATPconc->hardcodeValue(this->ATPconc_local);
+		CTPconc->hardcodeValue(this->CTPconc_local);
+		GTPconc->hardcodeValue(this->GTPconc_local);
+		UTPconc->hardcodeValue(this->UTPconc_local);
+
+		// Set the cutoff time to that of the current experiment
+		_inSimulationTimeLimit = this->lanes.at(this->currentExperiment)->get_time();
+	}
+
+
 	else cout << "Unknown data type " << this->dataType << endl;
+
+
 
 }
 
@@ -164,6 +263,10 @@ void ExperimentalData::applySettings(){
 double ExperimentalData::getObservation() {
 	return this->observationsY.at(this->currentExperiment);
 }
+
+GelLaneData* ExperimentalData::getCurrentLane(){
+	return this->lanes.at(this->currentExperiment);
+} 
 
 
 

@@ -262,23 +262,34 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 				string experimentType = experimentEle->Attribute("dataType") ? experimentEle->Attribute("dataType") : "forceVelocity";
 
-				// Find the number of observations
+				// Find the number of observations. If this is a time gel then count the number of lanes
 				int numObservations = 0;
-				for(const TiXmlAttribute* attr = experimentEle->FirstAttribute(); attr; attr=attr->Next()) {
-					string attrName = attr->Name();
-					if (attrName.substr(0,3) == "obs") numObservations++;
+				if (experimentType == "timeGel"){
+
+					// Count number of lanes
+					for(TiXmlElement* laneEle = experimentEle->FirstChildElement(); laneEle; laneEle=laneEle->NextSiblingElement()) {
+						numObservations++;
+					}	
+
+				}
+				else{
+					for (const TiXmlAttribute* attr = experimentEle->FirstAttribute(); attr; attr=attr->Next()) {
+						string attrName = attr->Name();
+						if (attrName.substr(0,3) == "obs") numObservations++;
+					}
 				}
 				if (numObservations == 0) continue;
+				
 
 				_numExperimentalObservations += numObservations;
-				ExperimentalData experiment(experiments.size() + 1, experimentType, numObservations);
+				ExperimentalData* experiment = new ExperimentalData(experiments.size() + 1, experimentType, numObservations);
 
 				// Set the constant NTP concentrations and force
-				if (experimentEle->Attribute("ATPconc")) experiment.set_ATPconc(atof(experimentEle->Attribute("ATPconc")));
-				if (experimentEle->Attribute("CTPconc")) experiment.set_CTPconc(atof(experimentEle->Attribute("CTPconc")));
-				if (experimentEle->Attribute("GTPconc")) experiment.set_GTPconc(atof(experimentEle->Attribute("GTPconc")));
-				if (experimentEle->Attribute("UTPconc")) experiment.set_UTPconc(atof(experimentEle->Attribute("UTPconc")));
-				if (experimentEle->Attribute("force")) experiment.set_force(atof(experimentEle->Attribute("force")));
+				if (experimentEle->Attribute("ATPconc")) experiment->set_ATPconc(atof(experimentEle->Attribute("ATPconc")));
+				if (experimentEle->Attribute("CTPconc")) experiment->set_CTPconc(atof(experimentEle->Attribute("CTPconc")));
+				if (experimentEle->Attribute("GTPconc")) experiment->set_GTPconc(atof(experimentEle->Attribute("GTPconc")));
+				if (experimentEle->Attribute("UTPconc")) experiment->set_UTPconc(atof(experimentEle->Attribute("UTPconc")));
+				if (experimentEle->Attribute("force")) experiment->set_force(atof(experimentEle->Attribute("force")));
 
 
 				// Use a separate sequence for this dataset?
@@ -290,39 +301,107 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 					Sequence* newSeq = new Sequence(seqID, templateType, primerType, templateSeq);
 					sequences[seqID] = newSeq;
-					experiment.set_sequenceID(seqID);
+					experiment->set_sequenceID(seqID);
 
 				}
 
 				// Use default sequence
-				else experiment.set_sequenceID(_seqID);
+				else experiment->set_sequenceID(_seqID);
 
 
-				// Add experimental settings (x-axis) and observations (y-axis)
-				for (int obsNum = 1; obsNum <= numObservations; obsNum ++){
 
-					// If the current observation does not exist then stop parsing
-					string key = "obs" + to_string(obsNum);
-					if (!experimentEle->Attribute(key.c_str())) break;
-					string obs = experimentEle->Attribute(key.c_str());
 
-					// Split string by comma
-					vector<string> split_vector = Settings::split(obs, ',');
-					double x = atof(split_vector.at(0).c_str());
-					double y = atof(split_vector.at(1).c_str());
-					if (split_vector.size() == 2) experiment.addDatapoint(x, y);
+				// Time gel data
+				if (experimentType == "timeGel"){
 
-					// Additionally parse the number of trials
-					else if (split_vector.size() == 3){
-						int n = atoi(split_vector.at(2).c_str());
-						experiment.addDatapoint(x, y, n);
+					// Iterate through all lanes
+					int laneNum = 0;
+					for(TiXmlElement* laneEle = experimentEle->FirstChildElement(); laneEle; laneEle=laneEle->NextSiblingElement()) {
+
+
+						// Find the number of observations in this lane
+						int numObservationsLane = 0;
+						for(const TiXmlAttribute* attr = laneEle->FirstAttribute(); attr; attr=attr->Next()) {
+							string attrName = attr->Name();
+							if (attrName.substr(0,3) == "obs") numObservationsLane++;
+						}
+						if (numObservationsLane == 0) continue;
+
+
+						// Find the time associated with this lane
+						double time;
+						if (laneEle->Attribute("time")) time = atof(laneEle->Attribute("time"));
+						else continue;
+
+						laneNum ++;
+
+						experiment->addTimeGelLane(laneNum, time, numObservationsLane);
+
+
+
+
+						// Parse all bands in the lane
+						for (int obsNum = 1; obsNum <= numObservationsLane; obsNum ++){
+
+
+							// If the current observation does not exist then stop parsing
+							string key = "obs" + to_string(obsNum);
+							if (!laneEle->Attribute(key.c_str())) break;
+							string obs = laneEle->Attribute(key.c_str());
+
+							cout << "obs " << obs << endl;
+
+							// Split string by comma
+							vector<string> split_vector = Settings::split(obs, ',');
+							double x = atof(split_vector.at(0).c_str());
+							double y = atof(split_vector.at(1).c_str());
+							if (split_vector.size() == 2) experiment->addTimeGelBand(x, y);
+
+							else {
+								cout << "Error: cannot parse experimental observations." << endl;
+								exit(0);
+							}
+
+
+
+						}
+
+
+
 					}
 
-					else {
-						cout << "Error: cannot parse experimental observations." << endl;
-						exit(0);
-					}
+				}
 
+				// Other data (not time gel)
+				else {
+
+					// Add experimental settings (x-axis) and observations (y-axis)
+					for (int obsNum = 1; obsNum <= numObservations; obsNum ++){
+
+						// If the current observation does not exist then stop parsing
+						string key = "obs" + to_string(obsNum);
+						if (!experimentEle->Attribute(key.c_str())) break;
+						string obs = experimentEle->Attribute(key.c_str());
+
+						// Split string by comma
+						vector<string> split_vector = Settings::split(obs, ',');
+						double x = atof(split_vector.at(0).c_str());
+						double y = atof(split_vector.at(1).c_str());
+						if (split_vector.size() == 2) experiment->addDatapoint(x, y);
+
+						// Additionally parse the number of trials
+						else if (split_vector.size() == 3){
+							int n = atoi(split_vector.at(2).c_str());
+							experiment->addDatapoint(x, y, n);
+						}
+
+						else {
+							cout << "Error: cannot parse experimental observations." << endl;
+							exit(0);
+						}
+
+
+					}
 
 				}
 

@@ -26,6 +26,8 @@
 
 #include "State.h"
 #include "randomc/randomc.h"
+#include "SimulatorResultSummary.h"
+
 
 #include <string>
 #include <list>
@@ -65,7 +67,7 @@ class Simulator{
 
     public:
     	Simulator();
-    	double perform_N_Trials(int N, State* state, bool verbose);
+    	void perform_N_Trials(SimulatorResultSummary* resultSummary, State* state, bool verbose);
     	int getNtrialsTotal_GUI();
     	int getNtrialsCompleted_GUI();
     	list<int> sample_action_GUI();
