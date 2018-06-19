@@ -2810,7 +2810,8 @@ function loadSession_controller(XMLData, resolve = function() { }){
 		var model = result["model"];
 		var compactState = result["compactState"];
 		var experimentalData = result["ABC_EXPERIMENTAL_DATA"];
-		
+
+		console.log("experimentalData", experimentalData);
 		
 			
 		var openPlots = function(){
@@ -2913,6 +2914,19 @@ function loadSession_controller(XMLData, resolve = function() { }){
 						var ntp = experimentalData["fits"][fitID]["vals"][obsNum]["ntp"];
 						var velocity = experimentalData["fits"][fitID]["vals"][obsNum]["velocity"];
 						textAreaString += ntp + ", " + velocity;
+					}
+
+
+					else if (dataType == "timeGel"){
+						var time = experimentalData["fits"][fitID]["vals"][obsNum].t;
+						textAreaString += "t=" + time + "\n";
+						for (var obsNumLane = 0; obsNumLane < experimentalData["fits"][fitID]["vals"][obsNum].densities.length; obsNumLane++){
+							
+							textAreaString += experimentalData["fits"][fitID]["vals"][obsNum].lengths[obsNumLane] + ",";
+							textAreaString += experimentalData["fits"][fitID]["vals"][obsNum].densities[obsNumLane];
+							if (obsNumLane < experimentalData["fits"][fitID]["vals"][obsNum].densities.length - 1) textAreaString += "\n" 
+
+						}
 					}
 
 
@@ -3273,16 +3287,7 @@ function uploadABC_controller(TSVstring){
 
 		});
 
-
-
-
 	}
-
-
-
-
-
-
 
 }
 
@@ -3292,6 +3297,9 @@ function uploadABC_controller(TSVstring){
 
 
 function beginABC_controller(abcDataObjectForModel){
+
+
+	console.log("experimentalData", abcDataObjectForModel);
 
 	hideButtonAndShowStopButton("simulate");
 	var showRejectedParameters = $("#ABC_showRejectedParameters").prop("checked");
@@ -3595,8 +3603,11 @@ function update_burnin_controller(){
 	var burnin = $("#MCMC_burnin").val();
 	if (WEB_WORKER == null) {
 		MCMC_JS.update_burnin_WW(burnin);
-	}else{
+	}else if (WEB_WORKER_WASM == null){
 		var fnStr = stringifyFunction("MCMC_JS.update_burnin_WW", [burnin]);
+		callWebWorkerFunction(fnStr);
+	}else{
+		var fnStr = "wasm_" + stringifyFunction("update_burnin", [burnin]);
 		callWebWorkerFunction(fnStr);
 	}
 
@@ -3665,7 +3676,7 @@ function getPosteriorDistribution_controller(resolve = function(posterior) { }){
 		toCall().then((posterior) => resolve(posterior));
 	}
 
-	else {// if (WEB_WORKER_WASM == null){
+	else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("ABC_JS.getPosteriorDistribution_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
@@ -3674,7 +3685,7 @@ function getPosteriorDistribution_controller(resolve = function(posterior) { }){
 
 	}
 
-	/*
+
 	else{
 
 
@@ -3686,7 +3697,7 @@ function getPosteriorDistribution_controller(resolve = function(posterior) { }){
 
 
 	}
-	*/
+
 
 }
 

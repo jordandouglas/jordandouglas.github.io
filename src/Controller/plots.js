@@ -1142,7 +1142,7 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 
 function plot_MCMC_trace(){
 
-	console.log("plot_MCMC_trace", PLOT_DATA["whichPlotInWhichCanvas"]);
+	//console.log("plot_MCMC_trace", PLOT_DATA["whichPlotInWhichCanvas"]);
 
 	// Find the canvas to print onto
 	var canvasesToPrintTo = [];
@@ -1156,11 +1156,17 @@ function plot_MCMC_trace(){
 
 		var pltNum = canvasesToPrintTo[j];
 
+
+		console.log("burnin", PLOT_DATA["whichPlotInWhichCanvas"][pltNum].burnin);
+
 		var yVar = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].customParamY; 
 		
 
 		var xVals = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].xData.vals;
 		var yVals = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].yData.vals;
+
+		if (xVals == null) xVals = [];
+		if (yVals == null) yVals = [];
 
 		/*
 		for (var postNum = 0; postNum < PLOT_DATA["whichPlotInWhichCanvas"][pltNum].xData.length; postNum++){
@@ -1238,8 +1244,7 @@ function plot_MCMC_trace(){
 		//console.log("Values", xVals, yVals);
 
 		var ylab = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].xData.name != null ? PLOT_DATA["whichPlotInWhichCanvas"][pltNum].xData.name : "chiSq";
-		var burnin = Math.floor(parseFloat(PLOT_DATA["whichPlotInWhichCanvas"][pltNum].burnin) / 100 * xVals.length);
-		trace_plot(xVals, yVals, range, epsilon, "plotCanvas" + pltNum, "plotCanvasContainer" + pltNum, "State", ylab, PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["canvasSizeMultiplier"]);
+		trace_plot(xVals, yVals, range, epsilon, "plotCanvas" + pltNum, "plotCanvasContainer" + pltNum, PLOT_DATA["whichPlotInWhichCanvas"][pltNum].burnin,  "State", ylab, PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["canvasSizeMultiplier"]);
 
 	}
 
@@ -3183,6 +3188,21 @@ function plot_parameter_heatmap(plotNumCustom = null){
 
 		//console.log("xLab", xLab, "ylab", yLab, PLOT_DATA["whichPlotInWhichCanvas"]);
 
+		if (xvals == null) xvals = [];
+		if (yvals == null) yvals = [];
+		if (zvals == null) zvals = [];
+
+
+		// Filter out burn-in values
+		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom].burnin != null) {
+			var burnin = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom].burnin;
+			xvals = xvals.slice(burnin, xvals.length)
+			zvals = yvals.slice(burnin, yvals.length)
+			zvals = yvals.slice(burnin, yvals.length)
+
+
+		}
+
 
 		// If y is probability make a histogram 
 		if (xvals != null && PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParamY"] == "probability"){
@@ -3325,6 +3345,9 @@ function plot_custom(plotNumCustom = null){
 		var yLab = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["name"];
 		var xvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xData"]["vals"];
 		var yvals = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["yData"]["vals"];
+
+		if (xvals == null) xvals = [];
+		if (yvals == null) yvals = [];
 
 
 		// If are is no y vals then make a histogram, or if there is x but y is 'prob' 

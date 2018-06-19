@@ -1059,13 +1059,12 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 			for (var i = 0; i < fits.length; i ++){
 
 				var fitID = fits[i];
-				var dataType = $("#forceVelocityInputData_" + fitID).length > 0 ? "forceVelocity" : $("#ntpVelocityInputData_" + fitID).length > 0 ? "ntpVelocity" : null;
+				var dataType = $("#forceVelocityInputData_" + fitID).length > 0 ? "forceVelocity" : $("#ntpVelocityInputData_" + fitID).length > 0 ? "ntpVelocity" : $("#timeGelInputData_" + fitID).length > 0 ? "timeGel" : null;
 
 				saveXML.writeStartElement(fitID);
 
 
 					saveXML.writeAttributeString("dataType", dataType);
-					saveXML.writeAttributeString("chiSqthreshold", abcDataObjectForModel["fits"][fitID]["chiSqthreshold"]);
 					saveXML.writeAttributeString("ATPconc", abcDataObjectForModel["fits"][fitID]["ATPconc"]);
 					saveXML.writeAttributeString("CTPconc", abcDataObjectForModel["fits"][fitID]["CTPconc"]);
 					saveXML.writeAttributeString("GTPconc", abcDataObjectForModel["fits"][fitID]["GTPconc"]);
@@ -1080,6 +1079,25 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 							var ntpVelocity = abcDataObjectForModel["fits"][fitID]["vals"][obsNum]["ntp"] + "," + abcDataObjectForModel["fits"][fitID]["vals"][obsNum]["velocity"];
 							saveXML.writeAttributeString("obs" + (obsNum+1), ntpVelocity);
 						}
+						else if (dataType == "timeGel"){
+
+							// Start a new indentation level
+							var timeElement = "lane" + (obsNum+1); 
+							saveXML.writeStartElement(timeElement);
+
+								saveXML.writeAttributeString("time", abcDataObjectForModel["fits"][fitID]["vals"][obsNum].t)
+
+								for (var obsNumLane = 0; obsNumLane < abcDataObjectForModel["fits"][fitID]["vals"][obsNum].densities.length; obsNumLane++){
+									var lengthsDensities = abcDataObjectForModel["fits"][fitID]["vals"][obsNum].lengths[obsNumLane] + "," + abcDataObjectForModel["fits"][fitID]["vals"][obsNum].densities[obsNumLane];
+									saveXML.writeAttributeString("obs" + (obsNumLane+1), lengthsDensities);
+								}
+
+
+							saveXML.writeEndElement();
+								
+						}
+
+
 					}
 
 

@@ -203,16 +203,16 @@ function getAbcDataObject(which = "ABC"){
 	}
 
 	abcDataObjectForModel["fits"] = {};
+
 	for (var fitNum = 0; fitNum <= curveTables.length; fitNum++){
 
-		
 
 		var table = $(curveTables[fitNum]);
 		var fitID = table.attr("fitID");
 
 
 		// Which type of data?
-		var dataType = $("#forceVelocityInputData_" + fitID).length > 0 ? "forceVelocity" : $("#ntpVelocityInputData_" + fitID).length > 0 ? "ntpVelocity" : null;
+		var dataType = $("#forceVelocityInputData_" + fitID).length > 0 ? "forceVelocity" : $("#ntpVelocityInputData_" + fitID).length > 0 ? "ntpVelocity" : $("#timeGelInputData_" + fitID).length > 0 ? "timeGel" : null;
 
 		if (dataType == null) continue;
 
@@ -233,8 +233,28 @@ function getAbcDataObject(which = "ABC"){
 		var splitValues = dataValues.split("\n");
 		if (splitValues.length == 0) valid = false;
 
+
 		for (var lineNum = 0; lineNum < splitValues.length; lineNum++){
+
+
+			if (splitValues[lineNum].trim() == "") continue;
+		
+
+
+
+
+			// New time category in gel data
+			if (dataType == "timeGel" && splitValues[lineNum].trim().substring(0, 2) == "t="){
+				var splitLine = splitValues[lineNum].split("=");
+				var time = parseFloat(splitLine[1]);
+				abcDataObjectForModel["fits"][fitID]["vals"].push({t: time, lengths: [], densities: []})
+				continue;
+			}
+
+
+
 			var splitLine = splitValues[lineNum].split(",");
+
 
 			if (splitLine.length == 1 && splitLine[0].trim() == "") continue;
 
@@ -244,6 +264,10 @@ function getAbcDataObject(which = "ABC"){
 
 			if    (dataType == "forceVelocity") abcDataObjectForModel["fits"][fitID]["vals"].push({force: X_axis_value, velocity: Y_axis_value});
 			else if (dataType == "ntpVelocity") abcDataObjectForModel["fits"][fitID]["vals"].push({ntp: X_axis_value, velocity: Y_axis_value});
+			else if (dataType == "timeGel"){
+				abcDataObjectForModel["fits"][fitID]["vals"][abcDataObjectForModel["fits"][fitID]["vals"].length-1].lengths.push(X_axis_value);
+				abcDataObjectForModel["fits"][fitID]["vals"][abcDataObjectForModel["fits"][fitID]["vals"].length-1].densities.push(Y_axis_value);
+			}
 
 		}
 	}
@@ -952,7 +976,7 @@ function getTimeGelTemplate(fitID){
 
 			<td class="` + fitID + `" style="width:200px; text-align:center; vertical-align:top">
 				<br><br>
-				<div style="font-size:18px;">Time gel experimental data</div>
+				<div style="font-size:18px;">Gel experimental data</div>
 
 
 					<textarea class="ABCinputData ntpVelocityInputData" id="timeGelInputData_` + fitID + `" onChange="validateAllAbcDataInputs()" style="font-size:14px; padding: 5 10;  width: 200px; height: 200px; max-width:200px; max-height:500px; min-height:100px; min-width:200px"  
@@ -986,7 +1010,7 @@ function getTimeGelTemplate(fitID){
 					<input type=button id='deleteExperiment_` + fitID + `' class='minimise' style='float:right'  value='&times;' onClick=deleteExperiment("` + fitID + `") title='Delete this experiment'>
 
 
-
+					<br><br><br>
 					<table style="width:250px; margin:auto">
 
 						<tr>
@@ -1042,6 +1066,7 @@ function getTimeGelTemplate(fitID){
 								<input class="variable" value=100 type="number" id="UTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
 							</td>
 					 	</tr>
+
 
 
 
@@ -1133,6 +1158,9 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 	getPosteriorDistribution_controller(function(result){
 
+
+		//console.log("getPosteriorDistribution_controller", result);
+
 		
 		var abcDataObjectForModel = getAbcDataObject();
 
@@ -1186,12 +1214,12 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 
 			// If MCMC then account for the burn-in
-			var startingPosteriorNum = Math.floor(parseFloat($("#MCMC_burnin").val()) / 100 * posterior.length);
+			for (var postNum = result.burnin; result.burnin >= 0 && postNum < posterior.length; postNum++){
 
-			for (var postNum = startingPosteriorNum; postNum < posterior.length; postNum++){
+				console.log("postNum", postNum);
+				console.log(posterior[postNum]);
 
-
-				var posteriorVelocities = posterior[postNum]["velocity"]["vals"];
+				var posteriorVelocities = posterior[postNum]["simulatedValues"];
 
 				ctx.beginPath();
 				var xPrime = widthScale * (forces[0] - xmin) + axisGap;
@@ -1383,12 +1411,10 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 
 
 			// If MCMC then account for the burn-in
-			var startingPosteriorNum = Math.floor(parseFloat($("#MCMC_burnin").val()) / 100 * posterior.length);
-
-			for (var postNum = startingPosteriorNum; postNum < posterior.length; postNum++){
+			for (var postNum = result.burnin; result.burnin >= 0 && postNum < posterior.length; postNum++){
 
 
-				var posteriorVelocities = posterior[postNum]["velocity"]["vals"];
+				var posteriorVelocities = posterior[postNum]["simulatedValues"];
 
 				ctx.beginPath();
 				var xPrime = widthScale * (concentrations[0] - xmin) + axisGap;
