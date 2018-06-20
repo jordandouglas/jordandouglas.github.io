@@ -92,7 +92,6 @@ extern double burnin; // Percentage
 extern int logEvery;
 extern int N_THREADS;
 extern bool _RUNNING_ABC;
-extern double _inSimulationTimeLimit;
 
 
 // Experimental data

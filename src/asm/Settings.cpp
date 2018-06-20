@@ -92,7 +92,6 @@ double burnin = 10;
 int logEvery = 100;
 int N_THREADS = 1;
 bool _RUNNING_ABC = false;
-double _inSimulationTimeLimit = -1; // Number of seconds to run simulations for until returning (in-simulation time, not clock time). Set to -1 for unlimited
 
 
 // Experimental data
@@ -120,7 +119,7 @@ Parameter* bubbleRight = new Parameter("bubbleRight", true, "inclusive", "Bubble
 Parameter* GDagSlide = new Parameter("GDagSlide", false, "false", "\u0394G\u2020\U0001D70F", "Free energy barrier height of translocation", "\u0394G_{\U0001D70F}^{\u2020}  (k_{B}T)");
 Parameter* DGPost = new Parameter("DGPost", false, "false", "\u0394G\U0001D70F1", "Free energy added on to posttranslocated ground state", "\u0394G_{\U0001D70F1}  (k_{B}T)");
 Parameter* barrierPos = new Parameter("barrierPos", false, "false", "Barrier height position  (\u212B)", "Position of translocation intermediate state", "\u03B4_{1}");
-Parameter* arrestTime = new Parameter("arrestTime", false, "inclusive", "Arrest timeout  (s)", "Maximum pause duration before the simulation is arrested. Set to zero to prevent arrests.");
+Parameter* arrestTime = new Parameter("arrestTime", false, "inclusive", "Arrest timeout  (s)", "Time from the start until transcription is arrested. Set to zero to prevent arrests.");
 Parameter* kCat = new Parameter("kCat", false, "inclusive", "Rate of catalysis (s\u207B\u00B9)", "Rate constant of catalysing bound NTP", "k_{cat}  (s^{\u22121\u2009})");
 Parameter* Kdiss = new Parameter("Kdiss", false, "exclusive", "KD (\u03bcM)", "Dissociation constant of NTP",  "K_{D}  (\u03bcM)");
 Parameter* RateBind = new Parameter("RateBind", false, "inclusive", "Rate of binding  (\u03bcM\u207B\u00B9 s\u207B\u00B9)", "Second order rate constant of binding the correct NTP", "k_{bind} (\u03bcM^{\u22121} s^{\u22121\u2009})");
@@ -188,7 +187,7 @@ void Settings::init(){
 	Kdiss->setDistributionParameter("fixedDistnVal", 35);
 	RateBind->setDistributionParameter("fixedDistnVal", 250);
 
-	arrestTime->setDistributionParameter("fixedDistnVal", 600);
+	arrestTime->setDistributionParameter("fixedDistnVal", 0);
 
 	RateActivate->setDistributionParameter("fixedDistnVal", 4);
 	RateDeactivate->setDistributionParameter("fixedDistnVal", 0.1);

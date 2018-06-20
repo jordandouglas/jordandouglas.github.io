@@ -1062,15 +1062,18 @@ extern "C" {
 
 		string toReturnJSON = "{";
 		toReturnJSON += "'burnin':" + to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
-		toReturnJSON += "'posterior':[";
 
+		// Velocities and band densities
+		toReturnJSON += "'posterior':[";
 		for (list<PosteriorDistributionSample*>::iterator it = _GUI_posterior.begin(); it != _GUI_posterior.end(); ++ it){
 			toReturnJSON += (*it)->toJSON() + ",";
 		}
 		if (toReturnJSON.substr(toReturnJSON.length()-1, 1) == ",") toReturnJSON = toReturnJSON.substr(0, toReturnJSON.length() - 1);
 		toReturnJSON += "]";
-		toReturnJSON += "}";
 
+
+
+		toReturnJSON += "}";
 		messageFromWasmToJS(toReturnJSON, msgID);
 
 	}

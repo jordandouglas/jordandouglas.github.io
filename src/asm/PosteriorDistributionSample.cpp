@@ -38,6 +38,7 @@ using namespace std;
 PosteriorDistributionSample::PosteriorDistributionSample(int sampleNum){
 	this->sampleNum = sampleNum;
 	this->simulatedValues.resize(_numExperimentalObservations);
+	this->simulatedDensities.resize(_numExperimentalObservations);
 	this->currentObsNum = 0;
 	this->chiSquared = 0;
 	this->priorProb = 0;
@@ -61,14 +62,22 @@ PosteriorDistributionSample* PosteriorDistributionSample::clone(bool copySimulat
 		copy->addParameterEstimate(paramID, value);
 	}
 
-	// Copy simulated velocities
 	if (copySimulations) {
+
+		// Copy simulated velocities
 		copy->chiSquared = this->chiSquared;
 		copy->currentObsNum = this->currentObsNum;
 		for (int i = 0; i < this->simulatedValues.size(); i ++){
 			copy->simulatedValues.at(i) = this->simulatedValues.at(i);
 		}
+
+		// Copy band densities
+		for (int i = 0; i < this->simulatedDensities.size(); i ++){
+			vector<double> the_copy(this->simulatedDensities.at(i));
+			copy->simulatedDensities.at(i) = the_copy;
+		}
 	}
+
 
 	return copy;
 
@@ -153,8 +162,12 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 		}
 
 
+
+		vector<double> simulatedDensities( lengthCounts.size() );
+		
+
+		/*
 		// Normalise so it has a mean of 0 and var of 1
-		vector<int> simulatedDensities( lengthCounts.size() );
 		double mu = 0;
 		double sigma2 = 0;
 		for (int i = 0; i < lengthCounts.size(); i ++) mu += lengthCounts.at(i);
@@ -162,15 +175,23 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 		for (int i = 0; i < lengthCounts.size(); i ++) sigma2 += pow(lengthCounts.at(i) - mu, 2);
 		sigma2 /= lengthCounts.size();
 		for (int i = 0; i < lengthCounts.size(); i ++) simulatedDensities.at(i) = (lengthCounts.at(i) - mu) / sigma2;
+		*/
 
 
+		// Normalise so it has a max of 1
+		double max_val = 0;
+		for (int i = 0; i < lengthCounts.size(); i ++) max_val = max(max_val, 1.0 * lengthCounts.at(i));
+		for (int i = 0; i < lengthCounts.size(); i ++) simulatedDensities.at(i) = lengthCounts.at(i) / max_val;
+
+
+		/*
 		// We don't want to divide by zero so will use a fudge factor
 		double fudge = 0.0001;
 		for (int i = 0; i < simulatedDensities.size(); i ++) {
 			if (simulatedDensities.at(i) >= 0 && simulatedDensities.at(i) < fudge) simulatedDensities.at(i) = fudge;
 			else if (simulatedDensities.at(i) < 0 && simulatedDensities.at(i) > -fudge) simulatedDensities.at(i) = -fudge;
 		}
-
+		*/
 
 		// Compute chi-squared in specified lag range. Lag refers to how far the observed is behind the simulated
 		// Lag = 1:
@@ -199,6 +220,9 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 
 		}
 
+		cout << "simulatedDensities " << simulatedDensities.size() << ", lengthCounts " << lengthCounts.size() << endl;
+
+		this->simulatedDensities.at(this->currentObsNum) = simulatedDensities;
 		this->simulatedValues.at(this->currentObsNum) = chiSqLane;
 		this->chiSquared += chiSqLane;
 
@@ -367,7 +391,26 @@ string PosteriorDistributionSample::toJSON(){
 	}
 	if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
 
+	JSON += "],";
+
+
+	if (this->simulatedDensities.size() > 0) cout << "this->simulatedDensities.size() " << this->simulatedDensities.size() << " this->simulatedDensities.at(0).size() " << this->simulatedDensities.at(0).size() << endl;
+
+	// Simulated bands
+	JSON += "'simulatedDensities':[";
+	for (int i = 0; i < this->simulatedDensities.size(); i ++){
+		JSON += "[";
+		for (int j = 0; j < this->simulatedDensities.at(i).size(); j ++){
+			JSON += to_string(this->simulatedDensities.at(i).at(j)) + ",";
+		}
+		if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
+		JSON += "],";
+
+	}
+	if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
 	JSON += "]";
+
+
 	JSON += "}";
 	return JSON;
 

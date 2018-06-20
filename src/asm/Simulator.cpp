@@ -398,7 +398,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
 		// Check if in-simulation time limit has been exceeded
-		if (_inSimulationTimeLimit > 0 && timeElapsed >= _inSimulationTimeLimit) {
+		if (arrestTime->getVal() > 0 && timeElapsed >= arrestTime->getVal()) {
 
 			//cout << "In-simulation timeout reached " << timeElapsed << endl;
 
@@ -412,11 +412,10 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
 
-		// Arrest if timeout has been reached or if have gone beyond the end of the sequence
-		if ((arrestTime->getVal() != 0 && timeElapsedSinceLastCatalysis >= arrestTime->getVal()) ||
-			(s->get_mRNAPosInActiveSite() <= 1 && s->get_mRNAPosInActiveSite() <= 1 && s->getRightTemplateBaseNumber() > templateSequence.length()) ||
+		// Arrest if have gone beyond the end of the sequence
+		if ((s->get_mRNAPosInActiveSite() <= 1 && s->get_mRNAPosInActiveSite() <= 1 && s->getRightTemplateBaseNumber() > templateSequence.length()) ||
 			(s->get_mRNAPosInActiveSite() == 0 && s->getRightTemplateBaseNumber() == templateSequence.length()) ){
-
+		
 
 		//		if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal()-1) ||
 	//	(this->mRNAPosInActiveSite <= 1 && this->rightTemplateBase > templateSequence.length())) this->terminate();
@@ -430,6 +429,8 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				return;
 			}
 		}
+
+
 
 
 		// If NTP is not bound and we are in posttranslocated state, and user has requested to assume binding equilibrium but NOT translocation

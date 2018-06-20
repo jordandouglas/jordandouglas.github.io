@@ -45,6 +45,7 @@ class PosteriorDistributionSample {
 	string modelIndicator;
 	map<string, double> parameterEstimates;
 	vector<double> simulatedValues; // eg. Velocities
+	vector<vector<double>> simulatedDensities; 
 
 
     public:

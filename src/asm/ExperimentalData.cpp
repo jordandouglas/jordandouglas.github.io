@@ -226,7 +226,6 @@ void ExperimentalData::applySettings(){
 		GTPconc->hardcodeValue(this->GTPconc_local);
 		UTPconc->hardcodeValue(this->UTPconc_local);
 		FAssist->hardcodeValue(currentXVal);
-		_inSimulationTimeLimit = -1;
 	}
 
 
@@ -237,7 +236,6 @@ void ExperimentalData::applySettings(){
 		GTPconc->hardcodeValue(this->GTPconc_local * currentXVal);
 		UTPconc->hardcodeValue(this->UTPconc_local * currentXVal);
 		FAssist->hardcodeValue(this->force);
-		_inSimulationTimeLimit = -1;
 	}
 
 
@@ -248,7 +246,7 @@ void ExperimentalData::applySettings(){
 		UTPconc->hardcodeValue(this->UTPconc_local);
 
 		// Set the cutoff time to that of the current experiment
-		_inSimulationTimeLimit = this->lanes.at(this->currentExperiment)->get_time();
+		arrestTime->hardcodeValue(this->lanes.at(this->currentExperiment)->get_time());
 	}
 
 
