@@ -80,6 +80,10 @@ class PlotSettings{
 	double timeToCatalysisThisTrial_Z;
 
 
+	// Trace plot
+	double ESS;
+
+
 
 	public:
 		PlotSettings(int plotNumber, string name);

@@ -46,6 +46,7 @@ class GelLaneData{
 		GelLaneData(int laneNum, double time, int nObs);
 		void addNewBand(double len, double den);
 		string toJSON();
+		void clear();
 
 		double get_time();
 		double get_densityAt(int len);

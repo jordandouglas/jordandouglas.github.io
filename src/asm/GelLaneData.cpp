@@ -85,6 +85,11 @@ string GelLaneData::toJSON(){
 }
 
 
+void GelLaneData::clear(){
+	this->transcriptLengths.clear();
+	this->densities.clear();
+}
+
 
 double GelLaneData::get_time(){
 	return this->time;

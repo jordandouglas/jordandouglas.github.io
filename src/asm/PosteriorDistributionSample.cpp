@@ -121,7 +121,7 @@ double PosteriorDistributionSample::getParameterEstimate(string paramID){
 	return this->parameterEstimates[paramID];
 }
 
-// Gets a list of all parameters being estimated and returns as a string
+// Gets a list of all parameters being estimated and returns as a list of strings
 vector<string> PosteriorDistributionSample::getParameterNames(){
 
 	// Get parameter names
@@ -140,9 +140,6 @@ vector<string> PosteriorDistributionSample::getParameterNames(){
 // Cache the simulated value, and use the simulated and observed values to update the chi squared test statistic
 void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSummary* simulated, ExperimentalData* observed){
 
-
-
-//void PosteriorDistributionSample::addSimulatedAndObservedValue(double simVal, double obsVal){
 
 
 	if (this->currentObsNum >= this->simulatedValues.size()) return;
@@ -220,7 +217,6 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 
 		}
 
-		cout << "simulatedDensities " << simulatedDensities.size() << ", lengthCounts " << lengthCounts.size() << endl;
 
 		this->simulatedDensities.at(this->currentObsNum) = simulatedDensities;
 		this->simulatedValues.at(this->currentObsNum) = chiSqLane;
@@ -249,7 +245,7 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 	}
 
 	this->currentObsNum ++;
-	
+
 
 }
 
@@ -394,7 +390,7 @@ string PosteriorDistributionSample::toJSON(){
 	JSON += "],";
 
 
-	if (this->simulatedDensities.size() > 0) cout << "this->simulatedDensities.size() " << this->simulatedDensities.size() << " this->simulatedDensities.at(0).size() " << this->simulatedDensities.at(0).size() << endl;
+	//if (this->simulatedDensities.size() > 0) cout << "this->simulatedDensities.size() " << this->simulatedDensities.size() << " this->simulatedDensities.at(0).size() " << this->simulatedDensities.at(0).size() << endl;
 
 	// Simulated bands
 	JSON += "'simulatedDensities':[";

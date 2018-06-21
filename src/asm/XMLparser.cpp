@@ -27,6 +27,7 @@
 #include "Model.h"
 #include "Parameter.h"
 #include "ExperimentalData.h"
+#include "MCMC.h"
 
 
 #include <iostream>
@@ -76,7 +77,8 @@ bool XMLparser::parseXMLFromString(char* XMLdata){
 }
 
 
-
+// Parse all information from the XML file
+// If MCMC is in already progress (ie. MCMC::isInitialised() is set to true) then there are certain variables which we do not want to change eg. the experiments used by MCMC
 void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 
@@ -244,8 +246,8 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 			
 
-			_numExperimentalObservations = 0;
-			inferenceMethod = abcEle->Attribute("inferenceMethod") ? abcEle->Attribute("inferenceMethod") : inferenceMethod;
+			if (!MCMC::isInitialised()) _numExperimentalObservations = 0;
+			if (!MCMC::isInitialised()) inferenceMethod = abcEle->Attribute("inferenceMethod") ? abcEle->Attribute("inferenceMethod") : inferenceMethod;
 			ntrials_abc = abcEle->Attribute("ntrials") ? atoi(abcEle->Attribute("ntrials")) : ntrials_abc;
 			testsPerData = abcEle->Attribute("testsPerData") ? atoi(abcEle->Attribute("testsPerData")) : testsPerData;
 			_testsPerData_preburnin = abcEle->Attribute("testsPerData_preburnin") ? atoi(abcEle->Attribute("testsPerData_preburnin")) : _testsPerData_preburnin;
@@ -253,12 +255,24 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 			_chiSqthreshold_0 = abcEle->Attribute("chiSqthreshold_0") ? atof(abcEle->Attribute("chiSqthreshold_0")) : _chiSqthreshold_0;
 			_chiSqthreshold_gamma = abcEle->Attribute("chiSqthreshold_gamma") ? atof(abcEle->Attribute("chiSqthreshold_gamma")) : _chiSqthreshold_gamma;
 			burnin = abcEle->Attribute("burnin") ? atoi(abcEle->Attribute("burnin")) : burnin;
-			logEvery = abcEle->Attribute("logEvery") ? atoi(abcEle->Attribute("logEvery")) : logEvery;
+			if (!MCMC::isInitialised()) logEvery = abcEle->Attribute("logEvery") ? atoi(abcEle->Attribute("logEvery")) : logEvery;
 
+
+
+			if (!MCMC::isInitialised()) {
+
+				// Delete all current experimental datasets
+				for (list<ExperimentalData*>::iterator it = experiments.begin(); it != experiments.end(); ++it){
+					(*it)->clear();
+					delete (*it);
+				}
+				experiments.clear();
+
+			}
 
 
 			// Parse experimental datasets
-			for(TiXmlElement* experimentEle = abcEle->FirstChildElement(); experimentEle; experimentEle=experimentEle->NextSiblingElement()) {
+			for(TiXmlElement* experimentEle = abcEle->FirstChildElement(); !MCMC::isInitialised() && experimentEle; experimentEle=experimentEle->NextSiblingElement()) {
 
 				string experimentType = experimentEle->Attribute("dataType") ? experimentEle->Attribute("dataType") : "forceVelocity";
 

@@ -189,7 +189,7 @@ bool ExperimentalData::reset() {
 bool ExperimentalData::next() {
 
 	this->currentExperiment ++;
-	if (this->currentExperiment >= this->settingsX.size()) return false;
+	if (this->currentExperiment >= this->ntrials.size()) return false;
 
 	// Change the settings
 	applySettings();
@@ -206,6 +206,18 @@ string ExperimentalData::getDataType(){
 	return this->dataType;
 }
 
+void ExperimentalData::clear(){
+	this->ntrials.clear();
+	this->settingsX.clear();
+	this->observationsY.clear();
+
+	for (int i = 0; i < this->lanes.size(); i ++){
+		this->lanes.at(i)->clear();
+		delete this->lanes.at(i);
+	}
+	this->lanes.clear();
+
+}
 
 // Applies the current experimental settings to the model ie. NTP concentration and force
 void ExperimentalData::applySettings(){

@@ -405,7 +405,7 @@ list<ParameterHeatmapData*> BayesianCalculations::getPosteriorDistributionAsHeat
 	heatMapData.push_back(new ParameterHeatmapData("probability", "Probability density"));
 	heatMapData.push_back(new ParameterHeatmapData("logPrior", "Log Prior"));
 	heatMapData.push_back(new ParameterHeatmapData("chiSq", "Chi-squared", "X^{2}"));
-	heatMapData.push_back(new ParameterHeatmapData("state", "State number", "X^{2}"));
+	heatMapData.push_back(new ParameterHeatmapData("state", "State", "X^{2}"));
 	for (int i = 0; i < _GUI_posterior.front()->getParameterNames().size(); i++){
 		string paramID = _GUI_posterior.front()->getParameterNames().at(i);
 		Parameter* param = Settings::getParameterByName(paramID);

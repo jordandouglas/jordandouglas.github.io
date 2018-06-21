@@ -488,6 +488,24 @@ uploadABC = function(TSVfile, msgID = null){
 }
 
 
+// Return a list of all parameters which are being estimated in the posterior distribution
+getParametersWithPriors = function(msgID = null){
+	
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log("Returning", JSON.parse(resultStr));
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	
+	Module.ccall("getParametersWithPriors", null, ["number"],  [msgID]); 
+
+
+	
+}
+
+
+
 
 // Change the burn-in
 update_burnin = function(burnin){

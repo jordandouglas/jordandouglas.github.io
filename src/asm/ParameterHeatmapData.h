@@ -39,7 +39,9 @@ class ParameterHeatmapData{
 	string name; // Name to display on axis label
 	string latexName; // If this is provided then will try to render this in latex math notation instead of the name
 	list<double> values; // Values (one number for each trial)
-
+	double burninStartState;
+	bool needToRecalculateESS;
+	double ESS;
 
 
 	public:
@@ -50,6 +52,10 @@ class ParameterHeatmapData{
 		string getID();
 		string toJSON();
 		list<double> getVals();
+
+
+		void setBurnin(double burninStartState);
+		double getESS();
 
 
 

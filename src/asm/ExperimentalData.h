@@ -70,7 +70,7 @@ class ExperimentalData{
 		void addDatapoint(double setting, double observation, int n);
 		void print();
 		string toJSON();
-
+		void clear();
 
 		void set_ATPconc(double val);
 		void set_CTPconc(double val);

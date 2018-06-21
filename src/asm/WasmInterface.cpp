@@ -623,7 +623,7 @@ extern "C" {
 	// Parse XML settings in string form
 	void EMSCRIPTEN_KEEPALIVE loadSessionFromXML(char* XMLdata, int msgID){
 
-		Settings::init();
+		// Settings::init();
 	
 		// Reinitialise the modeltimer_start
 		//delete currentModel;
@@ -953,12 +953,18 @@ extern "C" {
 
 		
 
+		//Settings::print();
+
 		// Start timer
 		_interfaceSimulation_startTime = chrono::system_clock::now();
 
 		// Output string
 		_ABCoutputToPrint.str("");
 		_ABCoutputToPrint.clear();
+
+
+		// Ensure that the current MCMC state has been activated and has not been changed by the user
+		//MCMC::activatePreviousState();
 
 		// Stop when user presses stop button or when all trials completed
 		bool stop = MCMC::getPreviousStateNumber() > ntrials_abc || MCMC::get_hasFailedBurnin() || _GUI_STOP;
@@ -1174,7 +1180,11 @@ extern "C" {
 		messageFromWasmToJS(toReturnJSON, msgID);
 
 
+	}
 
+	// Return a list of all parameters which are being estimated in the posterior distribution
+	void EMSCRIPTEN_KEEPALIVE getParametersWithPriors(int msgID){
+		messageFromWasmToJS(MCMC::parametersToEstimate_toJSON(), msgID);
 	}
 
 

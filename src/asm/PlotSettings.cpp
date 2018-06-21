@@ -114,6 +114,7 @@ PlotSettings::PlotSettings(int plotNumber, string name){
 		this->xData = "{}"; // State number
 		this->yData = "{}"; // Custom Y variable
 		this->plotFromPosterior = true;
+		this->ESS = 0;
 	}
 
 
@@ -199,8 +200,6 @@ void PlotSettings::deleteSiteRecordings(){
 	this->timeToCatalysisThisTrial_Z = 0;
 
 
-
-
 }
 
 
@@ -227,6 +226,8 @@ void PlotSettings::trialEnd(){
 	this->timeToCatalysisThisTrial_Z = 0;
 
 }
+
+
 
 
 
@@ -271,8 +272,16 @@ void PlotSettings::updateHeatmapData(list<ParameterHeatmapData*> heatmapData){
 		// Cache the the data which we are interested in (in JSON format)
 		for (list<ParameterHeatmapData*>::iterator it = heatmapData.begin(); it != heatmapData.end(); ++it){
 			if ((*it)->getID() == "state") this->xData = (*it)->toJSON();
-			if ((*it)->getID() == this->customParamY) this->yData = (*it)->toJSON();
+			if ((*it)->getID() == this->customParamY) {
+				this->yData = (*it)->toJSON();
+
+				// Calculate the effective sample size
+				(*it)->setBurnin( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) );
+				this->ESS = (*it)->getESS();
+			}
 		}
+
+
 
 
 
@@ -351,6 +360,7 @@ string PlotSettings::toJSON(){
 		settingsJSON += "'xData':" + this->xData + ",";
 		settingsJSON += "'yData':" + this->yData + ",";
 		settingsJSON += "'burnin':" + to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
+		settingsJSON += "'ESS':" + to_string(this->ESS) + ",";
 	}
 
 

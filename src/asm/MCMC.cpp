@@ -115,7 +115,6 @@ void MCMC::initMCMC(){
 	}
 
 
-	cout << "done metropolisHastings" << endl;
 
 	if(_USING_GUI) _GUI_posterior.push_back(MCMC::previousMCMCstate->clone(true));
 
@@ -142,11 +141,12 @@ void MCMC::initMCMC(){
 
 }
 
+bool MCMC::isInitialised() {
+	return MCMC::initialised;
+}
+
 // Reverse-initialisation
 void MCMC::cleanup(){
-
-
-	
 
 
 	// Reset GUI list of posterior distribution samples
@@ -344,8 +344,6 @@ void MCMC::makeProposal(){
 
 	}
 
-
-
 }
 
 
@@ -363,6 +361,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistributionSample* this_M
 		cout << "Could not initialise experiment" << endl;
 		exit(0);
 	}
+
 
 
 	// Cache the parameter values in posterior row object
@@ -392,11 +391,17 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistributionSample* this_M
 	}
 
 
+
+
 	// Iterate through all experimental settings and perform simulations at each setting. The velocities/densities generated are cached in the posterior object
+
 
 	// Run simulations and stop if it exceeds threshold (unless this is the first trial)
 	int ntrialsPerDatapoint = MCMC::getNTrials();
 	SimulatorResultSummary* simulationResults = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
+
+
+
 	this_MCMCState->addSimulatedAndObservedValue(simulationResults, (*currentExperiment));
 	delete simulationResults;
 
@@ -406,6 +411,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistributionSample* this_M
 
 
 	while (MCMC::nextExperiment()){
+
 
 		// Run simulations and stop if it exceeds threshold (unless this is the first trial)
 		ntrialsPerDatapoint = MCMC::getNTrials();
@@ -571,4 +577,23 @@ int MCMC::get_nStatesUntilBurnin(){
 
 ExperimentalData* MCMC::getCurrentExperiment(){
 	return (*currentExperiment);
+}
+
+
+// Return a JSON string of all parameters being estimated
+string MCMC::parametersToEstimate_toJSON(){
+
+	string JSON = "{";
+	for (list<Parameter*>::iterator it = MCMC::parametersToEstimate.begin(); it != MCMC::parametersToEstimate.end(); ++it) {
+		JSON += (*it)->toJSON() + ",";
+	}
+	if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
+	JSON += "}";
+	return JSON;
+
+}
+
+
+void MCMC::activatePreviousState() {
+	MCMC::previousMCMCstate->setParametersFromState();
 }

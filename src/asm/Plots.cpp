@@ -858,6 +858,8 @@ string Plots::getPlotDataAsJSON(){
 			if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->updateHeatmapData(heatMapDataToSend);
 		}
 
+
+
 	}
 
 

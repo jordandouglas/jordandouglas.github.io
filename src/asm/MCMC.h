@@ -74,6 +74,9 @@ class MCMC{
 		static double getEpsilon();
 		static void setPreviousState(PosteriorDistributionSample* state);
 		static int get_nStatesUntilBurnin();
+		static string parametersToEstimate_toJSON();
+		static void activatePreviousState();
+		static bool isInitialised();
 
 
 		// Experimental data
