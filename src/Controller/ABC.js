@@ -179,7 +179,7 @@ function removeTracePlots(){
 
 function getAbcDataObject(which = "ABC"){
 
-	console.log("getAbcDataObject", which);
+	//console.log("getAbcDataObject", which);
 	
 	var curveTables = $(".ABCcurveRow");
 	var abcDataObjectForModel = {};
@@ -1234,8 +1234,8 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 			// If MCMC then account for the burn-in
 			for (var postNum = result.burnin; result.burnin >= 0 && postNum < posterior.length; postNum++){
 
-				console.log("postNum", postNum);
-				console.log(posterior[postNum]);
+				//console.log("postNum", postNum);
+				//console.log(posterior[postNum]);
 
 				var posteriorVelocities = posterior[postNum]["simulatedValues"];
 
@@ -1802,21 +1802,22 @@ function drawTimeGelDensityCanavs(fitID, sequenceLength, laneData = null){
 	var canvas = $("#timeGelDensityPlot_" + fitID)[0];
 	if (canvas == null) return;
 
-	var ctx = canvas.getContext('2d');
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	ctx.globalAlpha = 1;
+	getPosteriorDistribution_controller(function(result){
+
+		var ctx = canvas.getContext('2d');
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.globalAlpha = 1;
 
 
-	var canvasSizeMultiplier = 1;
-	var laneLabelHeight = 20 * canvasSizeMultiplier;
-	var margin = 3 * canvasSizeMultiplier;
-	var axisGap = 40 * canvasSizeMultiplier;
-	var laneWidth = 40 * canvasSizeMultiplier;
-	var laneGap = 5 * canvasSizeMultiplier;
+		var canvasSizeMultiplier = 1;
+		var laneLabelHeight = 20 * canvasSizeMultiplier;
+		var margin = 3 * canvasSizeMultiplier;
+		var axisGap = 40 * canvasSizeMultiplier;
+		var laneWidth = 40 * canvasSizeMultiplier;
+		var laneGap = 5 * canvasSizeMultiplier;
 
 
 
-	if (laneData != null){
 
 
 
@@ -1861,205 +1862,197 @@ function drawTimeGelDensityCanavs(fitID, sequenceLength, laneData = null){
 
 
 
-		getPosteriorDistribution_controller(function(result){
 
 
 
-			if (result.posterior != null && result.posterior.length > 0){
+
+		if (result.posterior != null && result.posterior.length > 0){
 
 
-				var abcDataObjectForModel = getAbcDataObject();
+			var abcDataObjectForModel = getAbcDataObject();
 
-				var fitIDs = [];
-				for (var fitID_temp in abcDataObjectForModel["fits"]) fitIDs.push(fitID_temp);
-				fitIDs.sort();
-				var correctObsNum = 0;
-				console.log("abcDataObjectForModel", abcDataObjectForModel)
-				for (var fitNum = 0; fitNum < fitIDs.length; fitNum++){
+			var fitIDs = [];
+			for (var fitID_temp in abcDataObjectForModel["fits"]) fitIDs.push(fitID_temp);
+			fitIDs.sort();
+			var correctObsNum = 0;
+			//console.log("abcDataObjectForModel", abcDataObjectForModel)
+			for (var fitNum = 0; fitNum < fitIDs.length; fitNum++){
 
-					if (fitIDs[fitNum] == fitID) {
+				if (fitIDs[fitNum] == fitID) {
 
-						// Correct fit num, get the right lane
-						for (var laneNum = 0; laneNum < abcDataObjectForModel["fits"][fitIDs[fitNum]]["vals"].length; laneNum++){
-							if (abcDataObjectForModel["fits"][fitIDs[fitNum]]["vals"].t == laneData.t) break;
-							correctObsNum ++;
-						}
-						break;
+					// Correct fit num, get the right lane
+					for (var laneNum = 0; laneNum < abcDataObjectForModel["fits"][fitIDs[fitNum]]["vals"].length; laneNum++){
+						if (abcDataObjectForModel["fits"][fitIDs[fitNum]]["vals"][laneNum].t == laneData.t) break;
+						correctObsNum ++;
 					}
-					correctObsNum += abcDataObjectForModel["fits"][fitIDs[fitNum]]["vals"].length;
+					break;
 				}
-				correctObsNum = 0;
-
-
-				console.log("result", result);
-
-				// Account for the MCMC burn-in
-				ctx.globalAlpha = 0.5;
-				ctx.strokeStyle = "#008cba";
-				ctx.lineWidth = 1 * canvasSizeMultiplier;
-				for (var postNum = result.burnin; result.burnin >= 0 && postNum < result.posterior.length; postNum++){
-
-
-
-
-					var posteriorDensities = result.posterior[postNum]["simulatedDensities"][correctObsNum];
-
-
-					console.log("posteriorDensities", correctObsNum, posteriorDensities)
-
-					var xPrime = widthScale * 0 + axisGap;
-					var yPrime = plotHeight + margin - heightScale * -ymin;
-					ctx.moveTo(xPrime, yPrime);
-
-
-					// Plot the posterior distribution of densities
-					for (var len = 1; posteriorDensities != null && len < posteriorDensities.length; len++) {
-
-
-
-						// If there is a density for this length use it, else 0
-						var density = 0;
-						for (var j = 0; j < laneData.densities.length; j ++){
-							if (laneData.lengths[j] == len) {
-								density = posteriorDensities[j]
-								break;
-							}
-						}
-
-						console.log("len", len, "density", density);
-						
-
-
-						// Plot it
-						xPrime = widthScale * (len - xmin) + axisGap;
-						yPrime = plotHeight + margin - heightScale * (density - ymin);
-						ctx.lineTo(xPrime, yPrime);
-
-					}
-
-					ctx.stroke();
-
-				}
-
-
-
+				correctObsNum += abcDataObjectForModel["fits"][fitIDs[fitNum]]["vals"].length;
 			}
 
 
 
-			// Plot the observed densities
-			ctx.globalAlpha = 1;
-			ctx.strokeStyle = "black";
-			ctx.lineWidth = 2 * canvasSizeMultiplier;
-			ctx.beginPath();
-			var xPrime = widthScale * xmin + axisGap;
-			var yPrime = plotHeight + margin - heightScale * -ymin;
-			ctx.moveTo(xPrime, yPrime);
+			//console.log("result", correctObsNum, result);
 
-
-			for (var len = xmin+1; len <= xmax; len ++){
-
-				// If there is a density for this length use it, else 0
-				var density = 0;
-				for (var j = 0; j < laneData.densities.length; j ++){
-					if (laneData.lengths[j] == len) {
-						density = laneData.densities[j]
-						break;
-					}
-				}
-
-
-				// Plot it
-				xPrime = widthScale * (len - xmin) + axisGap;
-				yPrime = plotHeight + margin - heightScale * (density - ymin);
-				ctx.lineTo(xPrime, yPrime);
-
-			}
-
-			ctx.stroke();
-
-
-
-			// X min and max
-			var axisPointMargin = 5 * canvasSizeMultiplier;
+			// Account for the MCMC burn-in
+			ctx.globalAlpha = 0.25;
+			ctx.strokeStyle = "#008cba";
 			ctx.lineWidth = 1 * canvasSizeMultiplier;
-			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
-			ctx.textBaseline="top"; 
-			ctx.textAlign="left"; 
-			ctx.fillText(xmin, axisGap, canvas.height - axisGap + axisPointMargin);
-			ctx.textAlign="right"; 
-			ctx.fillText(xmax, canvas.width - margin - 1, canvas.height - axisGap + axisPointMargin);
-
-			// Draw a tick on the axis
-			ctx.beginPath();
-			ctx.moveTo(canvas.width - margin, canvas.height - axisGap - tickLength/2);
-			ctx.lineTo(canvas.width - margin, canvas.height - axisGap + tickLength/2);
-			ctx.stroke();
-
-
-			// Y min and max
-			ctx.save()
-			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
-			ctx.textBaseline="bottom"; 
-			ctx.textAlign="right"; 
-			ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
-			ctx.rotate(-Math.PI/2);
-			ctx.fillText(0, 0, 0);
-			ctx.restore();
-			
-			ctx.save()
-			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
-			ctx.textAlign="right"; 
-			ctx.textBaseline="bottom"; 
-			ctx.translate(axisGap - axisPointMargin, margin);
-			ctx.rotate(-Math.PI/2);
-			ctx.fillText(ymax, 0, 0);
-			ctx.restore();
-
-
-		});
-
-
-
-	}
-
-
-	// Axes
-	ctx.strokeStyle = "black";
-	ctx.lineWidth = 2 * canvasSizeMultiplier;
-	ctx.beginPath();
-	ctx.moveTo(axisGap, margin);
-	ctx.lineTo(axisGap, canvas.height - axisGap);
-	ctx.lineTo(canvas.width - margin, canvas.height - axisGap);
-	ctx.stroke();
-
-	
-
-	// X label
-	ctx.fillStyle = "black";
-	ctx.font = 20 * canvasSizeMultiplier + "px Arial";
-	ctx.textAlign="center"; 
-	ctx.textBaseline="top"; 
-	var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
-	var xlabYPos = canvas.height - axisGap / 2;
-	ctx.fillText("Transcript length (nt) for t=" + laneData.t + "s", xlabXPos, xlabYPos);
-
-
-	// Y label
-	ctx.font = 20 * canvasSizeMultiplier + "px Arial";
-	ctx.textAlign="center"; 
-	ctx.textBaseline="bottom"; 
-	ctx.save()
-	var ylabXPos = 2 * axisGap / 3;
-	var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
-	ctx.translate(ylabXPos, ylabYPos);
-	ctx.rotate(-Math.PI/2);
-	ctx.fillText("Density", 0 ,0);
-	ctx.restore();
+			for (var postNum = result.burnin; result.burnin >= 0 && postNum < result.posterior.length; postNum++){
 
 
 
 
+				var posteriorDensities = result.posterior[postNum]["simulatedDensities"][correctObsNum];
+
+
+				//console.log("posteriorDensities", correctObsNum, posteriorDensities)
+
+				var xPrime = widthScale * 0 + axisGap;
+				var yPrime = plotHeight + margin - heightScale * -ymin;
+				ctx.moveTo(xPrime, yPrime);
+
+
+				// Plot the posterior distribution of densities
+				for (var len = 1; posteriorDensities != null && len < posteriorDensities.length; len++) {
+
+
+
+					// If there is a density for this length use it, else 0
+					var density = posteriorDensities[len];
+
+					//console.log("len", len, "density", density);
+					
+
+
+					// Plot it
+					xPrime = widthScale * (len - xmin) + axisGap;
+					yPrime = plotHeight + margin - heightScale * (density - ymin);
+					ctx.lineTo(xPrime, yPrime);
+
+				}
+
+				ctx.stroke();
+
+			}
+
+
+
+		}
+
+		
+
+
+		// Plot the observed densities
+		ctx.globalAlpha = 1;
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = 2 * canvasSizeMultiplier;
+		ctx.beginPath();
+		var xPrime = widthScale * xmin + axisGap;
+		var yPrime = plotHeight + margin - heightScale * -ymin;
+		ctx.moveTo(xPrime, yPrime);
+
+
+		for (var len = xmin+1; len <= xmax; len ++){
+
+			// If there is a density for this length use it, else 0
+			var density = 0;
+			for (var j = 0; j < laneData.densities.length; j ++){
+				if (laneData.lengths[j] == len) {
+					density = laneData.densities[j]
+					break;
+				}
+			}
+
+
+			// Plot it
+			xPrime = widthScale * (len - xmin) + axisGap;
+			yPrime = plotHeight + margin - heightScale * (density - ymin);
+			ctx.lineTo(xPrime, yPrime);
+
+		}
+
+		ctx.stroke();
+
+
+
+		// X min and max
+		var axisPointMargin = 5 * canvasSizeMultiplier;
+		ctx.lineWidth = 1 * canvasSizeMultiplier;
+		ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+		ctx.textBaseline="top"; 
+		ctx.textAlign="left"; 
+		ctx.fillText(xmin, axisGap, canvas.height - axisGap + axisPointMargin);
+		ctx.textAlign="right"; 
+		ctx.fillText(xmax, canvas.width - margin - 1, canvas.height - axisGap + axisPointMargin);
+
+		// Draw a tick on the axis
+		ctx.beginPath();
+		ctx.moveTo(canvas.width - margin, canvas.height - axisGap - tickLength/2);
+		ctx.lineTo(canvas.width - margin, canvas.height - axisGap + tickLength/2);
+		ctx.stroke();
+
+
+		// Y min and max
+		ctx.save()
+		ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+		ctx.textBaseline="bottom"; 
+		ctx.textAlign="right"; 
+		ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
+		ctx.rotate(-Math.PI/2);
+		ctx.fillText(0, 0, 0);
+		ctx.restore();
+		
+		ctx.save()
+		ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+		ctx.textAlign="right"; 
+		ctx.textBaseline="bottom"; 
+		ctx.translate(axisGap - axisPointMargin, margin);
+		ctx.rotate(-Math.PI/2);
+		ctx.fillText(ymax, 0, 0);
+		ctx.restore();
+
+
+
+		
+
+
+
+		// Draw the axes 2x so they always exist
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = 2 * canvasSizeMultiplier;
+		ctx.beginPath();
+		ctx.moveTo(axisGap, margin);
+		ctx.lineTo(axisGap, canvas.height - axisGap);
+		ctx.lineTo(canvas.width - margin, canvas.height - axisGap);
+		ctx.stroke();
+
+		
+
+		// X label
+		ctx.fillStyle = "black";
+		ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+		ctx.textAlign="center"; 
+		ctx.textBaseline="top"; 
+		var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
+		var xlabYPos = canvas.height - axisGap / 2;
+		ctx.fillText("Transcript length (nt) for t=" + laneData.t + "s", xlabXPos, xlabYPos);
+
+
+		// Y label
+		ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+		ctx.textAlign="center"; 
+		ctx.textBaseline="bottom"; 
+		ctx.save()
+		var ylabXPos = 2 * axisGap / 3;
+		var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
+		ctx.translate(ylabXPos, ylabYPos);
+		ctx.rotate(-Math.PI/2);
+		ctx.fillText("Density", 0 ,0);
+		ctx.restore();
+
+
+	});
 
 }
 

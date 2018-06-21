@@ -2801,7 +2801,7 @@ function getAllSequences_controller(resolve = function(allSeqs) { }){
 function loadSession_controller(XMLData, resolve = function() { }){
 
 
-	console.log("XMLData", XMLData);
+	// console.log("XMLData", XMLData);
 	var updateDom = function(result){
 
 		console.log("updateDom", result);
@@ -2811,7 +2811,7 @@ function loadSession_controller(XMLData, resolve = function() { }){
 		var compactState = result["compactState"];
 		var experimentalData = result["ABC_EXPERIMENTAL_DATA"];
 
-		console.log("experimentalData", experimentalData);
+		// console.log("experimentalData", experimentalData);
 		
 			
 		var openPlots = function(){
@@ -2894,8 +2894,13 @@ function loadSession_controller(XMLData, resolve = function() { }){
 
 			for (var fitID in experimentalData["fits"]){
 
-
 				var dataType = experimentalData["fits"][fitID]["dataType"];
+
+
+				//console.log("fitID", fitID);
+				//if ($("[fitid='" + fitID + "']").length > 0) continue;
+
+
 
 				// Add a new ABC curve
 				addNewABCData(dataType);
@@ -3364,8 +3369,6 @@ function beginABC_controller(abcDataObjectForModel){
 
 
 
-
-
 		// Convert all current settings into XML format and then upload them to set the MCMC settings
 		var toCall = () => new Promise((resolve) => getXMLstringOfSession("", resolve));
 		toCall().then((XMLData) => {
@@ -3625,12 +3628,21 @@ function get_ParametersWithPriors_controller(resolve = function() { }){
 		toCall().then((params) => resolve(params));
 	}
 
-	else{
+	else if (WEB_WORKER_WASM == null) {
 		var res = stringifyFunction("MCMC_JS.get_ParametersWithPriors_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall().then((params) => resolve(params));
+	}
+
+	else {
+		var res = stringifyFunction("getParametersWithPriors", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((params) => resolve(params));
+
 
 	}
 	

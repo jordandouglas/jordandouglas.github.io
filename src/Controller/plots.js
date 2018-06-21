@@ -302,7 +302,8 @@ function selectPlot(plotNum, deleteData = null){
 
 
 		else if (value == "tracePlot") {
-			$("#plotLabel" + plotNum).html(`ESS: <span id='plotLabelVariable` + plotNum + `'>0</span>`);
+			$("#plotLabel" + plotNum).html(`Effective sample size: <span id='plotLabelVariable` + plotNum + `'>0</span>`);
+			//$("#plotLabel" + plotNum).html("");
 		}
 
 
@@ -1157,7 +1158,7 @@ function plot_MCMC_trace(){
 		var pltNum = canvasesToPrintTo[j];
 
 
-		console.log("burnin", PLOT_DATA["whichPlotInWhichCanvas"][pltNum].burnin);
+		//console.log("burnin", PLOT_DATA["whichPlotInWhichCanvas"][pltNum].burnin);
 
 		var yVar = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].customParamY; 
 		
@@ -1239,11 +1240,12 @@ function plot_MCMC_trace(){
 
 
 		// Print ESS
-		$("#plotLabelVariable" + pltNum).html(roundToSF(PLOT_DATA["whichPlotInWhichCanvas"][pltNum].ESS));
+		$("#plotLabelVariable" + pltNum).html(Math.round(PLOT_DATA["whichPlotInWhichCanvas"][pltNum].ESS * 100) / 100);
+		$("#plotLabelVariable" + pltNum).css("color", PLOT_DATA["whichPlotInWhichCanvas"][pltNum].ESS < 100 ? "red" : PLOT_DATA["whichPlotInWhichCanvas"][pltNum].ESS < 200 ? "#EE7600" : "black");
 
 		//console.log("Values", xVals, yVals);
 
-		var ylab = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].xData.name != null ? PLOT_DATA["whichPlotInWhichCanvas"][pltNum].xData.name : "chiSq";
+		var ylab = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].yData.name != null ? PLOT_DATA["whichPlotInWhichCanvas"][pltNum].yData.name : "chiSq";
 		trace_plot(xVals, yVals, range, epsilon, "plotCanvas" + pltNum, "plotCanvasContainer" + pltNum, PLOT_DATA["whichPlotInWhichCanvas"][pltNum].burnin,  "State", ylab, PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["canvasSizeMultiplier"]);
 
 	}
@@ -5079,109 +5081,7 @@ function plotOptions(plotNum){
 		case "parameterHeatmap": 
 			
 
-			// X-axis parameter
-			$("#settingCell1").html(customPlotSelectParameterTemplate());
-			$("#settingCell3").html(customPlotSelectPropertyTemplate());
-			$("#settingCell5").html(parameterHeatmapZAxisTemplate());
-
-			get_PHYSICAL_PARAMETERS_controller(function(params){
-				console.log("params",params, params.length);
-				for (var paramID in params){
-					if (!params[paramID]["hidden"] && !params[paramID]["binary"] && params[paramID].name != null) {
-						$("#customParamX_params").append(`<option value="` + paramID + `" style="color:white"> ` + params[paramID]["name"] + `</option>`);
-						$("#customParamY_params").append(`<option value="` + paramID + `" style="color:white"> ` + params[paramID]["name"] + `</option>`);
-						$("#customParamZ_params").append(`<option value="` + paramID + `" style="color:white"> ` + params[paramID]["name"] + `</option>`);
-					}
-				}
-
-				$("#customParamX").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamX"]);
-				$("#customParamY").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamY"]);
-				$("#customParamZ").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["metricZ"]);
-				//updateParameterPlotSettings();
-
-
-				// Z-axis
-				$("#settingCell6").html(distanceVsTimeOptionsTemplate3().replace("ZMINDEFAULT", 0).replace("ZMAXDEFAULT", 1));
-
-
-				// Z axis colouring
-				$("#settingCell7").html(heatmapZAxisLegend());
-				$("#zColouring").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zColouring"]);
-
-
-				// Y-axis attribute
-				$("#settingCell2").html(distanceVsTimeOptionsTemplate1().replace("Time range", "X-axis range").replace("XUNITS", "").replace("XUNITS", ""));
-				$("#settingCell4").html(distanceVsTimeOptionsTemplate2().replace("Distance range", "Y-axis range").replace("YUNITS", "").replace("YUNITS", "").replace("YMINDEFAULT", 0).replace("YMAXDEFAULT", 1));
-				$("#pauseXRow").remove();
-				$("#shortPauseXRow").remove();
-
-
-				// Set xmax and xmin
-				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"] == "automaticX") $('input[name="xRange"][value="automaticX"]').click()
-				else {
-					$('input[name="xRange"][value="specifyX"]').click()
-					$("#xMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][0]);
-					$("#xMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][1]);
-				}
-
-
-				// Set ymax and ymin
-				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"] == "automaticY") $('input[name="yRange"][value="automaticY"]').click()
-				else {
-					$('input[name="yRange"][value="specifyY"]').click()
-					$("#yMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][0]);
-					$("#yMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][1]);
-				}
-
-
-
-				// Set zmax and zmin
-				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"] == "automaticZ") $('input[name="zRange"][value="automaticZ"]').click()
-				else {
-					$('input[name="zRange"][value="specifyZ"]').click()
-					$("#zMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][0]);
-					$("#zMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][1]);
-				}
-
-
-
-				$("#settingCell8").html(getPosteriorCheckboxTemplate());
-				//if (!PLOT_DATA["thereExistsPosteriorDistribution"]) {
-				//	$("#plotFromPosterior").css("cursor", "auto");
-					//$("#plotFromPosterior").attr("disabled", "disabled");
-				//}
-				$("#plotFromPosterior").prop("checked", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFromPosterior"]);
-
-
-
-				// Site specific constraints. Set the html attr 'oldvals' to what it was when the settings dialog loaded
-				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordX"] == "allSites") $('input[name="sitesToRecordX"][value="allSites"]').click();
-				else {
-					$('input[name="sitesToRecordX"][value="specifySites"]').click();
-					var recordingString = convertListToCommaString(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordX"])
-					$("#sitesToRecord_textboxX").val(recordingString);
-					$("#sitesToRecord_textboxX").attr("oldvals", recordingString);
-				}
-
-				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordY"] == "allSites") $('input[name="sitesToRecordY"][value="allSites"]').click();
-				else {
-					$('input[name="sitesToRecordY"][value="specifySites"]').click();
-					var recordingString = convertListToCommaString(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordY"])
-					$("#sitesToRecord_textboxY").val(recordingString);
-					$("#sitesToRecord_textboxY").attr("oldvals", recordingString);
-				}
-
-				if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordZ"] == "allSites") $('input[name="sitesToRecordZ"][value="allSites"]').click();
-				else {
-					$('input[name="sitesToRecordZ"][value="specifySites"]').click();
-					var recordingString = convertListToCommaString(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordZ"])
-					$("#sitesToRecord_textboxZ").val(recordingString);
-					$("#sitesToRecord_textboxZ").attr("oldvals", recordingString);
-				}
-
-
-			});
-
+			populateHeatmapSettingsParameterDropdowns(plotNum, true);
 
 			break;
 			
@@ -5193,7 +5093,7 @@ function plotOptions(plotNum){
 			// Create a dropdown list which contains all the parameters sampled in the prior
 			$("#settingCell4").html(getTracePlotDropdownTemplate().replace("Calculated per trial.", ""));
 			get_ParametersWithPriors_controller(function(params){
-				
+
 				for (var paramID in params){
 					$("#traceVariableY").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
 				}
@@ -5246,6 +5146,125 @@ function plotOptions(plotNum){
 		});
 		
 	}, 50);
+
+
+}
+
+
+
+function populateHeatmapSettingsParameterDropdowns(plotNum, posteriorFromModel = false){
+
+
+	// X-axis parameter
+	$("#settingCell1").html(customPlotSelectParameterTemplate());
+	$("#settingCell3").html(customPlotSelectPropertyTemplate());
+	$("#settingCell5").html(parameterHeatmapZAxisTemplate());
+
+
+	// If sampling from posterior then only have parameters which are being estimated in the dropdown
+	var usingPosterior = posteriorFromModel ? PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFromPosterior"] : $("#plotFromPosterior").prop("checked");
+	var functionToGetParameters = usingPosterior ? function(resolve) { get_ParametersWithPriors_controller(resolve) } : function(resolve) { get_PHYSICAL_PARAMETERS_controller(resolve) };
+
+
+	functionToGetParameters(function(params){
+		console.log("params",params, params.length);
+		for (var paramID in params){
+			if (!params[paramID]["hidden"] && !params[paramID]["binary"] && params[paramID].name != null) {
+				$("#customParamX_params").append(`<option value="` + paramID + `" style="color:white"> ` + params[paramID]["name"] + `</option>`);
+				$("#customParamY_params").append(`<option value="` + paramID + `" style="color:white"> ` + params[paramID]["name"] + `</option>`);
+				$("#customParamZ_params").append(`<option value="` + paramID + `" style="color:white"> ` + params[paramID]["name"] + `</option>`);
+			}
+		}
+
+		$("#customParamX").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamX"]);
+		$("#customParamY").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["customParamY"]);
+		$("#customParamZ").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["metricZ"]);
+		//updateParameterPlotSettings();
+
+
+		// Z-axis
+		$("#settingCell6").html(distanceVsTimeOptionsTemplate3().replace("ZMINDEFAULT", 0).replace("ZMAXDEFAULT", 1));
+
+
+		// Z axis colouring
+		$("#settingCell7").html(heatmapZAxisLegend());
+		$("#zColouring").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zColouring"]);
+
+
+		// Y-axis attribute
+		$("#settingCell2").html(distanceVsTimeOptionsTemplate1().replace("Time range", "X-axis range").replace("XUNITS", "").replace("XUNITS", ""));
+		$("#settingCell4").html(distanceVsTimeOptionsTemplate2().replace("Distance range", "Y-axis range").replace("YUNITS", "").replace("YUNITS", "").replace("YMINDEFAULT", 0).replace("YMAXDEFAULT", 1));
+		$("#pauseXRow").remove();
+		$("#shortPauseXRow").remove();
+
+
+		// Set xmax and xmin
+		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"] == "automaticX") $('input[name="xRange"][value="automaticX"]').click()
+		else {
+			$('input[name="xRange"][value="specifyX"]').click()
+			$("#xMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][0]);
+			$("#xMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"][1]);
+		}
+
+
+		// Set ymax and ymin
+		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"] == "automaticY") $('input[name="yRange"][value="automaticY"]').click()
+		else {
+			$('input[name="yRange"][value="specifyY"]').click()
+			$("#yMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][0]);
+			$("#yMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][1]);
+		}
+
+
+
+		// Set zmax and zmin
+		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"] == "automaticZ") $('input[name="zRange"][value="automaticZ"]').click()
+		else {
+			$('input[name="zRange"][value="specifyZ"]').click()
+			$("#zMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][0]);
+			$("#zMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][1]);
+		}
+
+
+
+		$("#settingCell8").html(getPosteriorCheckboxTemplate());
+		//if (!PLOT_DATA["thereExistsPosteriorDistribution"]) {
+		//	$("#plotFromPosterior").css("cursor", "auto");
+			//$("#plotFromPosterior").attr("disabled", "disabled");
+		//}
+		$("#plotFromPosterior").prop("checked", usingPosterior);
+		$("#plotFromPosterior").attr("onChange", "populateHeatmapSettingsParameterDropdowns(" + plotNum + ")");
+
+
+
+
+		// Site specific constraints. Set the html attr 'oldvals' to what it was when the settings dialog loaded
+		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordX"] == "allSites") $('input[name="sitesToRecordX"][value="allSites"]').click();
+		else {
+			$('input[name="sitesToRecordX"][value="specifySites"]').click();
+			var recordingString = convertListToCommaString(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordX"])
+			$("#sitesToRecord_textboxX").val(recordingString);
+			$("#sitesToRecord_textboxX").attr("oldvals", recordingString);
+		}
+
+		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordY"] == "allSites") $('input[name="sitesToRecordY"][value="allSites"]').click();
+		else {
+			$('input[name="sitesToRecordY"][value="specifySites"]').click();
+			var recordingString = convertListToCommaString(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordY"])
+			$("#sitesToRecord_textboxY").val(recordingString);
+			$("#sitesToRecord_textboxY").attr("oldvals", recordingString);
+		}
+
+		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordZ"] == "allSites") $('input[name="sitesToRecordZ"][value="allSites"]').click();
+		else {
+			$('input[name="sitesToRecordZ"][value="specifySites"]').click();
+			var recordingString = convertListToCommaString(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["sitesToRecordZ"])
+			$("#sitesToRecord_textboxZ").val(recordingString);
+			$("#sitesToRecord_textboxZ").attr("oldvals", recordingString);
+		}
+
+
+	});
 
 
 }
