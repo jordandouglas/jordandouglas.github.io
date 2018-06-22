@@ -852,6 +852,7 @@ function closeAllDialogs(){
 	closeKineticCachePopup();
 	closeNTPModelPopup();
 	closePosteriorSummaryPopup();
+	closeGelLaneInformationPopup();
 
 
 }
