@@ -41,6 +41,11 @@
 <script language='JavaScript' type="text/javascript" src="src/Resources/xml_for_script-3.1/jsXMLParser/xmlsax.js"></script>
 <script language='JavaScript' type="text/javascript" src="src/Resources/hammer.js"></script>
 
+<script language='JavaScript' type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/2.3.3/fabric.min.js"></script>
+
+
+
+
 
 <!--<script language='JavaScript' type='text/JavaScript' src='src/Resources/d3.v4.min.js'></script> -->
 <script src="https://d3js.org/d3.v5.min.js"></script>
@@ -777,6 +782,11 @@ window.onkeyup = function(e) {
 		//addNotificationMessage("Hello there", 100, 100);
 
 		//console.log(JSON.stringify({XXX:{XXX: "there"}, YYY: "hello"}));
+	}else if(key == 8 || key == 46){ // Delete and backspace
+		for (var fitID in gelFabricCanvases){
+			deleteFabricCanvasSelection(fitID); // Delete all selected objects in time gel canvases
+		}
+
 	}
 	
 
