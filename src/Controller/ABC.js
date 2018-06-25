@@ -974,61 +974,103 @@ function getABCpauseSiteTemplate(fitID){
 
 function getTimeGelTemplate(fitID){
 	return `
-		<tr fitID="` + fitID + `" class="ABCcurveRow timeGelRow"> <!-- style="background-color:#b3b3b3;"> -->
 
 
-			<td class="` + fitID + `" style="width:200px; text-align:center; vertical-align:top">
-				<br><br>
-				<div style="font-size:18px;">
-					Experimental data
-					<input type=image class="rotate180" title="Upload an a time gel image as .png or .jpg" onClick="uploadGel('` + fitID + `');" src="src/Images/download.png" style="cursor: pointer; vertical-align: middle; height:20px; ">  
-					<input style="display:none" type="file" id="uploadGel_` + fitID + `" accept=".png, .jpg, .jpeg"> 
-				</div>
+		<tr fitID="` + fitID + `" class="timeGelRow" >
 
-
-					<textarea class="ABCinputData ntpVelocityInputData" id="timeGelInputData_` + fitID + `" onChange="validateAllAbcDataInputs()" style="font-size:14px; padding: 5 10;  width: 200px; height: 200px; max-width:200px; max-height:500px; min-height:100px; min-width:200px"  
-					title="Input time gel data in the specified format" placeholder="Example.                                      t=5                                        10, 0.5                                 11, 0.5                                t=10                                 20, 3"></textarea>
-					<br><br>
-					<span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
-						Input transcript length (nt) and relative density observations. Separate length and density values with a comma and separate observations with a line break. 
-						Ensure there are no duplicate lengths.
-					</span>
-
-
-				
-
-				
-			</td>
-
-
-			<td class="` + fitID + `" style="width:300px; text-align:center; vertical-align:top">
-
+			<td colspan=3  style="width:450px; text-align:center; vertical-align:top">
 				<div style="font-size:20px;">
 					Gel electrophoresis of transcript lengths over time
 					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="src/Images/help.png"></a>
-						
 				</div>
+			</td>
 
-					<span id="timeGelPlotDIV_` + fitID + `">
-						<canvas id="timeGelPlotIMG_` + fitID + `" width=300 style="position:absolute;"></canvas>
-						<canvas id="timeGelPlot_` + fitID + `" width=300 height=300> </canvas>
-					</span>
+		</tr>
+
+		<tr fitID="` + fitID + `" class="ABCcurveRow timeGelRow"> <!-- style="background-color:#b3b3b3;"> -->
+
+
+
+			<td colspan=2 class="` + fitID + `">
+
+				
+
+					<div id="timeGelPlotDIV_` + fitID + `" style="float:left">
+						<canvas id="timeGelPlotIMG_` + fitID + `" width=400 style="position:absolute;"></canvas>
+						<canvas id="timeGelPlot_` + fitID + `" width=400 height=300 style=""> </canvas>
+					</div>
 
 			</td>
 
-
-
-			<td class="` + fitID + `" style="text-align:center; vertical-align:top">
+			<td class="` + fitID + `" style="text-align:center; vertical-align:top;">
 
 					<input type=button id='deleteExperiment_` + fitID + `' class='minimise' style='float:right'  value='&times;' onClick=deleteExperiment("` + fitID + `") title='Delete this experiment'>
-
+			
 
 					<br><br><br>
 					<table style="width:250px; margin:auto">
 
+
+
+
+
+					 	<tr>
+							<td colspan=2 style="text-align:center;">
+								<br><br>
+								<div style="font-size:18px;">Gel Settings
+									<input type=image class="rotate180" title="Upload a time gel image as .png or .jpg" onClick="uploadGel('` + fitID + `');" src="src/Images/download.png" style="cursor: pointer; vertical-align: middle; height:20px; ">  
+									<input style="display:none" type="file" id="uploadGel_` + fitID + `" accept=".png, .jpg, .jpeg"> 
+								</div>
+							</td>
+
+						</tr>
+
+
+
+						<tr>
+							<td style="text-align:center;" colspan=2 title="Use the cursor to draw a lane on the gel, or set prior distributions behind molecular weights">
+
+
+								<span style="font-size:14px; vertical-align:middle" >Draw lane</span>
+								<label class="switch">
+						 			 <input class="modelSetting" type="checkbox" id="selectLaneOrPrior_` + fitID + `" > </input>
+						 		 	<span class="slider round notboolean"></span>
+								</label> 
+								<span style="font-size:14px; vertical-align:middle" >Draw MW prior</span>
+
+					 		</td>
+					 	</tr>
+
+
+				 		<tr>
+							<td style="text-align:left;" colspan=2>
+								<br>
+									&nbsp;&nbsp; <input id="lightOnDark_` + fitID + `" class="operation" type=button onClick="changeLightDarkGelSettings('` + fitID + `'); drawTimeGelPlotCanvas('` + fitID + `')" value='Dark' title="Dark bands on light background or light bands on dark background?" style="width:60px; background-color:#fafafa; color:black; font-weight:bold;"></input>
+					 				<input id="editLaneBtn_` + fitID + `" type=button class="operation" onClick="displayGelLaneDialog('` + fitID + `')" value='Edit selected lane' title="View and change the information for the selected lane. Draw a lane on the gel using the cursor and then click on a lane to select it." style="width:150px; display:none"></input>
+					 				
+					 		</td>
+					 	</tr>
+
+
+
+
+
+					 	<tr class=" timeGelDensityPlotDIV_` + fitID + `" style="display:none;">
+							<td style="text-align:center;" colspan=2>
+								<br>
+								Display band densities for:
+					 			<select class="plot-dropdown" title="Select which lane to display" id = "selectLane_` + fitID + `"  OnChange="drawTimeGelPlotCanvas('` + fitID + `');" style="vertical-align: middle; width: 180px">
+								</select>
+					 		</td>
+
+					 	</tr>
+
+
+
+
 						<tr>
 							<td colspan=2 style="text-align:center;">
-								<br>
+								<br><br>
 								<div style="font-size:18px;">NTP Concentrations</div>
 							</td>
 
@@ -1081,29 +1123,6 @@ function getTimeGelTemplate(fitID){
 					 	</tr>
 
 
-				 		<tr>
-							<td style="text-align:center;" colspan=2>
-								<br><br>
-					 				<input id="editLaneBtn_` + fitID + `" type=button class="operation" onClick="displayGelLaneDialog('` + fitID + `')" value='Edit selected lane' title="View and change the information for the selected lane. Draw a lane on the gel using the cursor and then click on a lane to select it." disabled="true" style="width:150px; cursor:none; background-color:#858280 "></input>
-								
-					 		</td>
-					 	</tr>
-
-
-
-					
-
-
-					 	<tr class=" timeGelDensityPlotDIV_` + fitID + `" style="display:none;">
-							<td style="text-align:center;" colspan=2>
-								<br><br>
-								Display band densities for:
-					 			<select class="plot-dropdown" title="Select which lane to display" id = "selectLane_` + fitID + `"  OnChange="validateAllAbcDataInputs();" style="vertical-align: middle; width: 180px">
-								</select>
-					 		</td>
-
-					 	</tr>
-
 
 
 
@@ -1114,6 +1133,8 @@ function getTimeGelTemplate(fitID){
 
 
 			</td>
+
+
 
 		</tr>
 
@@ -1148,19 +1169,20 @@ function uploadGel(fitID){
             img.addEventListener("load", function() {
 
             	//$("#timeGelPlotIMG_" + fitID).attr("src", img.src);
-				$("#timeGelPlotIMG_" + fitID).offset({ top: $("#timeGelPlot_" + fitID).offset().top, left: $("#timeGelPlot_" + fitID).offset().left});
 
 
 				// Set the canvas behind the fabric canvas to a static image of the gel
 				var bgImageCanvas = $("#timeGelPlotIMG_" + fitID)[0];
-				bgImageCanvas.width = 300;
+				bgImageCanvas.width = 400;
 				bgImageCanvas.height = (img.height / img.width) * bgImageCanvas.width;
 				var ctx = bgImageCanvas.getContext('2d');
 				ctx.drawImage(img, 0, 0, bgImageCanvas.width, bgImageCanvas.height);
 
 
-
            		drawTimeGelCanvasFromImage(fitID, img);
+
+				$("#timeGelPlotIMG_" + fitID).offset({ top: $("#timeGelPlot_" + fitID).offset().top, left: $("#timeGelPlot_" + fitID).offset().left});
+           		
 
             });
             img.src = reader.result;
@@ -1185,38 +1207,101 @@ function uploadGel(fitID){
 function getPixelDensitiesForLane(fitID, lane){
 
 
-	// Get the rectangle object associated with this lane 
-	for (var pixelRow = lane.rectangle.top; pixelRow <= lane.rectangle.top + lane.rectangle.height; pixelRow++){
 
-
-	}
-	/*
-	var m = slope(A, B);
-var b = intercept(A, m);
-
-var coordinates = [];
-for (var x = A[0]; x <= B[0]; x++) {
-    var y = m * x + b;
-    coordinates.push([x, y]);
-}
-
-var pixelData = canvas.getContext('2d').getImageData(event.offsetX, event.offsetY, 1, 1).data;
-
-
-
-
+	// Canvas where the image is stored
 	var bgImageCanvas = $("#timeGelPlotIMG_" + fitID)[0];
-	var fabricCanvas = gelFabricCanvases[fitID];
-	if (fabricCanvas == null) {
-		console.log("Error: cannot find fabric canvas", fitID);
-		return;
+	var ctx = bgImageCanvas.getContext('2d');
+
+	var angleRadians = lane.rectangle.angle * Math.PI / 180;
+
+	console.log("angleRadians", angleRadians, Math.sin(Math.PI));
+
+	// Slope of the left border of the rectangle
+	var leftSlope = Math.abs(Math.cos(angleRadians) / Math.sin(angleRadians)); // Slope = run / rise
+	if (angleRadians > 0) leftSlope = -leftSlope;
+
+
+	// Slope of the top border of the rectangle
+	var topSlope = 1/leftSlope; // Math.abs(lane.rectangle.width * Math.cos(angleRadians));
+	//if (angleRadians > 0) topSlope = -topSlope;
+
+
+	var densities = [];
+
+	console.log("rect", lane.rectangle);
+	var lightOnDark = $("#lightOnDark_" + fitID).val() == "Light";
+
+	// Iterate through all pixels along the left long diagonal
+	for (var pixelRowY = 0; pixelRowY <= Math.floor(lane.rectangle.height - 1); pixelRowY++){
+
+		var pixelRowX = pixelRowY / leftSlope;
+
+		var x0 = pixelRowX + lane.rectangle.left;
+		var y0 = pixelRowY + lane.rectangle.top;
+
+		//console.log("x0", x0, "y0", y0, "leftSlope", leftSlope, "topSlope", topSlope);
+
+		// Iterate through all pixels along the line which goes between the left rectangle border and the right border along the angle of the top of the rectangle
+		var meanPixelRowDensity = 0;
+		for (var x = x0; x < x0 + Math.floor(lane.rectangle.width); x++){
+
+			var y = Math.floor(y0 + topSlope * (x-x0));
+
+			var pixelData = ctx.getImageData(Math.floor(x), y, 1, 1).data;
+
+
+			// Using Luma to convert RGB into density. See https://en.wikipedia.org/wiki/Luma_(video)
+			var density = 0.2126*pixelData[0]/255 + 0.7152*pixelData[1]/255 + 0.0722*pixelData[2]/255;
+			//console.log("Pixel at", x, ",", y, " = ", pixelData, "has density", density);
+
+			if (!lightOnDark) density = 1 - density;
+
+			meanPixelRowDensity += density;
+
+		}
+		//console.log("row has mean density", meanPixelRowDensity / Math.floor(lane.rectangle.width));
+		densities.push(meanPixelRowDensity / Math.floor(lane.rectangle.width));
+		
+
 	}
 
 
-	*/
+
+	// Normalise densities so that max = 1 and min = 0
+	var max = 0;
+	var min = 1;
+	for (var i = 0; i < densities.length; i++) {
+		min = Math.min(min, densities[i]);
+		max = Math.max(max, densities[i]);
+	}
+	for (var i = 0; i < densities.length; i++) densities[i] = (densities[i] - min) / (max - min);
+
+
+	return densities;
+
 
 
 }
+
+
+function changeLightDarkGelSettings(fitID){
+
+
+	// From dark bands to light bands
+	if ($("#lightOnDark_" + fitID).val() == "Dark"){
+		$("#lightOnDark_" + fitID).val("Light");
+		$("#lightOnDark_" + fitID).css("background-color", "#606060");
+		$("#lightOnDark_" + fitID).css("color", "#fafafa");
+	}
+
+	// From light bands to dark banks
+	else if ($("#lightOnDark_" + fitID).val() == "Light") {
+		$("#lightOnDark_" + fitID).val("Dark");
+		$("#lightOnDark_" + fitID).css("background-color", "#fafafa");
+		$("#lightOnDark_" + fitID).css("color", "#606060");
+	}
+}
+
 
 
 function deleteExperiment(fitID){
@@ -1701,8 +1786,12 @@ function drawTimeGelPlotCanvas(fitID){
 	}
 
 
+
+	lane.densities = getPixelDensitiesForLane(fitID, lane);
+
+
 	// Draw band intensity plot for the selected lane
-	drawTimeGelDensityCanvas(fitID, lane);
+	drawTimeGelDensityCanvas(fitID, lane, fabricCanvas.MWpriors);
 
 
 }
@@ -1769,17 +1858,16 @@ function drawTimeGelCanvasFromImage(fitID, image){
 	fabricCanvas.selectedObject = null;
 	fabricCanvas.drawingRectangle = false;
 	fabricCanvas.lanes = [];
+	fabricCanvas.MWpriors = [];
 
 
-	fabricCanvas.setWidth(300);
-	fabricCanvas.setHeight((image.height / image.width) * 300);
+	fabricCanvas.setWidth(400);
+	fabricCanvas.setHeight((image.height / image.width) * 400);
 
 
 
-	// Disable the lane edit button
-	$("#editLaneBtn_" + fitID).css("cursor", "auto");
-	$("#editLaneBtn_" + fitID).css("background-color", "#858280");
-	$("#editLaneBtn_" + fitID).attr("disabled", "disabled");
+	// Hide the lane edit button
+	$("#editLaneBtn_" + fitID).hide(0);
 
 
 
@@ -1797,12 +1885,15 @@ function drawTimeGelCanvasFromImage(fitID, image){
 
 		// Drawing line
 		if (!fabricCanvas.drawingRectangle) {
+
+			var selectingMWprior = $("#selectLaneOrPrior_" + fitID).is(":checked");
+
 			var pointer = fabricCanvas.getPointer(o.e);
 			var points = [ pointer.x, pointer.y, pointer.x, pointer.y ];
 			line = new fabric.Line(points, {
 				strokeWidth: 2,
-				fill: '#EE7600',
-				stroke: '#EE7600',
+				fill: selectingMWprior ? "#afff14" : '#EE7600',
+				stroke: selectingMWprior ? "#afff14" : '#EE7600',
 				originX: 'center',
 				originY: 'center'
 			});
@@ -1844,10 +1935,26 @@ function drawTimeGelCanvasFromImage(fitID, image){
 		// Finish drawing rectangle
 		if (fabricCanvas.drawingRectangle) {
 
-			fabricCanvas.lanes.push({id: rectangle.id, rectangle:rectangle, laneNum: fabricCanvas.lanes.length + 1, time: 1, npixelsLength: rectangle.height, densities: new Array(Math.ceil(rectangle.height)) });
-			fabricCanvas.drawingRectangle = false;
 
-			drawTimeGelPlotCanvas(fitID);
+			// Is it a lane or a length prior
+			var selectingMWprior = $("#selectLaneOrPrior_" + fitID).is(":checked");
+			if (selectingMWprior){
+				
+				fabricCanvas.MWpriors.push({id: rectangle.id, rectangle:rectangle, transcriptLengthOfNormalMean: null, numberOf_SD_InRectWidth: 3 });
+
+
+			}else{
+
+				fabricCanvas.lanes.push({id: rectangle.id, rectangle:rectangle, laneNum: fabricCanvas.lanes.length + 1, time: 1, npixelsLength: rectangle.height, densities: new Array(Math.ceil(rectangle.height)) });
+				drawTimeGelPlotCanvas(fitID);
+
+			}
+
+			fabricCanvas.drawingRectangle = false;
+			
+
+
+			//console.log("finished rectangle", rectangle);
 		}
 
 		// Finish drawing line, start drawing rectangle
@@ -1858,6 +1965,13 @@ function drawTimeGelCanvasFromImage(fitID, image){
 				var temp = line.y1;
 				line.y1 = line.y2;
 				line.y2 = temp;
+			}
+
+
+			// Don't accept a line less than 3 pixels long
+			if (line.y2 - line.y1 <= 3){
+				isDown = false;
+				return;
 			}
 
 			// Euclidean length of line = rectangle height
@@ -1871,6 +1985,8 @@ function drawTimeGelCanvasFromImage(fitID, image){
 
 			//console.log("angle", angle * 180 / Math.PI);
 
+			var selectingMWprior = $("#selectLaneOrPrior_" + fitID).is(":checked");
+
 			rectangle = new fabric.Rect({
 				id: currentRectID,
 		        left: line.x1 - rectWidth/2,
@@ -1879,7 +1995,7 @@ function drawTimeGelCanvasFromImage(fitID, image){
 		        height: rectLength,
 		        angle: angle * 180 / Math.PI,
 		        fill: "",
-		        stroke: "#EE7600",
+		        stroke: selectingMWprior ? "#afff14" : "#EE7600",
 		        strokeWidth: 2,
 		    });
 		    fabricCanvas.remove(line);
@@ -1894,6 +2010,31 @@ function drawTimeGelCanvasFromImage(fitID, image){
 
 	fabricCanvas.on("object:selected", function(e) { 
 
+
+	// Finish drawing rectangle
+		if (fabricCanvas.drawingRectangle) {
+
+
+			// Is it a lane or a length prior
+			var selectingMWprior = $("#selectLaneOrPrior_" + fitID).is(":checked");
+			if (selectingMWprior){
+				
+				fabricCanvas.MWpriors.push({id: rectangle.id, rectangle:rectangle, transcriptLengthOfNormalMean: null, numberOf_SD_InRectWidth: 3 });
+
+
+			}else{
+
+				fabricCanvas.lanes.push({id: rectangle.id, rectangle:rectangle, laneNum: fabricCanvas.lanes.length + 1, time: 1, npixelsLength: rectangle.height, densities: new Array(Math.ceil(rectangle.height)) });
+				drawTimeGelPlotCanvas(fitID);
+
+			}
+
+			fabricCanvas.drawingRectangle = false;
+			
+
+			return;
+			//console.log("finished rectangle", rectangle);
+		}
 
 		//console.log("object:selected");
 
@@ -1911,10 +2052,45 @@ function drawTimeGelCanvasFromImage(fitID, image){
 
 
 
-		// Enable the lane edit button
-		$("#editLaneBtn_" + fitID).css("cursor", "pointer");
-		$("#editLaneBtn_" + fitID).css("background-color", "#008cba");
-		$("#editLaneBtn_" + fitID).attr("disabled", false);
+		// Find which lane/length is selected
+		var lane = null;
+		var MWlength = null
+		for (var i = 0; i < fabricCanvas.lanes.length; i ++){
+			if (e.target.id == fabricCanvas.lanes[i].id) {
+				lane = fabricCanvas.lanes[i];
+				break;
+			}
+		}
+
+
+		if (lane == null){
+			for (var i = 0; i < fabricCanvas.MWpriors.length; i ++){
+				if (e.target.id == fabricCanvas.MWpriors[i].id) {
+					MWlength = fabricCanvas.MWpriors[i];
+					break;
+				}
+			}
+		}
+
+
+		// A MW prior is being selected
+		if (MWlength != null) {
+			$("#editLaneBtn_" + fitID).show(200);
+			$("#editLaneBtn_" + fitID).val("Edit length prior");
+			$("#editLaneBtn_" + fitID).attr("title", "View and change the information for the selected molecular weight prior distribution. Draw a lane on the gel using the cursor and then click on a lane to select it.");
+		}
+
+		// A lane is being selected
+		else if (lane != null) {
+			$("#editLaneBtn_" + fitID).show(200);
+			$("#editLaneBtn_" + fitID).val("Edit selected lane");
+			$("#editLaneBtn_" + fitID).attr("title", "View and change the information for the selected lane. Draw a lane on the gel using the cursor and then click on a lane to select it.");
+		}
+		else {
+			$("#editLaneBtn_" + fitID).hide(0);
+			console.log("ERROR: cannot find object with id", e.target);
+			return;
+		}
 
 
 
@@ -1927,6 +2103,8 @@ function drawTimeGelCanvasFromImage(fitID, image){
 		fabricCanvas.drawingRectangle = false;
 		fabricCanvas.selectedObject = e.target;
 
+		drawTimeGelPlotCanvas(fitID);
+
 	});
 
 	fabricCanvas.on("selection:cleared", function(e) { 
@@ -1936,11 +2114,8 @@ function drawTimeGelCanvasFromImage(fitID, image){
 
 		fabricCanvas.selectedObject = null;
 
-		// Disable the lane edit button
-		$("#editLaneBtn_" + fitID).css("cursor", "auto");
-		$("#editLaneBtn_" + fitID).css("background-color", "#858280");
-		$("#editLaneBtn_" + fitID).attr("disabled", "disabled");
-
+		// Hide the lane edit button
+		$("#editLaneBtn_" + fitID).hide(0);
 
  	});
 
@@ -1949,14 +2124,18 @@ function drawTimeGelCanvasFromImage(fitID, image){
 }
 
 
+
+
+
 function displayGelLaneDialog(fitID){
 
 
 	var fabricCanvas = gelFabricCanvases[fitID];
 	if (fabricCanvas == null || fabricCanvas.selectedObject == null) return;
 
-	// Find which lane is selected
+	// Find which lane/length is selected
 	var lane = null;
+	var MWlength = null
 	for (var i = 0; i < fabricCanvas.lanes.length; i ++){
 		if (fabricCanvas.selectedObject.id == fabricCanvas.lanes[i].id) {
 			lane = fabricCanvas.lanes[i];
@@ -1964,8 +2143,21 @@ function displayGelLaneDialog(fitID){
 		}
 	}
 
+
 	if (lane == null){
-		console.log("ERROR: cannot find laneid", fabricCanvas.selectedObject.id);
+
+		for (var i = 0; i < fabricCanvas.MWpriors.length; i ++){
+			if (fabricCanvas.selectedObject.id == fabricCanvas.MWpriors[i].id) {
+				MWlength = fabricCanvas.MWpriors[i];
+				break;
+			}
+		}
+
+	}
+
+
+	if (lane == null && MWlength == null){
+		console.log("ERROR: cannot find obj with id", fabricCanvas.selectedObject.id);
 		return;
 	}
 
@@ -1975,7 +2167,18 @@ function displayGelLaneDialog(fitID){
 	$("#main").css("opacity", 0.5);
 	$("#mySidenav").css("opacity", 0.5);
 
-	var popupHTML = getGelLaneInformationTemplate(fitID, lane);
+	var popupHTML;
+
+	// Show molecular weight prior
+	if (lane == null){
+		popupHTML = getGelLengthPriorInformationTemplate(fitID, MWlength);
+	}
+
+	// Show lane information
+	else{
+		popupHTML = getGelLaneInformationTemplate(fitID, lane);;
+	}
+
 	//popupHTML = popupHTML.replace("XX_plotNum_XX", plotNum);
 	//popupHTML = popupHTML.replace("XX_plotName_XX", $("#selectPlot" + plotNum + " :selected").text());
 
@@ -1999,7 +2202,75 @@ function displayGelLaneDialog(fitID){
 
 }
 
+
+
+function getGelLengthPriorInformationTemplate(fitID, MWlength){
+
+	return `
+		<div id='laneDialog' style='background-color:#008cba; padding: 10 10; position:fixed; width: 20vw; left:40vw; top:30vh; z-index:5' fitID="` + fitID + `">
+			<div style='background-color:white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+				<span style='font-size: 22px'> Molecular weight prior distribution </span>
+				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeGelLaneInformationPopup("` + fitID + `")'>&times;</span>
+				<div style='font-size: 15px'> The rectangle you have drawn adds a constraint to the log linear model between molecular weight W (nt) and migration distance d (pixels). <br>
+
+				</div>
+				<table cellpadding=10 style='width:90%; margin:auto; font-size: 15px;'>
+
+
+
+				<tr>
+					<td colspan="2" > 
+							The middle of the rectangle corresponds to: 
+							<div style="text-align:center">
+								W = <input class="textboxBlue" type="number" style="width:35px; text-align:centre" id="transcriptLengthOfNormalMean" value=` + MWlength.transcriptLengthOfNormalMean + `> nt <br>
+							</div>
+					</td>
+
+
+
+				</tr>
+
+
+				<tr>
+
+					<td colspan="2" > 
+							The height of the rectangle corresponds to:
+							<div style="text-align:center">
+								<input class="textboxBlue" type="number" min=0 style="width:35px; text-align:centre" id="numberOf_SD_InRectWidth" value=` + MWlength.numberOf_SD_InRectWidth + `> pixel standard deviations <br>
+							</div>
+					</td>
+					
+
+
+				</tr>
+
+				<tr>
+
+					<td>
+						<input type="button" class="operation" onClick="closeGelLaneInformationPopup('` + fitID + `'); deleteFabricCanvasSelection('` + fitID + `')" value='Delete' title="Delete this lane" style="width:100px; float:right"></input>
+				
+
+					</td>
+					<td> 
+						<input type="button" class="operation" onClick="saveMWpriorInformation('` + fitID + `', '` + MWlength.id + `')" value='Save' title="Save information for this prior distribution" style="width:100px; float:right"></input>
+					</td>
+						
+				</tr>
+					
+				</table>
+				
+				
+			</div>
+		</div>
 	
+	
+	`;
+
+}
+
+
+
+
 function getGelLaneInformationTemplate(fitID, laneObj){
 
 	return `
@@ -2012,13 +2283,13 @@ function getGelLaneInformationTemplate(fitID, laneObj){
 				<tr>
 					<td> 
 							Lane number:
-							<input class="textboxBlue" type="number" style="width:60px; text-align:right" id="gelLaneNum" value=` + laneObj.laneNum + `> 
+							<input class="textboxBlue" type="number" style="width:35px; text-align:right" id="gelLaneNum" value=` + laneObj.laneNum + `> 
 					</td>
 					
 					
 					<td> 
 							Time:
-							<input class="textboxBlue" type="number" style="width:60px; text-align:right" id="gelLaneTime" value=` + laneObj.time + `> s
+							<input class="textboxBlue" type="number" style="width:35px; text-align:right" id="gelLaneTime" value=` + laneObj.time + `> s
 					</td>
 
 				</tr>
@@ -2066,7 +2337,36 @@ function saveLaneInformation(fitID, laneID){
 	}
 
 	lane.laneNum = parseFloat($("#gelLaneNum").val());
-	lane.time = parseFloat($("#gelLaneTime").val());
+	lane.transcriptLengthOfNormalMean = parseFloat($("#transcriptLengthOfNormalMean").val());
+	closeGelLaneInformationPopup(fitID);
+	drawTimeGelPlotCanvas(fitID);
+
+}
+
+
+
+function saveMWpriorInformation(fitID, MWpriorID){
+
+
+	var fabricCanvas = gelFabricCanvases[fitID];
+	if (fabricCanvas == null) return;
+
+	var MWprior = null;
+	for (var i = 0; i < fabricCanvas.MWpriors.length; i ++){
+		if (MWpriorID == fabricCanvas.MWpriors[i].id) {
+			MWprior = fabricCanvas.MWpriors[i];
+			break;
+		}
+	}
+
+	if (MWprior == null){
+		console.log("ERROR: cannot find MWpriorID", MWpriorID);
+		return;
+	}
+
+
+	MWprior.transcriptLengthOfNormalMean = parseFloat($("#transcriptLengthOfNormalMean").val());
+	MWprior.numberOf_SD_InRectWidth = parseFloat($("#numberOf_SD_InRectWidth").val());
 	closeGelLaneInformationPopup(fitID);
 	drawTimeGelPlotCanvas(fitID);
 
@@ -2097,6 +2397,7 @@ function closeGelLaneInformationPopup(fitID = null){
 }
 
 
+
 // Deletes the object selected in the specified fabric canvas 
 function deleteFabricCanvasSelection(fitID){
 
@@ -2104,15 +2405,19 @@ function deleteFabricCanvasSelection(fitID){
 	if (fabricCanvas == null || fabricCanvas.selectedObject == null) return; 
 
 
-	// Delete the lane object
+	// Delete the lane / MW prior object
 	for (var i = 0; i < fabricCanvas.lanes.length; i ++){
 		if (fabricCanvas.selectedObject.id == fabricCanvas.lanes[i].id) {
 			fabricCanvas.lanes.splice(i, 1);
 			break;
 		}
+
+		if (fabricCanvas.selectedObject.id == fabricCanvas.MWpriors[i].id) {
+			fabricCanvas.MWpriors.splice(i, 1);
+			break;
+		}
 	}
 
-	console.log("lanes", fabricCanvas.lanes);
 
 
 	// Delete the fabric object
@@ -2340,7 +2645,7 @@ function addTimeGelHoverEvents(ctx, stateHoverEvents, laneWidth, bandHeight, can
 
 
 // Draws a density plot for the specified lane
-function drawTimeGelDensityCanvas(fitID, laneData = null){
+function drawTimeGelDensityCanvas(fitID, laneData = null, MWpriors = []){
 
 
 	var canvas = $("#timeGelDensityPlot_" + fitID)[0];
@@ -2465,7 +2770,6 @@ function drawTimeGelDensityCanvas(fitID, laneData = null){
 					// If there is a density for this length use it, else 0
 					var density = posteriorDensities[len];
 
-					//console.log("len", len, "density", density);
 					
 
 
@@ -2493,14 +2797,17 @@ function drawTimeGelDensityCanvas(fitID, laneData = null){
 		ctx.lineWidth = 2 * canvasSizeMultiplier;
 		ctx.beginPath();
 		var xPrime = widthScale * xmin + axisGap;
-		var yPrime = plotHeight + margin - heightScale * -ymin;
+		var yPrime = plotHeight + margin - heightScale * (laneData.densities[0]-ymin);
 		ctx.moveTo(xPrime, yPrime);
 
 
-		for (var len = xmin+1; len <= xmax; len ++){
+		for (var index = 1; index <= laneData.densities.length; index ++){
+			var len = xmin + index;
+
+			//for (var len = xmin+1; len <= xmax; len ++){
 
 			// If there is a density for this length use it, else 0
-			var density = laneData.densities[len];
+			var density = laneData.densities[index];
 			if (density == null) density = 0;
 
 
@@ -2514,6 +2821,89 @@ function drawTimeGelDensityCanvas(fitID, laneData = null){
 		ctx.stroke();
 
 
+
+		// fabricCanvas.MWpriors.push({id: rectangle.id, rectangle:rectangle, transcriptLengthOfNormalMean: null, numberOf_SD_InRectWidth: 3 });
+
+		// Calculate the slope (of the left border) and intercept of the centre of this lane
+		var laneAngleRadians = laneData.rectangle.angle * Math.PI / 180;
+		var laneSlope = Math.abs(Math.cos(laneAngleRadians) / Math.sin(laneAngleRadians)); // Slope = run / rise
+		if (laneAngleRadians > 0) laneSlope = -laneSlope;
+		var laneInterceptX = laneData.rectangle.left + laneData.rectangle.width/2; 
+		var laneInterceptY = laneData.rectangle.top + laneInterceptX/laneSlope;
+
+		console.log("lane middle point", laneInterceptX, laneInterceptY, "slope", laneSlope);
+
+
+		// Plot the prior distributions of molecular weight
+		console.log("MWpriors", MWpriors);
+		for (var i = 0; i < MWpriors.length; i ++){
+
+			if (MWpriors[i].transcriptLengthOfNormalMean == null) continue;
+
+
+			// Calculate the slope (of the left border) and intercept of the horizontal centre of the band prior
+			var MWAngleRadians = MWpriors[i].rectangle.angle * Math.PI / 180;
+			var MWSlope = Math.abs(Math.cos(MWAngleRadians) / Math.sin(MWAngleRadians)); // Slope = run / rise
+			if (MWAngleRadians > 0) MWSlope = -MWSlope;
+			var MWInterceptY = MWpriors[i].rectangle.top + MWpriors[i].rectangle.height/2; 
+			var MWInterceptX = MWpriors[i].rectangle.left + MWInterceptY/MWSlope;
+			
+			console.log("MW middle point", MWInterceptX, MWInterceptY, "slope", MWSlope);
+
+			// Find where the centre of the rectangle intersects with this lane
+			var lineInterceptionX = (laneInterceptY - MWInterceptY) / (MWSlope - laneSlope);
+			var lineInterceptionY = MWSlope * lineInterceptionX + MWInterceptY;
+
+			console.log("These two lines intersect at", lineInterceptionX, lineInterceptionY);
+
+
+			var mu = lineInterceptionY;
+			var sd = MWpriors[i].rectangle.height / MWpriors[i].numberOf_SD_InRectWidth;
+
+
+			// Plot a normal distribution on top of the density plot
+			var normalFn = function(x) {
+				return 1 / (Math.sqrt(2 * Math.PI * sd * sd)) * Math.exp(-(x-mu) * (x-mu) / (2 * sd * sd));
+			};
+
+
+			// Find the position of all the coords
+			var xVals = [];
+			var yVals = [];
+			for (var xVal = axisGap; xVal <= canvas.width; xVal++) {	
+				var x = (xVal - axisGap) / widthScale + xmin;
+				var yval = normalFn(x); 
+				xVals.push(xVal);
+				yVals.push(yval);
+			}
+		
+			//console.log("Values", xVals, yVals, xmin, xmax);
+		
+			var ymaxNormal = maximumFromList(yVals);  
+			var heightScaleNormal = plotHeight / ymaxNormal;
+		
+			ctx.beginPath();
+			ctx.globalAlpha = 0.5;
+			ctx.lineWidth = 1;
+			ctx.fillStyle = "#008CBA";
+			ctx.strokeStyle = "#008CBA";
+			ctx.moveTo(axisGap, canvas.height - axisGap);
+			for (var j = 0; j < yVals.length; j ++){
+				ctx.lineTo(xVals[j], (canvas.height - axisGap) - yVals[j] * heightScaleNormal);
+			}
+			
+			ctx.lineTo(canvas.width,  canvas.height - axisGap);
+			ctx.fill();
+			ctx.stroke();
+				
+
+
+		} 
+
+
+		ctx.globalAlpha = 1;
+		ctx.strokeStyle = "black";
+		ctx.fillStyle = "black";
 
 		// X min and max
 		var axisPointMargin = 5 * canvasSizeMultiplier;
@@ -2552,12 +2942,7 @@ function drawTimeGelDensityCanvas(fitID, laneData = null){
 		ctx.restore();
 
 
-
-		
-
-
-
-		// Draw the axes 2x so they always exist
+		// Draw the axes
 		ctx.strokeStyle = "black";
 		ctx.lineWidth = 2 * canvasSizeMultiplier;
 		ctx.beginPath();
@@ -2575,7 +2960,7 @@ function drawTimeGelDensityCanvas(fitID, laneData = null){
 		ctx.textBaseline="top"; 
 		var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
 		var xlabYPos = canvas.height - axisGap / 2;
-		ctx.fillText("Pixel number for t=" + laneData.time + "s", xlabXPos, xlabYPos);
+		ctx.fillText("Migration distance (pixels) for t=" + laneData.time + "s", xlabXPos, xlabYPos);
 
 
 		// Y label

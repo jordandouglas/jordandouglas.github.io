@@ -4287,26 +4287,15 @@ function plot_probability_distribution(distn_fn, xmin, xmax, canvasID, xlab = ""
 	
 		var heightScale = plotHeight / ymax;
 	
-	ctx.beginPath();
-	//ctx.lineWidth = 1;
-	ctx.fillStyle = "#008CBA";
-	ctx.strokeStyle = "#008CBA";
-	ctx.moveTo(axisGap, plotHeight);
-	for (var i = 0; i < yVals.length; i ++){
-		ctx.lineTo(xVals[i], plotHeight - yVals[i] * heightScale);
-	}
-	/*
-	for (var xVal = axisGap; xVal <= canvas.width; xVal++) {
+		ctx.beginPath();
+		//ctx.lineWidth = 1;
+		ctx.fillStyle = "#008CBA";
+		ctx.strokeStyle = "#008CBA";
+		ctx.moveTo(axisGap, plotHeight);
+		for (var i = 0; i < yVals.length; i ++){
+			ctx.lineTo(xVals[i], plotHeight - yVals[i] * heightScale);
+		}
 		
-		var x = (xVal - axisGap) / widthScale + xmin;
-		var yVal = plotHeight - distn_fn(x) * heightScale;
-		
-		console.log("Plotting for", x, distn_fn(x));
-		console.log("Canvas coords", xVal, yVal);
-		
-		
-	}
-	*/
 		ctx.lineTo(canvas.width, plotHeight);
 		ctx.fill();
 		ctx.stroke();
