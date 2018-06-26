@@ -2697,7 +2697,7 @@ function addDensityNormalHoverEvents(ctx, canvas, MWprior, gelHoverEvents, width
 		var boundaryY = normalFn(trueX);
 		var mouseBoundaryY = (canvas.height - axisGap) - boundaryY * heightScaleNormal;
 
-		console.log("mouse", mouseX , mouseY, "true", trueX, boundaryY, "mouseBoundaryY", mouseBoundaryY, "heightScaleNormal");
+		//console.log("mouse", mouseX , mouseY, "true", trueX, boundaryY, "mouseBoundaryY", mouseBoundaryY, "heightScaleNormal");
 
 		var mouseInDistribution = mouseY <= canvas.height - axisGap && mouseY >= mouseBoundaryY;
 
