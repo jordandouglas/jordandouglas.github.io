@@ -1256,7 +1256,7 @@ extern "C" {
 		priorsVec.clear();
 
 		std::vector<Parameter*> calibrationsVector { std::begin(calibrationObservations), std::end(calibrationObservations) };
-		GelCalibrationSearch::initMCMC(calibrationsVector, 10000, 20);
+		GelCalibrationSearch::initMCMC(calibrationsVector, 100000, 100);
 
 
 		string toReturnJSON = "{'stop':" + string(_GUI_STOP ?  "true" : "false") + ",";
