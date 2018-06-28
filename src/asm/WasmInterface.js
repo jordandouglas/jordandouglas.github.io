@@ -488,6 +488,80 @@ uploadABC = function(TSVfile, msgID = null){
 }
 
 
+// Perform MCMC to infer the parameters of the gel lanes (ie. build a linear model of MW vs migration distance)
+initGelCalibration = function(fitID, priors, msgID = null){
+	
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+
+	/*
+	for (var i = 0; i < lanes.length; i ++){
+
+		var lane = lanes[i];
+
+		console.log("lane", lane);
+
+
+		// Save the lane
+		Module.ccall("addGelLane", null, ["string", "number", "number", "string"],  [fitID, lane.laneNum, lane.time, lane.densities.toString()]); 
+
+	}
+	*/
+
+	
+	Module.ccall("initGelCalibration", null, ["string", "number"],  [priors, msgID]); 
+
+
+}
+
+
+
+// Resume MCMC to infer the parameters of the gel lanes (ie. build a linear model of MW vs migration distance)
+resumeGelCalibration = function(msgID = null){
+
+
+	console.log("Resuming");
+
+	// Pause for a bit in case user requests to stop
+	setTimeout(function(){
+
+
+		// Create the callback function
+		var toDoAfterCall = function(resultStr){
+			//console.log("Returning", resultStr);
+			var result = JSON.parse(resultStr);
+
+			// Exit now
+			if (result.stop){
+				if (msgID != null) {
+					postMessage(msgID + "~X~" + resultStr);
+					WASM_MESSAGE_LISTENER[msgID] = null;
+				}
+			}
+
+			else{
+
+				// Resume the trials and tell the messenger to not delete the message
+				if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+				//resumeABC(msgID);
+
+			}
+		}
+
+
+		WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall, remove: false};
+		Module.ccall("resumeGelCalibration", null, ["number"], [msgID]); 
+
+	}, 1);
+
+
+}
+
+
 // Return a list of all parameters which are being estimated in the posterior distribution
 getParametersWithPriors = function(msgID = null){
 	

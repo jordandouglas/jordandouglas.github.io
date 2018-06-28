@@ -93,7 +93,7 @@ void MCMC::initMCMC(){
 
 
 	// 2 states stored in memory
-	MCMC::previousMCMCstate = new PosteriorDistributionSample(0);
+	MCMC::previousMCMCstate = new PosteriorDistributionSample(0, _numExperimentalObservations, true);
 	// MCMC::currentMCMCstate = new PosteriorDistributionSample(0);
 
 
@@ -243,7 +243,7 @@ void MCMC::perform_1_iteration(int n){
 
 
 	// Accept or reject
-	MCMC::currentMCMCstate = new PosteriorDistributionSample(n);
+	MCMC::currentMCMCstate = new PosteriorDistributionSample(n, _numExperimentalObservations, true);
 	bool accepted = MCMC::metropolisHastings(n, MCMC::currentMCMCstate, MCMC::previousMCMCstate);
 
 	//currentMCMCstate->print(false);
@@ -390,11 +390,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistributionSample* this_M
 
 	}
 
-
-
-
 	// Iterate through all experimental settings and perform simulations at each setting. The velocities/densities generated are cached in the posterior object
-
 
 	// Run simulations and stop if it exceeds threshold (unless this is the first trial)
 	int ntrialsPerDatapoint = MCMC::getNTrials();

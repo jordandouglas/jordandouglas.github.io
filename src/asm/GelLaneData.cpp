@@ -31,6 +31,19 @@
 using namespace std;
 
 
+GelLaneData::GelLaneData(int laneNum, double time, vector<double> densities){
+
+	this->laneNum = laneNum;
+	this->time = time;
+	this->densities = densities;
+
+}
+
+
+
+
+
+
 GelLaneData::GelLaneData(int laneNum, double time, int nObs){
 
 

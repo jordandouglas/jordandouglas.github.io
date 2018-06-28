@@ -37,11 +37,14 @@ using namespace std;
 // A single row in the log file
 class PosteriorDistributionSample {
 
-	
+
+	bool ABC; // True if ABC, false if there is a likelihood
 	int sampleNum;
 	int currentObsNum;
 	double chiSquared;
-	double priorProb;
+	double logPriorProb;
+	double logLikelihood;
+	double logPosterior;
 	string modelIndicator;
 	map<string, double> parameterEstimates;
 	vector<double> simulatedValues; // eg. Velocities
@@ -49,7 +52,7 @@ class PosteriorDistributionSample {
 
 
     public:
-    	PosteriorDistributionSample(int sampleNum);
+    	PosteriorDistributionSample(int sampleNum, int numExperimentalObservations, bool ABC);
     	void setStateNumber(int sampleNum);
     	int getStateNumber();
     	PosteriorDistributionSample* clone(bool copySimulations);
@@ -57,14 +60,18 @@ class PosteriorDistributionSample {
     	string get_modelIndicator();
     	double get_chiSquared();
     	void set_logPriorProb(double val);
+    	void set_logLikelihood(double val);
+    	void set_logPosterior(double val);
     	double get_logPriorProb();
+    	double get_logLikelihood();
+    	double get_logPosterior();
     	void addParameterEstimate(string paramID, double val);
     	double getParameterEstimate(string paramID);
     	vector<string> getParameterNames();
     	//void addSimulatedAndObservedValue(double simVal, double obsVal);
     	void addSimulatedAndObservedValue(SimulatorResultSummary* simulated, ExperimentalData* observed);
     	void parseFromLogFileLine(vector<string> splitLine, vector<string> headerLineSplit);
-
+    	bool isABC();
 		
     	void print(bool toFile);
     	void printHeader(bool toFile);

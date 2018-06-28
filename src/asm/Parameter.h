@@ -92,6 +92,7 @@ class Parameter{
 
 		void convertToMetaParameter(int ninstances); // Convert this parameter into an object which points to other parameter objects (one for each instance)
 		Parameter* getParameterFromMetaParameter(int instanceNum);
+		double getDistributionParameterValue(string name);
 		void setParameterInstance(int instanceNum);
 		int getNumberInstances();
 		bool get_isMetaParameter();

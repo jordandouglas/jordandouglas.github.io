@@ -70,7 +70,7 @@ vector<PosteriorDistributionSample*> BayesianCalculations::loadLogFile(string lo
 
 
         	// Parse state
-          	PosteriorDistributionSample* state = new PosteriorDistributionSample(0);
+          	PosteriorDistributionSample* state = new PosteriorDistributionSample(0, _numExperimentalObservations, true);
           	splitLine = Settings::split(line, '\t');
         	state->parseFromLogFileLine(splitLine, headerLineSplit);
 
@@ -324,7 +324,7 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistributionSampl
 	for (int n = 1; n <= ntrials_sim; n ++){
 
 
-		PosteriorDistributionSample* state = new PosteriorDistributionSample(n);
+		PosteriorDistributionSample* state = new PosteriorDistributionSample(n, _numExperimentalObservations, true);
 
 		// Sample parameters from posterior distribution
 		if (samplingFromPosterior) {
@@ -404,8 +404,14 @@ list<ParameterHeatmapData*> BayesianCalculations::getPosteriorDistributionAsHeat
 	// One heatmap object for each parameter in the posterior + chiSq + prior + histogram probability
 	heatMapData.push_back(new ParameterHeatmapData("probability", "Probability density"));
 	heatMapData.push_back(new ParameterHeatmapData("logPrior", "Log Prior"));
-	heatMapData.push_back(new ParameterHeatmapData("chiSq", "Chi-squared", "X^{2}"));
-	heatMapData.push_back(new ParameterHeatmapData("state", "State", "X^{2}"));
+
+	if (!_GUI_posterior.front()->isABC()){
+		heatMapData.push_back(new ParameterHeatmapData("logLikelihood", "Log Likelihood"));
+		heatMapData.push_back(new ParameterHeatmapData("logPosterior", "Log Posterior"));
+	}else{
+		heatMapData.push_back(new ParameterHeatmapData("chiSq", "Chi-squared", "X^{2}"));
+	}
+	heatMapData.push_back(new ParameterHeatmapData("state", "State"));
 	for (int i = 0; i < _GUI_posterior.front()->getParameterNames().size(); i++){
 		string paramID = _GUI_posterior.front()->getParameterNames().at(i);
 		Parameter* param = Settings::getParameterByName(paramID);
@@ -427,6 +433,8 @@ list<ParameterHeatmapData*> BayesianCalculations::getPosteriorDistributionAsHeat
 
 			if (paramID == "chiSq") (*col)->addValue( (*row)->get_chiSquared() );
 			else if (paramID == "logPrior") (*col)->addValue( (*row)->get_logPriorProb() );
+			else if (paramID == "logLikelihood") (*col)->addValue( (*row)->get_logLikelihood() );
+			else if (paramID == "logPosterior") (*col)->addValue( (*row)->get_logPosterior() );
 			else if (paramID == "state") (*col)->addValue( (*row)->getStateNumber() );
 			else (*col)->addValue( (*row)->getParameterEstimate(paramID) );
 		}

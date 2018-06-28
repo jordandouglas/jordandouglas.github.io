@@ -933,7 +933,7 @@ void Plots::userSelectPlot(int plotNum, string value, bool deleteData){
 	Plots::plotSettings.at(plotNum - 1) = newPlotSettings;
 
 	// If ABC has been running then set to posterior distribution
-	Plots::plotSettings.at(plotNum - 1)->set_plotFromPosterior(true);
+	Plots::plotSettings.at(plotNum - 1)->set_plotFromPosterior(_RUNNING_ABC);
 
 
 

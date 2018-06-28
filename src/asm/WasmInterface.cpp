@@ -33,6 +33,8 @@
 #include "MCMC.h"
 #include "BayesianCalculations.h"
 #include "PosteriorDistributionSample.h"
+#include "GelLaneData.h"
+#include "GelCalibrationSearch.h"
 
 
 #include <emscripten.h>
@@ -1148,7 +1150,7 @@ extern "C" {
 
 					if (lines.at(lineNum) == "") continue;
 
-					PosteriorDistributionSample* state = new PosteriorDistributionSample(0);
+					PosteriorDistributionSample* state = new PosteriorDistributionSample(0, _numExperimentalObservations, true);
 					lineSplit = Settings::split(lines.at(lineNum), '&');
 	        		state->parseFromLogFileLine(lineSplit, headerLineSplit);
 	        		_GUI_posterior.push_back(state);
@@ -1182,9 +1184,172 @@ extern "C" {
 
 	}
 
+
+
+	/*
+	// Add data for a single lane (easier to iterate through lanes in js than in c++)
+	void EMSCRIPTEN_KEEPALIVE addGelLane(char* fitID, int laneNum, double time, char* densities){
+
+
+
+		GelLaneData* newLane
+
+		cout << "Received fitID: " << string(fitID) << ", laneNum: " << laneNum << endl;
+		vector<string> densitiesVec = Settings::split(string(densities), ','); // Split by , to get values
+		for (int i = 0; i < densitiesVec.size(); i ++){
+			cout << densitiesVec.at(i) << ",";
+		}
+		cout << endl;
+
+		//GelLaneData
+
+		//messageFromWasmToJS("", msgID);
+	}
+	*/
+
+	// Initialise MCMC to infer the parameters of the gel lanes (ie. build a linear model of MW vs migration distance)
+	// Each datapoint in priors consists of (length of transcript, mean pixel value, sigma pixel value)
+	void EMSCRIPTEN_KEEPALIVE initGelCalibration(char* priors, int msgID){
+
+
+		_GUI_STOP = false;
+
+		// Output string
+		_ABCoutputToPrint.str("");
+		_ABCoutputToPrint.clear();
+
+
+		cout << "Received priors " << string(priors) << endl;
+		vector<string> priorsVec = Settings::split(string(priors), '|');
+		vector<string> datapoints;
+		free(priors);
+
+		list<Parameter*> calibrationObservations;
+		
+
+		// Iterate through each datapoint
+		for (int i = 0; i < priorsVec.size(); i ++){
+
+			if (priorsVec.at(i).length() == 0) continue;
+
+			// Get the 3 values for this datapoint
+			datapoints = Settings::split(string(priorsVec.at(i)), ','); 
+
+			if (datapoints.size() < 3) continue;
+
+
+			int transcriptLength = stoi(datapoints.at(0));
+			double pixelMu = stof(datapoints.at(1));
+			double pixelSigma = stof(datapoints.at(2));
+
+
+			// Will store in a parameter object since this is essentially a parameter. Also need to store the true transcript length. This is done hackily using the fixedDistnVal property
+			Parameter* obs = new Parameter("len" + to_string(transcriptLength), false, "false", "Migration distance for l=" + to_string(transcriptLength),  "Migration distance for l=" + to_string(transcriptLength));
+			obs->setDistributionParameter("fixedDistnVal", 1.0 * transcriptLength)->setDistributionParameter("normalMeanVal", pixelMu)->setDistributionParameter("normalSdVal", pixelSigma)->setPriorDistribution("Normal");
+			obs->sample();
+			calibrationObservations.push_back(obs);
+
+
+			datapoints.clear();
+
+		}
+		priorsVec.clear();
+
+		std::vector<Parameter*> calibrationsVector { std::begin(calibrationObservations), std::end(calibrationObservations) };
+		GelCalibrationSearch::initMCMC(calibrationsVector, 10000, 20);
+
+
+		string toReturnJSON = "{'stop':" + string(_GUI_STOP ?  "true" : "false") + ",";
+		toReturnJSON += "'acceptanceRate':0,";
+		toReturnJSON += "'lines':'" + _ABCoutputToPrint.str() + "'}";
+
+		messageFromWasmToJS(toReturnJSON, msgID);
+
+		cout << "Gel calibration initialised" << endl;
+	}
+
+
+
+
+	// Resume MCMC to infer the parameters of the gel lanes (ie. build a linear model of MW vs migration distance)
+	void EMSCRIPTEN_KEEPALIVE resumeGelCalibration(int msgID){
+
+
+		// Output string
+		_ABCoutputToPrint.str("");
+		_ABCoutputToPrint.clear();
+
+
+
+		// Stop when user presses stop button or when all trials completed
+		bool stop = _GUI_STOP;
+		_RUNNING_ABC = !stop;
+
+
+		// Stop timer
+		_interfaceSimulation_startTime = chrono::system_clock::now();
+		auto endTime = chrono::system_clock::now();
+		chrono::duration<double> elapsed_seconds = endTime - _interfaceSimulation_startTime;
+		double time = elapsed_seconds.count();
+
+
+
+		while(time < 1 && !stop) {
+
+
+		
+
+			// Start MCMC and return to the DOM every 1000 ms
+			stop = GelCalibrationSearch::perform_1_iteration(GelCalibrationSearch::getCurrentStateNumber() + 1) || _GUI_STOP;
+
+			
+			endTime = chrono::system_clock::now();
+			elapsed_seconds = endTime - _interfaceSimulation_startTime;
+			time = elapsed_seconds.count();
+
+
+		}
+
+
+
+		string toReturnJSON = "{'stop':" + string(stop ?  "true" : "false") + ",";
+		toReturnJSON += "'acceptanceRate':" + to_string(GelCalibrationSearch::getAcceptanceRate() * 100) + ",";
+		toReturnJSON += "'lines':'" + _ABCoutputToPrint.str() + "'}";
+
+
+		messageFromWasmToJS(toReturnJSON, msgID);
+
+	}
+
+
+
+
 	// Return a list of all parameters which are being estimated in the posterior distribution
 	void EMSCRIPTEN_KEEPALIVE getParametersWithPriors(int msgID){
-		messageFromWasmToJS(MCMC::parametersToEstimate_toJSON(), msgID);
+
+		if (_GUI_posterior.size() > 0){
+
+			// Likelihood MCMC
+			if (!_GUI_posterior.front()->isABC()){
+
+				string JSON = "{";
+
+				JSON += "'logLikelihood':{'name':'Log Likelihood'},";
+				JSON += "'logPosterior':{'name':'Log Posterior'}";
+				JSON += "}";
+
+				messageFromWasmToJS(JSON, msgID);
+			}
+
+			// ABC MCMC
+			else{
+				messageFromWasmToJS(MCMC::parametersToEstimate_toJSON(), msgID);
+			}
+
+		}
+
+		else messageFromWasmToJS("{}", msgID);
+		
 	}
 
 

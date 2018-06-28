@@ -43,6 +43,13 @@ class GelLaneData{
 
 	public:
 
+
+		GelLaneData(int laneNum, double time, vector<double> densities);
+
+
+
+
+
 		GelLaneData(int laneNum, double time, int nObs);
 		void addNewBand(double len, double den);
 		string toJSON();

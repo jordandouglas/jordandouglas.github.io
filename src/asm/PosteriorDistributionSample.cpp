@@ -35,24 +35,32 @@
 using namespace std;
 
 
-PosteriorDistributionSample::PosteriorDistributionSample(int sampleNum){
+PosteriorDistributionSample::PosteriorDistributionSample(int sampleNum, int numExperimentalObservations, bool ABC){
 	this->sampleNum = sampleNum;
-	this->simulatedValues.resize(_numExperimentalObservations);
-	this->simulatedDensities.resize(_numExperimentalObservations);
+	this->simulatedValues.resize(numExperimentalObservations);
+	this->simulatedDensities.resize(numExperimentalObservations);
 	this->currentObsNum = 0;
-	this->chiSquared = 0;
-	this->priorProb = 0;
+	this->logPriorProb = 1;
 	this->modelIndicator = "";
+
+	this->ABC = ABC;
+	if (this->ABC){
+		this->logLikelihood = 0;
+		this->logPosterior = 0;
+	}else{
+		this->chiSquared = 0;
+	}
 }	
 
 
 // Clones the object (including the simulations if specified)
 PosteriorDistributionSample* PosteriorDistributionSample::clone(bool copySimulations){
 	
-	PosteriorDistributionSample* copy = new PosteriorDistributionSample(this->sampleNum);
+	PosteriorDistributionSample* copy = new PosteriorDistributionSample(this->sampleNum, this->simulatedValues.size(), this->ABC);
 	copy->modelIndicator = this->modelIndicator;
-	copy->priorProb = this->priorProb;
-
+	copy->logPriorProb = this->logPriorProb;
+	copy->logPosterior = this->logPosterior;
+	copy->logLikelihood = this->logLikelihood;
 
 
 	// Copy parameters
@@ -96,13 +104,34 @@ double PosteriorDistributionSample::get_chiSquared(){
 }
 
 void PosteriorDistributionSample::set_logPriorProb(double val){
-	this->priorProb = val;
+	this->logPriorProb = val;
 }
 
 double PosteriorDistributionSample::get_logPriorProb(){
-	return this->priorProb;
+	return this->logPriorProb;
 }
 
+void PosteriorDistributionSample::set_logLikelihood(double val){
+	this->logLikelihood = val;
+}
+
+double PosteriorDistributionSample::get_logLikelihood(){
+	return this->logLikelihood;
+}
+
+
+void PosteriorDistributionSample::set_logPosterior(double val){
+	this->logPosterior = val;
+}
+
+double PosteriorDistributionSample::get_logPosterior(){
+	return this->logPosterior;
+}
+
+
+bool PosteriorDistributionSample::isABC(){
+	return this->ABC;
+}
 
 void PosteriorDistributionSample::set_modelIndicator(string val){
 	this->modelIndicator = val;
@@ -295,9 +324,15 @@ void PosteriorDistributionSample::printHeader(bool toFile){
 		else (_USING_GUI ? _ABCoutputToPrint : toFile ? (*logFile) :  cout) << "V" << (i+1) << gapUnit;
 	}
 
-	// Print prior and chi-squared
-	if (isWASM) WASM_string += "logPrior" + gapUnit + "chiSquared\n";
-	else (_USING_GUI ? _ABCoutputToPrint : toFile ? (*logFile) : cout) << "logPrior" + gapUnit + "chiSquared" + endLine;
+	// Print prior and either (likelihood and posterior) OR (chi-squared)
+	string priorStr = "";
+	priorStr += "logPrior" + gapUnit;
+	if (!this->ABC){
+		priorStr += "logLikelih" + gapUnit + "logPosteri" + endLine;
+	}
+	else priorStr += "chiSquared" + endLine;
+
+	(_USING_GUI ? _ABCoutputToPrint : toFile ? (*logFile) : cout) << priorStr;
 	
 	
 	if (toFile && !_USING_GUI) logFile->close();
@@ -361,9 +396,16 @@ void PosteriorDistributionSample::print(bool toFile){
 		else (_USING_GUI ? _ABCoutputToPrint :toFile ? logFile  : cout) << simulatedValues.at(i) << gapUnit;
 	}
 
-	// Print prior and chi-squared values
-	if (isWASM) WASM_string += to_string(this->priorProb) + gapUnit + to_string(this->chiSquared) + "\n";
-	else (_USING_GUI ? _ABCoutputToPrint : toFile ? logFile  : cout) << this->priorProb << gapUnit << this->chiSquared << endLine;
+
+	// Print prior and either (likelihood and posterior) OR (chi-squared)
+	string priorStr = "";
+	priorStr += to_string(this->logPriorProb) + gapUnit;
+	if (!this->ABC){
+		priorStr += to_string(this->logLikelihood)  + gapUnit + to_string(this->logPosterior)  + endLine;
+	}
+	else priorStr += to_string(this->chiSquared)  + endLine;
+
+	(_USING_GUI ? _ABCoutputToPrint : toFile ? logFile : cout) << priorStr;
 	
 	
 	if (toFile && !_USING_GUI) logFile.close();
@@ -484,7 +526,7 @@ void PosteriorDistributionSample::parseFromLogFileLine(vector<string> splitLine,
 
 		if (header == "State") this->setStateNumber(stoi(value));
 		else if (header == "Model") this->set_modelIndicator(value);
-		else if (header == "logPrior") this->priorProb = stof(value);
+		else if (header == "logPrior") this->logPriorProb = stof(value);
 		else if (header == "chiSquared") this->chiSquared = stof(value);
 		else if (std::regex_match (header, velocityMatch)) {
 			simulatedValues.at(simulatedVal) = stof(value); // Parse velocity

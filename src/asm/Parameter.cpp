@@ -180,6 +180,7 @@ Parameter* Parameter::clone(){
 void Parameter::sample(){
 
 
+
 	double prevVal = this->val;
 
 	if (this->isMetaParameter) {
@@ -272,7 +273,7 @@ void Parameter::sample(){
 
 	else {
 
-		cout << "ERROR: Unrecognised distribution: " << this->distributionName << endl;
+		cout << "ERROR: Unrecognised distribution: '" << this->distributionName << "' for parameter " << this->id << endl;
 		exit(1);
 	}
 
@@ -504,6 +505,12 @@ void Parameter::stopHardcoding(){
 	this->isHardcoded = false;
 	this->hardcodedVal = 0;
 	//sample();
+}
+
+
+double Parameter::getDistributionParameterValue(string name){
+	if (this->distributionParameters.find(name) == this->distributionParameters.end()) return 0;
+	return this->distributionParameters[name];
 }
 
 
