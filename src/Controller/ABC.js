@@ -1055,7 +1055,7 @@ function getTimeGelTemplate(fitID){
 
 
 
-					 	<tr class=" timeGelDensityPlotDIV_` + fitID + `" style="display:none;">
+					 	<tr class="timeGelDensityPlotDIV_` + fitID + `" style="display:none;">
 							<td style="text-align:center;" colspan=2>
 								<br>
 								Display band densities for:
@@ -1064,7 +1064,6 @@ function getTimeGelTemplate(fitID){
 					 		</td>
 
 					 	</tr>
-
 
 
 
@@ -1120,6 +1119,15 @@ function getTimeGelTemplate(fitID){
 					 		<td>
 								<input class="variable" value=100 type="number" id="UTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
 							</td>
+					 	</tr>
+
+
+				 		<tr>
+							<td style="text-align:center;" colspan=2>
+								<br><br>
+								<input id="submitGel` + fitID + `" type=button class="operation" onClick="submitGelFn('` + fitID + `')" value='Calibrate' title="Infers parameters for the linear model which predicts molecular weight from migration distance." style="width:150px;"></input>
+					 		</td>
+
 					 	</tr>
 
 
@@ -1233,19 +1241,24 @@ function getPixelDensitiesForLane(fitID, lane){
 	console.log("rect", lane.rectangle);
 	var lightOnDark = $("#lightOnDark_" + fitID).val() == "Light";
 
+	var laneWidth = lane.rectangle.width * lane.rectangle.scaleX;
+	var laneHeight = lane.rectangle.height * lane.rectangle.scaleY;
+
+
 	// Iterate through all pixels along the left long diagonal
-	for (var pixelRowY = 0; pixelRowY <= Math.floor(lane.rectangle.height - 1); pixelRowY++){
+	for (var pixelRowY = 0; pixelRowY <= Math.floor(laneHeight - 1); pixelRowY++){
 
 		var pixelRowX = pixelRowY / leftSlope;
 
 		var x0 = pixelRowX + lane.rectangle.left;
 		var y0 = pixelRowY + lane.rectangle.top;
 
+
 		//console.log("x0", x0, "y0", y0, "leftSlope", leftSlope, "topSlope", topSlope);
 
 		// Iterate through all pixels along the line which goes between the left rectangle border and the right border along the angle of the top of the rectangle
 		var meanPixelRowDensity = 0;
-		for (var x = x0; x < x0 + Math.floor(lane.rectangle.width); x++){
+		for (var x = x0; x < x0 + Math.floor(laneWidth); x++){
 
 			var y = Math.floor(y0 + topSlope * (x-x0));
 
@@ -1262,7 +1275,7 @@ function getPixelDensitiesForLane(fitID, lane){
 
 		}
 		//console.log("row has mean density", meanPixelRowDensity / Math.floor(lane.rectangle.width));
-		densities.push(meanPixelRowDensity / Math.floor(lane.rectangle.width));
+		densities.push(meanPixelRowDensity / Math.floor(laneWidth));
 		
 
 	}
@@ -1282,6 +1295,79 @@ function getPixelDensitiesForLane(fitID, lane){
 	return densities;
 
 
+}
+
+
+function computePriorLengthsMuAndSd(laneData, MWpriors) {
+
+
+
+	laneData.priors = [];
+
+	var laneWidth = laneData.rectangle.width * laneData.rectangle.scaleX;
+
+	// Calculate the slope (of the left border) and intercept of the centre of this lane
+	if (laneData.rectangle.angle > 180) laneData.rectangle.angle = laneData.rectangle.angle - 360;
+	var laneAngleRadians = laneData.rectangle.angle * Math.PI / 180;
+	var laneSlope = Math.abs(Math.cos(laneAngleRadians) / Math.sin(laneAngleRadians)); // Slope = run / rise
+	if (laneAngleRadians > 0) laneSlope = -laneSlope;
+	var laneInterceptX = laneData.rectangle.left + laneWidth/2; 
+	var laneInterceptY = laneData.rectangle.top + (laneInterceptX - laneData.rectangle.left) / laneSlope;
+	var laneIntercept = laneInterceptY - laneInterceptX*laneSlope;
+
+	//console.log("lane middle point", laneInterceptX, laneInterceptY, "slope", laneSlope);
+	//console.log("lane middle point", laneIntercept, "slope", laneSlope);
+
+
+
+
+	// Plot the prior distributions of molecular weight
+	//console.log("MWpriors", MWpriors);
+	for (var i = 0; i < MWpriors.length; i ++){
+
+
+		if (MWpriors[i].transcriptLengthOfNormalMean == null) continue;
+
+		if (MWpriors[i].rectangle.angle > 180) MWpriors[i].rectangle.angle = MWpriors[i].rectangle.angle - 360;
+
+
+		var MW_Height =  MWpriors[i].rectangle.height *  MWpriors[i].rectangle.scaleY;
+
+		//console.log("Mprior", MWpriors[i]);
+
+
+		// Calculate the slope (of the left border) and intercept of the horizontal centre of the band prior
+		var MWAngleRadians = MWpriors[i].rectangle.angle * Math.PI / 180;
+		var MWSlope = 1 / Math.abs(Math.cos(MWAngleRadians) / Math.sin(MWAngleRadians)); // Slope = run / rise
+		if (MWAngleRadians < 0) MWSlope = -MWSlope;
+		var MWInterceptY = MWpriors[i].rectangle.top + /*(MWAngleRadians < 0 ? 1 : -1) * */ MW_Height/2; 
+		var MWInterceptX = (MWInterceptY - MWpriors[i].rectangle.top)*MWSlope + MWpriors[i].rectangle.left;
+		var MWIntercept = MWInterceptY - MWInterceptX*MWSlope;
+
+		//console.log("MW top",  MWpriors[i].rectangle.top, "left", MWpriors[i].rectangle.left, "centre y", MWInterceptY, "centre x", MWInterceptX);
+
+		//console.log("MW middle point", MWIntercept, "slope", MWSlope);
+
+		// Find where the centre of the rectangle intersects with this lane
+		//var lineInterceptionX = (laneInterceptY - laneSlope*laneInterceptX - MWInterceptY + 1/MWSlope*MWInterceptX) / (1/MWSlope - laneSlope);
+		//var lineInterceptionY = laneSlope * (lineInterceptionX-laneInterceptX) + laneInterceptY;
+
+		var lineInterceptionX = (laneIntercept - MWIntercept) / (MWSlope - laneSlope);
+		var lineInterceptionY = laneSlope*lineInterceptionX + laneIntercept;
+
+		//console.log("These two lines intersect at", lineInterceptionX, lineInterceptionY - laneInterceptY);
+		//console.log("densities", laneData.densities);
+
+		var mu = lineInterceptionY - laneInterceptY;
+		var sd = MW_Height / MWpriors[i].numberOf_SD_InRectWidth;
+
+		//console.log("Mu", mu);
+
+		MWpriors[i].pixelMu = lineInterceptionY;
+		MWpriors[i].pixelSigma = sd;
+		laneData.priors.push({ transcriptLengthOfNormalMean: MWpriors[i].transcriptLengthOfNormalMean, pixelMu: mu, pixelSigma: sd });
+
+	} 
 
 }
 
@@ -1790,10 +1876,11 @@ function drawTimeGelPlotCanvas(fitID){
 
 
 	lane.densities = getPixelDensitiesForLane(fitID, lane);
+	computePriorLengthsMuAndSd(lane, fabricCanvas.MWpriors);
 
 
 	// Draw band intensity plot for the selected lane
-	drawTimeGelDensityCanvas(fitID, lane, fabricCanvas.MWpriors);
+	drawTimeGelDensityCanvas(fitID, lane);
 
 
 }
@@ -1859,6 +1946,7 @@ function drawTimeGelCanvasFromImage(fitID, image){
 
 	fabricCanvas.selectedObject = null;
 	fabricCanvas.drawingRectangle = false;
+	fabricCanvas.normLine = null;
 	fabricCanvas.lanes = [];
 	fabricCanvas.MWpriors = [];
 
@@ -1914,9 +2002,21 @@ function drawTimeGelCanvasFromImage(fitID, image){
 
 		// Drawing rectangle
 		if (fabricCanvas.drawingRectangle){
+
+			var selectingMWprior = $("#selectLaneOrPrior_" + fitID).is(":checked");
+
 			var pointer = fabricCanvas.getPointer(o.e);
-			var rectHalfWidth = Math.abs(line.x1 - pointer.x);
-			rectangle.set({ left: line.x1 - rectHalfWidth, width: 2*rectHalfWidth, top: line.y1 - Math.tan(rectangle.angle * Math.PI / 180) * rectHalfWidth, });
+
+			if (selectingMWprior) {
+				var rectHalfHeight = Math.abs(line.y1 - pointer.y);
+				rectangle.set({ left: line.x1 - rectHalfHeight / Math.tan(Math.PI/2 - rectangle.angle * Math.PI / 180), height: 2*rectHalfHeight, top: line.y1 - rectHalfHeight});
+			}
+			else {
+				var rectHalfWidth = Math.abs(line.x1 - pointer.x);
+				rectangle.set({ left: line.x1 - rectHalfWidth, width: 2*rectHalfWidth, top: line.y1 - Math.tan(rectangle.angle * Math.PI / 180) * rectHalfWidth});
+			}
+
+
 			fabricCanvas.renderAll();
 
 		}
@@ -1924,7 +2024,35 @@ function drawTimeGelCanvasFromImage(fitID, image){
 		// Drawing line
 		else if (isDown) {
 			var pointer = fabricCanvas.getPointer(o.e);
-			line.set({ x2: pointer.x, y2: pointer.y });
+
+
+			// Ensure that the line is parallel to the other lanes (if a lane) or perpendicular (if a band)
+			var selectingMWprior = $("#selectLaneOrPrior_" + fitID).is(":checked");
+
+
+			var x2 = pointer.x;
+			var y2 = pointer.y;
+
+
+			// Band
+			if (fabricCanvas.normLine != null && selectingMWprior){
+
+
+
+			} 
+
+			// Lane
+			else if (fabricCanvas.normLine != null && !selectingMWprior){
+
+				// User selects y2 but x2 is determined by the position of the norm line
+				x2 = (y2 - line.y1) / fabricCanvas.normLine + line.x1;
+
+			} 
+
+			line.set({ x2: x2, y2: y2 });
+
+
+
 			fabricCanvas.renderAll();
 		}
 
@@ -1954,7 +2082,6 @@ function drawTimeGelCanvasFromImage(fitID, image){
 
 			fabricCanvas.drawingRectangle = false;
 			
-
 
 			//console.log("finished rectangle", rectangle);
 		}
@@ -1996,33 +2123,76 @@ function drawTimeGelCanvasFromImage(fitID, image){
 			
 
 
-
-
-
-			// Angle of rotation
-			var angle = Math.acos((line.y2 - line.y1) / rectLength);
-
-			if (line.x2 > line.x1) angle = -angle;
-
 			//console.log("angle", angle * 180 / Math.PI);
 
 			var selectingMWprior = $("#selectLaneOrPrior_" + fitID).is(":checked");
 
-			rectangle = new fabric.Rect({
-				id: currentRectID,
-		        left: line.x1 - rectWidth/2,
-		        top: line.y1 - Math.tan(angle) * (rectWidth/2),
-		        width: rectWidth,
-		        height: rectLength,
-		        angle: angle * 180 / Math.PI,
-		        fill: "",
-		        stroke: selectingMWprior ? "#afff14" : "#EE7600",
-		        strokeWidth: 2,
-		    });
+
+			// left: line.x1 - rectHalfHeight / Math.tan(Math.PI/2 - rectangle.angle * Math.PI / 180), height: 2*rectHalfHeight,
+
+			if (selectingMWprior) {
+
+
+				// Angle of rotation
+				var angle = Math.acos((line.x2 - line.x1) / rectLength);
+				if (line.y2 > line.y1) angle = -angle;
+
+				rectangle = new fabric.Rect({
+					id: currentRectID,
+			        left: line.x1 - rectWidth/2 / Math.tan(angle),
+			        top: line.y1 - rectWidth/2,
+			        width: rectLength,
+			        height: rectWidth,
+			        angle: angle * 180 / Math.PI,
+			        fill: "",
+			        stroke: selectingMWprior ? "#afff14" : "#EE7600",
+			        strokeWidth: 2,
+					strokeWidthUnscaled: 2
+			        
+			    });
+		    }
+
+		    else {
+
+		   	 // Angle of rotation
+				var angle = Math.acos((line.y2 - line.y1) / rectLength);
+				if (line.x2 > line.x1) angle = -angle;
+
+				rectangle = new fabric.Rect({
+					id: currentRectID,
+			        left: line.x1 - rectWidth/2,
+			        top: line.y1 - Math.tan(angle) * (rectWidth/2),
+			        width: rectWidth,
+			        height: rectLength,
+			        angle: angle * 180 / Math.PI,
+			        fill: "",
+			        stroke: selectingMWprior ? "#afff14" : "#EE7600",
+			        strokeWidth: 2,
+					strokeWidthUnscaled: 2
+			        
+			    });
+		    }
+
 		    fabricCanvas.remove(line);
 		    fabricCanvas.add(rectangle);
 		    fabricCanvas.drawingRectangle = true;
 		    currentRectID ++;
+
+
+
+
+
+		    // If this is the first line then get the slope
+			if (fabricCanvas.normLine == null){
+
+				var laneSlope = Math.abs(Math.cos(angle) / Math.sin(angle)); // Slope = run / rise
+				if (angle > 0) laneSlope = -laneSlope;
+
+				if (selectingMWprior) fabricCanvas.normLine = 1/laneSlope;
+				else fabricCanvas.normLine = laneSlope;
+			}
+
+
 
 		}
 
@@ -2045,7 +2215,7 @@ function drawTimeGelCanvasFromImage(fitID, image){
 
 			}else{
 
-				fabricCanvas.lanes.push({id: rectangle.id, rectangle:rectangle, laneNum: fabricCanvas.lanes.length + 1, time: 1, densities: new Array(Math.ceil(rectangle.height)) });
+				fabricCanvas.lanes.push({id: rectangle.id, rectangle:rectangle, simulateLane: false, laneNum: fabricCanvas.lanes.length + 1, time: 1, densities: new Array(Math.ceil(rectangle.height)) });
 				drawTimeGelPlotCanvas(fitID);
 
 			}
@@ -2133,12 +2303,37 @@ function drawTimeGelCanvasFromImage(fitID, image){
 		//var fabricCanvas = gelFabricCanvases[fitID];
 		//if (fabricCanvas == null) return;
 
+		console.log("e cleared", fabricCanvas.selectedObject);
+		
+
 		fabricCanvas.selectedObject = null;
 
 		// Hide the lane edit button
 		$("#editLaneBtn_" + fitID).hide(0);
 
+
  	});
+
+
+ 	fabricCanvas.on("object:scaled", function(e) {
+
+
+ 		//console.log("scaled", e);
+
+ 		//e.target.width = e.target.width * e.target.scaleX;
+ 		//e.target.height = e.target.height * e.target.scaleY;
+
+ 		// Increasing width
+ 		//if (e.transform.action == "scaleX"){
+ 			//e.target.width = e.transform.width;
+ 			//e.target.top = 
+
+ 		//}
+ 		 e.target.strokeWidth = e.target.strokeWidthUnscaled / e.target.scaleY;
+
+ 	
+
+ 	}); 
 
 
 
@@ -2197,7 +2392,7 @@ function displayGelLaneDialog(fitID){
 
 	// Show lane information
 	else{
-		popupHTML = getGelLaneInformationTemplate(fitID, lane);;
+		popupHTML = getGelLaneInformationTemplate(fitID, lane);
 	}
 
 	//popupHTML = popupHTML.replace("XX_plotNum_XX", plotNum);
@@ -2205,7 +2400,8 @@ function displayGelLaneDialog(fitID){
 
 	$(popupHTML).appendTo('body');
 
-
+	if (lane != null && lane.simulateLane) $("#simulateLaneChk").click();
+	
 
 	window.setTimeout(function(){
 	
@@ -2314,6 +2510,27 @@ function getGelLaneInformationTemplate(fitID, laneObj){
 					</td>
 
 				</tr>
+
+				<tr>
+					<td title="Do you want to simulate this lane?"> 
+
+
+						<label class="switch">
+				 			 <input type="checkbox" id="simulateLaneChk" > </input>
+				 		 	<span class="slider round"></span>
+						</label> 
+						<span style="font-size:14px; vertical-align:middle" >Simulate lane</span>
+
+
+					</td>
+					
+					
+					<td> 
+					</td>
+
+				</tr>
+
+
 				<tr>
 
 					<td>
@@ -2358,7 +2575,9 @@ function saveLaneInformation(fitID, laneID){
 	}
 
 	lane.laneNum = parseFloat($("#gelLaneNum").val());
-	lane.transcriptLengthOfNormalMean = parseFloat($("#transcriptLengthOfNormalMean").val());
+	lane.time = parseFloat($("#gelLaneTime").val());
+	lane.simulateLane = $("#simulateLaneChk").prop("checked");
+
 	closeGelLaneInformationPopup(fitID);
 	drawTimeGelPlotCanvas(fitID);
 
@@ -2417,6 +2636,53 @@ function closeGelLaneInformationPopup(fitID = null){
 
 }
 
+
+
+function submitGelFn(fitID){
+
+
+	
+	var fabricCanvas = gelFabricCanvases[fitID];
+	var submitObj = [];
+
+	// Send through densities and prior distributions behind densities. Only submit lanes which have had the simulate button ticked
+	for (var i = 0; i < fabricCanvas.lanes.length; i ++){
+
+		// if (!fabricCanvas.lanes[i].simulateLane) continue;
+
+		fabricCanvas.lanes[i].densities = getPixelDensitiesForLane(fitID, fabricCanvas.lanes[i]);
+		computePriorLengthsMuAndSd(fabricCanvas.lanes[i], fabricCanvas.MWpriors);
+		//var lane = {laneNum: fabricCanvas.lanes[i].laneNum, time: fabricCanvas.lanes[i].time, densities: fabricCanvas.lanes[i].densities, priors: fabricCanvas.lanes[i].priors};
+		//submitObj.push(lane);
+	}
+
+
+
+
+	var priors = "";
+	for (var i = 0; i < fabricCanvas.MWpriors.length; i ++){
+
+		var MWprior = fabricCanvas.MWpriors[i];
+		if (MWprior.transcriptLengthOfNormalMean == null) continue;
+
+		priors = priors + MWprior.transcriptLengthOfNormalMean + "," + MWprior.pixelMu + "," + MWprior.pixelSigma;
+		//priors.push({transcriptLengthOfNormalMean: MWprior.transcriptLengthOfNormalMean, pixelMu: MWprior.pixelMu, pixelSigma: MWprior.pixelSigma});
+		if (i < fabricCanvas.MWpriors.length - 1) priors += "|";
+
+	}
+
+
+	if (priors.length == 0) return;
+
+	//console.log("Submitting", priors);
+
+	onABCStart();
+	addTracePlots();
+	gelInference_controller(fitID, priors);
+
+
+
+}
 
 
 // Deletes the object selected in the specified fabric canvas 
@@ -2679,7 +2945,7 @@ function addTimeGelHoverEvents(ctx, stateHoverEvents, laneWidth, bandHeight, can
 */
 
 // Hover over a normal distribution to read its description
-function addDensityNormalHoverEvents(ctx, canvas, MWprior, gelHoverEvents, widthScale, normalFn, axisGap, canvasSizeMultiplier, heightScaleNormal){
+function addDensityNormalHoverEvents(ctx, canvas, transcriptLengthOfNormalMean, gelHoverEvents, widthScale, normalFn, axisGap, canvasSizeMultiplier, heightScaleNormal){
 
 
 	
@@ -2703,7 +2969,7 @@ function addDensityNormalHoverEvents(ctx, canvas, MWprior, gelHoverEvents, width
 
 		if (mouseInDistribution){
 
-			var textbox = "mRNA length = " + MWprior.transcriptLengthOfNormalMean + " nt";
+			var textbox = "mRNA length = " + transcriptLengthOfNormalMean + " nt";
 
 			ctx.font = 16 * canvasSizeMultiplier + "px Arial";
 			ctx.textAlign= "left";
@@ -2734,7 +3000,7 @@ function addDensityNormalHoverEvents(ctx, canvas, MWprior, gelHoverEvents, width
 
 
 // Draws a density plot for the specified lane
-function drawTimeGelDensityCanvas(fitID, laneData = null, MWpriors = []){
+function drawTimeGelDensityCanvas(fitID, laneData = null){
 
 
 	var canvas = $("#timeGelDensityPlot_" + fitID)[0];
@@ -2776,29 +3042,6 @@ function drawTimeGelDensityCanvas(fitID, laneData = null, MWpriors = []){
 		var ymin = 0;
 		var ymax = 1;
 		var heightScale = plotHeight / (ymax - ymin);
-
-
-		// X min and max
-		var axisPointMargin = 5 * canvasSizeMultiplier;
-		ctx.font = 12 * canvasSizeMultiplier + "px Arial";
-		ctx.textBaseline="top"; 
-		var tickLength = 10 * canvasSizeMultiplier;
-		ctx.lineWidth = 1 * canvasSizeMultiplier;
-
-		for (var labelID = 0; labelID < xlabPos.length; labelID++){
-			var x0 = widthScale * (xlabPos[labelID] - xmin) + axisGap;
-			ctx.textAlign= labelID == 0 ? "left" : "center";
-			ctx.fillText(xlabPos[labelID], x0, canvas.height - axisGap + axisPointMargin);
-
-			// Draw a tick on the axis
-			ctx.beginPath();
-			ctx.moveTo(x0, canvas.height - axisGap - tickLength/2);
-			ctx.lineTo(x0, canvas.height - axisGap + tickLength/2);
-			ctx.stroke();
-
-		}
-
-
 
 
 
@@ -2910,55 +3153,14 @@ function drawTimeGelDensityCanvas(fitID, laneData = null, MWpriors = []){
 		ctx.stroke();
 
 
-
-		// fabricCanvas.MWpriors.push({id: rectangle.id, rectangle:rectangle, transcriptLengthOfNormalMean: null, numberOf_SD_InRectWidth: 3 });
-
-		// Calculate the slope (of the left border) and intercept of the centre of this lane
-		if (laneData.rectangle.angle > 180) laneData.rectangle.angle = laneData.rectangle.angle - 360;
-		var laneAngleRadians = laneData.rectangle.angle * Math.PI / 180;
-		var laneSlope = Math.abs(Math.cos(laneAngleRadians) / Math.sin(laneAngleRadians)); // Slope = run / rise
-		if (laneAngleRadians > 0) laneSlope = -laneSlope;
-		var laneInterceptX = laneData.rectangle.left + laneData.rectangle.width/2; 
-		var laneInterceptY = laneData.rectangle.top + laneInterceptX/laneSlope;
-		var laneIntercept = laneInterceptY - laneInterceptX*laneSlope;
-
-		//console.log("lane middle point", laneInterceptX, laneInterceptY, "slope", laneSlope);
-		console.log("lane middle point", laneIntercept, "slope", laneSlope);
-
-
 		// Plot the prior distributions of molecular weight
-		console.log("MWpriors", MWpriors);
-		for (var i = 0; i < MWpriors.length; i ++){
+		//console.log("MWpriors", MWpriors);
+		for (var i = 0; i < laneData.priors.length; i ++){
 
-			if (MWpriors[i].transcriptLengthOfNormalMean == null) continue;
+			
+			var mu = laneData.priors[i].pixelMu;
+			var sd = laneData.priors[i].pixelSigma;
 
-			if (MWpriors[i].rectangle.angle > 180) MWpriors[i].rectangle.angle = MWpriors[i].rectangle.angle - 360;
-
-
-			// Calculate the slope (of the left border) and intercept of the horizontal centre of the band prior
-			var MWAngleRadians = MWpriors[i].rectangle.angle * Math.PI / 180;
-			var MWSlope = Math.abs(Math.cos(MWAngleRadians) / Math.sin(MWAngleRadians)); // Slope = run / rise
-			if (MWAngleRadians < 0) MWSlope = -MWSlope;
-			var MWInterceptY = MWpriors[i].rectangle.top + (MWAngleRadians < 0 ? 1 : -1) * MWpriors[i].rectangle.height/2; 
-			var MWInterceptX = -(MWInterceptY - MWpriors[i].rectangle.top)*MWSlope + MWpriors[i].rectangle.left;
-			var MWIntercept = MWInterceptY - MWInterceptX/MWSlope;
-
-			console.log("MW top",  MWpriors[i].rectangle.top, "left", MWpriors[i].rectangle.left, "centre y", MWInterceptY, "centre x", MWInterceptX);
-
-			console.log("MW middle point", MWIntercept, "slope", 1/MWSlope);
-
-			// Find where the centre of the rectangle intersects with this lane
-			//var lineInterceptionX = (laneInterceptY - laneSlope*laneInterceptX - MWInterceptY + 1/MWSlope*MWInterceptX) / (1/MWSlope - laneSlope);
-			//var lineInterceptionY = laneSlope * (lineInterceptionX-laneInterceptX) + laneInterceptY;
-
-			var lineInterceptionX = (laneIntercept - MWIntercept) / (1/MWSlope - laneSlope);
-			var lineInterceptionY = laneSlope*lineInterceptionX + laneIntercept;
-
-			console.log("These two lines intersect at", lineInterceptionX, lineInterceptionY - laneInterceptY);
-			console.log("densities", laneData.densities);
-
-			var mu = lineInterceptionY - laneInterceptY;
-			var sd = MWpriors[i].rectangle.height / MWpriors[i].numberOf_SD_InRectWidth;
 
 
 			// Plot a normal distribution on top of the density plot
@@ -2996,10 +3198,10 @@ function drawTimeGelDensityCanvas(fitID, laneData = null, MWpriors = []){
 			ctx.fill();
 			ctx.stroke();
 
-
+			// console.log("prior", laneData.priors[i]);
 
 			// Add hover events for the normal distribution
-			addDensityNormalHoverEvents(ctx, canvas, MWpriors[i], gelHoverEvents, widthScale, normalFn, axisGap, canvasSizeMultiplier, heightScaleNormal)
+			addDensityNormalHoverEvents(ctx, canvas, laneData.priors[i].transcriptLengthOfNormalMean, gelHoverEvents, widthScale, normalFn, axisGap, canvasSizeMultiplier, heightScaleNormal)
 				
 
 
@@ -3009,6 +3211,36 @@ function drawTimeGelDensityCanvas(fitID, laneData = null, MWpriors = []){
 		ctx.globalAlpha = 1;
 		ctx.strokeStyle = "black";
 		ctx.fillStyle = "black";
+
+
+
+
+
+
+
+
+		// X ticks and values
+		var axisPointMargin = 5 * canvasSizeMultiplier;
+		ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+		ctx.textBaseline="top"; 
+		var tickLength = 10 * canvasSizeMultiplier;
+		ctx.lineWidth = 1 * canvasSizeMultiplier;
+
+		for (var labelID = 0; labelID < xlabPos.length; labelID++){
+			var x0 = widthScale * (xlabPos[labelID] - xmin) + axisGap;
+			ctx.textAlign= labelID == 0 ? "left" : "center";
+			ctx.fillText(xlabPos[labelID], x0, canvas.height - axisGap + axisPointMargin);
+
+			// Draw a tick on the axis
+			ctx.beginPath();
+			ctx.moveTo(x0, canvas.height - axisGap - tickLength/2);
+			ctx.lineTo(x0, canvas.height - axisGap + tickLength/2);
+			ctx.stroke();
+
+		}
+
+
+
 
 		// X min and max
 		var axisPointMargin = 5 * canvasSizeMultiplier;
@@ -3103,7 +3335,7 @@ function drawTimeGelDensityCanvas(fitID, laneData = null, MWpriors = []){
 			else{
 
 				if ($("#timeGelPlot_" + fitID).css('cursor') == "pointer") {
-					drawTimeGelDensityCanvas(fitID, laneData, MWpriors);
+					drawTimeGelDensityCanvas(fitID, laneData);
 					$("#timeGelPlot_" + fitID).css('cursor','auto');
 				}
 
@@ -3113,7 +3345,7 @@ function drawTimeGelDensityCanvas(fitID, laneData = null, MWpriors = []){
 
 
 		canvas.onmouseleave = function(e){
-			drawTimeGelDensityCanvas(fitID, laneData, MWpriors);
+			drawTimeGelDensityCanvas(fitID, laneData);
 		};
 
 

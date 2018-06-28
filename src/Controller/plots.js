@@ -5078,9 +5078,14 @@ function plotOptions(plotNum){
 			
 		case "tracePlot":
 		
-		
+
+			console.log("TP", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]);
+
 			// Create a dropdown list which contains all the parameters sampled in the prior
 			$("#settingCell4").html(getTracePlotDropdownTemplate().replace("Calculated per trial.", ""));
+
+
+
 			get_ParametersWithPriors_controller(function(params){
 
 				for (var paramID in params){

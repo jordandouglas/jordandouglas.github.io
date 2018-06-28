@@ -3001,6 +3001,107 @@ function loadSession_controller(XMLData, resolve = function() { }){
 
 
 
+// Perform MCMC to infer the parameters of the gel lanes (ie. build a linear model of MW vs migration distance)
+function gelInference_controller(fitID, priors ){
+
+
+
+	hideButtonAndShowStopButton("simulate");
+	running_ABC = true;
+	var restoreDOM = function(){
+
+
+		hideStopButtonAndShow("simulate");
+		$("#beginABC_btn").val("Resume ABC");
+		$("#beginMCMC_btn").val("Resume MCMC-ABC");
+		$(".beginABC_btn").attr("onclick", "beginABC()");
+		$("#ABCntrials").css("cursor", "");
+		$("#ABCntrials").css("background-color", "#008cba");
+		$("#ABCntrials").attr("disabled", false);
+		$("#MCMCntrials").css("cursor", "");
+		$("#MCMCntrials").css("background-color", "#008cba");
+		$("#MCMCntrials").attr("disabled", false);
+		$("#PreExp").attr("disabled", false);
+		$("#PreExp").css("cursor", "");
+		$("#PreExp").css("background-color", "#008CBA");
+		running_ABC = false;
+		simulationRenderingController = false;
+
+		// get_unrendered_ABCoutput_controller();
+
+
+	};
+
+
+
+	
+	if (WEB_WORKER_WASM != null){
+
+
+		$("#PreExp").val("hidden");
+		simulationRenderingController = false;
+
+
+
+		onABCStart();
+
+		// To do in between MCMC trials
+		var updateDOMbetweenTrials = function(result){
+
+			console.log("updateDOMbetweenTrials", result);
+		
+
+			drawPlots();
+
+
+			$("#ABCacceptanceVal").html(roundToSF(result.acceptanceRate));
+
+			/*
+			// Update the counter
+			var nTrialsToGo = parseFloat(result["nTrialsToGo"]);
+			if (nTrialsToGo != parseFloat($("#ABCntrials").val()) && !isNaN(nTrialsToGo)) {
+				$("#ABCntrials").val(nTrialsToGo);
+				$("#MCMCntrials").val(nTrialsToGo);
+			}
+			*/
+
+			if (result["lines"] != null) {
+				addNewABCRows(result["lines"].split("!"));
+			}
+
+
+			// validateAllAbcDataInputs();
+
+
+
+			if (result.stop) {
+				restoreDOM();
+				MESSAGE_LISTENER[msgID] = null;
+			}
+
+			else {
+
+				// Go back to the model when done
+				var resumeCalibrationFnStr = "wasm_" + stringifyFunction("resumeGelCalibration", [msgID]);
+				var toCall_resume = () => new Promise((resolve) => callWebWorkerFunction(resumeCalibrationFnStr, resolve, msgID, false));
+				toCall_resume().then((result) => updateDOMbetweenTrials(result));
+
+			}
+
+		};
+
+
+		var res = stringifyFunction("initGelCalibration", [fitID, priors], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID, false));
+		toCall().then((result) => updateDOMbetweenTrials(result));
+
+	}
+
+
+}
+
 
 
 // Show or hide sitewise plot
@@ -3213,15 +3314,13 @@ function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardat
 	}
 
 
-
-
 }
+
 
 
 
 // Uploads the string in tsv format to the posterior distribution
 function uploadABC_controller(TSVstring){
-
 
 
 	//console.log("TSVstring", TSVstring);
@@ -3368,7 +3467,6 @@ function beginABC_controller(abcDataObjectForModel){
 
 
 
-
 		// Convert all current settings into XML format and then upload them to set the MCMC settings
 		var toCall = () => new Promise((resolve) => getXMLstringOfSession("", resolve));
 		toCall().then((XMLData) => {
@@ -3466,7 +3564,6 @@ function beginABC_controller(abcDataObjectForModel){
 
 			});
 		});
-
 
 
 	}
