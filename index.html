@@ -3383,21 +3383,17 @@ function closeNav() {
 								<td style="vertical-align:middle; text-align:right">
 
 									
-									<table style="text-align:right">
+									<table style="text-align:center">
 										<tr>
 
+
 											<td>
+												<input type=button id="posteriorSummary_btn" onClick="posteriorSummary()" value='Posterior Summary' title="Extract values from the posterior distribution" class="operation" style="background-color:#008cba; width: 200px"> 
+												<br><br>
 												<input type=button id="beginMCMC_btn" onClick="beginABC()" value='Begin MCMC-ABC' title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="operation beginABC_btn" style="background-color:#008cba; width: 180px"> 
-												
 
 											</td>
 
-
-											<td>
-												<input type=image id="uploadABC" class="rotate180" title="Upload an ABC output in .log format" onClick="uploadABC();" src="src/Images/download.png" style="cursor: pointer; vertical-align: middle; height:20px; ">  
-													<input style="display:none" type="file" id="uploadABCinput" accept=".log"> 
-												<input type=image id="downloadABC" title="Download the ABC output (displayed below) in .log format" onClick=downloadABC() src="src/Images/download.png" style="cursor: pointer; display:none; vertical-align: middle; height:20px; ">  
-											</td>
 										</tr>
 
 										
@@ -3406,39 +3402,6 @@ function closeNav() {
 								</td>
 
 
-
-
-								<td style="vertical-align:top; text-align:right">
-
-									<table style="text-align:right">
-										
-
-										<tr class="MCMC_display" style="display:none; vertical-align: middle;"  title="Effective sample size" >
-
-											<td>
-												ESS:
-												<span id="ABC_ESS_val">
-													0
-												</span>
-											</td>
-										</tr>
-										
-										
-										
-										<tr style="vertical-align: middle;"  >
-
-											<td>
-													<input type=button id="posteriorSummary_btn" onClick="posteriorSummary()" value='Posterior Summary' title="Extract values from the posterior distribution" class="operation" style="background-color:#008cba; width: 200px"> 
-											</td>
-										</tr>
-										
-
-
-
-										
-									</table>
-
-								</td>
 
 							<tr>
 						</table>
@@ -3446,6 +3409,16 @@ function closeNav() {
 
 						<div style="padding: 5 10">
 
+
+
+
+							<span>
+								<input type=image id="uploadABC" class="rotate180" title="Upload an ABC output in .log format" onClick="uploadABC();" src="src/Images/download.png" style="cursor: pointer; vertical-align: middle; height:20px; ">  
+									<input style="display:none" type="file" id="uploadABCinput" accept=".log"> 
+								<input type=image id="downloadABC" title="Download the ABC output (displayed below) in .log format" onClick=downloadABC() src="src/Images/download.png" style="cursor: pointer; display:none; vertical-align: middle; height:20px; ">  
+							</span>
+
+							&nbsp;&nbsp;
 							<span id="nRowsToDisplayABC" style="margin-left:10px;">
 								<input type=button id='minusABCrows' class='minimise dropdown-disabled' style='width:40px'  value='&larr;30' onClick=minusABCrows() title='See previous 30 rows'>
 								&nbsp;Displaying lines <span id='numABCrowsDisplayed'>0</span> out of <span id='numABCrowsGenerated'>0</span>&nbsp;
@@ -3468,7 +3441,7 @@ function closeNav() {
 								Status: <span id="burninStatusVal" style="color:red">  </span>
 							</span>
 
-							<br>
+							<br><br>
 
 							<div id="ABCoutput" style="width:95%; font-family:'Courier New'; background-color:white; color: black; font-size: 14px; padding: 10 20; height: 600px; overflow-y:scroll; overflow-x:scroll">
 
