@@ -118,7 +118,7 @@ Parameter* bubbleRight = new Parameter("bubbleRight", true, "inclusive", "Bubble
 
 Parameter* GDagSlide = new Parameter("GDagSlide", false, "false", "\u0394G\u2020\U0001D70F", "Free energy barrier height of translocation", "\u0394G_{\U0001D70F}^{\u2020}  (k_{B}T)");
 Parameter* DGPost = new Parameter("DGPost", false, "false", "\u0394G\U0001D70F1", "Free energy added on to posttranslocated ground state", "\u0394G_{\U0001D70F1}  (k_{B}T)");
-Parameter* barrierPos = new Parameter("barrierPos", false, "false", "Barrier height position  (\u212B)", "Position of translocation intermediate state", "\u03B4_{1}");
+Parameter* barrierPos = new Parameter("barrierPos", false, "false", "Transition state position  (\u212B)", "Position of translocation transition state", "\u03B4_{1}");
 Parameter* arrestTime = new Parameter("arrestTime", false, "inclusive", "Arrest timeout  (s)", "Time from the start until transcription is arrested. Set to zero to prevent arrests.");
 Parameter* kCat = new Parameter("kCat", false, "inclusive", "Rate of catalysis (s\u207B\u00B9)", "Rate constant of catalysing bound NTP", "k_{cat}  (s^{\u22121\u2009})");
 Parameter* Kdiss = new Parameter("Kdiss", false, "exclusive", "KD (\u03bcM)", "Dissociation constant of NTP",  "K_{D}  (\u03bcM)");

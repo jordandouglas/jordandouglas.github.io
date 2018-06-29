@@ -120,7 +120,7 @@ bool GelCalibrationSearch::perform_1_iteration(int n) {
 
 
 	if ((n == 1 || n % logEveryNStates == 0)){
-		cout << "Performing MCMC trial " << n << endl;
+		//cout << "Performing MCMC trial " << n << endl;
 	}
 
 
