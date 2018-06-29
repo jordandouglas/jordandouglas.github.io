@@ -1875,11 +1875,7 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 	var heightScale = plotHeight;
 	
 
-
-
 	if (values.length > 5){
-		
-
 		
 		
 		// If xRange is set to pauseX set min to 1 and max to whatever the maximum is
@@ -2224,7 +2220,7 @@ function add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLab
 		ctx.fillStyle = "black";
 		ctx.textBaseline="top"; 
 		var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
-		var xlabYPos = canvas.height - axisGap / 2;
+		var xlabYPos = canvas.height - 0.5 * axisGap;
 		writeLatexLabelOnCanvas(ctx, xlab, xlabXPos, xlabYPos, fontSize);
 		//ctx.fillText(xlab, xlabXPos, xlabYPos);
 		
@@ -3627,10 +3623,10 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	ctx.globalAlpha = 1;
 	ctx.textBaseline="top";
 	var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
-	var xlabYPos = canvas.height - axisGap / 3 - 7*canvasSizeMultiplier;
+	var xlabYPos = canvas.height - axisGap / 2;
 	ctx.fillStyle = "black";
 	//ctx.fillText(xlab, xlabXPos, xlabYPos);
-	writeLatexLabelOnCanvas(ctx, xlab, xlabXPos, xlabYPos, 24 * canvasSizeMultiplier);
+	writeLatexLabelOnCanvas(ctx, xlab, xlabXPos, xlabYPos, 20 * canvasSizeMultiplier);
 
 	
 	// Y label
@@ -3642,7 +3638,7 @@ function scatter_plot(xvals, yvals, range, id, canvasDivID, canvasSizeMultiplier
 	ctx.rotate(-Math.PI/2);
 	ctx.fillStyle = "black";
 	//ctx.fillText(ylab, 0 ,0);
-	writeLatexLabelOnCanvas(ctx, ylab, 0, 0, 24 * canvasSizeMultiplier);
+	writeLatexLabelOnCanvas(ctx, ylab, 0, 0, 20 * canvasSizeMultiplier);
 	ctx.restore();
 
 
