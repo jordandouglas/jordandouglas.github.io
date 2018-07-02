@@ -1181,12 +1181,19 @@ function loadSessionFromURL(url, resolve = function() { }){
 			var xmlDoc = parser.parseFromString(XMLstring, "text/xml");
 			var imgTags = xmlDoc.getElementsByTagName("img");
 			for (var j = 0; j < imgTags.length; j ++){
+
+				// Save the image encoding so it can be opened later
+				ABC_gel_images_to_load.push(imgTags[j].getAttribute("encoding"));
+
+				// Delete the node from the XML
 				imgTags[j].remove();
+
+		       
 			}
+
+
 			XMLstring = XMLToString(xmlDoc).replace(/(\r\n|\n|\r)/gm,"");
-
-
-			loadSession_controller(XMLstring, resolve);
+			loadSession_controller(XMLstring);
 		   
 		}
 	};
