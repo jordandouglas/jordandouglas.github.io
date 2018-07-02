@@ -329,57 +329,47 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 				if (experimentType == "timeGel"){
 
 					// Iterate through all lanes
-					int laneNum = 0;
 					for(TiXmlElement* laneEle = experimentEle->FirstChildElement(); laneEle; laneEle=laneEle->NextSiblingElement()) {
 
 
-						// Find the number of observations in this lane
-						int numObservationsLane = 0;
-						for(const TiXmlAttribute* attr = laneEle->FirstAttribute(); attr; attr=attr->Next()) {
-							string attrName = attr->Name();
-							if (attrName.substr(0,3) == "obs") numObservationsLane++;
-						}
-						if (numObservationsLane == 0) continue;
-
+						// Get the lane number
+						int laneNum = stoi(string(laneEle->Value()).substr(4)); // Substring "laneXXX" into the lane number "XXX"
+						
 
 						// Find the time associated with this lane
 						double time;
 						if (laneEle->Attribute("time")) time = atof(laneEle->Attribute("time"));
 						else continue;
 
-						laneNum ++;
 
-						experiment->addTimeGelLane(laneNum, time, numObservationsLane);
+						// Get the rectangle coordinates
+						double rectTop, rectLeft, rectWidth, rectHeight, rectAngle;
+						bool simulateLane;
+						if (laneEle->Attribute("rectTop")) rectTop = atof(laneEle->Attribute("rectTop"));
+						if (laneEle->Attribute("rectLeft")) rectLeft = atof(laneEle->Attribute("rectLeft"));
+						if (laneEle->Attribute("rectWidth")) rectWidth = atof(laneEle->Attribute("rectWidth"));
+						if (laneEle->Attribute("rectHeight")) rectHeight = atof(laneEle->Attribute("rectHeight"));
+						if (laneEle->Attribute("rectAngle")) rectAngle = atof(laneEle->Attribute("rectAngle"));
+						if (laneEle->Attribute("simulate")) simulateLane = string(laneEle->Attribute("simulate")) == "true" ? true : false;
 
 
 
 
-						// Parse all bands in the lane
-						for (int obsNum = 1; obsNum <= numObservationsLane; obsNum ++){
+						if (laneEle->Attribute("densities")){
 
-
-							// If the current observation does not exist then stop parsing
-							string key = "obs" + to_string(obsNum);
-							if (!laneEle->Attribute(key.c_str())) break;
-							string obs = laneEle->Attribute(key.c_str());
-
-							cout << "obs " << obs << endl;
-
-							// Split string by comma
-							vector<string> split_vector = Settings::split(obs, ',');
-							double x = atof(split_vector.at(0).c_str());
-							double y = atof(split_vector.at(1).c_str());
-							if (split_vector.size() == 2) experiment->addTimeGelBand(x, y);
-
-							else {
-								cout << "Error: cannot parse experimental observations." << endl;
-								exit(0);
+							// Parse the pixel densities
+							vector<string> splitStr = Settings::split(string(laneEle->Attribute("densities")), ','); // Split by , to get values
+							vector<double> densities(splitStr.size());
+							for (int obsNum = 0; obsNum < splitStr.size(); obsNum ++){
+								//cout << "obsNum " << obsNum << " " << splitStr.at(obsNum) << endl;
+								densities.at(obsNum) = stof(splitStr.at(obsNum));
 							}
 
-
-
+							experiment->addTimeGelLane(laneNum, time, densities, rectTop, rectLeft, rectWidth, rectHeight, rectAngle, simulateLane);
+							
 						}
 
+						else cout << "Cannot parse lane " << laneNum << " because there are no densities." << endl;
 
 
 					}

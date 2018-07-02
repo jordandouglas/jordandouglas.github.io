@@ -39,19 +39,23 @@ class GelLaneData{
 	double time;
 	vector<double> transcriptLengths;
 	vector<double> densities;
+	bool simulateLane;
+
+
+	// Lane rectangle coordinates
+	double rectTop;
+	double rectLeft;
+	double rectWidth;
+	double rectHeight;
+	double rectAngle;
 
 
 	public:
 
 
-		GelLaneData(int laneNum, double time, vector<double> densities);
+		GelLaneData(int laneNum, double time, vector<double> densities, double rectTop, double rectLeft, double rectWidth, double rectHeight, double rectAngle, bool simulateLane);
 
 
-
-
-
-		GelLaneData(int laneNum, double time, int nObs);
-		void addNewBand(double len, double den);
 		string toJSON();
 		void clear();
 

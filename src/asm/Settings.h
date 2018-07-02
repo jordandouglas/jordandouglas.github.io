@@ -98,7 +98,6 @@ extern bool _RUNNING_ABC;
 extern list<ExperimentalData*> experiments;
 extern int _numExperimentalObservations;
 
-
 // Model
 extern list<Model> modelsToEstimate;
 extern Model* currentModel;
@@ -112,6 +111,7 @@ extern bool _GUI_simulating;
 extern bool _applyingReactionsGUI;
 extern bool _showRNAfold_GUI;
 extern bool _GUI_user_applying_reaction; // Whether or not the user is applying a reaction manually
+extern int _currentLoggedPosteriorDistributionID;
 extern string _animationSpeed;
 extern Simulator* _interfaceSimulator; // The simulator object being used by the GUI
 extern State* _currentStateGUI; // The current state displayed on the GUI and used in all GUI simulations
@@ -119,7 +119,7 @@ extern chrono::system_clock::time_point _interfaceSimulation_startTime; // The s
 extern SlippageLandscapes* _slippageLandscapesToSendToDOM;
 extern ostringstream _ABCoutputToPrint;
 extern list<PosteriorDistributionSample*> _GUI_posterior;
-
+extern map<int, list<PosteriorDistributionSample*>> _gelPosteriorDistributions; // All posterior distributions for gel calibrations
 
 
 
@@ -183,7 +183,8 @@ class Settings{
 		static string toJSON();
 		static bool setSequence(string seqID);
 		static void resetRateTables();
-
+		static list<PosteriorDistributionSample*> getPosteriorDistributionByID(int fitID);
+		static void addToPosteriorDistribution(int fitID, PosteriorDistributionSample* obj);
 	
 
 		// Utilities

@@ -31,56 +31,39 @@
 using namespace std;
 
 
-GelLaneData::GelLaneData(int laneNum, double time, vector<double> densities){
+GelLaneData::GelLaneData(int laneNum, double time, vector<double> densities, double rectTop, double rectLeft, double rectWidth, double rectHeight, double rectAngle, bool simulateLane){
 
 	this->laneNum = laneNum;
 	this->time = time;
 	this->densities = densities;
+	this->rectTop = rectTop;
+	this->rectLeft = rectLeft;
+	this->rectWidth = rectWidth;
+	this->rectHeight = rectHeight;
+	this->rectAngle = rectAngle;
+	this->simulateLane = simulateLane;
+
 
 }
 
 
 
 
-
-
-GelLaneData::GelLaneData(int laneNum, double time, int nObs){
-
-
-	this->laneNum = laneNum;
-	this->time = time;
-	this->transcriptLengths.resize(nObs);
-	this->densities.resize(nObs);
-	this->currentBandNum = 0;
-
-}
-
-
-void GelLaneData::addNewBand(double len, double den){
-	
-	if (currentBandNum < transcriptLengths.size()){
-		this->transcriptLengths.at(currentBandNum) = len;
-		this->densities.at(currentBandNum) = den;
-		currentBandNum ++;
-	}
-
-}
 
 
 string GelLaneData::toJSON(){
 
 	//string JSON = "'lane" + this->laneNum + "':{";
 	string JSON = "";
-	JSON += "'t':" + to_string(this->time) + ",";
+	JSON += "'laneNum':" + to_string(this->laneNum) + ",";
+	JSON += "'time':" + to_string(this->time) + ",";
 
-
-	// Iterate through lengths
-	JSON += "'lengths':[";
-	for (int i = 0; i < this->transcriptLengths.size(); i++){
-		JSON += to_string(this->transcriptLengths.at(i)) + ",";
-	}
-	if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
-	JSON += "],";
+	// Rectangle coordinates
+	JSON += "'rectTop':" + to_string(this->rectTop) + ",";
+	JSON += "'rectLeft':" + to_string(this->rectLeft) + ",";
+	JSON += "'rectWidth':" + to_string(this->rectWidth) + ",";
+	JSON += "'rectHeight':" + to_string(this->rectHeight) + ",";
+	JSON += "'rectAngle':" + to_string(this->rectAngle) + ",";
 
 
 	// Iterate through densities

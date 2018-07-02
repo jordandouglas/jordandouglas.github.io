@@ -844,18 +844,24 @@ string Plots::getPlotDataAsJSON(){
 	if (parameterHeatmap_needsData) {
 
 
-		// If a plot needs access to the posterior distribution then convert the GUI posterior distribution into the appropriate format
-		bool aPlotNeedsPosteriorDistribution = false;
-		list<ParameterHeatmapData*> heatMapDataToSend = Plots::parametersPlotData;
-		for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++) {
-			if (Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->get_plotFromPosterior()) aPlotNeedsPosteriorDistribution = true;
-		}
-		if (aPlotNeedsPosteriorDistribution) heatMapDataToSend = BayesianCalculations::getPosteriorDistributionAsHeatmap();
-
 
 		// Send through either simulated data or posterior data
 		for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
-			if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->updateHeatmapData(heatMapDataToSend);
+			if (Plots::plotSettings.at(pltNum) != nullptr){
+
+				// If a plot needs access to the posterior distribution then convert the respective posterior distribution into the appropriate format
+				if (Plots::plotSettings.at(pltNum)->get_plotFromPosterior()){
+					list<ParameterHeatmapData*> heatMapDataToSend = BayesianCalculations::getPosteriorDistributionAsHeatmap(Plots::plotSettings.at(pltNum)->getPosteriorDistributionID());
+					Plots::plotSettings.at(pltNum)->updateHeatmapData(heatMapDataToSend);
+				}
+
+				// Send simulation data not Bayesian data
+				else {
+					Plots::plotSettings.at(pltNum)->updateHeatmapData(Plots::parametersPlotData);
+				}
+
+
+			}
 		}
 
 
@@ -933,7 +939,7 @@ void Plots::userSelectPlot(int plotNum, string value, bool deleteData){
 	Plots::plotSettings.at(plotNum - 1) = newPlotSettings;
 
 	// If ABC has been running then set to posterior distribution
-	Plots::plotSettings.at(plotNum - 1)->set_plotFromPosterior(_RUNNING_ABC);
+	Plots::plotSettings.at(plotNum - 1)->setPosteriorDistributionID(_currentLoggedPosteriorDistributionID, _currentLoggedPosteriorDistributionID > 0 ? "logPosterior" : "chiSq"); 
 
 
 
@@ -1082,9 +1088,10 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 	// Set non posterior distribution as the default option for all plots
 	if (ABC_cleardata) {
 
-		
+		_currentLoggedPosteriorDistributionID = -1;
 		for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
-			if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->set_plotFromPosterior(false);
+			if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->setPosteriorDistributionID(-1, "chiSq");
+
 		}
 
 	}
@@ -1119,7 +1126,18 @@ void Plots::prepareForABC(){
 
 	// Set posterior distribution as the default option for all plots
 	for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
-		if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->set_plotFromPosterior(true);
+		if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->setPosteriorDistributionID(0, "chiSq");
+	}
+
+}
+
+
+// Set all open trace plots so that its posterior distribution is the one specified
+void Plots::setTracePlotPosteriorByID(int id){
+
+	
+	for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
+		if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->setPosteriorDistributionID(id, id == 0 ? "chiSq" : "logPosterior");
 	}
 
 }

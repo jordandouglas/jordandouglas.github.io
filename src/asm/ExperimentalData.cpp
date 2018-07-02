@@ -59,27 +59,17 @@ ExperimentalData::ExperimentalData(int id, string dataType, int nObs){
 
 
 // Create a new lane in the time gel
-void ExperimentalData::addTimeGelLane(int laneNum, double time, int nObs){
+void ExperimentalData::addTimeGelLane(int laneNum, double time, vector<double> densities, double rectTop, double rectLeft, double rectWidth, double rectHeight, double rectAngle, bool simulateLane){
 
 
 	if (currentExperiment+1 < lanes.size()){
 		currentExperiment ++;
-		lanes.at(currentExperiment) = new GelLaneData(laneNum, time, nObs);
+		lanes.at(currentExperiment) = new GelLaneData(laneNum, time, densities, rectTop, rectLeft, rectWidth, rectHeight, rectAngle, simulateLane);
 	}
 
 
 }
 
-
-// Add a new band to the current time gel lane
-void ExperimentalData::addTimeGelBand(double len, double density){
-
-	if (currentExperiment < lanes.size()){
-		lanes.at(currentExperiment)->addNewBand(len, density);
-	}
-
-
-}
 
 
 void ExperimentalData::addDatapoint(double setting, double observation){

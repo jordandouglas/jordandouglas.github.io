@@ -314,6 +314,7 @@ void PosteriorDistributionSample::printHeader(bool toFile){
 	// Print parameter names
 	for(std::map<string, double>::iterator iter = this->parameterEstimates.begin(); iter != this->parameterEstimates.end(); ++ iter){
 		string paramID =  iter->first;
+		if (paramID.substr(0,3) == "len") continue; // HACK: Don't print the transcript length variables since we want to integrate over them
 		if (isWASM) WASM_string += paramID + gapUnit;
 		else (_USING_GUI ? _ABCoutputToPrint : toFile ? (*logFile) : cout) << paramID << gapUnit;
 	}
@@ -385,6 +386,8 @@ void PosteriorDistributionSample::print(bool toFile){
 
 	// Print parameter values
 	for(std::map<string, double>::iterator iter = this->parameterEstimates.begin(); iter != this->parameterEstimates.end(); ++ iter){
+		string paramID = iter->first;
+		if (paramID.substr(0,3) == "len") continue; // HACK: Don't print the transcript length variables since we want to integrate over them
 		double value = iter->second;
 		if (isWASM) WASM_string += to_string(value) + gapUnit;
 		else (_USING_GUI ? _ABCoutputToPrint : toFile ? logFile  :  cout) << value << gapUnit;
@@ -418,35 +421,56 @@ void PosteriorDistributionSample::print(bool toFile){
 }
 
 
+
 string PosteriorDistributionSample::toJSON(){
 
 	string JSON = "{";
 
-	// Simulated values
-	JSON += "'simulatedValues':[";
-	for (int i = 0; i < this->simulatedValues.size(); i ++){
-		JSON += to_string(this->simulatedValues.at(i)) + ",";
-	}
-	if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
-
-	JSON += "],";
+	if (this->ABC){
 
 
-	//if (this->simulatedDensities.size() > 0) cout << "this->simulatedDensities.size() " << this->simulatedDensities.size() << " this->simulatedDensities.at(0).size() " << this->simulatedDensities.at(0).size() << endl;
-
-	// Simulated bands
-	JSON += "'simulatedDensities':[";
-	for (int i = 0; i < this->simulatedDensities.size(); i ++){
-		JSON += "[";
-		for (int j = 0; j < this->simulatedDensities.at(i).size(); j ++){
-			JSON += to_string(this->simulatedDensities.at(i).at(j)) + ",";
+		// Simulated values
+		JSON += "'simulatedValues':[";
+		for (int i = 0; i < this->simulatedValues.size(); i ++){
+			JSON += to_string(this->simulatedValues.at(i)) + ",";
 		}
 		if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
+
 		JSON += "],";
 
+
+		//if (this->simulatedDensities.size() > 0) cout << "this->simulatedDensities.size() " << this->simulatedDensities.size() << " this->simulatedDensities.at(0).size() " << this->simulatedDensities.at(0).size() << endl;
+
+		// Simulated bands
+		JSON += "'simulatedDensities':[";
+		for (int i = 0; i < this->simulatedDensities.size(); i ++){
+			JSON += "[";
+			for (int j = 0; j < this->simulatedDensities.at(i).size(); j ++){
+				JSON += to_string(this->simulatedDensities.at(i).at(j)) + ",";
+			}
+			if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
+			JSON += "],";
+
+		}
+		if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
+		JSON += "]";
+
+
+
+	}else{
+
+
+		// Print parameter values
+		for(std::map<string, double>::iterator iter = this->parameterEstimates.begin(); iter != this->parameterEstimates.end(); ++ iter){
+			string paramID = iter->first;
+			double value = iter->second;
+			JSON += "'" + paramID + "':" + to_string(value) + ",";
+		}
+
+		if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
+
+
 	}
-	if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
-	JSON += "]";
 
 
 	JSON += "}";

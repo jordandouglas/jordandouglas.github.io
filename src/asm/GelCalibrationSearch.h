@@ -39,7 +39,7 @@ using namespace std;
 class GelCalibrationSearch{
 
 
-	
+	static int fitID;
 	static vector<Parameter*> calibrationObservations;
 	static int logEveryNStates;
 	static int nTrials;
@@ -63,7 +63,7 @@ class GelCalibrationSearch{
 
 	public:
 		
-		static void initMCMC(vector<Parameter*> calibrationObservations, int nTrials, int logEveryNTrials);
+		static void initMCMC(int fitID, vector<Parameter*> calibrationObservations, int nTrials, int logEveryNTrials);
 		static bool perform_1_iteration(int n);
 		static int getCurrentStateNumber();
 		static double getAcceptanceRate();

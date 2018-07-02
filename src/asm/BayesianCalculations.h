@@ -42,7 +42,8 @@ class BayesianCalculations{
 		static void printMarginalGeometricMedians(vector<PosteriorDistributionSample*> states);
 		static void sampleFromPosterior(vector<PosteriorDistributionSample*> posteriorDistribution);
 		static void printModelFrequencies(vector<PosteriorDistributionSample*> posteriorDistribution);
-		static list<ParameterHeatmapData*>  getPosteriorDistributionAsHeatmap();
+		static list<ParameterHeatmapData*>  getPosteriorDistributionAsHeatmap(int id);
+		static string getParametersInPosteriorDistributionJSON(int id);
 };
 
 #endif

@@ -60,7 +60,6 @@ class PlotSettings{
 	string customParamY;
 	string metricZ;
 	string zColouring;
-	bool plotFromPosterior;
 	string xData;
 	string yData;
 	string zData;
@@ -82,6 +81,7 @@ class PlotSettings{
 
 	// Trace plot
 	double ESS;
+	int selectedPosteriorID;
 
 
 
@@ -96,7 +96,8 @@ class PlotSettings{
 		void recordSite(int siteThatWasJustCatalysed, double timeToCatalysis);
 		void deleteSiteRecordings();
 		bool get_plotFromPosterior();
-		void set_plotFromPosterior(bool val);
+		void setPosteriorDistributionID(int id, string yAxisVariable);
+		int getPosteriorDistributionID();
 
 
 };

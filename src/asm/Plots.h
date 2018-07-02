@@ -116,6 +116,7 @@ class Plots{
 		static void recordSite(int siteThatWasJustCatalysed, double timeToCatalysis);
 		static void addCopiedSequence(string sequence);
 		static void prepareForABC();
+		static void setTracePlotPosteriorByID(int id);
 
 };
 

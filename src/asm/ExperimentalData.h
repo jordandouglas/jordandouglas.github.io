@@ -64,8 +64,7 @@ class ExperimentalData{
 		double getObservation(); // Return the current observation
 		string getDataType();
 		GelLaneData* getCurrentLane();
-		void addTimeGelLane(int laneNum, double time, int nObs);
-		void addTimeGelBand(double len, double density);
+		void addTimeGelLane(int laneNum, double time, vector<double> densities, double rectTop, double rectLeft, double rectWidth, double rectHeight, double rectAngle, bool simulateLane);
 		void addDatapoint(double setting, double observation);
 		void addDatapoint(double setting, double observation, int n);
 		void print();

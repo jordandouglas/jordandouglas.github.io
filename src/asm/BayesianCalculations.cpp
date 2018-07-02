@@ -393,33 +393,51 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistributionSampl
 
 
 // Returns the GUI posterior distribution in a format where it can be printed on a heatmap
-list<ParameterHeatmapData*> BayesianCalculations::getPosteriorDistributionAsHeatmap(){
+list<ParameterHeatmapData*> BayesianCalculations::getPosteriorDistributionAsHeatmap(int id){
+
+
+	list<PosteriorDistributionSample*> posteriorDistribution = Settings::getPosteriorDistributionByID(id);
 
 
 	// The posterior distribution is stored as rows, while the heatmap is stored as columns
 	list<ParameterHeatmapData*> heatMapData;
-	if (_GUI_posterior.size() == 0) return heatMapData;
+	if (posteriorDistribution.size() == 0) return heatMapData;
 
 
 	// One heatmap object for each parameter in the posterior + chiSq + prior + histogram probability
 	heatMapData.push_back(new ParameterHeatmapData("probability", "Probability density"));
 	heatMapData.push_back(new ParameterHeatmapData("logPrior", "Log Prior"));
 
-	if (!_GUI_posterior.front()->isABC()){
+	if (!posteriorDistribution.front()->isABC()){
 		heatMapData.push_back(new ParameterHeatmapData("logLikelihood", "Log Likelihood"));
 		heatMapData.push_back(new ParameterHeatmapData("logPosterior", "Log Posterior"));
 	}else{
 		heatMapData.push_back(new ParameterHeatmapData("chiSq", "Chi-squared", "X^{2}"));
 	}
 	heatMapData.push_back(new ParameterHeatmapData("state", "State"));
-	for (int i = 0; i < _GUI_posterior.front()->getParameterNames().size(); i++){
-		string paramID = _GUI_posterior.front()->getParameterNames().at(i);
+	for (int i = 0; i < posteriorDistribution.front()->getParameterNames().size(); i++){
+		string paramID = posteriorDistribution.front()->getParameterNames().at(i);
 		Parameter* param = Settings::getParameterByName(paramID);
-		if (param == nullptr) continue;
-		heatMapData.push_back(new ParameterHeatmapData(paramID, param->getName(), param->getLatexName()));
+
+		string paramName;
+		string paramLatexName = "";
+		if (param == nullptr) {
+			if (paramID == "slope") paramName = "Slope";
+			else if (paramID == "intercept") paramName = "Intercept";
+			else if (paramID == "sigma") {
+				paramName = "Variance";
+				paramLatexName = "\u03C3^{2}";
+			}
+			else continue;
+		}
+
+		else {
+			paramName = param->getName();
+			paramLatexName = param->getLatexName();
+		}
+
+		heatMapData.push_back(new ParameterHeatmapData(paramID, paramName, paramLatexName));
 	}
-
-
 
 
 	// Iterate through each column and populate it with estimates from the rows
@@ -429,7 +447,7 @@ list<ParameterHeatmapData*> BayesianCalculations::getPosteriorDistributionAsHeat
 		if (paramID == "probability") continue;
 
 
-		for (list<PosteriorDistributionSample*>::iterator row = _GUI_posterior.begin(); row != _GUI_posterior.end(); ++row){
+		for (list<PosteriorDistributionSample*>::iterator row = posteriorDistribution.begin(); row != posteriorDistribution.end(); ++row){
 
 			if (paramID == "chiSq") (*col)->addValue( (*row)->get_chiSquared() );
 			else if (paramID == "logPrior") (*col)->addValue( (*row)->get_logPriorProb() );
@@ -442,11 +460,69 @@ list<ParameterHeatmapData*> BayesianCalculations::getPosteriorDistributionAsHeat
 	}
 
 
-
-
-
 	return heatMapData;
 
 }
+
+
+
+
+
+
+
+// Returns a JSON string of all variables in the posterior distribution
+string BayesianCalculations::getParametersInPosteriorDistributionJSON(int id){
+
+
+	list<PosteriorDistributionSample*> posteriorDistribution = Settings::getPosteriorDistributionByID(id);
+
+
+	if (posteriorDistribution.size() > 0){
+
+		string JSON = "{";
+
+
+		if (!posteriorDistribution.front()->isABC()){
+			JSON += "'logPosterior':{'name':'Log Posterior'},";
+			JSON += "'logLikelihood':{'name':'Log Likelihood'},";
+		}else{
+			JSON += "'chiSq':{'name':'Chi-squared'},";
+		}
+		JSON += "'logPrior':{'name':'Log Prior'},";
+
+
+		// Parameters
+		for (int i = 0; i < posteriorDistribution.front()->getParameterNames().size(); i++){
+			string paramID = posteriorDistribution.front()->getParameterNames().at(i);
+			Parameter* param = Settings::getParameterByName(paramID);
+			if (param == nullptr) {
+				string paramName;
+				if (paramID == "slope") paramName = "Slope";
+				else if (paramID == "intercept") paramName = "Intercept";
+				else if (paramID == "sigma") paramName = "Variance";
+				else continue;
+
+				JSON += "'" + paramID + "':{'name':'" + paramName + "'},";
+
+			}
+
+			else {
+				JSON += param->toJSON() + "',";
+			}
+
+		}
+
+		if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
+
+		JSON += "}";
+
+		return JSON;
+
+	}
+	else return "{}";
+
+}
+
+
 
 

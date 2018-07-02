@@ -372,6 +372,7 @@ initABC = function(msgID = null){
 	}
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 
+
 	Module.ccall("initABC", null, ["number"], [msgID]); 
 
 
@@ -465,7 +466,38 @@ getABCoutput = function(msgID = null){
 	}
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 	
-	Module.ccall("getABCoutput", null, ["number"],  [msgID]); 
+	Module.ccall("getABCoutput", null, ["number", "number"],  [msgID, 0]); 
+
+}
+
+
+// Get all parameters in the specified posterior distribution. 0 = regular distribution, 1,2,3, ... refer to gel calibrations
+getParametersInPosteriorDistribution = function(posteriorID, msgID = null){
+	
+	
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	
+	Module.ccall("getParametersInPosteriorDistribution", null, ["number", "number"],  [posteriorID, msgID]); 
+
+}
+
+
+
+// Get the names of all posterior distributions
+getPosteriorDistributionNames = function(msgID = null){
+	
+	
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	
+	Module.ccall("getPosteriorDistributionNames", null, ["number"],  [msgID]); 
 
 }
 
@@ -513,7 +545,7 @@ initGelCalibration = function(fitID, priors, msgID = null){
 	*/
 
 	
-	Module.ccall("initGelCalibration", null, ["string", "number"],  [priors, msgID]); 
+	Module.ccall("initGelCalibration", null, ["number", "string", "number"],  [(fitID + "").substring(3), priors, msgID]); 
 
 
 }
@@ -560,6 +592,25 @@ resumeGelCalibration = function(msgID = null){
 
 
 }
+
+
+
+// Returns the posterior distribution for calibrating this gel
+getGelPosteriorDistribution = function(fitID, msgID = null){
+
+	
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+
+	
+	Module.ccall("getGelPosteriorDistribution", null, ["number", "number"],  [(fitID + "").substring(3), msgID]); 
+
+}
+
 
 
 // Return a list of all parameters which are being estimated in the posterior distribution
@@ -845,6 +896,24 @@ changeSpeed = function(speed, msgID = null){
 
 
 }
+
+
+// Set the current posterior distribution id
+setCurrentLoggedPosteriorDistributionID = function(id, msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+
+	//console.log("Changing speed to", speed);
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	Module.ccall("setCurrentLoggedPosteriorDistributionID", null, ["number", "number"], [id, msgID]);
+
+
+}
+
 
 
 // User selects which base to add next manually

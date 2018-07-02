@@ -935,11 +935,14 @@ extern "C" {
 		// Initialise MCMC
 		MCMC::initMCMC();
 
+		_currentLoggedPosteriorDistributionID = 0;
+
 
 		string toReturnJSON = "{'stop':" + string(_GUI_STOP ?  "true" : "false") + ",";
 		toReturnJSON += "'acceptanceRate':0,";
 		toReturnJSON += "'status':'" + MCMC::getStatus() + "',";
 		toReturnJSON += "'epsilon':'" + to_string(MCMC::getEpsilon()) + "',";
+		toReturnJSON += "'selectedPosteriorID':" + to_string(_currentLoggedPosteriorDistributionID) + ",";
 		toReturnJSON += "'newLines':'" + _ABCoutputToPrint.str() + "'}";
 
 
@@ -1088,14 +1091,17 @@ extern "C" {
 
 
 	// Generate the full ABC output
-	void EMSCRIPTEN_KEEPALIVE getABCoutput(int msgID){
+	void EMSCRIPTEN_KEEPALIVE getABCoutput(int msgID, int posteriorDistributionID){
 
 		// Output string
 		_ABCoutputToPrint.str("");
 		_ABCoutputToPrint.clear();
 
-		_GUI_posterior.front()->printHeader(false);
-		for (list<PosteriorDistributionSample*>::iterator it = _GUI_posterior.begin(); it != _GUI_posterior.end(); ++ it){
+
+		list<PosteriorDistributionSample*> posterior = Settings::getPosteriorDistributionByID(posteriorDistributionID);
+
+		posterior.front()->printHeader(false);
+		for (list<PosteriorDistributionSample*>::iterator it = posterior.begin(); it != posterior.end(); ++ it){
 			(*it)->print(false);
 		}
 
@@ -1209,7 +1215,7 @@ extern "C" {
 
 	// Initialise MCMC to infer the parameters of the gel lanes (ie. build a linear model of MW vs migration distance)
 	// Each datapoint in priors consists of (length of transcript, mean pixel value, sigma pixel value)
-	void EMSCRIPTEN_KEEPALIVE initGelCalibration(char* priors, int msgID){
+	void EMSCRIPTEN_KEEPALIVE initGelCalibration(int fitID, char* priors, int msgID){
 
 
 		_GUI_STOP = false;
@@ -1255,12 +1261,22 @@ extern "C" {
 		}
 		priorsVec.clear();
 
+
+		_currentLoggedPosteriorDistributionID = fitID;
+		
+
 		std::vector<Parameter*> calibrationsVector { std::begin(calibrationObservations), std::end(calibrationObservations) };
-		GelCalibrationSearch::initMCMC(calibrationsVector, 100000, 100);
+		GelCalibrationSearch::initMCMC(fitID, calibrationsVector, 1000000, 1000);
+
+
+		// Ensure that a trace plot is showing this posterior distribution
+		Plots::setTracePlotPosteriorByID(fitID);
+
 
 
 		string toReturnJSON = "{'stop':" + string(_GUI_STOP ?  "true" : "false") + ",";
 		toReturnJSON += "'acceptanceRate':0,";
+		toReturnJSON += "'selectedPosteriorID':" + to_string(_currentLoggedPosteriorDistributionID) + ",";
 		toReturnJSON += "'lines':'" + _ABCoutputToPrint.str() + "'}";
 
 		messageFromWasmToJS(toReturnJSON, msgID);
@@ -1324,6 +1340,62 @@ extern "C" {
 
 
 
+	// Returns the posterior distribution for calibrating this gel
+	void EMSCRIPTEN_KEEPALIVE getGelPosteriorDistribution(int fitID, int msgID){
+
+
+		list<PosteriorDistributionSample*> posterior = Settings::getPosteriorDistributionByID(fitID);
+
+		string toReturnJSON = "{";
+		//toReturnJSON += "'burnin':" + to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
+
+		// Velocities and band densities
+		toReturnJSON += "'posterior':[";
+		for (list<PosteriorDistributionSample*>::iterator it = posterior.begin(); it != posterior.end(); ++ it){
+			toReturnJSON += (*it)->toJSON() + ",";
+		}
+		if (toReturnJSON.substr(toReturnJSON.length()-1, 1) == ",") toReturnJSON = toReturnJSON.substr(0, toReturnJSON.length() - 1);
+		toReturnJSON += "]";
+		toReturnJSON += "}";
+
+		messageFromWasmToJS(toReturnJSON, msgID);
+
+
+	}
+
+
+	// Get all parameters in the specified posterior distribution. 0 = regular posterior distribution, 1,2,3, ... refer to gel calibrations
+	void EMSCRIPTEN_KEEPALIVE getParametersInPosteriorDistribution(int id, int msgID){
+
+
+		// Use default parameters if the posterior ID is -1 (ie. not a posterior)
+		if (id == -1){
+			string parametersJSON = "{";
+
+			for (int i = 0; i < Settings::paramList.size(); i ++){
+				parametersJSON += Settings::paramList.at(i)->toJSON();
+				if (i < Settings::paramList.size()-1) parametersJSON += ",";
+			}
+
+			parametersJSON += "}";
+
+			messageFromWasmToJS(parametersJSON, msgID);
+
+		}
+
+		else messageFromWasmToJS(BayesianCalculations::getParametersInPosteriorDistributionJSON(id), msgID);
+	}
+
+
+	// Set the current distribution
+	void EMSCRIPTEN_KEEPALIVE setCurrentLoggedPosteriorDistributionID(int id, int msgID){
+		cout << "Setting current posterior to " << id << endl;
+		_currentLoggedPosteriorDistributionID = id;
+		messageFromWasmToJS("{}", msgID);
+	}
+
+
+
 	// Return a list of all parameters which are being estimated in the posterior distribution
 	void EMSCRIPTEN_KEEPALIVE getParametersWithPriors(int msgID){
 
@@ -1343,7 +1415,7 @@ extern "C" {
 
 			// ABC MCMC
 			else{
-				messageFromWasmToJS(MCMC::parametersToEstimate_toJSON(), msgID);
+				messageFromWasmToJS("{" + MCMC::parametersToEstimate_toJSON() + "}", msgID);
 			}
 
 		}
@@ -1376,6 +1448,25 @@ extern "C" {
 		parametersJSON += "}";
 		_needToReinitiateAnimation = false;
 		messageFromWasmToJS(parametersJSON, msgID);
+	}
+
+
+	// Get the names of all posterior distributions
+	void EMSCRIPTEN_KEEPALIVE getPosteriorDistributionNames(int msgID){
+
+		string posteriorsJSON = "{";
+
+		if (_GUI_posterior.size() > 0) posteriorsJSON += "'0':'SimPol MCMC-ABC,";
+		for(std::map<int, list<PosteriorDistributionSample*>>::iterator iter = _gelPosteriorDistributions.begin(); iter != _gelPosteriorDistributions.end(); ++iter){
+			int id = iter->first;
+			 posteriorsJSON += "'" + to_string(id) + "':'Gel calibration " + to_string(id) + "',";
+		}
+
+		if (posteriorsJSON.substr(posteriorsJSON.length()-1, 1) == ",") posteriorsJSON = posteriorsJSON.substr(0, posteriorsJSON.length() - 1);
+		posteriorsJSON += "}";
+
+
+		messageFromWasmToJS(posteriorsJSON, msgID);
 	}
 
 

@@ -40,8 +40,7 @@ PlotSettings::PlotSettings(int plotNumber, string name){
 
 	this->plotNumber = plotNumber;
 	this->name = name;
-	this->plotFromPosterior = false;
-	
+	this->selectedPosteriorID = -1;
 
 	// Distance vs time plot
 	if (this->name == "distanceVsTime"){
@@ -113,8 +112,8 @@ PlotSettings::PlotSettings(int plotNumber, string name){
 		this->yRange = "automaticY";
 		this->xData = "{}"; // State number
 		this->yData = "{}"; // Custom Y variable
-		this->plotFromPosterior = true;
 		this->ESS = 0;
+		this->selectedPosteriorID = 0;
 	}
 
 
@@ -340,15 +339,14 @@ string PlotSettings::toJSON(){
 		settingsJSON += "'customParamY':'" + this->customParamY + "',";
 		settingsJSON += "'metricZ':'" + this->metricZ + "',";
 		settingsJSON += "'zColouring':'" + this->zColouring + "',";
-		settingsJSON += "'plotFromPosterior':" + string(this->plotFromPosterior ? "true" : "false") + ",";
 		settingsJSON += "'xData':" + this->xData + ",";
 		settingsJSON += "'yData':" + this->yData + ",";
 		settingsJSON += "'zData':" + this->zData + ",";
 		settingsJSON += "'sitesToRecordX':'" + this->sitesToRecordX + "',";
 		settingsJSON += "'sitesToRecordY':'" + this->sitesToRecordY + "',";
 		settingsJSON += "'sitesToRecordZ':'" + this->sitesToRecordZ + "',";
-		if (plotFromPosterior) settingsJSON += "'burnin':" + to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
-		
+		if (this->selectedPosteriorID == 0) settingsJSON += "'burnin':" + to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
+		settingsJSON += "'selectedPosteriorID':" + to_string(this->selectedPosteriorID) + ",";
 
 	}
 
@@ -361,6 +359,8 @@ string PlotSettings::toJSON(){
 		settingsJSON += "'yData':" + this->yData + ",";
 		settingsJSON += "'burnin':" + to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
 		settingsJSON += "'ESS':" + to_string(this->ESS) + ",";
+		settingsJSON += "'selectedPosteriorID':" + to_string(this->selectedPosteriorID) + ",";
+
 	}
 
 
@@ -369,7 +369,6 @@ string PlotSettings::toJSON(){
 	return settingsJSON;
 
 }
-
 
 
 
@@ -592,8 +591,8 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 		// Value at index 6 is the colour
 		this->zColouring = values.at(6);
 
-		// Value at index 7 is whether or not to plot from the posterior distribution
-		this->plotFromPosterior = values.at(7) == "true";
+		// Value at index 7 is the posterior distribution id to plot from
+		this->selectedPosteriorID = stoi(values.at(7));
 
 
 
@@ -636,20 +635,6 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 
 
 
-
-
-		// TODO If sample from posterior use the correct points 
-		/*
-		if (PLOTS_JS.whichPlotInWhichCanvas[plotNum]["plotFromPosterior"]){
-			var valuesX = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamX"]);
-			var valuesY = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["customParamY"]);
-			var valuesZ = ABC_JS.getListOfValuesFromPosterior_WW(PLOTS_JS.whichPlotInWhichCanvas[plotNum]["metricZ"]);
-			if (valuesX != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["name"], latexName:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["xData"]["latexName"], vals:valuesX};
-			if (valuesY != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["name"], latexName:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["yData"]["latexName"], vals:valuesY};
-			if (valuesZ != null) PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"] = {name:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"]["name"], latexName:PLOTS_JS.whichPlotInWhichCanvas[plotNum]["zData"]["latexName"], vals:valuesZ};
-		}
-		*/
-	
 
 
 	}
@@ -717,13 +702,18 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 
 
 bool PlotSettings::get_plotFromPosterior(){
-	return this->plotFromPosterior;
+	return this->selectedPosteriorID >= 0;
 }
 
 
-void PlotSettings::set_plotFromPosterior(bool val){
-	if (this->name == "parameterHeatmap"){
-		this->plotFromPosterior = val;
-		cout << "Posterior activated" << val << endl;
-	}
+
+void PlotSettings::setPosteriorDistributionID(int id, string yAxisVariable){
+	this->selectedPosteriorID = id;
+	if (this->name == "tracePlot") this->customParamY = yAxisVariable;
+
 }
+
+int PlotSettings::getPosteriorDistributionID(){
+	return this->selectedPosteriorID;
+}
+

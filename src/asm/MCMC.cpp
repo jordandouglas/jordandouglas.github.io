@@ -579,12 +579,11 @@ ExperimentalData* MCMC::getCurrentExperiment(){
 // Return a JSON string of all parameters being estimated
 string MCMC::parametersToEstimate_toJSON(){
 
-	string JSON = "{";
+	string JSON = "";
 	for (list<Parameter*>::iterator it = MCMC::parametersToEstimate.begin(); it != MCMC::parametersToEstimate.end(); ++it) {
 		JSON += (*it)->toJSON() + ",";
 	}
 	if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
-	JSON += "}";
 	return JSON;
 
 }

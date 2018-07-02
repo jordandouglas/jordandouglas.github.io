@@ -35,6 +35,7 @@
 using namespace std;
 
 
+int GelCalibrationSearch::fitID = 0;
 vector<Parameter*> GelCalibrationSearch::calibrationObservations;
 int GelCalibrationSearch::logEveryNStates = 1;
 int GelCalibrationSearch::nTrials = 0;
@@ -51,10 +52,11 @@ Parameter* GelCalibrationSearch::sigma;
 
 
 // Initialise MCMC for parameter search for a linear model for gel calibration
-void GelCalibrationSearch::initMCMC(vector<Parameter*> calibrationObservations, int nTrials, int logEveryNStates){
+void GelCalibrationSearch::initMCMC(int fitID, vector<Parameter*> calibrationObservations, int nTrials, int logEveryNStates){
 	
 	
 	cout << "Initialising inference" << endl; 
+	GelCalibrationSearch::fitID = fitID;
 	GelCalibrationSearch::calibrationObservations = calibrationObservations;
 	GelCalibrationSearch::logEveryNStates = logEveryNStates;
 	GelCalibrationSearch::nTrials = nTrials;
@@ -82,6 +84,14 @@ void GelCalibrationSearch::initMCMC(vector<Parameter*> calibrationObservations, 
 		parametersToEstimate.at(i)->sample();
 	}
 
+
+	// Initialise posterior distribution (and delete old one first)
+	list<PosteriorDistributionSample*> posterior = Settings::getPosteriorDistributionByID(fitID);
+	for (list<PosteriorDistributionSample*>::iterator it = posterior.begin(); it != posterior.end(); ++ it){
+		delete (*it);
+	}
+	posterior.clear();
+	_gelPosteriorDistributions[fitID] = posterior;
 
 
 
@@ -181,7 +191,7 @@ bool GelCalibrationSearch::perform_1_iteration(int n) {
 
 
 		if(_USING_GUI) {
-			_GUI_posterior.push_back(currentMCMCstate->clone(true));
+			Settings::addToPosteriorDistribution(GelCalibrationSearch::fitID, currentMCMCstate->clone(true));
 		}
 	}
 
@@ -247,8 +257,7 @@ bool GelCalibrationSearch::metropolisHastings(int sampleNum, PosteriorDistributi
 		double estimatedTranscriptLength = GelCalibrationSearch::slope->getVal() / obs->getVal() + GelCalibrationSearch::intercept->getVal();
 
 		//cout << "pixel: " << obs->getVal() << ", estimatedTranscriptLength: " << estimatedTranscriptLength << ", trueLength: " << obs->getDistributionParameterValue("fixedDistnVal") << endl;
-
-		logLikelihood += getLogLikelihood(obs->getDistributionParameterValue("fixedDistnVal"), 0, GelCalibrationSearch::sigma->getVal());
+		logLikelihood += GelCalibrationSearch::getLogLikelihood(obs->getDistributionParameterValue("fixedDistnVal"), estimatedTranscriptLength, GelCalibrationSearch::sigma->getVal());
 
 	}
 	proposal_MCMCState->set_logLikelihood(logLikelihood);

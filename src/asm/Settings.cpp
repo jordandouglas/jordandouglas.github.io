@@ -149,6 +149,7 @@ bool _GUI_simulating = false;
 bool _applyingReactionsGUI = false;
 bool _showRNAfold_GUI = false;
 bool _GUI_user_applying_reaction = false;
+int _currentLoggedPosteriorDistributionID = -1;
 string _animationSpeed = "medium";
 Simulator* _interfaceSimulator; // The simulator object being used by the GUI
 State* _currentStateGUI; // The current state displayed on the GUI and used in all GUI simulations
@@ -156,6 +157,7 @@ chrono::system_clock::time_point _interfaceSimulation_startTime = chrono::system
 SlippageLandscapes* _slippageLandscapesToSendToDOM;
 ostringstream _ABCoutputToPrint;
 list<PosteriorDistributionSample*> _GUI_posterior;
+map<int, list<PosteriorDistributionSample*>> _gelPosteriorDistributions; // All posterior distributions for gel calibrations
 
 
 void Settings::init(){
@@ -447,6 +449,35 @@ void Settings::resetRateTables(){
 	}
 	
 }
+
+
+
+list<PosteriorDistributionSample*> Settings::getPosteriorDistributionByID(int id){
+
+	if (id == 0) return _GUI_posterior;
+
+	if (_gelPosteriorDistributions.find(id) == _gelPosteriorDistributions.end()) {
+		list<PosteriorDistributionSample*> emptyList;
+		return emptyList;
+	}
+	return _gelPosteriorDistributions[id];
+
+}
+
+
+void Settings::addToPosteriorDistribution(int id, PosteriorDistributionSample* obj){
+
+	if (id == 0){
+		_GUI_posterior.push_back(obj);
+		return;
+	}
+
+	if (_gelPosteriorDistributions.find(id) == _gelPosteriorDistributions.end()) return;
+	_gelPosteriorDistributions[id].push_back(obj);
+
+}
+
+
 
 
 
