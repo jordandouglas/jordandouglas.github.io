@@ -22,6 +22,10 @@
 
 
 
+ABC_gel_images_to_load = [];
+
+
+
 function initABCpanel(){
 
 
@@ -68,7 +72,7 @@ function beginABC(){
 
 	// Load the force-velocity values
 	var which = $("#ABC_useMCMC").val() == 1 ? "ABC" : $("#ABC_useMCMC").val() == 2 ? "MCMC" : "NS-ABC"
-	var abcDataObjectForModel = getAbcDataObject(which)
+	var abcDataObjectForModel = getAbcDataObject(which);
 
 	console.log("Sending object", abcDataObjectForModel, $("#ABC_useMCMC").val());
 
@@ -116,6 +120,7 @@ function beginABC(){
 
 
 function onABCStart(){
+
 
 
 
@@ -208,6 +213,8 @@ function getAbcDataObject(which = "ABC"){
 
 	abcDataObjectForModel["fits"] = {};
 
+	console.log("curveTables", curveTables);
+
 	for (var fitNum = 0; fitNum <= curveTables.length; fitNum++){
 
 
@@ -216,14 +223,12 @@ function getAbcDataObject(which = "ABC"){
 
 
 		// Which type of data?
-		var dataType = $("#forceVelocityInputData_" + fitID).length > 0 ? "forceVelocity" : $("#ntpVelocityInputData_" + fitID).length > 0 ? "ntpVelocity" : $("#timeGelInputData_" + fitID).length > 0 ? "timeGel" : null;
+		var dataType = $("#forceVelocityInputData_" + fitID).length > 0 ? "forceVelocity" : $("#ntpVelocityInputData_" + fitID).length > 0 ? "ntpVelocity" : $(".timeGelInputData_" + fitID).length > 0 ? "timeGel" : null;
 
 		if (dataType == null) continue;
 
-		var dataValues = $("#" + dataType + "InputData_" + fitID).val();
 		abcDataObjectForModel["fits"][fitID] = {vals: []};
 		abcDataObjectForModel["fits"][fitID]["dataType"] = dataType;
-		abcDataObjectForModel["fits"][fitID]["chiSqthreshold"] = parseFloat($("#ABC_chiSq_" + fitID).val());
 		abcDataObjectForModel["fits"][fitID]["ATPconc"] = parseFloat($("#ATPconc_" + fitID).val());
 		abcDataObjectForModel["fits"][fitID]["CTPconc"] = parseFloat($("#CTPconc_" + fitID).val());
 		abcDataObjectForModel["fits"][fitID]["GTPconc"] = parseFloat($("#GTPconc_" + fitID).val());
@@ -234,46 +239,79 @@ function getAbcDataObject(which = "ABC"){
 		if (dataType == "ntpVelocity") abcDataObjectForModel["fits"][fitID]["force"] = parseFloat($("#ABC_force_" + fitID).val());
 
 
-		var splitValues = dataValues.split("\n");
-		if (splitValues.length == 0) valid = false;
+
+		// Time gel requires parsing the densities from the image
+		if (dataType == "timeGel"){
 
 
-		for (var lineNum = 0; lineNum < splitValues.length; lineNum++){
-
-
-			if (splitValues[lineNum].trim() == "") continue;
-		
-
+			var fabricCanvas = gelFabricCanvases[fitID];
+			var submitObj = [];
 
 
 
-			// New time category in gel data
-			if (dataType == "timeGel" && splitValues[lineNum].trim().substring(0, 2) == "t="){
-				var splitLine = splitValues[lineNum].split("=");
-				var time = parseFloat(splitLine[1]);
-				abcDataObjectForModel["fits"][fitID]["vals"].push({t: time, lengths: [], densities: []})
-				continue;
+			// Send through densities and prior distributions behind densities. Only submit lanes which have had the simulate button ticked
+			for (var i = 0; i < fabricCanvas.lanes.length; i ++){
+				fabricCanvas.lanes[i].densities = getPixelDensitiesForLane(fitID, fabricCanvas.lanes[i]);
 			}
 
 
-
-			var splitLine = splitValues[lineNum].split(",");
-
-
-			if (splitLine.length == 1 && splitLine[0].trim() == "") continue;
-
-			var X_axis_value = parseFloat(splitLine[0]);
-			var Y_axis_value = parseFloat(splitLine[1]);
+			abcDataObjectForModel["fits"][fitID].lanes = fabricCanvas.lanes;
 
 
-			if    (dataType == "forceVelocity") abcDataObjectForModel["fits"][fitID]["vals"].push({force: X_axis_value, velocity: Y_axis_value});
-			else if (dataType == "ntpVelocity") abcDataObjectForModel["fits"][fitID]["vals"].push({ntp: X_axis_value, velocity: Y_axis_value});
-			else if (dataType == "timeGel"){
-				abcDataObjectForModel["fits"][fitID]["vals"][abcDataObjectForModel["fits"][fitID]["vals"].length-1].lengths.push(X_axis_value);
-				abcDataObjectForModel["fits"][fitID]["vals"][abcDataObjectForModel["fits"][fitID]["vals"].length-1].densities.push(Y_axis_value);
+		}
+
+
+		// Velocity data
+		else{ 
+
+
+
+			var dataValues = $("#" + dataType + "InputData_" + fitID).val();
+			var splitValues = dataValues.split("\n");
+			if (splitValues.length == 0) valid = false;
+
+
+			for (var lineNum = 0; lineNum < splitValues.length; lineNum++){
+
+
+				if (splitValues[lineNum].trim() == "") continue;
+			
+
+
+				/*
+				// New time category in gel data
+				if (dataType == "timeGel" && splitValues[lineNum].trim().substring(0, 2) == "t="){
+					var splitLine = splitValues[lineNum].split("=");
+					var time = parseFloat(splitLine[1]);
+					abcDataObjectForModel["fits"][fitID]["vals"].push({t: time, lengths: [], densities: []})
+					continue;
+				}
+				*/
+
+
+				var splitLine = splitValues[lineNum].split(",");
+
+
+				if (splitLine.length == 1 && splitLine[0].trim() == "") continue;
+
+				var X_axis_value = parseFloat(splitLine[0]);
+				var Y_axis_value = parseFloat(splitLine[1]);
+
+
+				if    (dataType == "forceVelocity") abcDataObjectForModel["fits"][fitID]["vals"].push({force: X_axis_value, velocity: Y_axis_value});
+				else if (dataType == "ntpVelocity") abcDataObjectForModel["fits"][fitID]["vals"].push({ntp: X_axis_value, velocity: Y_axis_value});
+
+				/*
+				else if (dataType == "timeGel"){
+					abcDataObjectForModel["fits"][fitID]["vals"][abcDataObjectForModel["fits"][fitID]["vals"].length-1].lengths.push(X_axis_value);
+					abcDataObjectForModel["fits"][fitID]["vals"][abcDataObjectForModel["fits"][fitID]["vals"].length-1].densities.push(Y_axis_value);
+				}
+				*/
 			}
 
 		}
+
+
 	}
 
 
@@ -326,6 +364,16 @@ function validateExperimentalDataInput(ele){
 	var dataType =  $(ele).attr("id").indexOf("forceVelocity") != -1 ? "forceVelocity" : 
 					$(ele).attr("id").indexOf("ntpVelocity") != -1 ? "ntpVelocity" :
 					$(ele).attr("id").indexOf("timeGel") != -1 ?  "timeGel" : null;
+
+
+	// Time gel is validated if the calibrated property is set to true 
+	if (dataType == "timeGel"){
+
+		var fabricCanvas = gelFabricCanvases[fitID];
+		if (fabricCanvas == null || !fabricCanvas.calibrated) return false;
+		return true;
+	}
+
 
 
 	// Ensure that the values in this textbox are in the format force, velocity with lines separating observations
@@ -558,23 +606,31 @@ function addNewABCData(type = "forceVelocity"){
 			break;
 
 		case "timeGel":
-			HTMLtemplate = getTimeGelTemplate(fitID);
+			HTMLtemplate = getTimeGelTemplateLeft(fitID);
 			break;
 
 
 
 	}
 
-	
-	
-	
-	
+
+	if (type == "timeGel") ABCtableToUse = 1;
+
 	// Add the curve template to the newly opened cell
 	$("#ABCPanelTable" + ABCtableToUse).append(HTMLtemplate);
 
+
+	// Plot on the left and use entire row
+	if (type == "timeGel") {
+		$("#ABCPanelTable2").append(getTimeGelTemplateRight(fitID));
+	}
+
 	// Switch to the other ABC table next time so we have 2 columns of curves
-	ABCtableToUse ++;
-	if (ABCtableToUse > 2) ABCtableToUse = 1;
+	else {
+		ABCtableToUse ++;
+		if (ABCtableToUse > 2) ABCtableToUse = 1;
+	}
+
 
 	// Draw the canvas
 	switch(type){
@@ -968,17 +1024,41 @@ function getABCpauseSiteTemplate(fitID){
 
 
 
-
-
-
-
-function getTimeGelTemplate(fitID){
+function getTimeGelTemplateLeft(fitID){
 	return `
 
 
-		<tr fitID="` + fitID + `" class="timeGelRow" >
+		
 
-			<td colspan=3  style="width:450px; text-align:center; vertical-align:top">
+		<tr fitID="` + fitID + `" class="ABCcurveRow timeGelRow timeGelInputData_` + fitID + `"> <!-- style="background-color:#b3b3b3;"> -->
+
+
+			<td colspan=3 class="` + fitID + `">
+
+				
+
+					<div id="timeGelPlotDIV_` + fitID + `" style="float:left">
+						<canvas id="timeGelPlotIMG_` + fitID + `" width=800 style="position:absolute;"></canvas>
+						<canvas id="timeGelPlot_` + fitID + `" width=800 height=800 style=""> </canvas>
+					</div>
+
+			</td>
+
+		</tr>
+
+
+	`;
+}
+
+
+function getTimeGelTemplateRight(fitID){
+
+
+	return `
+
+	<tr fitID="` + fitID + `" class="timeGelRow" >
+
+			<td colspan=3  style="width:100%; text-align:center; vertical-align:top">
 				<div style="font-size:20px;">
 					Gel electrophoresis of transcript lengths over time
 					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="src/Images/help.png"></a>
@@ -987,25 +1067,15 @@ function getTimeGelTemplate(fitID){
 
 		</tr>
 
-		<tr fitID="` + fitID + `" class="ABCcurveRow timeGelRow"> <!-- style="background-color:#b3b3b3;"> -->
+
+		<tr fitID="` + fitID + `" class="timeGelRow"> <!-- style="background-color:#b3b3b3;"> -->
 
 
 
-			<td colspan=2 class="` + fitID + `">
 
-				
-
-					<div id="timeGelPlotDIV_` + fitID + `" style="float:left">
-						<canvas id="timeGelPlotIMG_` + fitID + `" width=400 style="position:absolute;"></canvas>
-						<canvas id="timeGelPlot_` + fitID + `" width=400 height=300 style=""> </canvas>
-					</div>
-
-			</td>
 
 			<td class="` + fitID + `" style="text-align:center; vertical-align:top;">
 
-					<input type=button id='deleteExperiment_` + fitID + `' class='minimise' style='float:right'  value='&times;' onClick=deleteExperiment("` + fitID + `") title='Delete this experiment'>
-			
 
 					<br><br><br>
 					<table style="width:250px; margin:auto">
@@ -1143,6 +1213,13 @@ function getTimeGelTemplate(fitID){
 			</td>
 
 
+			<td colspan=2  style="width:450px; text-align:center; vertical-align:top">
+				<input type=button id='deleteExperiment_` + fitID + `' class='minimise' style='float:right'  value='&times;' onClick=deleteExperiment("` + fitID + `") title='Delete this experiment'>
+				<canvas id="timeGelXYPlot_` + fitID + `" width=400 height=400> </canvas>
+			</td>
+
+
+
 
 		</tr>
 
@@ -1162,35 +1239,29 @@ function getTimeGelTemplate(fitID){
 
 
 
+
+
+
+
+
 function uploadGel(fitID){
 
 	 var loadGelPng = function(evt) {
 
 		//var files = evt.target.files; // FileList object
-		var file    = document.getElementById("uploadGel_" + fitID).files[0]; //sames as here
+		var file = document.getElementById("uploadGel_" + fitID).files[0]; //sames as here
 
 		var reader  = new FileReader();
 		reader.onloadend = function () {
-			console.log("image:", reader.result);
+			// console.log("image:", reader.result);
 
             var img = new Image();
             img.addEventListener("load", function() {
 
             	//$("#timeGelPlotIMG_" + fitID).attr("src", img.src);
 
+            	uploadGelFromImage(img, fitID);
 
-				// Set the canvas behind the fabric canvas to a static image of the gel
-				var bgImageCanvas = $("#timeGelPlotIMG_" + fitID)[0];
-				bgImageCanvas.width = 400;
-				bgImageCanvas.height = (img.height / img.width) * bgImageCanvas.width;
-				var ctx = bgImageCanvas.getContext('2d');
-				ctx.drawImage(img, 0, 0, bgImageCanvas.width, bgImageCanvas.height);
-
-
-           		drawTimeGelCanvasFromImage(fitID, img);
-
-				$("#timeGelPlotIMG_" + fitID).offset({ top: $("#timeGelPlot_" + fitID).offset().top, left: $("#timeGelPlot_" + fitID).offset().left});
-           		
 
             });
             img.src = reader.result;
@@ -1208,6 +1279,28 @@ function uploadGel(fitID){
 	$("#uploadGel_" + fitID).click();
 
 
+}
+
+
+
+
+function uploadGelFromImage(img, fitID){
+
+
+	// console.log("uploadGelFromImage", fitID, img);
+
+	// Set the canvas behind the fabric canvas to a static image of the gel
+	var bgImageCanvas = $("#timeGelPlotIMG_" + fitID)[0];
+	bgImageCanvas.width = Math.max(img.width, 400);
+	bgImageCanvas.height = (img.height / img.width) * bgImageCanvas.width;
+	var ctx = bgImageCanvas.getContext('2d');
+	ctx.drawImage(img, 0, 0, bgImageCanvas.width, bgImageCanvas.height);
+
+
+	drawTimeGelCanvasFromImage(fitID, img);
+
+	$("#timeGelPlotIMG_" + fitID).offset({ top: $("#timeGelPlot_" + fitID).offset().top, left: $("#timeGelPlot_" + fitID).offset().left});
+           		
 }
 
 
@@ -1417,7 +1510,6 @@ function deleteExperiment(fitID){
 		$("#GTPconc_fit" + (fitNum-1)).val($("#GTPconc_fit" + (fitNum)).val());
 		$("#UTPconc_fit" + (fitNum-1)).val($("#UTPconc_fit" + (fitNum)).val());
 		$("#ABC_force_fit" + (fitNum-1)).val($("#ABC_force_fit" + (fitNum)).val());
-		$("#ABC_chiSq_fit" + (fitNum-1)).val($("#ABC_chiSq_fit" + (fitNum)).val());
 		
 		
 	}
@@ -1873,7 +1965,8 @@ function drawTimeGelPlotCanvas(fitID){
 		}
 	}
 
-
+	console.log("fabricCanvas", fabricCanvas);
+	
 
 	lane.densities = getPixelDensitiesForLane(fitID, lane);
 	computePriorLengthsMuAndSd(lane, fabricCanvas.MWpriors);
@@ -1881,6 +1974,11 @@ function drawTimeGelPlotCanvas(fitID){
 
 	// Draw band intensity plot for the selected lane
 	drawTimeGelDensityCanvas(fitID, lane);
+
+	// Draw XY plot of molecular weight vs migration distance
+	drawMvsLplot(fitID, lane);
+
+
 
 
 }
@@ -1924,7 +2022,228 @@ function drawTimeGelPlotCanvas(fitID, timeGelData = null){
 
 
 
+// Draw migration distance vs transcript length plot
+function drawMvsLplot(fitID, lane){
 
+
+	var canvas = $("#timeGelXYPlot_" + fitID)[0];
+	if (canvas == null) return;
+
+	var ctx = canvas.getContext('2d');
+
+	var canvasSizeMultiplier = 1;
+	var axisGap = 45 * canvasSizeMultiplier;
+	var margin = 3 * canvasSizeMultiplier;
+
+
+	// Get the x and y data to plot
+	var migrationDistances = [];
+	var transcriptLengths = [];
+	var migrationStandardDeviations = [];
+	for (var i = 0; lane != null && i < lane.priors.length; i ++){
+		migrationDistances.push(lane.priors[i].pixelMu);
+		migrationStandardDeviations.push(lane.priors[i].pixelSigma);
+		transcriptLengths.push(lane.priors[i].transcriptLengthOfNormalMean);
+	}
+
+
+
+	getGelPosteriorDistribution_controller(fitID, function(result){
+
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
+		if (migrationDistances.length > 0){
+
+			console.log("migrationDistances", migrationDistances, "transcriptLengths", transcriptLengths);
+
+			var plotWidth = canvas.width - axisGap - margin;
+			var plotHeight = canvas.height - axisGap - margin;
+
+
+			var xmin = 0;
+			var xmax = roundToSF(maximumFromList(migrationDistances), 2, "ceil");
+			var ymin = 0;
+			var ymax = roundToSF(maximumFromList(transcriptLengths) * 1.3, 3, "ceil");
+
+			// Refine xmax and xmin and select positions to add ticks
+			var xlabPos = [];
+			var xResult = getNiceAxesNumbers(xmin, xmax, plotWidth, xmin == 0);
+			xmin = xResult["min"]
+			xmax = xResult["max"]
+			var widthScale = xResult["widthOrHeightScale"]
+			xlabPos = xResult["vals"]
+			//console.log("xResult", xResult);
+
+			var ylabPos = [];
+			var yResult = getNiceAxesNumbers(ymin, ymax, plotHeight, ymin == 0);
+			ymin = yResult["min"]
+			ymax = yResult["max"]
+			var heightScale = yResult["widthOrHeightScale"]
+			ylabPos = yResult["vals"]
+			//console.log("yResult", yResult);
+
+
+
+			// X min and max
+			var axisPointMargin = 5 * canvasSizeMultiplier;
+			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+			ctx.textBaseline="top"; 
+			var tickLength = 10 * canvasSizeMultiplier;
+			ctx.lineWidth = 1 * canvasSizeMultiplier;
+
+			for (var labelID = 0; labelID < xlabPos.length; labelID++){
+				var x0 = widthScale * (xlabPos[labelID] - xmin) + axisGap;
+				ctx.textAlign= labelID == 0 ? "left" : "center";
+				ctx.fillText(xlabPos[labelID], x0, canvas.height - axisGap + axisPointMargin);
+
+				// Draw a tick on the axis
+				ctx.beginPath();
+				ctx.moveTo(x0, canvas.height - axisGap - tickLength/2);
+				ctx.lineTo(x0, canvas.height - axisGap + tickLength/2);
+				ctx.stroke();
+
+			}
+
+
+
+
+			// Y min and max
+			ctx.textBaseline="bottom"; 
+
+			ctx.save()
+			ctx.translate(axisGap - 1.5*axisPointMargin, canvas.height - axisGap);
+			ctx.rotate(-Math.PI/2);
+			for (var labelID = 0; labelID < ylabPos.length; labelID++){
+				var y0 = heightScale * (ylabPos[labelID] - ymin);
+				ctx.fillText(ylabPos[labelID], y0, 0);
+
+				// Draw a tick on the axis
+				ctx.beginPath();
+				ctx.moveTo(y0, axisPointMargin - tickLength/2);
+				ctx.lineTo(y0, axisPointMargin + tickLength/2);
+				ctx.stroke();
+
+
+			}
+			ctx.restore();
+
+
+
+
+			// Plot the posterior distribution of curves
+			var posterior = result["posterior"];
+
+			console.log("Received posterior distribution", posterior);
+
+			ctx.globalAlpha = 0.4;
+			ctx.strokeStyle = "#008CBA";
+			ctx.lineWidth = 1 * canvasSizeMultiplier;
+
+			
+
+			// Plot the lines
+			for (var postNum = 0; postNum < posterior.length; postNum++){
+
+				var linearFn = function(x){
+					return posterior[postNum].slope / x + posterior[postNum].intercept;
+				}
+
+				// Initial point
+				var xPrime = axisGap;
+				var y = linearFn(xmin);
+				var yPrime = plotHeight + margin - heightScale * (y - ymin);
+
+				ctx.beginPath();
+				ctx.moveTo(xPrime, yPrime);
+
+				for (var x = xmin + 1; x <= xmax; x++){
+
+					
+					xPrime = widthScale * (x - xmin) + axisGap;
+					y = linearFn(x);
+					yPrime = plotHeight + margin - heightScale * (y - ymin);
+
+					if (y < ymin) break;
+
+					ctx.lineTo(xPrime, yPrime);
+
+
+				}
+
+
+				// Draw linear model line
+				ctx.stroke(); 
+
+
+			}
+			
+		
+
+			// Add the distance-length values to the plot
+			ctx.globalAlpha = 1;
+			ctx.strokeStyle = "black";
+			for (var obsNum = 0; obsNum < migrationDistances.length; obsNum++){
+					
+				var xPrime = widthScale * (migrationDistances[obsNum] - xmin) + axisGap;
+				var yPrime = plotHeight + margin - heightScale * (transcriptLengths[obsNum] - ymin);
+
+
+				// Add circle
+				ctx.beginPath();
+				ctx.fillStyle = "black"; // ;
+				ctx_ellipse(ctx, xPrime, yPrime, 3 * canvasSizeMultiplier, 3 * canvasSizeMultiplier, 0, 0, 2 * Math.PI);
+				ctx.fill();
+
+
+			}
+				
+
+
+		}
+
+
+
+		// Axes
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = 2 * canvasSizeMultiplier;
+		ctx.beginPath();
+		ctx.moveTo(axisGap, margin);
+		ctx.lineTo(axisGap, canvas.height - axisGap);
+		ctx.lineTo(canvas.width - margin, canvas.height - axisGap);
+		ctx.stroke();
+
+		
+
+		// X label
+		ctx.fillStyle = "black";
+		ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+		ctx.textAlign="center"; 
+		ctx.textBaseline="top"; 
+		var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
+		var xlabYPos = canvas.height - axisGap / 2;
+		ctx.fillText("Migration position (pixels)", xlabXPos, xlabYPos);
+
+		
+		// Y label
+		ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+		ctx.textAlign="center"; 
+		ctx.textBaseline="bottom"; 
+		ctx.save()
+		var ylabXPos = axisGap / 2;
+		var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
+		ctx.translate(ylabXPos, ylabYPos);
+		ctx.rotate(-Math.PI/2);
+		ctx.fillText("mRNA length (nt)", 0 ,0);
+		ctx.restore();
+
+	});
+
+
+
+}
+
+	
 
 
 
@@ -1949,10 +2268,12 @@ function drawTimeGelCanvasFromImage(fitID, image){
 	fabricCanvas.normLine = null;
 	fabricCanvas.lanes = [];
 	fabricCanvas.MWpriors = [];
+	fabricCanvas.calibrated = false;
+	fabricCanvas.currentRectID = 1;
 
 
-	fabricCanvas.setWidth(400);
-	fabricCanvas.setHeight((image.height / image.width) * 400);
+	fabricCanvas.setWidth(Math.max(image.width, 400));
+	fabricCanvas.setHeight((image.height / image.width) * fabricCanvas.width);
 
 
 
@@ -1961,7 +2282,6 @@ function drawTimeGelCanvasFromImage(fitID, image){
 
 
 
-    var currentRectID = 1;
 	var line, rectangle, isDown;
 
 	fabricCanvas.on('mouse:down', function(o){
@@ -2062,6 +2382,10 @@ function drawTimeGelCanvasFromImage(fitID, image){
 
 		if (fabricCanvas.selectedObject != null) return;
 
+
+		isDown = false;
+		
+
 		// Finish drawing rectangle
 		if (fabricCanvas.drawingRectangle) {
 
@@ -2069,15 +2393,10 @@ function drawTimeGelCanvasFromImage(fitID, image){
 			// Is it a lane or a length prior
 			var selectingMWprior = $("#selectLaneOrPrior_" + fitID).is(":checked");
 			if (selectingMWprior){
-				
 				fabricCanvas.MWpriors.push({id: rectangle.id, rectangle:rectangle, transcriptLengthOfNormalMean: null, numberOf_SD_InRectWidth: 3 });
-
-
 			}else{
-
 				fabricCanvas.lanes.push({id: rectangle.id, rectangle:rectangle, laneNum: fabricCanvas.lanes.length + 1, time: 1, densities: new Array(Math.ceil(rectangle.height)) });
 				drawTimeGelPlotCanvas(fitID);
-
 			}
 
 			fabricCanvas.drawingRectangle = false;
@@ -2088,8 +2407,6 @@ function drawTimeGelCanvasFromImage(fitID, image){
 
 		// Finish drawing line, start drawing rectangle
 		else {
-
-
 
 			//var selectingMWprior = $("#selectLaneOrPrior_" + fitID).is(":checked");
 
@@ -2138,7 +2455,7 @@ function drawTimeGelCanvasFromImage(fitID, image){
 				if (line.y2 > line.y1) angle = -angle;
 
 				rectangle = new fabric.Rect({
-					id: currentRectID,
+					id: fabricCanvas.currentRectID,
 			        left: line.x1 - rectWidth/2 / Math.tan(angle),
 			        top: line.y1 - rectWidth/2,
 			        width: rectLength,
@@ -2159,7 +2476,7 @@ function drawTimeGelCanvasFromImage(fitID, image){
 				if (line.x2 > line.x1) angle = -angle;
 
 				rectangle = new fabric.Rect({
-					id: currentRectID,
+					id: fabricCanvas.currentRectID,
 			        left: line.x1 - rectWidth/2,
 			        top: line.y1 - Math.tan(angle) * (rectWidth/2),
 			        width: rectWidth,
@@ -2176,8 +2493,7 @@ function drawTimeGelCanvasFromImage(fitID, image){
 		    fabricCanvas.remove(line);
 		    fabricCanvas.add(rectangle);
 		    fabricCanvas.drawingRectangle = true;
-		    currentRectID ++;
-
+		    fabricCanvas.currentRectID ++;
 
 
 
@@ -2196,13 +2512,12 @@ function drawTimeGelCanvasFromImage(fitID, image){
 
 		}
 
-		isDown = false;
 	});
 
 	fabricCanvas.on("object:selected", function(e) { 
 
 
-	// Finish drawing rectangle
+		// Finish drawing rectangle
 		if (fabricCanvas.drawingRectangle) {
 
 
@@ -2336,6 +2651,37 @@ function drawTimeGelCanvasFromImage(fitID, image){
  	}); 
 
 
+
+}
+
+
+// Load a lane into the appropriate fabric canvas
+function loadLane(fitID, laneNum, time, top, left, width, height, angle, simulateLane, densities){
+
+
+	var fabricCanvas = gelFabricCanvases[fitID];
+
+	// Create the rectangle
+	var rectangle = new fabric.Rect({
+			id: fabricCanvas.currentRectID,
+	        left: left,
+	        top: top,
+	        width: width,
+	        height: height,
+	        angle: angle,
+	        fill: "",
+	        stroke: "#EE7600",
+	        strokeWidth: 2,
+			strokeWidthUnscaled: 2
+	        
+	    });
+
+    fabricCanvas.add(rectangle);
+    fabricCanvas.currentRectID ++;
+
+	fabricCanvas.lanes.push({id: rectangle.id, laneNum: laneNum, time: time, densities: densities, simulateLane: simulateLane, rectangle: rectangle});
+
+	fabricCanvas.renderAll();
 
 }
 
@@ -2678,7 +3024,12 @@ function submitGelFn(fitID){
 
 	onABCStart();
 	addTracePlots();
-	gelInference_controller(fitID, priors);
+
+
+	gelInference_controller(fitID, priors, function(){
+		fabricCanvas.calibrated = true;
+		validateAllAbcDataInputs();
+	});
 
 
 
@@ -3123,36 +3474,6 @@ function drawTimeGelDensityCanvas(fitID, laneData = null){
 		
 
 
-		// Plot the observed densities
-		ctx.globalAlpha = 1;
-		ctx.strokeStyle = "black";
-		ctx.lineWidth = 2 * canvasSizeMultiplier;
-		ctx.beginPath();
-		var xPrime = widthScale * xmin + axisGap;
-		var yPrime = plotHeight + margin - heightScale * (laneData.densities[0]-ymin);
-		ctx.moveTo(xPrime, yPrime);
-
-
-		for (var index = 1; index <= laneData.densities.length; index ++){
-			var len = xmin + index;
-
-			//for (var len = xmin+1; len <= xmax; len ++){
-
-			// If there is a density for this length use it, else 0
-			var density = laneData.densities[index];
-			if (density == null) density = 0;
-
-
-			// Plot it
-			xPrime = widthScale * (len - xmin) + axisGap;
-			yPrime = plotHeight + margin - heightScale * (density - ymin);
-			ctx.lineTo(xPrime, yPrime);
-
-		}
-
-		ctx.stroke();
-
-
 		// Plot the prior distributions of molecular weight
 		//console.log("MWpriors", MWpriors);
 		for (var i = 0; i < laneData.priors.length; i ++){
@@ -3180,15 +3501,16 @@ function drawTimeGelDensityCanvas(fitID, laneData = null){
 			}
 		
 			//console.log("Values", xVals, yVals, xmin, xmax);
+
 		
 			var ymaxNormal = maximumFromList(yVals);  
 			var heightScaleNormal = plotHeight / ymaxNormal;
 		
 			ctx.beginPath();
-			ctx.globalAlpha = 0.5;
+			ctx.globalAlpha = 0.7;
 			ctx.lineWidth = 1;
-			ctx.fillStyle = "#008CBA";
-			ctx.strokeStyle = "#008CBA";
+			ctx.fillStyle = "#afff14";
+			ctx.strokeStyle = "#afff14";
 			ctx.moveTo(axisGap, canvas.height - axisGap);
 			for (var j = 0; j < yVals.length; j ++){
 				ctx.lineTo(xVals[j], (canvas.height - axisGap) - yVals[j] * heightScaleNormal);
@@ -3206,6 +3528,41 @@ function drawTimeGelDensityCanvas(fitID, laneData = null){
 
 
 		} 
+
+
+
+
+
+		// Plot the observed densities
+		ctx.globalAlpha = 1;
+		ctx.strokeStyle = "#EE7600";
+		ctx.fillStyle = "#EE7600";
+		ctx.lineWidth = 2 * canvasSizeMultiplier;
+		ctx.beginPath();
+		var xPrime = widthScale * xmin + axisGap;
+		var yPrime = plotHeight + margin - heightScale * (laneData.densities[0]-ymin);
+		ctx.moveTo(xPrime, yPrime);
+
+
+		for (var index = 1; index <= laneData.densities.length; index ++){
+			var len = xmin + index;
+
+			//for (var len = xmin+1; len <= xmax; len ++){
+
+			// If there is a density for this length use it, else 0
+			var density = laneData.densities[index];
+			if (density == null) density = 0;
+
+
+			// Plot it
+			xPrime = widthScale * (len - xmin) + axisGap;
+			yPrime = plotHeight + margin - heightScale * (density - ymin);
+			ctx.lineTo(xPrime, yPrime);
+
+		}
+
+		ctx.stroke();
+
 
 
 		ctx.globalAlpha = 1;
@@ -3297,7 +3654,7 @@ function drawTimeGelDensityCanvas(fitID, laneData = null){
 		ctx.textBaseline="top"; 
 		var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
 		var xlabYPos = canvas.height - axisGap / 2;
-		ctx.fillText("Migration distance (pixels) for t=" + laneData.time + "s", xlabXPos, xlabYPos);
+		ctx.fillText("Migration position (pixels) for t=" + laneData.time + "s", xlabXPos, xlabYPos);
 
 
 		// Y label
@@ -3676,6 +4033,9 @@ function addNewABCRows(lines){
 
 
 function renderABCoutput(){
+
+
+
 
 	// Print ALL lines or just accepted lines?
 	var linesToUse = $("#ABC_showRejectedParameters").prop("checked") ? ABClines : ABClinesAcceptedOnly;

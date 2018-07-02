@@ -1057,10 +1057,11 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 			for (var fitID in abcDataObjectForModel["fits"]) fits.push(fitID);
 			fits.sort();
 
+
 			for (var i = 0; i < fits.length; i ++){
 
 				var fitID = fits[i];
-				var dataType = $("#forceVelocityInputData_" + fitID).length > 0 ? "forceVelocity" : $("#ntpVelocityInputData_" + fitID).length > 0 ? "ntpVelocity" : $("#timeGelInputData_" + fitID).length > 0 ? "timeGel" : null;
+				var dataType = $("#forceVelocityInputData_" + fitID).length > 0 ? "forceVelocity" : $("#ntpVelocityInputData_" + fitID).length > 0 ? "ntpVelocity" : $(".timeGelInputData_" + fitID).length > 0 ? "timeGel" : null;
 
 				saveXML.writeStartElement(fitID);
 
@@ -1071,6 +1072,8 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 					saveXML.writeAttributeString("GTPconc", abcDataObjectForModel["fits"][fitID]["GTPconc"]);
 					saveXML.writeAttributeString("UTPconc", abcDataObjectForModel["fits"][fitID]["UTPconc"]);
 					if (dataType == "ntpVelocity") saveXML.writeAttributeString("force", abcDataObjectForModel["fits"][fitID]["force"]);
+
+
 					for (var obsNum = 0; obsNum < abcDataObjectForModel["fits"][fitID]["vals"].length; obsNum++){
 						if (dataType == "forceVelocity"){
 							var forceVelocity = abcDataObjectForModel["fits"][fitID]["vals"][obsNum]["force"] + "," + abcDataObjectForModel["fits"][fitID]["vals"][obsNum]["velocity"];
@@ -1080,25 +1083,59 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 							var ntpVelocity = abcDataObjectForModel["fits"][fitID]["vals"][obsNum]["ntp"] + "," + abcDataObjectForModel["fits"][fitID]["vals"][obsNum]["velocity"];
 							saveXML.writeAttributeString("obs" + (obsNum+1), ntpVelocity);
 						}
-						else if (dataType == "timeGel"){
+
+					}
+
+					if (dataType == "timeGel"){
+
+
+
+						for (var laneNum = 0; laneNum < abcDataObjectForModel["fits"][fitID]["lanes"].length; laneNum++){
+							
 
 							// Start a new indentation level
-							var timeElement = "lane" + (obsNum+1); 
+							var timeElement = "lane" + abcDataObjectForModel["fits"][fitID]["lanes"][laneNum].laneNum; 
 							saveXML.writeStartElement(timeElement);
 
-								saveXML.writeAttributeString("time", abcDataObjectForModel["fits"][fitID]["vals"][obsNum].t)
+								saveXML.writeAttributeString("time", abcDataObjectForModel["fits"][fitID]["lanes"][laneNum].time);
+								saveXML.writeAttributeString("simulate", abcDataObjectForModel["fits"][fitID]["lanes"][laneNum].simulateLane == null ? false : abcDataObjectForModel["fits"][fitID]["lanes"][laneNum].simulateLane);
+								saveXML.writeAttributeString("rectTop", abcDataObjectForModel["fits"][fitID]["lanes"][laneNum].rectangle.top);
+								saveXML.writeAttributeString("rectLeft", abcDataObjectForModel["fits"][fitID]["lanes"][laneNum].rectangle.left);
+								saveXML.writeAttributeString("rectWidth", abcDataObjectForModel["fits"][fitID]["lanes"][laneNum].rectangle.width);
+								saveXML.writeAttributeString("rectHeight", abcDataObjectForModel["fits"][fitID]["lanes"][laneNum].rectangle.height);
+								saveXML.writeAttributeString("rectAngle", abcDataObjectForModel["fits"][fitID]["lanes"][laneNum].rectangle.angle);
+								saveXML.writeAttributeString("densities", abcDataObjectForModel["fits"][fitID]["lanes"][laneNum].densities);
 
-								for (var obsNumLane = 0; obsNumLane < abcDataObjectForModel["fits"][fitID]["vals"][obsNum].densities.length; obsNumLane++){
-									var lengthsDensities = abcDataObjectForModel["fits"][fitID]["vals"][obsNum].lengths[obsNumLane] + "," + abcDataObjectForModel["fits"][fitID]["vals"][obsNum].densities[obsNumLane];
-									saveXML.writeAttributeString("obs" + (obsNumLane+1), lengthsDensities);
-								}
+
+								//for (var obsNumLane = 0; obsNumLane < abcDataObjectForModel["fits"][fitID]["vals"][obsNum].densities.length; obsNumLane++){
+									//var lengthsDensities = abcDataObjectForModel["fits"][fitID]["vals"][obsNum].lengths[obsNumLane] + "," + abcDataObjectForModel["fits"][fitID]["vals"][obsNum].densities[obsNumLane];
+									//saveXML.writeAttributeString("obs" + (obsNumLane+1), lengthsDensities);
+								//}
 
 
 							saveXML.writeEndElement();
-								
+
+
 						}
 
 
+
+						//console.log("abcDataObjectForModel", abcDataObjectForModel["fits"][fitID]);
+						//alert("A");
+
+						// Get the canvas where the image is saved
+						var canvas = document.getElementById("timeGelPlotIMG_" + fitID);
+
+						var png = canvas.toDataURL('image/png');
+
+						console.log("png", png);
+
+						// Start a new indentation level
+						saveXML.writeStartElement("img");
+							saveXML.writeAttributeString("encoding", png);
+						saveXML.writeEndElement();
+
+						
 					}
 
 
@@ -1130,11 +1167,26 @@ function loadSessionFromURL(url, resolve = function() { }){
 	xhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 		  
-		   if (xhttp == null || xhttp.responseXML == "") return;
-		   
-		   //console.log("xhttp.responseText", xhttp.responseText);
-		   var XMLstring = xhttp.responseText.replace(/(\r\n|\n|\r)/gm,"");
-		   loadSession_controller(XMLstring, resolve);
+			if (xhttp == null || xhttp.responseXML == "") return;
+
+			//console.log("xhttp.responseText", xhttp.responseText);
+			var XMLstring = xhttp.responseText.replace(/(\r\n|\n|\r)/gm,"");
+
+
+
+			// Do not send image encodings to the model (ie. gel images). 
+			// If the encoding is several MB it may slow things down and cause memory issues
+			// Place the image on the appropriate part of the DOM now and then send the remaining XML through to the model
+			var parser = new DOMParser();
+			var xmlDoc = parser.parseFromString(XMLstring, "text/xml");
+			var imgTags = xmlDoc.getElementsByTagName("img");
+			for (var j = 0; j < imgTags.length; j ++){
+				imgTags[j].remove();
+			}
+			XMLstring = XMLToString(xmlDoc).replace(/(\r\n|\n|\r)/gm,"");
+
+
+			loadSession_controller(XMLstring, resolve);
 		   
 		}
 	};
@@ -1143,6 +1195,20 @@ function loadSessionFromURL(url, resolve = function() { }){
 	
 	
 }
+
+function XMLToString(oXML) {
+
+	 //Code for IE
+	 if (window.ActiveXObject) {
+	 	var oString = oXML.xml; 
+	 	return oString;
+	 } 
+
+	 // Code for Chrome, Safari, Firefox, Opera, etc.
+	 else {
+		 return (new XMLSerializer()).serializeToString(oXML);
+	 }
+ }
 
 
 // Load the session from an xml file
@@ -1185,9 +1251,31 @@ function loadSessionFromFileName(fileName){
 
 			//console.log("Sending XMLstring", XMLstring);
 
+
+			// Do not send image encodings to the model (ie. gel images). 
+			// If the encoding is several MB it may slow things down and cause memory issues
+			// Place the image on the appropriate part of the DOM now and then send the remaining XML through to the model
+			var parser = new DOMParser();
+			var xmlDoc = parser.parseFromString(XMLstring, "text/xml");
+			var imgTags = xmlDoc.getElementsByTagName("img");
+			for (var j = 0; j < imgTags.length; j ++){
+
+				// Save the image encoding so it can be opened later
+				ABC_gel_images_to_load.push(imgTags[j].getAttribute("encoding"));
+
+				// Delete the node from the XML
+				imgTags[j].remove();
+
+
+		       
+			}
+
+
+			XMLstring = XMLToString(xmlDoc).replace(/(\r\n|\n|\r)/gm,"");
 			loadSession_controller(XMLstring);
 
 		};
+
 	})(fileName);
 
 	reader.readAsText(fileName);

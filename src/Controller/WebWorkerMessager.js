@@ -2500,7 +2500,7 @@ function saveSettings_controller(){
 
 			values.push($("#zColouring").val());
 
-			values.push($("#plotFromPosterior").prop("checked"));
+			values.push($("#selectPosteriorDistn").val());
 
 
 			// Site specific constraints for X, Y and Z
@@ -2872,10 +2872,12 @@ function loadSession_controller(XMLData, resolve = function() { }){
 		if (experimentalData != null){
 
 
+
+			console.log("experimentalData", experimentalData);
+
 			// Reset the ABC DOM
 			initABCpanel();
 
-			console.log("experimentalData", experimentalData);
 			if (experimentalData["ntrials"] != null) {
 				if (experimentalData["inferenceMethod"] == "ABC") $("#ABCntrials").val(experimentalData["ntrials"]);
 				else if (experimentalData["inferenceMethod"] == "MCMC") $("#MCMCntrials").val(experimentalData["ntrials"]);
@@ -2897,14 +2899,51 @@ function loadSession_controller(XMLData, resolve = function() { }){
 				var dataType = experimentalData["fits"][fitID]["dataType"];
 
 
-				//console.log("fitID", fitID);
+				console.log("fitID", fitID, dataType);
 				//if ($("[fitid='" + fitID + "']").length > 0) continue;
-
 
 
 				// Add a new ABC curve
 				addNewABCData(dataType);
 				var textAreaString = "";
+
+
+
+				// Display gel image if there is one
+				if (dataType == "timeGel" && ABC_gel_images_to_load.length > 0){
+
+
+					// Display first image in the list
+
+					// Create a new type of data
+					addNewABCData("timeGel");
+
+		            var img = new Image();
+		            img.addEventListener("load", function() {
+		            	console.log("Loaded image");
+		            	uploadGelFromImage(img, img.fitID);
+
+
+
+						// Render the lanes after the image had loaded
+						for (var obsNum = 0; obsNum < experimentalData["fits"][fitID]["vals"].length; obsNum++){
+							var lane = experimentalData["fits"][fitID]["vals"][obsNum];
+							loadLane(fitID, lane.laneNum, lane.time, lane.rectTop, lane.rectLeft, lane.rectWidth, lane.rectHeight, lane.rectAngle, lane.simulateLane, lane.densities);
+
+						}
+
+						drawTimeGelPlotCanvas(fitID);
+
+
+		            });
+
+		            // Parse the image encoding
+		            console.log("Loading image");
+	           		img.fitID = fitID;
+		            img.src = ABC_gel_images_to_load.shift();
+					
+				}
+
 
 
 				// Add the force-velocity observations to the DOM
@@ -2922,19 +2961,6 @@ function loadSession_controller(XMLData, resolve = function() { }){
 					}
 
 
-					else if (dataType == "timeGel"){
-						var time = experimentalData["fits"][fitID]["vals"][obsNum].t;
-						textAreaString += "t=" + time + "\n";
-						for (var obsNumLane = 0; obsNumLane < experimentalData["fits"][fitID]["vals"][obsNum].densities.length; obsNumLane++){
-							
-							textAreaString += experimentalData["fits"][fitID]["vals"][obsNum].lengths[obsNumLane] + ",";
-							textAreaString += experimentalData["fits"][fitID]["vals"][obsNum].densities[obsNumLane];
-							if (obsNumLane < experimentalData["fits"][fitID]["vals"][obsNum].densities.length - 1) textAreaString += "\n" 
-
-						}
-					}
-
-
 					if (obsNum < experimentalData["fits"][fitID]["vals"].length-1) textAreaString += "\n" 
 
 				}
@@ -2945,11 +2971,10 @@ function loadSession_controller(XMLData, resolve = function() { }){
 				$("#CTPconc_" + fitID).val(experimentalData["fits"][fitID]["CTPconc"]);
 				$("#GTPconc_" + fitID).val(experimentalData["fits"][fitID]["GTPconc"]);
 				$("#UTPconc_" + fitID).val(experimentalData["fits"][fitID]["UTPconc"]);
-				$("#ABC_chiSq_" + fitID).val(experimentalData["fits"][fitID]["chiSqthreshold"]);
 				if (dataType == "ntpVelocity") $("#ABC_force_" + fitID).val(experimentalData["fits"][fitID]["force"]);
 
 
-				$("#" + dataType + "InputData_" + fitID).val(textAreaString);
+				if (dataType != "timeGel") $("#" + dataType + "InputData_" + fitID).val(textAreaString);
 
 			}
 
@@ -3002,7 +3027,7 @@ function loadSession_controller(XMLData, resolve = function() { }){
 
 
 // Perform MCMC to infer the parameters of the gel lanes (ie. build a linear model of MW vs migration distance)
-function gelInference_controller(fitID, priors ){
+function gelInference_controller(fitID, priors, resolve = function() { } ){
 
 
 
@@ -3027,7 +3052,8 @@ function gelInference_controller(fitID, priors ){
 		running_ABC = false;
 		simulationRenderingController = false;
 
-		// get_unrendered_ABCoutput_controller();
+
+		resolve();
 
 
 	};
@@ -3042,13 +3068,28 @@ function gelInference_controller(fitID, priors ){
 		simulationRenderingController = false;
 
 
-
+		var first = true;
 		onABCStart();
 
 		// To do in between MCMC trials
 		var updateDOMbetweenTrials = function(result){
 
-			console.log("updateDOMbetweenTrials", result);
+			//console.log("updateDOMbetweenTrials", result);
+
+
+			if (first){
+				first = false;
+				getPosteriorDistributionNames(function(posteriorNames){
+
+					$("#selectLoggedPosteriorDistnDIV").show(100);
+
+					for (var p in posteriorNames){
+						$("#selectLoggedPosteriorDistn").append(`<option value="` + p + `" > ` + posteriorNames[p] + `</option>`);
+					}
+					console.log("result", result.selectedPosteriorID);
+					$("#selectLoggedPosteriorDistn").val(result.selectedPosteriorID);
+				});
+			}
 		
 
 			drawPlots();
@@ -3102,6 +3143,39 @@ function gelInference_controller(fitID, priors ){
 
 }
 
+
+function getGelPosteriorDistribution_controller(fitID, resolve){
+
+
+	if (WEB_WORKER_WASM != null){
+
+		var res = stringifyFunction("getGelPosteriorDistribution", [fitID], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
+	}
+
+
+}
+
+
+function setCurrentLoggedPosteriorDistributionID_controller(){
+
+	if (WEB_WORKER_WASM != null){
+
+		var newID = $("#selectLoggedPosteriorDistn").val();
+		var res = stringifyFunction("setCurrentLoggedPosteriorDistributionID", [newID], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
+	}
+
+
+}
 
 
 // Show or hide sitewise plot
@@ -3476,9 +3550,29 @@ function beginABC_controller(abcDataObjectForModel){
 
 
 				onABCStart();
+				var first = true;
 
 				// To do in between MCMC trials
 				var updateDOMbetweenTrials = function(result){
+
+
+
+
+					if (first){
+						first = false;
+						getPosteriorDistributionNames(function(posteriorNames){
+
+							$("#selectLoggedPosteriorDistnDIV").show(100);
+
+							for (var p in posteriorNames){
+								$("#selectLoggedPosteriorDistn").append(`<option value="` + p + `" > ` + posteriorNames[p] + `</option>`);
+							}
+							$("#selectLoggedPosteriorDistn").val(result.selectedPosteriorID);
+						});
+					}
+		
+
+
 					
 					drawPlots();
 
@@ -3714,6 +3808,37 @@ function update_burnin_controller(){
 
 }
 
+
+function getPosteriorDistributionNames(resolve = function() { }){
+	
+	if (WEB_WORKER_WASM != null) {
+		var res = stringifyFunction("getPosteriorDistributionNames", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((params) => resolve(params));
+
+
+	}
+	
+}
+
+
+
+
+function getParametersInPosteriorDistribution(posteriorID, resolve = function() { }){
+	
+	if (WEB_WORKER_WASM != null) {
+		var res = stringifyFunction("getParametersInPosteriorDistribution", [posteriorID], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((params) => resolve(params));
+
+
+	}
+	
+}
 
 
 

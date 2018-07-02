@@ -903,6 +903,7 @@ function step_plot(vals, range, id, canvasDivID, col, addDashedLines = true, xla
 	if (!isNaN(range[1])) {
 
 
+		
 		// Refine xmax and xmin and select positions to add ticks
 		var xlabPos = [];
 		var xResult = getNiceAxesNumbers(range[0], range[1], plotWidth, range[0] == 0);
@@ -4815,10 +4816,19 @@ function getTracePlotDropdownTemplate(){
 	return `
 		<legend><b>Y-axis variable</b></legend>
 		<select class="dropdown" title="What do you want to show on the y-axis?" id = "traceVariableY" style="vertical-align: middle; text-align:right;">
-			<option value="chiSq">chiSq</option>
-			<option value="logPrior">log prior</option>
 		</select><br>
 		Calculated per trial.
+	`;
+	
+}
+
+
+function selectPosteriorDistributionTemplate(){
+	
+	return `
+		<legend><b>Posterior distribution</b></legend>
+		<select class="dropdown" title="Which posterior distribution do you want to display?" id="selectPosteriorDistn" onChange="changePosteriorDistribution()" style="vertical-align: middle; text-align:right; min-width: 100px">
+		</select><br>
 	`;
 	
 }
@@ -4827,11 +4837,11 @@ function getTracePlotDropdownTemplate(){
 function getPosteriorCheckboxTemplate(){
 
 	return `
-		<label class="switch" title="Only plot points which were accepted by the posterior distribution?">
-	 	 	<input type="checkbox" id="plotFromPosterior"> </input>
-	 	 	<span class="slider round"></span>
-	 	 </label> 
-		<span style="font-size:15px; vertical-align:middle">Posterior</span>
+
+		<legend><b>Data to plot:</b></legend>
+		<select class="dropdown" title="Which data do you want to display?" id="selectPosteriorDistn" style="vertical-align: middle; text-align:right; min-width: 120px">
+			<option value="-1" style="color:white">SimPol simulations</option>
+		</select><br>
 		
 		
 	`;
@@ -5066,7 +5076,23 @@ function plotOptions(plotNum){
 		case "parameterHeatmap": 
 			
 
-			populateHeatmapSettingsParameterDropdowns(plotNum, true);
+			// If sampling from posterior then only have parameters which are being estimated in the dropdown
+			$("#settingCell8").html(getPosteriorCheckboxTemplate());
+			$("#selectPosteriorDistn").attr("onChange", "populateHeatmapSettingsParameterDropdowns(" + plotNum + ")");
+
+
+			getPosteriorDistributionNames(function(posteriorNames){
+
+				for (var p in posteriorNames){
+					$("#selectPosteriorDistn").append(`<option value="` + p + `" > ` + posteriorNames[p] + `</option>`);
+				}
+				$("#selectPosteriorDistn").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum].selectedPosteriorID);
+
+				console.log("selectedPosteriorID", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]);
+
+				populateHeatmapSettingsParameterDropdowns(plotNum, true);
+			});
+
 
 			break;
 			
@@ -5077,20 +5103,23 @@ function plotOptions(plotNum){
 
 			console.log("TP", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]);
 
+
+			// Create a dropdown list which contains all the posterior distributions to choose from
+			$("#settingCell3").html(selectPosteriorDistributionTemplate());
+
 			// Create a dropdown list which contains all the parameters sampled in the prior
 			$("#settingCell4").html(getTracePlotDropdownTemplate().replace("Calculated per trial.", ""));
-
-
-
-			get_ParametersWithPriors_controller(function(params){
-
-				for (var paramID in params){
-					$("#traceVariableY").append(`<option value="` + paramID + `" > ` + params[paramID]["name"] + `</option>`);
-				}
-				$("#traceVariableY").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum].customParamY);
-
-			});
 			
+			getPosteriorDistributionNames(function(posteriorNames){
+
+				for (var p in posteriorNames){
+					$("#selectPosteriorDistn").append(`<option value="` + p + `" > ` + posteriorNames[p] + `</option>`);
+				}
+				$("#selectPosteriorDistn").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum].selectedPosteriorID);
+				changePosteriorDistribution();
+			});
+
+		
 		
 			$("#settingCell1").html(distanceVsTimeOptionsTemplate1().replace("Time range", "Trace range").replace("XUNITS", "").replace("XUNITS", "").replace('value="1"', 'value="1000"'));
 			$("#pauseXRow").remove();
@@ -5142,6 +5171,37 @@ function plotOptions(plotNum){
 
 
 
+// Posterior distribution has been selected / changed. Now we need to populate the variables dropdown list
+function changePosteriorDistribution(){
+
+
+
+	var posteriorID = $("#selectPosteriorDistn").val();
+	var plotNum = $("#settingsPopup").attr("plotNum");
+
+	console.log("changePosteriorDistribution to", posteriorID, "for plot", plotNum);
+	
+
+	if (posteriorID == null) return;
+
+
+	posteriorID = parseFloat(posteriorID);
+
+	getParametersInPosteriorDistribution(posteriorID, function(params){
+
+		$("#traceVariableY").html("");
+
+		for (var paramID in params){
+			$("#traceVariableY").append(`<option value="` + paramID + `" > ` + params[paramID].name + `</option>`);
+		}
+		$("#traceVariableY").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum].customParamY);
+
+	});
+
+
+}
+
+
 function populateHeatmapSettingsParameterDropdowns(plotNum, posteriorFromModel = false){
 
 
@@ -5151,12 +5211,13 @@ function populateHeatmapSettingsParameterDropdowns(plotNum, posteriorFromModel =
 	$("#settingCell5").html(parameterHeatmapZAxisTemplate());
 
 
-	// If sampling from posterior then only have parameters which are being estimated in the dropdown
-	var usingPosterior = posteriorFromModel ? PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["plotFromPosterior"] : $("#plotFromPosterior").prop("checked");
-	var functionToGetParameters = usingPosterior ? function(resolve) { get_ParametersWithPriors_controller(resolve) } : function(resolve) { get_PHYSICAL_PARAMETERS_controller(resolve) };
+
+	var posteriorID = posteriorFromModel ? PLOT_DATA["whichPlotInWhichCanvas"][plotNum].selectedPosteriorID : $("#selectPosteriorDistn").val();
+
+	// var functionToGetParameters = usingPosterior ? function(resolve) { get_ParametersWithPriors_controller(resolve) } : function(resolve) { get_PHYSICAL_PARAMETERS_controller(resolve) };
 
 
-	functionToGetParameters(function(params){
+	getParametersInPosteriorDistribution(posteriorID, function(params){
 		console.log("params",params, params.length);
 		for (var paramID in params){
 			if (!params[paramID]["hidden"] && !params[paramID]["binary"] && params[paramID].name != null) {
@@ -5214,18 +5275,6 @@ function populateHeatmapSettingsParameterDropdowns(plotNum, posteriorFromModel =
 			$("#zMin_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][0]);
 			$("#zMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zRange"][1]);
 		}
-
-
-
-		$("#settingCell8").html(getPosteriorCheckboxTemplate());
-		//if (!PLOT_DATA["thereExistsPosteriorDistribution"]) {
-		//	$("#plotFromPosterior").css("cursor", "auto");
-			//$("#plotFromPosterior").attr("disabled", "disabled");
-		//}
-		$("#plotFromPosterior").prop("checked", usingPosterior);
-		$("#plotFromPosterior").attr("onChange", "populateHeatmapSettingsParameterDropdowns(" + plotNum + ")");
-
-
 
 
 		// Site specific constraints. Set the html attr 'oldvals' to what it was when the settings dialog loaded
