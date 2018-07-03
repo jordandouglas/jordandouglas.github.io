@@ -3068,8 +3068,41 @@ function gelInference_controller(fitID, priors, resolve = function() { } ){
 		simulationRenderingController = false;
 
 
-		var first = true;
 		onABCStart();
+
+
+
+
+
+		var toDoAfterInit = function(result){
+
+
+			// Update the list of posterior distributions and set to the correct one
+			getPosteriorDistributionNames(function(posteriorNames){
+
+				$("#selectLoggedPosteriorDistnDIV").show(100);
+
+				for (var p in posteriorNames){
+					if ($("#selectLoggedPosteriorDistn_" + p).length == 0) $("#selectLoggedPosteriorDistn").append(`<option id="selectLoggedPosteriorDistn_` + p + `" value="` + p + `" > ` + posteriorNames[p] + `</option>`);
+				}
+				console.log("result", result.selectedPosteriorID);
+				// setCurrentLoggedPosteriorDistributionID_controller();
+
+				if ($("#selectLoggedPosteriorDistn").val() != null && $("#selectLoggedPosteriorDistn").val() != result.selectedPosteriorID){
+					ABClines = [];
+					ABClinesAcceptedOnly = [];
+				}
+				$("#selectLoggedPosteriorDistn").val(result.selectedPosteriorID);
+				
+
+
+				updateDOMbetweenTrials(result);
+
+			});
+
+
+		}
+
 
 		// To do in between MCMC trials
 		var updateDOMbetweenTrials = function(result){
@@ -3077,22 +3110,8 @@ function gelInference_controller(fitID, priors, resolve = function() { } ){
 			//console.log("updateDOMbetweenTrials", result);
 
 
-			if (first){
-				first = false;
-				getPosteriorDistributionNames(function(posteriorNames){
-
-					$("#selectLoggedPosteriorDistnDIV").show(100);
-
-					for (var p in posteriorNames){
-						$("#selectLoggedPosteriorDistn").append(`<option value="` + p + `" > ` + posteriorNames[p] + `</option>`);
-					}
-					console.log("result", result.selectedPosteriorID);
-					$("#selectLoggedPosteriorDistn").val(result.selectedPosteriorID);
-				});
-			}
-		
-
 			drawPlots();
+			drawTimeGelPlotCanvas(fitID);
 
 
 			$("#ABCacceptanceVal").html(roundToSF(result.acceptanceRate));
@@ -3136,7 +3155,7 @@ function gelInference_controller(fitID, priors, resolve = function() { } ){
 		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID, false));
-		toCall().then((result) => updateDOMbetweenTrials(result));
+		toCall().then((result) => toDoAfterInit(result));
 
 	}
 
@@ -3163,14 +3182,30 @@ function getGelPosteriorDistribution_controller(fitID, resolve){
 
 function setCurrentLoggedPosteriorDistributionID_controller(){
 
+
+	var newID = $("#selectLoggedPosteriorDistn").val();
+
+	var resolve = function(){
+		
+		get_ABCoutput_controller(newID, function(linesResult) {
+
+			console.log("Rendering");
+
+			ABClines = [];
+			ABClinesAcceptedOnly = [];
+
+			addNewABCRows(linesResult.lines.split("!"));
+			
+		});
+	}
+
 	if (WEB_WORKER_WASM != null){
 
-		var newID = $("#selectLoggedPosteriorDistn").val();
 		var res = stringifyFunction("setCurrentLoggedPosteriorDistributionID", [newID], true);
 		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((result) => resolve(result));
+		toCall().then(() => resolve());
 
 	}
 
@@ -3407,7 +3442,7 @@ function uploadABC_controller(TSVstring){
 		if (success){
 
 
-			get_ABCoutput_controller(function(linesResult) {
+			get_ABCoutput_controller(0, function(linesResult) {
 
 				console.log("Rendering");
 
@@ -3550,28 +3585,38 @@ function beginABC_controller(abcDataObjectForModel){
 
 
 				onABCStart();
-				var first = true;
+
+				var toDoAfterInit = function(result){
+
+
+					// Update the list of posterior distributions and set to the correct one
+					getPosteriorDistributionNames(function(posteriorNames){
+
+						$("#selectLoggedPosteriorDistnDIV").show(100);
+
+						for (var p in posteriorNames){
+							if ($("#selectLoggedPosteriorDistn_" + p).length == 0) $("#selectLoggedPosteriorDistn").append(`<option id="selectLoggedPosteriorDistn_` + p + `" value="` + p + `" > ` + posteriorNames[p] + `</option>`);
+						}
+						console.log("result", result.selectedPosteriorID);
+
+
+						if ($("#selectLoggedPosteriorDistn").val() != null && $("#selectLoggedPosteriorDistn").val() != result.selectedPosteriorID){
+							ABClines = [];
+							ABClinesAcceptedOnly = [];
+						}
+						$("#selectLoggedPosteriorDistn").val(result.selectedPosteriorID);
+
+
+						updateDOMbetweenTrials(result);
+
+					});
+
+
+				}
+
 
 				// To do in between MCMC trials
 				var updateDOMbetweenTrials = function(result){
-
-
-					
-
-					if (first){
-						first = false;
-						getPosteriorDistributionNames(function(posteriorNames){
-
-							$("#selectLoggedPosteriorDistnDIV").show(100);
-
-							for (var p in posteriorNames){
-								$("#selectLoggedPosteriorDistn").append(`<option value="` + p + `" > ` + posteriorNames[p] + `</option>`);
-							}
-							$("#selectLoggedPosteriorDistn").val(result.selectedPosteriorID);
-						});
-					}
-		
-
 
 					
 					drawPlots();
@@ -3654,7 +3699,7 @@ function beginABC_controller(abcDataObjectForModel){
 				var fnStr = "wasm_" + res[0];
 				var msgID = res[1];
 				var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID, false));
-				toCall().then((result) => updateDOMbetweenTrials(result));
+				toCall().then((result) => toDoAfterInit(result));
 
 			});
 		});
@@ -3744,7 +3789,7 @@ function get_unrendered_ABCoutput_controller(resolve = function() { }){
 
 
 
-function get_ABCoutput_controller(resolve = function(lines) { }){
+function get_ABCoutput_controller(posteriorID, resolve = function(lines) { }){
 
 
 	if (WEB_WORKER == null) {
@@ -3763,7 +3808,7 @@ function get_ABCoutput_controller(resolve = function(lines) { }){
 
 	else{
 
-		var res = stringifyFunction("getABCoutput", [], true);
+		var res = stringifyFunction("getABCoutput", [posteriorID], true);
 		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
