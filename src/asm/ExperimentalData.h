@@ -58,13 +58,15 @@ class ExperimentalData{
 		
 		ExperimentalData(int id, string dataType, int nObs);
 
+
+		int getID();
 		bool reset(); // Changes the global settings to reflect the settings described by the first experiment in settingsX
 		bool next(); // Moves on to the next experimental settings
 		int getNTrials(); // Returns the number of trials to perform on the current observation (will return 0 if this has not been set)
 		double getObservation(); // Return the current observation
 		string getDataType();
 		GelLaneData* getCurrentLane();
-		void addTimeGelLane(int laneNum, double time, vector<double> densities, double rectTop, double rectLeft, double rectWidth, double rectHeight, double rectAngle, bool simulateLane);
+		void addTimeGelLane(int laneNum, double time, vector<double> densities, double rectTop, double rectLeft, double rectWidth, double rectHeight, double rectAngle, bool simulateLane, double laneInterceptY);
 		void addDatapoint(double setting, double observation);
 		void addDatapoint(double setting, double observation, int n);
 		void print();

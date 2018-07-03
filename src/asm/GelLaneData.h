@@ -48,16 +48,19 @@ class GelLaneData{
 	double rectWidth;
 	double rectHeight;
 	double rectAngle;
+	double laneInterceptY; // Where the line running down the middle of the lane intercepts the yaxis of the image 
 
 
 	public:
 
 
-		GelLaneData(int laneNum, double time, vector<double> densities, double rectTop, double rectLeft, double rectWidth, double rectHeight, double rectAngle, bool simulateLane);
+		GelLaneData(int laneNum, double time, vector<double> densities, double rectTop, double rectLeft, double rectWidth, double rectHeight, double rectAngle, bool simulateLane, double laneInterceptY);
 
 
 		string toJSON();
 		void clear();
+		int getNumDensities();
+		double get_laneInterceptY();
 
 		double get_time();
 		double get_densityAt(int len);

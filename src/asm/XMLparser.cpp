@@ -343,7 +343,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 
 						// Get the rectangle coordinates
-						double rectTop, rectLeft, rectWidth, rectHeight, rectAngle;
+						double rectTop, rectLeft, rectWidth, rectHeight, rectAngle, laneInterceptY;
 						bool simulateLane;
 						if (laneEle->Attribute("rectTop")) rectTop = atof(laneEle->Attribute("rectTop"));
 						if (laneEle->Attribute("rectLeft")) rectLeft = atof(laneEle->Attribute("rectLeft"));
@@ -351,6 +351,8 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 						if (laneEle->Attribute("rectHeight")) rectHeight = atof(laneEle->Attribute("rectHeight"));
 						if (laneEle->Attribute("rectAngle")) rectAngle = atof(laneEle->Attribute("rectAngle"));
 						if (laneEle->Attribute("simulate")) simulateLane = string(laneEle->Attribute("simulate")) == "true" ? true : false;
+						if (laneEle->Attribute("laneInterceptY")) laneInterceptY = atof(laneEle->Attribute("laneInterceptY"));
+
 
 
 
@@ -365,7 +367,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 								densities.at(obsNum) = stof(splitStr.at(obsNum));
 							}
 
-							experiment->addTimeGelLane(laneNum, time, densities, rectTop, rectLeft, rectWidth, rectHeight, rectAngle, simulateLane);
+							experiment->addTimeGelLane(laneNum, time, densities, rectTop, rectLeft, rectWidth, rectHeight, rectAngle, simulateLane, laneInterceptY);
 							
 						}
 

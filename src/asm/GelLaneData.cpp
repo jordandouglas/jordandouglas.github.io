@@ -31,7 +31,7 @@
 using namespace std;
 
 
-GelLaneData::GelLaneData(int laneNum, double time, vector<double> densities, double rectTop, double rectLeft, double rectWidth, double rectHeight, double rectAngle, bool simulateLane){
+GelLaneData::GelLaneData(int laneNum, double time, vector<double> densities, double rectTop, double rectLeft, double rectWidth, double rectHeight, double rectAngle, bool simulateLane, double laneInterceptY){
 
 	this->laneNum = laneNum;
 	this->time = time;
@@ -42,13 +42,19 @@ GelLaneData::GelLaneData(int laneNum, double time, vector<double> densities, dou
 	this->rectHeight = rectHeight;
 	this->rectAngle = rectAngle;
 	this->simulateLane = simulateLane;
+	this->laneInterceptY = laneInterceptY;
 
 
 }
 
 
+int GelLaneData::getNumDensities(){
+	return this->densities.size();
+}
 
-
+double GelLaneData::get_laneInterceptY(){
+	return this->laneInterceptY;
+}
 
 
 string GelLaneData::toJSON(){
@@ -93,10 +99,8 @@ double GelLaneData::get_time(){
 
 
 
-// Find the density which corresponds to this length. If cannot find then return 0 
-double GelLaneData::get_densityAt(int len){
-	for (int i = 0; i < this->densities.size(); i ++){
-		if (this->transcriptLengths.at(i) == len) return this->densities.at(i);
-	}
-	return 0;
+// Find the density which corresponds to this pixel. If cannot find then return 0 
+double GelLaneData::get_densityAt(int pos){
+	if (pos < 0 || pos >= this->densities.size()) return 0;
+	return this->densities.at(pos);
 }

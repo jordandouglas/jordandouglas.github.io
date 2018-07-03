@@ -640,6 +640,8 @@ extern "C" {
 		// Send the globals settings back to the DOM 
 		string parametersJSON = "{" + Settings::toJSON() + "}";
 
+		cout << "Finished parsing XML" << endl;
+
 		messageFromWasmToJS(parametersJSON, msgID);
 
 	}
@@ -920,6 +922,8 @@ extern "C" {
 	// Initialise ABC
 	void EMSCRIPTEN_KEEPALIVE initABC(int msgID){
 
+
+		cout << "Initialising ABC" << endl;
 
 		_GUI_STOP = false;
 		_GUI_simulating = true;
@@ -1456,7 +1460,7 @@ extern "C" {
 
 		string posteriorsJSON = "{";
 
-		if (_GUI_posterior.size() > 0) posteriorsJSON += "'0':'SimPol MCMC-ABC,";
+		if (_GUI_posterior.size() > 0) posteriorsJSON += "'0':'SimPol MCMC-ABC',";
 		for(std::map<int, list<PosteriorDistributionSample*>>::iterator iter = _gelPosteriorDistributions.begin(); iter != _gelPosteriorDistributions.end(); ++iter){
 			int id = iter->first;
 			 posteriorsJSON += "'" + to_string(id) + "':'Gel calibration " + to_string(id) + "',";
