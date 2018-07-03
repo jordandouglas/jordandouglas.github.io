@@ -1297,9 +1297,11 @@ function uploadGelFromImage(img, fitID){
 	ctx.drawImage(img, 0, 0, bgImageCanvas.width, bgImageCanvas.height);
 
 
+	$("#timeGelPlotIMG_" + fitID).offset({ top: $("#timeGelPlot_" + fitID).offset().top, left: $("#timeGelPlot_" + fitID).offset().left});
+	
+
 	drawTimeGelCanvasFromImage(fitID, img);
 
-	$("#timeGelPlotIMG_" + fitID).offset({ top: $("#timeGelPlot_" + fitID).offset().top, left: $("#timeGelPlot_" + fitID).offset().left});
            		
 }
 
@@ -1411,7 +1413,7 @@ function computePriorLengthsMuAndSd(laneData, MWpriors) {
 	//console.log("lane middle point", laneInterceptX, laneInterceptY, "slope", laneSlope);
 	//console.log("lane middle point", laneIntercept, "slope", laneSlope);
 
-
+	laneData.laneInterceptY = laneInterceptY;
 
 
 	// Plot the prior distributions of molecular weight
@@ -2041,7 +2043,7 @@ function drawMvsLplot(fitID, lane){
 	var transcriptLengths = [];
 	var migrationStandardDeviations = [];
 	for (var i = 0; lane != null && i < lane.priors.length; i ++){
-		migrationDistances.push(lane.priors[i].pixelMu);
+		migrationDistances.push(lane.priors[i].pixelMu + lane.laneInterceptY);
 		migrationStandardDeviations.push(lane.priors[i].pixelSigma);
 		transcriptLengths.push(lane.priors[i].transcriptLengthOfNormalMean);
 	}

@@ -1104,6 +1104,7 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 								saveXML.writeAttributeString("rectWidth", abcDataObjectForModel["fits"][fitID]["lanes"][laneNum].rectangle.width);
 								saveXML.writeAttributeString("rectHeight", abcDataObjectForModel["fits"][fitID]["lanes"][laneNum].rectangle.height);
 								saveXML.writeAttributeString("rectAngle", abcDataObjectForModel["fits"][fitID]["lanes"][laneNum].rectangle.angle);
+								saveXML.writeAttributeString("laneInterceptY", abcDataObjectForModel["fits"][fitID]["lanes"][laneNum].laneInterceptY);
 								saveXML.writeAttributeString("densities", abcDataObjectForModel["fits"][fitID]["lanes"][laneNum].densities);
 
 
@@ -1128,7 +1129,7 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 
 						var png = canvas.toDataURL('image/png');
 
-						console.log("png", png);
+						//console.log("png", png);
 
 						// Start a new indentation level
 						saveXML.writeStartElement("img");
@@ -1171,29 +1172,8 @@ function loadSessionFromURL(url, resolve = function() { }){
 
 			//console.log("xhttp.responseText", xhttp.responseText);
 			var XMLstring = xhttp.responseText.replace(/(\r\n|\n|\r)/gm,"");
+			loadSessionFromString(XMLstring);
 
-
-
-			// Do not send image encodings to the model (ie. gel images). 
-			// If the encoding is several MB it may slow things down and cause memory issues
-			// Place the image on the appropriate part of the DOM now and then send the remaining XML through to the model
-			var parser = new DOMParser();
-			var xmlDoc = parser.parseFromString(XMLstring, "text/xml");
-			var imgTags = xmlDoc.getElementsByTagName("img");
-			for (var j = 0; j < imgTags.length; j ++){
-
-				// Save the image encoding so it can be opened later
-				ABC_gel_images_to_load.push(imgTags[j].getAttribute("encoding"));
-
-				// Delete the node from the XML
-				imgTags[j].remove();
-
-		       
-			}
-
-
-			XMLstring = XMLToString(xmlDoc).replace(/(\r\n|\n|\r)/gm,"");
-			loadSession_controller(XMLstring);
 		   
 		}
 	};
@@ -1255,31 +1235,7 @@ function loadSessionFromFileName(fileName){
 
 			if (e == null || e.target.result == "") return;
 			var XMLstring = e.target.result.replace(/(\r\n|\n|\r)/gm,"");
-
-			//console.log("Sending XMLstring", XMLstring);
-
-
-			// Do not send image encodings to the model (ie. gel images). 
-			// If the encoding is several MB it may slow things down and cause memory issues
-			// Place the image on the appropriate part of the DOM now and then send the remaining XML through to the model
-			var parser = new DOMParser();
-			var xmlDoc = parser.parseFromString(XMLstring, "text/xml");
-			var imgTags = xmlDoc.getElementsByTagName("img");
-			for (var j = 0; j < imgTags.length; j ++){
-
-				// Save the image encoding so it can be opened later
-				ABC_gel_images_to_load.push(imgTags[j].getAttribute("encoding"));
-
-				// Delete the node from the XML
-				imgTags[j].remove();
-
-
-		       
-			}
-
-
-			XMLstring = XMLToString(xmlDoc).replace(/(\r\n|\n|\r)/gm,"");
-			loadSession_controller(XMLstring);
+			loadSessionFromString(XMLstring);
 
 		};
 
@@ -1293,6 +1249,31 @@ function loadSessionFromFileName(fileName){
 
 
 
+
+function loadSessionFromString(XMLstring, resolve = function() { }){
+
+
+	// Do not send image encodings to the model (ie. gel images). 
+	// If the encoding is several MB it may slow things down and cause memory issues
+	// Place the image on the appropriate part of the DOM now and then send the remaining XML through to the model
+	var parser = new DOMParser();
+	var xmlDoc = parser.parseFromString(XMLstring, "text/xml");
+	var imgTags = xmlDoc.getElementsByTagName("img");
+	for (var j = 0; j < imgTags.length; j ++){
+
+		// Save the image encoding so it can be opened later
+		ABC_gel_images_to_load.push(imgTags[j].getAttribute("encoding"));
+
+		// Delete the node from the XML
+		imgTags[j].remove();
+	}
+
+
+	XMLstring = XMLToString(xmlDoc).replace(/(\r\n|\n|\r)/gm,"");
+	loadSession_controller(XMLstring, resolve);
+
+
+}
 
 
 

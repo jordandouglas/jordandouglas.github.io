@@ -3545,8 +3545,8 @@ function beginABC_controller(abcDataObjectForModel){
 		var toCall = () => new Promise((resolve) => getXMLstringOfSession("", resolve));
 		toCall().then((XMLData) => {
 
-
-			loadSession_controller(XMLData.replace(/(\r\n|\n|\r)/gm,""), function() {
+			loadSessionFromString(XMLData, function() {
+			//loadSession_controller(XMLData.replace(/(\r\n|\n|\r)/gm,""), function() {
 
 
 				onABCStart();
@@ -3556,7 +3556,7 @@ function beginABC_controller(abcDataObjectForModel){
 				var updateDOMbetweenTrials = function(result){
 
 
-
+					
 
 					if (first){
 						first = false;
