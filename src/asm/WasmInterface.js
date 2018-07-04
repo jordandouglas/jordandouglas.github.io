@@ -457,7 +457,7 @@ getPosteriorDistribution = function(msgID = null){
 
 
 // Generate the full ABC output
-getABCoutput = function(msgID = null){
+getABCoutput = function(posteriorDistributionID, msgID = null){
 	
 	
 	// Create the callback function
@@ -909,7 +909,11 @@ setCurrentLoggedPosteriorDistributionID = function(id, msgID = null){
 	//console.log("Changing speed to", speed);
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 
+
+	// Set the new ID
 	Module.ccall("setCurrentLoggedPosteriorDistributionID", null, ["number", "number"], [id, msgID]);
+
+
 
 
 }

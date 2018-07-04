@@ -176,7 +176,7 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 
 	// If time gel then compare distribution of lengths
 	if (observed->getDataType() == "timeGel"){
-
+		
 
 
 		GelLaneData* currentLane = observed->getCurrentLane();
@@ -193,79 +193,98 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 		PosteriorDistributionSample* linearModel = (*posteriorIterator);
 
 
-		// Create empty list of intensities
-		vector<double> simulatedIntensities(currentLane->getNumDensities());
-		for (int i = 0; i < simulatedIntensities.size(); i ++) simulatedIntensities.at(i) = 0;
+
+		//
+		// Calculate the observed probability densities of length for this lane
+		//
+
+		// Create empty list of probability densities at each length
+		vector<double> observedLengthProbabilityDensities(templateSequence.length());
+		for (int i = 0; i < observedLengthProbabilityDensities.size(); i ++) observedLengthProbabilityDensities.at(i) = 0;
+		for (int i = 0; i < currentLane->getNumDensities(); i ++){
 
 
+			// Turn each migration position into a length using the linear model
+			double migrationPosition = currentLane->get_laneInterceptY() + i;
+			int len = (int)std::round(linearModel->getParameterEstimate("slope") / migrationPosition + getParameterEstimate("intercept"));
+
+
+			// If length is zero it won't show up on the gel
+			if (len <= 0 || len > templateSequence.length()) continue; 
+
+
+			// Calculate the band intensity from this migration distances. Longer molecules have more stain
+			// We are assuming a linear releationship between transcript length and its contribution to intensity at its position 
+			double density = currentLane->get_densityAt(i) / len;
+
+			observedLengthProbabilityDensities.at(len-1) += density;
+
+
+		}
+
+
+		//
+		// Calculate the simulated probability densities of length for this lane
+		//
+
+		// Create empty list of probability densities at each length
+		vector<double> simulatedLengthProbabilityDensities(templateSequence.length());
 		list<int> simulatedLengths = simulated->get_transcriptLengths();
 		for (list<int>::iterator it = simulatedLengths.begin(); it != simulatedLengths.end(); ++it){
 
 			int len = *it;
 
 			// If length is zero it won't show up on the gel
-			if (len == 0) continue; 
+			if (len == 0 || len > templateSequence.length()) continue; 
 
-			// Use the linear model to convert each length into a migration distance (units pixels)
-			double migrationDistance = linearModel->getParameterEstimate("slope") / (len - linearModel->getParameterEstimate("intercept"));
-
-			int migrationDistanceAlongLane = std::floor(migrationDistance - currentLane->get_laneInterceptY());
-
-			//cout << "migrationDistance: " << migrationDistance << ", migrationDistanceAlongLane: " << migrationDistanceAlongLane << " len " << simulatedIntensities.size() << endl;
-
-			// If migration distance is outside of the lane's range then continue
-			if (migrationDistanceAlongLane <= 0|| migrationDistanceAlongLane-1 >= simulatedIntensities.size()) continue;
 
 			// Calculate the band intensity from this migration distances. Longer molecules have more stain
 			// We are assuming a linear releationship between transcript length and its contribution to intensity at its position 
-			simulatedIntensities.at(migrationDistanceAlongLane-1) += len;
+			simulatedLengthProbabilityDensities.at(len-1) += len;
 			
 
 		}
 
 
+		//
+		// Normalise probability densities into range [0,1] (so not technically a probability distribution but proportional to one)
+		//
 
-		// Normalise intensities into range [0,1]
-		double minIntensity = INFINITY;
-		double maxIntensity = 0;
-		for (int i = 0; i < simulatedIntensities.size(); i ++){
-			maxIntensity = std::max(maxIntensity, simulatedIntensities.at(i)); 
-			minIntensity = std::min(minIntensity, simulatedIntensities.at(i));
+
+		// Observed
+		double minObsDensity = INFINITY;
+		double maxObsDensity = 0;
+		for (int i = 0; i < observedLengthProbabilityDensities.size(); i ++){
+			maxObsDensity = std::max(maxObsDensity, observedLengthProbabilityDensities.at(i)); 
+			minObsDensity = std::min(minObsDensity, observedLengthProbabilityDensities.at(i));
 		}
 
-		if (maxIntensity - minIntensity > 0){
-			for (int i = 0; i < simulatedIntensities.size(); i ++) simulatedIntensities.at(i) = (simulatedIntensities.at(i) - minIntensity) / (maxIntensity - minIntensity);
+		if (maxObsDensity - minObsDensity > 0){
+			for (int i = 0; i < observedLengthProbabilityDensities.size(); i ++) observedLengthProbabilityDensities.at(i) = (observedLengthProbabilityDensities.at(i) - minObsDensity) / (maxObsDensity - minObsDensity);
 		}
 
 		else{
-			for (int i = 0; i < simulatedIntensities.size(); i ++) simulatedIntensities.at(i) = 0;
+			for (int i = 0; i < observedLengthProbabilityDensities.size(); i ++) observedLengthProbabilityDensities.at(i) = 0;
 		}
 
 
-
-		/*
-		// Normalise so it has a mean of 0 and var of 1
-		double mu = 0;
-		double sigma2 = 0;
-		for (int i = 0; i < lengthCounts.size(); i ++) mu += lengthCounts.at(i);
-		mu /= lengthCounts.size();
-		for (int i = 0; i < lengthCounts.size(); i ++) sigma2 += pow(lengthCounts.at(i) - mu, 2);
-		sigma2 /= lengthCounts.size();
-		for (int i = 0; i < lengthCounts.size(); i ++) simulatedDensities.at(i) = (lengthCounts.at(i) - mu) / sigma2;
-
-		// Normalise so it has a max of 1
-		double max_val = 0;
-		for (int i = 0; i < lengthCounts.size(); i ++) max_val = max(max_val, 1.0 * lengthCounts.at(i));
-		for (int i = 0; i < lengthCounts.size(); i ++) simulatedDensities.at(i) = lengthCounts.at(i) / max_val;
-
-
-		// We don't want to divide by zero so will use a fudge factor
-		double fudge = 0.0001;
-		for (int i = 0; i < simulatedDensities.size(); i ++) {
-			if (simulatedDensities.at(i) >= 0 && simulatedDensities.at(i) < fudge) simulatedDensities.at(i) = fudge;
-			else if (simulatedDensities.at(i) < 0 && simulatedDensities.at(i) > -fudge) simulatedDensities.at(i) = -fudge;
+		// Simulated
+		double minSimDensity = INFINITY;
+		double maxSimDensity = 0;
+		for (int i = 0; i < simulatedLengthProbabilityDensities.size(); i ++){
+			maxSimDensity = std::max(maxSimDensity, simulatedLengthProbabilityDensities.at(i)); 
+			minSimDensity = std::min(minSimDensity, simulatedLengthProbabilityDensities.at(i));
 		}
-		*/
+
+		if (maxSimDensity - minSimDensity > 0){
+			for (int i = 0; i < simulatedLengthProbabilityDensities.size(); i ++) simulatedLengthProbabilityDensities.at(i) = (simulatedLengthProbabilityDensities.at(i) - minSimDensity) / (maxSimDensity - minSimDensity);
+		}
+
+		else{
+			for (int i = 0; i < simulatedLengthProbabilityDensities.size(); i ++) simulatedLengthProbabilityDensities.at(i) = 0;
+		}
+
+
 
 	
 
@@ -273,16 +292,16 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 		// Lag = 1:
 		// Sim:		1	2	3	4	5
 		// Obs:			1	2	3	4	5
-		int minLag = -20;
-		int maxLag = 20;
+		int minLag = -3;
+		int maxLag = 3;
 		//GelLaneData* currentLane = observed->getCurrentLane();
 		double chiSqLane = 0;
 		for (int lag = minLag; lag <= maxLag; lag++){
 
 			// Compute X2 at current lag
-			for (int i = max(lag, 0); i < min(simulatedIntensities.size() + lag, simulatedIntensities.size()); i ++){
-				double simVal = simulatedIntensities.at(i);
-				double obsVal = currentLane->get_densityAt(i-lag);
+			for (int i = max(lag, 0); i < min(observedLengthProbabilityDensities.size() + lag, observedLengthProbabilityDensities.size()); i ++){
+				double simVal = simulatedLengthProbabilityDensities.at(i);
+				double obsVal = observedLengthProbabilityDensities.at(i); //currentLane->get_densityAt(i-lag);
 
 
 				// Calculate accumulative chi-squared. Want to ensure that 0/0 = 0 and not infinity
@@ -298,7 +317,7 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 
 
 
-		this->simulatedDensities.at(this->currentObsNum) = simulatedIntensities;
+		this->simulatedDensities.at(this->currentObsNum) = simulatedLengthProbabilityDensities;
 		this->simulatedValues.at(this->currentObsNum) = chiSqLane;
 		this->chiSquared += chiSqLane;
 

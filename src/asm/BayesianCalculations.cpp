@@ -507,7 +507,7 @@ string BayesianCalculations::getParametersInPosteriorDistributionJSON(int id){
 			}
 
 			else {
-				JSON += param->toJSON() + "',";
+				JSON += param->toJSON() + ",";
 			}
 
 		}

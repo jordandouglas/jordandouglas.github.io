@@ -90,6 +90,10 @@ void MCMC::initMCMC(){
 	MCMC::tryToEstimateParameter(kCat);
 	MCMC::tryToEstimateParameter(Kdiss);
 	MCMC::tryToEstimateParameter(RateBind);
+	MCMC::tryToEstimateParameter(RateActivate);
+	MCMC::tryToEstimateParameter(RateDeactivate);
+	MCMC::tryToEstimateParameter(RateCleave);
+
 
 
 	// 2 states stored in memory

@@ -104,3 +104,5 @@ double GelLaneData::get_densityAt(int pos){
 	if (pos < 0 || pos >= this->densities.size()) return 0;
 	return this->densities.at(pos);
 }
+
+
