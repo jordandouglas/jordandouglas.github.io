@@ -1227,7 +1227,8 @@ function getTimeGelTemplateRight(fitID){
 		<tr fitID="` + fitID + `" class="timeGelRow timeGelDensityPlotDIV_` + fitID + `" style="display:none">
 
 			<td colspan=3>
-				<canvas id="timeGelDensityPlot_` + fitID + `" width=750 height=150> </canvas>
+				<canvas id="timeGelDensityPlot_` + fitID + `" width=750 height=150> </canvas> <br>
+				<canvas id="timeGelDensityPosteriorPlot_` + fitID + `" width=750 height=150> </canvas>
 			</td>
 
 		</tr>
@@ -1981,46 +1982,15 @@ function drawTimeGelPlotCanvas(fitID){
 	drawMvsLplot(fitID, lane);
 
 
+	drawTimeGelDensityPosteriorCanvas(fitID, lane);
+
+
+
 
 
 }
 
 
-
-
-/*
-function drawTimeGelPlotCanvas(fitID, timeGelData = null){
-
-	// Draw the gel
-	drawTimeGelCanvas(fitID, timeGelData);
-	
-
-	// Draw band intensity plot for the selected lane
-	if (timeGelData != null && timeGelData.length > 0) {
-		console.log("timeGelData", timeGelData);
-
-		var currentVal = $("#selectLane_" + fitID).val(); // Save the current value (if it has one)
-
-		$("#selectLane_" + fitID).children().remove();
-		for (var i = 0; i < timeGelData.length; i ++){
-			$("#selectLane_" + fitID).append("<option value='" + (i+1) + "'>Lane " + (i+1) + ": t = " + timeGelData[i].t + "s</option>");
-		}
-
-		if (currentVal != null) $("#selectLane_" + fitID).val(currentVal); // Reset to the previous lane number (if there was one)
-		$(".timeGelDensityPlotDIV_" + fitID).show(50);
-
-
-		// Draw the density plot of the appropriate lane
-		currentVal = $("#selectLane_" + fitID).val();
-		getTemplateSequenceLength_controller(function(result) {
-			drawTimeGelDensityCanvas(fitID, result.nbases, timeGelData[parseFloat(currentVal)-1]);
-		});
-
-
-	}
-
-}
-*/
 
 
 
@@ -3352,6 +3322,449 @@ function addDensityNormalHoverEvents(ctx, canvas, transcriptLengthOfNormalMean, 
 
 
 
+
+
+
+
+// Draws a posterior density plot of lengths vs intensities for the specified lane
+function drawTimeGelDensityPosteriorCanvas(fitID, laneData = null){
+
+
+	console.log("drawTimeGelDensityPosteriorCanvas", drawTimeGelDensityPosteriorCanvas);
+
+
+	var canvas = $("#timeGelDensityPosteriorPlot_" + fitID)[0];
+	if (canvas == null) return;
+
+
+	getGelPosteriorDistribution_controller(fitID, function(calibrationResult){
+
+
+		// Plot the polymerase simulation ABC posterior distribution (if there is one)
+		getPosteriorDistribution_controller(function(polymeraseResult){
+
+
+			var ctx = canvas.getContext('2d');
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.globalAlpha = 1;
+
+
+			var canvasSizeMultiplier = 1;
+			var laneLabelHeight = 20 * canvasSizeMultiplier;
+			var margin = 3 * canvasSizeMultiplier;
+			var axisGap = 40 * canvasSizeMultiplier;
+			var laneWidth = 40 * canvasSizeMultiplier;
+			var laneGap = 5 * canvasSizeMultiplier;
+
+
+
+
+			var plotWidth = canvas.width - axisGap - margin;
+			var plotHeight = canvas.height - axisGap - margin;
+
+
+
+			if (calibrationResult.posterior != null && calibrationResult.posterior.length > 0){
+
+
+				// Find mean predicted length to use as xlim
+				var meanPredictedLength = 0; 
+				for (var j = 0; j < calibrationResult.posterior.length; j ++){
+					var predictedLength = calibrationResult.posterior[j].intercept + calibrationResult.posterior[j].slope / laneData.laneInterceptY;
+					meanPredictedLength += predictedLength;
+					//maximumPredictedLength = Math.max(maximumPredictedLength, Math.round(predictedLength));
+				}
+				meanPredictedLength = meanPredictedLength / calibrationResult.posterior.length;
+				console.log("Mean length", meanPredictedLength);
+
+
+
+			
+
+				// Refine xmax and xmin and select positions to add ticks
+				var xlabPos = [];
+				var xResult = getNiceAxesNumbers(1, meanPredictedLength, plotWidth, false);
+				var xmin = xResult["min"]
+				var xmax = xResult["max"]
+				var widthScale = xResult["widthOrHeightScale"]
+				xlabPos = xResult["vals"]
+				//console.log("xResult", xResult);
+
+				var ymin = 0;
+				var ymax = 1;
+				var heightScale = plotHeight / (ymax - ymin);
+
+
+
+
+
+
+
+
+				// Plot the calibration results and account for the MCMC burn-in
+				ctx.globalAlpha = 0.3;
+				ctx.strokeStyle = "blue"; // "#424f4f";
+				ctx.fillStyle = "blue"; //"#424f4f";
+				ctx.lineWidth = 1 * canvasSizeMultiplier;
+				console.log("calibrationResult", calibrationResult);
+				for (var postNum = calibrationResult.burnin; calibrationResult.burnin >= 0 && postNum < calibrationResult.burnin + 10 /*calibrationResult.posterior.length*/; postNum++){
+
+
+					var slope = calibrationResult.posterior[postNum].slope;
+					var intercept = calibrationResult.posterior[postNum].intercept;
+
+					// Plot a curve of length densities
+					var observedLengthProbabilityDensities = [];
+					for (var len = 1; len <= xmax; len++) observedLengthProbabilityDensities[len-1] = 0;
+					for (var j = 0; j < laneData.densities.length; j ++){
+
+
+						// Turn each migration position into a length using the linear model
+						var migrationPosition = laneData.laneInterceptY + j;
+						var len = Math.round(slope / migrationPosition + intercept);
+
+						//console.log("len", len, "migrationPosition", migrationPosition, "j", j, "slope", slope, "intercept", intercept);
+
+
+						// If length is zero it won't show up on the gel
+						if (len <= 0 || len > xmax) continue; 
+
+
+						// Calculate the band intensity from this migration distances. Longer molecules have more stain
+						// We are assuming a linear releationship between transcript length and its contribution to intensity at its position 
+						var density = laneData.densities[j] / len;
+
+						observedLengthProbabilityDensities[len-1] += density;
+
+
+					}
+
+					//console.log("observedLengthProbabilityDensities", observedLengthProbabilityDensities);
+
+					// Normalise into range [0,1]
+					var minObsDensity = 1e10;
+					var maxObsDensity = 0;
+					for (var i = 0; i < observedLengthProbabilityDensities.length; i ++){
+						maxObsDensity = Math.max(maxObsDensity, observedLengthProbabilityDensities[i]); 
+						minObsDensity = Math.min(minObsDensity, observedLengthProbabilityDensities[i]);
+					}
+
+					if (maxObsDensity - minObsDensity > 0){
+						for (var i = 0; i < observedLengthProbabilityDensities.length; i ++) observedLengthProbabilityDensities[i] = (observedLengthProbabilityDensities[i] - minObsDensity) / (maxObsDensity - minObsDensity);
+					}
+
+					else{
+						for (var i = 0; i < observedLengthProbabilityDensities.length; i ++) observedLengthProbabilityDensities[i] = 0;
+					}
+
+
+
+					// Plot the calibration posterior distribution of densities
+					var xPrime = widthScale * 0 + axisGap;
+					var yPrime = plotHeight + margin - heightScale * -ymin;
+					ctx.moveTo(xPrime, yPrime);
+					for (var len = 1; len < observedLengthProbabilityDensities.length; len++) {
+
+
+						var density = observedLengthProbabilityDensities[len];
+
+						// Plot it
+						xPrime = widthScale * (len - xmin) + axisGap;
+						yPrime = plotHeight + margin - heightScale * (density - ymin);
+						ctx.lineTo(xPrime, yPrime);
+
+					}
+					ctx.stroke();
+
+
+
+					/*
+					var posteriorDensities = calibrationResult.posterior[postNum]["simulatedDensities"][correctObsNum];
+
+
+					//console.log("posteriorDensities", correctObsNum, posteriorDensities)
+
+					var xPrime = widthScale * 0 + axisGap;
+					var yPrime = plotHeight + margin - heightScale * -ymin;
+					ctx.moveTo(xPrime, yPrime);
+
+
+					// Plot the posterior distribution of densities
+					for (var len = 1; posteriorDensities != null && len < posteriorDensities.length; len++) {
+
+
+
+						// If there is a density for this length use it, else 0
+						var density = posteriorDensities[len];
+
+						
+
+
+						// Plot it
+						xPrime = widthScale * (len - xmin) + axisGap;
+						yPrime = plotHeight + margin - heightScale * (density - ymin);
+						ctx.lineTo(xPrime, yPrime);
+
+					}
+
+					ctx.stroke();
+				*/
+					
+				}
+
+
+
+
+
+
+
+				if (polymeraseResult.posterior != null && polymeraseResult.posterior.length > 0){
+
+
+					
+					var abcDataObjectForModel = getAbcDataObject();
+
+
+					var fitIDs = [];
+					for (var fitID_temp in abcDataObjectForModel["fits"]) fitIDs.push(fitID_temp);
+					fitIDs.sort();
+					var correctObsNum = 0;
+					//console.log("abcDataObjectForModel", abcDataObjectForModel)
+					for (var fitNum = 0; fitNum < fitIDs.length; fitNum++){
+
+						if (fitIDs[fitNum] == fitID) {
+
+							// Correct fit num, get the right lane
+							for (var laneNum = 0; laneNum < abcDataObjectForModel["fits"][fitIDs[fitNum]]["vals"].length; laneNum++){
+								if (abcDataObjectForModel["fits"][fitIDs[fitNum]]["vals"][laneNum].t == laneData.time) break;
+								correctObsNum ++;
+							}
+							break;
+						}
+						correctObsNum += abcDataObjectForModel["fits"][fitIDs[fitNum]]["vals"].length;
+					}
+
+
+					console.log("polymeraseResult", polymeraseResult, "correctObsNum", correctObsNum);
+
+
+
+
+					// Account for the MCMC burn-in
+					ctx.globalAlpha = 0.25;
+					ctx.strokeStyle = "red";
+					ctx.fillStyle = "red";
+					ctx.lineWidth = 1 * canvasSizeMultiplier;
+					for (var postNum = polymeraseResult.burnin; polymeraseResult.burnin >= 0 && postNum < polymeraseResult.posterior.length; postNum++){
+
+
+
+						var posteriorDensities = polymeraseResult.posterior[postNum]["simulatedDensities"][correctObsNum];
+
+
+						//console.log("postNum", postNum, posteriorDensities);
+						
+
+						//console.log("posteriorDensities", correctObsNum, posteriorDensities)
+
+						var xPrime = widthScale * 0 + axisGap;
+						var yPrime = plotHeight + margin - heightScale * -ymin;
+						ctx.moveTo(xPrime, yPrime);
+
+
+						// Plot the posterior distribution of densities
+						for (var len = 1; posteriorDensities != null && len < posteriorDensities.length; len++) {
+
+
+
+							// If there is a density for this length use it, else 0
+							var density = posteriorDensities[len];
+
+							
+
+
+							// Plot it
+							xPrime = widthScale * (len - xmin) + axisGap;
+							yPrime = plotHeight + margin - heightScale * (density - ymin);
+							ctx.lineTo(xPrime, yPrime);
+
+						}
+
+
+
+						ctx.globalAlpha = 0.25;
+						ctx.strokeStyle = "red";
+						ctx.fillStyle = "red";
+						ctx.stroke();
+
+					}
+
+
+
+				}
+
+
+				//console.log("result", correctObsNum, result);
+
+
+
+
+				ctx.globalAlpha = 1;
+				ctx.strokeStyle = "black";
+				ctx.fillStyle = "black";
+
+
+				// X ticks and values
+				var axisPointMargin = 5 * canvasSizeMultiplier;
+				ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+				ctx.textBaseline="top"; 
+				var tickLength = 10 * canvasSizeMultiplier;
+				ctx.lineWidth = 1 * canvasSizeMultiplier;
+
+				for (var labelID = 0; labelID < xlabPos.length; labelID++){
+					var x0 = widthScale * (xlabPos[labelID] - xmin) + axisGap;
+					ctx.textAlign= labelID == 0 ? "left" : "center";
+					ctx.fillText(xlabPos[labelID], x0, canvas.height - axisGap + axisPointMargin);
+
+					// Draw a tick on the axis
+					ctx.beginPath();
+					ctx.moveTo(x0, canvas.height - axisGap - tickLength/2);
+					ctx.lineTo(x0, canvas.height - axisGap + tickLength/2);
+					ctx.stroke();
+
+				}
+
+
+
+
+				// X min and max
+				var axisPointMargin = 5 * canvasSizeMultiplier;
+				ctx.lineWidth = 1 * canvasSizeMultiplier;
+				ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+				ctx.textBaseline="top"; 
+				ctx.textAlign="left"; 
+				ctx.fillText(xmin, axisGap, canvas.height - axisGap + axisPointMargin);
+				ctx.textAlign="right"; 
+				ctx.fillText(roundToSF(xmax), canvas.width - margin - 1, canvas.height - axisGap + axisPointMargin);
+
+				// Draw a tick on the axis
+				ctx.beginPath();
+				ctx.moveTo(canvas.width - margin, canvas.height - axisGap - tickLength/2);
+				ctx.lineTo(canvas.width - margin, canvas.height - axisGap + tickLength/2);
+				ctx.stroke();
+
+
+				// Y min and max
+				ctx.save()
+				ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+				ctx.textBaseline="bottom"; 
+				ctx.textAlign="right"; 
+				ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
+				ctx.rotate(-Math.PI/2);
+				ctx.fillText(0, 0, 0);
+				ctx.restore();
+				
+				ctx.save()
+				ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+				ctx.textAlign="right"; 
+				ctx.textBaseline="bottom"; 
+				ctx.translate(axisGap - axisPointMargin, margin);
+				ctx.rotate(-Math.PI/2);
+				ctx.fillText(ymax, 0, 0);
+				ctx.restore();
+
+
+
+
+			}
+
+
+
+			/*
+
+			// Plot the observed densities
+			ctx.globalAlpha = 1;
+			ctx.strokeStyle = "#EE7600";
+			ctx.fillStyle = "#EE7600";
+			ctx.lineWidth = 2 * canvasSizeMultiplier;
+			ctx.beginPath();
+			var xPrime = widthScale * xmin + axisGap;
+			var yPrime = plotHeight + margin - heightScale * (laneData.densities[0]-ymin);
+			ctx.moveTo(xPrime, yPrime);
+
+
+			for (var index = 1; index <= laneData.densities.length; index ++){
+				var len = xmin + index;
+
+				//for (var len = xmin+1; len <= xmax; len ++){
+
+				// If there is a density for this length use it, else 0
+				var density = laneData.densities[index];
+				if (density == null) density = 0;
+
+
+				// Plot it
+				xPrime = widthScale * (len - xmin) + axisGap;
+				yPrime = plotHeight + margin - heightScale * (density - ymin);
+				ctx.lineTo(xPrime, yPrime);
+
+			}
+
+			ctx.stroke();
+
+			*/
+		
+
+			ctx.globalAlpha = 1;
+			ctx.strokeStyle = "black";
+			ctx.fillStyle = "black";
+
+
+			// Draw the axes
+			ctx.strokeStyle = "black";
+			ctx.lineWidth = 2 * canvasSizeMultiplier;
+			ctx.beginPath();
+			ctx.moveTo(axisGap, margin);
+			ctx.lineTo(axisGap, canvas.height - axisGap);
+			ctx.lineTo(canvas.width - margin, canvas.height - axisGap);
+			ctx.stroke();
+
+			
+
+			// X label
+			ctx.fillStyle = "black";
+			ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+			ctx.textAlign="center"; 
+			ctx.textBaseline="top"; 
+			var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
+			var xlabYPos = canvas.height - axisGap / 2;
+			ctx.fillText("Transcript length (nt) for t=" + laneData.time + "s", xlabXPos, xlabYPos);
+
+
+			// Y label
+			ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+			ctx.textAlign="center"; 
+			ctx.textBaseline="bottom"; 
+			ctx.save()
+			var ylabXPos = 2 * axisGap / 3;
+			var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
+			ctx.translate(ylabXPos, ylabYPos);
+			ctx.rotate(-Math.PI/2);
+			ctx.fillText("Density", 0 ,0);
+			ctx.restore();
+
+		});
+
+	});
+
+}
+
+
+
+
+
+
+
 // Draws a density plot for the specified lane
 function drawTimeGelDensityCanvas(fitID, laneData = null){
 
@@ -3399,7 +3812,7 @@ function drawTimeGelDensityCanvas(fitID, laneData = null){
 
 
 
-
+		/*
 		if (result.posterior != null && result.posterior.length > 0){
 
 
@@ -3426,7 +3839,6 @@ function drawTimeGelDensityCanvas(fitID, laneData = null){
 
 
 
-			//console.log("result", correctObsNum, result);
 
 			// Account for the MCMC burn-in
 			ctx.globalAlpha = 0.25;
@@ -3472,7 +3884,7 @@ function drawTimeGelDensityCanvas(fitID, laneData = null){
 
 
 		}
-
+		*/
 		
 
 
