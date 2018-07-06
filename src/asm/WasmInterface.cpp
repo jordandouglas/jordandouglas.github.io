@@ -1359,7 +1359,8 @@ extern "C" {
 			toReturnJSON += (*it)->toJSON() + ",";
 		}
 		if (toReturnJSON.substr(toReturnJSON.length()-1, 1) == ",") toReturnJSON = toReturnJSON.substr(0, toReturnJSON.length() - 1);
-		toReturnJSON += "]";
+		toReturnJSON += "],";
+		toReturnJSON += "'burnin':" + to_string(std::floor(posterior.size() * 0.1));
 		toReturnJSON += "}";
 
 		messageFromWasmToJS(toReturnJSON, msgID);
