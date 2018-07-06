@@ -2109,7 +2109,7 @@ function drawMvsLplot(fitID, lane){
 			console.log("Received posterior distribution", posterior);
 
 			ctx.globalAlpha = 0.4;
-			ctx.strokeStyle = "#008CBA";
+			ctx.strokeStyle = "#424f4f";
 			ctx.lineWidth = 1 * canvasSizeMultiplier;
 
 			
@@ -3402,9 +3402,7 @@ function drawTimeGelDensityPosteriorCanvas(fitID, laneData = null){
 
 
 				// Plot the calibration results and account for the MCMC burn-in
-				ctx.globalAlpha = 0.3;
-				ctx.strokeStyle = "blue"; // "#424f4f";
-				ctx.fillStyle = "blue"; //"#424f4f";
+				if (calibrationResult.burnin == null) calibrationResult.burnin = 100;
 				ctx.lineWidth = 1 * canvasSizeMultiplier;
 				console.log("calibrationResult", calibrationResult);
 				for (var postNum = calibrationResult.burnin; calibrationResult.burnin >= 0 && postNum < calibrationResult.burnin + 10 /*calibrationResult.posterior.length*/; postNum++){
@@ -3460,6 +3458,9 @@ function drawTimeGelDensityPosteriorCanvas(fitID, laneData = null){
 
 
 					// Plot the calibration posterior distribution of densities
+					ctx.globalAlpha = 0.3;
+					ctx.strokeStyle = "#424f4f";
+					ctx.beginPath();
 					var xPrime = widthScale * 0 + axisGap;
 					var yPrime = plotHeight + margin - heightScale * -ymin;
 					ctx.moveTo(xPrime, yPrime);
@@ -3474,8 +3475,10 @@ function drawTimeGelDensityPosteriorCanvas(fitID, laneData = null){
 						ctx.lineTo(xPrime, yPrime);
 
 					}
-					ctx.stroke();
 
+
+					ctx.stroke();
+					ctx.closePath();
 
 
 					/*
@@ -3552,8 +3555,7 @@ function drawTimeGelDensityPosteriorCanvas(fitID, laneData = null){
 
 					// Account for the MCMC burn-in
 					ctx.globalAlpha = 0.25;
-					ctx.strokeStyle = "red";
-					ctx.fillStyle = "red";
+					ctx.strokeStyle = "#008cba";
 					ctx.lineWidth = 1 * canvasSizeMultiplier;
 					for (var postNum = polymeraseResult.burnin; polymeraseResult.burnin >= 0 && postNum < polymeraseResult.posterior.length; postNum++){
 
@@ -3567,6 +3569,7 @@ function drawTimeGelDensityPosteriorCanvas(fitID, laneData = null){
 
 						//console.log("posteriorDensities", correctObsNum, posteriorDensities)
 
+						ctx.beginPath();
 						var xPrime = widthScale * 0 + axisGap;
 						var yPrime = plotHeight + margin - heightScale * -ymin;
 						ctx.moveTo(xPrime, yPrime);
@@ -3592,11 +3595,8 @@ function drawTimeGelDensityPosteriorCanvas(fitID, laneData = null){
 
 
 
-						ctx.globalAlpha = 0.25;
-						ctx.strokeStyle = "red";
-						ctx.fillStyle = "red";
 						ctx.stroke();
-
+						ctx.closePath();
 					}
 
 
