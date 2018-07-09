@@ -187,7 +187,7 @@ void Settings::init(){
 
 	kCat->setDistributionParameter("fixedDistnVal", 30)->setDistributionParameter("lognormalMeanVal", 3.454)->setDistributionParameter("lognormalSdVal", 0.587);
 	Kdiss->setDistributionParameter("fixedDistnVal", 35);
-	RateBind->setDistributionParameter("fixedDistnVal", 250);
+	RateBind->setDistributionParameter("fixedDistnVal", 0.5);
 
 	arrestTime->setDistributionParameter("fixedDistnVal", 0);
 
@@ -270,9 +270,9 @@ void Settings::initPolymerases(){
 	ecoliPol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 25.56));
 	ecoliPol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 1.8));
 	ecoliPol->setParameter(RateBind->clone()->setDistributionParameter("fixedDistnVal", 0.5448));
-	ecoliPol->setParameter(hybridLen->clone()->setDistributionParameter("fixedDistnVal", 10));
-	ecoliPol->setParameter(bubbleLeft->clone()->setDistributionParameter("fixedDistnVal", 0));
-	ecoliPol->setParameter(bubbleRight->clone()->setDistributionParameter("fixedDistnVal", 0));
+	ecoliPol->setParameter(hybridLen->clone()->setDistributionParameter("fixedDistnVal", 9));
+	ecoliPol->setParameter(bubbleLeft->clone()->setDistributionParameter("fixedDistnVal", 2));
+	ecoliPol->setParameter(bubbleRight->clone()->setDistributionParameter("fixedDistnVal", 1));
 
 	// S. cerevisiae parameters
 	yeastPol->setParameter(GDagSlide->clone()->setDistributionParameter("fixedDistnVal", 8.536));
@@ -417,10 +417,6 @@ void Settings::initSequences(){
 	sequences[seq->getID()] = seq;
 
 
-
-
-
-
 	setSequence("Buchnera aphidicola murC1 EU274658");
 
 }
@@ -429,8 +425,13 @@ void Settings::initSequences(){
 bool Settings::setSequence(string seqID){
 
 	if (sequences.find(seqID) == sequences.end()) return false;
+
+
 	currentSequence = sequences[seqID];
-	seqID = currentSequence->getID();
+
+	
+
+	_seqID = currentSequence->getID();
 	templateSequence = currentSequence->get_templateSequence();
 	complementSequence = currentSequence->get_complementSequence();
 	TemplateType = currentSequence->get_templateType();

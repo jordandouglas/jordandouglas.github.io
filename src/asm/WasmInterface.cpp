@@ -635,7 +635,8 @@ extern "C" {
 		XMLparser::parseXMLFromString(XMLdata);
 
 		Settings::sampleAll();
-		Settings::initSequences();
+		//Settings::initSequences();
+
 
 		// Send the globals settings back to the DOM 
 		string parametersJSON = "{" + Settings::toJSON() + "}";

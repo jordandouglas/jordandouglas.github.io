@@ -103,12 +103,15 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 			_seqID = sequenceEle->Attribute("seqID") ? sequenceEle->Attribute("seqID") : _seqID;
 			bool succ = Settings::setSequence(_seqID);
 
+
 			// If sequence does not already exist then create it
 			if (!succ){
 				
 				string templateSeq = sequenceEle->Attribute("seq") ? sequenceEle->Attribute("seq") : "AAAAAAAAAAAAAAAAAAAAAAAAAA";
 				string templateType = sequenceEle->Attribute("TemplateType") ? sequenceEle->Attribute("TemplateType") : "dsDNA";
 				string primerType = sequenceEle->Attribute("PrimerType") ? sequenceEle->Attribute("PrimerType") : "ssRNA";
+
+
 
 				Sequence* newSeq = new Sequence(_seqID, templateType, primerType, templateSeq);
 				sequences[_seqID] = newSeq;
