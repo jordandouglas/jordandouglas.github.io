@@ -1435,7 +1435,7 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 
 		}
 
-
+		showFoldedRNA_controller(false);
 		refreshNavigationCanvases();
 		update_sliding_curve(-1);
 		update_slipping_curve(0);
@@ -2697,13 +2697,13 @@ function getMisbindMatrix_controller(resolve = function(x) { }){
 
 
 
-function showFoldedRNA_controller(){
+function showFoldedRNA_controller(toDisplay = null){
 
 	
 	// No RNA secondary structure display on mobile phones beause svg is not well supported
 	if ($("#PreExp").val() == "hidden" || IS_MOBILE) return;
-	
-	var toDisplay = !$("#foldBtnDiv").hasClass("toolbarIconDisabled");
+
+	if (toDisplay == null) toDisplay = !$("#foldBtnDiv").hasClass("toolbarIconDisabled");
 
 	var updateDOM = function(graphInfo){
 		if (toDisplay) {

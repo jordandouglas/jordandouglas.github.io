@@ -21,9 +21,9 @@
 
 
 function destroySecondaryStructure(){
-		$("#mRNAsvg").remove();
-		$("#bases").height(300);
-		$("#bases").children().show(0);
+	$("#mRNAsvg").remove();
+	$("#bases").height(300);
+	$("#bases").children().show(0);
 }
 
 

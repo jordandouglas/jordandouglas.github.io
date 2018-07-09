@@ -2108,7 +2108,7 @@ function drawMvsLplot(fitID, lane){
 
 			console.log("Received posterior distribution", posterior);
 
-			ctx.globalAlpha = 0.4;
+			ctx.globalAlpha = 0.3;
 			ctx.strokeStyle = "#424f4f";
 			ctx.lineWidth = 1 * canvasSizeMultiplier;
 
@@ -2809,7 +2809,7 @@ function getGelLengthPriorInformationTemplate(fitID, MWlength){
 function getGelLaneInformationTemplate(fitID, laneObj){
 
 	return `
-		<div id='laneDialog' style='background-color:#008cba; padding: 10 10; position:fixed; width: 20vw; left:40vw; top:50vh; z-index:5' fitID="` + fitID + `">
+		<div id='laneDialog' style='background-color:#008cba; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:50vh; z-index:5' fitID="` + fitID + `">
 			<div style='background-color:white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> Lane information </span>
 				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeGelLaneInformationPopup("` + fitID + `")'>&times;</span>
@@ -4520,7 +4520,7 @@ function renderABCoutput(){
 
 
 	// Enable/disable the plus 30 sequences button
-	if (stopRow < linesToUse.length - 3 && numRowsDisplayed == 30) {
+	if (stopRow < linesToUse.length && numRowsDisplayed == 30) {
 		$("#plusABCrows").removeClass("dropdown-disabled");
 		$("#plusABCrows").prop("disabled", false);
 	}else{
