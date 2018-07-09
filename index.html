@@ -405,7 +405,8 @@ function submitCustomSequence(resolveAfterRefresh = function() { }){
 		var templateType = $("#SelectTemplateType").val();
 		var primerType = $("#SelectPrimerType").val();
 		var inputSequenceIsNascent = $('input[name="inputSeqType"][value="inputNascentSeq"]').prop("checked");
-
+		showFoldedRNA_controller(false);
+		
 
 		var toCall = (newSequenceID, newTemplateType, newPrimerType) => new Promise((resolve) => userInputSequence_controller(newSequenceID, newTemplateType, primerType, inputSequenceIsNascent, resolve));
 		toCall(newSeq, templateType, primerType, inputSequenceIsNascent).then((result) => {
@@ -482,11 +483,15 @@ function userChangeSequence(resolveAfterRefresh = function() { }){
 
 		var toCall = (newSequenceID) => new Promise((resolve) => userSelectSequence_controller(newSequenceID, null, null, resolve));
 		toCall(sequenceID).then((uselessVar) => {
-
+			showFoldedRNA_controller(false);
+			
 
 			var refr = () => new Promise((resolve) => refresh(resolve));
 			var sequenceChangeRefreshTemp = function(){
+
+
 				
+
 				refreshPlotDataSequenceChangeOnly_controller(function(){
 					sequenceChangeRefresh();
 					$("#translocationSummaryContainer").hide(100);
@@ -643,7 +648,6 @@ function refresh(resolve = function(){}){
 			userInputModel_controller();
 			changeSpeed_controller();
 			setNextBaseToAdd_controller();
-
 			
 			//return;
 
