@@ -305,7 +305,7 @@ void Settings::initPolymerases(){
 
 
 	// Activate the Yeast polymerase II as the default
-	if (_currentPolymerase == "") Settings::activatePolymerase("polII");
+	if (_currentPolymerase == "") Settings::activatePolymerase("RNAP");
 
 }
 

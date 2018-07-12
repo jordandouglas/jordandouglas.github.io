@@ -62,7 +62,6 @@ class Coordinates{
 		static bool objectExists(string id); // See if object exists
 		static HTMLobject* getObjectByID(string id);
 
-
 		// Returns a JSON string which contains information on what changes must be made (eg. on the next animation frame)
 		static string getUnrenderedObjectsJSON(bool clearList);
 
@@ -87,6 +86,10 @@ class Coordinates{
 		static void change_src_of_object(HTMLobject* obj, string newSrc);
 		static void change_src_of_object_from_id(string id, string newSrc);
 		static void set_TP_state(int pos, string whichSeq, bool addTP);
+		static void setNucleotideFoldedness(int pos, bool folded);
+		static void setFoldAnchorPoint(int pos);
+		static void addBondBetweenNucleotides(int nt1, int nt2, bool basepair);
+		static void removeBondBetweenNucleotides(int nt1, int nt2);
 		//static void setXYWHsrc(string id, double x, double y, double width, double height, string src);
 
 		// Deleting objects

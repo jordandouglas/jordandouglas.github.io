@@ -53,7 +53,7 @@ vector<PosteriorDistributionSample*> BayesianCalculations::loadLogFile(string lo
 
 
 		// Parse header
-    	getline(logfile, line);
+    	// getline(logfile, line);
     	while (line != "") getline(logfile, line);
     	vector<string> headerLineSplit = Settings::split(line, '\t');
 

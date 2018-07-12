@@ -46,14 +46,28 @@ class HTMLobject{
 	double height;
 	string src;
 	int animationTime;
+
 	string baseStr; // If nucleotide
 	bool hasTP; // If nucleotide
 	int ntPos; // If nucleotide
 	string whichSeq; // If nucleotide
+	bool isFolded; // If nucleotide
+	bool isFoldAnchorPoint; // If nucleotide
+
+
+	// Is a bond between two nucleotides
+	bool isBond;
+	int nt1;
+	int nt2;
+	bool basepair; // Basepair or backbone bond
+	bool addBond; // Is the bond being added or removed
+
 	bool needsAnimating;
 	bool needsGenerating;
 	bool needsSourceUpdate;
 	bool needsDeleting;
+	bool needsFolding;
+	bool needsUnfolding;
 	int zIndex;
 
 	public:
@@ -68,6 +82,10 @@ class HTMLobject{
 		// Nucleotide constructor
 		HTMLobject(string id, double x, double y, double width, double height, string src, int animation_time, int zIndex, string baseStr, string whichSeq, bool hasTP, int ntPos);
 
+		// Edge between two nucleotides
+		HTMLobject(string id, int nt1, int nt2, bool basepair, bool add);
+
+
 		string toJSON(bool render);
 		void displace(double dx, double dy);
 		void setAnimationTime(int animationTime);
@@ -75,6 +93,7 @@ class HTMLobject{
 		void deleteObject();
 		void setTP(bool addTP);
 		void set_needsAnimating();
+		void setAsAnchorPoint();
 
 		string getID();
 		string getBase();
@@ -88,6 +107,13 @@ class HTMLobject{
 		bool get_needsAnimating();
 		bool get_needsSourceUpdate();
 		bool get_needsDeleting();
+
+
+
+		void setFoldedness(bool isFolded);
+
+
+
 
 
 };

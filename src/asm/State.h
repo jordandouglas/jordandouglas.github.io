@@ -59,6 +59,11 @@ class State{
 	int changeInLeftBulgePosition;
 
 
+	// Fold information
+	string _5primeStructure;
+	string _3primeStructure;
+
+
 	// Information on bulges
 	deque<int> bulgePos;
 	deque<int> bulgedBase;
@@ -85,6 +90,11 @@ class State{
 	int get_fissure_landscape_of(int S);
 
 
+	// Folding
+	float foldUpstream();
+	float foldDownstream();
+	int findBondsRecurse(int index, string structureString, int index0BaseNumber);
+	
 
     public:
     	State(bool init);
@@ -123,9 +133,13 @@ class State{
 		double calculateCleavageRate(bool ignoreStateRestrictions);
 
 
+
+		// Fold mRNA and store secondary structure strings
+		void fold(bool fold5Prime, bool fold3Prime);
+		void unfold();
+
 		// Fold mRNA and returns a JSON string with information on where to position the folded bases
-		string fold(bool fold5Prime, bool fold3Prime);
-		int findBondsRecurse(int index, string structureString, string& bonds, int index0BaseNumber);
+		string foldJSON(bool fold5Prime, bool fold3Prime);
 
 		State* slipLeft(int S);
 		State* slipRight(int S);

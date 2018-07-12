@@ -594,7 +594,37 @@ void Coordinates::delete_nt(int pos, string whichSeq){
 	if (!nt->get_needsGenerating() && !nt->get_needsAnimating() && !nt->get_needsSourceUpdate() && !nt->get_needsDeleting()) Coordinates::unrenderedObjects.push_back(nt);
 	nt->deleteObject();
 
+}
 
+
+void Coordinates::setNucleotideFoldedness(int pos, bool folded){
+
+	HTMLobject* nt = Coordinates::NascentSequenceHTMLObjects.at(pos);
+	if (!nt->get_needsGenerating() && !nt->get_needsAnimating() && !nt->get_needsSourceUpdate() && !nt->get_needsDeleting()) Coordinates::unrenderedObjects.push_back(nt);
+	nt->setFoldedness(folded);
+
+}
+
+void Coordinates::setFoldAnchorPoint(int pos){
+	HTMLobject* nt = Coordinates::NascentSequenceHTMLObjects.at(pos);
+	if (nt == nullptr) return;
+	nt->setAsAnchorPoint();
+	Coordinates::unrenderedObjects.push_back(nt);
+}
+
+
+
+void Coordinates::addBondBetweenNucleotides(int nt1, int nt2, bool basepair){
+	HTMLobject* bond = new HTMLobject(to_string(nt1) + "_" + to_string(nt2), nt1, nt2, basepair, true);
+	//Coordinates::HTMLobjects.push_back(bond);
+	Coordinates::unrenderedObjects.push_back(bond);
+}
+
+
+void Coordinates::removeBondBetweenNucleotides(int nt1, int nt2){
+	HTMLobject* bond = new HTMLobject(to_string(nt1) + "_" + to_string(nt2), nt1, nt2, true, false);
+	//Coordinates::HTMLobjects.push_back(bond);
+	Coordinates::unrenderedObjects.push_back(bond);
 }
 
 
@@ -616,6 +646,8 @@ HTMLobject* Coordinates::getObjectByID(string id){
 	}
 	return nullptr;
 }
+
+
 
 
 

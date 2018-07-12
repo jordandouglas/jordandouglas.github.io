@@ -31,13 +31,12 @@
 
 using namespace std;
 
+
 // Send a single instruction to the controller. eg. clear
 HTMLobject::HTMLobject(string instruction){
 
 	this->id = instruction;
 
-
-	if(this->id == "") cout << "No id 1" << endl;
 
 	// Defaults 
 	this->x = 0;
@@ -53,10 +52,18 @@ HTMLobject::HTMLobject(string instruction){
 	this->needsAnimating = false;
 	this->needsSourceUpdate = false;
 	this->needsDeleting = true;
+	this->needsFolding = false;
+	this->needsUnfolding = false;
 	this->baseStr = "";
 	this->hasTP = false;
 	this->ntPos = -1;
 	this->whichSeq = "";
+	this->isFolded = false;
+	this->isBond = false;
+	this->nt1 = 0;
+	this->nt2 = 0;
+	this->basepair = false; 
+	this->isFoldAnchorPoint = false;
 }
 
 
@@ -80,10 +87,18 @@ HTMLobject::HTMLobject(string id, double x, double y, double width, double heigh
 	this->needsAnimating = false;
 	this->needsSourceUpdate = false;
 	this->needsDeleting = false;
+	this->needsFolding = false;
+	this->needsUnfolding = false;
 	this->baseStr = "";
 	this->hasTP = false;
 	this->ntPos = -1;
 	this->whichSeq = "";
+	this->isFolded = false;
+	this->isBond = false;
+	this->nt1 = 0;
+	this->nt2 = 0;
+	this->basepair = false; 
+	this->isFoldAnchorPoint = false;
 
 
 	if(this->id == "") cout << "No id 2 " << endl;
@@ -115,11 +130,58 @@ HTMLobject::HTMLobject(string id, double x, double y, double width, double heigh
 	this->needsAnimating = false;
 	this->needsSourceUpdate = false;
 	this->needsDeleting = false;
-
+	this->isFolded = false;
+	this->needsFolding = false;
+	this->needsUnfolding = false;
+	this->isBond = false;
+	this->nt1 = 0;
+	this->nt2 = 0;
+	this->basepair = false; 
+	this->isFoldAnchorPoint = false;
+	
 
 	if(this->id == "") cout << "No id 3 " << src << "," << ntPos << endl;
 
 }
+
+
+
+// Edge between two nucleotides. This bond is either being added or removed. This object will be immediately deleted after it has been sent
+HTMLobject::HTMLobject(string id, int nt1, int nt2, bool basepair, bool add){
+
+
+	this->id = id;
+	this->isBond = true;
+	this->nt1 = nt1;
+	this->nt2 = nt2;
+	this->basepair = basepair; 
+	this->addBond = add;
+
+
+	// Defaults 
+	this->x = 0;
+	this->y = 0;
+	this->width = 0;
+	this->height = 0;
+	this->src = "";
+	this->animationTime = 0;
+	this->zIndex = 1;
+	this->dx = 0;
+	this->dy = 0;
+	this->needsGenerating = true;
+	this->needsAnimating = false;
+	this->needsSourceUpdate = false;
+	this->needsDeleting = false;
+	this->needsFolding = false;
+	this->needsUnfolding = false;
+	this->baseStr = "";
+	this->hasTP = false;
+	this->ntPos = -1;
+	this->whichSeq = "";
+	this->isFolded = false;
+	this->isFoldAnchorPoint = false;
+}
+
 
 
 
@@ -132,24 +194,47 @@ string HTMLobject::toJSON(bool render){
 	JSON += "'id':'" + this->id + "',"; 
 	JSON += "'src':'" + this->src + "',"; 
 
-	// Nucleotide only
-	if (this->baseStr != "") {
-		JSON += "'base':'" + this->baseStr + "',"; 
-		JSON += "'hasTP':" + string(this->hasTP ? "true" : "false") + ","; 
-		JSON += "'pos':" + to_string(this->ntPos) + ","; 
-		JSON += "'seq':'" + this->whichSeq + "',"; 
+
+
+	if (this->isBond){
+
+		JSON += "'isBond':true,"; 
+		JSON += "'source':" + to_string(this->nt1) + ","; 
+		JSON += "'target':" + to_string(this->nt2) + ","; 
+		JSON += "'bp':" + string(this->basepair ? "true" : "false") + ","; 
+		JSON += "'terminal':" + string(this->nt1 == 0 ? "true" : "false") + ","; 
+		JSON += "'add':" + string(this->addBond ? "true" : "false") + ","; 
+
 	}
 
+	else {
 
-	// Display information
-	JSON += "'x':" + to_string(this->x) + ","; 
-	JSON += "'y':" + to_string(this->y) + ","; 
-	JSON += "'dx':" + to_string(this->dx) + ","; 
-	JSON += "'dy':" + to_string(this->dy) + ","; 
-	JSON += "'width':" + to_string(this->width) + ","; 
-	JSON += "'height':" + to_string(this->height) + ","; 
-	JSON += "'animationTime':" + to_string(this->animationTime) + ","; 
-	JSON += "'zIndex':" + to_string(this->zIndex) + ","; 
+
+
+		// Nucleotide only
+		if (this->baseStr != "") {
+			JSON += "'base':'" + this->baseStr + "',"; 
+			JSON += "'hasTP':" + string(this->hasTP ? "true" : "false") + ","; 
+			JSON += "'pos':" + to_string(this->ntPos) + ","; 
+			JSON += "'seq':'" + this->whichSeq + "',"; 
+			JSON += "'isFolded':" + string(this->isFolded ? "true" : "false") + ","; 
+			JSON += "'needsFolding':" + string(this->needsFolding ? "true" : "false") + ","; 
+			JSON += "'needsUnfolding':" + string(this->needsUnfolding ? "true" : "false") + ","; 
+			JSON += "'fixed':" + string(this->isFoldAnchorPoint ? "true" : "false") + ","; 
+		}
+
+
+		// Display information
+		JSON += "'x':" + to_string(this->x) + ","; 
+		JSON += "'y':" + to_string(this->y) + ","; 
+		JSON += "'dx':" + to_string(this->dx) + ","; 
+		JSON += "'dy':" + to_string(this->dy) + ","; 
+		JSON += "'width':" + to_string(this->width) + ","; 
+		JSON += "'height':" + to_string(this->height) + ","; 
+		JSON += "'animationTime':" + to_string(this->animationTime) + ","; 
+		JSON += "'zIndex':" + to_string(this->zIndex) + ","; 
+
+	}
 
 
 	// Meta information
@@ -174,6 +259,8 @@ string HTMLobject::toJSON(bool render){
 		}
 		this->needsGenerating = false;
 		this->needsSourceUpdate = false;
+		this->needsFolding = false;
+		this->needsUnfolding = false;
 
 	}
 
@@ -260,4 +347,36 @@ bool HTMLobject::get_needsSourceUpdate(){
 
 bool HTMLobject::get_needsDeleting(){
 	return this->needsDeleting;
+}
+
+
+
+void HTMLobject::setFoldedness(bool isFolded){
+
+
+	//cout << "setFoldedness " <<  isFolded << " for " << this->id << endl;
+
+	// If going from folded to unfolded then have to unfold the object
+	if (!isFolded && this->isFolded) {
+		this->needsFolding = false;
+		this->needsUnfolding = true;
+	}
+
+	// If going from unfolded to folded then have to fold the object
+	else if (isFolded && !this->isFolded) {
+		this->needsFolding = true;
+		this->needsUnfolding = false;
+	}
+
+	this->isFolded = isFolded;
+	this->isFoldAnchorPoint = false;
+	
+}
+
+
+
+
+void HTMLobject::setAsAnchorPoint(){
+	this->needsFolding = true;
+	this->isFoldAnchorPoint = true;
 }

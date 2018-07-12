@@ -44,7 +44,7 @@ PosteriorDistributionSample::PosteriorDistributionSample(int sampleNum, int numE
 	this->modelIndicator = "";
 
 	this->ABC = ABC;
-	if (this->ABC){
+	if (!this->ABC){
 		this->logLikelihood = 0;
 		this->logPosterior = 0;
 	}else{
