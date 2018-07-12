@@ -632,7 +632,10 @@ function renderObjects(override = false, resolve = function(){}){
 
 			//console.log("unrenderedObjects_controller", unrenderedObjects_controller);
 
+
 			//renderingObjects = true;
+			var nucleotidesToFold_nodes = [];
+			var nucleotidesToFold_edges = [];
 			while (unrenderedObjects_controller.length > 0){
 
 				var nt = unrenderedObjects_controller.shift();
@@ -653,6 +656,8 @@ function renderObjects(override = false, resolve = function(){}){
 					$("#" + nt["id"]).remove();
 					if (nt["hasTP"]) delete_TP(nt["pos"]);
 					nt["needsDeleting"] = false;
+
+
 					continue;
 
 				}
@@ -662,8 +667,13 @@ function renderObjects(override = false, resolve = function(){}){
 				if($("#" + nt["id"]).length == 0 || nt["needsGenerating"]){
 
 
+					// Bond between folded nucleotides. This is handled by the force directed graph
+					if (nt.isBond){
+						nucleotidesToFold_edges.push(nt);
+					}
+
 					// Polymerase is generated differently since it is a canvas not an image
-					if (nt["id"] == "pol" && nt["src"] != "paraPol") {
+					else if (nt["id"] == "pol" && nt["src"] != "paraPol") {
 						generatePol(nt);
 
 					}else{
@@ -718,6 +728,31 @@ function renderObjects(override = false, resolve = function(){}){
 				}
 
 
+
+
+
+				if (nt.needsFolding){
+
+					if (!nt.fixed) $("#" + nt["id"]).hide(0);
+					else{
+						$("#" + nt["id"]).show(0);
+						nt.fixedX = nt.x;
+						nt.fixedY = nt.y;
+					}
+					nucleotidesToFold_nodes.push(nt);
+
+
+				}
+
+				else if (nt.needsUnfolding){
+
+					//console.log("Will unfold", nt);
+					$("#" + nt["id"]).show(0);
+				}
+
+
+
+
 				// Change the x and y coordinates of the object and move the triphoshate with it
 				var TP_inDOM = nt["seq"] == "m" && $("#phos" + nt["pos"]).length > 0;
 				if(nt["needsAnimating"]){
@@ -731,8 +766,17 @@ function renderObjects(override = false, resolve = function(){}){
 					if (nt["hasTP"] && !TP_inDOM) add_triphosphate(nt["pos"], nt["x"], nt["y"]);
 
 
+					// Fold the nucleotide by deleting the <img> and adding it to the force directed graph (svg)
+					//if (nt.isFolded) {
+						//console.log("Will fold", nt);
+						//$("#" + nt["id"]).remove();
+
+
+					//}
+
+
 					// Instant update
-					if (nt["animationTime"] <= 1){
+					if (nt["animationTime"] <= 1 || nt.isFolded){
 						//console.log("Need to instantly update", nt);
 						element.finish();
 						element.css("left", nt["x"] + "px");
@@ -770,11 +814,15 @@ function renderObjects(override = false, resolve = function(){}){
 					nt["needsAnimating"] = false;
 				} 
 
+
+
 				if (nt["id"] == "pol") {
 					moveScrollBar();
 				}
 
 			}
+
+			updateSecondaryStructure(nucleotidesToFold_nodes, nucleotidesToFold_edges);
 
 				
 

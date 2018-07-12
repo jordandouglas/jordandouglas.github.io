@@ -1414,6 +1414,7 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 
 
 
+
 		if (DOMupdates != null) {
 		
 			// Create any new slippage landscapes that are required
@@ -1435,12 +1436,12 @@ function backwards_controller(state = null, UPDATE_COORDS = true, resolve = func
 
 		}
 
-		showFoldedRNA_controller(false);
+		//showFoldedRNA_controller(false);
 		refreshNavigationCanvases();
 		update_sliding_curve(-1);
 		update_slipping_curve(0);
 		renderObjects();
-		destroySecondaryStructure();
+		//destroySecondaryStructure();
 		
 
 	
@@ -2748,7 +2749,7 @@ function getMFESequenceBonds_controller(){
 
 		//console.log("graphInfo", graphInfo);
 		renderSecondaryStructure(graphInfo);
-		//renderObjects();
+		renderObjects();
 
 	};
 	
