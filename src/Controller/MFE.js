@@ -88,7 +88,7 @@ function updateSecondaryStructure(new_nodes, edges){
 	}
 
 	for (var i = 0; i < MFE_simulationNodes.length; i ++){
-		if (MFE_simulationNodes[i] == null || MFE_simulationNodes[i].id == null) MFE_simulationNodes[i] = {width: 0};
+		if (MFE_simulationNodes[i] == null || MFE_simulationNodes[i].id == null) MFE_simulationNodes[i] = {src: "Xg"};
 	}
 	console.log("MFE_simulationNodes", MFE_simulationNodes);
 	
@@ -136,8 +136,8 @@ function updateSecondaryStructure(new_nodes, edges){
 
 	var nodeImage = MFE_node.append("image")
 	 .attr("xlink:href", d => d == null ? "" : "src/Images/" + d.src + ".png")
-	 .attr("height", "22px")
-	 .attr("width", d => d == null ? "" : d.fixed ? 0 : d.src == "5RNA" ? "77px" : "22px" )
+	 .attr("height", d => d.src == "Xg" ? "0px" : "22px")
+	 .attr("width", d => d.src == "Xg" ? "0px" : d.fixed ? 0 : d.src == "5RNA" ? "77px" : "22px" )
    	 .attr("class", "svgnode");
 	 
 	 //.attr("x", d => d.fixed ? d.fx - $("#bases").scrollLeft() : d.x)
