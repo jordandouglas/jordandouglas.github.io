@@ -354,10 +354,10 @@ bool HTMLobject::get_needsDeleting(){
 void HTMLobject::setFoldedness(bool isFolded){
 
 
-	//cout << "setFoldedness " <<  isFolded << " for " << this->id << endl;
+	//cout << "setFoldedness from " << this->isFolded << " to " <<  isFolded << " for " << this->id << endl;
 
 	// If going from folded to unfolded then have to unfold the object
-	if (!isFolded && this->isFolded) {
+	if (!isFolded && (this->isFolded || this->isFoldAnchorPoint)) {
 		this->needsFolding = false;
 		this->needsUnfolding = true;
 	}

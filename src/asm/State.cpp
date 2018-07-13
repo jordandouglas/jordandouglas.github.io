@@ -1879,8 +1879,9 @@ float State::foldUpstream(){
 
 	if (this->isGuiState && _animationSpeed != "hidden"){
 
+
 		// Set the folded bases to 'folded' mode so the DOM can render them differently
-		for (int i = 0; i <= max((int)this->_5primeStructure.length(), length_5prime); i ++){
+		for (int i = 0; i <= max((int)this->_5primeStructure.length(), length_5prime) + 1; i ++){
 			Coordinates::setNucleotideFoldedness(i, i <= length_5prime);
 		}
 		Coordinates::setFoldAnchorPoint(length_5prime+1);
@@ -1937,11 +1938,11 @@ float State::foldDownstream(){
 
 
 
-
-
-	if (false && this->isGuiState && _animationSpeed != "hidden"){
+	if (this->isGuiState && _animationSpeed != "hidden"){
 
 		// Set the folded bases to 'folded' mode so the DOM can render them differently
+		//Coordinates::setNucleotideFoldedness(this->rightTemplateBase, false);
+		Coordinates::setNucleotideFoldedness(this->rightTemplateBase, false);
 		for (int i = this->rightTemplateBase+1; i <= this->rightTemplateBase + length_3prime; i ++){
 			Coordinates::setNucleotideFoldedness(i, true);
 		}
@@ -1962,7 +1963,7 @@ float State::foldDownstream(){
 
 
 	// Add basepair bonds
-	if (false && this->isGuiState && _animationSpeed != "hidden") this->findBondsRecurse(0, this->_3primeStructure, this->rightTemplateBase+1);
+	if (this->isGuiState && _animationSpeed != "hidden") this->findBondsRecurse(0, this->_3primeStructure, this->rightTemplateBase);
 
 
 	// Clean up
