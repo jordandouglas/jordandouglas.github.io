@@ -27,12 +27,27 @@ MFE_wallReplusionDistance = 20000000; // How close does something need to be to 
 MFE_repulsionForce = -10;
 MFE_yShift = 100;
 
+MFE_simulationNodes = [];
+
 
 
 function destroySecondaryStructure(){
 	$("#mRNAsvg").remove();
 	$("#bases").height(300);
 	$("#bases").children().show(0);
+	MFE_simulationNodes = [];
+	MFE_simulation = null;
+}
+
+
+function removeNodeSecondaryStructure(nt){
+
+	if (MFE_simulation == null) return;
+	var baseNum = parseFloat(nt.id.substring(1));
+	MFE_simulationNodes[baseNum] = {};
+	//console.log("removing", baseNum, MFE_simulationNodes);
+	
+
 }
 
 
@@ -40,6 +55,8 @@ function destroySecondaryStructure(){
 // https://bl.ocks.org/mbostock/1095795
 function updateSecondaryStructure(new_nodes, edges){
 
+
+	console.log("edges", edges);
 
 	if (new_nodes.length == 0 || MFE_simulation == null) return;
 
@@ -64,12 +81,16 @@ function updateSecondaryStructure(new_nodes, edges){
 
 
 	// If there are any new vertices add them to the list. If some need removing then remove them
-	var simulationNodes = MFE_simulation.nodes();
-	console.log(simulationNodes);
+	// console.log(MFE_simulationNodes);
 	for (var i = 0; i < new_nodes.length; i ++){
 		var baseNum = parseFloat(new_nodes[i].id.substring(1));
-		simulationNodes[baseNum] = new_nodes[i];
+		MFE_simulationNodes[baseNum] = new_nodes[i];
 	}
+
+	for (var i = 0; i < MFE_simulationNodes.length; i ++){
+		if (MFE_simulationNodes[i] == null || MFE_simulationNodes[i].id == null) MFE_simulationNodes[i] = {};
+	}
+	console.log("MFE_simulationNodes", MFE_simulationNodes);
 	
 
 	var svg = d3.select("#mRNAsvg");
@@ -100,7 +121,7 @@ function updateSecondaryStructure(new_nodes, edges){
 	
 	// Add the new nodes
 	MFE_node = svg.selectAll("img")
-	 .data(simulationNodes);
+	 .data(MFE_simulationNodes);
 
 	// MFE_node.exit().remove();
 
@@ -114,9 +135,9 @@ function updateSecondaryStructure(new_nodes, edges){
 
 
 	var nodeImage = MFE_node.append("image")
-	 .attr("xlink:href", d => "src/Images/" + d.src + ".png")
+	 .attr("xlink:href", d => d == null ? "" : "src/Images/" + d.src + ".png")
 	 .attr("height", "22px")
-	 .attr("width", d => d.fixed ? 0 : d.src == "5RNA" ? "77px" : "22px" )
+	 .attr("width", d => d == null ? "" : d.fixed ? 0 : d.src == "5RNA" ? "77px" : "22px" )
    	 .attr("class", "svgnode");
 	 
 	 //.attr("x", d => d.fixed ? d.fx - $("#bases").scrollLeft() : d.x)
@@ -124,12 +145,12 @@ function updateSecondaryStructure(new_nodes, edges){
 
 
 	// Restart the simulation
-	MFE_simulation = d3.forceSimulation(simulationNodes)
+	MFE_simulation = d3.forceSimulation(MFE_simulationNodes)
 		.alphaDecay(0.007)
 		.force("linkForce", linkForce)
 		.force("charge", d3.forceManyBody().strength(MFE_repulsionForce))
 		.on("tick", tick)
-		//.alpha(1).restart();
+		.alpha(1).restart();
 
 
 	//MFE_simulation.nodes(MFE_node);
@@ -183,7 +204,7 @@ function renderSecondaryStructure(data){
 
 
 
-		var nodes = [];
+		MFE_simulationNodes = [];
 		var edges = [];
 
 		//for (v in nodes) if (nodes[v].fixed) {
@@ -218,7 +239,7 @@ function renderSecondaryStructure(data){
 		 var color = d3.scaleOrdinal(d3.schemeCategory20);
 
 		 MFE_node = svg.selectAll("img")
-		     .data(nodes)
+		     .data(MFE_simulationNodes)
 		     .enter()
 		     .append("g")
 		     .call(d3.drag()
@@ -237,7 +258,7 @@ function renderSecondaryStructure(data){
 
 		
 
-	     MFE_simulation = d3.forceSimulation(nodes)
+	     MFE_simulation = d3.forceSimulation(MFE_simulationNodes)
 			.alphaDecay(0.007)
 			.force("linkForce", linkForce)
 			.force("charge", d3.forceManyBody().strength(MFE_repulsionForce))
@@ -258,13 +279,13 @@ function renderSecondaryStructure(data){
 
 
 function MFE_dist(d){
-	return d.bp ? 30 : d.terminal ? 50 : 20;
+	return d == null ? 0 : d.bp ? 30 : d.terminal ? 50 : 20;
 }
 
 
 function MFE_dragstarted(d) {
 
-	if (d.fixed) return;
+	if (d == null || d.fixed) return;
 
 	// if (d.x - (d.src == "5RNA" ? 38 : 11) < 0 || d.y - 22 < 0 || d.x + (d.src == "5RNA" ? 38 : 11) > width-20 || d.y + 22 > height-20) return;
 
@@ -275,7 +296,7 @@ function MFE_dragstarted(d) {
 
 function MFE_dragged(d) {
 
-	if (d.fixed) return;
+	if (d == null || d.fixed) return;
 
 	//console.log("dragged", d, d3.event);
 
@@ -287,7 +308,7 @@ function MFE_dragged(d) {
 
 function MFE_dragended(d) {
 
-	if (d.fixed) return;
+	if (d == null || d.fixed) return;
 
 	if (!d3.event.active) MFE_simulation.alphaTarget(0);
 	d.fx = null;
@@ -299,6 +320,7 @@ function MFE_dragended(d) {
 
 function MFE_dx(dvertex) {
 
+	
 	if (dvertex.fixed) return dvertex.x = dvertex.fixedX;
 
 	//console.log("moving", dvertex);
@@ -370,6 +392,7 @@ function tick(){
 
 
 	MFE_node.attr("transform", function(dvertex){
+		if (dvertex == null) return 0;
 		return "translate(" + MFE_dx(dvertex) + "," + MFE_dy(dvertex) + ")";
 	});
 	

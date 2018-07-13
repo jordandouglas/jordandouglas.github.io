@@ -733,6 +733,7 @@ function renderObjects(override = false, resolve = function(){}){
 
 				if (nt.needsFolding){
 
+					//console.log("Will fold", nt);
 					if (!nt.fixed) $("#" + nt["id"]).hide(0);
 					else{
 						$("#" + nt["id"]).show(0);
@@ -744,9 +745,10 @@ function renderObjects(override = false, resolve = function(){}){
 
 				}
 
-				else if (nt.needsUnfolding){
+				if (nt.needsUnfolding){
 
 					//console.log("Will unfold", nt);
+					removeNodeSecondaryStructure(nt);
 					$("#" + nt["id"]).show(0);
 				}
 
