@@ -287,17 +287,20 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 		float this_MFE = state->get_5primeStructureMFE();
 		string this_structure = state->get_5primeStructure();
 
+
 		// Free energy of the structure when polymerase moves upstream by 1 bp
 		State* stateBck = state->clone()->backward();
 		stateBck->fold(true, false);
 		float upstream_MFE = stateBck->get_5primeStructureMFE();
 		string upstream_structure = stateBck->get_5primeStructure();
 
+		if (this_structure.length() < 5) barrierHeight = 0;
+
 
 		// Midpoint blockade: take the free energy of the two neighbouring structures and average them out
-		if (currentModel->get_currentRNABlockadeModel() == "midpointBlockade"){
+		else if (currentModel->get_currentRNABlockadeModel() == "midpointBlockade"){
 			barrierHeight = (this_MFE + upstream_MFE) / 2 - this_MFE;
-			//cout << "Upstream midpoint barrier: " << barrierHeight << endl;
+			cout << "Upstream midpoint barrier: " << barrierHeight << endl;
 		}
 
 
@@ -314,7 +317,7 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 			strcpy(structure_char, transitionStructure.c_str());
 
 			barrierHeight = vRNA_eval(seq_char, structure_char) - this_MFE;
-			//cout << "Gibbs energy: " << barrierHeight << endl;
+			cout << "Upstream intersection Gibbs energy: " << barrierHeight << endl;
 
 			// Clean up
 			free(seq_char);
@@ -384,10 +387,13 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 		float downstream_MFE = stateFwd->get_3primeStructureMFE();
 		string downstream_structure = stateFwd->get_3primeStructure();
 
+
+		if (this_structure.length() < 5) barrierHeight = 0;
+
 		// Midpoint blockade: take the free energy of the two neighbouring structures and average them out
-		if (currentModel->get_currentRNABlockadeModel() == "midpointBlockade"){
+		else if (currentModel->get_currentRNABlockadeModel() == "midpointBlockade"){
 			barrierHeight = (this_MFE + downstream_MFE) / 2 - this_MFE;
-			//cout << "Downstream midpoint barrier: " << barrierHeight << endl;
+			cout << "Downstream midpoint barrier: " << barrierHeight << endl;
 		}
 
 
@@ -404,7 +410,7 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 			strcpy(structure_char, transitionStructure.c_str());
 
 			barrierHeight = vRNA_eval(seq_char, structure_char) - this_MFE;
-			//cout << "Gibbs energy: " << barrierHeight << endl;
+			cout << "Downstream Gibbs energy: " << barrierHeight << endl;
 
 			// Clean up
 			free(seq_char);
