@@ -630,7 +630,7 @@ function refresh(resolve = function(){}){
 		$(".simulateRow").show(true); 
 
 
-		if (!IS_MOBILE && $("#SelectPrimerType").val() == "ssRNA") $("#foldBtnDiv").show(true); // Can only fold ssRNA
+		if (/* !IS_MOBILE && */ $("#SelectPrimerType").val() == "ssRNA") $("#foldBtnDiv").show(true); // Can only fold ssRNA
 		else $("#foldBtnDiv").hide(true);
 
 
