@@ -2463,6 +2463,8 @@ function closeNav() {
 
 					<table style="width:100%">
 
+
+						
 						<tr id="allowmRNAfolding_container"  title="Do you want the mRNA to fold automatically during the simulation? This will place constraints upon backwards translocation.">
 
 
@@ -2484,6 +2486,33 @@ function closeNav() {
 
 					 	</tr>
 
+
+
+
+
+					 	<tr id="currentRNABlockadeModel_container">
+
+							<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#translocation_ModelHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+					 		</td>
+
+							<td colspan = 3 style="text-align:center">
+
+					 			RNA blockade model:
+					 			<select class="dropdown modelSetting" style="width:150px;" id = "currentRNABlockadeModel" title="Select which model to use as a blockade for translocation" OnChange="userInputModel_controller()">
+
+					 				<option value="terminalBlockade">Terminal blockade</option>
+					 				<option value="midpointBlockade">Midpoint blockade</option>
+					 				<option value="intersectionBlockade">Intersection blockade</option>
+
+								</select>
+					 		</td>
+
+
+					 	</tr>
+
+
+					 	<!--
 					 	<tr id="nbpToFold_container">
 
 
@@ -2507,7 +2536,7 @@ function closeNav() {
 					 		</td>
 
 					 	</tr>
-
+					 	-->
 
 				 	</table>
 
