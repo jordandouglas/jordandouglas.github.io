@@ -257,8 +257,10 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 	if (!currentModel->get_allowmRNAfolding()) return 0;
 
 
+	State* clone = state->clone();
+
 	// If the barrier height has already been cached, return it
-	int pos = state->getLeftNascentBaseNumber() - 1;
+	int pos = clone->getLeftNascentBaseNumber() - 1;
 	if (this->upstreamRNABlockadeTable[pos] != -INF) return this->upstreamRNABlockadeTable[pos];
 
 
@@ -266,13 +268,13 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 	double barrierHeight = 0;
 
 	// Fold the RNA of this state
-	state->fold(true, false);
+	clone->fold(true, false);
 
 	// Boundary model -> prohibit translocation if there is any structure here
 	if (currentModel->get_currentRNABlockadeModel() == "terminalBlockade"){
 
 
-		string structure = state->get_5primeStructure();
+		string structure = clone->get_5primeStructure();
 		if (structure.substr(structure.length()-1, 1) == ")") barrierHeight = INF;
 
 		cout << "terminalBlockade " << structure << ":" << barrierHeight << endl;
@@ -284,12 +286,12 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 	else {
 
 		// Free energy of this structure
-		float this_MFE = state->get_5primeStructureMFE();
-		string this_structure = state->get_5primeStructure();
+		float this_MFE = clone->get_5primeStructureMFE();
+		string this_structure = clone->get_5primeStructure();
 
 
 		// Free energy of the structure when polymerase moves upstream by 1 bp
-		State* stateBck = state->clone()->backward();
+		State* stateBck = clone->clone()->backward();
 		stateBck->fold(true, false);
 		float upstream_MFE = stateBck->get_5primeStructureMFE();
 		string upstream_structure = stateBck->get_5primeStructure();
@@ -310,7 +312,7 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 
 
 			// Use RNAeval to compute the Gibbs energy of this structure
-			string seq = state->get_NascentSequence().substr(0, transitionStructure.length());
+			string seq = clone->get_NascentSequence().substr(0, transitionStructure.length());
 			char* seq_char = (char *) calloc(seq.length()+1, sizeof(char));
 			char* structure_char = (char *) calloc(seq.length()+1, sizeof(char));
 			strcpy(seq_char, seq.c_str());
@@ -348,9 +350,10 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 
 	if (!currentModel->get_allowmRNAfolding()) return 0;
 
+	State* clone = state->clone();
 
 	// If the barrier height has already been cached, return it
-	int pos = state->getRightNascentBaseNumber() - 1;
+	int pos = clone->getRightNascentBaseNumber() - 1;
 	if (this->downstreamRNABlockadeTable[pos] != -INF) return this->downstreamRNABlockadeTable[pos];
 
 
@@ -358,13 +361,13 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 	double barrierHeight = 0;
 
 	// Fold the RNA of this state
-	state->fold(false, true);
+	clone->fold(false, true);
 
 	// Boundary model -> prohibit translocation if there is any structure here
 	if (currentModel->get_currentRNABlockadeModel() == "terminalBlockade"){
 
 
-		string structure = state->get_3primeStructure();
+		string structure = clone->get_3primeStructure();
 		if (structure.substr(0, 1) == "(") barrierHeight = INF;
 
 		cout << "terminalBlockade " << structure << ":" << barrierHeight << endl;
@@ -377,12 +380,12 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 
 
 		// Free energy of this structure
-		float this_MFE = state->get_3primeStructureMFE();
-		string this_structure = state->get_3primeStructure();
+		float this_MFE = clone->get_3primeStructureMFE();
+		string this_structure = clone->get_3primeStructure();
 
 
 		// Free energy of the structure when polymerase moves downstream by 1 bp
-		State* stateFwd = state->clone()->forward();
+		State* stateFwd = clone->clone()->forward();
 		stateFwd->fold(false, true);
 		float downstream_MFE = stateFwd->get_3primeStructureMFE();
 		string downstream_structure = stateFwd->get_3primeStructure();
@@ -403,7 +406,7 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 
 
 			// Use RNAeval to compute the Gibbs energy of this structure
-			string seq = state->get_NascentSequence().substr(state->getRightNascentBaseNumber(), transitionStructure.length());
+			string seq = clone->get_NascentSequence().substr(clone->getRightNascentBaseNumber(), transitionStructure.length());
 			char* seq_char = (char *) calloc(seq.length()+1, sizeof(char));
 			char* structure_char = (char *) calloc(seq.length()+1, sizeof(char));
 			strcpy(seq_char, seq.c_str());

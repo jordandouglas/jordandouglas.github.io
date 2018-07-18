@@ -613,6 +613,15 @@ void Coordinates::setFoldAnchorPoint(int pos){
 }
 
 
+// Set the initial coordinates of this folded RNA nucleotide for the force-directed graph
+void Coordinates::setFoldInitialPositions(int pos, double x, double y){
+
+	HTMLobject* nt = Coordinates::NascentSequenceHTMLObjects.at(pos);
+	nt->setFoldInitialPositions(x, y);
+
+}
+
+
 
 void Coordinates::addBondBetweenNucleotides(int nt1, int nt2, bool basepair){
 	HTMLobject* bond = new HTMLobject(to_string(nt1) + "_" + to_string(nt2), nt1, nt2, basepair, true);

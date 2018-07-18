@@ -53,6 +53,8 @@ class HTMLobject{
 	string whichSeq; // If nucleotide
 	bool isFolded; // If nucleotide
 	bool isFoldAnchorPoint; // If nucleotide
+	double foldX;
+	double foldY;
 
 
 	// Is a bond between two nucleotides
@@ -111,7 +113,7 @@ class HTMLobject{
 
 
 		void setFoldedness(bool isFolded);
-
+		void setFoldInitialPositions(double x, double y);
 
 
 

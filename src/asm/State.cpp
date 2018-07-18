@@ -1883,6 +1883,11 @@ float State::foldUpstream(){
 
 
 
+	// Compute MFE structure for 5' end
+	float MFE = vRNA_compute_MFE(seq_5prime, structure_5prime, length_5prime);
+
+
+
 	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden"){
 
 
@@ -1898,11 +1903,78 @@ float State::foldUpstream(){
 			Coordinates::addBondBetweenNucleotides(i, i+1, false);
 		}
 
+
+		// If the sequence was not previously folded and it is now, and it is long, then set the initial coordinates of the nucleotides 
+		if (this->_5primeStructure == "" && length_5prime > 12){
+
+
+
+			// Allocate memory for coordinates of 5' end
+			float* XY = (float *) calloc(2*length_5prime+1, sizeof(float));
+
+			// Get the initial coordinates of the 5' structure
+			vRNA_get_coordinates(structure_5prime, XY, length_5prime);
+
+
+
+			// Dimensions
+			double startX = max(3 * Coordinates::getHTMLobject("pol")->getX() / 4, Coordinates::getHTMLobject("pol")->getX() - 500);
+			double startY = 300;
+			double xWidth = 2 * Coordinates::getHTMLobject("pol")->getX() / 4;
+			double yHeight = 600;
+
+			Coordinates::setFoldInitialPositions(0, startX, startY);
+
+
+
+			// Normalise the X and Y coordinates into the appropriate svg range
+			int xmax = XY[0];
+			int xmin = XY[0];
+			int ymax = XY[length_5prime];
+			int ymin = XY[length_5prime];
+			for (int i = 1; i < length_5prime; i ++){
+
+				if (XY[i] > xmax) xmax = XY[i];
+				else if (XY[i] < xmin) xmin = XY[i];
+
+				if (XY[i+length_5prime] > ymax) ymax = XY[i+length_5prime];
+				else if (XY[i+length_5prime] < ymin) ymin = XY[i+length_5prime];
+			}
+
+			for (int i = 0; i < length_5prime; i ++){
+				XY[i] = startX + xWidth * (XY[i] - xmin) / (xmax - xmin);
+				XY[i+length_5prime] = yHeight * (XY[i+length_5prime] - ymin) / (ymax - ymin);
+			}
+
+			//cout << "max: " << xmax << ",xmin: " << xmin << ",ymax: " << ymax << ", ymin: " << ymin << endl;
+
+
+			// Calculate mean x and y distance to move in order to have the structure centered at (startX, startY) 
+			double displX = 0;
+			double displY = 0;
+
+			//for (int i = 0; i < length_5prime; i ++){
+				//displX += startX - XY[i];
+				//displY += startY - XY[i+length];
+			//}
+			//displX /= length_5prime;
+			//displY /= length_5prime;
+
+
+			for (int i = 0; i < length_5prime; i ++){
+				Coordinates::setFoldInitialPositions(i+1, XY[i] + displX, XY[i+length_5prime] + displY);
+			}
+			
+			// Clean-up
+			free(XY);
+
+
+
+		}
+
+
 	}
 
-
-	// Compute MFE structure for 5' end
-	float MFE = vRNA_compute_MFE(seq_5prime, structure_5prime, length_5prime);
 
 
 				/*
@@ -1953,6 +2025,9 @@ float State::foldDownstream(){
 	strcpy(seq_3prime, this->get_NascentSequence().substr(this->rightTemplateBase, length_3prime).c_str());
 
 
+	// Compute MFE structure for 5' end
+	float MFE = vRNA_compute_MFE_no_cache(seq_3prime, structure_3prime, length_3prime);
+
 
 	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden"){
 
@@ -1970,11 +2045,65 @@ float State::foldDownstream(){
 			Coordinates::addBondBetweenNucleotides(i, i+1, false);
 		}
 
+
+
+		// If the sequence was not previously folded and it is now, and it is long, then set the initial coordinates of the nucleotides 
+		if (this->_3primeStructure == "" && length_3prime > 12){
+
+
+
+
+			// Allocate memory for coordinates of 3' end
+			float* XY = (float *) calloc(2*length_3prime+1, sizeof(float));
+
+			// Get the initial coordinates of the 3' structure
+			vRNA_get_coordinates(structure_3prime, XY, length_3prime);
+
+
+			// Dimensions
+			double startX = 5 * Coordinates::getHTMLobject("pol")->getX() / 4 + Coordinates::getHTMLobject("pol")->getWidth();
+			double startY = 300;
+			double xWidth = 6 * Coordinates::getHTMLobject("pol")->getX() / 4 + Coordinates::getHTMLobject("pol")->getWidth();
+			double yHeight = 600;
+
+
+
+			// Normalise the X and Y coordinates into the appropriate svg range
+			int xmax = XY[0];
+			int xmin = XY[0];
+			int ymax = XY[length_3prime];
+			int ymin = XY[length_3prime];
+			for (int i = 0; i < length_3prime; i ++){
+
+				if (XY[i] > xmax) xmax = XY[i];
+				else if (XY[i] < xmin) xmin = XY[i];
+
+				if (XY[i+length_3prime] > ymax) ymax = XY[i+length_3prime];
+				else if (XY[i+length_3prime] < ymin) ymin = XY[i+length_3prime];
+			}
+
+			for (int i = 0; i < length_3prime; i ++){
+				XY[i] = startX + xWidth * (XY[i] - xmin) / (xmax - xmin);
+				XY[i+length_3prime] = yHeight * (XY[i+length_3prime] - ymin) / (ymax - ymin);
+			}
+
+			//cout << "max: " << xmax << ",xmin: " << xmin << ",ymax: " << ymax << ", ymin: " << ymin << endl;
+
+
+
+			for (int i = 0; i < length_3prime; i ++){
+				Coordinates::setFoldInitialPositions(i + 1 + this->rightTemplateBase, XY[i], XY[i+length_3prime]);
+			}
+
+			// Clean-up
+			free(XY);
+
+		}
+
 	}
 
 
-	// Compute MFE structure for 5' end
-	float MFE = vRNA_compute_MFE_no_cache(seq_3prime, structure_3prime, length_3prime);
+
 	this->_3primeStructure = string(structure_3prime);
 
 
@@ -2029,6 +2158,11 @@ void State::unfold(){
 
 	if (PrimerType != "ssRNA" || !this->isGuiState) return;
 	cout << "Unfolding" << endl;
+
+	this->_3primeStructure = "";
+	this->_5primeStructure = "";
+	this->_3primeMFE = 0;
+	this->_5primeMFE = 0;
 
 	for (int i = 0; i <= this->nascentSequence.length(); i ++){
 		Coordinates::setNucleotideFoldedness(i, false);

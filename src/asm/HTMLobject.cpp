@@ -64,6 +64,8 @@ HTMLobject::HTMLobject(string instruction){
 	this->nt2 = 0;
 	this->basepair = false; 
 	this->isFoldAnchorPoint = false;
+	this->foldX = -1;
+	this->foldY = -1;
 }
 
 
@@ -99,6 +101,8 @@ HTMLobject::HTMLobject(string id, double x, double y, double width, double heigh
 	this->nt2 = 0;
 	this->basepair = false; 
 	this->isFoldAnchorPoint = false;
+	this->foldX = -1;
+	this->foldY = -1;
 
 
 	if(this->id == "") cout << "No id 2 " << endl;
@@ -138,6 +142,8 @@ HTMLobject::HTMLobject(string id, double x, double y, double width, double heigh
 	this->nt2 = 0;
 	this->basepair = false; 
 	this->isFoldAnchorPoint = false;
+	this->foldX = -1;
+	this->foldY = -1;
 	
 
 	if(this->id == "") cout << "No id 3 " << src << "," << ntPos << endl;
@@ -180,6 +186,8 @@ HTMLobject::HTMLobject(string id, int nt1, int nt2, bool basepair, bool add){
 	this->whichSeq = "";
 	this->isFolded = false;
 	this->isFoldAnchorPoint = false;
+	this->foldX = -1;
+	this->foldY = -1;
 }
 
 
@@ -225,8 +233,14 @@ string HTMLobject::toJSON(bool render){
 
 
 		// Display information
-		JSON += "'x':" + to_string(this->x) + ","; 
-		JSON += "'y':" + to_string(this->y) + ","; 
+		if (this->baseStr != "" && this->isFolded && !this->isFoldAnchorPoint && this->foldX >= 0){
+			JSON += "'x':" + to_string(this->foldX) + ","; 
+			JSON += "'y':" + to_string(this->foldY) + ","; 
+		}
+		else{
+			JSON += "'x':" + to_string(this->x) + ","; 
+			JSON += "'y':" + to_string(this->y) + ","; 
+		}
 		JSON += "'dx':" + to_string(this->dx) + ","; 
 		JSON += "'dy':" + to_string(this->dy) + ","; 
 		JSON += "'width':" + to_string(this->width) + ","; 
@@ -360,6 +374,8 @@ void HTMLobject::setFoldedness(bool isFolded){
 	if (!isFolded && (this->isFolded || this->isFoldAnchorPoint)) {
 		this->needsFolding = false;
 		this->needsUnfolding = true;
+		this->foldX = -1;
+		this->foldY = -1;
 	}
 
 	// If going from unfolded to folded then have to fold the object
@@ -379,4 +395,10 @@ void HTMLobject::setFoldedness(bool isFolded){
 void HTMLobject::setAsAnchorPoint(){
 	this->needsFolding = true;
 	this->isFoldAnchorPoint = true;
+}
+
+
+void HTMLobject::setFoldInitialPositions(double x, double y){
+	this->foldX = x;
+	this->foldY = y;
 }

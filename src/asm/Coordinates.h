@@ -88,6 +88,7 @@ class Coordinates{
 		static void set_TP_state(int pos, string whichSeq, bool addTP);
 		static void setNucleotideFoldedness(int pos, bool folded);
 		static void setFoldAnchorPoint(int pos);
+		static void setFoldInitialPositions(int pos, double x, double y);
 		static void addBondBetweenNucleotides(int nt1, int nt2, bool basepair);
 		static void removeBondBetweenNucleotides(int nt1, int nt2);
 		//static void setXYWHsrc(string id, double x, double y, double width, double height, string src);
