@@ -2702,7 +2702,7 @@ function showFoldedRNA_controller(toDisplay = null){
 
 	
 	// No RNA secondary structure display on mobile phones beause svg is not well supported
-	if ($("#PreExp").val() == "hidden" || IS_MOBILE) return;
+	if ($("#PreExp").val() == "hidden"/* || IS_MOBILE*/) return;
 
 	if (toDisplay == null) toDisplay = !$("#foldBtnDiv").hasClass("toolbarIconDisabled");
 
@@ -2742,7 +2742,7 @@ function getMFESequenceBonds_controller(){
 
 
 	// No RNA secondary structure display on mobile phones beause svg is not well supported
-	if ($("#PreExp").val() == "hidden" || IS_MOBILE) return;
+	if ($("#PreExp").val() == "hidden" || /* IS_MOBILE*/) return;
 	
 
 	var updateDOM = function(){
