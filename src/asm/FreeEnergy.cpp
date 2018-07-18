@@ -41,7 +41,7 @@ map<std::string, double> FreeEnergy::basepairingEnergy;
 double FreeEnergy::getFreeEnergyOfHybrid(State* state){
 
 	vector<string> hybridStrings = FreeEnergy::getHybridString(state);
-	double danglingEndMultipler = 0;// 0.5 * (state->get_mRNAPosInActiveSite() == 1);
+	double danglingEndMultipler = 0.5 * (state->get_mRNAPosInActiveSite() == 1);
 	double hybridFreeEnergy = FreeEnergy::getHybridFreeEnergy(hybridStrings.at(0), hybridStrings.at(1), TemplateType.substr(2), PrimerType.substr(2));
 
 	// Account for a dangling base by 1) assuming that the danglng base was paired, and then 2) multiplying the free energy of this doublet by "danglingEndMultipler"
@@ -113,7 +113,7 @@ double FreeEnergy::getFreeEnergyOfIntermediateState(State* state1, State* state2
 
 
 	// Account for a dangling base by 1) assuming that the danglng base was paired, and then 2) multiplying the free energy of this doublet by "danglingEndMultipler"
-	double danglingEndMultipler = 0; //0.5 * ( (state1->get_mRNAPosInActiveSite() == 1 && state2->get_mRNAPosInActiveSite() == 0) || (state1->get_mRNAPosInActiveSite() == 0 && state2->get_mRNAPosInActiveSite() == 1));
+	double danglingEndMultipler = 0.5 * ( (state1->get_mRNAPosInActiveSite() == 1 && state2->get_mRNAPosInActiveSite() == 0) || (state1->get_mRNAPosInActiveSite() == 0 && state2->get_mRNAPosInActiveSite() == 1));
 	if (danglingEndMultipler != 0) {
 		
 		string leftTemplateBase, leftNascentBase, rightTemplateBase, rightNascentBase;
