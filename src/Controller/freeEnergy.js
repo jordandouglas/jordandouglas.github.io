@@ -242,15 +242,13 @@ function updateModelDOM(elongation_model_temp){
 
 
 		// $("#nbpToFold_container").show(100);
-		// $("#nbpToFold_desc").show(100);
-		$("#currentRNABlockadeModel_container").show(100);
+		$("#nbpToFold_desc").show(100);
 		$("#currentRNABlockadeModel_container").show(100);
 
 	}
 	else {
 		// $("#nbpToFold_container").hide(0);
-		// $("#nbpToFold_desc").hide(0);
-		$("#currentRNABlockadeModel_container").hide(0);
+		$("#nbpToFold_desc").hide(0);
 		$("#currentRNABlockadeModel_container").hide(0);
 	}
 	
