@@ -100,7 +100,8 @@ State* State::setToInitialState(){
 
 	this->_5primeStructure = "";
 	this->_3primeStructure = "";
-
+	this->_5primeMFE = 0;
+	this->_3primeMFE = 0;
 
 	
 	// Transcribe a few bases forward to avoid left bubble effects
@@ -462,7 +463,7 @@ State* State::forward(){
 
 
 	// Fold the mRNA if applicable
-	if (currentModel->get_allowmRNAfolding() || (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden")) this->fold(true, true);
+	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden") this->fold(true, true);
 
 
 	// If this is GUI state then we will be applying these changes to the DOM 
@@ -661,7 +662,7 @@ State* State::backward(){
 
 
 	// Fold the mRNA if applicable
-	if (currentModel->get_allowmRNAfolding() || (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden")) this->fold(true, true);
+	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden") this->fold(true, true);
 
 
 	// If this is GUI state then we will be applying these changes to the DOM 
@@ -1858,7 +1859,7 @@ float State::foldUpstream(){
 
 
 	if (PrimerType != "ssRNA" || this->leftNascentBase <= 3 || this->terminated){
-		cout << "Cannot fold 5'" << endl;
+		//cout << "Cannot fold 5'" << endl;
 
 		// Set the folded bases to 'unfolded' mode so the DOM can render them differently
 		for (int i = 0; i <= this->_5primeStructure.length(); i ++){
@@ -1868,6 +1869,11 @@ float State::foldUpstream(){
 
 		return 0;
 	}
+				/*
+				cout << "Calculating free energy" << endl;
+				auto timeStart = chrono::system_clock::now();
+				*/
+
 
 	// Allocate memory for sequence, structure and coordinates of 5' end
 	int length_5prime = this->leftNascentBase-1;
@@ -1877,7 +1883,7 @@ float State::foldUpstream(){
 
 
 
-	if (this->isGuiState && _animationSpeed != "hidden"){
+	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden"){
 
 
 		// Set the folded bases to 'folded' mode so the DOM can render them differently
@@ -1897,11 +1903,21 @@ float State::foldUpstream(){
 
 	// Compute MFE structure for 5' end
 	float MFE = vRNA_compute_MFE(seq_5prime, structure_5prime, length_5prime);
+
+
+				/*
+				auto timeStop = chrono::system_clock::now();
+				chrono::duration<double> elapsed_seconds = timeStop - timeStart;
+				double time = elapsed_seconds.count();
+				cout << "Time to fold mRNA " << time << "s" << endl;
+				*/
+
+
 	this->_5primeStructure = string(structure_5prime);
 
 
 	// Add basepair bonds
-	if (this->isGuiState && _animationSpeed != "hidden") this->findBondsRecurse(0, this->_5primeStructure, 0);
+	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden") this->findBondsRecurse(0, this->_5primeStructure, 0);
 
 
 	// Clean up
@@ -1924,7 +1940,7 @@ float State::foldDownstream(){
 
 	// This can only work if backtracked by more than 4 positions
 	if (PrimerType != "ssRNA" || this->mRNAPosInActiveSite >= -4 || this->terminated){
-		cout << "Cannot fold 3'" << endl;
+		//cout << "Cannot fold 3'" << endl;
 		this->_3primeStructure = "";
 		return 0;
 	}
@@ -1938,7 +1954,7 @@ float State::foldDownstream(){
 
 
 
-	if (this->isGuiState && _animationSpeed != "hidden"){
+	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden"){
 
 		// Set the folded bases to 'folded' mode so the DOM can render them differently
 		//Coordinates::setNucleotideFoldedness(this->rightTemplateBase, false);
@@ -1963,7 +1979,7 @@ float State::foldDownstream(){
 
 
 	// Add basepair bonds
-	if (this->isGuiState && _animationSpeed != "hidden") this->findBondsRecurse(0, this->_3primeStructure, this->rightTemplateBase);
+	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden") this->findBondsRecurse(0, this->_3primeStructure, this->rightTemplateBase);
 
 
 	// Clean up
@@ -1981,16 +1997,12 @@ float State::foldDownstream(){
 void State::fold(bool fold5Prime, bool fold3Prime){
 
 
-
-	cout << "Calculating free energy" << endl;
-
-
 	// Fold the 5' (ie. upstream) mRNA and store the structure string
 	if (fold5Prime){
 
-		float MFE = this->foldUpstream();
-		if (MFE) {
-			cout << "5' fold free energy: " << MFE << "kBT with structure " << this->_5primeStructure << endl;
+		this->_5primeMFE = this->foldUpstream();
+		if (this->_5primeMFE) {
+			//cout << "5' fold free energy: " << this->_5primeMFE << "kBT with structure " << this->_5primeStructure << endl;
 		}
 
 	}
@@ -1999,12 +2011,13 @@ void State::fold(bool fold5Prime, bool fold3Prime){
 	// Fold the 3' (ie. downstream) mRNA  and store the structure string
 	if (fold3Prime){
 
-		float MFE = this->foldDownstream();
-		if (MFE) {
-			cout << "3' fold free energy: " << MFE << "kBT with structure " << this->_3primeStructure << endl;
+		this->_3primeMFE = this->foldDownstream();
+		if (this->_3primeMFE) {
+			//cout << "3' fold free energy: " << this->_3primeMFE << "kBT with structure " << this->_3primeStructure << endl;
 		}
 
 	}
+
 
 
 }
@@ -2027,12 +2040,11 @@ void State::unfold(){
 
 
 
-
+/*
 string State::foldJSON(bool fold5Prime, bool fold3Prime){
 
 
 	if (PrimerType != "ssRNA" || this->leftNascentBase <= 3) return "{}";
-
 
 
 
@@ -2254,7 +2266,7 @@ string State::foldJSON(bool fold5Prime, bool fold3Prime){
 
 
 }
-
+*/
 
 
 
@@ -2495,4 +2507,21 @@ double State::calculateBackwardTranslocationFreeEnergyBarrier(bool ignoreParamet
 	return barrierHeight;
 
 
+}
+
+
+string State::get_5primeStructure(){
+	return this->_5primeStructure;
+}
+
+string State::get_3primeStructure(){
+	return this->_3primeStructure;
+}
+
+float State::get_5primeStructureMFE(){
+	return this->_5primeMFE;
+}
+
+float State::get_3primeStructureMFE(){
+	return this->_3primeMFE;
 }

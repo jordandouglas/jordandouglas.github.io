@@ -523,17 +523,9 @@ extern "C" {
 			return;
 		}
 		
-		auto timeStart = chrono::system_clock::now();
-		string foldJSON = _currentStateGUI->foldJSON(true, true);
-		auto timeStop = chrono::system_clock::now();
+		_currentStateGUI->fold(true, true);
 
-
-		chrono::duration<double> elapsed_seconds = timeStop - timeStart;
-		double time = elapsed_seconds.count();
-
-		cout << "Time to fold mRNA " << time << "s" << endl;
-
-		messageFromWasmToJS(foldJSON, msgID);
+		messageFromWasmToJS("", msgID);
 	}
 
 
@@ -562,6 +554,7 @@ extern "C" {
 
 		// Ensure that the current sequence's translocation rate cache is up to date
 		currentSequence->initRateTable();
+		currentSequence->initRNAunfoldingTable();
 
 
 		messageFromWasmToJS("", msgID);
@@ -1511,6 +1504,7 @@ extern "C" {
 			else if (setting == "useFourNTPconcentrations") currentModel->set_useFourNTPconcentrations(val == "true");
 			else if (setting == "NTPbindingNParams") currentModel->set_NTPbindingNParams(atoi(val.c_str()));
 			else if (setting == "currentTranslocationModel") currentModel->set_currentTranslocationModel(val);
+			else if (setting == "currentRNABlockadeModel") currentModel->set_currentRNABlockadeModel(val);
 			else if (setting == "assumeBindingEquilibrium") currentModel->set_assumeBindingEquilibrium(val == "true");
 			else if (setting == "assumeTranslocationEquilibrium") currentModel->set_assumeTranslocationEquilibrium(val == "true");
 			
@@ -1518,6 +1512,7 @@ extern "C" {
 
 
 		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
+		currentSequence->initRNAunfoldingTable();
 
 		// Hide and show parameters
 		Settings::updateParameterVisibilities();

@@ -42,6 +42,7 @@ Sequence::Sequence(string seqID, string TemplateType, string PrimerType, string 
 	else this->complementSequence = "";
 
 	this->rateTableBuilt = false;
+	this->RNAunfoldingTableBuilt = false;
 	this->translocationRatesCache = new TranslocationRatesCache();
 
 
@@ -54,6 +55,12 @@ void Sequence::flagForRateTableRebuilding(){
 	this->rateTableBuilt = false;
 }
 
+// Instruct the sequence to rebuild the RNA unfolding table next time requested
+void Sequence::flagForUnfoldingTableRebuilding(){
+	this->RNAunfoldingTableBuilt = false;
+}
+
+
 
 
 // Initialise the translocation rates table for this sequence
@@ -65,6 +72,18 @@ void Sequence::initRateTable(){
 	this->translocationRatesCache->buildTranslocationRateTable(this->templateSequence); 
    	this->translocationRatesCache->buildBacktrackRateTable(this->templateSequence);
    	this->rateTableBuilt = true;
+}
+
+
+// Initialise the RNA unfolding barrier heights table for this sequence
+void Sequence::initRNAunfoldingTable(){
+
+	if (this->RNAunfoldingTableBuilt) return;
+	cout << "Initialising unfolding tables for " << seqID << endl;
+	
+	this->translocationRatesCache->buildUpstreamRNABlockadeTable(this->templateSequence); 
+   	this->translocationRatesCache->buildDownstreamRNABlockadeTable(this->templateSequence);
+   	this->RNAunfoldingTableBuilt = true;
 }
 
 

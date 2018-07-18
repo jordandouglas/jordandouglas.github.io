@@ -172,6 +172,7 @@ list<int> Simulator::sample_action_GUI(){
 		this->nTrialsCompletedGUI++;
 		if (!_RUNNING_ABC) Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
 		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
+		currentSequence->initRNAunfoldingTable();
 
 		// Return now if have performed all N trials
 		if (this->nTrialsCompletedGUI >= this->nTrialsTotalGUI) return this->actionsToReturn;
@@ -215,6 +216,7 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
 
 		if (!_RUNNING_ABC) Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
 		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
+		currentSequence->initRNAunfoldingTable();
 		performSimulation(_currentStateGUI, result);
 
 
@@ -309,6 +311,7 @@ void Simulator::resume_trials_GUI(double* toReturn){
 
 		if (!_RUNNING_ABC) Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
 		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
+		currentSequence->initRNAunfoldingTable();
 
 	}
 

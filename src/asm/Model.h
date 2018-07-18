@@ -52,6 +52,7 @@ class Model{
 	bool assumeTranslocationEquilibrium;
 	bool allowMultipleBulges;
 	string currentTranslocationModel;
+	string currentRNABlockadeModel;
 	int NTPbindingNParams;
 	//bool modelIsActive;
 
@@ -109,6 +110,10 @@ class Model{
 
 		Model* set_currentTranslocationModel(string val);
 		string get_currentTranslocationModel();
+		Model* set_currentRNABlockadeModel(string val);
+		string get_currentRNABlockadeModel();
+
+
 		Model* set_NTPbindingNParams(int val);
 		int get_NTPbindingNParams();
 

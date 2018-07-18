@@ -438,6 +438,7 @@ bool Settings::setSequence(string seqID){
 	PrimerType = currentSequence->get_primerType();
 
 	currentSequence->initRateTable();
+	currentSequence->initRNAunfoldingTable();
 	_translocationRatesCache = currentSequence->getRatesCache();
 
 	return true;
@@ -455,6 +456,20 @@ void Settings::resetRateTables(){
 	}
 	
 }
+
+
+// Instruct all sequences to rebuild their unfolding barrier cache next time requested
+void Settings::resetUnfoldingTables(){
+
+	for(std::map<string, Sequence*>::iterator iter = sequences.begin(); iter != sequences.end(); ++iter){
+		Sequence* seq = iter->second;
+		seq->flagForUnfoldingTableRebuilding();
+	}
+	
+}
+
+
+
 
 
 

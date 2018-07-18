@@ -183,6 +183,7 @@ class Settings{
 		static string toJSON();
 		static bool setSequence(string seqID);
 		static void resetRateTables();
+		static void resetUnfoldingTables();
 		static list<PosteriorDistributionSample*> getPosteriorDistributionByID(int fitID);
 		static void addToPosteriorDistribution(int fitID, PosteriorDistributionSample* obj);
 	

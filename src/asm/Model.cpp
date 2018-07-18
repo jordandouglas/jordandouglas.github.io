@@ -53,6 +53,7 @@ Model::Model(){
 
 
 	currentTranslocationModel = "sealingBarriers";
+	currentRNABlockadeModel = "terminalBlockade";
 	NTPbindingNParams = 2;
 
 }
@@ -76,6 +77,7 @@ Model* Model::clone(){
 	clonedModel->assumeBindingEquilibrium = this->assumeBindingEquilibrium;
 	clonedModel->assumeTranslocationEquilibrium = this->assumeTranslocationEquilibrium;
 	clonedModel->currentTranslocationModel = this->currentTranslocationModel;
+	clonedModel->currentRNABlockadeModel = this->currentRNABlockadeModel;
 	clonedModel->allowMultipleBulges = this->allowMultipleBulges;
 	clonedModel->allowDNAbending = this->allowDNAbending;
 
@@ -193,6 +195,7 @@ string Model::toJSON(){
 	JSON += "'allowMultipleBulges':" + string(this->allowMultipleBulges ? "true" : "false") + ",";
 	JSON += "'NTPbindingNParams':" + to_string(this->NTPbindingNParams) + ",";
 	JSON += "'currentTranslocationModel':'" + this->currentTranslocationModel + "',";
+	JSON += "'currentRNABlockadeModel':'" + this->currentRNABlockadeModel + "',";
 	JSON += "'assumeBindingEquilibrium':" + string(this->assumeBindingEquilibrium ? "true" : "false") + ",";
 	JSON += "'allowDNAbending':" + string(this->allowDNAbending ? "true" : "false") + ",";
 	JSON += "'assumeTranslocationEquilibrium':" + string(this->assumeTranslocationEquilibrium ? "true" : "false");
@@ -220,6 +223,7 @@ void Model::print(){
 	cout << "useFourNTPconcentrations = " << this->useFourNTPconcentrations << endl;
 	cout << "NTPbindingNParams = " << this->NTPbindingNParams << endl;
 	cout << "currentTranslocationModel = " << this->currentTranslocationModel << endl;
+	cout << "currentRNABlockadeModel = " << this->currentRNABlockadeModel << endl;
 	cout << "assumeBindingEquilibrium = " << this->assumeBindingEquilibrium << endl;
 	cout << "assumeTranslocationEquilibrium = " << this->assumeTranslocationEquilibrium << endl;
 	cout << "allowMultipleBulges = " << this->allowMultipleBulges << endl;
@@ -384,6 +388,17 @@ string Model::get_currentTranslocationModel(){
 	//cout << "get_currentTranslocationModel " << this->currentTranslocationModel << "." << endl;
 	return this->currentTranslocationModel;
 }
+
+
+Model* Model::set_currentRNABlockadeModel(string val){
+	if (val != this->currentRNABlockadeModel) Settings::resetUnfoldingTables(); // Need to reset the translocation rate cache when this is changed
+	this->currentRNABlockadeModel = val;
+	return this;
+}
+string Model::get_currentRNABlockadeModel(){
+	return this->currentRNABlockadeModel;
+}
+
 
 
 Model* Model::set_NTPbindingNParams(int val){

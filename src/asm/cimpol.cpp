@@ -185,6 +185,7 @@ int main(int argc, char** argv) {
 
 	Settings::sampleAll();
 	currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
+	currentSequence->initRNAunfoldingTable();
 	SimulatorPthread::init(); 
 	Plots::init();
 	if (PrimerType == "ssRNA") vRNA_init(complementSequence.c_str());

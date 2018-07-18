@@ -62,6 +62,8 @@ class State{
 	// Fold information
 	string _5primeStructure;
 	string _3primeStructure;
+	float _5primeMFE;
+	float _3primeMFE;
 
 
 	// Information on bulges
@@ -175,6 +177,11 @@ class State{
 		double calculateTranslocationFreeEnergy(bool ignoreParametersAndSettings);
 		double calculateForwardTranslocationFreeEnergyBarrier(bool ignoreParametersAndSettings);
 		double calculateBackwardTranslocationFreeEnergyBarrier(bool ignoreParametersAndSettings);
+
+		string get_5primeStructure();
+		string get_3primeStructure();
+		float get_5primeStructureMFE();
+		float get_3primeStructureMFE();
 
 
 };

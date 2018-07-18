@@ -45,6 +45,7 @@ class Sequence{
 	string correctSequence(string seq, bool isRNA);
 	TranslocationRatesCache* translocationRatesCache;
 	bool rateTableBuilt;
+	bool RNAunfoldingTableBuilt;
 
 
 	public:
@@ -54,7 +55,10 @@ class Sequence{
 		string getID();
 		TranslocationRatesCache* getRatesCache();
 		void initRateTable();
+		void initRNAunfoldingTable();
+
 		void flagForRateTableRebuilding();
+		void flagForUnfoldingTableRebuilding();
 
 		bool nascentIsRNA();
 		bool nascentIsSS();

@@ -28,6 +28,7 @@
 #include "ViennaRNA/gquad.h"
 #include "ViennaRNA/plot_layouts.h"
 #include "ViennaRNA/naview.h"
+#include "ViennaRNA/eval.h"
 
 #include <string.h>
 #include <limits.h>
@@ -207,3 +208,18 @@ void vRNA_get_coordinates(char* structure, float* XY, int length){
 
 }
 
+
+
+// Returns the Gibbs energy of the specified structure and sequence (equivalent to RNAeval)
+float vRNA_eval(char* sequence, char* structure){
+
+
+	// Allocate memory to fold the current sequence
+	vrna_fold_compound_t*  vc = vrna_fold_compound(sequence, &md, 1);
+	float energy = vrna_eval_structure_v(vc, structure, 0, NULL);
+
+	// Clean up
+    vrna_fold_compound_free(vc);
+
+	return energy / vRNA_RT;
+}	

@@ -146,6 +146,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 					else if (modelSettingName == "useFourNTPconcentrations") currentModel->set_useFourNTPconcentrations(value == "true");
 					else if (modelSettingName == "NTPbindingNParams") currentModel->set_NTPbindingNParams(atoi(value.c_str()));
 					else if (modelSettingName == "currentTranslocationModel") currentModel->set_currentTranslocationModel(value);
+					else if (modelSettingName == "currentRNABlockadeModel") currentModel->set_currentRNABlockadeModel(value);
 					else if (modelSettingName == "assumeBindingEquilibrium") currentModel->set_assumeBindingEquilibrium(value == "true");
 					else if (modelSettingName == "assumeTranslocationEquilibrium") currentModel->set_assumeTranslocationEquilibrium(value == "true");
 				}
@@ -470,6 +471,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 						else if (attrName == "useFourNTPconcentrations") model->set_useFourNTPconcentrations(value == "true");
 						else if (attrName == "NTPbindingNParams") model->set_NTPbindingNParams(atoi(value.c_str()));
 						else if (attrName == "currentTranslocationModel") model->set_currentTranslocationModel(value);
+						else if (attrName == "currentRNABlockadeModel") model->set_currentRNABlockadeModel(value);
 						else if (attrName == "assumeBindingEquilibrium") model->set_assumeBindingEquilibrium(value == "true");
 						else if (attrName == "assumeTranslocationEquilibrium") model->set_assumeTranslocationEquilibrium(value == "true");
 						

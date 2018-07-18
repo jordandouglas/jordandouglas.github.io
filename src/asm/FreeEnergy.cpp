@@ -41,7 +41,7 @@ map<std::string, double> FreeEnergy::basepairingEnergy;
 double FreeEnergy::getFreeEnergyOfHybrid(State* state){
 
 	vector<string> hybridStrings = FreeEnergy::getHybridString(state);
-	double danglingEndMultipler = 0.5 * (state->get_mRNAPosInActiveSite() == 1);
+	double danglingEndMultipler = 0;// 0.5 * (state->get_mRNAPosInActiveSite() == 1);
 	double hybridFreeEnergy = FreeEnergy::getHybridFreeEnergy(hybridStrings.at(0), hybridStrings.at(1), TemplateType.substr(2), PrimerType.substr(2));
 
 	// Account for a dangling base by 1) assuming that the danglng base was paired, and then 2) multiplying the free energy of this doublet by "danglingEndMultipler"
@@ -113,7 +113,7 @@ double FreeEnergy::getFreeEnergyOfIntermediateState(State* state1, State* state2
 
 
 	// Account for a dangling base by 1) assuming that the danglng base was paired, and then 2) multiplying the free energy of this doublet by "danglingEndMultipler"
-	double danglingEndMultipler = 0.5 * ( (state1->get_mRNAPosInActiveSite() == 1 && state2->get_mRNAPosInActiveSite() == 0) || (state1->get_mRNAPosInActiveSite() == 0 && state2->get_mRNAPosInActiveSite() == 1));
+	double danglingEndMultipler = 0; //0.5 * ( (state1->get_mRNAPosInActiveSite() == 1 && state2->get_mRNAPosInActiveSite() == 0) || (state1->get_mRNAPosInActiveSite() == 0 && state2->get_mRNAPosInActiveSite() == 1));
 	if (danglingEndMultipler != 0) {
 		
 		string leftTemplateBase, leftNascentBase, rightTemplateBase, rightNascentBase;
@@ -585,6 +585,67 @@ void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
 	cout << "4" << endl;
 }
 
+
+
+// Compare two RNA secondary structure strings and take the intersection between basepairs
+string FreeEnergy::getSecondaryStructureStringIntersection(string str1, string str2){
+
+	// Build the transition string (all dots)
+	string transitionString = "";
+	for (int i = 0; i < min(str1.length(), str2.length()); i ++)  transitionString += ".";
+
+	// Iterate through the strings
+	for (int i = 0; i < min(str1.length(), str2.length()); i ++){
+
+
+		string char1 = str1.substr(i, 1);
+		string char2 = str2.substr(i, 1);
+
+		// If one or both are dots then the intersection string has a dot here
+		if (char1 == "." || char2 == ".") continue;
+
+
+		// If one or both are closing brackets then the intersection string at this position has already been set in a previous iteration 
+		if (char1 == ")" || char2 == ")") continue;
+
+
+		// Both are opening brackets. Need to check if the two correspond to the same basepair
+		int indentationLevel = 1;
+		for (int j = i+1; j < min(str1.length(), str2.length()); j ++){
+
+			// Iterate until the current symbol is a closing bracket and the indentation level is 0
+			string char1J = str1.substr(j, 1);
+			if (char1J == "(") indentationLevel++;
+
+			else if (char1J == ")"){
+				indentationLevel--;
+
+				if (indentationLevel == 0) {
+
+					// Found the correct closing bracket. Check if the other string has a closing bracket here too
+					string char2J = str2.substr(j, 1);
+					if (char2J == ")"){
+
+						// TODO: Set the position j in the transition string to a closing bracket and position i to an opening bracket
+						transitionString = transitionString.replace(i, 1, "(").replace(j, 1, ")");
+
+					}
+
+					break;
+
+				}
+			}
+
+
+		}
+
+
+	}
+
+	return transitionString;
+
+
+}
 
 
 void FreeEnergy::init_BP_parameters(){

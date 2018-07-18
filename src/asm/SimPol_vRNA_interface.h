@@ -44,7 +44,10 @@ extern "C" float vRNA_compute_MFE(char* sequence, char* structure, int length);
 extern "C" float vRNA_compute_MFE_no_cache(char* sequence, char* structure, int length);
 
 // Returns coordinates to position each RNA base on a plot
-extern "C"  void vRNA_get_coordinates(char* structure, float* XY, int length);
+extern "C" void vRNA_get_coordinates(char* structure, float* XY, int length);
+
+// Returns the Gibbs energy of the specified structure and sequence (equivalent to RNAeval)
+extern "C" float vRNA_eval(char* sequence, char* structure);
 
 
 

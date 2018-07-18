@@ -37,11 +37,20 @@ class TranslocationRatesCache{
 	private:
 		double*** translocationRateTable;
 		double** backtrackRateTable;
+
+		double* upstreamRNABlockadeTable;
+		double* downstreamRNABlockadeTable;
+
+
+		double getUpstreamRNABlockadeBarrierHeight(State* state);
+		double getDownstreamRNABlockadeBarrierHeight(State* state);
 	
 	public:
 		double getTranslocationRates(State* state, bool fwd);
 		void buildTranslocationRateTable(string templSequence);
 		void buildBacktrackRateTable(string templSequence);
+		void buildUpstreamRNABlockadeTable(string templSequence);
+		void buildDownstreamRNABlockadeTable(string templSequence);
 		TranslocationRatesCache();
 
 

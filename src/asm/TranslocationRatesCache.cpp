@@ -23,6 +23,8 @@
 #include "State.h"
 #include "Settings.h"
 #include "TranslocationRatesCache.h"
+#include "FreeEnergy.h"
+#include "SimPol_vRNA_interface.h"
 
 
 #include <iostream>
@@ -39,7 +41,7 @@ TranslocationRatesCache::TranslocationRatesCache(){
 
 
 double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
-
+	
 
 	int h = (int)hybridLen->getVal();
 
@@ -56,7 +58,8 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		double forceGradientFwd = exp(( FAssist->getVal() * 1e-12 * (barrierPos->getVal()) * 1e-10) / (_kBT));
 		double forceGradientBck = exp((-FAssist->getVal() * 1e-12 * (3.4-barrierPos->getVal()) * 1e-10) / (_kBT));
 		double DGPostModifier = state->get_mRNAPosInActiveSite() == 1 ? exp(DGPost->getVal()) : 1;
-
+		double RNAunfoldingBarrier = 1;
+		
 		
 
 		double hypertranslocationGradientForward = 1; // Modify the rate of hypertranslocating forwards
@@ -76,10 +79,16 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 
 
 		if (rates[0] != -1) {
+
+
+			// RNA unfolding barrier heights 
+			if (fwd && rates[1] != 0) RNAunfoldingBarrier = exp(-this->getDownstreamRNABlockadeBarrierHeight(state));
+			else if (!fwd && rates[0] != 0) RNAunfoldingBarrier = exp(-this->getUpstreamRNABlockadeBarrierHeight(state));
+
 			//if (rates[0] >= INF || rates[1] >= INF || forceGradientFwd >= INF || forceGradientBck >= INF || GDagRateModifier >= INF)
 				//cout << "rates[0]: " << rates[0] << ", rates[1]: " << rates[1] << ", forceGradientFwd: " << forceGradientFwd << " forceGradientBck: " << forceGradientBck << " GDagRateModifier: " << GDagRateModifier << endl;
-			if (fwd) return rates[1] * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd;
-			else return rates[0] * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck;
+			if (fwd) return rates[1] * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd * RNAunfoldingBarrier;
+			else return rates[0] * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck * RNAunfoldingBarrier;
 		}
 
 
@@ -94,9 +103,13 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		translocationRateTable[rowNum][colNum][1] = kfwd;
 
 
+		// RNA unfolding barrier heights 
+		if (fwd && rates[1] != 0) RNAunfoldingBarrier = exp(-this->getDownstreamRNABlockadeBarrierHeight(state));
+		else if (!fwd && rates[0] != 0) RNAunfoldingBarrier = exp(-this->getUpstreamRNABlockadeBarrierHeight(state));
 
-		if (fwd) return kfwd * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd;
-		else return kbck * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck;
+
+		if (fwd) return kfwd * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd * RNAunfoldingBarrier;
+		else return kbck * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck * RNAunfoldingBarrier;
 
 		
 		
@@ -117,11 +130,19 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		double GDagRateModifier = exp(-GDagSlide->getVal());
 		double forceGradientFwd = exp(( FAssist->getVal() * 1e-12 * (barrierPos->getVal()) * 1e-10) / (_kBT));
 		double forceGradientBck = exp((-FAssist->getVal() * 1e-12 * (3.4-barrierPos->getVal()) * 1e-10) / (_kBT));
-
+		double RNAunfoldingBarrier = 1;
 		
 		if (rates[0] != -1) {
-			if (fwd) return rates[1] * GDagRateModifier * forceGradientFwd;
-			else return rates[0] * GDagRateModifier * forceGradientBck;
+
+
+			// RNA unfolding barrier heights 
+			if (fwd && rates[1] != 0) RNAunfoldingBarrier = exp(-this->getDownstreamRNABlockadeBarrierHeight(state));
+			else if (!fwd && rates[0] != 0) RNAunfoldingBarrier = exp(-this->getUpstreamRNABlockadeBarrierHeight(state));
+
+
+
+			if (fwd) return rates[1] * GDagRateModifier * forceGradientFwd * RNAunfoldingBarrier;
+			else return rates[0] * GDagRateModifier * forceGradientBck * RNAunfoldingBarrier;
 		}
 		
 		
@@ -137,8 +158,13 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 			//cout << "b rates[0]: " << rates[0] << ", rates[1]: " << rates[1] << ", forceGradientFwd: " << forceGradientFwd << " forceGradientBck: " << forceGradientBck << " GDagRateModifier: " << GDagRateModifier << endl;
 			
 
-		if (fwd) return kfwd * GDagRateModifier * forceGradientFwd;
-		else return kbck * GDagRateModifier * forceGradientBck;
+		// RNA unfolding barrier heights 
+		if (fwd && rates[1] != 0) RNAunfoldingBarrier = exp(-this->getDownstreamRNABlockadeBarrierHeight(state));
+		else if (!fwd && rates[0] != 0) RNAunfoldingBarrier = exp(-this->getUpstreamRNABlockadeBarrierHeight(state));
+
+
+		if (fwd) return kfwd * GDagRateModifier * forceGradientFwd * RNAunfoldingBarrier;
+		else return kbck * GDagRateModifier * forceGradientBck * RNAunfoldingBarrier;
 
 		
 	}
@@ -166,21 +192,21 @@ void TranslocationRatesCache::buildTranslocationRateTable(string templSequence){
 	int nLengths = templSequence.length() - h + 1;
 	int nPositions = h + 1;
 	if (nLengths <= 0) return;
-	translocationRateTable = new double**[nLengths];
+	this->translocationRateTable = new double**[nLengths];
 
 
 	for(int nascentLen = h-1; nascentLen < templSequence.length(); nascentLen ++){
 		
 		int rowNum = nascentLen - (h-1);
-		translocationRateTable[rowNum] = new double*[nPositions];
+		this->translocationRateTable[rowNum] = new double*[nPositions];
 
 		for (int activeSitePos = -1; activeSitePos <= h-1; activeSitePos ++){
 			int colNum = activeSitePos + 1;
 
 			// Will leave it empty and add values only as they are needed
-			translocationRateTable[rowNum][colNum] = new double[2]; 
-			translocationRateTable[rowNum][colNum][0] = -1; 
-			translocationRateTable[rowNum][colNum][1] = -1; 
+			this->translocationRateTable[rowNum][colNum] = new double[2]; 
+			this->translocationRateTable[rowNum][colNum][0] = -1; 
+			this->translocationRateTable[rowNum][colNum][1] = -1; 
 		}
 		
 	}
@@ -205,17 +231,222 @@ void TranslocationRatesCache::buildBacktrackRateTable(string templSequence){
 
 	int h = (int)hybridLen->getVal();
 	if (templSequence.length() - h - 1 < 0) return;
-	backtrackRateTable = new double*[templSequence.length() - h - 1];
+	this->backtrackRateTable = new double*[templSequence.length() - h - 1];
 
 
 	for (int leftHybridBase = 1; leftHybridBase <= templSequence.length() - h - 1; leftHybridBase ++){
 		int indexNum = leftHybridBase - 1;
 
 		// Will leave it empty and add values only as they are needed
-		backtrackRateTable[indexNum] = new double[2];
-		backtrackRateTable[indexNum][0] = -1; 
-		backtrackRateTable[indexNum][1] = -1; 
+		this->backtrackRateTable[indexNum] = new double[2];
+		this->backtrackRateTable[indexNum][0] = -1; 
+		this->backtrackRateTable[indexNum][1] = -1; 
 	}
 
 
+}
+
+
+
+
+double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state){
+
+
+	//cout << "getUpstreamRNABlockadeBarrierHeight" << endl;
+
+	if (!currentModel->get_allowmRNAfolding()) return 0;
+
+
+	// If the barrier height has already been cached, return it
+	int pos = state->getLeftNascentBaseNumber() - 1;
+	if (this->upstreamRNABlockadeTable[pos] != -INF) return this->upstreamRNABlockadeTable[pos];
+
+
+	// Otherwise calculate it
+	double barrierHeight = 0;
+
+	// Fold the RNA of this state
+	state->fold(true, false);
+
+	// Boundary model -> prohibit translocation if there is any structure here
+	if (currentModel->get_currentRNABlockadeModel() == "terminalBlockade"){
+
+
+		string structure = state->get_5primeStructure();
+		if (structure.substr(structure.length()-1, 1) == ")") barrierHeight = INF;
+
+		cout << "terminalBlockade " << structure << ":" << barrierHeight << endl;
+
+	}
+
+
+	// Otherwise we need to consider the current state and the back translocated state
+	else {
+
+		// Free energy of this structure
+		float this_MFE = state->get_5primeStructureMFE();
+		string this_structure = state->get_5primeStructure();
+
+		// Free energy of the structure when polymerase moves upstream by 1 bp
+		State* stateBck = state->clone()->backward();
+		stateBck->fold(true, false);
+		float upstream_MFE = stateBck->get_5primeStructureMFE();
+		string upstream_structure = stateBck->get_5primeStructure();
+
+
+		// Midpoint blockade: take the free energy of the two neighbouring structures and average them out
+		if (currentModel->get_currentRNABlockadeModel() == "midpointBlockade"){
+			barrierHeight = (this_MFE + upstream_MFE) / 2 - this_MFE;
+			//cout << "Upstream midpoint barrier: " << barrierHeight << endl;
+		}
+
+
+		else if (currentModel->get_currentRNABlockadeModel() == "intersectionBlockade"){
+			string transitionStructure = FreeEnergy::getSecondaryStructureStringIntersection(this_structure, upstream_structure);
+			//cout << this_structure << "/" << upstream_structure  << "Transition intersection structure " << transitionStructure << endl;
+
+
+			// Use RNAeval to compute the Gibbs energy of this structure
+			string seq = state->get_NascentSequence().substr(0, transitionStructure.length());
+			char* seq_char = (char *) calloc(seq.length()+1, sizeof(char));
+			char* structure_char = (char *) calloc(seq.length()+1, sizeof(char));
+			strcpy(seq_char, seq.c_str());
+			strcpy(structure_char, transitionStructure.c_str());
+
+			barrierHeight = vRNA_eval(seq_char, structure_char) - this_MFE;
+			//cout << "Gibbs energy: " << barrierHeight << endl;
+
+			// Clean up
+			free(seq_char);
+			free(structure_char);
+	
+
+
+		}
+		
+
+
+	}
+
+
+	this->upstreamRNABlockadeTable[pos] = barrierHeight;
+	return barrierHeight;
+
+
+
+
+}
+
+
+double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* state){
+
+
+	//cout << "getDownstreamRNABlockadeBarrierHeight" << endl;
+
+	if (!currentModel->get_allowmRNAfolding()) return 0;
+
+
+	// If the barrier height has already been cached, return it
+	int pos = state->getRightNascentBaseNumber() - 1;
+	if (this->downstreamRNABlockadeTable[pos] != -INF) return this->downstreamRNABlockadeTable[pos];
+
+
+	// Otherwise calculate it
+	double barrierHeight = 0;
+
+	// Fold the RNA of this state
+	state->fold(false, true);
+
+	// Boundary model -> prohibit translocation if there is any structure here
+	if (currentModel->get_currentRNABlockadeModel() == "terminalBlockade"){
+
+
+		string structure = state->get_3primeStructure();
+		if (structure.substr(0, 1) == "(") barrierHeight = INF;
+
+		cout << "terminalBlockade " << structure << ":" << barrierHeight << endl;
+
+	}
+
+
+	// Otherwise we need to consider the current state and the forward translocated state
+	else {
+
+
+		// Free energy of this structure
+		float this_MFE = state->get_3primeStructureMFE();
+		string this_structure = state->get_3primeStructure();
+
+
+		// Free energy of the structure when polymerase moves downstream by 1 bp
+		State* stateFwd = state->clone()->forward();
+		stateFwd->fold(false, true);
+		float downstream_MFE = stateFwd->get_3primeStructureMFE();
+		string downstream_structure = stateFwd->get_3primeStructure();
+
+		// Midpoint blockade: take the free energy of the two neighbouring structures and average them out
+		if (currentModel->get_currentRNABlockadeModel() == "midpointBlockade"){
+			barrierHeight = (this_MFE + downstream_MFE) / 2 - this_MFE;
+			//cout << "Downstream midpoint barrier: " << barrierHeight << endl;
+		}
+
+
+		else if (currentModel->get_currentRNABlockadeModel() == "intersectionBlockade"){
+			string transitionStructure = FreeEnergy::getSecondaryStructureStringIntersection(this_structure, "." + downstream_structure);
+			//cout << this_structure << "/" << downstream_structure  << "Downstream transition intersection structure " << transitionStructure << endl;
+
+
+			// Use RNAeval to compute the Gibbs energy of this structure
+			string seq = state->get_NascentSequence().substr(state->getRightNascentBaseNumber(), transitionStructure.length());
+			char* seq_char = (char *) calloc(seq.length()+1, sizeof(char));
+			char* structure_char = (char *) calloc(seq.length()+1, sizeof(char));
+			strcpy(seq_char, seq.c_str());
+			strcpy(structure_char, transitionStructure.c_str());
+
+			barrierHeight = vRNA_eval(seq_char, structure_char) - this_MFE;
+			//cout << "Gibbs energy: " << barrierHeight << endl;
+
+			// Clean up
+			free(seq_char);
+			free(structure_char);
+	
+
+
+		}
+
+
+	}
+
+
+	this->downstreamRNABlockadeTable[pos] = barrierHeight;
+	return barrierHeight;
+
+}
+
+
+
+
+
+// Build a table of rates for translocating upstream from the current position.
+// The active site position and transcript length don't matter - only the transcript position that is one basepair upstream of the polymerase matters
+void TranslocationRatesCache::buildUpstreamRNABlockadeTable(string templSequence){
+	this->upstreamRNABlockadeTable = new double[templSequence.length()];
+
+	// Initialise all values at negative infinity
+	for (int i = 0; i < templSequence.length(); i ++){
+		this->upstreamRNABlockadeTable[i] = -INF; 
+	}
+
+}
+
+
+// Build a table of rates for translocating downstream from the current position.
+// The active site position and transcript length don't matter - only the transcript position that is one basepair downstream of the polymerase matters
+void TranslocationRatesCache::buildDownstreamRNABlockadeTable(string templSequence){
+	this->downstreamRNABlockadeTable = new double[templSequence.length()];
+
+	// Initialise all values at negative infinity
+	for (int i = 0; i < templSequence.length(); i ++){
+		this->downstreamRNABlockadeTable[i] = -INF; 
+	}
 }
