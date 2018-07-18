@@ -56,7 +56,7 @@ function removeNodeSecondaryStructure(nt){
 function updateSecondaryStructure(new_nodes, edges){
 
 
-	console.log("edges", edges);
+	//console.log("edges", edges);
 
 	if (new_nodes.length == 0 || MFE_simulation == null) return;
 
@@ -90,7 +90,7 @@ function updateSecondaryStructure(new_nodes, edges){
 	for (var i = 0; i < MFE_simulationNodes.length; i ++){
 		if (MFE_simulationNodes[i] == null || MFE_simulationNodes[i].id == null) MFE_simulationNodes[i] = {src: "Xg"};
 	}
-	console.log("MFE_simulationNodes", MFE_simulationNodes);
+	//console.log("MFE_simulationNodes", MFE_simulationNodes);
 	
 
 	var svg = d3.select("#mRNAsvg");
@@ -170,7 +170,7 @@ function updateSecondaryStructure(new_nodes, edges){
 
 
 // Call this function the first time the force directed graph is established
-function renderSecondaryStructure(data){
+function renderSecondaryStructure(){
 	
 	
 

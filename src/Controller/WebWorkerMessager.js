@@ -2740,15 +2740,14 @@ function showFoldedRNA_controller(toDisplay = null){
 
 function getMFESequenceBonds_controller(){
 
-	
+
 	// No RNA secondary structure display on mobile phones beause svg is not well supported
 	if ($("#PreExp").val() == "hidden" || IS_MOBILE) return;
 	
 
-	var updateDOM = function(graphInfo){
+	var updateDOM = function(){
 
-		//console.log("graphInfo", graphInfo);
-		renderSecondaryStructure(graphInfo);
+		renderSecondaryStructure();
 		renderObjects();
 
 	};
@@ -2769,13 +2768,12 @@ function getMFESequenceBonds_controller(){
 	
 	else {
 		
-
 		var res = stringifyFunction("getMFESequenceBonds", [], true);
 		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((graphInfo) => updateDOM(graphInfo));
+		toCall().then(() => updateDOM());
 	}
 	
 }
@@ -3309,7 +3307,7 @@ function userInputModel_controller(){
 		var id = $(ele).attr("id");
 		var val = $(ele).is(":checked");
 		if (id == "NTPbindingNParams") val = (val == true ? 8 : 2); 
-		else if (id == "currentTranslocationModel") val = $(ele).val();
+		else if (id == "currentTranslocationModel" || id == "currentRNABlockadeModel") val = $(ele).val();
 		toSend[id] = val;
 
 	}

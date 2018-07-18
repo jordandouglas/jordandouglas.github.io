@@ -239,13 +239,19 @@ function updateModelDOM(elongation_model_temp){
 
 
 	if (elongation_model_temp["allowmRNAfolding"]) {
-		$("#nbpToFold_container").show(100);
-		$("#nbpToFold_desc").show(100);
+
+
+		// $("#nbpToFold_container").show(100);
+		// $("#nbpToFold_desc").show(100);
+		$("#currentRNABlockadeModel_container").show(100);
+		$("#currentRNABlockadeModel_container").show(100);
 
 	}
 	else {
-		$("#nbpToFold_container").hide(0);
-		$("#nbpToFold_desc").hide(0);
+		// $("#nbpToFold_container").hide(0);
+		// $("#nbpToFold_desc").hide(0);
+		$("#currentRNABlockadeModel_container").hide(0);
+		$("#currentRNABlockadeModel_container").hide(0);
 	}
 	
 	
@@ -327,6 +333,8 @@ function updateModelDOM(elongation_model_temp){
 
 
 	$("#currentTranslocationModel").val(elongation_model_temp["currentTranslocationModel"]);
+	$("#currentRNABlockadeModel").val(elongation_model_temp["currentRNABlockadeModel"]);
+
 	//if (elongation_model_temp["id"] == "twoSiteBrownian") $("#allowGeometricCatalysis_container").hide(100);
 	//else $("#allowGeometricCatalysis_container").show(100);
 
@@ -365,7 +373,9 @@ function setModelOptions(){
 
 		//ELONGATION_MODEL_TEMP = currentElongationModel; //elongation_model[currentElongationModel];
 		//$("#SelectElongationModel").val(currentElongationModel);
-		$("#currentTranslocationModel").val(currentTranslocationModel);
+		//$("#currentTranslocationModel").val(currentTranslocationModel);
+		//$("#currentRNABlockadeModel").val(currentRNABlockadeModel);
+
 		updateModelDOM(ELONGATION_MODEL_TEMP);
 
 	});
