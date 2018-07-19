@@ -222,8 +222,14 @@ E_ext_loop_5( vrna_fold_compound_t *vc){
                 /* check for possible stems branching off the exterior loop */
                 if(sc && sc->f){
                   for (i=j-turn-1; i>1; i--){
+
+
+
                     if(f5[i-1] != INF){
+
                       ij = indx[j]+i;
+                      //if (matrices->evaluated[ij]) continue;
+
 
                       if(with_gquad){
                         f5[j] = MIN2(f5[j], f5[i-1] + ggg[ij]);
@@ -251,7 +257,9 @@ E_ext_loop_5( vrna_fold_compound_t *vc){
                 } else {
                   for (i=j-turn-1; i>1; i--){
                     if(f5[i-1] != INF){
+
                       ij = indx[j]+i;
+                      //if (matrices->evaluated[ij]) continue;
 
                       if(with_gquad){
                         f5[j] = MIN2(f5[j], f5[i-1] + ggg[ij]);
@@ -277,6 +285,8 @@ E_ext_loop_5( vrna_fold_compound_t *vc){
                   }
                 }
                 ij = indx[j] + 1;
+                //if (matrices->evaluated[ij]) continue;
+              	//matrices->evaluated[ij] = 1;
 
                 if(with_gquad){
                   f5[j] = MIN2(f5[j], ggg[ij]);

@@ -236,13 +236,18 @@ fill_arrays(vrna_fold_compound_t *vc){
   }
 
 
-  /* prefill matrices with init contributions */
+
+
+  // prefill matrices with init contributions 
+  /*
   for(j = 1; j <= length; j++)
     for(i = (j > TURN ? (j - TURN) : 1); i < j; i++){
       my_c[indx[j] + i] = my_fML[indx[j] + i] = INF;
       if(uniq_ML)
         my_fM1[indx[j] + i] = INF;
     }
+    */
+   
 
   /* start recursion */
 
@@ -262,6 +267,10 @@ fill_arrays(vrna_fold_compound_t *vc){
 
     for (j = i+TURN+1; j <= length; j++) {
       ij            = indx[j]+i;
+
+
+      if (matrices->evaluated[ij]) continue;
+
       type          = (unsigned char)ptype[ij];
       hc_decompose  = hard_constraints[ij];
       energy        = INF;
@@ -287,17 +296,17 @@ fill_arrays(vrna_fold_compound_t *vc){
         }
 
         /* check for interior loops */
-        energy = vrna_E_int_loop(vc, i, j);
-        new_c = MIN2(new_c, energy);
+    	energy = vrna_E_int_loop(vc, i, j);
+   	 	new_c = MIN2(new_c, energy);
 
         /* remember stack energy for --noLP option */
         if(noLP){
-          stackEnergy = vrna_E_stack(vc, i, j);
-          new_c       = MIN2(new_c, cc1[j-1]+stackEnergy);
-          cc[j]       = new_c;
-          my_c[ij]    = cc1[j-1]+stackEnergy;
+			stackEnergy = vrna_E_stack(vc, i, j);
+			new_c       = MIN2(new_c, cc1[j-1]+stackEnergy);
+			cc[j]       = new_c;
+			my_c[ij]    = cc1[j-1]+stackEnergy;
         } else {
-          my_c[ij]    = new_c;
+        	my_c[ij]    = new_c;
         }
       } /* end >> if (pair) << */
 
@@ -308,8 +317,11 @@ fill_arrays(vrna_fold_compound_t *vc){
       my_fML[ij] = vrna_E_ml_stems_fast(vc, i, j, Fmi, DMLi);
 
       if(uniq_ML){  /* compute fM1 for unique decomposition */
-        my_fM1[ij] = E_ml_rightmost_stem(i, j, vc);
+		my_fM1[ij] = E_ml_rightmost_stem(i, j, vc);
       }
+
+      matrices->evaluated[ij] = 1;
+
 
     } /* end of j-loop */
 

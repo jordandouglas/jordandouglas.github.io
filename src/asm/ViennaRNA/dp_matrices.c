@@ -378,6 +378,7 @@ mfe_matrices_alloc_default( vrna_mx_mfe_t *vars,
   size          = ((n + 1) * (m + 2)) / 2;
   lin_size      = n + 2;
 
+  //vars->evaluated = NULL;
   vars->f5  = NULL;
   vars->f3  = NULL;
   vars->fc  = NULL;
@@ -386,6 +387,9 @@ mfe_matrices_alloc_default( vrna_mx_mfe_t *vars,
   vars->fM1 = NULL;
   vars->fM2 = NULL;
   vars->ggg = NULL;
+
+  if(alloc_vector)
+    vars->evaluated  = (int *) vrna_alloc(sizeof(int) * size);
 
   if(alloc_vector & ALLOC_F5)
     vars->f5  = (int *) vrna_alloc(sizeof(int) * lin_size);
