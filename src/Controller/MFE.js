@@ -22,8 +22,8 @@
 MFE_simulation = null;
 MFE_node = null;
 MFE_links = null;
-MFE_wallRepulsionForce = -500; // * nodes.length;
-MFE_wallReplusionDistance = 20000000; // How close does something need to be to a wall to experience repulsion
+MFE_wallRepulsionForce = -200; // * nodes.length;
+MFE_wallReplusionDistance = 150; // How close does something need to be to a wall to experience repulsion
 MFE_repulsionForce = -10;
 MFE_yShift = 100;
 
@@ -375,8 +375,12 @@ function MFE_dy(dvertex) {
 	// Calculate wall repulsion force. Do not accept non-positive distances to the wall
 	var distanceToTopWall = Math.max(dvertex.y - 22, 1);
 	var distanceToBottomWall = Math.max((MFE_height-20) - (dvertex.y + 22), 1);
+
+	//if (dvertex.id == "m15") console.log("MFE_height", MFE_height, dvertex.y, distanceToBottomWall);
+	
+
 	if (distanceToTopWall < MFE_wallReplusionDistance) dvertex.vy += -MFE_wallRepulsionForce / (distanceToTopWall * distanceToTopWall * distanceToTopWall);
-	if (distanceToBottomWall < MFE_wallReplusionDistance) dvertex.vy += MFE_wallRepulsionForce / (distanceToBottomWall * distanceToBottomWall * distanceToTopWall);
+	if (distanceToBottomWall < MFE_wallReplusionDistance) dvertex.vy += MFE_wallRepulsionForce / (distanceToBottomWall * distanceToBottomWall * distanceToBottomWall);
 
 
 

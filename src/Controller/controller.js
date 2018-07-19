@@ -734,7 +734,11 @@ function renderObjects(override = false, resolve = function(){}){
 				if (nt.needsFolding){
 
 					//console.log("Will fold", nt);
-					if (!nt.fixed) $("#" + nt["id"]).hide(0);
+					if (!nt.fixed) {
+						$("#" + nt["id"]).hide(0);
+						if (nt.foldX != null && nt.foldX >= 0) nt.x = nt.foldX;
+						if (nt.foldY != null && nt.foldY >= 0) nt.y = nt.foldY;
+					}
 					else{
 						$("#" + nt["id"]).show(0);
 						nt.fixedX = nt.x;
