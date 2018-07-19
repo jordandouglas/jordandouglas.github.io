@@ -1869,10 +1869,10 @@ float State::foldUpstream(){
 
 		return 0;
 	}
-				/*
-				cout << "Calculating free energy" << endl;
-				auto timeStart = chrono::system_clock::now();
-				*/
+				
+				//cout << "Calculating free energy" << endl;
+				//auto timeStart = chrono::system_clock::now();
+
 
 
 	// Allocate memory for sequence, structure and coordinates of 5' end
@@ -1887,6 +1887,13 @@ float State::foldUpstream(){
 	float MFE = vRNA_compute_MFE(seq_5prime, structure_5prime, length_5prime);
 
 
+				//auto timeStop = chrono::system_clock::now();
+				//chrono::duration<double> elapsed_seconds = timeStop - timeStart;
+				//double time = elapsed_seconds.count();
+				//cout << "Time to fold mRNA " << time << "s" << endl;
+
+
+	//cout << "Folded into " << MFE << ":" << structure_5prime << endl;
 
 	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden"){
 
@@ -1898,6 +1905,7 @@ float State::foldUpstream(){
 		Coordinates::setFoldAnchorPoint(length_5prime+1);
 
 
+
 		// Add bonds between all nucleotides along the backbone 
 		for (int i = 0; i <= length_5prime; i ++){
 			Coordinates::addBondBetweenNucleotides(i, i+1, false);
@@ -1905,22 +1913,28 @@ float State::foldUpstream(){
 
 
 		// If the sequence was not previously folded and it is now, and it is long, then set the initial coordinates of the nucleotides 
-		if (this->_5primeStructure == "" && length_5prime > 12){
+		if (false && this->_5primeStructure == "" && length_5prime > 12){
+
 
 
 
 			// Allocate memory for coordinates of 5' end
 			float* XY = (float *) calloc(2*length_5prime+1, sizeof(float));
 
+			// cout << "getting coordinates " << length_5prime << endl;
+			
+
 			// Get the initial coordinates of the 5' structure
 			vRNA_get_coordinates(structure_5prime, XY, length_5prime);
 
+
+			// cout << "got coordinates" << endl;
 
 
 			// Dimensions
 			double startX = max(3 * Coordinates::getHTMLobject("pol")->getX() / 4, Coordinates::getHTMLobject("pol")->getX() - 500);
 			double startY = 300;
-			double xWidth = 2 * Coordinates::getHTMLobject("pol")->getX() / 4;
+			double xWidth = max(2 * Coordinates::getHTMLobject("pol")->getX() / 4, Coordinates::getHTMLobject("pol")->getX() - 700);
 			double yHeight = 600;
 
 			Coordinates::setFoldInitialPositions(0, startX, startY);
@@ -1967,7 +1981,7 @@ float State::foldUpstream(){
 			
 			// Clean-up
 			free(XY);
-
+			cout << "cleaning up" << endl;
 
 
 		}
@@ -1976,13 +1990,6 @@ float State::foldUpstream(){
 	}
 
 
-
-				/*
-				auto timeStop = chrono::system_clock::now();
-				chrono::duration<double> elapsed_seconds = timeStop - timeStart;
-				double time = elapsed_seconds.count();
-				cout << "Time to fold mRNA " << time << "s" << endl;
-				*/
 
 
 	this->_5primeStructure = string(structure_5prime);
@@ -2048,7 +2055,7 @@ float State::foldDownstream(){
 
 
 		// If the sequence was not previously folded and it is now, and it is long, then set the initial coordinates of the nucleotides 
-		if (this->_3primeStructure == "" && length_3prime > 12){
+		if (false && this->_3primeStructure == "" && length_3prime > 12){
 
 
 

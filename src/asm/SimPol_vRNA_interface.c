@@ -65,6 +65,7 @@ void vRNA_init(const char* nascentSequence){
 	int size          = ((n + 1) * (m + 2)) / 2;
  	int lin_size      = n + 2;
 
+ 	if (vc->matrices->evaluated) for (i = 0; i < size; i ++) vc->matrices->evaluated[i] = 0;
 	if (vc->matrices->f5) for (i = 0; i < lin_size; i ++) vc->matrices->f5[i] = INF;
 	if (vc->matrices->f3) for (i = 0; i < lin_size; i ++) vc->matrices->f3[i] = INF;
 	if (vc->matrices->fc) for (i = 0; i < lin_size; i ++) vc->matrices->fc[i] = INF;
@@ -132,6 +133,8 @@ float vRNA_compute_MFE_no_cache(char* sequence, char* structure, int length){
 	int size          = ((n + 1) * (m + 2)) / 2;
  	int lin_size      = n + 2;
 
+
+ 	if (vc->matrices->evaluated) for (i = 0; i < size; i ++) vc->matrices->evaluated[i] = 0;
 	if (vc_temp->matrices->f5) for (i = 0; i < lin_size; i ++) vc_temp->matrices->f5[i] = INF;
 	if (vc_temp->matrices->f3) for (i = 0; i < lin_size; i ++) vc_temp->matrices->f3[i] = INF;
 	if (vc_temp->matrices->fc) for (i = 0; i < lin_size; i ++) vc_temp->matrices->fc[i] = INF;
@@ -181,7 +184,7 @@ void vRNA_get_coordinates(char* structure, float* XY, int length){
 		ge += ee;
 		gb = ge - Lg*4 - l[0] - l[1] - l[2] + 1;
 
-		// Add pseudo-base pair encloding gquad
+		// Add pseudo-base pair encoding gquad
 		for (i=0; i < Lg; i++) {
 			pair_table_g[ge-i] = gb+i;
 			pair_table_g[gb+i] = ge-i;

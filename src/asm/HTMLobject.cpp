@@ -229,18 +229,18 @@ string HTMLobject::toJSON(bool render){
 			JSON += "'needsFolding':" + string(this->needsFolding ? "true" : "false") + ","; 
 			JSON += "'needsUnfolding':" + string(this->needsUnfolding ? "true" : "false") + ","; 
 			JSON += "'fixed':" + string(this->isFoldAnchorPoint ? "true" : "false") + ","; 
+
+			if (this->isFolded && !this->isFoldAnchorPoint && this->foldX >= 0){
+				JSON += "'foldX':" + to_string(this->foldX) + ","; 
+				JSON += "'foldY':" + to_string(this->foldY) + ","; 
+			}
+
 		}
 
 
 		// Display information
-		if (this->baseStr != "" && this->isFolded && !this->isFoldAnchorPoint && this->foldX >= 0){
-			JSON += "'x':" + to_string(this->foldX) + ","; 
-			JSON += "'y':" + to_string(this->foldY) + ","; 
-		}
-		else{
-			JSON += "'x':" + to_string(this->x) + ","; 
-			JSON += "'y':" + to_string(this->y) + ","; 
-		}
+		JSON += "'x':" + to_string(this->x) + ","; 
+		JSON += "'y':" + to_string(this->y) + ","; 
 		JSON += "'dx':" + to_string(this->dx) + ","; 
 		JSON += "'dy':" + to_string(this->dy) + ","; 
 		JSON += "'width':" + to_string(this->width) + ","; 
