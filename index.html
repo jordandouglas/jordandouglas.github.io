@@ -2205,10 +2205,31 @@ function closeNav() {
 
 
 				 	</tr>
+					
+					
+					<tr style="display:none" id="currentInactivationModel_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#translocation_ModelHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+						</td>
+
+						<td colspan = 3 style="text-align:center">
+
+							Inactivation model:
+							<select class="dropdown modelSetting" style="width:150px;" id = "currentInactivationModel" title="Select which model to use for polymerase inactivation" OnChange="userInputModel_controller()">
+
+								<option value="sequenceIndependent">Sequence independent</option>
+								<option value="hybridDestabilisation">Hybrid destabilisation</option>
+
+							</select>
+						</td>
+
+
+					</tr>
 
 
 
-					<tr id="kU_container">
+					<tr style="display:none" id="kU_container">
 
 						<td style="text-align:left; font-size:10px; float:left; width:20px">
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kU_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
@@ -2232,7 +2253,7 @@ function closeNav() {
 
 
 
-				 	<tr id="kA_container">
+				 	<tr style="display:none" id="kA_container">
 
 
 				 		<td style="text-align:left; font-size:10px; float:left; width:20px">
@@ -2254,6 +2275,30 @@ function closeNav() {
 				 		</td>
 
 				 	</tr>
+					
+					
+					<tr style="display:none" id="deltaGDaggerHybridDestabil_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kU_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							&Delta;G<sup>&dagger;</sup><sub>h</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="deltaGDaggerHybridDestabil"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sup>B</sup>T 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='deltaGDaggerHybridDestabil_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
+
 
 
 
