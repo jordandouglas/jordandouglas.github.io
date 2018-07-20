@@ -2215,8 +2215,8 @@ function closeNav() {
 
 						<td colspan = 3 style="text-align:center">
 
-							Inactivation model:
-							<select class="dropdown modelSetting" style="width:150px;" id = "currentInactivationModel" title="Select which model to use for polymerase inactivation" OnChange="userInputModel_controller()">
+							Model:
+							<select class="dropdown modelSetting" style="" id="currentInactivationModel" title="Select which model to use for polymerase inactivation" OnChange="userInputModel_controller()">
 
 								<option value="sequenceIndependent">Sequence independent</option>
 								<option value="hybridDestabilisation">Hybrid destabilisation</option>
@@ -2253,6 +2253,31 @@ function closeNav() {
 
 
 
+
+					<tr style="display:none" id="deltaGDaggerHybridDestabil_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kU_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							&Delta;G<sup>&dagger;</sup><sub>&pi;</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="deltaGDaggerHybridDestabil"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='deltaGDaggerHybridDestabil_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
+
+
+
 				 	<tr style="display:none" id="kA_container">
 
 
@@ -2275,9 +2300,58 @@ function closeNav() {
 				 		</td>
 
 				 	</tr>
-					
-					
-					<tr style="display:none" id="deltaGDaggerHybridDestabil_container">
+
+
+
+
+				 	<tr id="allowBacktracking_container" title="Can the polymerase translocate far backwards (backtracking) during the simulation?">
+
+
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+
+				 		<td colspan=3>
+		 					<label class="switch">
+						 	 <input class="modelSetting" type="checkbox" id="allowBacktracking" OnChange="userInputModel_controller()"> </input>
+						 	 <span class="slider round"></span>
+
+							</label> 
+							<span style="font-size:15px; vertical-align:middle" > Enable backtracking </span>
+
+				 		</td>
+
+				 	</tr>
+
+
+
+				 	<tr id="allowBacktrackWithoutInactivation_container" title="Can the polymerase backtrack without entering the inactive state first (during the simulation)?">
+
+
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+
+				 		<td colspan=3>
+		 					<label class="switch">
+					 		 <input class="modelSetting" type="checkbox" id="allowBacktrackWithoutInactivation" OnChange="userInputModel_controller()"> </input>
+					 	 	<span class="slider round"></span>
+
+							</label> 
+							<span style="font-size:15px; vertical-align:middle" > Enable backtracking without inactivation</span>
+							<br> <br style="line-height:5px">
+
+				 		</td>
+
+				 	</tr>
+
+
+
+					<tr style="display:none" id="deltaGDaggerBacktrack_container">
 
 						<td style="text-align:left; font-size:10px; float:left; width:20px">
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kU_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
@@ -2285,16 +2359,16 @@ function closeNav() {
 
 
 						<td style="text-align:right; width:110px">
-							&Delta;G<sup>&dagger;</sup><sub>h</sub> = 
+							&Delta;G<sup>&dagger;</sup><sub>&tau;&minus;</sub> = 
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="deltaGDaggerHybridDestabil"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sup>B</sup>T 
+							<input class="variable"  type="number" id="deltaGDaggerBacktrack"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T 
 				 		</td>
 
 
 				 		<td>
-							<input type=image id='deltaGDaggerHybridDestabil_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+							<input type=image id='deltaGDaggerBacktrack_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				 		</td>
 
 				 	</tr>
@@ -2302,28 +2376,29 @@ function closeNav() {
 
 
 
-					<tr id="RateCleave_container">
+					<tr id="currentBacksteppingModel_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#translocation_ModelHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+						</td>
+
+						<td colspan = 3 style="text-align:center">
+
+							Backstep model:
+							<select class="dropdown modelSetting" style="" id="currentBacksteppingModel" title="Select which model to use for backtracking" OnChange="userInputModel_controller()">
+
+								<option value="backstep0">0 &rightarrow; -1 barrier </option>
+								<option value="backstep1">-1 &rightarrow; -2 barrier </option>
+
+							</select>
+						</td>
 
 
-				 		<td style="text-align:left; font-size:10px; float:left; width:20px">
-				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateCleave_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
-				 		</td>
+					</tr>
 
 
-						<td style="text-align:right; width:110px">
-							k<sub>cleave</sub> = 
-				 		</td>
-
-				 		<td>
-							<input class="variable"  type="number" id="RateCleave" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
-				 		</td>
-
-
-				 		<td>
-							<input type=image id='RateCleave_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
-				 		</td>
-
-				 	</tr>
+					
+	
 
 
 
@@ -2546,8 +2621,8 @@ function closeNav() {
 					 			<select class="dropdown modelSetting" style="width:150px;" id = "currentRNABlockadeModel" title="Select which model to use as a blockade for translocation" OnChange="userInputModel_controller()">
 
 					 				<option value="terminalBlockade">Terminal blockade</option>
-					 				<option value="midpointBlockade">Midpoint blockade</option>
 					 				<option value="intersectionBlockade">Intersection blockade</option>
+					 				<option value="midpointBlockade">Midpoint blockade</option>
 
 								</select>
 					 		</td>
@@ -2631,6 +2706,33 @@ function closeNav() {
 
 
 
+
+						<tr id="RateCleave_container">
+
+
+					 		<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateCleave_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+					 		</td>
+
+
+							<td style="text-align:right; width:110px">
+								k<sub>cleave</sub> = 
+					 		</td>
+
+					 		<td>
+								<input class="variable"  type="number" id="RateCleave" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+					 		</td>
+
+
+					 		<td>
+								<input type=image id='RateCleave_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
+					 		</td>
+
+					 	</tr>
+
+
+
+
 						<tr id="allowHypertranslocation_container"  title="Can the polymerase translocate far forwards (hypertranslocation) during the simulation?">
 
 
@@ -2652,49 +2754,7 @@ function closeNav() {
 
 					 	</tr>
 
-					 	<tr id="allowBacktracking_container" title="Can the polymerase translocate far backwards (backtracking) during the simulation?">
 
-
-
-							<td style="text-align:left; font-size:10px; float:left; width:20px">
-					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
-					 		</td>
-
-
-					 		<td colspan=3>
-			 					<label class="switch">
-							 	 <input class="modelSetting" type="checkbox" id="allowBacktracking" OnChange="userInputModel_controller()"> </input>
-							 	 <span class="slider round"></span>
-
-								</label> 
-								<span style="font-size:15px; vertical-align:middle" > Enable backtracking</span>
-
-					 		</td>
-
-					 	</tr>
-
-
-					 	<tr id="allowBacktrackWithoutInactivation_container" title="Can the polymerase backtrack without entering the inactive state first (during the simulation)?">
-
-
-
-							<td style="text-align:left; font-size:10px; float:left; width:20px">
-					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
-					 		</td>
-
-
-					 		<td colspan=3>
-			 					<label class="switch">
-						 		 <input class="modelSetting" type="checkbox" id="allowBacktrackWithoutInactivation" OnChange="userInputModel_controller()"> </input>
-						 	 	<span class="slider round"></span>
-
-								</label> 
-								<span style="font-size:15px; vertical-align:middle" > Enable backtracking without inactivation</span>
-								<br> <br style="line-height:5px">
-
-					 		</td>
-
-					 	</tr>
 
 
 					 	<tr id="allowGeometricCatalysis_container" title="Do you want to enable the geometric elongation speed boost? This will improve performance however some information will be lost eg. backwards translocation, NTP release.">
