@@ -205,16 +205,47 @@ function updateModelDOM(elongation_model_temp){
 
 	//if(elongation_model_temp["allowHypertranslocation"]) $("#DGHyperDag_container").show(300);
 	//else  $("#DGHyperDag_container").hide(0);
+
+
 	
 	// Pausing and inactivation
 	if (elongation_model_temp["allowInactivation"]) {
-		$("#kU_container").show(100);
+
+		$("#currentInactivationModel_container").show(100);
 		$("#kA_container").show(100);
+		$("#currentInactivationModel").val(elongation_model_temp.currentInactivationModel);
+
+		if (elongation_model_temp.currentInactivationModel == "sequenceIndependent"){
+			$("#kU_container").show(100);
+			$("#deltaGDaggerHybridDestabil_container").hide(0);
+		}
+
+		else if (elongation_model_temp.currentInactivationModel == "hybridDestabilisation"){
+			$("#deltaGDaggerHybridDestabil_container").show(100);
+			$("#kU_container").hide(0);
+		}
+
+
+
 	}
 	else {
 		$("#kU_container").hide(0);
 		$("#kA_container").hide(0);
+		$("#deltaGDaggerHybridDestabil_container").hide(0);
+		$("#currentInactivationModel_container").hide(0);
 	}
+
+
+	// Backtracking model
+	if (elongation_model_temp["allowBacktracking"]){
+		$("#deltaGDaggerBacktrack_container").show(100);
+	}
+	else{
+		$("#deltaGDaggerBacktrack_container").hide(0);
+	}
+
+
+
 
 
 	// DNA bending

@@ -3307,7 +3307,7 @@ function userInputModel_controller(){
 		var id = $(ele).attr("id");
 		var val = $(ele).is(":checked");
 		if (id == "NTPbindingNParams") val = (val == true ? 8 : 2); 
-		else if (id == "currentTranslocationModel" || id == "currentRNABlockadeModel") val = $(ele).val();
+		else if (id == "currentTranslocationModel" || id == "currentRNABlockadeModel" || id == "currentInactivationModel" || id == "currentBacksteppingModel") val = $(ele).val();
 		toSend[id] = val;
 
 	}
