@@ -51,8 +51,12 @@ class Model{
 	bool assumeBindingEquilibrium;
 	bool assumeTranslocationEquilibrium;
 	bool allowMultipleBulges;
+
 	string currentTranslocationModel;
 	string currentRNABlockadeModel;
+	string currentInactivationModel;
+	string currentBacksteppingModel;
+
 	int NTPbindingNParams;
 	//bool modelIsActive;
 
@@ -112,6 +116,10 @@ class Model{
 		string get_currentTranslocationModel();
 		Model* set_currentRNABlockadeModel(string val);
 		string get_currentRNABlockadeModel();
+		Model* set_currentInactivationModel(string val);
+		string get_currentInactivationModel();
+		Model* set_currentBacksteppingModel(string val);
+		string get_currentBacksteppingModel();
 
 
 		Model* set_NTPbindingNParams(int val);

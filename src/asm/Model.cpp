@@ -54,6 +54,8 @@ Model::Model(){
 
 	currentTranslocationModel = "sealingBarriers";
 	currentRNABlockadeModel = "terminalBlockade";
+	currentInactivationModel = "sequenceIndependent";
+	currentBacksteppingModel = "backstep0";
 	NTPbindingNParams = 2;
 
 }
@@ -78,6 +80,8 @@ Model* Model::clone(){
 	clonedModel->assumeTranslocationEquilibrium = this->assumeTranslocationEquilibrium;
 	clonedModel->currentTranslocationModel = this->currentTranslocationModel;
 	clonedModel->currentRNABlockadeModel = this->currentRNABlockadeModel;
+	clonedModel->currentInactivationModel = this->currentInactivationModel;
+	clonedModel->currentBacksteppingModel = this->currentBacksteppingModel;
 	clonedModel->allowMultipleBulges = this->allowMultipleBulges;
 	clonedModel->allowDNAbending = this->allowDNAbending;
 
@@ -196,6 +200,8 @@ string Model::toJSON(){
 	JSON += "'NTPbindingNParams':" + to_string(this->NTPbindingNParams) + ",";
 	JSON += "'currentTranslocationModel':'" + this->currentTranslocationModel + "',";
 	JSON += "'currentRNABlockadeModel':'" + this->currentRNABlockadeModel + "',";
+	JSON += "'currentInactivationModel':'" + this->currentInactivationModel + "',";
+	JSON += "'currentBacksteppingModel':'" + this->currentBacksteppingModel + "',";
 	JSON += "'assumeBindingEquilibrium':" + string(this->assumeBindingEquilibrium ? "true" : "false") + ",";
 	JSON += "'allowDNAbending':" + string(this->allowDNAbending ? "true" : "false") + ",";
 	JSON += "'assumeTranslocationEquilibrium':" + string(this->assumeTranslocationEquilibrium ? "true" : "false");
@@ -224,6 +230,8 @@ void Model::print(){
 	cout << "NTPbindingNParams = " << this->NTPbindingNParams << endl;
 	cout << "currentTranslocationModel = " << this->currentTranslocationModel << endl;
 	cout << "currentRNABlockadeModel = " << this->currentRNABlockadeModel << endl;
+	cout << "currentInactivationModel = " << this->currentInactivationModel << endl;
+	cout << "currentBacksteppingModel = " << this->currentBacksteppingModel << endl;
 	cout << "assumeBindingEquilibrium = " << this->assumeBindingEquilibrium << endl;
 	cout << "assumeTranslocationEquilibrium = " << this->assumeTranslocationEquilibrium << endl;
 	cout << "allowMultipleBulges = " << this->allowMultipleBulges << endl;
@@ -398,6 +406,27 @@ Model* Model::set_currentRNABlockadeModel(string val){
 string Model::get_currentRNABlockadeModel(){
 	return this->currentRNABlockadeModel;
 }
+
+
+
+Model* Model::set_currentInactivationModel(string val){
+	this->currentInactivationModel = val;
+	return this;
+}
+string Model::get_currentInactivationModel(){
+	return this->currentInactivationModel;
+}
+
+Model* Model::set_currentBacksteppingModel(string val){
+	this->currentBacksteppingModel = val;
+	return this;
+}
+string Model::get_currentBacksteppingModel(){
+	return this->currentBacksteppingModel;
+}
+
+
+
 
 
 

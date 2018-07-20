@@ -1504,7 +1504,9 @@ extern "C" {
 			else if (setting == "useFourNTPconcentrations") currentModel->set_useFourNTPconcentrations(val == "true");
 			else if (setting == "NTPbindingNParams") currentModel->set_NTPbindingNParams(atoi(val.c_str()));
 			else if (setting == "currentTranslocationModel") currentModel->set_currentTranslocationModel(val);
+			else if (setting == "currentBacksteppingModel") currentModel->set_currentBacksteppingModel(val);
 			else if (setting == "currentRNABlockadeModel") currentModel->set_currentRNABlockadeModel(val);
+			else if (setting == "currentInactivationModel") currentModel->set_currentInactivationModel(val);
 			else if (setting == "assumeBindingEquilibrium") currentModel->set_assumeBindingEquilibrium(val == "true");
 			else if (setting == "assumeTranslocationEquilibrium") currentModel->set_assumeTranslocationEquilibrium(val == "true");
 			

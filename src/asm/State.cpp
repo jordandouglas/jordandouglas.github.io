@@ -530,8 +530,11 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 
 
 		// Check if going from backtracked to pretranslocated is permitted while activated
-		if (currentModel->get_allowBacktracking() && currentModel->get_allowInactivation() && !currentModel->get_allowBacktrackWithoutInactivation() && this->activated && this->mRNAPosInActiveSite == -1) return 0;
-
+		//if (currentModel->get_allowBacktracking() && currentModel->get_allowInactivation() && !currentModel->get_allowBacktrackWithoutInactivation() && this->activated && this->mRNAPosInActiveSite == -1) return 0;
+		if (currentModel->get_allowBacktracking() && currentModel->get_allowInactivation() && !currentModel->get_allowBacktrackWithoutInactivation() && this->activated){
+			if (this->mRNAPosInActiveSite == -1 && currentModel->get_currentBacksteppingModel() == "backstep0") return 0;
+			if (this->mRNAPosInActiveSite == -2 && currentModel->get_currentBacksteppingModel() == "backstep1") return 0;
+		}
 
 
 		double rate = _translocationRatesCache->getTranslocationRates(this, true);
@@ -690,10 +693,21 @@ double State::calculateBackwardRate(bool lookupFirst, bool ignoreStateRestrictio
 	if (lookupFirst){
 
 		// Check if backtracking is permitted
-		if (!currentModel->get_allowBacktracking() && this->mRNAPosInActiveSite <= 0) return 0;
+		if (!currentModel->get_allowBacktracking()){
+			if (this->mRNAPosInActiveSite < 0) return 0;
+			if (this->mRNAPosInActiveSite == 0 && currentModel->get_currentBacksteppingModel() == "backstep0") return 0; // Can go freely from 0 to -1 if backstep1 mode
+		} 
 
 		// Check if backtracking is permitted while activated
-		if (currentModel->get_allowBacktracking() && currentModel->get_allowInactivation() && !currentModel->get_allowBacktrackWithoutInactivation() && this->activated && this->mRNAPosInActiveSite == 0) return 0;
+		// if (currentModel->get_allowBacktracking() && currentModel->get_allowInactivation() && !currentModel->get_allowBacktrackWithoutInactivation() && this->activated && this->mRNAPosInActiveSite == 0) return 0;
+		if (currentModel->get_allowBacktracking() && currentModel->get_allowInactivation() && !currentModel->get_allowBacktrackWithoutInactivation() && this->activated){
+			if (this->mRNAPosInActiveSite == 0 && currentModel->get_currentBacksteppingModel() == "backstep0") return 0;
+			if (this->mRNAPosInActiveSite == -1 && currentModel->get_currentBacksteppingModel() == "backstep1") return 0;
+		}
+
+
+
+
 
 		return _translocationRatesCache->getTranslocationRates(this, false);
 
@@ -907,7 +921,12 @@ State* State::activate(){
 
 double State::calculateActivateRate(bool ignoreStateRestrictions){
 
-	if (ignoreStateRestrictions || !this->activated) return RateActivate->getVal();
+	if (ignoreStateRestrictions || !this->activated){
+
+		// Sequence dependent and independent have the same rate
+		return RateActivate->getVal();
+
+	}
 	return 0;
 }
 
@@ -933,7 +952,31 @@ State* State::deactivate(){
 
 
 double State::calculateDeactivateRate(bool ignoreStateRestrictions){
-	if (currentModel->get_allowInactivation() && (ignoreStateRestrictions || (this->activated && !this->NTPbound()))) return RateDeactivate->getVal();
+	if (currentModel->get_allowInactivation() && (ignoreStateRestrictions || (this->activated && !this->NTPbound()))) {
+
+		// Sequence independent
+		if (currentModel->get_currentInactivationModel() == "sequenceIndependent") {
+			return RateDeactivate->getVal();
+		}
+
+
+		// Sequence dependent
+		else if (currentModel->get_currentInactivationModel() == "hybridDestabilisation"){
+
+			// Compute enegry barrier to go from the full hybrid into the destabilised hybrid
+			double relativeBarrierHeight = deltaGDaggerHybridDestabil->getVal() - FreeEnergy::getFreeEnergyOfHybrid(this);
+
+			//cout << "h = " << FreeEnergy::getFreeEnergyOfHybrid(this) << " barrier " << relativeBarrierHeight << endl;
+			//vector<string> x = FreeEnergy::getHybridString(this);
+			//cout << x.at(0) << "/" << x.at(1) << endl;
+
+			// If posttranslocated then account for the Gibbs energy bonus
+			if (this->mRNAPosInActiveSite == 1) relativeBarrierHeight = relativeBarrierHeight - DGPost->getVal();
+			return _preExp * exp(-relativeBarrierHeight);
+		}
+
+	}
+
 	return 0;
 }
 

@@ -54,7 +54,23 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		int colNum = state->get_mRNAPosInActiveSite() + 1;
 		
 		double* rates = translocationRateTable[rowNum][colNum];
-		double GDagRateModifier = exp(-GDagSlide->getVal());
+
+		// Parameterised translocation barrier height
+		double backtrackBarrier = GDagSlide->getVal();
+
+		if (currentModel->get_allowBacktracking()){
+
+
+			// If in the 0 position and going backwards and the backtracking barrier is between 0 and -1, apply the backtrack penalty
+			if (state->get_mRNAPosInActiveSite() == 0 && !fwd && currentModel->get_currentBacksteppingModel() == "backstep0") backtrackBarrier += deltaGDaggerBacktrack->getVal();
+
+			// If in the -1 position and (going backwards and the backtracking barrier is between -1 and -2) OR (the backtracking barrier is between 0 and -1), apply the backtrack penalty
+			else if (state->get_mRNAPosInActiveSite() == -1 && ((!fwd && currentModel->get_currentBacksteppingModel() == "backstep1") || currentModel->get_currentBacksteppingModel() == "backstep0")) backtrackBarrier += deltaGDaggerBacktrack->getVal();
+
+		}
+
+		double GDagRateModifier = exp(-backtrackBarrier);
+
 		double forceGradientFwd = exp(( FAssist->getVal() * 1e-12 * (barrierPos->getVal()) * 1e-10) / (_kBT));
 		double forceGradientBck = exp((-FAssist->getVal() * 1e-12 * (3.4-barrierPos->getVal()) * 1e-10) / (_kBT));
 		double DGPostModifier = state->get_mRNAPosInActiveSite() == 1 ? exp(DGPost->getVal()) : 1;
@@ -127,7 +143,8 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		int indexNum = leftHybridBase - 1;
 
 		auto rates = backtrackRateTable[indexNum];
-		double GDagRateModifier = exp(-GDagSlide->getVal());
+		double backtrackBarrier = GDagSlide->getVal() + deltaGDaggerBacktrack->getVal();
+		double GDagRateModifier = exp(-backtrackBarrier);
 		double forceGradientFwd = exp(( FAssist->getVal() * 1e-12 * (barrierPos->getVal()) * 1e-10) / (_kBT));
 		double forceGradientBck = exp((-FAssist->getVal() * 1e-12 * (3.4-barrierPos->getVal()) * 1e-10) / (_kBT));
 		double RNAunfoldingBarrier = 1;

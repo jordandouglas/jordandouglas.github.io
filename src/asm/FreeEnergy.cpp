@@ -41,6 +41,9 @@ map<std::string, double> FreeEnergy::basepairingEnergy;
 double FreeEnergy::getFreeEnergyOfHybrid(State* state){
 
 	vector<string> hybridStrings = FreeEnergy::getHybridString(state);
+
+	//cout << "Hybrid strings " << hybridStrings.at(0) << "/" << hybridStrings.at(1) << endl;
+
 	double danglingEndMultipler = 0.5 * (state->get_mRNAPosInActiveSite() == 1);
 	double hybridFreeEnergy = FreeEnergy::getHybridFreeEnergy(hybridStrings.at(0), hybridStrings.at(1), TemplateType.substr(2), PrimerType.substr(2));
 
@@ -210,15 +213,15 @@ vector<string> FreeEnergy::getHybridString(State *state){
 	for (int hybridPos = 0; hybridPos < stopWhenAt; hybridPos++){
 			
 
-		int templateBaseNum = state->getRightTemplateBaseNumber() - (hybridPos + templatePastBulge) + 1;
-		int nascentBaseNum = state->getRightNascentBaseNumber() - (hybridPos + nascentPastBulge) + 1;
+		int templateBaseNum = state->getRightTemplateBaseNumber() - (hybridPos + templatePastBulge);
+		int nascentBaseNum = state->getRightNascentBaseNumber() - (hybridPos + nascentPastBulge);
 
 		//int baseNum = rightBase - hybridPos;
 
 		
 		// Go to next base if this one does not exist
-		if (templateBaseNum <= 0 || templateBaseNum <= state->getLeftTemplateBaseNumber() || templateBaseNum > templateSequence.length()) continue;
-		if (nascentBaseNum <= 0 || nascentBaseNum <= state->getLeftNascentBaseNumber() || nascentBaseNum > state->get_nascentLength()) continue;
+		if (templateBaseNum <= 0 || templateBaseNum < state->getLeftTemplateBaseNumber() || templateBaseNum > templateSequence.length()) continue;
+		if (nascentBaseNum <= 0 || nascentBaseNum < state->getLeftNascentBaseNumber() || nascentBaseNum > state->get_nascentLength()) continue;
 
 
 		// Ensure that the rightMostMbase is part of the chain and not bound as free NTP

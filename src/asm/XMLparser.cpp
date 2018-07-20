@@ -147,6 +147,8 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 					else if (modelSettingName == "NTPbindingNParams") currentModel->set_NTPbindingNParams(atoi(value.c_str()));
 					else if (modelSettingName == "currentTranslocationModel") currentModel->set_currentTranslocationModel(value);
 					else if (modelSettingName == "currentRNABlockadeModel") currentModel->set_currentRNABlockadeModel(value);
+					else if (modelSettingName == "currentInactivationModel") currentModel->set_currentInactivationModel(value);
+					else if (modelSettingName == "currentBacksteppingModel") currentModel->set_currentBacksteppingModel(value);
 					else if (modelSettingName == "assumeBindingEquilibrium") currentModel->set_assumeBindingEquilibrium(value == "true");
 					else if (modelSettingName == "assumeTranslocationEquilibrium") currentModel->set_assumeTranslocationEquilibrium(value == "true");
 				}
@@ -184,6 +186,13 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 				else if (paramID == "kCat") param = kCat; 
 				else if (paramID == "Kdiss") param = Kdiss; 
 				else if (paramID == "RateBind") param = RateBind; 
+				else if (paramID == "RateActivate") param = RateActivate; 
+				else if (paramID == "RateDeactivate") param = RateDeactivate; 
+				else if (paramID == "deltaGDaggerHybridDestabil") param = deltaGDaggerHybridDestabil; 
+				else if (paramID == "deltaGDaggerBacktrack") param = deltaGDaggerBacktrack; 
+				else if (paramID == "RateCleave") param = RateCleave; 
+
+
 				else continue;
 
 
@@ -471,6 +480,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 						else if (attrName == "useFourNTPconcentrations") model->set_useFourNTPconcentrations(value == "true");
 						else if (attrName == "NTPbindingNParams") model->set_NTPbindingNParams(atoi(value.c_str()));
 						else if (attrName == "currentTranslocationModel") model->set_currentTranslocationModel(value);
+						else if (attrName == "currentInactivationModel") model->set_currentInactivationModel(value);
 						else if (attrName == "currentRNABlockadeModel") model->set_currentRNABlockadeModel(value);
 						else if (attrName == "assumeBindingEquilibrium") model->set_assumeBindingEquilibrium(value == "true");
 						else if (attrName == "assumeTranslocationEquilibrium") model->set_assumeTranslocationEquilibrium(value == "true");
@@ -497,6 +507,13 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 						else if (attrName == "RateBind") model->addParameterHardcoding("RateBind", value); 
 
 						else if (attrName == "arrestTime") model->addParameterHardcoding("arrestTime", value);
+
+						else if (attrName == "RateActivate") model->addParameterHardcoding("RateActivate", value); 
+						else if (attrName == "RateDeactivate") model->addParameterHardcoding("RateDeactivate", value); 
+						else if (attrName == "deltaGDaggerBacktrack") model->addParameterHardcoding("deltaGDaggerBacktrack", value); 
+						else if (attrName == "deltaGDaggerHybridDestabil") model->addParameterHardcoding("deltaGDaggerHybridDestabil", value); 
+						else if (attrName == "RateCleave") model->addParameterHardcoding("RateCleave", value); 
+
 
 					}
 

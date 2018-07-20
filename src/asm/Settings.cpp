@@ -116,8 +116,8 @@ Parameter* hybridLen = new Parameter("hybridLen", true, "exclusive", "Hybrid len
 Parameter* bubbleLeft = new Parameter("bubbleLeft", true, "inclusive", "Bubble length left (bp)", "Number of unpaired template bases 3\u2032 of the hybrid", "\u03B2_{1} (bp)");
 Parameter* bubbleRight = new Parameter("bubbleRight", true, "inclusive", "Bubble length right (bp)", "Number of unpaired template bases 5\u2032 of the hybrid", "\u03B2_{2} (bp)");
 
-Parameter* GDagSlide = new Parameter("GDagSlide", false, "false", "\u0394G\u2020\U0001D70F", "Free energy barrier height of translocation", "\u0394G_{\U0001D70F}^{\u2020}  (k_{B}T)");
-Parameter* DGPost = new Parameter("DGPost", false, "false", "\u0394G\U0001D70F1", "Free energy added on to posttranslocated ground state", "\u0394G_{\U0001D70F1}  (k_{B}T)");
+Parameter* GDagSlide = new Parameter("GDagSlide", false, "false", "\u0394G\u2020\U0001D70F", "Gibbs energy barrier height of translocation", "\u0394G_{\U0001D70F}^{\u2020}  (k_{B}T)");
+Parameter* DGPost = new Parameter("DGPost", false, "false", "\u0394G\U0001D70F1", "Gibbs energy added on to posttranslocated ground state", "\u0394G_{\U0001D70F1}  (k_{B}T)");
 Parameter* barrierPos = new Parameter("barrierPos", false, "false", "Transition state position  (\u212B)", "Position of translocation transition state", "\u03B4_{1}");
 Parameter* arrestTime = new Parameter("arrestTime", false, "inclusive", "Arrest timeout  (s)", "Time from the start until transcription is arrested. Set to zero to prevent arrests.");
 Parameter* kCat = new Parameter("kCat", false, "inclusive", "Rate of catalysis (s\u207B\u00B9)", "Rate constant of catalysing bound NTP", "k_{cat}  (s^{\u22121\u2009})");
@@ -126,6 +126,8 @@ Parameter* RateBind = new Parameter("RateBind", false, "inclusive", "Rate of bin
 
 Parameter* RateActivate = new Parameter("kA", false, "inclusive", "Rate of activation (s\u207B\u00B9)", "Rate constant of polymerase leaving the catalytically unactive state", "k_[A]  (s^[\u22121\u2009])");
 Parameter* RateDeactivate = new Parameter("kU", false, "inclusive", "Rate of inactivation (s\u207B\u00B9)", "Rate constant of polymerase entering the catalytically unactive state", "k_[U]  (s^[\u22121\u2009])");
+Parameter* deltaGDaggerHybridDestabil = new Parameter("deltaGDaggerHybridDestabil", false, "false", "\u0394G\u2020\u03C0", "Gibbs energy barrier of hybrid destabilisation, which causes catalytic inactivation.");
+Parameter* deltaGDaggerBacktrack = new Parameter("deltaGDaggerBacktrack", false, "false", "\u0394G\u2020\U0001D70F-", "Additive Gibbs energy barrier height of backtracking. Added onto the value of \u0394G\u2020\U0001D70F.", "\u0394G_{\U0001D70F-}^{\u2020}  (k_{B}T)");
 Parameter* RateCleave = new Parameter("RateCleave", false, "inclusive", "Rate of cleavage (s\u207B\u00B9)", "Rate constant of cleaving the dangling 3\u2032 end of the nascent strand when backtracked", "k_[cleave]  (s^[\u22121\u2009])");
 
 Parameter* upstreamCurvatureCoeff = new Parameter("upstreamCurvatureCoeff", false, "false", "3\u2032 DNA curvature coeff.", "Change in free energy of translocation associated with DNA upstream from the hybrid, per degree of curvature", "\u0394G_{3\u2032bend}  (k_{B}T)");
@@ -135,8 +137,7 @@ Parameter* downstreamWindow = new Parameter("downstreamWindow", true, "exclusive
 
 
 
-vector<Parameter*> Settings::paramList(19);
-//vector<Parameter*> Settings::paramList(23);
+vector<Parameter*> Settings::paramList(21); // Number of parameters
 
 CRandomMersenne* Settings::SFMT;
 
@@ -191,8 +192,10 @@ void Settings::init(){
 
 	arrestTime->setDistributionParameter("fixedDistnVal", 0);
 
-	RateActivate->setDistributionParameter("fixedDistnVal", 4);
-	RateDeactivate->setDistributionParameter("fixedDistnVal", 0.1);
+	RateActivate->setDistributionParameter("fixedDistnVal", 0.1);
+	RateDeactivate->setDistributionParameter("fixedDistnVal", 0.05);
+	deltaGDaggerHybridDestabil->setDistributionParameter("fixedDistnVal", -1);
+	deltaGDaggerBacktrack->setDistributionParameter("fixedDistnVal", 0);
 	RateCleave->setDistributionParameter("fixedDistnVal", 0);
 
 	upstreamCurvatureCoeff->setDistributionParameter("fixedDistnVal", 0);
@@ -230,6 +233,10 @@ void Settings::init(){
 	paramList.at(16) = RateActivate;
 	paramList.at(17) = RateDeactivate;
 	paramList.at(18) = RateCleave;
+	paramList.at(19) = deltaGDaggerHybridDestabil;
+	paramList.at(20) = deltaGDaggerBacktrack;
+
+
 
 	/*
 	paramList.at(19) = upstreamCurvatureCoeff;
@@ -369,6 +376,10 @@ void Settings::setParameterList(vector<Parameter*> params){
 	RateActivate = paramList.at(16);
 	RateDeactivate = paramList.at(17);
 	RateCleave = paramList.at(18);
+	deltaGDaggerHybridDestabil = paramList.at(19);
+	deltaGDaggerBacktrack = paramList.at(20);
+
+
 
 	/*
 	upstreamCurvatureCoeff = paramList.at(19);
@@ -597,6 +608,8 @@ void Settings::print(){
 	RateActivate->print();
 	RateDeactivate->print();
 	RateCleave->print();
+	deltaGDaggerHybridDestabil->print();
+	deltaGDaggerBacktrack->print();
 
 	upstreamCurvatureCoeff->print();
 	downstreamCurvatureCoeff->print();
@@ -712,14 +725,34 @@ void Settings::updateParameterVisibilities(){
 
 
 
-	// Activation allowed?
+	// Inactivation allowed?
 	if (currentModel->get_allowInactivation()){
+
 		RateActivate->show();
-		RateDeactivate->show();
+		if (currentModel->get_currentInactivationModel() == "sequenceIndependent"){
+			RateDeactivate->show();
+			deltaGDaggerHybridDestabil->hide();
+		}
+		else if (currentModel->get_currentInactivationModel() == "hybridDestabilisation"){
+			deltaGDaggerHybridDestabil->show();
+			RateDeactivate->hide();
+		}
 	}else{
 		RateActivate->hide();
 		RateDeactivate->hide();
+		deltaGDaggerHybridDestabil->hide();
 	}
+
+
+	// Backtracking allowed?
+	if (currentModel->get_allowBacktracking()){
+		deltaGDaggerBacktrack->show();
+	}else{
+		deltaGDaggerBacktrack->hide();
+	}
+
+
+
 
 
 	
@@ -771,6 +804,8 @@ void Settings::clearParameterHardcodings(){
 	RateActivate->stopHardcoding();
 	RateDeactivate->stopHardcoding();
 	RateCleave->stopHardcoding();
+	deltaGDaggerHybridDestabil->stopHardcoding();
+	deltaGDaggerBacktrack->stopHardcoding();
 	upstreamCurvatureCoeff->stopHardcoding();
 	downstreamCurvatureCoeff->stopHardcoding();
 	upstreamWindow->stopHardcoding();
@@ -805,6 +840,8 @@ void Settings::sampleAll(){
 	RateActivate->sample();
 	RateDeactivate->sample();
 	RateCleave->sample();
+	deltaGDaggerHybridDestabil->sample();
+	deltaGDaggerBacktrack->sample();
 	upstreamCurvatureCoeff->sample();
 	downstreamCurvatureCoeff->sample();
 	upstreamWindow->sample();
@@ -840,6 +877,8 @@ Parameter* Settings::getParameterByName(string paramID){
 	if (paramID == "kA") return RateActivate;
 	if (paramID == "kU") return RateDeactivate;
 	if (paramID == "RateCleave") return RateCleave;
+	if (paramID == "deltaGDaggerHybridDestabil") return deltaGDaggerHybridDestabil;
+	if (paramID == "deltaGDaggerBacktrack") return deltaGDaggerBacktrack;
 	if (paramID == "upstreamCurvatureCoeff") return upstreamCurvatureCoeff;
 	if (paramID == "downstreamCurvatureCoeff") return downstreamCurvatureCoeff;
 	if (paramID == "upstreamWindow") return upstreamWindow;
