@@ -647,7 +647,21 @@ function renderObjects(override = false, resolve = function(){}){
 				}
 
 				if (nt.id == "" || nt.id == null) continue;
-				
+
+
+
+
+
+
+				if (nt.needsUnfolding){
+
+					//console.log("Will unfold", nt);
+					removeNodeSecondaryStructure(nt);
+					$("#" + nt["id"]).show(0);
+				}
+
+
+
 				// Remove the object from the page
 				if(nt["needsDeleting"]){
 
@@ -747,13 +761,6 @@ function renderObjects(override = false, resolve = function(){}){
 					nucleotidesToFold_nodes.push(nt);
 
 
-				}
-
-				if (nt.needsUnfolding){
-
-					//console.log("Will unfold", nt);
-					removeNodeSecondaryStructure(nt);
-					$("#" + nt["id"]).show(0);
 				}
 
 

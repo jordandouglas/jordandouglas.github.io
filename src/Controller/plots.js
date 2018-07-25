@@ -4731,7 +4731,6 @@ function customPlotSelectParameterTemplate(){
 				<option value="catalyTime" style="color:white">Mean catalysis time (s)</option>
 				<option value="totalTime" style="color:white">Mean transcription time (s)</option>
 				<option value="nascentLen" style="color:white">Nascent strand length (nt)</option>
-				<option value="chiSq" style="color:white">Chi-squared test statistic</option>
 			</optgroup>
 			
 			<optgroup label="Parameters" id="customParamX_params">
@@ -4763,7 +4762,6 @@ function customPlotSelectPropertyTemplate(){
 				<option value="catalyTime" style="color:white">Mean catalysis time (s)</option>
 				<option value="totalTime" style="color:white">Mean transcription time (s)</option>
 				<option value="nascentLen" style="color:white">Nascent strand length (nt)</option>
-				<option value="chiSq" style="color:white">Chi-squared test statistic</option>
 			</optgroup>
 			
 			<optgroup label="Parameters" id="customParamY_params">
@@ -4793,7 +4791,6 @@ function parameterHeatmapZAxisTemplate(){
 				<option value="catalyTime" style="color:white">Mean catalysis time (s)</option>
 				<option value="totalTime" style="color:white">Mean transcription time (s)</option>
 				<option value="nascentLen" style="color:white">Nascent strand length (nt)</option>
-				<option value="chiSq" style="color:white">Chi-squared test statistic</option>
 			</optgroup>
 			
 			<optgroup label="Parameters" id="customParamZ_params">

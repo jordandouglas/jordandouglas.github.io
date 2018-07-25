@@ -616,9 +616,9 @@ function userChangePolymerase_controller(){
 	if (WEB_WORKER_WASM != null) {
 
 
-		var toDoAfterChange = function(){
+		var toDoAfterChange = function(model){
+			updateModelDOM(model);
 			refresh();
-
 		}
 
 
@@ -631,7 +631,7 @@ function userChangePolymerase_controller(){
 		//console.log("Sending function: " + fnStr);
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 
-		toCall(fnStr).then(() => toDoAfterChange());
+		toCall(fnStr).then((model) => toDoAfterChange(model));
 
 	}
 

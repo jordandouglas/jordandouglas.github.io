@@ -889,7 +889,7 @@ function getNTPModelSettingsTemplate(){
 								<table style="width:50%; margin:auto">
 								
 								
-									<tr id="assumeBindingEquilibrium_container" title="Assume that binding NTP is an equilibrium process? This assumption will speed up the simulation">
+									<tr id="assumeBindingEquilibrium_container" title="Assume that binding NTP is an equilibrium process?">
 
 
 										<td style="text-align:left; font-size:10px; float:left;">
