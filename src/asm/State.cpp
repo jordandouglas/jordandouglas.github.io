@@ -991,7 +991,10 @@ State* State::cleave(){
 		int nbasesCleaved = this->nascentSequence.length() - newLength;
 
 		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
-			
+
+
+			cout << "Deleting from " << newLength+1 << " to " << this->nascentSequence.length() << endl;
+
 			// Delete the base objects 
 			for (int baseNum = newLength+1; baseNum <= this->nascentSequence.length(); baseNum++){
 				//Coordinates::move_nt(baseNum, "m", 20, 50);

@@ -760,7 +760,7 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE userChangePolymerase(char* polID, int msgID){
 
 		Settings::activatePolymerase(polID);
-		messageFromWasmToJS("", msgID);
+		messageFromWasmToJS("{" + currentModel->toJSON() + "}", msgID);
 
 	}
 

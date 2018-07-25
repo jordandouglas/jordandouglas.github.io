@@ -311,6 +311,8 @@ bool HTMLobject::get_hasTP(){
 
 void HTMLobject::deleteObject(){
 	this->needsDeleting = true;
+	if (isFolded) this->needsUnfolding = true;
+
 }
 
 double HTMLobject::getX(){

@@ -302,9 +302,9 @@ userChangePolymerase = function(selectedPolymeraseID, msgID = null){
 
 
 	// Create the callback function
-	var toDoAfterCall = function(){
+	var toDoAfterCall = function(resultStr){
 		//console.log("Returning", JSON.parse(resultStr));
-		if (msgID != null) postMessage(msgID + "~X~done");
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 	}
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 
