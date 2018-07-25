@@ -1596,7 +1596,7 @@ function closeNav() {
 			  
 			  
 			 <div  class="parameter-bg">
-				 <div class="parameter-title noselect" style="font-size: 28px;">Parameters
+				 <div class="parameter-title noselect" style="font-size: 28px;">Parameters &amp; Settings
 						  
 					</div>
 				 
@@ -1932,12 +1932,145 @@ function closeNav() {
 
 
 			</div>
+
+
 			<br>
-			
-			
+			<div class="parameter-bg">
+				<div class="parameter-title">NTP Incorporation Parameters 
+
+				<input type=image id='viewNTPModelBtn' title="View the NTP binding rates" onClick="viewMisincorporationModel()" src="src/Images/bindingIcon.png" style="display:none; position: absolute; left: 310px; padding: 3 3; width:25px; height:25px; float:right; vertical-align: middle; ">   <br></div>
+
+				<br>
+
+
+				<div style="width:100%; text-align:center; display:none">
+					<input type=button id='viewNTPmodelBtn' onClick=viewNTPModel() value='Incorporation Settings' title="Change the NTP binding/catalysis parameters for this model" class="operation" style="z-index: 100; margin:auto; width:190px">
+				</div>
+
+
+
+
+
+				<table style="width:100%">
+
+
+
+
+					<tr id="Kdiss_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Kdiss_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							K<sub>D</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="Kdiss"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='Kdiss_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
+
+
+				 	<tr id="kCat_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kCat_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							k<sub>cat</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="kCat"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='kCat_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
+
+
+
+
+
+					<tr id="assumeBindingEquilibrium_container"  title="Assume that binding NTP is an equilibrium process?">
+
+
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+
+				 		<td colspan=3>
+		 					<label class="switch">
+					 	 		<input class="modelSetting" type="checkbox" id="assumeBindingEquilibrium" OnChange="userInputModel_controller()"> </input>
+					 	 		<span class="slider round"></span>
+
+							</label> 
+							<span style="font-size:15px; vertical-align:middle" >Assume NTP binding at equilibrium</span>
+
+				 		</td>
+
+				 	</tr>
+
+
+				 	<tr id="RateBind_container" style="display:none">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateBind_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							k<sub>cat</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="RateBind"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='RateBind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
+
+					
+
+
+
+
+
+
+
+
+		 		</table>
+
+
+				
+
+			</div>
 			
 
 
+
+
+
+			<br>
 			<div class="parameter-bg">
 
 
@@ -2154,23 +2287,7 @@ function closeNav() {
 				 
 			</div>
 			
-			
-			<br>
-			<div class="parameter-bg">
-				<div class="parameter-title">NTP Parameters 
 
-				<input type=image id='viewNTPModelBtn' title="View the NTP binding rates" onClick="viewMisincorporationModel()" src="src/Images/bindingIcon.png" style="display:none; position: absolute; left: 310px; padding: 3 3; width:25px; height:25px; float:right; vertical-align: middle; ">   <br></div>
-
-				<br>
-
-
-				<div style="width:100%; text-align:center">
-					<input type=button id='viewNTPmodelBtn' onClick=viewNTPModel() value='Incorporation Settings' title="Change the NTP binding/catalysis parameters for this model" class="operation" style="z-index: 100; margin:auto; width:190px">
-				</div>
-				
-
-			</div>
-			
 			
 			<br>
 			<div class="parameter-bg">
