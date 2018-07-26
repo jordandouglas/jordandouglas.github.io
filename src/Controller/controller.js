@@ -649,16 +649,13 @@ function renderObjects(override = false, resolve = function(){}){
 				if (nt.id == "" || nt.id == null) continue;
 
 
-
-
-
-
 				if (nt.needsUnfolding){
 
 					//console.log("Will unfold", nt);
 					removeNodeSecondaryStructure(nt);
 					$("#" + nt["id"]).show(0);
 				}
+
 
 
 
@@ -762,6 +759,7 @@ function renderObjects(override = false, resolve = function(){}){
 
 
 				}
+
 
 
 
