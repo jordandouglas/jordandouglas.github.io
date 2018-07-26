@@ -993,8 +993,6 @@ State* State::cleave(){
 		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
 
 
-			cout << "Deleting from " << newLength+1 << " to " << this->nascentSequence.length() << endl;
-
 			// Delete the base objects 
 			for (int baseNum = newLength+1; baseNum <= this->nascentSequence.length(); baseNum++){
 				//Coordinates::move_nt(baseNum, "m", 20, 50);
@@ -2064,9 +2062,21 @@ float State::foldDownstream(){
 
 
 	// This can only work if backtracked by more than 4 positions
-	if (PrimerType != "ssRNA" || this->mRNAPosInActiveSite >= -4 || this->terminated){
+	if (PrimerType != "ssRNA" || this->mRNAPosInActiveSite >= 0 || this->terminated){
 		//cout << "Cannot fold 3'" << endl;
 		this->_3primeStructure = "";
+
+
+		// Unfold the downstream bases 
+		if (this->mRNAPosInActiveSite== 0 && PrimerType == "ssRNA" && !this->terminated && _showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden"){
+
+
+			Coordinates::setNucleotideFoldedness(this->rightTemplateBase, false);
+			Coordinates::setNucleotideFoldedness(this->rightTemplateBase+1, false);
+
+		}
+
+
 		return 0;
 	}
 	
