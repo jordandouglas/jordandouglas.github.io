@@ -839,7 +839,7 @@ function renderObjects(override = false, resolve = function(){}){
 
 			//$("#bases").children().promise().done(function(){
 				//renderingObjects = false;
-				removeSequenceLoadingHTML();
+			removeSequenceLoadingHTML();
 				
 			//});
 			//getMFESequenceBonds_controller();

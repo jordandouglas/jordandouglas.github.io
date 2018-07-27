@@ -1078,7 +1078,6 @@ function submitDistribution_controller(resolve = function() {}){
 	
 	else {
 		
-		callWebWorkerFunction(stringifyFunction("PARAMS_JS.submitDistribution_WW", [paramID, distributionName, distributionParams]));
 
 		// Send to WebAssembly webworker
 		var res = stringifyFunction("saveParameterDistribution", [paramID, distributionName, distributionParamsDict], true);
