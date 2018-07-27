@@ -2549,6 +2549,7 @@ function closeNav() {
 
 
 
+
 			<div style="display:none" class="parameter-bg">
 				<div class="parameter-title">DNA Bending </div>  <br> 
 
@@ -2700,9 +2701,31 @@ function closeNav() {
 					<table style="width:100%">
 
 
-						
-						<tr id="allowmRNAfolding_container"  title="Do you want the mRNA to fold automatically during the simulation? This will place constraints upon backwards translocation.">
 
+						<tr  id="rnaFoldDistance_container">
+
+							<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#hybridLen_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+					 		</td>
+
+							<td style="text-align:right; width:110px">
+					 			Fold distance:
+					 		</td>
+
+					 		<td>
+				    			<input class="variable"  type="number"  id="rnaFoldDistance" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
+							</td>
+
+
+					 		<td>
+								<input type=image id='rnaFoldDistance_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+							</td>
+
+					 	</tr>
+
+
+
+						<tr id="allowmRNAfolding_container"  title="Do you want the mRNA to fold automatically during the simulation? This will place constraints upon backwards translocation.">
 
 
 							<td style="text-align:left; font-size:10px; float:left; width:20px">
@@ -2725,8 +2748,7 @@ function closeNav() {
 
 
 
-
-					 	<tr id="currentRNABlockadeModel_container">
+					 	<tr style="display:none" id="currentRNABlockadeModel_container">
 
 							<td style="text-align:left; font-size:10px; float:left; width:20px">
 					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#translocation_ModelHelp"><img class="helpIcon" src="src/Images/help.png"></a>
@@ -2746,6 +2768,8 @@ function closeNav() {
 
 
 					 	</tr>
+
+
 
 
 					 	<!--
@@ -2783,10 +2807,82 @@ function closeNav() {
 					
 				</div>
 			</div>
+
+
+
 			<br>
-			
-			
-			
+			<div class="parameter-bg">
+				<div class="parameter-title">Cleavage Parameters </div>  <br> 
+
+
+
+				<table style="width:100%">
+
+
+
+						<tr id="RateCleave_container">
+
+
+					 		<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateCleave_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+					 		</td>
+
+
+							<td style="text-align:right; width:110px">
+								k<sub>cleave</sub> = 
+					 		</td>
+
+					 		<td>
+								<input class="variable"  type="number" id="RateCleave" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+					 		</td>
+
+
+					 		<td>
+								<input type=image id='RateCleave_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
+					 		</td>
+
+					 	</tr>
+
+
+
+					 	<tr id="CleavageLimit_container">
+
+
+					 		<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateCleave_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+					 		</td>
+
+
+							<td style="text-align:right; width:110px">
+								&lambda;<sub>cleave</sub> = 
+					 		</td>
+
+					 		<td>
+								<input class="variable"  type="number" id="CleavageLimit" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  nt 
+					 		</td>
+
+
+					 		<td>
+								<input type=image id='CleavageLimit_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
+					 		</td>
+
+					 	</tr>
+
+
+
+
+
+				</table>
+				
+			</div>
+
+
+
+
+
+
+
+			<br>
 			<div class="parameter-bg">
 				<div class="parameter-title">Advanced Model Settings <br> <br></div>
 
@@ -2817,32 +2913,6 @@ function closeNav() {
 
 					 		<td>
 								<input type=image id='arrestTime_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
-					 		</td>
-
-					 	</tr>
-
-
-
-
-						<tr id="RateCleave_container">
-
-
-					 		<td style="text-align:left; font-size:10px; float:left; width:20px">
-					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateCleave_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
-					 		</td>
-
-
-							<td style="text-align:right; width:110px">
-								k<sub>cleave</sub> = 
-					 		</td>
-
-					 		<td>
-								<input class="variable"  type="number" id="RateCleave" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
-					 		</td>
-
-
-					 		<td>
-								<input type=image id='RateCleave_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
 					 		</td>
 
 					 	</tr>
