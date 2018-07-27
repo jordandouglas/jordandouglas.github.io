@@ -358,8 +358,9 @@ extern "C" {
 	// Returns all data needed to draw the cleavage navigation canvas
 	void EMSCRIPTEN_KEEPALIVE getCleavageCanvasData(int msgID){
 
+		int maxPos = currentModel->get_currentBacksteppingModel() == "backstep0" ? 0 : -1;
 		string activationJSON = "{";
-		activationJSON += "'canCleave':" + string(_currentStateGUI->get_mRNAPosInActiveSite() < 0 ? "true" : "false") + ",";
+		activationJSON += "'canCleave':" + string( (_currentStateGUI->get_mRNAPosInActiveSite() < maxPos && (CleavageLimit->getVal() == 0|| _currentStateGUI->get_mRNAPosInActiveSite() >= -CleavageLimit->getVal()))  ? "true" : "false") + ",";
 		activationJSON += "'kcleave':" + to_string(_currentStateGUI->calculateCleavageRate(false));
 		activationJSON += "}";
 		messageFromWasmToJS(activationJSON, msgID);

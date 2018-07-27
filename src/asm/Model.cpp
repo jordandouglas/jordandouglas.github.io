@@ -43,7 +43,7 @@ Model::Model(){
 	allowGeometricCatalysis = true;
 	allowmRNAfolding = false;
 	allowMisincorporation = false;
-	useFourNTPconcentrations = true;
+	useFourNTPconcentrations = false;
 	assumeBindingEquilibrium = true;
 	assumeTranslocationEquilibrium = false;
 	allowMultipleBulges = true;
@@ -126,25 +126,10 @@ void Model::activateModel(){
 		string paramID =  iter->first;
 		int instanceNum = iter->second;
 
-		if (paramID == "NTPconc") NTPconc->setParameterInstance(instanceNum);
-		else if (paramID == "ATPconc") ATPconc->setParameterInstance(instanceNum);
-		else if (paramID == "CTPconc") CTPconc->setParameterInstance(instanceNum);
-		else if (paramID == "GTPconc") GTPconc->setParameterInstance(instanceNum);
-		else if (paramID == "UTPconc") UTPconc->setParameterInstance(instanceNum);
-		else if (paramID == "FAssist") FAssist->setParameterInstance(instanceNum);
 
-		else if (paramID == "hybridLen") hybridLen->setParameterInstance(instanceNum);
-		else if (paramID == "bubbleLeft") bubbleLeft->setParameterInstance(instanceNum);
-		else if (paramID == "bubbleRight") bubbleRight->setParameterInstance(instanceNum);
+		Parameter* param = Settings::getParameterByName(paramID);
+		if (param != nullptr) param->setParameterInstance(instanceNum);
 
-		else if (paramID == "GDagSlide") GDagSlide->setParameterInstance(instanceNum);
-		else if (paramID == "DGPost") DGPost->setParameterInstance(instanceNum);
-		else if (paramID == "barrierPos") barrierPos->setParameterInstance(instanceNum);
-
-		else if (paramID == "arrestTime") arrestTime->setParameterInstance(instanceNum);
-		else if (paramID == "kCat") kCat->setParameterInstance(instanceNum);
-		else if (paramID == "Kdiss") Kdiss->setParameterInstance(instanceNum);
-		else if (paramID == "RateBind") RateBind->setParameterInstance(instanceNum);
 	}
 
 
@@ -154,25 +139,8 @@ void Model::activateModel(){
 		string paramID =  iter->first;
 		double value = iter->second;
 
-		if (paramID == "NTPconc") NTPconc->hardcodeValue(value);
-		else if (paramID == "ATPconc") ATPconc->hardcodeValue(value);
-		else if (paramID == "CTPconc") CTPconc->hardcodeValue(value);
-		else if (paramID == "GTPconc") GTPconc->hardcodeValue(value);
-		else if (paramID == "UTPconc") UTPconc->hardcodeValue(value);
-		else if (paramID == "FAssist") FAssist->hardcodeValue(value);
-
-		else if (paramID == "hybridLen") hybridLen->hardcodeValue(value);
-		else if (paramID == "bubbleLeft") bubbleLeft->hardcodeValue(value);
-		else if (paramID == "bubbleRight") bubbleRight->hardcodeValue(value);
-
-		else if (paramID == "GDagSlide") GDagSlide->hardcodeValue(value);
-		else if (paramID == "DGPost") DGPost->hardcodeValue(value);
-		else if (paramID == "barrierPos") barrierPos->hardcodeValue(value);
-
-		else if (paramID == "arrestTime") arrestTime->hardcodeValue(value);
-		else if (paramID == "kCat") kCat->hardcodeValue(value);
-		else if (paramID == "Kdiss") Kdiss->hardcodeValue(value);
-		else if (paramID == "RateBind") RateBind->hardcodeValue(value);
+		Parameter* param = Settings::getParameterByName(paramID);
+		if (param != nullptr) param->hardcodeValue(value);
 
 	}
 }
@@ -183,7 +151,6 @@ string Model::toJSON(){
 
 
 	//cout << "Getting translocation model " << this->currentTranslocationModel << "." << endl;
-
 	
 	string JSON = "'id':'simpleBrownian','name':'Simple Brownian ratchet model',";
 	

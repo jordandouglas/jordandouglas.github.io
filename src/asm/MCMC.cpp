@@ -93,7 +93,7 @@ void MCMC::initMCMC(){
 	MCMC::tryToEstimateParameter(RateActivate);
 	MCMC::tryToEstimateParameter(RateDeactivate);
 	MCMC::tryToEstimateParameter(RateCleave);
-
+	MCMC::tryToEstimateParameter(CleavageLimit);
 
 
 	// 2 states stored in memory

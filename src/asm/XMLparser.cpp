@@ -183,6 +183,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 				else if (paramID == "barrierPos") param = barrierPos; 
 				else if (paramID == "FAssist") param = FAssist; 
 				else if (paramID == "arrestTime") param = arrestTime; 
+				else if (paramID == "rnaFoldDistance") param = rnaFoldDistance; 
 				else if (paramID == "kCat") param = kCat; 
 				else if (paramID == "Kdiss") param = Kdiss; 
 				else if (paramID == "RateBind") param = RateBind; 
@@ -191,6 +192,8 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 				else if (paramID == "deltaGDaggerHybridDestabil") param = deltaGDaggerHybridDestabil; 
 				else if (paramID == "deltaGDaggerBacktrack") param = deltaGDaggerBacktrack; 
 				else if (paramID == "RateCleave") param = RateCleave; 
+				else if (paramID == "CleavageLimit") param = CleavageLimit; 
+
 
 
 				else continue;
@@ -507,12 +510,15 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 						else if (attrName == "RateBind") model->addParameterHardcoding("RateBind", value); 
 
 						else if (attrName == "arrestTime") model->addParameterHardcoding("arrestTime", value);
+						else if (attrName == "rnaFoldDistance") model->addParameterHardcoding("rnaFoldDistance", value);
+
 
 						else if (attrName == "RateActivate") model->addParameterHardcoding("RateActivate", value); 
 						else if (attrName == "RateDeactivate") model->addParameterHardcoding("RateDeactivate", value); 
 						else if (attrName == "deltaGDaggerBacktrack") model->addParameterHardcoding("deltaGDaggerBacktrack", value); 
 						else if (attrName == "deltaGDaggerHybridDestabil") model->addParameterHardcoding("deltaGDaggerHybridDestabil", value); 
 						else if (attrName == "RateCleave") model->addParameterHardcoding("RateCleave", value); 
+						else if (attrName == "CleavageLimit") model->addParameterHardcoding("CleavageLimit", value); 
 
 
 					}

@@ -128,7 +128,14 @@ Parameter* RateActivate = new Parameter("kA", false, "inclusive", "Rate of activ
 Parameter* RateDeactivate = new Parameter("kU", false, "inclusive", "Rate of inactivation (s\u207B\u00B9)", "Rate constant of polymerase entering the catalytically unactive state", "k_[U]  (s^[\u22121\u2009])");
 Parameter* deltaGDaggerHybridDestabil = new Parameter("deltaGDaggerHybridDestabil", false, "false", "\u0394G\u2020\u03C0", "Gibbs energy barrier of hybrid destabilisation, which causes catalytic inactivation.");
 Parameter* deltaGDaggerBacktrack = new Parameter("deltaGDaggerBacktrack", false, "false", "\u0394G\u2020\U0001D70F-", "Additive Gibbs energy barrier height of backtracking. Added onto the value of \u0394G\u2020\U0001D70F.", "\u0394G_{\U0001D70F-}^{\u2020}  (k_{B}T)");
+
+
 Parameter* RateCleave = new Parameter("RateCleave", false, "inclusive", "Rate of cleavage (s\u207B\u00B9)", "Rate constant of cleaving the dangling 3\u2032 end of the nascent strand when backtracked", "k_[cleave]  (s^[\u22121\u2009])");
+Parameter* CleavageLimit = new Parameter("CleavageLimit", true, "inclusive", "Cleavage limit (nt)", "Maximum number of backtracked nucleotides which can be cleaved. Set to 0 to have no upper limit.", "\u03BB_[cleave]  (nt)");
+
+
+Parameter* rnaFoldDistance = new Parameter("rnaFoldDistance", true, "inclusive", "Fold distance (nt)", "Number of nucleotides upstream from the polymerase which cannot fold");
+
 
 Parameter* upstreamCurvatureCoeff = new Parameter("upstreamCurvatureCoeff", false, "false", "3\u2032 DNA curvature coeff.", "Change in free energy of translocation associated with DNA upstream from the hybrid, per degree of curvature", "\u0394G_{3\u2032bend}  (k_{B}T)");
 Parameter* downstreamCurvatureCoeff = new Parameter("downstreamCurvatureCoeff", false, "false", "5\u2032 DNA curvature coeff.", "Change in free energy of translocation associated with DNA downstream from the hybrid, per degree of curvature", "\u0394G_{5\u2032bend}  (k_{B}T)");
@@ -137,7 +144,7 @@ Parameter* downstreamWindow = new Parameter("downstreamWindow", true, "exclusive
 
 
 
-vector<Parameter*> Settings::paramList(21); // Number of parameters
+vector<Parameter*> Settings::paramList(23); // Number of parameters
 
 CRandomMersenne* Settings::SFMT;
 
@@ -197,11 +204,16 @@ void Settings::init(){
 	deltaGDaggerHybridDestabil->setDistributionParameter("fixedDistnVal", -1);
 	deltaGDaggerBacktrack->setDistributionParameter("fixedDistnVal", 0);
 	RateCleave->setDistributionParameter("fixedDistnVal", 0);
+	CleavageLimit->setDistributionParameter("fixedDistnVal", 10);
+
 
 	upstreamCurvatureCoeff->setDistributionParameter("fixedDistnVal", 0);
 	downstreamCurvatureCoeff->setDistributionParameter("fixedDistnVal", 0);
 	upstreamWindow->setDistributionParameter("fixedDistnVal", 8);
 	downstreamWindow->setDistributionParameter("fixedDistnVal", 8);
+
+
+	rnaFoldDistance->setDistributionParameter("fixedDistnVal", 8);
 
 
 	upstreamCurvatureCoeff->hide();
@@ -235,8 +247,8 @@ void Settings::init(){
 	paramList.at(18) = RateCleave;
 	paramList.at(19) = deltaGDaggerHybridDestabil;
 	paramList.at(20) = deltaGDaggerBacktrack;
-
-
+	paramList.at(21) = rnaFoldDistance;
+	paramList.at(22) = CleavageLimit;
 
 	/*
 	paramList.at(19) = upstreamCurvatureCoeff;
@@ -288,8 +300,8 @@ void Settings::initPolymerases(){
 	yeastPol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 29.12));
 	yeastPol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 72));
 	yeastPol->setParameter(hybridLen->clone()->setDistributionParameter("fixedDistnVal", 10));
-	yeastPol->setParameter(bubbleLeft->clone()->setDistributionParameter("fixedDistnVal", 2));
-	yeastPol->setParameter(bubbleRight->clone()->setDistributionParameter("fixedDistnVal", 2));
+	yeastPol->setParameter(bubbleLeft->clone()->setDistributionParameter("fixedDistnVal", 1));
+	yeastPol->setParameter(bubbleRight->clone()->setDistributionParameter("fixedDistnVal", 1));
 
 	// T7 parameters
 	T7pol->setParameter(DGPost->clone()->setDistributionParameter("fixedDistnVal", -4.709));
@@ -378,6 +390,8 @@ void Settings::setParameterList(vector<Parameter*> params){
 	RateCleave = paramList.at(18);
 	deltaGDaggerHybridDestabil = paramList.at(19);
 	deltaGDaggerBacktrack = paramList.at(20);
+	rnaFoldDistance = paramList.at(21);
+	CleavageLimit = paramList.at(22);
 
 
 
@@ -608,6 +622,7 @@ void Settings::print(){
 	RateActivate->print();
 	RateDeactivate->print();
 	RateCleave->print();
+	CleavageLimit->print();
 	deltaGDaggerHybridDestabil->print();
 	deltaGDaggerBacktrack->print();
 
@@ -615,7 +630,7 @@ void Settings::print(){
 	downstreamCurvatureCoeff->print();
 	upstreamWindow->print();
 	downstreamWindow->print();
-
+	rnaFoldDistance->print();
 
 
 	cout << endl << endl;
@@ -784,34 +799,9 @@ string Settings::complementSeq(string orig, bool toRNA){
 
 void Settings::clearParameterHardcodings(){
 
-	NTPconc->stopHardcoding();
-	ATPconc->stopHardcoding();
-	CTPconc->stopHardcoding();
-	GTPconc->stopHardcoding();
-	UTPconc->stopHardcoding();
-
-	hybridLen->stopHardcoding();
-	bubbleLeft->stopHardcoding();
-	bubbleRight->stopHardcoding();
-	GDagSlide->stopHardcoding();
-	DGPost->stopHardcoding();
-	barrierPos->stopHardcoding();
-	FAssist->stopHardcoding();
-	arrestTime->stopHardcoding();
-	kCat->stopHardcoding();
-	Kdiss->stopHardcoding();
-	RateBind->stopHardcoding();
-	RateActivate->stopHardcoding();
-	RateDeactivate->stopHardcoding();
-	RateCleave->stopHardcoding();
-	deltaGDaggerHybridDestabil->stopHardcoding();
-	deltaGDaggerBacktrack->stopHardcoding();
-	upstreamCurvatureCoeff->stopHardcoding();
-	downstreamCurvatureCoeff->stopHardcoding();
-	upstreamWindow->stopHardcoding();
-	downstreamWindow->stopHardcoding();
-
-
+	for (int i = 0; i < Settings::paramList.size(); i ++){
+		Settings::paramList.at(i)->stopHardcoding();
+	}
 
 }
 
@@ -820,33 +810,9 @@ void Settings::clearParameterHardcodings(){
 void Settings::sampleAll(){
 
 	// Sample all model parameters
-	NTPconc->sample();
-	ATPconc->sample();
-	CTPconc->sample();
-	GTPconc->sample();
-	UTPconc->sample();
-
-	hybridLen->sample();
-	bubbleLeft->sample();
-	bubbleRight->sample();
-	GDagSlide->sample();
-	DGPost->sample();
-	barrierPos->sample();
-	FAssist->sample();
-	arrestTime->sample();
-	kCat->sample();
-	Kdiss->sample();
-	RateBind->sample();
-	RateActivate->sample();
-	RateDeactivate->sample();
-	RateCleave->sample();
-	deltaGDaggerHybridDestabil->sample();
-	deltaGDaggerBacktrack->sample();
-	upstreamCurvatureCoeff->sample();
-	downstreamCurvatureCoeff->sample();
-	upstreamWindow->sample();
-	downstreamWindow->sample();
-
+	for (int i = 0; i < Settings::paramList.size(); i ++){
+		Settings::paramList.at(i)->sample();
+	}
 
 	// Samples a model
 	sampleModel();
@@ -877,12 +843,15 @@ Parameter* Settings::getParameterByName(string paramID){
 	if (paramID == "kA") return RateActivate;
 	if (paramID == "kU") return RateDeactivate;
 	if (paramID == "RateCleave") return RateCleave;
+	if (paramID == "CleavageLimit") return CleavageLimit;
 	if (paramID == "deltaGDaggerHybridDestabil") return deltaGDaggerHybridDestabil;
 	if (paramID == "deltaGDaggerBacktrack") return deltaGDaggerBacktrack;
 	if (paramID == "upstreamCurvatureCoeff") return upstreamCurvatureCoeff;
 	if (paramID == "downstreamCurvatureCoeff") return downstreamCurvatureCoeff;
 	if (paramID == "upstreamWindow") return upstreamWindow;
 	if (paramID == "downstreamWindow") return downstreamWindow;
+	if (paramID == "rnaFoldDistance") return rnaFoldDistance;
+
 
 
 

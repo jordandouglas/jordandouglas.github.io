@@ -149,11 +149,14 @@ extern Parameter *RateDeactivate;
 extern Parameter *deltaGDaggerHybridDestabil;
 extern Parameter *deltaGDaggerBacktrack;
 extern Parameter *RateCleave;
+extern Parameter *CleavageLimit;
 
 extern Parameter *upstreamCurvatureCoeff;
 extern Parameter *downstreamCurvatureCoeff;
 extern Parameter *upstreamWindow;
 extern Parameter *downstreamWindow;
+
+extern Parameter* rnaFoldDistance;
 
 
 

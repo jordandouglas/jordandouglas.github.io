@@ -985,7 +985,8 @@ double State::calculateDeactivateRate(bool ignoreStateRestrictions){
 // Cleave the 3' end of the nascent strand (if the polymerase is backtracked) and reactivates the polymerase
 State* State::cleave(){
 
-	if (this->mRNAPosInActiveSite < 0){
+	int maxPos = currentModel->get_currentBacksteppingModel() == "backstep0" ? 0 : -1;
+	if (this->mRNAPosInActiveSite < maxPos && (CleavageLimit->getVal() == 0|| this->mRNAPosInActiveSite >= -CleavageLimit->getVal())){
 
 		int newLength = this->nascentSequence.length() + this->mRNAPosInActiveSite;
 		int nbasesCleaved = this->nascentSequence.length() - newLength;
@@ -999,11 +1000,11 @@ State* State::cleave(){
 				Coordinates::delete_nt(baseNum, "m");
 			}
 
-
-			// Reset the 'time until catalysis' or this will make the interpretation of the time to catalysis sitewise plot less meaningful 
-			Plots::resetTimeToCatalysis();
-
 		}
+
+
+		// Reset the 'time until catalysis' or this will make the interpretation of the time to catalysis sitewise plot less meaningful 
+		if (this->isGuiState) Plots::resetTimeToCatalysis();
 
 		this->nextTemplateBaseToCopy -= nbasesCleaved;
 		this->nascentSequence = this->nascentSequence.substr(0, newLength);
@@ -1018,7 +1019,10 @@ State* State::cleave(){
 
 
 double State::calculateCleavageRate(bool ignoreStateRestrictions){
-	if (ignoreStateRestrictions || this->mRNAPosInActiveSite < 0) return RateCleave->getVal();
+
+
+	int maxPos = currentModel->get_currentBacksteppingModel() == "backstep0" ? 0 : -1;
+	if (ignoreStateRestrictions || (this->mRNAPosInActiveSite < maxPos && (CleavageLimit->getVal() == 0|| this->mRNAPosInActiveSite >= -CleavageLimit->getVal()))) return RateCleave->getVal();
 	return 0;
 }
 
@@ -1902,7 +1906,7 @@ int State::get_fissure_landscape_of(int S){
 float State::foldUpstream(){
 
 
-	if (PrimerType != "ssRNA" || this->leftNascentBase <= 3 || this->terminated){
+	if (PrimerType != "ssRNA" || this->leftNascentBase - rnaFoldDistance->getVal() <= 3 || this->terminated){
 		//cout << "Cannot fold 5'" << endl;
 
 		// Set the folded bases to 'unfolded' mode so the DOM can render them differently
@@ -1920,7 +1924,7 @@ float State::foldUpstream(){
 
 
 	// Allocate memory for sequence, structure and coordinates of 5' end
-	int length_5prime = this->leftNascentBase-1;
+	int length_5prime = this->leftNascentBase-1-rnaFoldDistance->getVal();
 	char* seq_5prime = (char *) calloc(length_5prime+1, sizeof(char));
 	char* structure_5prime = (char *) calloc(length_5prime+1, sizeof(char));
 	strcpy(seq_5prime, this->get_NascentSequence().substr(0, length_5prime).c_str());
@@ -2062,7 +2066,7 @@ float State::foldDownstream(){
 
 
 	// This can only work if backtracked by more than 4 positions
-	if (PrimerType != "ssRNA" || this->mRNAPosInActiveSite >= 0 || this->terminated){
+	if (PrimerType != "ssRNA" || this->mRNAPosInActiveSite >= -rnaFoldDistance->getVal() || this->terminated){
 		//cout << "Cannot fold 3'" << endl;
 		this->_3primeStructure = "";
 
@@ -2082,10 +2086,10 @@ float State::foldDownstream(){
 	
 
 	// Allocate memory for sequence, structure and coordinates of 3' end
-	int length_3prime = this->get_nascentLength() - this->rightTemplateBase;
+	int length_3prime = this->get_nascentLength() - this->rightTemplateBase - rnaFoldDistance->getVal();
 	char* seq_3prime = (char *) calloc(length_3prime+1, sizeof(char));
 	char* structure_3prime = (char *) calloc(length_3prime+1, sizeof(char));
-	strcpy(seq_3prime, this->get_NascentSequence().substr(this->rightTemplateBase, length_3prime).c_str());
+	strcpy(seq_3prime, this->get_NascentSequence().substr(this->rightTemplateBase + rnaFoldDistance->getVal(), length_3prime).c_str());
 
 
 	// Compute MFE structure for 5' end
@@ -2096,15 +2100,15 @@ float State::foldDownstream(){
 
 		// Set the folded bases to 'folded' mode so the DOM can render them differently
 		//Coordinates::setNucleotideFoldedness(this->rightTemplateBase, false);
-		Coordinates::setNucleotideFoldedness(this->rightTemplateBase, false);
-		for (int i = this->rightTemplateBase+1; i <= this->rightTemplateBase + length_3prime; i ++){
+		Coordinates::setNucleotideFoldedness(this->rightTemplateBase + rnaFoldDistance->getVal(), false);
+		for (int i = this->rightTemplateBase+1 + rnaFoldDistance->getVal(); i <= this->rightTemplateBase + rnaFoldDistance->getVal() + length_3prime; i ++){
 			Coordinates::setNucleotideFoldedness(i, true);
 		}
-		Coordinates::setFoldAnchorPoint(this->rightTemplateBase);
+		Coordinates::setFoldAnchorPoint(this->rightTemplateBase + rnaFoldDistance->getVal());
 
 
 		// Add bonds between all nucleotides along the backbone 
-		for (int i = this->rightTemplateBase; i < this->rightTemplateBase + length_3prime; i ++){
+		for (int i = this->rightTemplateBase+ rnaFoldDistance->getVal(); i < this->rightTemplateBase + length_3prime+ rnaFoldDistance->getVal(); i ++){
 			Coordinates::addBondBetweenNucleotides(i, i+1, false);
 		}
 
@@ -2155,7 +2159,7 @@ float State::foldDownstream(){
 
 
 			for (int i = 0; i < length_3prime; i ++){
-				Coordinates::setFoldInitialPositions(i + 1 + this->rightTemplateBase, XY[i], XY[i+length_3prime]);
+				Coordinates::setFoldInitialPositions(i + 1 + this->rightTemplateBase + rnaFoldDistance->getVal(), XY[i], XY[i+length_3prime]);
 			}
 
 			// Clean-up
@@ -2171,7 +2175,7 @@ float State::foldDownstream(){
 
 
 	// Add basepair bonds
-	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden") this->findBondsRecurse(0, this->_3primeStructure, this->rightTemplateBase);
+	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden") this->findBondsRecurse(0, this->_3primeStructure, this->rightTemplateBase + rnaFoldDistance->getVal());
 
 
 	// Clean up
@@ -2194,7 +2198,7 @@ void State::fold(bool fold5Prime, bool fold3Prime){
 
 		this->_5primeMFE = this->foldUpstream();
 		if (this->_5primeMFE) {
-			//cout << "5' fold free energy: " << this->_5primeMFE << "kBT with structure " << this->_5primeStructure << endl;
+			// cout << "5' fold free energy: " << this->_5primeMFE << "kBT with structure " << this->_5primeStructure << endl;
 		}
 
 	}
@@ -2205,7 +2209,7 @@ void State::fold(bool fold5Prime, bool fold3Prime){
 
 		this->_3primeMFE = this->foldDownstream();
 		if (this->_3primeMFE) {
-			//cout << "3' fold free energy: " << this->_3primeMFE << "kBT with structure " << this->_3primeStructure << endl;
+			// cout << "3' fold free energy: " << this->_3primeMFE << "kBT with structure " << this->_3primeStructure << endl;
 		}
 
 	}
