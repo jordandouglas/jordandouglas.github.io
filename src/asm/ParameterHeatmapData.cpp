@@ -118,7 +118,7 @@ double ParameterHeatmapData::getESS(){
 	//cout << "Computing ESS of " << this->name << " from burnin " << this->burninStartState << endl;
 
 
-	int MAX_LAG = 2000;
+	const int MAX_LAG = 2000;
 	double sum = 0.0;
 
 	// Get values post-burnin

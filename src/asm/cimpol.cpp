@@ -37,7 +37,6 @@
 #include "SimulatorResultSummary.h"
 
 
-#include <dlfcn.h>
 #include <iostream>
 #include <string>
 #include <random>
