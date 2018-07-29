@@ -152,7 +152,7 @@ function updateSecondaryStructure(new_nodes, edges){
 		.force("linkForce", linkForce)
 		.force("charge", d3.forceManyBody().strength(MFE_repulsionForce))
 		.on("tick", tick)
-		.alpha(1).restart();
+		.alpha(0.8).restart();
 
 
 	//MFE_simulation.nodes(MFE_node);
