@@ -65,6 +65,8 @@ function updateSecondaryStructure(new_nodes, edges){
 		return;
 	}
 
+	MFE_simulation.stop();
+
 	//renderSecondaryStructure({vertices: nodes, bonds: []});
 	//return;
 
