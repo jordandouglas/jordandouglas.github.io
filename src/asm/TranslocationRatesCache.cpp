@@ -277,7 +277,9 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 	State* clone = state->clone();
 
 	// If the barrier height has already been cached, return it
-	int pos = clone->getLeftNascentBaseNumber() - 1;
+	int pos = clone->getLeftNascentBaseNumber() - 1 - rnaFoldDistance->getVal();
+	if (pos < 0) return 0;
+
 	if (this->upstreamRNABlockadeTable[pos] != -INF) return this->upstreamRNABlockadeTable[pos];
 
 
@@ -287,8 +289,16 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 	// Fold the RNA of this state
 	clone->fold(true, false);
 
+
+	// No structure
+	if (clone->get_5primeStructure() == ""){
+
+		barrierHeight = 0;
+
+	}
+
 	// Boundary model -> prohibit translocation if there is any structure here
-	if (currentModel->get_currentRNABlockadeModel() == "terminalBlockade"){
+	else if (currentModel->get_currentRNABlockadeModel() == "terminalBlockade"){
 
 
 		string structure = clone->get_5primeStructure();
@@ -370,8 +380,12 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 	State* clone = state->clone();
 
 	// If the barrier height has already been cached, return it
-	int pos = clone->getRightNascentBaseNumber() - 1;
-	if (this->downstreamRNABlockadeTable[pos] != -INF) return this->downstreamRNABlockadeTable[pos];
+	int pos = clone->getRightNascentBaseNumber() - 1 + rnaFoldDistance->getVal();
+	if (pos < 0 || pos+1 > clone->get_nascentLength() /* || pos >= templateSequence.length()*/) return 0;
+
+
+	// TODO: CACHING NEED TO KNOW THE POSITION AND THE LENGTH
+	// if (this->downstreamRNABlockadeTable[pos] != -INF) return this->downstreamRNABlockadeTable[pos];
 
 
 	// Otherwise calculate it
@@ -380,8 +394,15 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 	// Fold the RNA of this state
 	clone->fold(false, true);
 
+
+	// No structure
+	if (clone->get_3primeStructure() == ""){
+		barrierHeight = 0;
+	}
+
+
 	// Boundary model -> prohibit translocation if there is any structure here
-	if (currentModel->get_currentRNABlockadeModel() == "terminalBlockade"){
+	else if (currentModel->get_currentRNABlockadeModel() == "terminalBlockade"){
 
 
 		string structure = clone->get_3primeStructure();
@@ -444,7 +465,7 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 	}
 
 
-	this->downstreamRNABlockadeTable[pos] = barrierHeight;
+	// this->downstreamRNABlockadeTable[pos] = barrierHeight;
 	return barrierHeight;
 
 }

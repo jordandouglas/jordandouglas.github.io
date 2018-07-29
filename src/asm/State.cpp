@@ -129,6 +129,11 @@ State* State::clone(){
 	s->rightNascentBase = this->rightNascentBase;
 	s->changeInLeftBulgePosition = this->changeInLeftBulgePosition;
 
+	s->_5primeStructure = this->_5primeStructure;
+	s->_3primeStructure = this->_3primeStructure;
+	s->_5primeMFE = this->_5primeMFE;
+	s->_3primeMFE = this->_3primeMFE;
+
 
 	// Clone the vectors
 	s->bulgePos = bulgePos;
@@ -1907,18 +1912,19 @@ float State::foldUpstream(){
 
 
 	if (PrimerType != "ssRNA" || this->leftNascentBase - rnaFoldDistance->getVal() <= 3 || this->terminated){
-		//cout << "Cannot fold 5'" << endl;
+		cout << "Cannot fold 5'" << endl;
 
 		// Set the folded bases to 'unfolded' mode so the DOM can render them differently
-		for (int i = 0; i <= this->_5primeStructure.length(); i ++){
+		for (int i = 0; this->_5primeStructure.length() > 0 && i <= this->_5primeStructure.length(); i ++){
 			Coordinates::setNucleotideFoldedness(i, false);
 		}
 		this->_5primeStructure = "";
 
+
 		return 0;
 	}
 				
-				//cout << "Calculating free energy" << endl;
+				// cout << "Calculating 5' free energy" << endl;
 				//auto timeStart = chrono::system_clock::now();
 
 
@@ -2072,7 +2078,7 @@ float State::foldDownstream(){
 
 
 		// Unfold the downstream bases 
-		if (this->mRNAPosInActiveSite== 0 && PrimerType == "ssRNA" && !this->terminated && _showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden"){
+		if (this->mRNAPosInActiveSite == 0 && PrimerType == "ssRNA" && !this->terminated && _showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden"){
 
 
 			Coordinates::setNucleotideFoldedness(this->rightTemplateBase, false);
@@ -2083,7 +2089,9 @@ float State::foldDownstream(){
 
 		return 0;
 	}
-	
+
+
+	cout << "Calculating 3' free energy" << endl;
 
 	// Allocate memory for sequence, structure and coordinates of 3' end
 	int length_3prime = this->get_nascentLength() - this->rightTemplateBase - rnaFoldDistance->getVal();
@@ -2213,6 +2221,7 @@ void State::fold(bool fold5Prime, bool fold3Prime){
 		}
 
 	}
+
 
 
 

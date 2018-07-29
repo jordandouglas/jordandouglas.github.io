@@ -2,17 +2,14 @@
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
 	This file is part of SimPol.
-
     SimPol is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
     SimPol is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with SimPol.  If not, see <http://www.gnu.org/licenses/>. 
     --------------------------------------------------------------------
@@ -58,7 +55,6 @@ using namespace std;
 				-logO <filename>: log file to write to
 				-logI <filename>: log file to read from (only used by -summary and -sample)
 				-nthreads <n>: number of threads to split simulations over (default 1)
-
 				-MCMC: perform MCMC instead of simulating (default false)
 				-plotO <foldername> folder name to save plot data into (only if MCMC is false) 
 				-resume: resumes MCMC from the last state printed in the file specified by -logO and appends to -logO (default false)
@@ -68,7 +64,6 @@ using namespace std;
 							If -summary is also specified then will use the geometric median
 							Otherwise will sample from the distributions specified in -xml xmlfile
 							This will be printed into terminal, or -logO file if specified
-
 				-marginal: if -summary is enabled then will print a marginal-model geometric median summary. Models 
 */
 
@@ -254,10 +249,3 @@ int main(int argc, char** argv) {
    return 0;
 
 }
-
-
-
-
-
-
-
