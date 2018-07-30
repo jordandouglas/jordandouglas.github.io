@@ -207,7 +207,7 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
 	double result[3];
 	for (int n = 1; n <= nTrialsTotalGUI; n ++){
 		//if (n == 1 || n % 100 == 0) cout << "Starting trial " << n << endl;
-
+		//cout << "Starting trial " << n << endl;
 
 
 		result[0] = 0;
@@ -276,7 +276,7 @@ void Simulator::resume_trials_GUI(double* toReturn){
 
 	for (int n = nTrialsCompletedGUI+1; n <= nTrialsTotalGUI; n ++){
 		//if (n == 1 || n % 100 == 0) cout << "Starting trial " << n << endl;
-
+		//cout << "Starting trial " << n << endl;
 
 		performSimulation(_currentStateGUI, result);
 

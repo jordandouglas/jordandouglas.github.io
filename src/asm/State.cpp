@@ -136,10 +136,10 @@ State* State::clone(){
 
 
 	// Clone the vectors
-	s->bulgePos = bulgePos;
-	s->bulgedBase = bulgedBase;
-	s->bulgeSize = bulgeSize;
-	s->partOfBulgeID = partOfBulgeID;
+	s->bulgePos = this->bulgePos;
+	s->bulgedBase = this->bulgedBase;
+	s->bulgeSize = this->bulgeSize;
+	s->partOfBulgeID = this->partOfBulgeID;
 
 
 	return s;
@@ -2091,7 +2091,7 @@ float State::foldDownstream(){
 	}
 
 
-	cout << "Calculating 3' free energy" << endl;
+	//cout << "Calculating 3' free energy" << endl;
 
 	// Allocate memory for sequence, structure and coordinates of 3' end
 	int length_3prime = this->get_nascentLength() - this->rightTemplateBase - rnaFoldDistance->getVal();
@@ -2213,7 +2213,7 @@ void State::fold(bool fold5Prime, bool fold3Prime){
 
 
 	// Fold the 3' (ie. downstream) mRNA  and store the structure string
-	if (fold3Prime){
+	if (false && fold3Prime){
 
 		this->_3primeMFE = this->foldDownstream();
 		if (this->_3primeMFE) {

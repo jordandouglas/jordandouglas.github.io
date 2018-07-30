@@ -268,18 +268,19 @@ void TranslocationRatesCache::buildBacktrackRateTable(string templSequence){
 
 double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state){
 
-
 	//cout << "getUpstreamRNABlockadeBarrierHeight" << endl;
 
 	if (!currentModel->get_allowmRNAfolding()) return 0;
 
 
-	State* clone = state->clone();
+
 
 	// If the barrier height has already been cached, return it
-	int pos = clone->getLeftNascentBaseNumber() - 1 - rnaFoldDistance->getVal();
+	int pos = state->getLeftNascentBaseNumber() - 1 - rnaFoldDistance->getVal();
 	if (pos < 0) return 0;
 
+
+	//cout << "pos " << pos << ":" << this->upstreamRNABlockadeTable[pos] << endl;
 	if (this->upstreamRNABlockadeTable[pos] != -INF) return this->upstreamRNABlockadeTable[pos];
 
 
@@ -287,6 +288,7 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 	double barrierHeight = 0;
 
 	// Fold the RNA of this state
+	State* clone = state->clone();
 	clone->fold(true, false);
 
 
@@ -360,6 +362,8 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 
 	}
 
+	delete clone;
+
 
 	this->upstreamRNABlockadeTable[pos] = barrierHeight;
 	return barrierHeight;
@@ -373,15 +377,16 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* state){
 
 
+
 	//cout << "getDownstreamRNABlockadeBarrierHeight" << endl;
 
-	if (!currentModel->get_allowmRNAfolding()) return 0;
+	if (true || !currentModel->get_allowmRNAfolding()) return 0;
 
-	State* clone = state->clone();
+
 
 	// If the barrier height has already been cached, return it
-	int pos = clone->getRightNascentBaseNumber() - 1 + rnaFoldDistance->getVal();
-	if (pos < 0 || pos+1 > clone->get_nascentLength() /* || pos >= templateSequence.length()*/) return 0;
+	int pos = state->getRightNascentBaseNumber() - 1 + rnaFoldDistance->getVal();
+	if (pos < 0 || pos+1 > state->get_nascentLength() /* || pos >= templateSequence.length()*/) return 0;
 
 
 	// TODO: CACHING NEED TO KNOW THE POSITION AND THE LENGTH
@@ -392,6 +397,7 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 	double barrierHeight = 0;
 
 	// Fold the RNA of this state
+	State* clone = state->clone();
 	clone->fold(false, true);
 
 
@@ -408,7 +414,7 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 		string structure = clone->get_3primeStructure();
 		if (structure.substr(0, 1) == "(") barrierHeight = INF;
 
-		cout << "terminalBlockade " << structure << ":" << barrierHeight << endl;
+		//cout << "terminalBlockade " << structure << ":" << barrierHeight << endl;
 
 	}
 
@@ -434,7 +440,7 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 		// Midpoint blockade: take the free energy of the two neighbouring structures and average them out
 		else if (currentModel->get_currentRNABlockadeModel() == "midpointBlockade"){
 			barrierHeight = (this_MFE + downstream_MFE) / 2 - this_MFE;
-			cout << "Downstream midpoint barrier: " << barrierHeight << endl;
+			//cout << "Downstream midpoint barrier: " << barrierHeight << endl;
 		}
 
 
@@ -451,7 +457,7 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 			strcpy(structure_char, transitionStructure.c_str());
 
 			barrierHeight = vRNA_eval(seq_char, structure_char) - this_MFE;
-			cout << "Downstream Gibbs energy: " << barrierHeight << endl;
+			//cout << "Downstream Gibbs energy: " << barrierHeight << endl;
 
 			// Clean up
 			free(seq_char);
@@ -463,6 +469,8 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 
 
 	}
+
+	delete clone;
 
 
 	// this->downstreamRNABlockadeTable[pos] = barrierHeight;
