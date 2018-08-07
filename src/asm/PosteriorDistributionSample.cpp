@@ -324,6 +324,45 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 
 	}
 
+	else if (observed->getDataType() == "pauseEscape"){
+
+
+		// Calculate observed probability of being at the current site at the current time (under the log-linear model fit to the original data)
+		int pauseSite =  observed->get_pauseSite();
+		//double Emax = observed->get_Emax();
+		//double rate = log(2) / observed->get_t12();
+		//double time = observed->getCurrentSettingX();
+		double obsVal = observed->getObservation(); // Emax * exp(-time * rate);
+
+
+
+		// Calculate simulated probability of being at the current site at the current time (by calculating the proportion of trancripts of the right length)
+		double simVal = 0;
+		list<int> simulatedLengths = simulated->get_transcriptLengths();
+		for (list<int>::iterator it = simulatedLengths.begin(); it != simulatedLengths.end(); ++it){
+			int len = *it;
+			if (len == pauseSite) simVal++;
+		}
+		simVal = simVal / simulatedLengths.size();
+
+		//cout << "t = " << observed->getCurrentSettingX() << "; simVal = " << simVal << "; obsVal = " << obsVal << endl;
+
+		this->simulatedValues.at(this->currentObsNum) = simVal;
+
+		this->chiSquared += pow(simVal - obsVal, 2);
+		/*
+		if (simVal == 0) this->chiSquared = INF;
+		else {
+			double chiSqTop = pow(simVal - obsVal, 2);
+			if (chiSqTop != 0) this->chiSquared += chiSqTop / abs(simVal);
+		}
+
+		this->chiSquared = min(this->chiSquared, 1.0 * INF);
+		*/
+
+	}
+
+
 	// Otherwise compare simulated and observed velocities
 	else {
 		
@@ -334,8 +373,13 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 		this->simulatedValues.at(this->currentObsNum) = simVal;
 
 		// Calculate accumulative chi-squared. Want to ensure that 0/0 = 0 and not infinity
-		double chiSqTop = pow(simVal - obsVal, 2);
-		if (chiSqTop != 0) this->chiSquared += chiSqTop / abs(simVal);
+		if (simVal == 0) this->chiSquared = INF;
+		else {
+			double chiSqTop = pow(simVal - obsVal, 2);
+			if (chiSqTop != 0) this->chiSquared += chiSqTop / abs(simVal);
+		}
+
+		this->chiSquared = min(this->chiSquared, 1.0 * INF);
 
 		//Settings::print();
 		//cout << "Simval " << simVal << "; obsVal " << obsVal << "; X2 " << this->chiSquared << endl;

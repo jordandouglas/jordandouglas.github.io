@@ -285,8 +285,11 @@ void Parameter::sample(){
 	}
 
 
-	// If this is the a structural parameter then the translocation cache needs to be updated
-	if (prevVal != this->val && (this->id == "hybridLen" || this->id == "bubbleLeft" || this->id == "bubbleRight")) Settings::resetRateTables();
+	// If this is the a structural parameter then the translocation cache needs to be updated and so does the minimum value for halt position
+	if (prevVal != this->val && (this->id == "hybridLen" || this->id == "bubbleLeft" || this->id == "bubbleRight")) {
+		Settings::resetRateTables();
+	}
+
 	// if (prevVal != this->val && this->id == "rnaFoldDistance") Settings::resetUnfoldingTables();
 
 }

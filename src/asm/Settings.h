@@ -130,6 +130,7 @@ extern Parameter *CTPconc;
 extern Parameter *GTPconc;
 extern Parameter *UTPconc;
 extern Parameter *FAssist;
+extern Parameter *haltPosition;
 
 extern Parameter *hybridLen;
 extern Parameter *bubbleLeft;

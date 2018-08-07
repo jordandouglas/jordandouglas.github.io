@@ -111,6 +111,8 @@ Parameter* CTPconc = new Parameter("CTPconc", false, "inclusive", " [CTP] (\u03b
 Parameter* GTPconc = new Parameter("GTPconc", false, "inclusive", " [GTP] (\u03bcM)", "Cellular concentration of GTP");
 Parameter* UTPconc = new Parameter("UTPconc", false, "inclusive", " [UTP] (\u03bcM)", "Cellular concentration of UTP");
 Parameter* FAssist = new Parameter("FAssist", false, "false", "Force  (pN)", "Assisting force applied to the polymerase during single-molecule experiments.");
+Parameter* haltPosition = new Parameter("haltPosition", true, "exclusive", "Halt position (nt)", "Position where the polymerase is halted prior to the start of the experiment.");
+
 
 Parameter* hybridLen = new Parameter("hybridLen", true, "exclusive", "Hybrid length (bp)", "Number of base pairs inside the polymerase", "h (bp)");
 Parameter* bubbleLeft = new Parameter("bubbleLeft", true, "inclusive", "Bubble length left (bp)", "Number of unpaired template bases 3\u2032 of the hybrid", "\u03B2_{1} (bp)");
@@ -144,7 +146,7 @@ Parameter* downstreamWindow = new Parameter("downstreamWindow", true, "exclusive
 
 
 
-vector<Parameter*> Settings::paramList(23); // Number of parameters
+vector<Parameter*> Settings::paramList(26); // Number of parameters
 
 CRandomMersenne* Settings::SFMT;
 
@@ -183,6 +185,9 @@ void Settings::init(){
 	GTPconc->setDistributionParameter("fixedDistnVal", 468)->hide();
 	UTPconc->setDistributionParameter("fixedDistnVal", 567)->hide();
 	FAssist->setDistributionParameter("fixedDistnVal", 0)->setDistributionParameter("uniformDistnLowerVal", -30)->setDistributionParameter("uniformDistnUpperVal", 30);
+	haltPosition->setDistributionParameter("fixedDistnVal", 14)->setDistributionParameter("lowerVal", 14);
+
+
 
 	hybridLen->setDistributionParameter("fixedDistnVal", 9);
 	bubbleLeft->setDistributionParameter("fixedDistnVal", 2);
@@ -209,8 +214,8 @@ void Settings::init(){
 
 	upstreamCurvatureCoeff->setDistributionParameter("fixedDistnVal", 0);
 	downstreamCurvatureCoeff->setDistributionParameter("fixedDistnVal", 0);
-	upstreamWindow->setDistributionParameter("fixedDistnVal", 8);
-	downstreamWindow->setDistributionParameter("fixedDistnVal", 8);
+	upstreamWindow->setDistributionParameter("fixedDistnVal", 12);
+	downstreamWindow->setDistributionParameter("fixedDistnVal", 12);
 
 
 	rnaFoldDistance->setDistributionParameter("fixedDistnVal", 8);
@@ -218,8 +223,8 @@ void Settings::init(){
 
 	upstreamCurvatureCoeff->hide();
 	downstreamCurvatureCoeff->hide();
-	upstreamWindow->hide();
-	downstreamWindow->hide();
+	//upstreamWindow->hide();
+	//downstreamWindow->hide();
 
 
 
@@ -250,12 +255,12 @@ void Settings::init(){
 	paramList.at(21) = rnaFoldDistance;
 	paramList.at(22) = CleavageLimit;
 
-	/*
-	paramList.at(19) = upstreamCurvatureCoeff;
-	paramList.at(20) = downstreamCurvatureCoeff;
-	paramList.at(21) = upstreamWindow;
-	paramList.at(22) = downstreamWindow;
-	*/
+
+	//paramList.at(19) = upstreamCurvatureCoeff;
+	//paramList.at(20) = downstreamCurvatureCoeff;
+	paramList.at(23) = upstreamWindow;
+	paramList.at(24) = downstreamWindow;
+	paramList.at(25) = haltPosition;
 
 
 
@@ -392,6 +397,10 @@ void Settings::setParameterList(vector<Parameter*> params){
 	deltaGDaggerBacktrack = paramList.at(20);
 	rnaFoldDistance = paramList.at(21);
 	CleavageLimit = paramList.at(22);
+	upstreamWindow = paramList.at(23);
+	downstreamWindow = paramList.at(24);
+
+	haltPosition = paramList.at(25);
 
 
 
@@ -606,6 +615,7 @@ void Settings::print(){
 	}
 	else NTPconc->print();
 	FAssist->print();
+	haltPosition->print();
 
 	hybridLen->print();
 	bubbleLeft->print();
@@ -829,6 +839,8 @@ Parameter* Settings::getParameterByName(string paramID){
 	if (paramID == "GTPconc") return GTPconc;
 	if (paramID == "UTPconc") return UTPconc;
 	if (paramID == "FAssist") return FAssist;
+	if (paramID == "haltPosition") return haltPosition;
+
 
 	if (paramID == "hybridLen") return hybridLen;
 	if (paramID == "bubbleLeft") return bubbleLeft;

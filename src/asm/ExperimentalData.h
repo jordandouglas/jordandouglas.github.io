@@ -44,6 +44,7 @@ class ExperimentalData{
 	double GTPconc_local;
 	double UTPconc_local;
 	double force;
+	int halt; 
 	string sequenceID; // Use a separate sequence for this dataset? Optional 
 
 	int currentExperiment;
@@ -52,6 +53,12 @@ class ExperimentalData{
 	vector<int> ntrials; // Number of simulations to perform per observation (optional) 
 
 	vector<GelLaneData*> lanes; // For time gels only
+
+
+	// Pause escape only
+	int pauseSite;
+	double Emax;
+	double t12;
 	
 
 	public:
@@ -78,14 +85,24 @@ class ExperimentalData{
 		void set_GTPconc(double val);
 		void set_UTPconc(double val);
 		void set_force(double val);
+		void set_halt(int val);
+		void set_pauseSite(int val);
+		void set_Emax(double val);
+		void set_t12(double val);
 		void set_sequenceID(string seqID);
+
+
 
 		double get_ATPconc();
 		double get_CTPconc();
 		double get_GTPconc();
 		double get_UTPconc();
 		double get_force();
-		
+		int get_halt();
+		int get_pauseSite();
+		double get_Emax();
+		double get_t12();
+		double getCurrentSettingX();
 
 };
 

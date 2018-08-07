@@ -42,8 +42,13 @@ ExperimentalData::ExperimentalData(int id, string dataType, int nObs){
 	this->CTPconc_local = CTPconc->getVal();
 	this->GTPconc_local = GTPconc->getVal();
 	this->UTPconc_local = UTPconc->getVal();
+	this->halt = 0;
 	this->currentExperiment = -1;
 	this->sequenceID = _seqID;
+
+	this->pauseSite = 0;
+	this->Emax = 0;
+	this->t12 = 0;
 
 
 	ntrials.resize(nObs);
@@ -98,6 +103,9 @@ void ExperimentalData::addDatapoint(double setting, double observation, int n){
 }
 
 
+double ExperimentalData::getCurrentSettingX(){
+	return settingsX.at(this->currentExperiment);
+}
 
 
 void ExperimentalData::print(){
@@ -123,6 +131,12 @@ string ExperimentalData::toJSON(){
 	JSON += "'GTPconc':" + to_string(this->GTPconc_local) + ",";
 	JSON += "'UTPconc':" + to_string(this->UTPconc_local) + ",";
 	JSON += "'force':" + to_string(this->force) + ",";
+	if (this->dataType == "pauseEscape") {
+		JSON += "'pauseSite':" + to_string(this->pauseSite) + ",";
+		JSON += "'halt':" + to_string(this->halt) + ",";
+		JSON += "'Emax':" + to_string(this->Emax) + ",";
+		JSON += "'t12':" + to_string(this->t12) + ",";
+	}
 	JSON += "'vals':[";
 
 	// Iterate through all observed values
@@ -130,7 +144,7 @@ string ExperimentalData::toJSON(){
 	for (int i = 0; i < nobservations; i ++){
 
 
-		JSON += "{";
+		if (this->dataType != "pauseEscape") JSON += "{";
 
 		if (this->dataType == "forceVelocity"){
 			JSON += "'force':" + to_string(settingsX.at(i)) + ",";
@@ -143,11 +157,16 @@ string ExperimentalData::toJSON(){
 		}
 
 
+		else if (this->dataType == "pauseEscape"){
+			JSON += to_string(settingsX.at(i)) + ",";
+		}
+
+
 		else if (this->dataType == "timeGel"){
 			JSON += this->lanes.at(i)->toJSON();
 		}
 
-		JSON += "},";
+		if (this->dataType != "pauseEscape") JSON += "},";
 		
 
 	}
@@ -244,6 +263,22 @@ void ExperimentalData::applySettings(){
 	}
 
 
+	else if (this->dataType == "pauseEscape"){
+		ATPconc->hardcodeValue(this->ATPconc_local);
+		CTPconc->hardcodeValue(this->CTPconc_local);
+		GTPconc->hardcodeValue(this->GTPconc_local);
+		UTPconc->hardcodeValue(this->UTPconc_local);
+		FAssist->hardcodeValue(this->force);
+		haltPosition->hardcodeValue(this->halt);
+
+		// Set the cutoff time to that of the current experiment
+		double currentTime = this->settingsX.at(this->currentExperiment);
+		arrestTime->hardcodeValue(currentTime);
+
+	}
+
+
+
 	else if (this->dataType == "timeGel"){
 		ATPconc->hardcodeValue(this->ATPconc_local);
 		CTPconc->hardcodeValue(this->CTPconc_local);
@@ -288,6 +323,21 @@ void ExperimentalData::set_UTPconc(double val) {
 void ExperimentalData::set_force(double val) {
 	this->force = val;
 }
+void ExperimentalData::set_halt(int val) {
+	this->halt = val;
+}
+void ExperimentalData::set_pauseSite(int val) {
+	this->pauseSite = val;
+}
+void ExperimentalData::set_Emax(double val) {
+	this->Emax = val;
+}
+void ExperimentalData::set_t12(double val) {
+	this->t12 = val;
+}
+
+
+
 void ExperimentalData::set_sequenceID(string seqID){
 	this->sequenceID = seqID;
 }
@@ -310,6 +360,17 @@ double ExperimentalData::get_UTPconc() {
 double ExperimentalData::get_force() {
 	return this->force;
 }
-
+int ExperimentalData::get_halt() {
+	return this->halt;
+}
+int ExperimentalData::get_pauseSite() {
+	return this->pauseSite;
+}
+double ExperimentalData::get_Emax() {
+	return this->Emax;
+}
+double ExperimentalData::get_t12() {
+	return this->t12;
+}
 
 

@@ -302,6 +302,16 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 					}	
 
 				}
+				else if (experimentType == "pauseEscape"){
+
+					// Count number of times in the list
+					if (experimentEle->Attribute("times")){
+						string times = string(experimentEle->Attribute("times"));
+						vector<string> times_split = Settings::split(times, ',');
+						numObservations = times_split.size();
+					}
+
+				}
 				else{
 					for (const TiXmlAttribute* attr = experimentEle->FirstAttribute(); attr; attr=attr->Next()) {
 						string attrName = attr->Name();
@@ -320,6 +330,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 				if (experimentEle->Attribute("GTPconc")) experiment->set_GTPconc(atof(experimentEle->Attribute("GTPconc")));
 				if (experimentEle->Attribute("UTPconc")) experiment->set_UTPconc(atof(experimentEle->Attribute("UTPconc")));
 				if (experimentEle->Attribute("force")) experiment->set_force(atof(experimentEle->Attribute("force")));
+				if (experimentEle->Attribute("halt")) experiment->set_halt(atoi(experimentEle->Attribute("halt")));
 
 
 				// Use a separate sequence for this dataset?
@@ -371,8 +382,6 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 
 
-
-
 						if (laneEle->Attribute("densities")){
 
 							// Parse the pixel densities
@@ -394,7 +403,49 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 				}
 
-				// Other data (not time gel)
+
+
+				else if (experimentType == "pauseEscape"){
+
+					int pauseSite = 0;
+					double Emax = 0;
+					double t12 = 0;
+
+					if (experimentEle->Attribute("pauseSite")) {
+						pauseSite = atoi(experimentEle->Attribute("pauseSite"));
+						experiment->set_pauseSite(pauseSite);
+					}
+
+					if (experimentEle->Attribute("Emax")) {
+						Emax = atof(experimentEle->Attribute("Emax"));
+						experiment->set_Emax(Emax);
+					}
+
+					if (experimentEle->Attribute("t12")) {
+						t12 = atof(experimentEle->Attribute("t12"));
+						experiment->set_t12(t12);
+					}
+
+
+
+					// The times when the samples were made
+					string times = string(experimentEle->Attribute("times"));
+					vector<string> times_split = Settings::split(times, ',');
+
+					for (int obsNum = 0; obsNum < numObservations; obsNum ++){
+
+						double time = stof(times_split.at(obsNum));
+						double rate = log(2) / t12;
+						double expectedProb = Emax * exp(-time * rate);
+						experiment->addDatapoint(time, expectedProb);
+
+					}
+
+				}
+
+
+
+				// Velocity data (not time gel)
 				else {
 
 					// Add experimental settings (x-axis) and observations (y-axis)

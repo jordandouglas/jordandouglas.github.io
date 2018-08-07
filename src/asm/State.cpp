@@ -105,7 +105,9 @@ State* State::setToInitialState(){
 
 	
 	// Transcribe a few bases forward to avoid left bubble effects
-	this->transcribe(_nBasesToTranscribeInit + max(2, (int)(bubbleLeft->getVal())));
+	int transcribeDistance = max(int(haltPosition->getVal()) - this->rightTemplateBase, _nBasesToTranscribeInit + max(2, (int)(bubbleLeft->getVal())));
+	this->transcribe(transcribeDistance);
+	this->backward();
 	if (this->isGuiState) _applyingReactionsGUI = false;
 
 
@@ -2199,14 +2201,14 @@ float State::foldDownstream(){
 
 
 void State::fold(bool fold5Prime, bool fold3Prime){
-
+	cout << "Folding" << endl;
 
 	// Fold the 5' (ie. upstream) mRNA and store the structure string
 	if (fold5Prime){
 
 		this->_5primeMFE = this->foldUpstream();
 		if (this->_5primeMFE) {
-			// cout << "5' fold free energy: " << this->_5primeMFE << "kBT with structure " << this->_5primeStructure << endl;
+			 cout << "5' fold free energy: " << this->_5primeMFE << "kBT with structure " << this->_5primeStructure << endl;
 		}
 
 	}

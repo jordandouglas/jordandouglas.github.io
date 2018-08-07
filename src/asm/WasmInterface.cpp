@@ -548,7 +548,6 @@ extern "C" {
 		delete _currentStateGUI;
 		_currentStateGUI = new State(true, true);
 
-
 		// Refresh plot
 		Plots::refreshPlotData(_currentStateGUI);
 
