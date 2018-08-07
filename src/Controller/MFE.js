@@ -58,7 +58,13 @@ function updateSecondaryStructure(new_nodes, edges){
 
 	//console.log("edges", edges);
 
-	if (new_nodes.length == 0 || MFE_simulation == null) return;
+	if (new_nodes.length == 0) return;
+
+	if (MFE_simulation == null && $("PreExp").val() != "hidden") {
+		renderSecondaryStructure();
+	}
+	else if (MFE_simulation == null) return;
+
 
 	if (MFE_simulation == null) {
 		//renderSecondaryStructure(data);

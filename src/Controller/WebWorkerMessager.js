@@ -2912,10 +2912,6 @@ function loadSession_controller(XMLData, resolve = function() { }){
 
 
 					// Display first image in the list
-
-					// Create a new type of data
-					addNewABCData("timeGel");
-
 		            var img = new Image();
 		            img.addEventListener("load", function() {
 		            	console.log("Loaded image");
@@ -2940,6 +2936,18 @@ function loadSession_controller(XMLData, resolve = function() { }){
 	           		img.fitID = fitID;
 		            img.src = ABC_gel_images_to_load.shift();
 					
+				}
+
+				else if(dataType == "pauseEscape"){
+
+
+					$("#pauseEscape_site_" + fitID).val(experimentalData["fits"][fitID]["pauseSite"]);
+					$("#pauseEscape_Emax_" + fitID).val(experimentalData["fits"][fitID]["Emax"]);
+					$("#pauseEscape_t12_" + fitID).val(experimentalData["fits"][fitID]["t12"]);
+
+					var inputString = experimentalData["fits"][fitID]["vals"].join(",");
+					$("#pauseEscapeInputData_" + fitID).val(inputString);
+
 				}
 
 
@@ -2970,9 +2978,10 @@ function loadSession_controller(XMLData, resolve = function() { }){
 				$("#GTPconc_" + fitID).val(experimentalData["fits"][fitID]["GTPconc"]);
 				$("#UTPconc_" + fitID).val(experimentalData["fits"][fitID]["UTPconc"]);
 				if (dataType == "ntpVelocity") $("#ABC_force_" + fitID).val(experimentalData["fits"][fitID]["force"]);
+				if (dataType == "pauseEscape") $("#ABC_haltPosition_" + fitID).val(experimentalData["fits"][fitID]["halt"]);
 
 
-				if (dataType != "timeGel") $("#" + dataType + "InputData_" + fitID).val(textAreaString);
+				if (dataType != "timeGel" && dataType != "pauseEscape") $("#" + dataType + "InputData_" + fitID).val(textAreaString);
 
 			}
 

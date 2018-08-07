@@ -213,7 +213,7 @@ function getAbcDataObject(which = "ABC"){
 
 	abcDataObjectForModel["fits"] = {};
 
-	console.log("curveTables", curveTables);
+	//console.log("curveTables", curveTables);
 
 	for (var fitNum = 0; fitNum <= curveTables.length; fitNum++){
 
@@ -223,7 +223,12 @@ function getAbcDataObject(which = "ABC"){
 
 
 		// Which type of data?
-		var dataType = $("#forceVelocityInputData_" + fitID).length > 0 ? "forceVelocity" : $("#ntpVelocityInputData_" + fitID).length > 0 ? "ntpVelocity" : $(".timeGelInputData_" + fitID).length > 0 ? "timeGel" : null;
+		var dataType =  $("#forceVelocityInputData_" + fitID).length > 0 ? "forceVelocity" : 
+						$("#ntpVelocityInputData_" + fitID).length > 0 ? "ntpVelocity" : 
+						$("#pauseEscapeInputData_" + fitID).length > 0 ? "pauseEscape" : 
+						$(".timeGelInputData_" + fitID).length > 0 ? "timeGel" : null;
+
+
 
 		if (dataType == null) continue;
 
@@ -238,6 +243,13 @@ function getAbcDataObject(which = "ABC"){
 		// NTP velocity data also has a force 
 		if (dataType == "ntpVelocity") abcDataObjectForModel["fits"][fitID]["force"] = parseFloat($("#ABC_force_" + fitID).val());
 
+		// Pause escape data
+		if (dataType == "pauseEscape"){
+			abcDataObjectForModel["fits"][fitID]["pauseSite"] = parseFloat($("#pauseEscape_site_" + fitID).val());
+			abcDataObjectForModel["fits"][fitID]["Emax"] = parseFloat($("#pauseEscape_Emax_" + fitID).val());
+			abcDataObjectForModel["fits"][fitID]["t12"] = parseFloat($("#pauseEscape_t12_" + fitID).val());
+			abcDataObjectForModel["fits"][fitID]["haltPosition"] = parseFloat($("#ABC_haltPosition_" + fitID).val());
+		}
 
 
 		// Time gel requires parsing the densities from the image
@@ -261,7 +273,29 @@ function getAbcDataObject(which = "ABC"){
 		}
 
 
-		// Velocity data
+		else if (dataType == "pauseEscape"){
+
+			var dataValues = $("#" + dataType + "InputData_" + fitID).val();
+			var splitValues = dataValues.split("\n");
+
+			var splitTimes = splitValues[0].split(",");
+			abcDataObjectForModel["fits"][fitID].vals = [];
+			for (var i = 0; i < splitTimes.length; i ++){
+
+				var time = parseFloat(splitTimes[i].trim());
+				abcDataObjectForModel["fits"][fitID].vals.push(time);
+
+			}
+
+
+			abcDataObjectForModel["fits"][fitID].vals.sort(function(a,b) { return a - b; });
+
+
+		}
+
+
+
+		// Velocity or pause-escape data
 		else{ 
 
 
@@ -314,7 +348,7 @@ function getAbcDataObject(which = "ABC"){
 
 	}
 
-
+	//console.log("abcDataObjectForModel", abcDataObjectForModel);
 	return abcDataObjectForModel;
 
 
@@ -361,9 +395,14 @@ function validateExperimentalDataInput(ele){
 
 	var valid = true;
 
+
 	var dataType =  $(ele).attr("id").indexOf("forceVelocity") != -1 ? "forceVelocity" : 
 					$(ele).attr("id").indexOf("ntpVelocity") != -1 ? "ntpVelocity" :
+					$(ele).attr("id").indexOf("pauseEscape") != -1 ? "pauseEscape" : 
 					$(ele).attr("id").indexOf("timeGel") != -1 ?  "timeGel" : null;
+
+
+	var fitID = $(ele).attr("id").split("_")[1];
 
 
 	// Time gel is validated if the calibrated property is set to true 
@@ -372,6 +411,57 @@ function validateExperimentalDataInput(ele){
 		var fabricCanvas = gelFabricCanvases[fitID];
 		if (fabricCanvas == null || !fabricCanvas.calibrated) return false;
 		return true;
+	}
+
+
+	else if (dataType == "pauseEscape"){
+
+		var valid = true;
+
+
+		var pauseSite = parseFloat($("#pauseEscape_site_" + fitID).val());
+		var Emax = parseFloat($("#pauseEscape_Emax_" + fitID).val());
+		var t12 = parseFloat($("#pauseEscape_t12_" + fitID).val());
+
+		if (pauseSite == null || pauseSite <= 0) return false;
+
+
+		var dataValues = $(ele).val();
+
+
+		var splitValues = dataValues.split("\n");
+		if (splitValues.length != 1) valid = false;
+
+		var splitTimes = splitValues[0].split(",");
+		var times = {};
+		for (var i = 0; i < splitTimes.length; i ++){
+
+			var time = parseFloat(splitTimes[i].trim());
+			if (time == null || isNaN(time) || time <= 0){;
+				valid = false; 
+				break;
+			}
+
+			// Check for duplicates
+			if (times[time] == true) {
+				valid = false; 
+				break;
+			}
+			times[time] = true;
+
+		}
+
+		var timesList = [];
+		for (var val in times) timesList.push(val);
+		timesList.sort(function(a,b) { return a - b; });
+
+
+		// Draw the plot
+		drawPauseEscapeCanvas(fitID, pauseSite, Emax, t12, timesList);
+
+
+		return valid;
+
 	}
 
 
@@ -451,7 +541,6 @@ function validateExperimentalDataInput(ele){
 
 
 	if (valid) {
-		var fitID = $(ele).attr("id").split("_")[1];
 		if (dataType == "forceVelocity") drawForceVelocityCurveCanvas(fitID, X_axis_values, Y_axis_values);
 		else if (dataType == "ntpVelocity") drawNtpVelocityCurveCanvas(fitID, X_axis_values, Y_axis_values);
 		else if (dataType == "timeGel") drawTimeGelPlotCanvas(fitID, timeGelData);
@@ -569,7 +658,11 @@ function getNewCurveButtonsTemplate(){
 					<br><br>
 					<input type=button onClick='addNewABCData("ntpVelocity")' value='+ [NTP]-velocity curve' title="Add [NTP]-velocity experimental data" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
 					<br><br>
-					<input type=button onClick='addNewABCData("timeGel")' value='+ Time gel' title="Upload a gel of transcript lengths over time" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
+
+					<!--<input type=button onClick='addNewABCData("timeGel")' value='+ Time gel' title="Upload a gel of transcript lengths over time" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
+					<br><br>-->
+
+					<input type=button onClick='addNewABCData("pauseEscape")' value='+ Pause escape data' title="Add maximal pause probability and/or half life data about a pause site" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
 					<br><br>
 					
 				</div>
@@ -601,7 +694,7 @@ function addNewABCData(type = "forceVelocity"){
 			HTMLtemplate = getABCntpVelocityCurveTemplate(fitID);
 			break;
 
-		case "pauseSite":
+		case "pauseEscape":
 			HTMLtemplate = getABCpauseSiteTemplate(fitID);
 			break;
 
@@ -645,6 +738,11 @@ function addNewABCData(type = "forceVelocity"){
 		case "timeGel":
 			drawTimeGelPlotCanvas(fitID);
 			break;
+		case "pauseEscape":
+			drawPauseEscapeCanvas(fitID);
+			break;
+
+
 
 	}
 
@@ -908,26 +1006,81 @@ function getABCntpVelocityCurveTemplate(fitID){
 
 function getABCpauseSiteTemplate(fitID){
 	return `
-		<tr fitID="` + fitID + `" class="ABCcurveRow ntpVelocityRow"> <!-- style="background-color:#b3b3b3;"> -->
+		<tr fitID="` + fitID + `" class="ABCcurveRow pauseEscapeRow"> <!-- style="background-color:#b3b3b3;"> -->
 
 
-			<td class="` + fitID + `" style="width:500px; text-align:center; vertical-align:top">
-				<div style="font-size:20px;">
-					Pause site experimental data
-					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="src/Images/help.png"></a>
-						
-				</div>
+			<td class="` + fitID + `" style="width:200px; text-align:center; vertical-align:top">
+				<br><br>
+				<div style="font-size:18px;">Pause escape data</div><br>
 
 
-					<textarea class="ABCinputData ntpVelocityInputData" id="ntpVelocityInputData_` + fitID + `" onChange="validateAllAbcDataInputs()" style="font-size:14px; padding: 5 10;  width: 400px; height: 200px; max-width:400px; max-height:500px; min-height:100px; min-width:200px"  
-					title="Input pause site locations in the specified format" placeholder="Example.                                                   28                                                           49,5.4,0.41                                                        101,8.6,0.21"></textarea>
-					<br><br>
+				<table style="width:250px; margin:auto">
+
+						<tr>
+							<td style="text-align:right;">
+					 			Pause site:  
+					 		</td>
+
+					 		<td>
+					 			<input type="number" id="pauseEscape_site_` + fitID + `" min=1 onChange="validateAllAbcDataInputs()" title="The position of the pause site (mandatory)"
+							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> 
+							</td>
+					 	</tr>
+
+
+					 	<tr>
+							<td style="text-align:right;">
+					 			E<sub>max</sub> = 
+					 		</td>
+
+					 		<td>
+					 			<input type="number" id="pauseEscape_Emax_` + fitID + `" value=0 step=0.1 min=0 max=1 onChange="validateAllAbcDataInputs()"  title="The maximal pause probability of the pause. Leave blank if unknown."
+								 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> 
+							</td>
+					 	</tr>
+
+
+
+
+					 	<tr>
+							<td style="text-align:right;">
+					 			  t<sub>1/2</sub> = 
+					 		</td>
+
+					 		<td>
+								<input type="number" id="pauseEscape_t12_` + fitID + `"  min=0 onChange="validateAllAbcDataInputs()" title="The half-life of the pause (s). Leave blank if unknown."
+							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"></td>
+					 	</tr>
+
+
+
+					 </table>
+
+
+
+					 Time samples:
+					<textarea class="ABCinputData pauseEscapeInputData" id="pauseEscapeInputData_` + fitID + `" onChange="validateAllAbcDataInputs()" style="font-size:14px; padding: 5 10;  width: 200px; height: 80px; max-width:200px; max-height:500px; min-height:100px; min-width:200px"  
+					title="Input the times when samples were taken (mandatory)." placeholder="Example: 1,2,5,10,60,120"></textarea>
+					<br><br >
 					<span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
-						Input observed pause site locations. On each line specify the site number that the pause occurred at. Optional: Emax followed by the halflife of the pause (units s), seperated with commas.
+						Input the times when samples were taken (units s), seperated with commas. 
 					</span>
 
 			</td>
 
+
+			<td class="` + fitID + `" style="width:300px; text-align:center; vertical-align:top">
+
+				<div style="font-size:20px;">
+					Pause escape curve
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+						
+				</div>
+
+					
+					<canvas id="pauseEscapeCurve_` + fitID + `" width=300 height=300> </canvas>
+
+			</td>
 
 
 
@@ -935,15 +1088,8 @@ function getABCpauseSiteTemplate(fitID){
 
 					<input type=button id='deleteExperiment_` + fitID + `' class='minimise' style='float:right'  value='&times;' onClick=deleteExperiment("` + fitID + `") title='Delete this experiment'>
 
-					<br><br>
-					Force:
-						<input type="number" id="ABC_force_` + fitID + `" value=0 title="The force (pN) applied during this experiment"
-							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA">pN <br> <br>
-
-					
-
-						<table style="width:250px; margin:auto">
-
+				
+					<table style="width:250px; margin:auto">
 
 						<tr>
 							<td colspan=2 style="text-align:center;">
@@ -959,7 +1105,7 @@ function getABCpauseSiteTemplate(fitID){
 					 		</td>
 
 					 		<td>
-					 			<input class="variable" value=1000   type="number" id="ATPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
+					 			<input class="variable" value=100   type="number" id="ATPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
 							</td>
 					 	</tr>
 
@@ -970,7 +1116,7 @@ function getABCpauseSiteTemplate(fitID){
 					 		</td>
 
 					 		<td>
-					 			<input class="variable" value=1000  type="number"  id="CTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+					 			<input class="variable" value=100  type="number"  id="CTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
 							</td>
 					 	</tr>
 
@@ -983,7 +1129,7 @@ function getABCpauseSiteTemplate(fitID){
 					 		</td>
 
 					 		<td>
-								<input class="variable" value=1000 type="number"  id="GTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+								<input class="variable" value=100 type="number"  id="GTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
 							</td>
 					 	</tr>
 
@@ -995,18 +1141,27 @@ function getABCpauseSiteTemplate(fitID){
 					 		</td>
 
 					 		<td>
-								<input class="variable" value=1000 type="number" id="UTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
+								<input class="variable" value=100 type="number" id="UTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
+							</td>
+					 	</tr>
+
+
+					 	<tr>
+							<td style="text-align:right;">
+								<br><br>
+					 			Halt: 
+					 		</td>
+
+					 		<td>
+					 			<br><br>
+								<input type="number" id="ABC_haltPosition_` + fitID + `" value=0 title="The template position where the polymerase starts transcription from. Set to 0 to leave as transcription bubble default."
+							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> nt
 							</td>
 					 	</tr>
 
 
 
 					 </table>
-
-					 <br>
-					 <div style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
-						Enter the NTP concentrations for this experiment.
-					</div> <br> <br>
 
 
 
@@ -1740,6 +1895,8 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 
 
+
+
 function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = null){
 
 
@@ -1855,7 +2012,10 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 
 
 			}
-				
+
+
+
+
 			
 			// X min and max
 			var axisPointMargin = 10 * canvasSizeMultiplier;
@@ -1932,6 +2092,257 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 }
 
 
+
+
+function drawPauseEscapeCanvas(fitID, pauseSite = "", Emax = 0, t12 = 1, timesList = []){
+
+
+	var canvas = $("#pauseEscapeCurve_" + fitID)[0];
+	if (canvas == null) return;
+
+	var ctx = canvas.getContext('2d');
+
+	var canvasSizeMultiplier = 1;
+	var axisGap = 45 * canvasSizeMultiplier;
+	var margin = 3 * canvasSizeMultiplier;
+
+
+
+	getPosteriorDistribution_controller(function(result){
+
+
+		var abcDataObjectForModel = getAbcDataObject();
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		if (timesList != null){
+
+			var plotWidth = canvas.width - axisGap - margin;
+			var plotHeight = canvas.height - axisGap - margin;
+
+
+
+			var xmin = 0;
+			var xmax = roundToSF(maximumFromList(timesList), 2, "ceil");
+			var ymin = 0;
+			var ymax = 1; // roundToSF(maximumFromList(timesList) * 1.3, 3, "ceil");
+
+
+			// Refine xmax and xmin and select positions to add ticks
+			var xlabPos = [];
+			var xResult = getNiceAxesNumbers(xmin, xmax, plotWidth, true);
+			xmin = xResult["min"]
+			xmax = xResult["max"]
+			var widthScale = xResult["widthOrHeightScale"]
+			xlabPos = xResult["vals"]
+			//console.log("xResult", xResult);
+
+			var ylabPos = [];
+			var yResult = getNiceAxesNumbers(ymin, ymax, plotHeight, false);
+			ymin = yResult["min"]
+			ymax = yResult["max"]
+			var heightScale = yResult["widthOrHeightScale"]
+			ylabPos = yResult["vals"]
+			//console.log("yResult", yResult);
+
+
+
+			// X min and max
+			var axisPointMargin = 5 * canvasSizeMultiplier;
+			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+			ctx.textBaseline="top"; 
+			var tickLength = 10 * canvasSizeMultiplier;
+			ctx.lineWidth = 1 * canvasSizeMultiplier;
+
+			for (var labelID = 0; labelID < xlabPos.length; labelID++){
+				var x0 = widthScale * (xlabPos[labelID] - xmin) + axisGap;
+				ctx.textAlign= labelID == 0 ? "left" : "center";
+				ctx.fillText(xlabPos[labelID], x0, canvas.height - axisGap + axisPointMargin);
+
+				// Draw a tick on the axis
+				ctx.beginPath();
+				ctx.moveTo(x0, canvas.height - axisGap - tickLength/2);
+				ctx.lineTo(x0, canvas.height - axisGap + tickLength/2);
+				ctx.stroke();
+
+			}
+
+
+			// Y min and max
+			ctx.textBaseline="bottom"; 
+
+			ctx.save()
+			ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
+			ctx.rotate(-Math.PI/2);
+			for (var labelID = 0; labelID < ylabPos.length; labelID++){
+				var y0 = heightScale * (ylabPos[labelID] - ymin);
+				ctx.fillText(ylabPos[labelID], y0, 0);
+
+				// Draw a tick on the axis
+				ctx.beginPath();
+				ctx.moveTo(y0, axisPointMargin - tickLength/2);
+				ctx.lineTo(y0, axisPointMargin + tickLength/2);
+				ctx.stroke();
+
+
+			}
+			ctx.restore();
+
+
+
+
+
+			// Plot the posterior distribution of curves
+			var posterior = result["posterior"];
+			
+
+			ctx.globalAlpha = 0.4;
+			ctx.strokeStyle = "#008CBA";
+			ctx.lineWidth = 1 * canvasSizeMultiplier;
+
+
+
+
+			// Find the starting and stopping index of these posterior velocities in the list
+			var fitIDs = [];
+			for (var fitID_temp in abcDataObjectForModel["fits"]) fitIDs.push(fitID_temp);
+			fitIDs.sort();
+			var startingObsNum = 0;
+			for (var fitNum = 0; fitNum < fitIDs.length; fitNum++){
+				if (fitIDs[fitNum] == fitID) break;
+				startingObsNum += abcDataObjectForModel["fits"][fitIDs[fitNum]]["vals"].length;
+			}
+
+			
+			// If MCMC then account for the burn-in
+			for (var postNum = result.burnin; result.burnin >= 0 && postNum < posterior.length; postNum++){
+
+
+				var posteriorConcProbs = posterior[postNum]["simulatedValues"];
+
+
+				ctx.beginPath();
+				var xPrime = widthScale * (timesList[0] - xmin) + axisGap;
+				var yPrime = plotHeight + margin - heightScale * (posteriorConcProbs[startingObsNum] - ymin);
+				ctx.moveTo(xPrime, yPrime);
+
+
+				for (var timeNum = 1; timeNum < timesList.length; timeNum++ ){
+					var index = startingObsNum + timeNum;
+					var xPrime = widthScale * (timesList[timeNum] - xmin) + axisGap;
+					var yPrime = plotHeight + margin - heightScale * (posteriorConcProbs[index] - ymin);
+					ctx.lineTo(xPrime, yPrime);
+				}
+
+
+				ctx.stroke();
+
+
+
+			}
+
+
+
+			// Add the pause escape curve to the plot
+			ctx.globalAlpha = 1;
+			ctx.strokeStyle = "black";
+
+			ctx.beginPath();
+			ctx.moveTo(axisGap, Emax);
+
+			var rate = Math.log(2) / t12;
+			for (var xPrime = axisGap; xPrime < widthScale * (xmax - xmin) + axisGap; xPrime++){
+				var x = (xPrime - axisGap) / widthScale + xmin;
+				var y = Emax * Math.exp(-x * rate);
+				var yPrime = plotHeight + margin - heightScale * (y - ymin);
+				ctx.lineTo(xPrime, yPrime);
+				
+			}
+			ctx.stroke();
+
+
+
+			// Draw a black circle on the curve at each sample time
+			for (var i = 0; i < timesList.length; i ++){
+
+				var time = timesList[i];
+				var xPrime = widthScale * (time - xmin) + axisGap;
+				var y = Emax * Math.exp(-time * rate);
+				var yPrime = plotHeight + margin - heightScale * (y - ymin);
+
+
+				ctx.beginPath();
+				ctx_ellipse(ctx, xPrime, yPrime, 3 * canvasSizeMultiplier, 3 * canvasSizeMultiplier, 0, 0, 2 * Math.PI);
+				ctx.fill();
+
+
+			}
+			
+
+
+			/*
+
+			for (var obsNum = 0; obsNum < concentrations.length; obsNum++){
+					
+				var xPrime = widthScale * (concentrations[obsNum] - xmin) + axisGap;
+				var yPrime = plotHeight + margin - heightScale * (velocities[obsNum] - ymin);
+
+
+				// Add circle
+				ctx.beginPath();
+				ctx.fillStyle = "black"; // ;
+				ctx_ellipse(ctx, xPrime, yPrime, 3 * canvasSizeMultiplier, 3 * canvasSizeMultiplier, 0, 0, 2 * Math.PI);
+				ctx.fill();
+
+
+			}
+			*/	
+
+
+		}
+
+
+
+		// Axes
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = 2 * canvasSizeMultiplier;
+		ctx.beginPath();
+		ctx.moveTo(axisGap, margin);
+		ctx.lineTo(axisGap, canvas.height - axisGap);
+		ctx.lineTo(canvas.width - margin, canvas.height - axisGap);
+		ctx.stroke();
+
+		
+
+		// X label
+		ctx.fillStyle = "black";
+		ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+		ctx.textAlign="center"; 
+		ctx.textBaseline="top"; 
+		var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
+		var xlabYPos = canvas.height - axisGap / 2;
+		ctx.fillText("Elongation time (s)", xlabXPos, xlabYPos);
+
+		
+		// Y label
+		ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+		ctx.textAlign="center"; 
+		ctx.textBaseline="bottom"; 
+		ctx.save()
+		var ylabXPos = 2 * axisGap / 4;
+		var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
+		ctx.translate(ylabXPos, ylabYPos);
+		ctx.rotate(-Math.PI/2);
+		ctx.fillText("[Site " + pauseSite + "]", 0 ,0);
+		ctx.restore();
+
+	});
+
+
+
+
+
+
+}
 
 
 

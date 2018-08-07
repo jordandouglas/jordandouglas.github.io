@@ -1120,7 +1120,10 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 			for (var i = 0; i < fits.length; i ++){
 
 				var fitID = fits[i];
-				var dataType = $("#forceVelocityInputData_" + fitID).length > 0 ? "forceVelocity" : $("#ntpVelocityInputData_" + fitID).length > 0 ? "ntpVelocity" : $(".timeGelInputData_" + fitID).length > 0 ? "timeGel" : null;
+				var dataType =  $("#forceVelocityInputData_" + fitID).length > 0 ? "forceVelocity" : 
+						$("#ntpVelocityInputData_" + fitID).length > 0 ? "ntpVelocity" : 
+						$("#pauseEscapeInputData_" + fitID).length > 0 ? "pauseEscape" : 
+						$(".timeGelInputData_" + fitID).length > 0 ? "timeGel" : null;
 
 				saveXML.writeStartElement(fitID);
 
@@ -1131,6 +1134,12 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 					saveXML.writeAttributeString("GTPconc", abcDataObjectForModel["fits"][fitID]["GTPconc"]);
 					saveXML.writeAttributeString("UTPconc", abcDataObjectForModel["fits"][fitID]["UTPconc"]);
 					if (dataType == "ntpVelocity") saveXML.writeAttributeString("force", abcDataObjectForModel["fits"][fitID]["force"]);
+					if (dataType == "pauseEscape") {
+						saveXML.writeAttributeString("pauseSite", abcDataObjectForModel["fits"][fitID]["pauseSite"]);
+						saveXML.writeAttributeString("Emax", abcDataObjectForModel["fits"][fitID]["Emax"]);
+						saveXML.writeAttributeString("t12", abcDataObjectForModel["fits"][fitID]["t12"]);
+						saveXML.writeAttributeString("halt", abcDataObjectForModel["fits"][fitID]["haltPosition"]);
+					}
 
 
 					for (var obsNum = 0; obsNum < abcDataObjectForModel["fits"][fitID]["vals"].length; obsNum++){
@@ -1145,7 +1154,15 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 
 					}
 
-					if (dataType == "timeGel"){
+
+
+					if (dataType == "pauseEscape"){
+						var pauseEscapeTimes = abcDataObjectForModel["fits"][fitID]["vals"].join(",");
+						saveXML.writeAttributeString("times", pauseEscapeTimes);
+					}
+
+
+					else if (dataType == "timeGel"){
 
 
 
