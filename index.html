@@ -630,6 +630,10 @@ function refresh(resolve = function(){}){
 		$(".simulateRow").show(true); 
 
 
+
+
+
+
 		if (/* !IS_MOBILE && */ $("#SelectPrimerType").val() == "ssRNA") $("#foldBtnDiv").show(true); // Can only fold ssRNA
 		else $("#foldBtnDiv").hide(true);
 
@@ -665,7 +669,9 @@ function refresh(resolve = function(){}){
 
 			//transcribe_controller(2, true);
 			var afterRender = function(){
-				
+				//if ($("#foldBtnDiv").hasClass("toolbarIconDisabled")) {
+					//showFoldedRNA_controller(true);
+				//}
 				update_sliding_curve(0)
 				resolve();
 
@@ -779,7 +785,7 @@ window.onkeyup = function(e) {
 	}else if (key == 27 && !e.ctrlKey && !e.shiftKey) { // Escape
 		stop_controller();
 		closeAllDialogs();
-		// bendDNA_controller();
+		bendDNA_controller();
 
 		var abcDataObjectForModel = getAbcDataObject();
 		console.log("abcDataObjectForModel", abcDataObjectForModel);
@@ -1846,6 +1852,31 @@ function closeNav() {
 
 
 
+
+
+			 		<tr id="haltPosition_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#FAssist_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			Halt: 
+				 		</td>
+
+				 		<td>
+							<input type="number" class="variable"  id="haltPosition" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">nt
+			 			</td>
+
+
+				 		<td>
+							<input type=image id='haltPosition_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
+				 		</td>
+
+				 	</tr>
+
+
+
 				 </table>
 
 
@@ -2035,7 +2066,7 @@ function closeNav() {
 
 
 						<td style="text-align:right; width:110px">
-							k<sub>cat</sub> = 
+							k<sub>bind</sub> = 
 				 		</td>
 
 				 		<td>
@@ -2548,9 +2579,9 @@ function closeNav() {
 
 
 
-
-
-			<div style="display:none" class="parameter-bg">
+			<!--
+			<br>
+			<div class="parameter-bg">
 				<div class="parameter-title">DNA Bending </div>  <br> 
 
 
@@ -2687,7 +2718,7 @@ function closeNav() {
 			
 				
 			</div>
-
+			-->
 
 
 			<div id="mRNAFoldingBg" style="display:none">
