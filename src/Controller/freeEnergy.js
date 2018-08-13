@@ -44,20 +44,14 @@ function refreshFreeEnergy(){
 
 function complementSequence(seq, toRNA = true){
 
-	console.log("seq1", seq);
 
 	seq = seq.replace(/[C]/gi, "X").replace(/[G]/gi, "C").replace(/[X]/gi, "G");
 
 
-	console.log("seq2", seq);
 
 	if (toRNA) seq = seq.replace(/[A]/gi, "X").replace(/[TU]/gi, "A").replace(/[X]/gi, "U");
 	else if (toRNA) seq = seq.replace(/[A]/gi, "X").replace(/[TU]/gi, "A").replace(/[X]/gi, "T");
 
-
-	console.log("seq3", seq);
-
-	alert(5);
 
 	return seq;
 
