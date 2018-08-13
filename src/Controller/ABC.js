@@ -250,7 +250,11 @@ function getAbcDataObject(which = "ABC"){
 			abcDataObjectForModel["fits"][fitID]["Emin"] = parseFloat($("#pauseEscape_Emin_" + fitID).val());
 			abcDataObjectForModel["fits"][fitID]["t12"] = parseFloat($("#pauseEscape_t12_" + fitID).val());
 			if ($("#pauseEscapeUseNewSeq_" + fitID).is(":checked")){
+
+				// Nascent sequence
 				var seq = $("#pauseEscapeSeq_" + fitID).val().trim().toUpperCase().replace(/[^ACGTU]/gi, '');
+				seq = complementSequence(seq, $("#SelectTemplateType").val().substr(2, 5) == "RNA");
+
 				if (seq != "") abcDataObjectForModel["fits"][fitID]["seq"] = seq;
 			}
 
@@ -1199,7 +1203,7 @@ function getABCpauseSiteTemplate(fitID){
 
 					 	<tr id="pauseEscapeSeqRow_` + fitID + `" style="display:none">
 							<td style="text-align:right;" colspan=2>
-					 			<textarea id="pauseEscapeSeq_` + fitID + `" title="Please submit a sequence" style="max-width: 100%; width: 100%; height: 120px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input template sequence 3' to 5'..."></textarea> 
+					 			<textarea id="pauseEscapeSeq_` + fitID + `" title="Please submit a sequence" style="max-width: 100%; width: 100%; height: 120px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input nascent sequence 5' to 3'..."></textarea> 
 							</td>
 					 	</tr>
 
