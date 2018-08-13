@@ -465,8 +465,10 @@ getABCoutput = function(posteriorDistributionID, msgID = null){
 		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
 	}
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+	console.log("msgID", msgID, "posteriorDistributionID", posteriorDistributionID);
 	
-	Module.ccall("getABCoutput", null, ["number", "number"],  [msgID, 0]); 
+	Module.ccall("getABCoutput", null, ["number", "number"],  [msgID, posteriorDistributionID]); 
 
 }
 

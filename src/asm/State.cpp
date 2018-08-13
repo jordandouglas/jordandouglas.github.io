@@ -504,10 +504,6 @@ State* State::terminate(){
 
 	}
 
-
-
-
-
 	/*
 	if (WW_JS.isWebWorker && !RUNNING_FROM_COMMAND_LINE && !ABC_JS.ABC_simulating){
 		postMessage("_renderTermination(" + JSON.stringify({primerSeq: primerSeq, insertPositions: insertPositions}) + ")" );
@@ -521,6 +517,8 @@ State* State::terminate(){
 	*/
 	return this;
 }
+
+
 
 double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestrictions){
 

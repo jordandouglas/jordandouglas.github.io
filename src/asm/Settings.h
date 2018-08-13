@@ -188,6 +188,7 @@ class Settings{
 		static vector<Parameter*> getParamListClone();
 		static string toJSON();
 		static bool setSequence(string seqID);
+		static Sequence* getSequence(string seqID);
 		static void resetRateTables();
 		static void resetUnfoldingTables();
 		static list<PosteriorDistributionSample*> getPosteriorDistributionByID(int fitID);

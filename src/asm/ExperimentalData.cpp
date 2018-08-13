@@ -118,8 +118,8 @@ void ExperimentalData::print(){
 	}
 	cout << endl;
 
-
 }
+
 
 string ExperimentalData::toJSON(){
 
@@ -137,6 +137,15 @@ string ExperimentalData::toJSON(){
 		JSON += "'Emax':" + to_string(this->Emax) + ",";
 		JSON += "'t12':" + to_string(this->t12) + ",";
 	}
+
+
+	// Using own sequence?
+	if (this->sequenceID != _seqID){
+		JSON += "'seq':'" + Settings::getSequence(this->sequenceID)->get_templateSequence() + "',";
+
+	}
+
+
 	JSON += "'vals':[";
 
 	// Iterate through all observed values

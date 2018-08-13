@@ -481,6 +481,15 @@ bool Settings::setSequence(string seqID){
 
 
 
+Sequence* Settings::getSequence(string seqID){
+
+	if (sequences.find(seqID) == sequences.end()) return nullptr;
+	return sequences[seqID];
+
+}
+
+
+
 // Instruct all sequences to rebuild their translocation rate cache next time requested
 void Settings::resetRateTables(){
 
