@@ -2948,6 +2948,11 @@ function loadSession_controller(XMLData, resolve = function() { }){
 					var inputString = experimentalData["fits"][fitID]["vals"].join(",");
 					$("#pauseEscapeInputData_" + fitID).val(inputString);
 
+					if (experimentalData["fits"][fitID]["seq"] != null) {
+						$("#pauseEscapeUseNewSeq_" + fitID).click();
+						$("#pauseEscapeSeq_" + fitID).val(experimentalData["fits"][fitID]["seq"]);
+					}
+
 				}
 
 

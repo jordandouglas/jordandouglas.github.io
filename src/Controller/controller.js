@@ -1134,12 +1134,6 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 					saveXML.writeAttributeString("GTPconc", abcDataObjectForModel["fits"][fitID]["GTPconc"]);
 					saveXML.writeAttributeString("UTPconc", abcDataObjectForModel["fits"][fitID]["UTPconc"]);
 					if (dataType == "ntpVelocity") saveXML.writeAttributeString("force", abcDataObjectForModel["fits"][fitID]["force"]);
-					if (dataType == "pauseEscape") {
-						saveXML.writeAttributeString("pauseSite", abcDataObjectForModel["fits"][fitID]["pauseSite"]);
-						saveXML.writeAttributeString("Emax", abcDataObjectForModel["fits"][fitID]["Emax"]);
-						saveXML.writeAttributeString("t12", abcDataObjectForModel["fits"][fitID]["t12"]);
-						saveXML.writeAttributeString("halt", abcDataObjectForModel["fits"][fitID]["haltPosition"]);
-					}
 
 
 					for (var obsNum = 0; obsNum < abcDataObjectForModel["fits"][fitID]["vals"].length; obsNum++){
@@ -1157,8 +1151,13 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 
 
 					if (dataType == "pauseEscape"){
+						saveXML.writeAttributeString("pauseSite", abcDataObjectForModel["fits"][fitID]["pauseSite"]);
+						saveXML.writeAttributeString("Emax", abcDataObjectForModel["fits"][fitID]["Emax"]);
+						saveXML.writeAttributeString("t12", abcDataObjectForModel["fits"][fitID]["t12"]);
+						saveXML.writeAttributeString("halt", abcDataObjectForModel["fits"][fitID]["haltPosition"]);
 						var pauseEscapeTimes = abcDataObjectForModel["fits"][fitID]["vals"].join(",");
 						saveXML.writeAttributeString("times", pauseEscapeTimes);
+						if (abcDataObjectForModel["fits"][fitID]["seq"] != null) saveXML.writeAttributeString("seq", abcDataObjectForModel["fits"][fitID]["seq"]);
 					}
 
 

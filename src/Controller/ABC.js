@@ -247,7 +247,13 @@ function getAbcDataObject(which = "ABC"){
 		if (dataType == "pauseEscape"){
 			abcDataObjectForModel["fits"][fitID]["pauseSite"] = parseFloat($("#pauseEscape_site_" + fitID).val());
 			abcDataObjectForModel["fits"][fitID]["Emax"] = parseFloat($("#pauseEscape_Emax_" + fitID).val());
+			abcDataObjectForModel["fits"][fitID]["Emin"] = parseFloat($("#pauseEscape_Emin_" + fitID).val());
 			abcDataObjectForModel["fits"][fitID]["t12"] = parseFloat($("#pauseEscape_t12_" + fitID).val());
+			if ($("#pauseEscapeUseNewSeq_" + fitID).is(":checked")){
+				var seq = $("#pauseEscapeSeq_" + fitID).val().trim().toUpperCase().replace(/[^ACGTU]/gi, '');
+				if (seq != "") abcDataObjectForModel["fits"][fitID]["seq"] = seq;
+			}
+
 			abcDataObjectForModel["fits"][fitID]["haltPosition"] = parseFloat($("#ABC_haltPosition_" + fitID).val());
 		}
 
@@ -421,6 +427,7 @@ function validateExperimentalDataInput(ele){
 
 		var pauseSite = parseFloat($("#pauseEscape_site_" + fitID).val());
 		var Emax = parseFloat($("#pauseEscape_Emax_" + fitID).val());
+		var Emin = parseFloat($("#pauseEscape_Emin_" + fitID).val());
 		var t12 = parseFloat($("#pauseEscape_t12_" + fitID).val());
 
 		if (pauseSite == null || pauseSite <= 0) return false;
@@ -457,7 +464,7 @@ function validateExperimentalDataInput(ele){
 
 
 		// Draw the plot
-		drawPauseEscapeCanvas(fitID, pauseSite, Emax, t12, timesList);
+		drawPauseEscapeCanvas(fitID, pauseSite, Emax, Emin, t12, timesList);
 
 
 		return valid;
@@ -1040,6 +1047,18 @@ function getABCpauseSiteTemplate(fitID){
 					 	</tr>
 
 
+					 	<tr>
+							<td style="text-align:right;">
+					 			E<sub>min</sub> = 
+					 		</td>
+
+					 		<td>
+					 			<input type="number" id="pauseEscape_Emin_` + fitID + `" value=0 step=0.1 min=0 max=1 onChange="validateAllAbcDataInputs()"  title="The maixmum probability of arrest if the polymerase fails to recover. Leave blank if unknown."
+								 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> 
+							</td>
+					 	</tr>
+
+
 
 
 					 	<tr>
@@ -1158,6 +1177,34 @@ function getABCpauseSiteTemplate(fitID){
 							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> nt
 							</td>
 					 	</tr>
+
+
+					 	<tr title='Use the same sequence selected in &#9776; Parameters or a different sequence?'  >
+						 
+							<td style="text-align:right; font-size:13px">
+					 			Same sequence
+					 		</td>
+							 
+					 		<td colspan=3>
+						 		<label class="switch">
+							 		 <input class="modelSetting" type="checkbox" id="pauseEscapeUseNewSeq_` + fitID + `" OnChange="$('#pauseEscapeSeqRow_` + fitID + `').toggle()"> </input>
+							 		 <span class="slider round notboolean"></span>
+								</label> 
+								<span style="font-size:13px; vertical-align:middle" >New sequence</span>
+					 		</td>
+						
+					 	</tr>
+
+
+
+					 	<tr id="pauseEscapeSeqRow_` + fitID + `" style="display:none">
+							<td style="text-align:right;" colspan=2>
+					 			<textarea id="pauseEscapeSeq_` + fitID + `" title="Please submit a sequence" style="max-width: 100%; width: 100%; height: 120px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input template sequence 3' to 5'..."></textarea> 
+							</td>
+					 	</tr>
+
+
+
 
 
 
@@ -2094,7 +2141,7 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 
 
 
-function drawPauseEscapeCanvas(fitID, pauseSite = "", Emax = 0, t12 = 1, timesList = []){
+function drawPauseEscapeCanvas(fitID, pauseSite = "", Emax = 0, Emin = 0, t12 = 1, timesList = []){
 
 
 	var canvas = $("#pauseEscapeCurve_" + fitID)[0];
@@ -4770,8 +4817,9 @@ function downloadABC(){
 
 	stop_controller(function() { 
 
-		get_ABCoutput_controller(function(result){
+		get_ABCoutput_controller(0, function(result){
 
+			console.log("result", result);
 			if (result.lines.length == 0) return;
 
 			var stringToPrint = result.lines;
