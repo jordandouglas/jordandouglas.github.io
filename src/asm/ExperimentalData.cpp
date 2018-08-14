@@ -141,7 +141,7 @@ string ExperimentalData::toJSON(){
 
 	// Using own sequence?
 	if (this->sequenceID != _seqID){
-		JSON += "'seq':'" + Settings::getSequence(this->sequenceID)->get_templateSequence() + "',";
+		JSON += "'seq':'" + Settings::getSequence(this->sequenceID)->get_complementSequence() + "',";
 
 	}
 

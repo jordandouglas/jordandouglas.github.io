@@ -327,6 +327,15 @@ double Parameter::calculateLogPrior(){
 		return log(1 / (upper - lower));
 	}
 
+
+
+	else if (this->distributionName == "DiscreteUniform"){
+		double lower = this->distributionParameters["uniformDistnLowerVal"];
+		double upper = this->distributionParameters["uniformDistnUpperVal"];
+		if (this->val < lower || this->val > upper) return -INFINITY;
+		return log(1 / (upper - lower + 1));
+	}
+
 	else if (this->distributionName == "Normal"){
 		if (this->val < this->distributionParameters["lowerVal"] || this->val > this->distributionParameters["upperVal"]) return -INFINITY;
 		double mu = this->distributionParameters["normalMeanVal"];
@@ -405,6 +414,11 @@ void Parameter::makeProposal(){
 			newVal = this->val + x * stepSize;
 			//newVal = Settings::wrap(newVal, this->distributionParameters["uniformDistnLowerVal"],  this->distributionParameters["uniformDistnUpperVal"]);
 			this->val = newVal;
+		}
+
+
+		else if (this->distributionName == "DiscreteUniform"){
+			this->sample();
 		}
 				
 				
