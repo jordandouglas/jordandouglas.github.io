@@ -86,6 +86,7 @@ void MCMC::initMCMC(){
 	MCMC::tryToEstimateParameter(bubbleRight);
 	MCMC::tryToEstimateParameter(GDagSlide);
 	MCMC::tryToEstimateParameter(DGPost);
+	MCMC::tryToEstimateParameter(deltaGDaggerBacktrack);
 	MCMC::tryToEstimateParameter(barrierPos);
 	MCMC::tryToEstimateParameter(kCat);
 	MCMC::tryToEstimateParameter(Kdiss);

@@ -126,8 +126,8 @@ Parameter* kCat = new Parameter("kCat", false, "inclusive", "Rate of catalysis (
 Parameter* Kdiss = new Parameter("Kdiss", false, "exclusive", "KD (\u03bcM)", "Dissociation constant of NTP",  "K_{D}  (\u03bcM)");
 Parameter* RateBind = new Parameter("RateBind", false, "inclusive", "Rate of binding  (\u03bcM\u207B\u00B9 s\u207B\u00B9)", "Second order rate constant of binding the correct NTP", "k_{bind} (\u03bcM^{\u22121} s^{\u22121\u2009})");
 
-Parameter* RateActivate = new Parameter("kA", false, "inclusive", "Rate of activation (s\u207B\u00B9)", "Rate constant of polymerase leaving the catalytically unactive state", "k_[A]  (s^[\u22121\u2009])");
-Parameter* RateDeactivate = new Parameter("kU", false, "inclusive", "Rate of inactivation (s\u207B\u00B9)", "Rate constant of polymerase entering the catalytically unactive state", "k_[U]  (s^[\u22121\u2009])");
+Parameter* RateActivate = new Parameter("RateActivate", false, "inclusive", "Rate of activation (s\u207B\u00B9)", "Rate constant of polymerase leaving the catalytically unactive state", "k_[A]  (s^[\u22121\u2009])");
+Parameter* RateDeactivate = new Parameter("RateDeactivate", false, "inclusive", "Rate of inactivation (s\u207B\u00B9)", "Rate constant of polymerase entering the catalytically unactive state", "k_[U]  (s^[\u22121\u2009])");
 Parameter* deltaGDaggerHybridDestabil = new Parameter("deltaGDaggerHybridDestabil", false, "false", "\u0394G\u2020\u03C0", "Gibbs energy barrier of hybrid destabilisation, which causes catalytic inactivation.");
 Parameter* deltaGDaggerBacktrack = new Parameter("deltaGDaggerBacktrack", false, "false", "\u0394G\u2020\U0001D70F-", "Additive Gibbs energy barrier height of backtracking. Added onto the value of \u0394G\u2020\U0001D70F.", "\u0394G_{\U0001D70F-}^{\u2020}  (k_{B}T)");
 
@@ -223,8 +223,8 @@ void Settings::init(){
 
 	upstreamCurvatureCoeff->hide();
 	downstreamCurvatureCoeff->hide();
-	//upstreamWindow->hide();
-	//downstreamWindow->hide();
+	upstreamWindow->hide();
+	downstreamWindow->hide();
 
 
 
@@ -430,15 +430,6 @@ void Settings::initSequences(){
 	sequences[seq->getID()] = seq;
 
 	seq = new Sequence("HIV-1 LTR WT", "dsDNA", "ssRNA", "CCCAGAGAGACCAATCTGGTCTAGACTCGGACCCTCGAGAGACCGATCGATCCCTTGGGTGACGAATTCGGAGTTATTTCGAACGTACGGACGTCTCC");
-	sequences[seq->getID()] = seq;
-
-	seq = new Sequence("HIV-1 LTR 50", "dsDNA", "ssRNA", "CCCAGAGAGACCAATCTGGTCTAGACTCGGACCCTCGAGAGACCGATCGATCCCTTGGGTGACGGCAAAAAAGCGATTTCGAACGTACGGACGTCTCC");
-	sequences[seq->getID()] = seq;
-
-	seq = new Sequence("HIV-1 LTR 52", "dsDNA", "ssRNA", "CCCAGAGAGACCAATCTGGTCTAGACTCGGACCCTCGAGAGACCGATCGATCCCTTGGGTGACGGCTTTTTTGCGATTTCGAACGTACGGACGTCTCC");
-	sequences[seq->getID()] = seq;
-
-	seq = new Sequence("HIV-1 LTR B10", "dsDNA", "ssRNA", "CCCAGAGAGACCAATCTGGTCTAGACTCGGACCCTCGAGAGACCGATCGATTAAGGCCCTGACGAATTCGGAGTTATTTCGAACGTACGGACGTCTCC");
 	sequences[seq->getID()] = seq;
 
 	seq = new Sequence("lambda tR1", "dsDNA", "ssRNA", "TTTTTTTTACCTTAAGGTGGTGTGGGTGTGTGGGTGTGGGTGTGTGGTGTGGGTGTGGTGTGGGTGTGTGGTGTGGGTGTGGTGTGGTGTGGGCCCATGGGTTTTAATTTGGTGTGGATACCACATACGTAAATAAACGTATGTAAGTTAGTTAACAATAGATTCCTTTATGAATGTATACCAAGCACGTTTGTTTGCGTTGCTCCGAGATGCTTAG");
@@ -779,7 +770,7 @@ void Settings::updateParameterVisibilities(){
 
 
 	// Backtracking allowed?
-	if (currentModel->get_allowBacktracking()){
+	if (currentModel->get_allowBacktracking() || currentModel->get_currentBacksteppingModel() == "backstep1"){
 		deltaGDaggerBacktrack->show();
 	}else{
 		deltaGDaggerBacktrack->hide();
@@ -861,8 +852,8 @@ Parameter* Settings::getParameterByName(string paramID){
 	if (paramID == "kCat") return kCat;
 	if (paramID == "Kdiss") return Kdiss;
 	if (paramID == "RateBind") return RateBind;
-	if (paramID == "kA") return RateActivate;
-	if (paramID == "kU") return RateDeactivate;
+	if (paramID == "RateActivate") return RateActivate;
+	if (paramID == "RateDeactivate") return RateDeactivate;
 	if (paramID == "RateCleave") return RateCleave;
 	if (paramID == "CleavageLimit") return CleavageLimit;
 	if (paramID == "deltaGDaggerHybridDestabil") return deltaGDaggerHybridDestabil;

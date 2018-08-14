@@ -59,8 +59,21 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		// Parameterised translocation barrier height
 		double backtrackBarrier = GDagSlide->getVal();
 
+
+		// If going from 0 to -1, apply the backtrack barrier penalty (regardless of the backstep model)
+		if (!fwd && state->get_mRNAPosInActiveSite() == 0 ) backtrackBarrier += deltaGDaggerBacktrack->getVal();
+
+
+		// If going from -1 to 0, apply the backtrack barrier penalty (regardless of the backstep model)
+		if (fwd && state->get_mRNAPosInActiveSite() == -1 ) backtrackBarrier += deltaGDaggerBacktrack->getVal();
+
+
+
 		if (currentModel->get_allowBacktracking()){
 
+			
+
+			/*
 
 			// If in the 0 position and going backwards and the backtracking barrier is between 0 and -1, apply the backtrack penalty
 			if (state->get_mRNAPosInActiveSite() == 0 && !fwd && currentModel->get_currentBacksteppingModel() == "backstep0") backtrackBarrier += deltaGDaggerBacktrack->getVal();
@@ -68,7 +81,8 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 			// If in the -1 position and (going backwards and the backtracking barrier is between -1 and -2) OR (the backtracking barrier is between 0 and -1), apply the backtrack penalty
 			else if (state->get_mRNAPosInActiveSite() == -1 && ((!fwd && currentModel->get_currentBacksteppingModel() == "backstep1") || currentModel->get_currentBacksteppingModel() == "backstep0")) backtrackBarrier += deltaGDaggerBacktrack->getVal();
 
-		}
+			*/
+		} 
 
 		double GDagRateModifier = exp(-backtrackBarrier);
 
