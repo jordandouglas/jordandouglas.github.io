@@ -3355,9 +3355,6 @@ function userInputModel_controller(){
 	
 	else{
 		
-
-		
-		callWebWorkerFunction(stringifyFunction("FE_JS.userInputModel_WW", [toSend]));
 		
 		var res = stringifyFunction("setModelSettings", [toSend], true);
 		var fnStr = "wasm_" + res[0];

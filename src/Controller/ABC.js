@@ -1203,7 +1203,7 @@ function getABCpauseSiteTemplate(fitID){
 
 					 	<tr id="pauseEscapeSeqRow_` + fitID + `" style="display:none">
 							<td style="text-align:right;" colspan=2>
-					 			<textarea id="pauseEscapeSeq_` + fitID + `" title="Please submit a sequence" style="max-width: 100%; width: 100%; height: 120px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input nascent sequence 5' to 3'..."></textarea> 
+					 			<textarea id="pauseEscapeSeq_` + fitID + `" title="Please enter a sequence" style="max-width: 100%; width: 100%; height: 120px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input nascent sequence 5' to 3'..."></textarea> 
 							</td>
 					 	</tr>
 
