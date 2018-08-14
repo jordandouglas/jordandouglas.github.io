@@ -566,7 +566,22 @@ double MCMC::getEpsilon(){
 void MCMC::setPreviousState(PosteriorDistributionSample* state){
 
 	MCMC::previousMCMCstate = state;
-	MCMC::epsilon = max(_chiSqthreshold_0 * pow(_chiSqthreshold_gamma, (_chiSqthreshold_0 - state->getStateNumber())), _chiSqthreshold_min);
+	MCMC::epsilon = max(_chiSqthreshold_0 * pow(_chiSqthreshold_gamma, state->getStateNumber()), _chiSqthreshold_min);
+
+
+
+	// Check if burnin has failed
+	double cutoff = log(_chiSqthreshold_min / _chiSqthreshold_0) / log(_chiSqthreshold_gamma) + 500;
+	if (state->getStateNumber() > cutoff) MCMC::hasFailedBurnin = true;
+
+
+	// Check if burnin has been achieved
+	if ( MCMC::epsilon <= _chiSqthreshold_min && MCMC::previousMCMCstate->get_chiSquared() <= MCMC::epsilon) MCMC::hasAchievedBurnin = true;
+
+	// Check if pre-burnin has been achieved
+	if (MCMC::epsilon <= _chiSqthreshold_min * 2) MCMC::hasAchievedPreBurnin = true;
+		
+
 
 }
 

@@ -1090,7 +1090,9 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 
 		_currentLoggedPosteriorDistributionID = -1;
 		for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
-			if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->setPosteriorDistributionID(-1, "chiSq");
+			if (Plots::plotSettings.at(pltNum) != nullptr) {
+				Plots::plotSettings.at(pltNum)->setPosteriorDistributionID(-1, "chiSq");
+			}
 
 		}
 
@@ -1135,7 +1137,6 @@ void Plots::prepareForABC(){
 // Set all open trace plots so that its posterior distribution is the one specified
 void Plots::setTracePlotPosteriorByID(int id){
 
-	
 	for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
 		if (Plots::plotSettings.at(pltNum) != nullptr) Plots::plotSettings.at(pltNum)->setPosteriorDistributionID(id, id == 0 ? "chiSq" : "logPosterior");
 	}

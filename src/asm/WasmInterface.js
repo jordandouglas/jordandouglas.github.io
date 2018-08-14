@@ -635,9 +635,19 @@ getParametersWithPriors = function(msgID = null){
 
 
 // Change the burn-in
-update_burnin = function(burnin){
+update_burnin = function(burnin, msgID = null){
 
-	Module.ccall("update_burnin", null, ["number"],  [burnin]); 
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log("Returning", JSON.parse(resultStr));
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+
+
+	Module.ccall("update_burnin", null, ["number", "number"],  [burnin, msgID]); 
 
 }
 

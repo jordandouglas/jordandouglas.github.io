@@ -1134,7 +1134,6 @@ extern "C" {
 			int lineNum = 0;
 			for (lineNum = 0; lineNum < lines.size(); lineNum ++){
 
-				cout << "line" << lineNum << ":" << lines.at(lineNum) << endl;
 
 				if (lines.at(lineNum) == "") continue;
 				headerLineSplit = Settings::split(lines.at(lineNum), '&');
@@ -1142,7 +1141,6 @@ extern "C" {
 
 			}
 
-			cout << 1 << endl;
 
 			if (headerLineSplit.size() > 0) {
 
@@ -1177,8 +1175,15 @@ extern "C" {
         }
 
 		string toReturnJSON = "{'success':" + string(success ? "true" : "false") + ",";
-		toReturnJSON += "'inferenceMethod':'" + inferenceMethod + "'";
+		toReturnJSON += "'inferenceMethod':'" + inferenceMethod + "',";
+		toReturnJSON += "'acceptanceRate':0,";
+		toReturnJSON += "'status':'" + MCMC::getStatus() + "',";
+		toReturnJSON += "'epsilon':" + to_string(MCMC::getEpsilon());
 		toReturnJSON += "}";
+
+
+		// Notify the plots that ABC is in effect
+		Plots::prepareForABC();
 
 
 
@@ -1428,8 +1433,9 @@ extern "C" {
 
 
 	// Change the burn-in
-	void EMSCRIPTEN_KEEPALIVE update_burnin(double burnin_new){
+	void EMSCRIPTEN_KEEPALIVE update_burnin(double burnin_new, int msgID){
 		burnin = burnin_new;
+		messageFromWasmToJS("", msgID);
 	}
 
 

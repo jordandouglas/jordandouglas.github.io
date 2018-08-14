@@ -708,7 +708,9 @@ bool PlotSettings::get_plotFromPosterior(){
 
 
 void PlotSettings::setPosteriorDistributionID(int id, string yAxisVariable){
-	this->selectedPosteriorID = id;
+
+
+	if (this->name != "tracePlot" || id >= 0) this->selectedPosteriorID = id;
 	if (this->name == "tracePlot") this->customParamY = yAxisVariable;
 
 }
