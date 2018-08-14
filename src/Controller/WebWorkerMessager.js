@@ -3466,6 +3466,11 @@ function uploadABC_controller(TSVstring){
 				drawPlots(true);
 
 				if (result.inferenceMethod == "MCMC") addTracePlots();
+
+
+				$("#ABCacceptanceVal").html(roundToSF(result.acceptanceRate));
+				$("#burninStatusVal").html(result.status);
+				$("#currentEpsilonVal").html(roundToSF(result.epsilon), 6);
 				
 			});
 
@@ -3847,6 +3852,11 @@ function updateABCExperimentalData_controller(){
 function update_burnin_controller(){
 
 
+	var resolve = function(){
+		validateAllAbcDataInputs(); 
+		drawPlots();
+	}
+
 
 	var burnin = $("#MCMC_burnin").val();
 	if (WEB_WORKER == null) {
@@ -3855,8 +3865,12 @@ function update_burnin_controller(){
 		var fnStr = stringifyFunction("MCMC_JS.update_burnin_WW", [burnin]);
 		callWebWorkerFunction(fnStr);
 	}else{
-		var fnStr = "wasm_" + stringifyFunction("update_burnin", [burnin]);
-		callWebWorkerFunction(fnStr);
+
+		var res = stringifyFunction("update_burnin", [burnin], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then(() => resolve());
 	}
 
 
