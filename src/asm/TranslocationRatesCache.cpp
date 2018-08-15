@@ -37,7 +37,14 @@ using namespace std;
 
 
 TranslocationRatesCache::TranslocationRatesCache(){
-	
+
+	this->translocationRateTable = nullptr;
+	this->backtrackRateTable = nullptr;
+
+	this->nrows_transloc = 0;
+	this->ncols_transloc = 0;
+	this->nrows_backtrack = 0;
+
 }
 
 
@@ -224,9 +231,25 @@ void TranslocationRatesCache::buildTranslocationRateTable(string templSequence){
 	int nLengths = templSequence.length() - h + 1;
 	int nPositions = h + 1;
 	if (nLengths <= 0) return;
-	this->translocationRateTable = new double**[nLengths];
 
 
+	// Delete the currently stored array
+	if (this->translocationRateTable)  {
+		for(unsigned int i = 0; i < this->nrows_transloc; ++i){
+			for (unsigned int j = 0; j < this->ncols_transloc; ++j){
+				delete[] this->translocationRateTable[i][j];
+			}
+			delete[] this->translocationRateTable[i];
+		}
+		delete[] this->translocationRateTable;
+	}
+
+
+	this->nrows_transloc = nLengths;
+	this->ncols_transloc = nPositions;
+
+
+	this->translocationRateTable = new double**[nrows_transloc];
 	for(int nascentLen = h-1; nascentLen < templSequence.length(); nascentLen ++){
 		
 		int rowNum = nascentLen - (h-1);
@@ -244,11 +267,14 @@ void TranslocationRatesCache::buildTranslocationRateTable(string templSequence){
 	}
 
 
+
+
 }
 
 
 
 void TranslocationRatesCache::buildBacktrackRateTable(string templSequence){
+	
 
 
 	// Once the polymerase has entered state -2 (ie backtracked by 2 positions) then all backtracking rates 
@@ -263,8 +289,18 @@ void TranslocationRatesCache::buildBacktrackRateTable(string templSequence){
 
 	int h = (int)hybridLen->getVal();
 	if (templSequence.length() - h - 1 < 0) return;
-	this->backtrackRateTable = new double*[templSequence.length() - h - 1];
 
+	if (this->backtrackRateTable) {
+
+		for (unsigned int i = 0; i < this->nrows_backtrack; ++i){
+			delete[] this->backtrackRateTable[i];
+		}
+		delete[] this->backtrackRateTable;
+
+	}
+
+	this->nrows_backtrack = templSequence.length() - h - 1;
+	this->backtrackRateTable = new double*[nrows_backtrack];
 
 	for (int leftHybridBase = 1; leftHybridBase <= templSequence.length() - h - 1; leftHybridBase ++){
 		int indexNum = leftHybridBase - 1;
@@ -274,6 +310,7 @@ void TranslocationRatesCache::buildBacktrackRateTable(string templSequence){
 		this->backtrackRateTable[indexNum][0] = -1; 
 		this->backtrackRateTable[indexNum][1] = -1; 
 	}
+
 
 
 }

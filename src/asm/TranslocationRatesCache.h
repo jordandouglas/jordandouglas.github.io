@@ -44,6 +44,12 @@ class TranslocationRatesCache{
 
 		double getUpstreamRNABlockadeBarrierHeight(State* state);
 		double getDownstreamRNABlockadeBarrierHeight(State* state);
+
+
+		int nrows_transloc;
+		int ncols_transloc;
+
+		int nrows_backtrack;
 	
 	public:
 		double getTranslocationRates(State* state, bool fwd);
