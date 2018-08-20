@@ -67,7 +67,7 @@ void Sequence::flagForUnfoldingTableRebuilding(){
 void Sequence::initRateTable(){
 
 	if (this->rateTableBuilt) return;
-	cout << "Initialising rate tables for " << seqID << endl;
+	//cout << "Initialising rate tables for " << seqID << endl;
 	
 	this->translocationRatesCache->buildTranslocationRateTable(this->templateSequence); 
    	this->translocationRatesCache->buildBacktrackRateTable(this->templateSequence);
@@ -79,7 +79,7 @@ void Sequence::initRateTable(){
 void Sequence::initRNAunfoldingTable(){
 
 	if (this->RNAunfoldingTableBuilt) return;
-	cout << "Initialising unfolding tables for " << seqID << endl;
+	//cout << "Initialising unfolding tables for " << seqID << endl;
 	
 	this->translocationRatesCache->buildUpstreamRNABlockadeTable(this->templateSequence); 
    	this->translocationRatesCache->buildDownstreamRNABlockadeTable(this->templateSequence);

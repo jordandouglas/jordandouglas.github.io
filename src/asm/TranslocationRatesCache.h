@@ -35,8 +35,12 @@ using namespace std;
 class TranslocationRatesCache{
 
 	private:
-		double*** translocationRateTable;
-		double** backtrackRateTable;
+		// double*** translocationRateTable;
+		// double** backtrackRateTable;
+
+		vector<vector<vector<double>>> translocationRateTable;
+		vector<vector<double>> backtrackRateTable;
+
 
 		double* upstreamRNABlockadeTable;
 		double* downstreamRNABlockadeTable;
@@ -46,10 +50,6 @@ class TranslocationRatesCache{
 		double getDownstreamRNABlockadeBarrierHeight(State* state);
 
 
-		int nrows_transloc;
-		int ncols_transloc;
-
-		int nrows_backtrack;
 	
 	public:
 		double getTranslocationRates(State* state, bool fwd);

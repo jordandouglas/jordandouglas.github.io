@@ -38,12 +38,7 @@ using namespace std;
 
 TranslocationRatesCache::TranslocationRatesCache(){
 
-	this->translocationRateTable = nullptr;
-	this->backtrackRateTable = nullptr;
 
-	this->nrows_transloc = 0;
-	this->ncols_transloc = 0;
-	this->nrows_backtrack = 0;
 
 }
 
@@ -60,8 +55,22 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		
 		int rowNum = state->get_nascentLength() - (h-1);
 		int colNum = state->get_mRNAPosInActiveSite() + 1;
-		
-		double* rates = translocationRateTable[rowNum][colNum];
+
+
+		if (rowNum >= this->translocationRateTable.size()){
+			cout << "translocationRateTable oor: len: " << state->get_nascentLength() << ", h = " << h << ", rowNum: " << rowNum << endl;
+			exit(0);
+		}
+
+
+		if (colNum >= this->translocationRateTable.at(rowNum).size()){
+			cout << "translocationRateTable oor: rowNum: " << rowNum << " colNum " << colNum << endl;
+			exit(0);
+		}
+	
+
+
+		vector<double> rates = this->translocationRateTable.at(rowNum).at(colNum);
 
 		// Parameterised translocation barrier height
 		double backtrackBarrier = GDagSlide->getVal();
@@ -116,17 +125,17 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 
 
 
-		if (rates[0] != -1) {
+		if (rates.at(0) != -1) {
 
 
 			// RNA unfolding barrier heights 
-			if (fwd && rates[1] != 0) RNAunfoldingBarrier = exp(-this->getDownstreamRNABlockadeBarrierHeight(state));
-			else if (!fwd && rates[0] != 0) RNAunfoldingBarrier = exp(-this->getUpstreamRNABlockadeBarrierHeight(state));
+			if (fwd && rates.at(1) != 0) RNAunfoldingBarrier = exp(-this->getDownstreamRNABlockadeBarrierHeight(state));
+			else if (!fwd && rates.at(0) != 0) RNAunfoldingBarrier = exp(-this->getUpstreamRNABlockadeBarrierHeight(state));
 
 			//if (rates[0] >= INF || rates[1] >= INF || forceGradientFwd >= INF || forceGradientBck >= INF || GDagRateModifier >= INF)
 				//cout << "rates[0]: " << rates[0] << ", rates[1]: " << rates[1] << ", forceGradientFwd: " << forceGradientFwd << " forceGradientBck: " << forceGradientBck << " GDagRateModifier: " << GDagRateModifier << endl;
-			if (fwd) return rates[1] * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd * RNAunfoldingBarrier;
-			else return rates[0] * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck * RNAunfoldingBarrier;
+			if (fwd) return rates.at(1) * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd * RNAunfoldingBarrier;
+			else return rates.at(0) * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck * RNAunfoldingBarrier;
 		}
 
 
@@ -137,13 +146,14 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		// If rates are not in table then add them and return them
 		double kbck = state->calculateBackwardRate(false, false); // Important to include false or will end up in infinite loop
 		double kfwd = state->calculateForwardRate(false, false);
-		translocationRateTable[rowNum][colNum][0] = kbck;
-		translocationRateTable[rowNum][colNum][1] = kfwd;
+		rates.at(0) = kbck;
+		rates.at(1) = kfwd;
+		this->translocationRateTable.at(rowNum).at(colNum) = rates;
 
 
 		// RNA unfolding barrier heights 
-		if (fwd && rates[1] != 0) RNAunfoldingBarrier = exp(-this->getDownstreamRNABlockadeBarrierHeight(state));
-		else if (!fwd && rates[0] != 0) RNAunfoldingBarrier = exp(-this->getUpstreamRNABlockadeBarrierHeight(state));
+		if (fwd && rates.at(1) != 0) RNAunfoldingBarrier = exp(-this->getDownstreamRNABlockadeBarrierHeight(state));
+		else if (!fwd && rates.at(0) != 0) RNAunfoldingBarrier = exp(-this->getUpstreamRNABlockadeBarrierHeight(state));
 
 
 		if (fwd) return kfwd * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd * RNAunfoldingBarrier;
@@ -158,38 +168,44 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 	else{
 		
 		
-		
 
-		int rightHybridBase = state->get_mRNAPosInActiveSite() + state->get_nascentLength();
-		int leftHybridBase = rightHybridBase + 1 - h;
+		int leftHybridBase = state->getLeftNascentBaseNumber();
 		int indexNum = leftHybridBase - 1;
 
-		auto rates = backtrackRateTable[indexNum];
+		if (indexNum >= this->backtrackRateTable.size()){
+
+			cout << "bt oor: indexNum: " << indexNum << endl;
+
+		}
+
+		vector<double> rates = this->backtrackRateTable.at(indexNum);
+
 		double backtrackBarrier = GDagSlide->getVal() + deltaGDaggerBacktrack->getVal();
 		double GDagRateModifier = exp(-backtrackBarrier);
 		double forceGradientFwd = exp(( FAssist->getVal() * 1e-12 * (barrierPos->getVal()) * 1e-10) / (_kBT));
 		double forceGradientBck = exp((-FAssist->getVal() * 1e-12 * (3.4-barrierPos->getVal()) * 1e-10) / (_kBT));
 		double RNAunfoldingBarrier = 1;
 		
-		if (rates[0] != -1) {
+		if (rates.at(0) != -1) {
 
 
 			// RNA unfolding barrier heights 
-			if (fwd && rates[1] != 0) RNAunfoldingBarrier = exp(-this->getDownstreamRNABlockadeBarrierHeight(state));
-			else if (!fwd && rates[0] != 0) RNAunfoldingBarrier = exp(-this->getUpstreamRNABlockadeBarrierHeight(state));
+			if (fwd && rates.at(1) != 0) RNAunfoldingBarrier = exp(-this->getDownstreamRNABlockadeBarrierHeight(state));
+			else if (!fwd && rates.at(0) != 0) RNAunfoldingBarrier = exp(-this->getUpstreamRNABlockadeBarrierHeight(state));
 
 
 
-			if (fwd) return rates[1] * GDagRateModifier * forceGradientFwd * RNAunfoldingBarrier;
-			else return rates[0] * GDagRateModifier * forceGradientBck * RNAunfoldingBarrier;
+			if (fwd) return rates.at(1) * GDagRateModifier * forceGradientFwd * RNAunfoldingBarrier;
+			else return rates.at(0) * GDagRateModifier * forceGradientBck * RNAunfoldingBarrier;
 		}
 		
 		
 		// If rates are not in table then add them and return them
 		double kbck = state->calculateBackwardRate(false, false); // Important to include false or will end up in infinite loop
 		double kfwd = state->calculateForwardRate(false, false);
-		backtrackRateTable[indexNum][0] = kbck;
-		backtrackRateTable[indexNum][1] = kfwd;
+		rates.at(0) = kbck;
+		rates.at(1) = kfwd;
+		this->backtrackRateTable.at(indexNum) = rates;
 
 
 
@@ -198,8 +214,8 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 			
 
 		// RNA unfolding barrier heights 
-		if (fwd && rates[1] != 0) RNAunfoldingBarrier = exp(-this->getDownstreamRNABlockadeBarrierHeight(state));
-		else if (!fwd && rates[0] != 0) RNAunfoldingBarrier = exp(-this->getUpstreamRNABlockadeBarrierHeight(state));
+		if (fwd && rates.at(1) != 0) RNAunfoldingBarrier = exp(-this->getDownstreamRNABlockadeBarrierHeight(state));
+		else if (!fwd && rates.at(0) != 0) RNAunfoldingBarrier = exp(-this->getUpstreamRNABlockadeBarrierHeight(state));
 
 
 		if (fwd) return kfwd * GDagRateModifier * forceGradientFwd * RNAunfoldingBarrier;
@@ -223,50 +239,46 @@ void TranslocationRatesCache::buildTranslocationRateTable(string templSequence){
 	// There are l + 1 entries in each row, where l is the length of the nascent strand in the row
 
 
-	//cout << "Building translocation rate table..." << templSequence.length() << endl;
-
 	if (hybridLen == nullptr || (int)hybridLen->getVal() <= 0) return;
 	
 	int h = (int)hybridLen->getVal();
+
+
+
 	int nLengths = templSequence.length() - h + 1;
 	int nPositions = h + 1;
 	if (nLengths <= 0) return;
 
 
+
+
 	// Delete the currently stored array
-	if (this->translocationRateTable)  {
-		for(unsigned int i = 0; i < this->nrows_transloc; ++i){
-			for (unsigned int j = 0; j < this->ncols_transloc; ++j){
-				delete[] this->translocationRateTable[i][j];
-			}
-			delete[] this->translocationRateTable[i];
+	for(unsigned int i = 0; i < this->translocationRateTable.size(); ++i){
+		for (unsigned int j = 0; j < this->translocationRateTable.at(i).size(); ++j){
+			this->translocationRateTable.at(i).at(j).clear();
 		}
-		delete[] this->translocationRateTable;
+		this->translocationRateTable.at(i).clear();
 	}
+	this->translocationRateTable.clear();
 
 
-	this->nrows_transloc = nLengths;
-	this->ncols_transloc = nPositions;
 
-
-	this->translocationRateTable = new double**[nrows_transloc];
+	this->translocationRateTable.resize(nLengths);
 	for(int nascentLen = h-1; nascentLen < templSequence.length(); nascentLen ++){
 		
 		int rowNum = nascentLen - (h-1);
-		this->translocationRateTable[rowNum] = new double*[nPositions];
+		this->translocationRateTable.at(rowNum).resize(nPositions);
 
 		for (int activeSitePos = -1; activeSitePos <= h-1; activeSitePos ++){
 			int colNum = activeSitePos + 1;
 
 			// Will leave it empty and add values only as they are needed
-			this->translocationRateTable[rowNum][colNum] = new double[2]; 
-			this->translocationRateTable[rowNum][colNum][0] = -1; 
-			this->translocationRateTable[rowNum][colNum][1] = -1; 
+			this->translocationRateTable.at(rowNum).at(colNum).resize(2);
+			this->translocationRateTable.at(rowNum).at(colNum).at(0) = -1; 
+			this->translocationRateTable.at(rowNum).at(colNum).at(1) = -1; 
 		}
 		
 	}
-
-
 
 
 }
@@ -282,7 +294,6 @@ void TranslocationRatesCache::buildBacktrackRateTable(string templSequence){
 	// which are coming out of the NTP pore don't matter. This assumption would no longer hold if we started
 	// folding the 3' end of the nascent strand
 
-	//cout << "Building backtrack rate table..." << templSequence.length() << endl;
 
 	if (hybridLen == nullptr || (int)hybridLen->getVal() <= 0) return;
 
@@ -290,26 +301,26 @@ void TranslocationRatesCache::buildBacktrackRateTable(string templSequence){
 	int h = (int)hybridLen->getVal();
 	if (templSequence.length() - h - 1 < 0) return;
 
-	if (this->backtrackRateTable) {
 
-		for (unsigned int i = 0; i < this->nrows_backtrack; ++i){
-			delete[] this->backtrackRateTable[i];
-		}
-		delete[] this->backtrackRateTable;
 
+	// Clear the previous table
+	for (unsigned int i = 0; i < this->backtrackRateTable.size(); ++i){
+		this->backtrackRateTable.at(i).clear();
 	}
+	this->backtrackRateTable.clear();
 
-	this->nrows_backtrack = templSequence.length() - h - 1;
-	this->backtrackRateTable = new double*[nrows_backtrack];
+
+	this->backtrackRateTable.resize(templSequence.length() - h - 1);
 
 	for (int leftHybridBase = 1; leftHybridBase <= templSequence.length() - h - 1; leftHybridBase ++){
 		int indexNum = leftHybridBase - 1;
 
 		// Will leave it empty and add values only as they are needed
-		this->backtrackRateTable[indexNum] = new double[2];
-		this->backtrackRateTable[indexNum][0] = -1; 
-		this->backtrackRateTable[indexNum][1] = -1; 
+		this->backtrackRateTable.at(indexNum).resize(2);
+		this->backtrackRateTable.at(indexNum).at(0) = -1; 
+		this->backtrackRateTable.at(indexNum).at(1) = -1; 
 	}
+
 
 
 

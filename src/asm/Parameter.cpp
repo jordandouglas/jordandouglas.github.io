@@ -137,7 +137,6 @@ double Parameter::getTrueVal(){
 
 void Parameter::setVal(double val){
 	if (this->isMetaParameter) this->instances.at(this->currentInstance)->setVal(val);
-
 	else this->val = val;
 }
 
@@ -285,8 +284,9 @@ void Parameter::sample(){
 	}
 
 
-	// If this is the a structural parameter then the translocation cache needs to be updated and so does the minimum value for halt position
+	// If this is the a structural parameter then the translocation cache needs to be updated
 	if (prevVal != this->val && (this->id == "hybridLen" || this->id == "bubbleLeft" || this->id == "bubbleRight")) {
+		//cout << "Need to reset rate table. " << this->id <<  " went from " << prevVal << " to " << this->val << endl; 
 		Settings::resetRateTables();
 	}
 
@@ -489,6 +489,15 @@ void Parameter::rejectProposal(){
 
 
 	if (!this->hasMadeProposal) return;
+
+
+	// If this is the a structural parameter then the translocation cache needs to be updated
+	if (this->valBeforeMakingProposal != this->val && (this->id == "hybridLen" || this->id == "bubbleLeft" || this->id == "bubbleRight")) {
+		//cout << "rejectProposal: Need to reset rate table. " << this->id <<  " went from " << this->val << " back to " << this->valBeforeMakingProposal << endl; 
+		Settings::resetRateTables();
+	}
+
+
 	this->val = this->valBeforeMakingProposal;
 	this->hasMadeProposal = false;
 }
