@@ -1,12 +1,12 @@
 #!/bin/bash -e
 
-echo "Building SimpolC..."
+echo "Building SimpolC with vRNA..."
 
-g++ -std=c++11 -O3 -fpermissive -pthread -o SimpolC cimpol.cpp HTMLobject.cpp Coordinates.cpp SimPol_vRNA_interface.c \
-   Parameter.cpp SlippageLandscapes.cpp XMLparser.cpp ParameterHeatmapData.cpp Plots.cpp PlotSettings.cpp \
+g++ -std=c++11 -O3 -fpermissive -pthread -o SimpolC cimpol.cpp HTMLobject.cpp Coordinates.cpp SimPol_vRNA_interfaceNull.cpp \
+   Parameter.cpp SlippageLandscapes.cpp XMLparser.cpp ParameterHeatmapData.cpp Plots.cpp PlotSettings.cpp GelCalibrationSearch.cpp  \
     BayesianCalculations.cpp Model.cpp MCMC.cpp ExperimentalData.cpp WasmMessengerNull.cpp SimulatorPthread.cpp \
-    PosteriorDistriutionSample.cpp Simulator.cpp State.cpp Sequence.cpp Settings.cpp FreeEnergy.cpp TranslocationRatesCache.cpp \
-    Polymerase.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp  \
+    PosteriorDistributionSample.cpp Simulator.cpp State.cpp Sequence.cpp SimulatorResultSummary.cpp Settings.cpp FreeEnergy.cpp TranslocationRatesCache.cpp \
+    Polymerase.cpp randomc/mersenne.cpp tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp GelLaneData.cpp \
 	ViennaRNA/dist_vars.c ViennaRNA/data_structures.c \
 	ViennaRNA/part_func.c ViennaRNA/read_epars.c ViennaRNA/treedist.c ViennaRNA/energy_par.c ViennaRNA/inverse.c \
 	ViennaRNA/ProfileDist.c ViennaRNA/RNAstruct.c ViennaRNA/utils.c ViennaRNA/mfe.c ViennaRNA/fold.c ViennaRNA/naview.c \
@@ -24,4 +24,5 @@ g++ -std=c++11 -O3 -fpermissive -pthread -o SimpolC cimpol.cpp HTMLobject.cpp Co
 	ViennaRNA/alphabet.c ViennaRNA/equilibrium_probs.c ViennaRNA/file_formats_msa.c ViennaRNA/plot_structure.c ViennaRNA/plot_layouts.c
 
 
-echo "Done! Saved to SimpolC"
+
+echo "Done!"

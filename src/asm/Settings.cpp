@@ -24,7 +24,7 @@
 #include "Model.h"
 #include "ExperimentalData.h"
 #include "TranslocationRatesCache.h"
-
+#include "SimPol_vRNA_interface.h"
 
 #include <locale> 
 #include <random>
@@ -465,6 +465,11 @@ bool Settings::setSequence(string seqID){
 	currentSequence->initRateTable();
 	currentSequence->initRNAunfoldingTable();
 	_translocationRatesCache = currentSequence->getRatesCache();
+
+
+	cout << "initialising vrna" << endl;
+	if (PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
+
 
 	return true;
 
