@@ -305,6 +305,27 @@ function init(){
 
 
 
+function minimiseSection(element, setTo = null){
+
+	var toHide = $(element).attr("id");
+	toHide = toHide.substring(0, toHide.length-3); // Remove 'Btn' from the end
+	console.log(toHide);
+
+	
+	if(setTo == false || (setTo == null && $(element).attr("disp") == "false")){
+		$(element).html("&plus;")
+		$("#" + toHide).hide(setTo == null ? 0 : 0);
+		$(element).attr("disp", true);
+	}
+	else{
+		$(element).html("&minus;")
+		$("#" + toHide).show(setTo == null ? 0 : 0);
+		$(element).attr("disp", false);
+	}
+
+}
+
+
 function addSequenceLoadingHTML(){
 
 	dontAddLoadingHTML = false;
@@ -1610,61 +1631,78 @@ function closeNav() {
 
 
 
-			<div  class="parameter-bg" id="polymeraseSelectionDiv" style="display:none">
-				
-				<div class="parameter-title">
-					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#polymeraseSelection"><img class="helpIcon" src="src/Images/help.png"></a>
-					Polymerase
-				</div>
 
-				<br>Select polymerase: <select class="dropdown" style="width: 350px;" id = "SelectPolymerase" title="Select which polymerase to use. Different polymerases have different initial parameter estimates but these can be edited" OnChange="stop_controller(function() { userChangePolymerase_controller() }); ">
-				</select>
-
-			</div><br>
-			
 			<div  class="parameter-bg">
 				
 				<div class="parameter-title">
 					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#sequenceSelection"><img class="helpIcon" src="src/Images/help.png"></a>
+
+					<span id="SequenceSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3;  float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
 					Sequence Options
 				</div>
 
 
-			 <br> Select sequence: <select class="dropdown" style="width: 350px;" name="SelectSequence" id = "SelectSequence" title="Select a sequence" OnChange="stop_controller(function() { userChangeSequence(); }); ">
-			</select>
-				
-			Template: <select class="dropdown" name="SelectTemplateType" id="SelectTemplateType" OnChange="stop_controller(function() { submitCustomSequence(); });">
-					  <option value="ssRNA">ssRNA</option>
-					  <option value="ssDNA">ssDNA</option>
-					  <option value="dsRNA">dsRNA</option>
-					  <option value="dsDNA">dsDNA</option>
-				</select>
-				
-				&nbsp;Nascent type: <select class="dropdown" name="SelectPrimerType" id="SelectPrimerType" OnChange="stop_controller(function() { submitCustomSequence(); });">
-					  <option value="ssRNA">ssRNA</option>
-					  <option value="ssDNA">ssDNA</option>
-					  <option value="dsRNA">dsRNA</option>
-					  <option value="dsDNA">dsDNA</option>
-				</select>
-				
-				
-			<br> 
-				<div id="userChangeSequence" style="display:none"> <br>
-					<textarea id="UserSequence" title="Please submit a sequence" style="max-width: 350px; width: 350px; height: 100px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input template sequence 3' to 5' and then Submit..."></textarea> 
-						&nbsp;&nbsp;
-						<div style="width:100%; margin:auto; text-align:center; line-height:25px; font-family:Arial;  vertical-align:bottom">
+			
+				<div id="SequenceSettings">
+					 <br> Select sequence: <select class="dropdown" style="width: 350px;" name="SelectSequence" id = "SelectSequence" title="Select a sequence" OnChange="stop_controller(function() { userChangeSequence(); }); ">
+					</select>
 						
-							
-							<label style="font-size:16px;"><input type="radio" onclick="changeInputSequenceType()" name="inputSeqType" value="inputTemplateSeq"  checked=true> </input> Template </label>
-							<label style="font-size:16px;"><input type="radio" onclick="changeInputSequenceType()" name="inputSeqType" value="inputNascentSeq">  </input> Nascent  </label>
-							<span class="noselect" style="padding:2 5; background-color:#008CBA; color:white; cursor:pointer; font-size:16px; float:right;" onClick="submitCustomSequence()" title="Submit sequence">Submit</span> 
+					Template: <select class="dropdown" name="SelectTemplateType" id="SelectTemplateType" OnChange="stop_controller(function() { submitCustomSequence(); });">
+							  <option value="ssRNA">ssRNA</option>
+							  <option value="ssDNA">ssDNA</option>
+							  <option value="dsRNA">dsRNA</option>
+							  <option value="dsDNA">dsDNA</option>
+						</select>
+						
+						&nbsp;Nascent type: <select class="dropdown" name="SelectPrimerType" id="SelectPrimerType" OnChange="stop_controller(function() { submitCustomSequence(); });">
+							  <option value="ssRNA">ssRNA</option>
+							  <option value="ssDNA">ssDNA</option>
+							  <option value="dsRNA">dsRNA</option>
+							  <option value="dsDNA">dsDNA</option>
+						</select>
+						
+						
+					<br> 
+						<div id="userChangeSequence" style="display:none"> <br>
+							<textarea id="UserSequence" title="Please submit a sequence" style="max-width: 350px; width: 350px; height: 100px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input template sequence 3' to 5' and then Submit..."></textarea> 
+								&nbsp;&nbsp;
+								<div style="width:100%; margin:auto; text-align:center; line-height:25px; font-family:Arial;  vertical-align:bottom">
+								
+									
+									<label style="font-size:16px;"><input type="radio" onclick="changeInputSequenceType()" name="inputSeqType" value="inputTemplateSeq"  checked=true> </input> Template </label>
+									<label style="font-size:16px;"><input type="radio" onclick="changeInputSequenceType()" name="inputSeqType" value="inputNascentSeq">  </input> Nascent  </label>
+									<span class="noselect" style="padding:2 5; background-color:#008CBA; color:white; cursor:pointer; font-size:16px; float:right;" onClick="submitCustomSequence()" title="Submit sequence">Submit</span> 
+								</div>
 						</div>
-				</div>
-				<br>
+						<br>
+					</div>
+					<br>
 			</div>
 
 			 
 			<br> 
+
+
+
+			<div class="parameter-bg" id="polymeraseSelectionDiv" style="display:none">
+				
+				<div class="parameter-title">
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#polymeraseSelection"><img class="helpIcon" src="src/Images/help.png"></a>
+
+					<span id="PolymeraseSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
+					
+					Polymerase
+				</div>
+
+				<div id="PolymeraseSettings">
+
+				<br>Select polymerase: <select class="dropdown" style="width: 350px;" id = "SelectPolymerase" title="Select which polymerase to use. Different polymerases have different initial parameter estimates but these can be edited" OnChange="stop_controller(function() { userChangePolymerase_controller() }); ">
+				</select>
+
+				</div>
+				<br>
+			</div><br>
+
 			
 			
 			
@@ -1674,10 +1712,12 @@ function closeNav() {
 			
 			<div class="parameter-bg">
 				
-				<div class="parameter-title" >Experimental Conditions</div> <br>
+				<div class="parameter-title" >
+				<span id="ExpeirmentalConditionsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
+				Experimental Conditions</div> 
 
 
-				<table style="width:100%">
+				<table style="width:100%;" id="ExpeirmentalConditions">
 
 
 
@@ -1879,15 +1919,17 @@ function closeNav() {
 				 </table>
 
 
-				
+				<br>
 			</div>
 			<br>
 			
 			<div class="parameter-bg">
-				<div class="parameter-title">Structural Parameters </div>  <br> 
+				<div class="parameter-title">
+				<span id="StructuralSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
+				Structural Parameters </div>  
 
 
-				<table style="width:100%">
+				<table style="width:100%;" id="StructuralSettings">
 
 					<tr id="hybridLen_container">
 
@@ -1960,28 +2002,21 @@ function closeNav() {
 				 </table>
 
 
-
+				 <br>
 			</div>
 
 
 			<br>
 			<div class="parameter-bg">
-				<div class="parameter-title">NTP Incorporation Parameters 
-
-				<input type=image id='viewNTPModelBtn' title="View the NTP binding rates" onClick="viewMisincorporationModel()" src="src/Images/bindingIcon.png" style="display:none; position: absolute; left: 310px; padding: 3 3; width:25px; height:25px; float:right; vertical-align: middle; ">   <br></div>
-
-				<br>
-
-
-				<div style="width:100%; text-align:center; display:none">
-					<input type=button id='viewNTPmodelBtn' onClick=viewNTPModel() value='Incorporation Settings' title="Change the NTP binding/catalysis parameters for this model" class="operation" style="z-index: 100; margin:auto; width:190px">
+				<div class="parameter-title">
+				<span id="NTPincorporationSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
+				NTP Incorporation Parameters 
 				</div>
 
 
 
 
-
-				<table style="width:100%">
+				<table style="width:100%;" id="NTPincorporationSettings">
 
 
 
@@ -2092,7 +2127,7 @@ function closeNav() {
 
 
 				
-
+				<br>
 			</div>
 			
 
@@ -2106,35 +2141,22 @@ function closeNav() {
 
 				<div class="parameter-title">
 					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#translocation_ModelHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+					<span id="TranslocationSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
 					Translocation Parameters 
 					
 					
-					<input type=image id="calculateTranslocationBtn" title="Calculate translocation summary" onClick="translocationCalculationSummary()" src="src/Images/calculator.png" style="padding: 3 3; vertical-align:middle; height:25px; cursor:pointer;"> 
+					 
 				</div>
 
 
-				<br>
+			
 
-				<table style="width:100%">
+				<table style="width:100%; display:none" id="TranslocationSettings">
 
 
 
 	
 		
-					<tr id="translocationSummaryContainer" style="display:none">
-
-						<td colspan = 4 style="position:relative; text-align:left; font-size:14px; padding: 10 10; background-color:#ebe9e7; width:100%">
-				 			<div title = "Close" class="blueCloseBtn" onclick='$("#translocationSummaryContainer").hide(100);'>&times;</div>
-							<div title = "Rate of translocation from the pretranslocated into the posttranslocated state, averaged across the whole sequence (arithmetic mean)."> Mean forward translocation rate: <span id="meanForwardRate"></span> s<sup>-1</sup> </div> 
-							<div title = "Rate of translocation from the posttranslocated into the pretranslocated state, averaged across the whole sequence (arithmetic mean)."> Mean backward translocation rate: <span id="meanBackwardsRate"></span> s<sup>-1</sup> </div>
-							<div title = "Rate of translocation from the pretranslocated into the posttranslocated state divided by the rate of the reverse reaction, averaged across the whole sequence (geometric mean)."> Mean forward equilibrium constant: <span id="meanEquilibriumConstantFwdOverBck"></span> </div> 
-							<div title = "Rate of translocation from the posttranslocated into the pretranslocated state divided by the rate of the reverse reaction, averaged across the whole sequence (geometric mean)."> Mean backward equilibrium constant: <span id="meanEquilibriumConstant"></span> </div> 
-							<div title = "Gibbs energy of the translocation transition state, averaged across the whole sequence (arithmetic mean). These &Delta;G terms are relative to that of the fully basepaired template and a free unpaired nascent strand."> Mean Gibbs energy of transition state: <span id="meanBarrierHeight"></span> k<sub>B</sub>T </div> 
-							
-
-				 		</td>
-
-				 	</tr>
 		
 
 
@@ -2303,9 +2325,48 @@ function closeNav() {
 				 		</td>
 
 
+				 	</tr>
+
+
+
+					<tr title="Do you want to assume that translocation between the pretranslocated and posttranslocated states is in equilibrium?">
+
+
+
+						<td colspan=3 style="text-align:right">
+						 	Translocation kinetic summary
+				 		</td>
+
+
+
+				 		<td>
+							<input type=image id="calculateTranslocationBtn" title="Calculate translocation summary" onClick="translocationCalculationSummary()" src="src/Images/calculator.png" style="padding: 3 3; vertical-align:middle; height:25px; cursor:pointer;">
+						</td>
 
 
 				 	</tr>
+
+
+
+					<tr id="translocationSummaryContainer" style="display:none">
+
+						<td colspan = 4 style="position:relative; text-align:left; font-size:14px; padding: 10 10; background-color:#ebe9e7; width:100%">
+				 			<div title = "Close" class="blueCloseBtn" onclick='$("#translocationSummaryContainer").hide(100);'>&times;</div>
+							<div title = "Rate of translocation from the pretranslocated into the posttranslocated state, averaged across the whole sequence (arithmetic mean)."> Mean forward translocation rate: <span id="meanForwardRate"></span> s<sup>-1</sup> </div> 
+							<div title = "Rate of translocation from the posttranslocated into the pretranslocated state, averaged across the whole sequence (arithmetic mean)."> Mean backward translocation rate: <span id="meanBackwardsRate"></span> s<sup>-1</sup> </div>
+							<div title = "Rate of translocation from the pretranslocated into the posttranslocated state divided by the rate of the reverse reaction, averaged across the whole sequence (geometric mean)."> Mean forward equilibrium constant: <span id="meanEquilibriumConstantFwdOverBck"></span> </div> 
+							<div title = "Rate of translocation from the posttranslocated into the pretranslocated state divided by the rate of the reverse reaction, averaged across the whole sequence (geometric mean)."> Mean backward equilibrium constant: <span id="meanEquilibriumConstant"></span> </div> 
+							<div title = "Gibbs energy of the translocation transition state, averaged across the whole sequence (arithmetic mean). These &Delta;G terms are relative to that of the fully basepaired template and a free unpaired nascent strand."> Mean Gibbs energy of transition state: <span id="meanBarrierHeight"></span> k<sub>B</sub>T </div> 
+							
+
+				 		</td>
+
+				 	</tr>
+
+
+
+				 		
+
 
 
 
@@ -2313,7 +2374,7 @@ function closeNav() {
 				 </table>
 
 
-
+				 <br>
 
 				 
 			</div>
@@ -2322,11 +2383,14 @@ function closeNav() {
 			
 			<br>
 			<div class="parameter-bg">
-				<div class="parameter-title">Pause Parameters </div>  <br> 
+				<div class="parameter-title">
+				<span id="PauseParametersSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
+				Pause Parameters 
+				</div>  
 
 
 
-				<table style="width:100%">
+				<table style="width:100%; display:none" id="PauseParametersSettings">
 
 
 
@@ -2573,7 +2637,7 @@ function closeNav() {
 				
 				<span style="display:none">Special site = <input class="variable"  type="number" name="specialSite" id="specialSite" value=33 style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"></span>
 				
-				
+				<br>
 				
 			</div>
 
@@ -2725,11 +2789,14 @@ function closeNav() {
 				<br>
 				<div  class="parameter-bg">
 					
-					<div class="parameter-title">RNA Folding Settings </div>  <br> 
+					<div class="parameter-title">
+					<span id="RNAfoldingSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
+					RNA Folding Settings 
+					</div> 
 
 
 
-					<table style="width:100%">
+					<table style="width:100%; display:none" id="RNAfoldingSettings">
 
 
 
@@ -2835,19 +2902,24 @@ function closeNav() {
 					<div id="nbpToFold_desc" style="display:none">
 						<br><br>The first simulation may take longer as we calculate the MFE structure of the nascent strand. 
 					</div>
-					
+					<br>
 				</div>
+
 			</div>
 
 
 
 			<br>
 			<div class="parameter-bg">
-				<div class="parameter-title">Cleavage Parameters </div>  <br> 
+				
+				<div class="parameter-title">
+					<span id="cleavageSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
+					Cleavage Parameters 
+				</div>  
 
 
 
-				<table style="width:100%">
+				<table style="width:100%; display:none"  id="cleavageSettings">
 
 
 
@@ -2904,7 +2976,7 @@ function closeNav() {
 
 
 				</table>
-				
+				<br>
 			</div>
 
 
@@ -2915,17 +2987,20 @@ function closeNav() {
 
 			<br>
 			<div class="parameter-bg">
-				<div class="parameter-title">Advanced Model Settings <br> <br></div>
+				
+				<div class="parameter-title">
+				<span id="advancedModelSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
+				Advanced Model Settings 
+				 </div>
 
 
-					<div style="display:none">
-				 		<br> Elongation model: <select class="dropdown" style="width: 350px;" name="SelectElongationModel" id = "SelectElongationModel" title="Select an elongation model" OnChange="stop_controller(); userInputModel_controller()">
-											</select>
-					</div>
 
 
+					<table style="width:100%; display:none" id="advancedModelSettings">
 
-					<table style="width:100%">
+
+						
+
 
 						<tr id="arrestTime_container">
 
