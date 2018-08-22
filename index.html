@@ -2125,13 +2125,14 @@ function closeNav() {
 
 						<td colspan = 4 style="position:relative; text-align:left; font-size:14px; padding: 10 10; background-color:#ebe9e7; width:100%">
 				 			<div title = "Close" class="blueCloseBtn" onclick='$("#translocationSummaryContainer").hide(100);'>&times;</div>
-							<div title = "Rate of translocation from the pretranslocated into the posttranslocated state, averaged across the whole sequence"> Mean forward translocation rate: <span id="meanForwardRate"></span> s<sup>-1</sup> </div> 
-							<div title = "Rate of translocation from the posttranslocated into the pretranslocated state, averaged across the whole sequence"> Mean backward translocation rate: <span id="meanBackwardsRate"></span> s<sup>-1</sup> </div>
-							<div title = "Rate of translocation from the pretranslocated into the posttranslocated state divided by the rate of the reverse reaction, averaged across the whole sequence (geometric mean)"> Mean forward equilibrium constant: <span id="meanEquilibriumConstantFwdOverBck"></span> </div> 
-							<div title = "Rate of translocation from the posttranslocated into the pretranslocated state divided by the rate of the reverse reaction, averaged across the whole sequence (geometric mean)"> Mean backward equilibrium constant: <span id="meanEquilibriumConstant"></span> </div> 
+							<div title = "Rate of translocation from the pretranslocated into the posttranslocated state, averaged across the whole sequence (arithmetic mean)."> Mean forward translocation rate: <span id="meanForwardRate"></span> s<sup>-1</sup> </div> 
+							<div title = "Rate of translocation from the posttranslocated into the pretranslocated state, averaged across the whole sequence (arithmetic mean)."> Mean backward translocation rate: <span id="meanBackwardsRate"></span> s<sup>-1</sup> </div>
+							<div title = "Rate of translocation from the pretranslocated into the posttranslocated state divided by the rate of the reverse reaction, averaged across the whole sequence (geometric mean)."> Mean forward equilibrium constant: <span id="meanEquilibriumConstantFwdOverBck"></span> </div> 
+							<div title = "Rate of translocation from the posttranslocated into the pretranslocated state divided by the rate of the reverse reaction, averaged across the whole sequence (geometric mean)."> Mean backward equilibrium constant: <span id="meanEquilibriumConstant"></span> </div> 
+							<div title = "Gibbs energy of the translocation transition state, averaged across the whole sequence (arithmetic mean). These &Delta;G terms are relative to that of the fully basepaired template and a free unpaired nascent strand."> Mean Gibbs energy of transition state: <span id="meanBarrierHeight"></span> k<sub>B</sub>T </div> 
 							
-				 		</td>
 
+				 		</td>
 
 				 	</tr>
 		
@@ -2376,7 +2377,7 @@ function closeNav() {
 
 
 
-					<tr style="display:none" id="kU_container">
+					<tr style="display:none" id="RateDeactivate_container">
 
 						<td style="text-align:left; font-size:10px; float:left; width:20px">
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kU_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
@@ -2388,12 +2389,12 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="kU"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+							<input class="variable"  type="number" id="RateDeactivate"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
 				 		</td>
 
 
 				 		<td>
-							<input type=image id='kU_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
+							<input type=image id='RateDeactivate_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">  
 				 		</td>
 
 				 	</tr>
@@ -2425,7 +2426,7 @@ function closeNav() {
 
 
 
-				 	<tr style="display:none" id="kA_container">
+				 	<tr style="display:none" id="RateActivate_container">
 
 
 				 		<td style="text-align:left; font-size:10px; float:left; width:20px">
@@ -2438,12 +2439,12 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="kA" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+							<input class="variable"  type="number" id="RateActivate" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
 				 		</td>
 
 
 				 		<td>
-							<input type=image id='kA_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
+							<input type=image id='RateActivate_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn">
 				 		</td>
 
 				 	</tr>
@@ -2990,6 +2991,30 @@ function closeNav() {
 								</label> 
 								<span style="font-size:15px; vertical-align:middle" > Enable geometric reaction sampling </span>
 								<br> <br style="line-height:5px">
+
+					 		</td>
+
+					 	</tr>
+
+
+
+
+						<tr id="subtractMeanBarrierHeight_container"  title="Subtract the mean Gibbs energy barrier height (across the sequence) of the translocation transition state. This will make comparisons between different translocation models more meaningful.">
+
+
+
+							<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
+					 		</td>
+
+
+					 		<td colspan=3>
+			 					<label class="switch">
+							 	 <input class="modelSetting" type="checkbox" id="subtractMeanBarrierHeight" OnChange="userInputModel_controller()"> </input>
+							 	 <span class="slider round"></span>
+
+								</label> 
+								<span style="font-size:15px; vertical-align:middle"> Normalise translocation barrier heights </span>
 
 					 		</td>
 
@@ -3719,7 +3744,7 @@ function closeNav() {
 										<tr>
 											<td>
 												Burn-in (%):
-												<input type="number" id="MCMC_burnin" onChange="validateAllAbcDataInputs(); update_burnin_controller(); drawPlots()" min=0 max=100 value=-1 title="Percentage of points to throw away before reaching the posterior distribution. Set to -1 to allow Simpol to select burn-in automatically" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+												<input type="number" id="MCMC_burnin" onChange="update_burnin_controller();" min=0 max=100 value=-1 title="Percentage of points to throw away before reaching the posterior distribution. Set to -1 to allow Simpol to select burn-in automatically" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 										
