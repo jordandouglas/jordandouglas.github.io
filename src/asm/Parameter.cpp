@@ -186,6 +186,7 @@ void Parameter::recomputeNormalisationTerms(){
 	// If this parameter is the Gibbs energy barrier of translocation, normalise by subtracting from the mean
 	if (currentModel->get_subtractMeanBarrierHeight() && this->id == "GDagSlide") {
 		this->normalisationAdditiveTerm = -currentSequence->getMeanTranslocationBarrierHeight();
+		//cout << " normalisationAdditiveTerm " << this->normalisationAdditiveTerm << endl;
 	}
 
 	else this->normalisationAdditiveTerm = 0;

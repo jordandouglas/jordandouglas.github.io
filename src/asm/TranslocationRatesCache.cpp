@@ -59,7 +59,7 @@ double TranslocationRatesCache::get_meanGibbsEnergyBarrier(){
 
 
 void TranslocationRatesCache::reset_meanGibbsEnergyBarrier(){
-	this->meanGibbsEnergyBarrier == -INF;
+	this->meanGibbsEnergyBarrier = -INF;
 }
 
 
