@@ -123,14 +123,14 @@ Parameter* Parameter::show(){
 }
 
 
-double Parameter::getVal(){
-	if (this->isMetaParameter) return this->instances.at(this->currentInstance)->getVal();
+double Parameter::getVal(bool normalise){
+	if (this->isMetaParameter) return this->instances.at(this->currentInstance)->getVal(normalise);
 
 
 	// if(this->id == "GDagSlide") cout << "ID" << this->id << "; val = " << this->val << "; norm " << this->normalisationAdditiveTerm << endl;
 
-	if (this->isHardcoded) return this->hardcodedVal + this->normalisationAdditiveTerm;
-	return this->val + this->normalisationAdditiveTerm;
+	if (this->isHardcoded) return this->hardcodedVal + (normalise ? this->normalisationAdditiveTerm : 0);
+	return this->val + (normalise ? this->normalisationAdditiveTerm : 0);
 
 }
 

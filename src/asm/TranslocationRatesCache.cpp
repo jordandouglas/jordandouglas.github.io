@@ -67,7 +67,7 @@ void TranslocationRatesCache::reset_meanGibbsEnergyBarrier(){
 double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 	
 
-	int h = (int)hybridLen->getVal();
+	int h = (int)hybridLen->getVal(true);
 
 
 	// Polymerase is not backtracked. Use regular translocation table
@@ -94,15 +94,15 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		vector<double> rates = this->translocationRateTable.at(rowNum).at(colNum);
 
 		// Parameterised translocation barrier height
-		double backtrackBarrier = GDagSlide->getVal();
+		double backtrackBarrier = GDagSlide->getVal(true);
 
 
 		// If going from 0 to -1, apply the backtrack barrier penalty (regardless of the backstep model)
-		if (!fwd && state->get_mRNAPosInActiveSite() == 0 ) backtrackBarrier += deltaGDaggerBacktrack->getVal();
+		if (!fwd && state->get_mRNAPosInActiveSite() == 0 ) backtrackBarrier += deltaGDaggerBacktrack->getVal(true);
 
 
 		// If going from -1 to 0, apply the backtrack barrier penalty (regardless of the backstep model)
-		if (fwd && state->get_mRNAPosInActiveSite() == -1 ) backtrackBarrier += deltaGDaggerBacktrack->getVal();
+		if (fwd && state->get_mRNAPosInActiveSite() == -1 ) backtrackBarrier += deltaGDaggerBacktrack->getVal(true);
 
 
 
@@ -113,19 +113,19 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 			/*
 
 			// If in the 0 position and going backwards and the backtracking barrier is between 0 and -1, apply the backtrack penalty
-			if (state->get_mRNAPosInActiveSite() == 0 && !fwd && currentModel->get_currentBacksteppingModel() == "backstep0") backtrackBarrier += deltaGDaggerBacktrack->getVal();
+			if (state->get_mRNAPosInActiveSite() == 0 && !fwd && currentModel->get_currentBacksteppingModel() == "backstep0") backtrackBarrier += deltaGDaggerBacktrack->getVal(true);
 
 			// If in the -1 position and (going backwards and the backtracking barrier is between -1 and -2) OR (the backtracking barrier is between 0 and -1), apply the backtrack penalty
-			else if (state->get_mRNAPosInActiveSite() == -1 && ((!fwd && currentModel->get_currentBacksteppingModel() == "backstep1") || currentModel->get_currentBacksteppingModel() == "backstep0")) backtrackBarrier += deltaGDaggerBacktrack->getVal();
+			else if (state->get_mRNAPosInActiveSite() == -1 && ((!fwd && currentModel->get_currentBacksteppingModel() == "backstep1") || currentModel->get_currentBacksteppingModel() == "backstep0")) backtrackBarrier += deltaGDaggerBacktrack->getVal(true);
 
 			*/
 		} 
 
 		double GDagRateModifier = exp(-backtrackBarrier);
 
-		double forceGradientFwd = exp(( FAssist->getVal() * 1e-12 * (barrierPos->getVal()) * 1e-10) / (_kBT));
-		double forceGradientBck = exp((-FAssist->getVal() * 1e-12 * (3.4-barrierPos->getVal()) * 1e-10) / (_kBT));
-		double DGPostModifier = state->get_mRNAPosInActiveSite() == 1 ? exp(DGPost->getVal()) : 1;
+		double forceGradientFwd = exp(( FAssist->getVal(true) * 1e-12 * (barrierPos->getVal(true)) * 1e-10) / (_kBT));
+		double forceGradientBck = exp((-FAssist->getVal(true) * 1e-12 * (3.4-barrierPos->getVal(true)) * 1e-10) / (_kBT));
+		double DGPostModifier = state->get_mRNAPosInActiveSite() == 1 ? exp(DGPost->getVal(true)) : 1;
 		double RNAunfoldingBarrier = 1;
 		
 		
@@ -138,7 +138,7 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		}
 
 
-		//cout << "F = " << FAssist->getVal() << ", delta1 = " << barrierPos->getVal() << endl;
+		//cout << "F = " << FAssist->getVal(true) << ", delta1 = " << barrierPos->getVal(true) << endl;
 		//cout << "kbck = " << rates[0] << ", kfwd = " << rates[1] << ", forceGradientFwd = " << forceGradientFwd << ", GDagRateModifier = " << GDagRateModifier  << endl;
 		//if (fwd) cout << rates[1] * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd << endl;
 		//else cout << rates[0] * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck << endl;
@@ -201,10 +201,10 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 
 		vector<double> rates = this->backtrackRateTable.at(indexNum);
 
-		double backtrackBarrier = GDagSlide->getVal() + deltaGDaggerBacktrack->getVal();
+		double backtrackBarrier = GDagSlide->getVal(true) + deltaGDaggerBacktrack->getVal(true);
 		double GDagRateModifier = exp(-backtrackBarrier);
-		double forceGradientFwd = exp(( FAssist->getVal() * 1e-12 * (barrierPos->getVal()) * 1e-10) / (_kBT));
-		double forceGradientBck = exp((-FAssist->getVal() * 1e-12 * (3.4-barrierPos->getVal()) * 1e-10) / (_kBT));
+		double forceGradientFwd = exp(( FAssist->getVal(true) * 1e-12 * (barrierPos->getVal(true)) * 1e-10) / (_kBT));
+		double forceGradientBck = exp((-FAssist->getVal(true) * 1e-12 * (3.4-barrierPos->getVal(true)) * 1e-10) / (_kBT));
 		double RNAunfoldingBarrier = 1;
 		
 		if (rates.at(0) != -1) {
@@ -260,9 +260,9 @@ void TranslocationRatesCache::buildTranslocationRateTable(string templSequence){
 	// There are l + 1 entries in each row, where l is the length of the nascent strand in the row
 
 
-	if (hybridLen == nullptr || (int)hybridLen->getVal() <= 0) return;
+	if (hybridLen == nullptr || (int)hybridLen->getVal(true) <= 0) return;
 	
-	int h = (int)hybridLen->getVal();
+	int h = (int)hybridLen->getVal(true);
 
 
 
@@ -316,10 +316,10 @@ void TranslocationRatesCache::buildBacktrackRateTable(string templSequence){
 	// folding the 3' end of the nascent strand
 
 
-	if (hybridLen == nullptr || (int)hybridLen->getVal() <= 0) return;
+	if (hybridLen == nullptr || (int)hybridLen->getVal(true) <= 0) return;
 
 
-	int h = (int)hybridLen->getVal();
+	int h = (int)hybridLen->getVal(true);
 	if (templSequence.length() - h - 1 < 0) return;
 
 
@@ -360,7 +360,7 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 
 
 	// If the barrier height has already been cached, return it
-	int pos = state->getLeftNascentBaseNumber() - 1 - rnaFoldDistance->getVal();
+	int pos = state->getLeftNascentBaseNumber() - 1 - rnaFoldDistance->getVal(true);
 	if (pos < 0) return 0;
 
 
@@ -469,7 +469,7 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 
 
 	// If the barrier height has already been cached, return it
-	int pos = state->getRightNascentBaseNumber() - 1 + rnaFoldDistance->getVal();
+	int pos = state->getRightNascentBaseNumber() - 1 + rnaFoldDistance->getVal(true);
 	if (pos < 0 || pos+1 > state->get_nascentLength() /* || pos >= templateSequence.length()*/) return 0;
 
 

@@ -254,10 +254,10 @@ bool GelCalibrationSearch::metropolisHastings(int sampleNum, PosteriorDistributi
 		Parameter* obs = calibrationObservations.at(obsNum);
 
 		// length = slope / distance + intercept
-		double estimatedTranscriptLength = GelCalibrationSearch::slope->getVal() / obs->getVal() + GelCalibrationSearch::intercept->getVal();
+		double estimatedTranscriptLength = GelCalibrationSearch::slope->getVal(true) / obs->getVal(true) + GelCalibrationSearch::intercept->getVal(true);
 
-		//cout << "pixel: " << obs->getVal() << ", estimatedTranscriptLength: " << estimatedTranscriptLength << ", trueLength: " << obs->getDistributionParameterValue("fixedDistnVal") << endl;
-		logLikelihood += GelCalibrationSearch::getLogLikelihood(obs->getDistributionParameterValue("fixedDistnVal"), estimatedTranscriptLength, GelCalibrationSearch::sigma->getVal());
+		//cout << "pixel: " << obs->getVal(true) << ", estimatedTranscriptLength: " << estimatedTranscriptLength << ", trueLength: " << obs->getDistributionParameterValue("fixedDistnVal") << endl;
+		logLikelihood += GelCalibrationSearch::getLogLikelihood(obs->getDistributionParameterValue("fixedDistnVal"), estimatedTranscriptLength, GelCalibrationSearch::sigma->getVal(true));
 
 	}
 	proposal_MCMCState->set_logLikelihood(logLikelihood);

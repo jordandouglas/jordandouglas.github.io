@@ -72,7 +72,7 @@ class Parameter{
     	string getID();
     	string getName();
     	string getLatexName();
-    	double getVal(); // Returns the effective value (being used for simulation purposes)
+    	double getVal(bool normalise); // Returns the effective value (being used for simulation purposes)
     	double getTrueVal(); // Returns the true underlying estimate of this parameter (used for MCMC purposes)
 		void setVal(double val);
 		void setPriorDistribution(string distributionName);

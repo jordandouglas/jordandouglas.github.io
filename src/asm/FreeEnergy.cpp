@@ -90,9 +90,9 @@ double FreeEnergy::getFreeEnergyOfTranscriptionBubble(State* state){
 		
 	double bubbleFreeEnergy = 0;
 	
-	int leftmostTemplatePos = state->getLeftTemplateBaseNumber() - (int)(bubbleLeft->getVal()) - 2;
+	int leftmostTemplatePos = state->getLeftTemplateBaseNumber() - (int)(bubbleLeft->getVal(true)) - 2;
 	int leftmostComplementPos = leftmostTemplatePos;
-	int rightmostTemplatePos = state->getRightTemplateBaseNumber() + (int)(bubbleRight->getVal());
+	int rightmostTemplatePos = state->getRightTemplateBaseNumber() + (int)(bubbleRight->getVal(true));
 	int rightmostComplementPos = rightmostTemplatePos;
 	vector<string> bubbleStrings = FreeEnergy::getHybridStringOfTranscriptionBubble(leftmostTemplatePos, rightmostTemplatePos, leftmostComplementPos, rightmostComplementPos);
 	//cout << "bubbleStrings " << bubbleStrings.at(0) << "/" <<  bubbleStrings.at(1) << endl;
@@ -172,9 +172,9 @@ double FreeEnergy::getFreeEnergyOfTranscriptionBubbleIntermediate(State* state1,
 	if (TemplateType.substr(0,2)== "ss") return 0;
 	double freeEnergy = 0;
 	
-	int leftmostTemplatePos = min(state1->getLeftTemplateBaseNumber(), state2->getLeftTemplateBaseNumber()) - (int)bubbleLeft->getVal() - 2;
+	int leftmostTemplatePos = min(state1->getLeftTemplateBaseNumber(), state2->getLeftTemplateBaseNumber()) - (int)bubbleLeft->getVal(true) - 2;
 	int leftmostComplementPos = leftmostTemplatePos;
-	int rightmostTemplatePos = max(state1->getRightTemplateBaseNumber(), state2->getRightTemplateBaseNumber()) + (int)bubbleRight->getVal();
+	int rightmostTemplatePos = max(state1->getRightTemplateBaseNumber(), state2->getRightTemplateBaseNumber()) + (int)bubbleRight->getVal(true);
 	int rightmostComplementPos = rightmostTemplatePos;
 
 
@@ -206,7 +206,7 @@ vector<string> FreeEnergy::getHybridString(State *state){
 
 
 	int activeSiteShift = state->get_mRNAPosInActiveSite() > 1 ? 1 : 0;
-	int stopWhenAt = (int)hybridLen->getVal();
+	int stopWhenAt = (int)hybridLen->getVal(true);
 	int templatePastBulge = 0;
 	int nascentPastBulge = 0;
 

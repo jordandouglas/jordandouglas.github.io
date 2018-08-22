@@ -125,7 +125,7 @@ void Coordinates::resetToInitialState(){
 		if (baseToAdd != "A" && baseToAdd != "C" && baseToAdd != "G" && baseToAdd != "T" && baseToAdd != "U") baseToAdd = "X";
 
 
-		if (index < hybridLen->getVal()){
+		if (index < hybridLen->getVal(true)){
 
 
 			Coordinates::create_nucleotide(index, "g", startX, startY + 52, baseToAdd, baseToAdd + "g", false);
@@ -154,7 +154,7 @@ void Coordinates::resetToInitialState(){
 
 		}else{
 
-			double dy = 52 - std::min(52.0, (index - (hybridLen->getVal()-1)) * 52/(bubbleRight->getVal()+1));
+			double dy = 52 - std::min(52.0, (index - (hybridLen->getVal(true)-1)) * 52/(bubbleRight->getVal(true)+1));
 			if (PrimerType.substr(0,2) == "ds" && TemplateType.substr(0,2) == "ss") dy = 52;
 			if (TemplateType.substr(0,2) == "ds") {
 				Coordinates::create_nucleotide(index, "g", startX, startY + dy, baseToAdd, baseToAdd + "m", false);
@@ -236,8 +236,8 @@ void Coordinates::generateAllCoordinates(State* state){
 		// Y value determined by whether it is part of hybrid, bubble or on the bottom
 		double ntY = 207;
 		if (PrimerType.substr(0,2) == "ss"){
-			if (i <= state->getLeftNascentBaseNumber() && i > state->getLeftNascentBaseNumber()  - (bubbleLeft->getVal()+1) && i >= 0) dy += -52/(bubbleLeft->getVal()+1);
-			if (i > state->getRightNascentBaseNumber() && i < state->getRightNascentBaseNumber() + (bubbleRight->getVal()+1) + 1) dy += 52/(bubbleRight->getVal()+1);
+			if (i <= state->getLeftNascentBaseNumber() && i > state->getLeftNascentBaseNumber()  - (bubbleLeft->getVal(true)+1) && i >= 0) dy += -52/(bubbleLeft->getVal(true)+1);
+			if (i > state->getRightNascentBaseNumber() && i < state->getRightNascentBaseNumber() + (bubbleRight->getVal(true)+1) + 1) dy += 52/(bubbleRight->getVal(true)+1);
 		} else ntY -= 52;
 
 
@@ -274,8 +274,8 @@ void Coordinates::generateAllCoordinates(State* state){
 		// Y value determined by whether it is part of hybrid, bubble or on the bottom
 		double ntY = 78;
 		if (PrimerType.substr(0,2) == "ss"){
-			if (i <= state->getLeftTemplateBaseNumber() &&  i > state->getLeftTemplateBaseNumber()  - (bubbleLeft->getVal()+1) && i >= 0) dy += 52/(bubbleLeft->getVal()+1);
-			if (i > state->getRightTemplateBaseNumber() && i < state->getRightTemplateBaseNumber() + (bubbleRight->getVal()+1) + 1) dy += -52/(bubbleRight->getVal()+1);
+			if (i <= state->getLeftTemplateBaseNumber() &&  i > state->getLeftTemplateBaseNumber()  - (bubbleLeft->getVal(true)+1) && i >= 0) dy += 52/(bubbleLeft->getVal(true)+1);
+			if (i > state->getRightTemplateBaseNumber() && i < state->getRightTemplateBaseNumber() + (bubbleRight->getVal(true)+1) + 1) dy += -52/(bubbleRight->getVal(true)+1);
 		} else ntY += 52;
 
 		//if (SEQS_JS.all_sequences[sequenceID]["primer"] != "dsRNA") 
@@ -285,7 +285,7 @@ void Coordinates::generateAllCoordinates(State* state){
 
 
 		 // Orientation
-		 if (i > 0 && i <= state->getRightTemplateBaseNumber() + bubbleRight->getVal() && i >= state->getLeftTemplateBaseNumber()) Coordinates::flip_base(i, "g", "g"); 
+		 if (i > 0 && i <= state->getRightTemplateBaseNumber() + bubbleRight->getVal(true) && i >= state->getLeftTemplateBaseNumber()) Coordinates::flip_base(i, "g", "g"); 
 		 else if (i > 0) Coordinates::flip_base(i, "g", "m"); 
 
 		 // Complementary strand
@@ -335,7 +335,7 @@ void Coordinates::create_HTMLobject(string id, double x, double y, double width,
 
 void Coordinates::create_pol(double x, double y, string src){
 
-	double width = hybridLen->getVal() * 25 + 75;
+	double width = hybridLen->getVal(true) * 25 + 75;
 	double height = 140;
 	Coordinates::create_HTMLobject("pol", x, y, width, height, src, 1);
 

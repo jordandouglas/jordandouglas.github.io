@@ -38,10 +38,10 @@ ExperimentalData::ExperimentalData(int id, string dataType, int nObs){
 	this->id = id;
 	this->dataType = dataType;
 	this->force = 0;
-	this->ATPconc_local = ATPconc->getVal();
-	this->CTPconc_local = CTPconc->getVal();
-	this->GTPconc_local = GTPconc->getVal();
-	this->UTPconc_local = UTPconc->getVal();
+	this->ATPconc_local = ATPconc->getVal(true);
+	this->CTPconc_local = CTPconc->getVal(true);
+	this->GTPconc_local = GTPconc->getVal(true);
+	this->UTPconc_local = UTPconc->getVal(true);
 	this->halt = 0;
 	this->currentExperiment = -1;
 	this->sequenceID = _seqID;

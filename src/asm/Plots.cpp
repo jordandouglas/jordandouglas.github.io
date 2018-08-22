@@ -256,7 +256,7 @@ void Plots::updateParameterPlotData(State* state){
 
 
 
-	int increaseInPrimerLength = state->get_nascentLength() - (hybridLen->getVal() + bubbleLeft->getVal() + 2);
+	int increaseInPrimerLength = state->get_nascentLength() - (hybridLen->getVal(true) + bubbleLeft->getVal(true) + 2);
 	double velocity_thisTrial = increaseInPrimerLength / Plots::totaltimeElapsedThisTrial;
 	double meanDwellTime_thisTrial = Plots::totaltimeElapsedThisTrial / Plots::catalysisTimesThisTrial.size();
 
@@ -282,7 +282,7 @@ void Plots::updateParameterPlotData(State* state){
 		// Add a new value for this parameter
 		else for (int i = 0; i < Settings::paramList.size(); i ++){
 			if ((*it)->getID() == Settings::paramList.at(i)->getID()){
-				(*it)->addValue(Settings::paramList.at(i)->getVal());
+				(*it)->addValue(Settings::paramList.at(i)->getVal(false));
 				break;
 			}
 		}

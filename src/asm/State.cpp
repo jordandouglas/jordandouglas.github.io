@@ -69,7 +69,7 @@ State* State::setToInitialState(){
 
 	if (this->isGuiState) _applyingReactionsGUI = true;
 	this->nascentSequence = "";
-	int sequenceLength = (int)(hybridLen->getVal()-1);
+	int sequenceLength = (int)(hybridLen->getVal(true)-1);
 	for (int i = 0; i < sequenceLength; i ++){
 		this->nascentSequence += Settings::complementSeq(templateSequence.substr(i,1), PrimerType.substr(2) == "RNA");
 	}
@@ -105,7 +105,7 @@ State* State::setToInitialState(){
 
 	
 	// Transcribe a few bases forward to avoid left bubble effects
-	int transcribeDistance = max(int(haltPosition->getVal()) - this->rightTemplateBase, _nBasesToTranscribeInit + max(2, (int)(bubbleLeft->getVal())));
+	int transcribeDistance = max(int(haltPosition->getVal(true)) - this->rightTemplateBase, _nBasesToTranscribeInit + max(2, (int)(bubbleLeft->getVal(true))));
 	this->transcribe(transcribeDistance);
 	this->backward();
 	if (this->isGuiState) _applyingReactionsGUI = false;
@@ -181,21 +181,21 @@ State* State::print(){
 	if (!this->terminated){
 	
 		// Left bubble (template strand)
-		int start = max(0, this->get_nascentLength() - (int)hybridLen->getVal()  - bubblePrint);
-		int stop = max(0, this->get_nascentLength() + this->mRNAPosInActiveSite - (int)hybridLen->getVal());
+		int start = max(0, this->get_nascentLength() - (int)hybridLen->getVal(true)  - bubblePrint);
+		int stop = max(0, this->get_nascentLength() + this->mRNAPosInActiveSite - (int)hybridLen->getVal(true));
 		int startingBase = start + 1;
 		cout << startingBase <<  templateSequence.substr(start, stop-start) << endl;
 		
 		// Hybrid (template side)
 		start = stop;
 		stop = this->get_nascentLength() + this->mRNAPosInActiveSite;
-		int strWidth = (stop - start + (int)hybridLen->getVal());
+		int strWidth = (stop - start + (int)hybridLen->getVal(true));
 		cout << setw(strWidth) << templateSequence.substr(start, stop-start) << endl;
 		
 		
 		// Hybrid (nascent side)
 		stop = this->get_nascentLength();
-		strWidth =  (stop - start + (int)hybridLen->getVal());
+		strWidth =  (stop - start + (int)hybridLen->getVal(true));
 		cout << setw(strWidth) << this->nascentSequence.substr(start, stop-start);
 
 
@@ -206,7 +206,7 @@ State* State::print(){
 		
 		// Left bubble (nascent strand)
 		stop = start;
-		start = max(0, this->get_nascentLength() - (int)hybridLen->getVal() - bubblePrint);
+		start = max(0, this->get_nascentLength() - (int)hybridLen->getVal(true) - bubblePrint);
 		startingBase = start + 1;
 		cout << startingBase << this->nascentSequence.substr(start, stop-start) << endl;
 	}
@@ -290,7 +290,7 @@ State* State::stutter(int N){
 	// Ensure that active site is open and NTP is not bound
 	if (this->NTPbound()) this->releaseNTP();
 
-	for (int i = this->bulgePos.at(0); i < hybridLen->getVal() && i > 0; i ++){
+	for (int i = this->bulgePos.at(0); i < hybridLen->getVal(true) && i > 0; i ++){
 		this->slipLeft(0);
 	}
 	for (int i = this->mRNAPosInActiveSite; i < 0; i ++){
@@ -309,7 +309,7 @@ State* State::stutter(int N){
 		this->bindNTP();
 		this->bindNTP();
 
-		for (int j = 0; i < hybridLen->getVal() - 4; j ++) this->slipLeft(0);
+		for (int j = 0; i < hybridLen->getVal(true) - 4; j ++) this->slipLeft(0);
 
 	}
 	
@@ -327,7 +327,7 @@ list<int> State::getStutterActions(int N){
 	// Ensure that active site is open and NTP is not bound
 	if (!this->activated) actionsToDo.push_back(4); // 4 = activate
 	if (this->NTPbound()) actionsToDo.push_back(2); // 2 = release
-	for (int i = this->bulgePos.at(0); i < hybridLen->getVal() && i > 0; i ++){
+	for (int i = this->bulgePos.at(0); i < hybridLen->getVal(true) && i > 0; i ++){
 		actionsToDo.push_back(8); // 8 = slipLeft(0)
 	}
 	for (int i = this->mRNAPosInActiveSite; i < 0; i ++){
@@ -347,7 +347,7 @@ list<int> State::getStutterActions(int N){
 		actionsToDo.push_back(3); // 3 = bind
 		actionsToDo.push_back(3); // 3 = catalyse
 
-		for (int j = 0; j < hybridLen->getVal() - 4; j ++) actionsToDo.push_back(8); // 8 = slip_left(0)
+		for (int j = 0; j < hybridLen->getVal(true) - 4; j ++) actionsToDo.push_back(8); // 8 = slip_left(0)
 
 	}
 
@@ -377,7 +377,7 @@ State* State::forward(){
 
 		for (int s = 0; s < this->bulgePos.size(); s++){
 			if (this->partOfBulgeID.at(s) != s) continue;
-			if (this->bulgePos.at(s) > 0 && this->bulgePos.at(s) == hybridLen->getVal() - 1) this->absorb_bulge(s, false, true, DOMupdates);
+			if (this->bulgePos.at(s) > 0 && this->bulgePos.at(s) == hybridLen->getVal(true) - 1) this->absorb_bulge(s, false, true, DOMupdates);
 			//if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) ++;
 		}
 
@@ -390,9 +390,9 @@ State* State::forward(){
 		// Move the polymerase
 		Coordinates::move_obj_from_id("pol", 25, 0);
 
-		double shiftBaseBy = -52/(bubbleLeft->getVal()+1);
-		for (int i = this->getLeftTemplateBaseNumber(); i > this->getLeftTemplateBaseNumber() - (bubbleLeft->getVal()+1) && i >= 0; i--) {
-			if (i == this->getLeftTemplateBaseNumber() - (bubbleLeft->getVal()+1) + 1){
+		double shiftBaseBy = -52/(bubbleLeft->getVal(true)+1);
+		for (int i = this->getLeftTemplateBaseNumber(); i > this->getLeftTemplateBaseNumber() - (bubbleLeft->getVal(true)+1) && i >= 0; i--) {
+			if (i == this->getLeftTemplateBaseNumber() - (bubbleLeft->getVal(true)+1) + 1){
 				if (PrimerType.substr(0,2) != "ds") {
 					Coordinates::move_nt(i, "g", 0, shiftBaseBy);
 					Coordinates::move_nt(i, "o", 0, -shiftBaseBy/2);
@@ -400,8 +400,8 @@ State* State::forward(){
 			}
 			else {
 				if (PrimerType.substr(0,2) != "ds") {
-					Coordinates::move_nt(i, "g", 0, -52/(bubbleLeft->getVal()+1));
-					Coordinates::move_nt(i, "o", 0, +26/(bubbleLeft->getVal()+1));
+					Coordinates::move_nt(i, "g", 0, -52/(bubbleLeft->getVal(true)+1));
+					Coordinates::move_nt(i, "o", 0, +26/(bubbleLeft->getVal(true)+1));
 				}
 			}
 		
@@ -412,16 +412,16 @@ State* State::forward(){
 
 
 
-		shiftBaseBy = 52/(bubbleRight->getVal()+1);
-		for (int i = this->getRightTemplateBaseNumber() + 1; i < this->getRightTemplateBaseNumber() + (bubbleRight->getVal()+1) + 1; i++) {
+		shiftBaseBy = 52/(bubbleRight->getVal(true)+1);
+		for (int i = this->getRightTemplateBaseNumber() + 1; i < this->getRightTemplateBaseNumber() + (bubbleRight->getVal(true)+1) + 1; i++) {
 
-			if (i == this->getRightTemplateBaseNumber() + (bubbleRight->getVal()+1)) {
+			if (i == this->getRightTemplateBaseNumber() + (bubbleRight->getVal(true)+1)) {
 				if (!(PrimerType.substr(0,2) == "ds" && TemplateType.substr(0,2) == "ss")) Coordinates::move_nt(i, "g", 0, shiftBaseBy);
 				Coordinates::move_nt(i, "o", 0, -shiftBaseBy/2);
 			}
 			else {
-				if (!(PrimerType.substr(0,2) == "ds" && TemplateType.substr(0,2) == "ss")) Coordinates::move_nt(i, "g", 0, +52/(bubbleRight->getVal()+1));
-				Coordinates::move_nt(i, "o", 0, -26/(bubbleRight->getVal()+1));
+				if (!(PrimerType.substr(0,2) == "ds" && TemplateType.substr(0,2) == "ss")) Coordinates::move_nt(i, "g", 0, +52/(bubbleRight->getVal(true)+1));
+				Coordinates::move_nt(i, "o", 0, -26/(bubbleRight->getVal(true)+1));
 			}
 		
 			if (i > 0 && TemplateType.substr(0,2) == "ds") {
@@ -432,8 +432,8 @@ State* State::forward(){
 
 
 		// Move mRNA bases
-		if (PrimerType.substr(0,2) != "ds") for (int i = this->getLeftNascentBaseNumber(); i > this->getLeftNascentBaseNumber() - (bubbleLeft->getVal()+1) && i >= 0; i--) Coordinates::move_nt(i, "m", 0, +52/(bubbleLeft->getVal()+1));
-		if (PrimerType.substr(0,2) != "ds") for (int i = this->getRightNascentBaseNumber() + 1; i < this->getRightNascentBaseNumber() + (bubbleRight->getVal()+1) + 1; i++) Coordinates::move_nt(i, "m", 0, -52/(bubbleRight->getVal()+1));
+		if (PrimerType.substr(0,2) != "ds") for (int i = this->getLeftNascentBaseNumber(); i > this->getLeftNascentBaseNumber() - (bubbleLeft->getVal(true)+1) && i >= 0; i--) Coordinates::move_nt(i, "m", 0, +52/(bubbleLeft->getVal(true)+1));
+		if (PrimerType.substr(0,2) != "ds") for (int i = this->getRightNascentBaseNumber() + 1; i < this->getRightNascentBaseNumber() + (bubbleRight->getVal(true)+1) + 1; i++) Coordinates::move_nt(i, "m", 0, -52/(bubbleRight->getVal(true)+1));
 	
 
 		// Remove NTP
@@ -442,8 +442,8 @@ State* State::forward(){
 
 
 		// Move bead to the right
-		if (FAssist->getVal() != 0){
-			if (FAssist->getVal() > 0) Coordinates::move_obj_from_id("rightBead", 25, 0); // Assisting load
+		if (FAssist->getVal(true) != 0){
+			if (FAssist->getVal(true) > 0) Coordinates::move_obj_from_id("rightBead", 25, 0); // Assisting load
 			else Coordinates::move_obj_from_id("leftBead", 25, 0); // Hindering load
 			Coordinates::move_obj_from_id("tweezer", 25, 0);
 			Coordinates::move_obj_from_id("forceArrow1", 25, 0);
@@ -464,7 +464,7 @@ State* State::forward(){
 
 	}
 
-	if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal()-1) ||
+	if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal(true)-1) ||
 		(this->mRNAPosInActiveSite <= 1 && this->rightTemplateBase > templateSequence.length())) this->terminate();
 
 
@@ -570,7 +570,7 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 
 State* State::backward(){
 	//if (this->terminated) return this;
-	if (this->getLeftTemplateBaseNumber() < 1 || this->getLeftTemplateBaseNumber() - bubbleLeft->getVal() -1 <= 2) return this;
+	if (this->getLeftTemplateBaseNumber() < 1 || this->getLeftTemplateBaseNumber() - bubbleLeft->getVal(true) -1 <= 2) return this;
 
 
 	SlippageLandscapes* DOMupdates = NULL;
@@ -597,16 +597,16 @@ State* State::backward(){
 
 
 		// Move genome bases
-		double shiftBaseBy = 52/(bubbleLeft->getVal()+1);
-		for (int i = this->getLeftTemplateBaseNumber() - 1; i > this->getLeftTemplateBaseNumber() - (bubbleLeft->getVal()+1) - 1 && i >= 0; i--) {
+		double shiftBaseBy = 52/(bubbleLeft->getVal(true)+1);
+		for (int i = this->getLeftTemplateBaseNumber() - 1; i > this->getLeftTemplateBaseNumber() - (bubbleLeft->getVal(true)+1) - 1 && i >= 0; i--) {
 
-			if (i == this->getLeftTemplateBaseNumber() - (bubbleLeft->getVal()+1)) {
+			if (i == this->getLeftTemplateBaseNumber() - (bubbleLeft->getVal(true)+1)) {
 				if (PrimerType.substr(0,2) != "ds") Coordinates::move_nt(i, "g", 0, shiftBaseBy);
 				if (PrimerType.substr(0,2) != "ds") Coordinates::move_nt(i, "o", 0, -shiftBaseBy/2);
 			}
 			else {
-				if (PrimerType.substr(0,2) != "ds") Coordinates::move_nt(i, "g", 0, +52/(bubbleLeft->getVal()+1));
-				if (PrimerType.substr(0,2) != "ds") Coordinates::move_nt(i, "o", 0, -26/(bubbleLeft->getVal()+1));
+				if (PrimerType.substr(0,2) != "ds") Coordinates::move_nt(i, "g", 0, +52/(bubbleLeft->getVal(true)+1));
+				if (PrimerType.substr(0,2) != "ds") Coordinates::move_nt(i, "o", 0, -26/(bubbleLeft->getVal(true)+1));
 			}
 				
 	
@@ -617,16 +617,16 @@ State* State::backward(){
 	
 	
 		
-		shiftBaseBy = -52/(bubbleRight->getVal()+1);
-		for (int i = this->getRightTemplateBaseNumber(); i < this->getRightTemplateBaseNumber() + (bubbleRight->getVal()+1); i++) {
+		shiftBaseBy = -52/(bubbleRight->getVal(true)+1);
+		for (int i = this->getRightTemplateBaseNumber(); i < this->getRightTemplateBaseNumber() + (bubbleRight->getVal(true)+1); i++) {
 
-			if (i == this->getRightTemplateBaseNumber() + (bubbleRight->getVal()+1) - 1) {
+			if (i == this->getRightTemplateBaseNumber() + (bubbleRight->getVal(true)+1) - 1) {
 				if (!(PrimerType.substr(0,2) == "ds" && TemplateType.substr(0,2) == "ss")) Coordinates::move_nt(i, "g", 0, shiftBaseBy);
 				Coordinates::move_nt(i, "o", 0, -shiftBaseBy/2);
 			}
 			else {
-				if (!(PrimerType.substr(0,2) == "ds" && TemplateType.substr(0,2) == "ss")) Coordinates::move_nt(i, "g", 0, -52/(bubbleRight->getVal()+1));
-				Coordinates::move_nt(i, "o", 0, +26/(bubbleRight->getVal()+1));
+				if (!(PrimerType.substr(0,2) == "ds" && TemplateType.substr(0,2) == "ss")) Coordinates::move_nt(i, "g", 0, -52/(bubbleRight->getVal(true)+1));
+				Coordinates::move_nt(i, "o", 0, +26/(bubbleRight->getVal(true)+1));
 			}
 	
 			if (i > 0 && TemplateType.substr(0,2) == "ds") {
@@ -638,8 +638,8 @@ State* State::backward(){
 
 
 		// Move mRNA bases
-		if (PrimerType.substr(0,2) != "ds") for (int i = this->getLeftNascentBaseNumber() - 1;i > this->getLeftNascentBaseNumber() - (bubbleLeft->getVal()+1) - 1 && i >= 0; i--) Coordinates::move_nt(i, "m", 0, -52/(bubbleLeft->getVal()+1));
-		if (PrimerType.substr(0,2) != "ds") for (int i = this->getRightNascentBaseNumber(); i < this->getRightNascentBaseNumber() + (bubbleRight->getVal()+1); i++) Coordinates::move_nt(i, "m", 0, +52/(bubbleRight->getVal()+1));
+		if (PrimerType.substr(0,2) != "ds") for (int i = this->getLeftNascentBaseNumber() - 1;i > this->getLeftNascentBaseNumber() - (bubbleLeft->getVal(true)+1) - 1 && i >= 0; i--) Coordinates::move_nt(i, "m", 0, -52/(bubbleLeft->getVal(true)+1));
+		if (PrimerType.substr(0,2) != "ds") for (int i = this->getRightNascentBaseNumber(); i < this->getRightNascentBaseNumber() + (bubbleRight->getVal(true)+1); i++) Coordinates::move_nt(i, "m", 0, +52/(bubbleRight->getVal(true)+1));
 
 
 		// Remove NTP
@@ -647,8 +647,8 @@ State* State::backward(){
 
 
 		// Move bead to the left
-		if (FAssist->getVal() != 0){
-			if (FAssist->getVal() > 0) Coordinates::move_obj_from_id("rightBead", -25, 0); // Assisting load
+		if (FAssist->getVal(true) != 0){
+			if (FAssist->getVal(true) > 0) Coordinates::move_obj_from_id("rightBead", -25, 0); // Assisting load
 			else Coordinates::move_obj_from_id("leftBead", -25, 0); // Hindering load
 			Coordinates::move_obj_from_id("tweezer", -25, 0);
 			Coordinates::move_obj_from_id("forceArrow1", -25, 0);
@@ -818,17 +818,17 @@ double State::calculateBindNTPrate(bool ignoreStateRestrictions){
 		double NTPconcentration = 0;
 		if (currentModel->get_useFourNTPconcentrations()){
 			string toBind = Settings::complementSeq(templateSequence.substr(this->get_nascentLength(),1), PrimerType.substr(2) == "RNA");
-			if (toBind == "A") NTPconcentration = ATPconc->getVal();
-			else if (toBind == "C") NTPconcentration = CTPconc->getVal();
-			else if (toBind == "G") NTPconcentration = GTPconc->getVal();
-			else if (toBind == "U" || toBind == "T") NTPconcentration = UTPconc->getVal();
+			if (toBind == "A") NTPconcentration = ATPconc->getVal(true);
+			else if (toBind == "C") NTPconcentration = CTPconc->getVal(true);
+			else if (toBind == "G") NTPconcentration = GTPconc->getVal(true);
+			else if (toBind == "U" || toBind == "T") NTPconcentration = UTPconc->getVal(true);
 		}
-		else NTPconcentration = NTPconc->getVal();
+		else NTPconcentration = NTPconc->getVal(true);
 
 		
 		// Calculate the rate of binding
 		//cout << "NTPconcentration = " << NTPconcentration << endl;
-		return RateBind->getVal() * NTPconcentration;
+		return RateBind->getVal(true) * NTPconcentration;
 		
 	}
 
@@ -845,7 +845,7 @@ double State::calculateCatalysisRate(bool ignoreStateRestrictions){
 		if (this->terminated || !this->activated) return 0;
 	}
 
-	if (ignoreStateRestrictions || (this->NTPbound() && this->mRNAPosInActiveSite == 1)) return kCat->getVal();
+	if (ignoreStateRestrictions || (this->NTPbound() && this->mRNAPosInActiveSite == 1)) return kCat->getVal(true);
 	return 0;
 }
 
@@ -870,7 +870,7 @@ State* State::releaseNTP(){
 
 
 	// Pyrophosphorylysis
-	else if (!this->NTPbound() && this->activated && this->get_nascentLength() > hybridLen->getVal() && this->mRNAPosInActiveSite == 0){
+	else if (!this->NTPbound() && this->activated && this->get_nascentLength() > hybridLen->getVal(true) && this->mRNAPosInActiveSite == 0){
 
 
 		// Add the triphosphate
@@ -898,7 +898,7 @@ State* State::releaseNTP(){
 
 double State::calculateReleaseNTPRate(bool ignoreStateRestrictions){
 	if (!ignoreStateRestrictions) if (!this->NTPbound() || this->terminated || currentModel->get_assumeBindingEquilibrium()) return 0;
-	return RateBind->getVal() * Kdiss->getVal(); 
+	return RateBind->getVal(true) * Kdiss->getVal(true); 
 
 }
 
@@ -929,7 +929,7 @@ double State::calculateActivateRate(bool ignoreStateRestrictions){
 	if (ignoreStateRestrictions || !this->activated){
 
 		// Sequence dependent and independent have the same rate
-		return RateActivate->getVal();
+		return RateActivate->getVal(true);
 
 	}
 	return 0;
@@ -961,7 +961,7 @@ double State::calculateDeactivateRate(bool ignoreStateRestrictions){
 
 		// Sequence independent
 		if (currentModel->get_currentInactivationModel() == "sequenceIndependent") {
-			return RateDeactivate->getVal();
+			return RateDeactivate->getVal(true);
 		}
 
 
@@ -969,14 +969,14 @@ double State::calculateDeactivateRate(bool ignoreStateRestrictions){
 		else if (currentModel->get_currentInactivationModel() == "hybridDestabilisation"){
 
 			// Compute enegry barrier to go from the full hybrid into the destabilised hybrid
-			double relativeBarrierHeight = deltaGDaggerHybridDestabil->getVal() - FreeEnergy::getFreeEnergyOfHybrid(this);
+			double relativeBarrierHeight = deltaGDaggerHybridDestabil->getVal(true) - FreeEnergy::getFreeEnergyOfHybrid(this);
 
 			//cout << "h = " << FreeEnergy::getFreeEnergyOfHybrid(this) << " barrier " << relativeBarrierHeight << endl;
 			//vector<string> x = FreeEnergy::getHybridString(this);
 			//cout << x.at(0) << "/" << x.at(1) << endl;
 
 			// If posttranslocated then account for the Gibbs energy bonus
-			if (this->mRNAPosInActiveSite == 1) relativeBarrierHeight = relativeBarrierHeight - DGPost->getVal();
+			if (this->mRNAPosInActiveSite == 1) relativeBarrierHeight = relativeBarrierHeight - DGPost->getVal(true);
 			return _preExp * exp(-relativeBarrierHeight);
 		}
 
@@ -991,7 +991,7 @@ double State::calculateDeactivateRate(bool ignoreStateRestrictions){
 State* State::cleave(){
 
 	int maxPos = currentModel->get_currentBacksteppingModel() == "backstep0" ? 0 : -1;
-	if (this->mRNAPosInActiveSite < maxPos && (CleavageLimit->getVal() == 0|| this->mRNAPosInActiveSite >= -CleavageLimit->getVal())){
+	if (this->mRNAPosInActiveSite < maxPos && (CleavageLimit->getVal(true) == 0|| this->mRNAPosInActiveSite >= -CleavageLimit->getVal(true))){
 
 		int newLength = this->nascentSequence.length() + this->mRNAPosInActiveSite;
 		int nbasesCleaved = this->nascentSequence.length() - newLength;
@@ -1027,7 +1027,7 @@ double State::calculateCleavageRate(bool ignoreStateRestrictions){
 
 
 	int maxPos = currentModel->get_currentBacksteppingModel() == "backstep0" ? 0 : -1;
-	if (ignoreStateRestrictions || (this->mRNAPosInActiveSite < maxPos && (CleavageLimit->getVal() == 0|| this->mRNAPosInActiveSite >= -CleavageLimit->getVal()))) return RateCleave->getVal();
+	if (ignoreStateRestrictions || (this->mRNAPosInActiveSite < maxPos && (CleavageLimit->getVal(true) == 0|| this->mRNAPosInActiveSite >= -CleavageLimit->getVal(true)))) return RateCleave->getVal(true);
 	return 0;
 }
 
@@ -1198,7 +1198,7 @@ void State::form_bulge(int S, bool form_left, SlippageLandscapes* DOMupdates){
 
 				Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary, "m")->getX(), 1, true, 0);
 				for (int i = this->bulgedBase.at(S) + 2; i < this->get_nascentLength() + 1; i ++){
-					if (PrimerType.substr(0,2) == "ss" && i > this->rightNascentBase && i-this->rightNascentBase <= (bubbleRight->getVal()+1)) Coordinates::move_nt(i, "m", -25, -52/(bubbleRight->getVal()+1));
+					if (PrimerType.substr(0,2) == "ss" && i > this->rightNascentBase && i-this->rightNascentBase <= (bubbleRight->getVal(true)+1)) Coordinates::move_nt(i, "m", -25, -52/(bubbleRight->getVal(true)+1));
 					else Coordinates::move_nt(i, "m", -25, 0);
 				}
 
@@ -1251,7 +1251,7 @@ void State::form_bulge(int S, bool form_left, SlippageLandscapes* DOMupdates){
 
 			if (PrimerType.substr(0,2) == "ss"){
 				for (int i = this->bulgedBase.at(S) - 2; i >= 0; i --){
-					if (this->bulgedBase.at(S)-i <= bubbleLeft->getVal()+1) Coordinates::move_nt(i, "m", 25, -52/(bubbleLeft->getVal()+1));
+					if (this->bulgedBase.at(S)-i <= bubbleLeft->getVal(true)+1) Coordinates::move_nt(i, "m", 25, -52/(bubbleLeft->getVal(true)+1));
 					else Coordinates::move_nt(i, "m", 25, 0);
 				}
 			}
@@ -1296,7 +1296,7 @@ void State::absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, Sl
 
 			if (PrimerType.substr(0,2) == "ss"){
 				for (int i = this->leftNascentBase - 1; i >= 0; i --){
-					if (this->leftNascentBase - i <= (bubbleLeft->getVal()+1)) Coordinates::move_nt(i, "m", -25, 52/(bubbleLeft->getVal()+1));
+					if (this->leftNascentBase - i <= (bubbleLeft->getVal(true)+1)) Coordinates::move_nt(i, "m", -25, 52/(bubbleLeft->getVal(true)+1));
 					else Coordinates::move_nt(i, "m", -25, 0);
 				}		
 			}
@@ -1358,7 +1358,7 @@ void State::absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, Sl
 
 			// Shift every rightward base 1 to the right
 			for (int i = leftBoundary + this->bulgeSize.at(S) + 1; i < this->get_nascentLength() + 1; i ++){
-				if (i >= this->rightNascentBase && i-(leftBoundary + this->bulgeSize.at(S)) <= (bubbleRight->getVal()+1)) Coordinates::move_nt(i, "m", 25, 52/(1+bubbleRight->getVal()));
+				if (i >= this->rightNascentBase && i-(leftBoundary + this->bulgeSize.at(S)) <= (bubbleRight->getVal(true)+1)) Coordinates::move_nt(i, "m", 25, 52/(1+bubbleRight->getVal(true)));
 				else Coordinates::move_nt(i, "m", 25, 0);
 			}	
 
@@ -1548,7 +1548,7 @@ void State::fuseBulgeLeft(int S, SlippageLandscapes* DOMupdates){
 
 			//if (PrimerType.substr(0,2) == "ss"){
 			for (int i = leftBoundary + this->bulgeSize.at(fuseWith) + 2; i < this->get_nascentLength() + 1; i ++){
-				if (PrimerType.substr(0,2) == "ss" && i>this->getRightNascentBaseNumber() && i-this->getRightNascentBaseNumber() <= bubbleRight->getVal()) Coordinates::move_nt(i, "m", -25, -52/bubbleRight->getVal());
+				if (PrimerType.substr(0,2) == "ss" && i>this->getRightNascentBaseNumber() && i-this->getRightNascentBaseNumber() <= bubbleRight->getVal(true)) Coordinates::move_nt(i, "m", -25, -52/bubbleRight->getVal(true));
 				else Coordinates::move_nt(i, "m", -25, 0);
 			}
 			//}
@@ -1643,7 +1643,7 @@ void State::fuseBulgeLeft(int S, SlippageLandscapes* DOMupdates){
 void State::fuseBulgeRight(int S, SlippageLandscapes* DOMupdates){
 
 	if (this->isGuiState) cout << "fuse right" << S << endl;
-	if (this->getLeftNascentBaseNumber() > 1 && this->bulgePos.at(S) == 0 && ((Settings::indexOf(this->bulgePos, this->getLeftBulgeBoundary()) != -1) || Settings::indexOf(this->bulgePos, hybridLen->getVal() - 2) != -1)) { // Form bulge first and then fuse them
+	if (this->getLeftNascentBaseNumber() > 1 && this->bulgePos.at(S) == 0 && ((Settings::indexOf(this->bulgePos, this->getLeftBulgeBoundary()) != -1) || Settings::indexOf(this->bulgePos, hybridLen->getVal(true) - 2) != -1)) { // Form bulge first and then fuse them
 		
 		
 		
@@ -1662,7 +1662,7 @@ void State::fuseBulgeRight(int S, SlippageLandscapes* DOMupdates){
 			int leftBoundary = this->bulgedBase.at(fuseWith) - this->bulgeSize.at(fuseWith);
 			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary+1, "m")->getX(), this->bulgeSize.at(fuseWith), true, 0);
 			for (int i = leftBoundary - 1;  i >= 0; i --){
-				if (i > this->getLeftNascentBaseNumber() - (bubbleLeft->getVal()+1)) Coordinates::move_nt(i, "m", 25, -52/(bubbleLeft->getVal()+1));
+				if (i > this->getLeftNascentBaseNumber() - (bubbleLeft->getVal(true)+1)) Coordinates::move_nt(i, "m", 25, -52/(bubbleLeft->getVal(true)+1));
 				else Coordinates::move_nt(i, "m", 25, 0);
 			}
 		}
@@ -1763,7 +1763,7 @@ string State::getSlipRightLabel(int S) {
 	string toReturn = "{}";
 
 	bool allowMultipleBulges = currentModel->get_allowMultipleBulges();
-	int h = this->getLeftBulgeBoundary() + 1; //hybridLen->getVal();
+	int h = this->getLeftBulgeBoundary() + 1; //hybridLen->getVal(true);
 
 	int fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 1, 1));
 	if (fuseWith == -1)	fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 2, 2));
@@ -1793,7 +1793,7 @@ string State::getSlipLeftLabel(int S) {
 	string toReturn = "{}";
 
 	bool allowMultipleBulges = currentModel->get_allowMultipleBulges();
-	int h = this->getLeftBulgeBoundary() + 1; //hybridLen->getVal();
+	int h = this->getLeftBulgeBoundary() + 1; //hybridLen->getVal(true);
 
 	int fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 1, 1));
 	if (fuseWith == -1)	fuseWith = Settings::indexOf(this->bulgePos, max(this->mRNAPosInActiveSite + 2, 2));
@@ -1911,7 +1911,7 @@ int State::get_fissure_landscape_of(int S){
 float State::foldUpstream(){
 
 
-	if (PrimerType != "ssRNA" || this->leftNascentBase - rnaFoldDistance->getVal() <= 3 || this->terminated){
+	if (PrimerType != "ssRNA" || this->leftNascentBase - rnaFoldDistance->getVal(true) <= 3 || this->terminated){
 		cout << "Cannot fold 5'" << endl;
 
 		// Set the folded bases to 'unfolded' mode so the DOM can render them differently
@@ -1930,7 +1930,7 @@ float State::foldUpstream(){
 
 
 	// Allocate memory for sequence, structure and coordinates of 5' end
-	int length_5prime = this->leftNascentBase-1-rnaFoldDistance->getVal();
+	int length_5prime = this->leftNascentBase-1-rnaFoldDistance->getVal(true);
 	char* seq_5prime = (char *) calloc(length_5prime+1, sizeof(char));
 	char* structure_5prime = (char *) calloc(length_5prime+1, sizeof(char));
 	strcpy(seq_5prime, this->get_NascentSequence().substr(0, length_5prime).c_str());
@@ -2072,7 +2072,7 @@ float State::foldDownstream(){
 
 
 	// This can only work if backtracked by more than 4 positions
-	if (PrimerType != "ssRNA" || this->mRNAPosInActiveSite >= -rnaFoldDistance->getVal() || this->terminated){
+	if (PrimerType != "ssRNA" || this->mRNAPosInActiveSite >= -rnaFoldDistance->getVal(true) || this->terminated){
 		//cout << "Cannot fold 3'" << endl;
 		this->_3primeStructure = "";
 
@@ -2094,10 +2094,10 @@ float State::foldDownstream(){
 	//cout << "Calculating 3' free energy" << endl;
 
 	// Allocate memory for sequence, structure and coordinates of 3' end
-	int length_3prime = this->get_nascentLength() - this->rightTemplateBase - rnaFoldDistance->getVal();
+	int length_3prime = this->get_nascentLength() - this->rightTemplateBase - rnaFoldDistance->getVal(true);
 	char* seq_3prime = (char *) calloc(length_3prime+1, sizeof(char));
 	char* structure_3prime = (char *) calloc(length_3prime+1, sizeof(char));
-	strcpy(seq_3prime, this->get_NascentSequence().substr(this->rightTemplateBase + rnaFoldDistance->getVal(), length_3prime).c_str());
+	strcpy(seq_3prime, this->get_NascentSequence().substr(this->rightTemplateBase + rnaFoldDistance->getVal(true), length_3prime).c_str());
 
 
 	// Compute MFE structure for 5' end
@@ -2108,15 +2108,15 @@ float State::foldDownstream(){
 
 		// Set the folded bases to 'folded' mode so the DOM can render them differently
 		//Coordinates::setNucleotideFoldedness(this->rightTemplateBase, false);
-		Coordinates::setNucleotideFoldedness(this->rightTemplateBase + rnaFoldDistance->getVal(), false);
-		for (int i = this->rightTemplateBase+1 + rnaFoldDistance->getVal(); i <= this->rightTemplateBase + rnaFoldDistance->getVal() + length_3prime; i ++){
+		Coordinates::setNucleotideFoldedness(this->rightTemplateBase + rnaFoldDistance->getVal(true), false);
+		for (int i = this->rightTemplateBase+1 + rnaFoldDistance->getVal(true); i <= this->rightTemplateBase + rnaFoldDistance->getVal(true) + length_3prime; i ++){
 			Coordinates::setNucleotideFoldedness(i, true);
 		}
-		Coordinates::setFoldAnchorPoint(this->rightTemplateBase + rnaFoldDistance->getVal());
+		Coordinates::setFoldAnchorPoint(this->rightTemplateBase + rnaFoldDistance->getVal(true));
 
 
 		// Add bonds between all nucleotides along the backbone 
-		for (int i = this->rightTemplateBase+ rnaFoldDistance->getVal(); i < this->rightTemplateBase + length_3prime+ rnaFoldDistance->getVal(); i ++){
+		for (int i = this->rightTemplateBase+ rnaFoldDistance->getVal(true); i < this->rightTemplateBase + length_3prime+ rnaFoldDistance->getVal(true); i ++){
 			Coordinates::addBondBetweenNucleotides(i, i+1, false);
 		}
 
@@ -2167,7 +2167,7 @@ float State::foldDownstream(){
 
 
 			for (int i = 0; i < length_3prime; i ++){
-				Coordinates::setFoldInitialPositions(i + 1 + this->rightTemplateBase + rnaFoldDistance->getVal(), XY[i], XY[i+length_3prime]);
+				Coordinates::setFoldInitialPositions(i + 1 + this->rightTemplateBase + rnaFoldDistance->getVal(true), XY[i], XY[i+length_3prime]);
 			}
 
 			// Clean-up
@@ -2183,7 +2183,7 @@ float State::foldDownstream(){
 
 
 	// Add basepair bonds
-	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden") this->findBondsRecurse(0, this->_3primeStructure, this->rightTemplateBase + rnaFoldDistance->getVal());
+	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden") this->findBondsRecurse(0, this->_3primeStructure, this->rightTemplateBase + rnaFoldDistance->getVal(true));
 
 
 	// Clean up
@@ -2591,13 +2591,13 @@ bool State::get_activated(){
 int State::get_initialLength() {
 	
 	// Returns the length of the sequence when it was first created
-	return (int)(hybridLen->getVal()-1) + 2 + max(2, (int)(bubbleLeft->getVal()));
+	return (int)(hybridLen->getVal(true)-1) + 2 + max(2, (int)(bubbleLeft->getVal(true)));
 }
 
 
 int State::getLeftNascentBaseNumber(){
 	return this->leftNascentBase;
-	//return this->State::get_nascentLength() + this->State::get_mRNAPosInActiveSite() + 1 - (int)(hybridLen->getVal());
+	//return this->State::get_nascentLength() + this->State::get_mRNAPosInActiveSite() + 1 - (int)(hybridLen->getVal(true));
 }
 
 int State::getRightNascentBaseNumber(){
@@ -2608,7 +2608,7 @@ int State::getRightNascentBaseNumber(){
 
 int State::getLeftTemplateBaseNumber(){
 	return this->leftTemplateBase;
-	//return this->State::get_nascentLength() + this->State::get_mRNAPosInActiveSite() + 1 - (int)(hybridLen->getVal());
+	//return this->State::get_nascentLength() + this->State::get_mRNAPosInActiveSite() + 1 - (int)(hybridLen->getVal(true));
 }
 
 int State::getRightTemplateBaseNumber(){
@@ -2623,14 +2623,14 @@ int State::get_nextTemplateBaseToCopy(){
 
 // Maximum value an element in bulgePos may take before the bulge will absorb if it goes any higher 
 int State::getLeftBulgeBoundary(){
-	return PrimerType.substr(0,2) == "ss" ? hybridLen->getVal() - 1 : this->rightNascentBase - 2 + this->changeInLeftBulgePosition;
+	return PrimerType.substr(0,2) == "ss" ? hybridLen->getVal(true) - 1 : this->rightNascentBase - 2 + this->changeInLeftBulgePosition;
 } 
 
 
 
 double State::calculateTranslocationFreeEnergy(bool ignoreParametersAndSettings){
 	double freeEnergy = FreeEnergy::getFreeEnergyOfHybrid(this) - FreeEnergy::getFreeEnergyOfTranscriptionBubble(this);
-	if (!ignoreParametersAndSettings && this->mRNAPosInActiveSite == 1) freeEnergy += DGPost->getVal();
+	if (!ignoreParametersAndSettings && this->mRNAPosInActiveSite == 1) freeEnergy += DGPost->getVal(true);
 	return freeEnergy;	
 }
 
@@ -2663,7 +2663,7 @@ double State::calculateForwardTranslocationFreeEnergyBarrier(bool ignoreParamete
 
 
 	if (!ignoreParametersAndSettings) {
-		barrierHeight += GDagSlide->getVal();
+		barrierHeight += GDagSlide->getVal(true);
 	}
 
 	delete stateAfterForwardtranslocation;
@@ -2683,7 +2683,7 @@ double State::calculateBackwardTranslocationFreeEnergyBarrier(bool ignoreParamet
 	
 	
 	// Do not back translocate if it will cause the bubble to be open on the 3' end
-	if (this->getLeftTemplateBaseNumber() - bubbleLeft->getVal() -1 <= 2){
+	if (this->getLeftTemplateBaseNumber() - bubbleLeft->getVal(true) -1 <= 2){
 		return INF;
 	}
 
@@ -2709,7 +2709,7 @@ double State::calculateBackwardTranslocationFreeEnergyBarrier(bool ignoreParamet
 
 
 	if (!ignoreParametersAndSettings) {
-		barrierHeight += GDagSlide->getVal();
+		barrierHeight += GDagSlide->getVal(true);
 	}
 
 

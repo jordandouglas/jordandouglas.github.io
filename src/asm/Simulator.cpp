@@ -401,7 +401,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
 		// Check if in-simulation time limit has been exceeded
-		if (arrestTime->getVal() > 0 && timeElapsed >= arrestTime->getVal()) {
+		if (arrestTime->getVal(true) > 0 && timeElapsed >= arrestTime->getVal(true)) {
 
 			//cout << "In-simulation timeout reached " << timeElapsed << endl;
 
@@ -420,7 +420,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			(s->get_mRNAPosInActiveSite() == 0 && s->getRightTemplateBaseNumber() == templateSequence.length()) ){
 		
 
-		//		if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal()-1) ||
+		//		if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal(true)-1) ||
 	//	(this->mRNAPosInActiveSite <= 1 && this->rightTemplateBase > templateSequence.length())) this->terminate();
 
 			if (!this->animatingGUI) {
@@ -538,16 +538,16 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				//cout << "justBindingEquilibrium" << endl;
 
 				// Calculate probability of NTP being bound or unbound. If concentration is zero it will never bind
-				double KD = Kdiss->getVal();
+				double KD = Kdiss->getVal(true);
 				double NTPconcentration = 0;
 				if (currentModel->get_useFourNTPconcentrations()){
 					string toBind = Settings::complementSeq(templateSequence.substr(s->get_nascentLength(),1), PrimerType.substr(2) == "RNA");
-					if (toBind == "A") NTPconcentration = ATPconc->getVal();
-					else if (toBind == "C") NTPconcentration = CTPconc->getVal();
-					else if (toBind == "G") NTPconcentration = GTPconc->getVal();
-					else if (toBind == "U" || toBind == "T") NTPconcentration = UTPconc->getVal();
+					if (toBind == "A") NTPconcentration = ATPconc->getVal(true);
+					else if (toBind == "C") NTPconcentration = CTPconc->getVal(true);
+					else if (toBind == "G") NTPconcentration = GTPconc->getVal(true);
+					else if (toBind == "U" || toBind == "T") NTPconcentration = UTPconc->getVal(true);
 				}
-				else NTPconcentration = NTPconc->getVal();
+				else NTPconcentration = NTPconc->getVal(true);
 				double probabilityBound = (NTPconcentration/KD) / (NTPconcentration/KD + 1);
 				if (!s->get_activated()) probabilityBound = 0;
 				double probabilityUnbound = 1 - probabilityBound;
@@ -645,7 +645,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				double boltzmannG0 = 0;
 				double boltzmannG1 = 1;
 				double boltzmannGN = 0;
-				if (k1_0 != 0 && s->getLeftTemplateBaseNumber() >= 1 && s->getLeftTemplateBaseNumber() - bubbleLeft->getVal() -1 > 2){
+				if (k1_0 != 0 && s->getLeftTemplateBaseNumber() >= 1 && s->getLeftTemplateBaseNumber() - bubbleLeft->getVal(true) -1 > 2){
 					boltzmannG0 = 1;
 					boltzmannG1 = k0_1 / k1_0;
 				}
@@ -664,14 +664,14 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 						double NTPconcentration = 0;
 						if (currentModel->get_useFourNTPconcentrations()){
 							string toBind = Settings::complementSeq(templateSequence.substr(s->get_nascentLength(),1), PrimerType.substr(2) == "RNA");
-							if (toBind == "A") NTPconcentration = ATPconc->getVal();
-							else if (toBind == "C") NTPconcentration = CTPconc->getVal();
-							else if (toBind == "G") NTPconcentration = GTPconc->getVal();
-							else if (toBind == "U" || toBind == "T") NTPconcentration = UTPconc->getVal();
+							if (toBind == "A") NTPconcentration = ATPconc->getVal(true);
+							else if (toBind == "C") NTPconcentration = CTPconc->getVal(true);
+							else if (toBind == "G") NTPconcentration = GTPconc->getVal(true);
+							else if (toBind == "U" || toBind == "T") NTPconcentration = UTPconc->getVal(true);
 						}
-						else NTPconcentration = NTPconc->getVal();
+						else NTPconcentration = NTPconc->getVal(true);
 
-						double KD = Kdiss->getVal();
+						double KD = Kdiss->getVal(true);
 						boltzmannGN = boltzmannG1 * NTPconcentration / KD;
 						if (!s->get_activated()) boltzmannGN = 0;
 					}
@@ -765,7 +765,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 			//if (reactionToDo == -1){
 				//cout << nTrialsCompletedGUI << ", runifNum:" << runifNum << ", reactionToDo " << reactionToDo << ", bck:" << rates[0] << ", fwd:" << kFwd << ", rel:" << rates[2] << ", cat:" << rates[3] << endl;
-				//cout << "GDagSlide->getVal() " << GDagSlide->getVal() << " exp(-GDagSlide->getVal()) " << exp(-GDagSlide->getVal()) << " exp(-9.079) " << exp(-9.079) <<  endl;
+				//cout << "GDagSlide->getVal(true) " << GDagSlide->getVal(true) << " exp(-GDagSlide->getVal(true)) " << exp(-GDagSlide->getVal(true)) << " exp(-9.079) " << exp(-9.079) <<  endl;
 			//}
 
 
@@ -890,7 +890,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 	//cout << "timeElapsed = " << timeElapsed << endl;
 	//cout << "velocity = " << velocity << endl;
 	/*
-	cout << "kcat " << kCat->getVal() << " KD " << Kdiss->getVal() << "[ATP] = " << ATPconc->getVal() << "F = " << FAssist->getVal() << "DGslide = " << GDagSlide->getVal() << endl;
+	cout << "kcat " << kCat->getVal(true) << " KD " << Kdiss->getVal(true) << "[ATP] = " << ATPconc->getVal(true) << "F = " << FAssist->getVal(true) << "DGslide = " << GDagSlide->getVal(true) << endl;
 	cout << "Trans eq: " << currentModel->get_assumeTranslocationEquilibrium() << " Bind eq " << currentModel->get_assumeBindingEquilibrium() << endl;
 	*/
 	//cout << s->get_initialLength() << ";" "distanceTravelled = " << distanceTravelled << endl;
@@ -927,16 +927,16 @@ double Simulator::geometricTranslocationSampling(State* s){
 
 
 	// Get time spent in bound and unbound states
-	double KD = Kdiss->getVal();
+	double KD = Kdiss->getVal(true);
 	double NTPconcentration = 0;
 	if (currentModel->get_useFourNTPconcentrations()){
 		string toBind = Settings::complementSeq(templateSequence.substr(s->get_nascentLength(),1), PrimerType.substr(2) == "RNA");
-		if (toBind == "A") NTPconcentration = ATPconc->getVal();
-		else if (toBind == "C") NTPconcentration = CTPconc->getVal();
-		else if (toBind == "G") NTPconcentration = GTPconc->getVal();
-		else if (toBind == "U" || toBind == "T") NTPconcentration = UTPconc->getVal();
+		if (toBind == "A") NTPconcentration = ATPconc->getVal(true);
+		else if (toBind == "C") NTPconcentration = CTPconc->getVal(true);
+		else if (toBind == "G") NTPconcentration = GTPconc->getVal(true);
+		else if (toBind == "U" || toBind == "T") NTPconcentration = UTPconc->getVal(true);
 	}
-	else NTPconcentration = NTPconc->getVal();
+	else NTPconcentration = NTPconc->getVal(true);
 	double probabilityBound = (NTPconcentration/KD) / (NTPconcentration/KD + 1);
 	double probabilityUnbound = 1 - probabilityBound;
 

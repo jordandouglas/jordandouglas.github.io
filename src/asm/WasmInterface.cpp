@@ -292,7 +292,7 @@ extern "C" {
 
 		double kBck = _currentStateGUI->calculateBackwardRate(true, false);
 		double kFwd = _currentStateGUI->calculateForwardRate(true, false);
-		bool bckBtnActive = _currentStateGUI->getLeftTemplateBaseNumber() - bubbleLeft->getVal() - 1 > 2; // Do not allow backstepping if it will break the 3' bubble
+		bool bckBtnActive = _currentStateGUI->getLeftTemplateBaseNumber() - bubbleLeft->getVal(true) - 1 > 2; // Do not allow backstepping if it will break the 3' bubble
 		bool fwdBtnActive = _currentStateGUI->getLeftTemplateBaseNumber() < templateSequence.length(); // Do not going forward if beyond the end of the sequence
 		string fwdBtnLabel = !_currentStateGUI->isTerminated() && _currentStateGUI->getLeftTemplateBaseNumber() >= _currentStateGUI->get_nascentLength() ? "Terminate" : "Forward";
 
@@ -360,7 +360,7 @@ extern "C" {
 
 		int maxPos = currentModel->get_currentBacksteppingModel() == "backstep0" ? 0 : -1;
 		string activationJSON = "{";
-		activationJSON += "'canCleave':" + string( (_currentStateGUI->get_mRNAPosInActiveSite() < maxPos && (CleavageLimit->getVal() == 0|| _currentStateGUI->get_mRNAPosInActiveSite() >= -CleavageLimit->getVal()))  ? "true" : "false") + ",";
+		activationJSON += "'canCleave':" + string( (_currentStateGUI->get_mRNAPosInActiveSite() < maxPos && (CleavageLimit->getVal(true) == 0|| _currentStateGUI->get_mRNAPosInActiveSite() >= -CleavageLimit->getVal(true)))  ? "true" : "false") + ",";
 		activationJSON += "'kcleave':" + to_string(_currentStateGUI->calculateCleavageRate(false));
 		activationJSON += "}";
 		messageFromWasmToJS(activationJSON, msgID);
@@ -388,7 +388,7 @@ extern "C" {
 		slippageJSON += "'stateRight':" + stateRight->toJSON() + ",";
 		slippageJSON += "'leftLabel':" + _currentStateGUI->getSlipLeftLabel(S) + ",";
 		slippageJSON += "'rightLabel':" + _currentStateGUI->getSlipRightLabel(S) + ",";
-		slippageJSON += "'hybridLen':" + to_string(hybridLen->getVal());
+		slippageJSON += "'hybridLen':" + to_string(hybridLen->getVal(true));
 		slippageJSON += "}";
 
 
@@ -418,9 +418,9 @@ extern "C" {
 		
 
 		// Calculate force gradients. The current state will have change in energy energy due to force = 0
-		double troughForceGradient = FAssist->getVal() * 1e-12 * 3.4  * 1e-10 / (_kBT); // Force x distance / kBT
-		double forceGradientBck = (+FAssist->getVal() * 1e-12 * (3.4-barrierPos->getVal()) * 1e-10) / (_kBT);
-		double forceGradientFwd = (-FAssist->getVal() * 1e-12 * (barrierPos->getVal()) * 1e-10) / (_kBT);
+		double troughForceGradient = FAssist->getVal(true) * 1e-12 * 3.4  * 1e-10 / (_kBT); // Force x distance / kBT
+		double forceGradientBck = (+FAssist->getVal(true) * 1e-12 * (3.4-barrierPos->getVal(true)) * 1e-10) / (_kBT);
+		double forceGradientFwd = (-FAssist->getVal(true) * 1e-12 * (barrierPos->getVal(true)) * 1e-10) / (_kBT);
 
 
 		// Energy and 2 surrounding peaks of current state
@@ -703,7 +703,7 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE userInputSequence(char* newSeq, char* newTemplateType, char* newPrimerType, int inputSequenceIsNascent, int msgID){
 
 		string seq = inputSequenceIsNascent == 1 ? Settings::complementSeq(string(newSeq), string(newTemplateType).substr(2) == "RNA") : string(newSeq);
-		if (seq.length() < hybridLen->getVal() + 2) {
+		if (seq.length() < hybridLen->getVal(true) + 2) {
 			messageFromWasmToJS("{'succ':false}", msgID);
 			return;
 		}
@@ -798,7 +798,7 @@ extern "C" {
 	double EMSCRIPTEN_KEEPALIVE getParameterValue(char* paramID) {
 
 		Parameter* param = Settings::getParameterByName(string(paramID));
-		if (param) return param->getVal();
+		if (param) return param->getVal(true);
 		cout << "Cannot find parameter " << string(paramID) << "!" << endl;
 		exit(0);
 		return 0;
@@ -817,9 +817,9 @@ extern "C" {
 
 
 			// Upstream window
-			if (_currentStateGUI->getLeftTemplateBaseNumber() - 12 - upstreamWindow->getVal() > 0){
+			if (_currentStateGUI->getLeftTemplateBaseNumber() - 12 - upstreamWindow->getVal(true) > 0){
 
-				string upstreamSequence = templateSequence.substr(_currentStateGUI->getLeftTemplateBaseNumber() - upstreamWindow->getVal() - 6, upstreamWindow->getVal() + 11);
+				string upstreamSequence = templateSequence.substr(_currentStateGUI->getLeftTemplateBaseNumber() - upstreamWindow->getVal(true) - 6, upstreamWindow->getVal(true) + 11);
 				char* seq = (char *) calloc(upstreamSequence.length()+1, sizeof(char));
 				double* curve = (double *) calloc(upstreamSequence.length()+1, sizeof(double));
 				double* bend = (double *) calloc(upstreamSequence.length()+1, sizeof(double));
@@ -828,7 +828,7 @@ extern "C" {
 
 
 
-				bendit_curvature(seq, upstreamSequence.length(), curve, bend, gc, scale, upstreamWindow->getVal(), upstreamWindow->getVal());
+				bendit_curvature(seq, upstreamSequence.length(), curve, bend, gc, scale, upstreamWindow->getVal(true), upstreamWindow->getVal(true));
 
 
 				string nextNum;
@@ -859,9 +859,9 @@ extern "C" {
 
 
 			// Downstream window
-			if (_currentStateGUI->getRightTemplateBaseNumber() + 12 + downstreamWindow->getVal() < templateSequence.length()){
+			if (_currentStateGUI->getRightTemplateBaseNumber() + 12 + downstreamWindow->getVal(true) < templateSequence.length()){
 
-				string downstreamSequence = templateSequence.substr(_currentStateGUI->getRightTemplateBaseNumber(), downstreamWindow->getVal() + 11);
+				string downstreamSequence = templateSequence.substr(_currentStateGUI->getRightTemplateBaseNumber(), downstreamWindow->getVal(true) + 11);
 				char* seq = (char *) calloc(downstreamSequence.length()+1, sizeof(char));
 				double* curve = (double *) calloc(downstreamSequence.length()+1, sizeof(double));
 				double* bend = (double *) calloc(downstreamSequence.length()+1, sizeof(double));
@@ -869,7 +869,7 @@ extern "C" {
 
 				strcpy(seq, downstreamSequence.c_str());
 
-				bendit_curvature(seq, downstreamSequence.length(), curve, bend, gc, scale, downstreamWindow->getVal(), downstreamWindow->getVal());
+				bendit_curvature(seq, downstreamSequence.length(), curve, bend, gc, scale, downstreamWindow->getVal(true), downstreamWindow->getVal(true));
 
 
 				string nextNum;
@@ -1598,7 +1598,7 @@ extern "C" {
 		stateDiagramJSON += "'kbind':" + to_string(currentModel->get_assumeBindingEquilibrium() ? 0 : stateToCalculateFor->calculateBindNTPrate(true)) + ","; // Rate of binding NTP
 		stateDiagramJSON += "'krelease':" + to_string(currentModel->get_assumeBindingEquilibrium() ? 0 : stateToCalculateFor->calculateReleaseNTPRate(true)) + ","; // Rate of releasing NTP
 		stateDiagramJSON += "'kcat':" + to_string(stateToCalculateFor->calculateCatalysisRate(true)) + ","; // Rate of catalysis
-		stateDiagramJSON += "'KD':" + to_string(Kdiss->getVal()) + ","; // Dissociation constant
+		stateDiagramJSON += "'KD':" + to_string(Kdiss->getVal(true)) + ","; // Dissociation constant
 		stateDiagramJSON += "'Kt':" + to_string(k_10 == 0 || k_01 == 0 ? 0 : k_10 / k_01) + ","; // Translocation constant
 		//cout << "k_10 " << k_10 << " k_01 " << k_01 << endl;
 
@@ -1904,7 +1904,7 @@ extern "C" {
 
 
 		// Gibbs energy of transition state
-		double meanBarrierHeight = currentSequence->getMeanTranslocationBarrierHeight() + GDagSlide->getVal();
+		double meanBarrierHeight = currentSequence->getMeanTranslocationBarrierHeight() + GDagSlide->getVal(true);
 		parametersJSON += "'meanBarrierHeight':" + to_string(meanBarrierHeight);
 		parametersJSON += "}";
 		messageFromWasmToJS(parametersJSON, msgID);
