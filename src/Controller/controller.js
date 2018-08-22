@@ -65,6 +65,7 @@ function translocationCalculationSummary(){
 		$("#meanEquilibriumConstantFwdOverBck").html(roundToSF(toReturn.meanEquilibriumConstantFwdOverBck, 3));
 		$("#meanForwardRate").html(roundToSF(toReturn.meanForwardRate, 3));
 		$("#meanBackwardsRate").html(roundToSF(toReturn.meanBackwardsRate, 3));
+		$("#meanBarrierHeight").html(roundToSF(toReturn.meanBarrierHeight, 3));
 		$("#translocationSummaryContainer").show(100);
 
 		
@@ -1153,6 +1154,7 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 					if (dataType == "pauseEscape"){
 						saveXML.writeAttributeString("pauseSite", abcDataObjectForModel["fits"][fitID]["pauseSite"]);
 						saveXML.writeAttributeString("Emax", abcDataObjectForModel["fits"][fitID]["Emax"]);
+						saveXML.writeAttributeString("Emin", abcDataObjectForModel["fits"][fitID]["Emin"]);
 						saveXML.writeAttributeString("t12", abcDataObjectForModel["fits"][fitID]["t12"]);
 						saveXML.writeAttributeString("halt", abcDataObjectForModel["fits"][fitID]["haltPosition"]);
 						var pauseEscapeTimes = abcDataObjectForModel["fits"][fitID]["vals"].join(",");

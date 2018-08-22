@@ -2303,7 +2303,7 @@ function drawPauseEscapeCanvas(fitID, pauseSite = "", Emax = 0, Emin = 0, t12 = 
 			var rate = Math.log(2) / t12;
 			for (var xPrime = axisGap; xPrime < widthScale * (xmax - xmin) + axisGap; xPrime++){
 				var x = (xPrime - axisGap) / widthScale + xmin;
-				var y = Emax * Math.exp(-x * rate);
+				var y = (Emax - Emin) * Math.exp(-x * rate) + Emin;
 				var yPrime = plotHeight + margin - heightScale * (y - ymin);
 				ctx.lineTo(xPrime, yPrime);
 				
@@ -2317,7 +2317,7 @@ function drawPauseEscapeCanvas(fitID, pauseSite = "", Emax = 0, Emin = 0, t12 = 
 
 				var time = timesList[i];
 				var xPrime = widthScale * (time - xmin) + axisGap;
-				var y = Emax * Math.exp(-time * rate);
+				var y = (Emax - Emin) * Math.exp(-time * rate) + Emin;
 				var yPrime = plotHeight + margin - heightScale * (y - ymin);
 
 
