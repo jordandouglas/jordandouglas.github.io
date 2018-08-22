@@ -60,6 +60,8 @@ class Sequence{
 		void flagForRateTableRebuilding();
 		void flagForUnfoldingTableRebuilding();
 
+
+		double getMeanTranslocationBarrierHeight();
 		bool nascentIsRNA();
 		bool nascentIsSS();
 		bool templateIsRNA();

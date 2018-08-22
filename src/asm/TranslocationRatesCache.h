@@ -50,6 +50,9 @@ class TranslocationRatesCache{
 		double getDownstreamRNABlockadeBarrierHeight(State* state);
 
 
+		double meanGibbsEnergyBarrier;
+
+
 	
 	public:
 		double getTranslocationRates(State* state, bool fwd);
@@ -57,7 +60,11 @@ class TranslocationRatesCache{
 		void buildBacktrackRateTable(string templSequence);
 		void buildUpstreamRNABlockadeTable(string templSequence);
 		void buildDownstreamRNABlockadeTable(string templSequence);
+		double get_meanGibbsEnergyBarrier();
+		void reset_meanGibbsEnergyBarrier();
+
 		TranslocationRatesCache();
+		void initTranslocationRates(string templateSequence);
 
 
 };

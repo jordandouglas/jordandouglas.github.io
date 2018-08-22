@@ -467,7 +467,6 @@ bool Settings::setSequence(string seqID){
 	_translocationRatesCache = currentSequence->getRatesCache();
 
 
-	cout << "initialising vrna" << endl;
 	if (PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
 
 
@@ -483,6 +482,8 @@ Sequence* Settings::getSequence(string seqID){
 	return sequences[seqID];
 
 }
+
+
 
 
 
@@ -834,6 +835,17 @@ void Settings::sampleAll(){
 
 
 }
+
+
+// Recomputes any normalisation terms in any parameters
+void Settings::renormaliseParameters(){
+
+	for (int i = 0; i < Settings::paramList.size(); i ++){
+		Settings::paramList.at(i)->recomputeNormalisationTerms();
+	}
+
+}
+
 
 
 Parameter* Settings::getParameterByName(string paramID){

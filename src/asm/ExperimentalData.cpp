@@ -48,6 +48,7 @@ ExperimentalData::ExperimentalData(int id, string dataType, int nObs){
 
 	this->pauseSite = 0;
 	this->Emax = 0;
+	this->Emin = 0;
 	this->t12 = 0;
 
 
@@ -135,6 +136,7 @@ string ExperimentalData::toJSON(){
 		JSON += "'pauseSite':" + to_string(this->pauseSite) + ",";
 		JSON += "'halt':" + to_string(this->halt) + ",";
 		JSON += "'Emax':" + to_string(this->Emax) + ",";
+		JSON += "'Emin':" + to_string(this->Emin) + ",";
 		JSON += "'t12':" + to_string(this->t12) + ",";
 	}
 
@@ -341,6 +343,9 @@ void ExperimentalData::set_pauseSite(int val) {
 void ExperimentalData::set_Emax(double val) {
 	this->Emax = val;
 }
+void ExperimentalData::set_Emin(double val) {
+	this->Emin = val;
+}
 void ExperimentalData::set_t12(double val) {
 	this->t12 = val;
 }
@@ -378,6 +383,10 @@ int ExperimentalData::get_pauseSite() {
 double ExperimentalData::get_Emax() {
 	return this->Emax;
 }
+double ExperimentalData::get_Emin() {
+	return this->Emin;
+}
+
 double ExperimentalData::get_t12() {
 	return this->t12;
 }

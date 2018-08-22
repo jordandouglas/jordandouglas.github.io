@@ -528,12 +528,15 @@ double FreeEnergy::getFreeEnergyOfTranscriptionBubbleHybridString(string templat
 // Populates the provided array[3] with 1) meanEquilibriumConstant, 2) meanForwardRate and 3) meanBackwardsRate
 void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
 
+
 	State* state = new State(true);
 
 
 	// Iterate until the end of the sequence
-	state->transcribe(1);
-	int nsites = templateSequence.length() - hybridLen->getVal() - std::max(bubbleLeft->getVal(), 2.0) - _nBasesToTranscribeInit;
+	state->forward();
+
+
+	int nsites = templateSequence.length() - state->get_nascentLength();
 	vector<double> equilibriumConstantsBckOverFwd(nsites);
 	vector<double> equilibriumConstantsFwdOverBck(nsites);
 	vector<double> forwardRates(nsites);
@@ -585,7 +588,39 @@ void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
 
 	delete state;
 
-	cout << "4" << endl;
+}
+
+
+// Calculate the Gibbs energy of the translocation transition state, averaged across the whole sequence (arithmetic mean)
+// This is a parameter-free estimate
+// Only considers the main elongation pathway
+double FreeEnergy::calculateMeanBarrierHeight(){
+
+	double meanBarrierHeight = 0;
+
+
+	State* state = new State(true);
+
+
+
+	// Iterate until the end of the sequence
+	int nsites = templateSequence.length() - state->get_nascentLength();
+	for (int i = 0; i < nsites; i ++){
+
+		meanBarrierHeight += state->calculateForwardTranslocationFreeEnergyBarrier(true);
+
+		// Bind NTP and catalyse to get next state
+		state->transcribe(1);
+
+	}
+
+
+	meanBarrierHeight = meanBarrierHeight / nsites;
+
+
+	delete state;
+	return meanBarrierHeight;
+
 }
 
 

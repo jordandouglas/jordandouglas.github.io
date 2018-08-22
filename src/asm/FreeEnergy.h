@@ -52,6 +52,7 @@ class FreeEnergy{
 		static void init_BP_parameters();
 
 		static void calculateMeanTranslocationEquilibriumConstant(double* results);
+		static double calculateMeanBarrierHeight();
 		static string getSecondaryStructureStringIntersection(string str1, string str2);
 
 };

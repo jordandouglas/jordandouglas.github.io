@@ -58,6 +58,7 @@ class ExperimentalData{
 	// Pause escape only
 	int pauseSite;
 	double Emax;
+	double Emin;
 	double t12;
 	
 
@@ -88,6 +89,7 @@ class ExperimentalData{
 		void set_halt(int val);
 		void set_pauseSite(int val);
 		void set_Emax(double val);
+		void set_Emin(double val);
 		void set_t12(double val);
 		void set_sequenceID(string seqID);
 
@@ -101,6 +103,7 @@ class ExperimentalData{
 		int get_halt();
 		int get_pauseSite();
 		double get_Emax();
+		double get_Emin();
 		double get_t12();
 		double getCurrentSettingX();
 

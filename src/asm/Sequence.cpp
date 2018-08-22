@@ -68,9 +68,8 @@ void Sequence::initRateTable(){
 
 	if (this->rateTableBuilt) return;
 	//cout << "Initialising rate tables for " << seqID << endl;
-	
-	this->translocationRatesCache->buildTranslocationRateTable(this->templateSequence); 
-   	this->translocationRatesCache->buildBacktrackRateTable(this->templateSequence);
+	this->translocationRatesCache->initTranslocationRates(this->templateSequence);
+	Settings::renormaliseParameters();
    	this->rateTableBuilt = true;
 }
 
@@ -84,6 +83,12 @@ void Sequence::initRNAunfoldingTable(){
 	this->translocationRatesCache->buildUpstreamRNABlockadeTable(this->templateSequence); 
    	this->translocationRatesCache->buildDownstreamRNABlockadeTable(this->templateSequence);
    	this->RNAunfoldingTableBuilt = true;
+}
+
+
+// Get the mean translocation barrier height for this sequence
+double Sequence::getMeanTranslocationBarrierHeight(){
+	return this->translocationRatesCache->get_meanGibbsEnergyBarrier();
 }
 
 

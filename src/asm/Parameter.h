@@ -48,6 +48,7 @@ class Parameter{
 
     bool hasMadeProposal;
     double valBeforeMakingProposal;
+    double normalisationAdditiveTerm; // An (optional) number to add onto this parameter for normalisation. This will not affect the prior probability or proposal distribution 
 
     map<string, double> distributionParameters;
 
@@ -97,6 +98,8 @@ class Parameter{
 		int getNumberInstances();
 		bool get_isMetaParameter();
 		vector<Parameter*> getParameterInstances();
+
+		void recomputeNormalisationTerms();
 
 };
 

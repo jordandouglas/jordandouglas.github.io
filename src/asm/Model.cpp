@@ -41,6 +41,7 @@ Model::Model(){
 	allowBacktrackWithoutInactivation = false;
 	deactivateUponMisincorporation = false;
 	allowGeometricCatalysis = true;
+	subtractMeanBarrierHeight = false;
 	allowmRNAfolding = false;
 	allowMisincorporation = false;
 	useFourNTPconcentrations = false;
@@ -73,6 +74,7 @@ Model* Model::clone(){
 	clonedModel->allowBacktrackWithoutInactivation = this->allowBacktrackWithoutInactivation;
 	clonedModel->deactivateUponMisincorporation = this->deactivateUponMisincorporation;
 	clonedModel->allowGeometricCatalysis = this->allowGeometricCatalysis;
+	clonedModel->subtractMeanBarrierHeight = this->subtractMeanBarrierHeight;
 	clonedModel->allowmRNAfolding = this->allowmRNAfolding;
 	clonedModel->allowMisincorporation = this->allowMisincorporation;
 	clonedModel->useFourNTPconcentrations = this->useFourNTPconcentrations;
@@ -160,6 +162,7 @@ string Model::toJSON(){
 	JSON += "'allowBacktrackWithoutInactivation':" + string(this->allowBacktrackWithoutInactivation ? "true" : "false") + ",";
 	JSON += "'deactivateUponMisincorporation':" + string(this->deactivateUponMisincorporation ? "true" : "false") + ",";
 	JSON += "'allowGeometricCatalysis':" + string(this->allowGeometricCatalysis ? "true" : "false") + ",";
+	JSON += "'subtractMeanBarrierHeight':" + string(this->subtractMeanBarrierHeight ? "true" : "false") + ",";
 	JSON += "'allowmRNAfolding':" + string(this->allowmRNAfolding ? "true" : "false") + ",";
 	JSON += "'allowMisincorporation':" + string(this->allowMisincorporation ? "true" : "false") + ",";
 	JSON += "'useFourNTPconcentrations':" + string(this->useFourNTPconcentrations ? "true" : "false") + ",";
@@ -190,6 +193,7 @@ void Model::print(){
 	cout << "allowBacktrackWithoutInactivation = " << this->allowBacktrackWithoutInactivation << endl;
 	cout << "deactivateUponMisincorporation = " << this->deactivateUponMisincorporation << endl;
 	cout << "allowGeometricCatalysis = " << this->allowGeometricCatalysis << endl;
+	cout << "subtractMeanBarrierHeight = " << this->subtractMeanBarrierHeight << endl;
 	cout << "allowmRNAfolding = " << this->allowmRNAfolding << endl;
 	cout << "allowDNAbending = " << this->allowDNAbending << endl;
 	cout << "allowMisincorporation = " << this->allowMisincorporation << endl;
@@ -289,6 +293,17 @@ Model* Model::set_allowGeometricCatalysis(bool val){
 bool Model::get_allowGeometricCatalysis(){
 	return this->allowGeometricCatalysis;
 }
+
+
+Model* Model::set_subtractMeanBarrierHeight(bool val){
+	this->subtractMeanBarrierHeight = val;
+	GDagSlide->recomputeNormalisationTerms();
+	return this;
+}
+bool Model::get_subtractMeanBarrierHeight(){
+	return this->subtractMeanBarrierHeight;
+}
+
 
 
 

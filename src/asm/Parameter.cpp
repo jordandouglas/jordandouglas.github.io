@@ -77,6 +77,7 @@ void Parameter::init(){
     this->valBeforeMakingProposal = 0;
     this->isMetaParameter = false;
     this->hidden = false;
+    this->normalisationAdditiveTerm = 0;
 
 
 	// Create the list of distribution parameters
@@ -125,14 +126,18 @@ Parameter* Parameter::show(){
 double Parameter::getVal(){
 	if (this->isMetaParameter) return this->instances.at(this->currentInstance)->getVal();
 
-	if (this->isHardcoded) return this->hardcodedVal;
-	return this->val;
+
+	// if(this->id == "GDagSlide") cout << "ID" << this->id << "; val = " << this->val << "; norm " << this->normalisationAdditiveTerm << endl;
+
+	if (this->isHardcoded) return this->hardcodedVal + this->normalisationAdditiveTerm;
+	return this->val + this->normalisationAdditiveTerm;
+
 }
 
 double Parameter::getTrueVal(){
 	if (this->isMetaParameter) return this->instances.at(this->currentInstance)->getTrueVal();
 
-	return this->val;
+	return this->val + normalisationAdditiveTerm;
 }
 
 void Parameter::setVal(double val){
@@ -161,6 +166,7 @@ Parameter* Parameter::clone(){
 	paramClone->isHardcoded = this->isHardcoded;
 	paramClone->hardcodedVal = this->hardcodedVal;
 	paramClone->val = this->val;
+	paramClone->normalisationAdditiveTerm = this->normalisationAdditiveTerm;
 
 	// Copy the distribution parameters
 	for(std::map<string, double>::iterator iter = this->distributionParameters.begin(); iter != this->distributionParameters.end(); ++iter){
@@ -173,7 +179,19 @@ Parameter* Parameter::clone(){
 
 }
 
+// Recompute any parameter-specific normalisation terms
+void Parameter::recomputeNormalisationTerms(){
 
+
+	// If this parameter is the Gibbs energy barrier of translocation, normalise by subtracting from the mean
+	if (currentModel->get_subtractMeanBarrierHeight() && this->id == "GDagSlide") {
+		this->normalisationAdditiveTerm = -currentSequence->getMeanTranslocationBarrierHeight();
+	}
+
+	else this->normalisationAdditiveTerm = 0;
+
+
+}
 
 
 void Parameter::sample(){
@@ -290,6 +308,9 @@ void Parameter::sample(){
 		Settings::resetRateTables();
 	}
 
+
+
+
 	// if (prevVal != this->val && this->id == "rnaFoldDistance") Settings::resetUnfoldingTables();
 
 }
@@ -375,6 +396,8 @@ double Parameter::calculateLogPrior(){
 
 // Makes a proposal and changes the value of this parameter 
 void Parameter::makeProposal(){
+
+
 
 	// If this is a metaparameter, uniformly at random select an instance to make a proposal on 
 	if (this->isMetaParameter) {

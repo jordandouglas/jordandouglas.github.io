@@ -37,10 +37,31 @@ using namespace std;
 
 
 TranslocationRatesCache::TranslocationRatesCache(){
+	this->meanGibbsEnergyBarrier = -INF;
+}
 
 
+// Reset all translocation rate related caches. Does not reset the mRNA folding energy cache
+void TranslocationRatesCache::initTranslocationRates(string templateSequence){
+	this->reset_meanGibbsEnergyBarrier();
+	this->buildTranslocationRateTable(templateSequence); 
+	this->buildBacktrackRateTable(templateSequence);
+}
+
+
+double TranslocationRatesCache::get_meanGibbsEnergyBarrier(){
+
+	if (this->meanGibbsEnergyBarrier == -INF) this->meanGibbsEnergyBarrier = FreeEnergy::calculateMeanBarrierHeight();
+
+	return this->meanGibbsEnergyBarrier;
 
 }
+
+
+void TranslocationRatesCache::reset_meanGibbsEnergyBarrier(){
+	this->meanGibbsEnergyBarrier == -INF;
+}
+
 
 
 double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){

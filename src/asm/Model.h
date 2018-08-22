@@ -44,6 +44,7 @@ class Model{
 	bool allowBacktrackWithoutInactivation;
 	bool deactivateUponMisincorporation;
 	bool allowGeometricCatalysis;
+	bool subtractMeanBarrierHeight;
 	bool allowDNAbending;
 	bool allowmRNAfolding;
 	bool allowMisincorporation;
@@ -96,6 +97,8 @@ class Model{
 		bool get_deactivateUponMisincorporation();
 		Model* set_allowGeometricCatalysis(bool val);
 		bool get_allowGeometricCatalysis();
+		Model* set_subtractMeanBarrierHeight(bool val);
+		bool get_subtractMeanBarrierHeight();
 		Model* set_allowDNAbending(bool val);
 		bool get_allowDNAbending();
 		Model* set_allowmRNAfolding(bool val);

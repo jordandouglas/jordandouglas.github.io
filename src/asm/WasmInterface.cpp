@@ -1501,6 +1501,7 @@ extern "C" {
 			else if (setting == "allowInactivation") currentModel->set_allowInactivation(val == "true");
 			else if (setting == "allowBacktrackWithoutInactivation") currentModel->set_allowBacktrackWithoutInactivation(val == "true");
 			else if (setting == "allowGeometricCatalysis") currentModel->set_allowGeometricCatalysis(val == "true");
+			else if (setting == "subtractMeanBarrierHeight") currentModel->set_subtractMeanBarrierHeight(val == "true");
 			else if (setting == "allowDNAbending") currentModel->set_allowDNAbending(val == "true");
 			else if (setting == "allowmRNAfolding") currentModel->set_allowmRNAfolding(val == "true");
 			else if (setting == "allowMisincorporation") currentModel->set_allowMisincorporation(val == "true");
@@ -1888,7 +1889,7 @@ extern "C" {
 
 
 
-	// Calculates the mean translocation equilibrium constant, and mean rates of going forward and backwards
+	// Calculates the mean translocation equilibrium constant, and mean rates of going forward and backwards, and Gibbs energy of transition state
 	void EMSCRIPTEN_KEEPALIVE calculateMeanTranslocationEquilibriumConstant(int msgID){
 
 		double results[4];
@@ -1899,7 +1900,12 @@ extern "C" {
 		parametersJSON += "'meanEquilibriumConstant':" + to_string(results[0]) + ",";
 		parametersJSON += "'meanEquilibriumConstantFwdOverBck':" + to_string(results[1]) + ",";
 		parametersJSON += "'meanForwardRate':" + to_string(results[2]) + ",";
-		parametersJSON += "'meanBackwardsRate':" + to_string(results[3]);
+		parametersJSON += "'meanBackwardsRate':" + to_string(results[3]) + ",";
+
+
+		// Gibbs energy of transition state
+		double meanBarrierHeight = currentSequence->getMeanTranslocationBarrierHeight() + GDagSlide->getVal();
+		parametersJSON += "'meanBarrierHeight':" + to_string(meanBarrierHeight);
 		parametersJSON += "}";
 		messageFromWasmToJS(parametersJSON, msgID);
 

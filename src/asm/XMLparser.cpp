@@ -141,6 +141,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 					else if (modelSettingName == "allowInactivation") currentModel->set_allowInactivation(value == "true");
 					else if (modelSettingName == "allowBacktrackWithoutInactivation") currentModel->set_allowBacktrackWithoutInactivation(value == "true");
 					else if (modelSettingName == "allowGeometricCatalysis") currentModel->set_allowGeometricCatalysis(value == "true");
+					else if (modelSettingName == "subtractMeanBarrierHeight") currentModel->set_subtractMeanBarrierHeight(value == "true");
 					else if (modelSettingName == "allowmRNAfolding") currentModel->set_allowmRNAfolding(value == "true");
 					else if (modelSettingName == "allowMisincorporation") currentModel->set_allowMisincorporation(value == "true");
 					else if (modelSettingName == "useFourNTPconcentrations") currentModel->set_useFourNTPconcentrations(value == "true");
@@ -409,6 +410,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 					int pauseSite = 0;
 					double Emax = 0;
+					double Emin = 0;
 					double t12 = 0;
 
 					if (experimentEle->Attribute("pauseSite")) {
@@ -419,6 +421,11 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 					if (experimentEle->Attribute("Emax")) {
 						Emax = atof(experimentEle->Attribute("Emax"));
 						experiment->set_Emax(Emax);
+					}
+
+					if (experimentEle->Attribute("Emin")) {
+						Emin = atof(experimentEle->Attribute("Emin"));
+						experiment->set_Emin(Emin);
 					}
 
 					if (experimentEle->Attribute("t12")) {
@@ -436,7 +443,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 						double time = stof(times_split.at(obsNum));
 						double rate = log(2) / t12;
-						double expectedProb = Emax * exp(-time * rate);
+						double expectedProb = (Emax - Emin) * exp(-time * rate) + Emin;
 						experiment->addDatapoint(time, expectedProb);
 
 					}
@@ -529,6 +536,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 						else if (attrName == "allowInactivation") model->set_allowInactivation(value == "true");
 						else if (attrName == "allowBacktrackWithoutInactivation") model->set_allowBacktrackWithoutInactivation(value == "true");
 						else if (attrName == "allowGeometricCatalysis") model->set_allowGeometricCatalysis(value == "true");
+						else if (attrName == "subtractMeanBarrierHeight") model->set_subtractMeanBarrierHeight(value == "true");
 						else if (attrName == "allowmRNAfolding") model->set_allowmRNAfolding(value == "true");
 						else if (attrName == "allowMisincorporation") model->set_allowMisincorporation(value == "true");
 						else if (attrName == "useFourNTPconcentrations") model->set_useFourNTPconcentrations(value == "true");

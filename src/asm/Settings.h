@@ -211,6 +211,9 @@ class Settings{
     	static void sortedPush(std::vector<double> &cont, double value);
     	static int indexOf(deque<int> arr, int val);
 
+
+    	static void renormaliseParameters();
+
 };
 
 
