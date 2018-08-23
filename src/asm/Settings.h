@@ -54,6 +54,16 @@ extern const int INF;
 extern const int _nBasesToTranscribeInit;
 
 
+
+// Translocation model constants. 
+// These terms are subtracted from the translocation barrier height of the respective model when normalising
+// Calculated using the rpob gene with transcription bubble 9/1/1
+extern const double _midpointModelConstant;
+extern const double _sealingModelConstant;
+extern const double _meltingModelConstant;
+extern const double _absoluteModelConstant;
+
+
 // Sequence information
 extern int ntrials_sim;
 extern string _seqID;
@@ -99,7 +109,7 @@ extern list<ExperimentalData*> experiments;
 extern int _numExperimentalObservations;
 
 // Model
-extern list<Model> modelsToEstimate;
+extern deque<Model> modelsToEstimate;
 extern Model* currentModel;
 
 
@@ -183,6 +193,8 @@ class Settings{
 		static void sampleAll();
 		static void sampleModel();
 		static void setModel(string modelID);
+		static Model* getModel(string modelID);
+		static bool checkIfModelExists(string modelID);
 		static Parameter* getParameterByName(string paramID);
 		static vector<Parameter*> paramList;
 		static vector<Parameter*> getParamListClone();

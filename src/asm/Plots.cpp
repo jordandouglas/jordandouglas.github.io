@@ -469,210 +469,6 @@ string Plots::getPlotDataAsJSON(){
 
 
 
-	if (distanceVsTime_needsData) {
-
-	
-		// Turn unsent distance versus time object into a JSON
-		Plots::plotDataJSON += ",'DVT_UNSENT':{";
-		string distances;
-		string times;
-		list<vector<double>> simulationList;
-		int nElements = -1;
-		int exceededStringLengthAt_i = -1;
-		int exceededStringLengthAt_j = -1;
-		int distanceTimeNumber = 0;
-		list<list<vector<double>>>::iterator it;
-		list<vector<double>>::iterator j;
-		for (it = Plots::distanceVsTimeDataUnsent.begin(); it != Plots::distanceVsTimeDataUnsent.end(); ++it){
-
-
-			// Simulation number of this simulation
-			nElements++;
-
-
-			simulationList = (*it);
-
-			if (simulationList.size() < 2) continue;
-
-
-			//cout << "a" << nElements << endl;
-
-
-			int simulationNum = 0;
-			if (simulationList.front().size() == 3) simulationNum = int(simulationList.front().at(2));
-
-
-			// Get all distances and times in this simulation
-			distances = "[";
-			times = "[";
-
-
-
-
-			//cout << distanceVsTimeDataUnsent_JSON << endl;
-			//cout << "size of this " << simulationList.size() << "size of parent " << Plots::distanceVsTimeDataUnsent.size() << endl;
-			exceededStringLengthAt_j = -1;
-			distanceTimeNumber = 0;
-			for (j = simulationList.begin(); j != simulationList.end(); ++j){
-
-
-				distanceTimeNumber ++;
-				if ((*j).size() < 2 || int((*j).at(0)) <= 0) continue;
-				distances += to_string(int((*j).at(0)));
-				times += to_string((*j).at(1));
-
-    			distances += ",";	
-    			times += ",";	
-
-
-        		if (Plots::plotDataJSON.length() + distances.length() + times.length() >= Plots::maximumBytesJSON - 1000) {
-        			exceededStringLengthAt_j = distanceTimeNumber;
-        			cout << "Maximum string size exceeded for distance vs time." << endl;
-        			break;
-        		}
-
-
-
-			}
-
-
-			// Delete all distance time objects up until the entry which caused memory to exceed 
-			distanceTimeNumber = 0;
-			for (j = simulationList.begin(); j != simulationList.end(); ++j){
-				distanceTimeNumber ++;
-				if (exceededStringLengthAt_j != -1 && distanceTimeNumber > exceededStringLengthAt_j) break;
-				(*j).clear();
-			}
-
-
-
-			// Clear the list of values for this simulation (up until the memory overflow was achieved, or the full list if string length was not exceeded)
-			if (exceededStringLengthAt_j != -1) {
-    			list<vector<double>>::iterator finalElementToDelete = (*it).begin();
-    			advance(finalElementToDelete, exceededStringLengthAt_j);
-    			(*it).erase((*it).begin(), finalElementToDelete);
-
-
-    			exceededStringLengthAt_i = nElements;
-				stringLengthHasBeenExceeded = true;
-
-
-				// Ensure that the next element (that has not been deleted) contains the simulation number
-				list<vector<double>>::iterator newFirstElement = (*it).begin();
-				(*newFirstElement).resize(3);
-				(*newFirstElement).at(2) = simulationNum;
-
-    		}
-			else (*it).clear();
-			//delete &simulationList;
-
-
-
-
-			if (distances.substr(distances.length()-1, 1) == ",") distances = distances.substr(0, distances.length() - 1);
-			if (times.substr(times.length()-1, 1) == ",") times = times.substr(0, times.length() - 1);
-			distances += "]";
-			times += "]";
-
-			//if (distances == "[]" || times == "[]") continue;
-
-
-			Plots::plotDataJSON += "'";
-			Plots::plotDataJSON += to_string(simulationNum);
-			Plots::plotDataJSON += "':{'sim':";
-			Plots::plotDataJSON += to_string(simulationNum);
-
-
-			Plots::plotDataJSON += ",'distances':";
-			Plots::plotDataJSON += distances;
-			Plots::plotDataJSON += ",'times':";
-			Plots::plotDataJSON += times;
-			Plots::plotDataJSON += "}";
-			Plots::plotDataJSON += ",";	
-
-
-    		//cout << "distanceVsTimeDataUnsent_JSON length " << distanceVsTimeDataUnsent_JSON.length() << endl;
-
-    		//cout << distanceVsTimeDataUnsent_JSON << endl;
-
-
-
-
-			//cout << "c" << nElements << endl;
-
-
-			// Stop adding elements to the string if we have gone past the maximum length
-    		if (exceededStringLengthAt_j != -1) break;
-
-
-
-
-		}
-
-
-
-		if (Plots::plotDataJSON.substr(Plots::plotDataJSON.length()-1, 1) == ",") Plots::plotDataJSON = Plots::plotDataJSON.substr(0, Plots::plotDataJSON.length() - 1);
-		Plots::plotDataJSON += "}";
-
-
-
-
-		//cout << distanceVsTimeDataUnsent_JSON << endl;
-
-
-
-
-		// Include median distance travelled
-		if (Plots::distancesTravelledOnEachTemplate.size() > 0){
-			int middleDistanceIndex = Plots::distancesTravelledOnEachTemplate.size() / 2;
-			//cout << middleDistanceIndex << endl;
-			Plots::plotDataJSON += ",'medianDistanceTravelledPerTemplate':" + to_string(Plots::distancesTravelledOnEachTemplate.at(middleDistanceIndex));
-		}
-
-		// Include median time travelled
-		if (Plots::timesSpentOnEachTemplate.size() > 0){
-			int middleTimeIndex = Plots::timesSpentOnEachTemplate.size() / 2;
-			//cout << middleTimeIndex << endl;
-			Plots::plotDataJSON += ",'medianTimeSpentOnATemplate':" + to_string(Plots::timesSpentOnEachTemplate.at(middleTimeIndex));
-		}
-
-
-		// Erase all unsent elements which were successfully added to the string before memory was exceeded
-		if (exceededStringLengthAt_i != -1) {
-			if (exceededStringLengthAt_i > 0){
-				list<list<vector<double>>>::iterator finalElementToDelete = Plots::distanceVsTimeDataUnsent.begin();
-				advance(finalElementToDelete, exceededStringLengthAt_i-1);
-				//cout << "Erasing upto element " << exceededStringLengthAt_i-1 << endl;
-
-				//cout << "length before " << Plots::distanceVsTimeDataUnsent.size() << endl;
-				Plots::distanceVsTimeDataUnsent.erase(Plots::distanceVsTimeDataUnsent.begin(), finalElementToDelete);
-				
-
-				//cout << "length after " << Plots::distanceVsTimeDataUnsent.size() << endl;
-			}
-		}
-		else {
-
-			Plots::distanceVsTimeDataUnsent.clear();
-
-			// Reinitialise the unsent data structure
-			if (Plots::distanceVsTimeSize < Plots::distanceVsTimeSizeMax) {
-				vector<double> distanceTimeUnsent(3);
-				//distanceTimeUnsent.at(0) = 0; // Distance (nt);
-				//distanceTimeUnsent.at(1) = Plots::timeWaitedUntilNextTranslocation; // Time (s)
-				distanceTimeUnsent.at(2) = Plots::currentSimNumber;
-		    	list<vector<double>> distanceTimeThisSimulation;
-				distanceTimeThisSimulation.push_back(distanceTimeUnsent);
-		    	Plots::distanceVsTimeDataUnsent.push_back(distanceTimeThisSimulation);
-	    	}
-
-	    }
-
-
-
-				
-	}
-
 
 
 	// Catalysis time histogram
@@ -894,6 +690,215 @@ string Plots::getPlotDataAsJSON(){
 
 
 	} 
+
+
+
+
+
+	if (distanceVsTime_needsData) {
+
+	
+		// Turn unsent distance versus time object into a JSON
+		Plots::plotDataJSON += ",'DVT_UNSENT':{";
+		string distances;
+		string times;
+		list<vector<double>> simulationList;
+		int nElements = -1;
+		int exceededStringLengthAt_i = -1;
+		int exceededStringLengthAt_j = -1;
+		int distanceTimeNumber = 0;
+		list<list<vector<double>>>::iterator it;
+		list<vector<double>>::iterator j;
+		for (it = Plots::distanceVsTimeDataUnsent.begin(); it != Plots::distanceVsTimeDataUnsent.end(); ++it){
+
+
+			// Simulation number of this simulation
+			nElements++;
+
+
+			simulationList = (*it);
+
+			if (simulationList.size() < 2) continue;
+
+
+			//cout << "a" << nElements << endl;
+
+
+			int simulationNum = 0;
+			if (simulationList.front().size() == 3) simulationNum = int(simulationList.front().at(2));
+
+
+			// Get all distances and times in this simulation
+			distances = "[";
+			times = "[";
+
+
+
+
+			//cout << distanceVsTimeDataUnsent_JSON << endl;
+			//cout << "size of this " << simulationList.size() << "size of parent " << Plots::distanceVsTimeDataUnsent.size() << endl;
+			exceededStringLengthAt_j = -1;
+			distanceTimeNumber = 0;
+			for (j = simulationList.begin(); j != simulationList.end(); ++j){
+
+
+				distanceTimeNumber ++;
+				if ((*j).size() < 2 || int((*j).at(0)) <= 0) continue;
+				distances += to_string(int((*j).at(0)));
+				times += to_string((*j).at(1));
+
+    			distances += ",";	
+    			times += ",";	
+
+
+        		if (Plots::plotDataJSON.length() + distances.length() + times.length() >= Plots::maximumBytesJSON - 1000) {
+        			exceededStringLengthAt_j = distanceTimeNumber;
+        			cout << "Maximum string size exceeded for distance vs time." << endl;
+        			break;
+        		}
+
+
+
+			}
+
+
+			// Delete all distance time objects up until the entry which caused memory to exceed 
+			distanceTimeNumber = 0;
+			for (j = simulationList.begin(); j != simulationList.end(); ++j){
+				distanceTimeNumber ++;
+				if (exceededStringLengthAt_j != -1 && distanceTimeNumber > exceededStringLengthAt_j) break;
+				(*j).clear();
+			}
+
+
+
+			// Clear the list of values for this simulation (up until the memory overflow was achieved, or the full list if string length was not exceeded)
+			if (exceededStringLengthAt_j != -1) {
+    			list<vector<double>>::iterator finalElementToDelete = (*it).begin();
+    			advance(finalElementToDelete, exceededStringLengthAt_j);
+    			(*it).erase((*it).begin(), finalElementToDelete);
+
+
+    			exceededStringLengthAt_i = nElements;
+				stringLengthHasBeenExceeded = true;
+
+
+				// Ensure that the next element (that has not been deleted) contains the simulation number
+				list<vector<double>>::iterator newFirstElement = (*it).begin();
+				(*newFirstElement).resize(3);
+				(*newFirstElement).at(2) = simulationNum;
+
+    		}
+			else (*it).clear();
+			//delete &simulationList;
+
+
+
+
+			if (distances.substr(distances.length()-1, 1) == ",") distances = distances.substr(0, distances.length() - 1);
+			if (times.substr(times.length()-1, 1) == ",") times = times.substr(0, times.length() - 1);
+			distances += "]";
+			times += "]";
+
+			//if (distances == "[]" || times == "[]") continue;
+
+
+			Plots::plotDataJSON += "'";
+			Plots::plotDataJSON += to_string(simulationNum);
+			Plots::plotDataJSON += "':{'sim':";
+			Plots::plotDataJSON += to_string(simulationNum);
+
+
+			Plots::plotDataJSON += ",'distances':";
+			Plots::plotDataJSON += distances;
+			Plots::plotDataJSON += ",'times':";
+			Plots::plotDataJSON += times;
+			Plots::plotDataJSON += "}";
+			Plots::plotDataJSON += ",";	
+
+
+    		//cout << "distanceVsTimeDataUnsent_JSON length " << distanceVsTimeDataUnsent_JSON.length() << endl;
+
+    		//cout << distanceVsTimeDataUnsent_JSON << endl;
+
+
+
+
+			//cout << "c" << nElements << endl;
+
+
+			// Stop adding elements to the string if we have gone past the maximum length
+    		if (exceededStringLengthAt_j != -1) break;
+
+
+
+
+		}
+
+
+
+		if (Plots::plotDataJSON.substr(Plots::plotDataJSON.length()-1, 1) == ",") Plots::plotDataJSON = Plots::plotDataJSON.substr(0, Plots::plotDataJSON.length() - 1);
+		Plots::plotDataJSON += "}";
+
+
+
+
+		//cout << distanceVsTimeDataUnsent_JSON << endl;
+
+
+
+
+		// Include median distance travelled
+		if (Plots::distancesTravelledOnEachTemplate.size() > 0){
+			int middleDistanceIndex = Plots::distancesTravelledOnEachTemplate.size() / 2;
+			//cout << middleDistanceIndex << endl;
+			Plots::plotDataJSON += ",'medianDistanceTravelledPerTemplate':" + to_string(Plots::distancesTravelledOnEachTemplate.at(middleDistanceIndex));
+		}
+
+		// Include median time travelled
+		if (Plots::timesSpentOnEachTemplate.size() > 0){
+			int middleTimeIndex = Plots::timesSpentOnEachTemplate.size() / 2;
+			//cout << middleTimeIndex << endl;
+			Plots::plotDataJSON += ",'medianTimeSpentOnATemplate':" + to_string(Plots::timesSpentOnEachTemplate.at(middleTimeIndex));
+		}
+
+
+		// Erase all unsent elements which were successfully added to the string before memory was exceeded
+		if (exceededStringLengthAt_i != -1) {
+			if (exceededStringLengthAt_i > 0){
+				list<list<vector<double>>>::iterator finalElementToDelete = Plots::distanceVsTimeDataUnsent.begin();
+				advance(finalElementToDelete, exceededStringLengthAt_i-1);
+				//cout << "Erasing upto element " << exceededStringLengthAt_i-1 << endl;
+
+				//cout << "length before " << Plots::distanceVsTimeDataUnsent.size() << endl;
+				Plots::distanceVsTimeDataUnsent.erase(Plots::distanceVsTimeDataUnsent.begin(), finalElementToDelete);
+				
+
+				//cout << "length after " << Plots::distanceVsTimeDataUnsent.size() << endl;
+			}
+		}
+		else {
+
+			Plots::distanceVsTimeDataUnsent.clear();
+
+			// Reinitialise the unsent data structure
+			if (Plots::distanceVsTimeSize < Plots::distanceVsTimeSizeMax) {
+				vector<double> distanceTimeUnsent(3);
+				//distanceTimeUnsent.at(0) = 0; // Distance (nt);
+				//distanceTimeUnsent.at(1) = Plots::timeWaitedUntilNextTranslocation; // Time (s)
+				distanceTimeUnsent.at(2) = Plots::currentSimNumber;
+		    	list<vector<double>> distanceTimeThisSimulation;
+				distanceTimeThisSimulation.push_back(distanceTimeUnsent);
+		    	Plots::distanceVsTimeDataUnsent.push_back(distanceTimeThisSimulation);
+	    	}
+
+	    }
+
+
+
+				
+	}
+
 
 
 

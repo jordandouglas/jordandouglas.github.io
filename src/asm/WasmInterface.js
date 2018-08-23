@@ -733,6 +733,39 @@ getParametersAndModelSettings = function(msgID = null){
 }
 
 
+
+// Returns the current model settings in a compact and easy to read format
+getParametersAndModelSettings_compact = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log(JSON.parse(resultStr));
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	Module.ccall("getParametersAndModelSettings_compact", null, ["number"], [msgID]);
+
+}
+
+
+// Activates the currently selected model
+activateModel = function(modelID, modelWeight, modelDescription, msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log(JSON.parse(resultStr));
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	Module.ccall("activateModel", null, ["number", "number", "string", "number"], [modelID, modelWeight, modelDescription, msgID]);
+
+
+}
+
+
+
 // Perform N simulations and then return to js after a timeout (~1000ms) has been reached to check if user has requested to stop
 startTrials = function(N, msgID = null){
 	

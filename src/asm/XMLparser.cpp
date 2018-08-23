@@ -595,7 +595,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 
 			// Normalise prior weights into probabilities
-			for (list<Model>::iterator it=modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+			for (deque<Model>::iterator it=modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
 				(*it).setPriorProb((*it).getPriorProb() / weightSum);
 			}
 

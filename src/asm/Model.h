@@ -83,6 +83,7 @@ class Model{
 		void addParameterInstanceMapping(string paramID, int instanceNum);
 		
 
+		double getTranslocationModelConstant();
 
 		// Model settings
 		Model* set_allowBacktracking(bool val);

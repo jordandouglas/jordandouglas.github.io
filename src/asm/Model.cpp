@@ -154,7 +154,7 @@ string Model::toJSON(){
 
 	//cout << "Getting translocation model " << this->currentTranslocationModel << "." << endl;
 	
-	string JSON = "'id':'simpleBrownian','name':'Simple Brownian ratchet model',";
+	string JSON = "";
 	
 	JSON += "'allowBacktracking':" + string(this->allowBacktracking ? "true" : "false") + ",";
 	JSON += "'allowHypertranslocation':" + string(this->allowHypertranslocation ? "true" : "false") + ",";
@@ -230,6 +230,22 @@ void Model::print(){
 
 
 }
+
+
+
+
+
+
+double Model::getTranslocationModelConstant(){
+
+	if (currentTranslocationModel == "sealingBarriers") return _sealingModelConstant;
+	if (currentTranslocationModel == "meltingBarriers") return _meltingModelConstant;
+	if (currentTranslocationModel == "midpointBarriers") return _midpointModelConstant;
+	if (currentTranslocationModel == "absoluteBarriers") return _absoluteModelConstant;
+	return 0;
+
+}
+
 
 
 // Use this function when a parameter has multiple instances and this model uses one of them

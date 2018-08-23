@@ -88,6 +88,7 @@ class Parameter{
 		void print();
 		double calculateLogPrior();
 		string toJSON();
+		string toJSON_compact();
 		Parameter* hide();
 		Parameter* show();
 

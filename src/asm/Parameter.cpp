@@ -137,7 +137,7 @@ double Parameter::getVal(bool normalise){
 double Parameter::getTrueVal(){
 	if (this->isMetaParameter) return this->instances.at(this->currentInstance)->getTrueVal();
 
-	return this->val + normalisationAdditiveTerm;
+	return this->val; // + normalisationAdditiveTerm;
 }
 
 void Parameter::setVal(double val){
@@ -185,7 +185,7 @@ void Parameter::recomputeNormalisationTerms(){
 
 	// If this parameter is the Gibbs energy barrier of translocation, normalise by subtracting from the mean
 	if (currentModel->get_subtractMeanBarrierHeight() && this->id == "GDagSlide") {
-		this->normalisationAdditiveTerm = -currentSequence->getMeanTranslocationBarrierHeight();
+		this->normalisationAdditiveTerm = currentModel->getTranslocationModelConstant();
 		//cout << " normalisationAdditiveTerm " << this->normalisationAdditiveTerm << endl;
 	}
 
@@ -611,6 +611,25 @@ string Parameter::toJSON(){
 	JSON += "}";
 	return JSON;
 }
+
+
+
+
+// Converts the parameter into a JSON string for use by javascript (not wrapped in { })
+// Only displays the parameter ID and its current distribution (and only if the distribution is 'fixed')
+string Parameter::toJSON_compact(){
+
+	
+
+	string JSON = "";
+	if (this->distributionName == "Fixed" && !this->hidden){
+		JSON = "'" + this->getID() + "':" + to_string(this->distributionParameters["fixedDistnVal"]);
+	}
+
+
+	return JSON;
+}
+
 
 
 

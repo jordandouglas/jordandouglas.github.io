@@ -1642,6 +1642,103 @@ extern "C" {
 	}
 
 
+
+	// Returns the current model settings in a compact and easy to read format
+	void EMSCRIPTEN_KEEPALIVE getParametersAndModelSettings_compact(int msgID){
+		string JSON = "{'parameters':{";
+
+		for (int i = 0; i < Settings::paramList.size(); i ++){
+			string paramJSON = Settings::paramList.at(i)->toJSON_compact();
+			if (paramJSON != ""){
+				JSON += paramJSON;
+				if (i < Settings::paramList.size()-1) JSON += ",";
+			}
+		}
+
+		JSON += "},'model':{" + currentModel->toJSON() + "}}";
+		messageFromWasmToJS(JSON, msgID);
+	}
+
+
+	// Activates the currently selected model
+	void EMSCRIPTEN_KEEPALIVE activateModel(int modelID, double modelWeight, char* modelDescription, int msgID){
+
+		cout << "Activating model " << modelID << " and weight " << modelWeight << " to:" << modelDescription << endl;
+
+		// If there are no models on the list to estimate, then add the current model to this list as the default model, and with weight 0
+		if (modelsToEstimate.size() == 0){
+			currentModel->setID("defualt");
+			currentModel->setPriorProb(0);
+			modelsToEstimate.push_back(*currentModel);
+		}
+
+
+
+		// Create the new model
+		Model* newModel;
+		string modelID_str = to_string(modelID);
+		if (!Settings::checkIfModelExists(modelID_str)){
+			newModel = currentModel->clone();
+			newModel->setID(modelID_str);
+			newModel->setPriorProb(modelWeight >= 0 ? modelWeight : 0);
+			modelsToEstimate.push_back(*newModel);
+		}
+		else newModel = Settings::getModel(modelID_str);
+
+
+		// Update the model settings
+		vector<string> modelSettings = Settings::split(string(modelDescription), ',');
+		for (int i = 0; i < modelSettings.size(); i ++){
+
+
+			vector<string> tokens = Settings::split(modelSettings.at(i), '=');
+			if (tokens.size() != 2) continue;
+
+
+			string setting = tokens.at(0);
+			string val = tokens.at(1);
+
+			cout << setting << "=" << val << endl; 
+
+			if (setting == "allowBacktracking") newModel->set_allowBacktracking(val == "true");
+			else if (setting == "allowHypertranslocation") newModel->set_allowHypertranslocation(val == "true");
+			else if (setting == "allowInactivation") newModel->set_allowInactivation(val == "true");
+			else if (setting == "allowBacktrackWithoutInactivation") newModel->set_allowBacktrackWithoutInactivation(val == "true");
+			else if (setting == "allowGeometricCatalysis") newModel->set_allowGeometricCatalysis(val == "true");
+			else if (setting == "subtractMeanBarrierHeight") newModel->set_subtractMeanBarrierHeight(val == "true");
+			else if (setting == "allowDNAbending") newModel->set_allowDNAbending(val == "true");
+			else if (setting == "allowmRNAfolding") newModel->set_allowmRNAfolding(val == "true");
+			else if (setting == "allowMisincorporation") newModel->set_allowMisincorporation(val == "true");
+			else if (setting == "useFourNTPconcentrations") newModel->set_useFourNTPconcentrations(val == "true");
+			else if (setting == "NTPbindingNParams") newModel->set_NTPbindingNParams(atoi(val.c_str()));
+			else if (setting == "currentTranslocationModel") newModel->set_currentTranslocationModel(val);
+			else if (setting == "currentBacksteppingModel") newModel->set_currentBacksteppingModel(val);
+			else if (setting == "currentRNABlockadeModel") newModel->set_currentRNABlockadeModel(val);
+			else if (setting == "currentInactivationModel") newModel->set_currentInactivationModel(val);
+			else if (setting == "assumeBindingEquilibrium") newModel->set_assumeBindingEquilibrium(val == "true");
+			else if (setting == "assumeTranslocationEquilibrium") newModel->set_assumeTranslocationEquilibrium(val == "true");
+
+
+		}
+
+
+
+		// Activate this model
+		Settings::setModel(modelID_str);
+
+
+		cout << "newModel " << endl;
+		newModel->print();
+
+
+		cout << "\n\n\ncurrentModel " << endl;
+		currentModel->print();
+
+		messageFromWasmToJS("", msgID);
+	}
+
+
+
 	
 	// Perform N simulations
 	// Returns mean velocity, real time taken and remaining number of trials to go

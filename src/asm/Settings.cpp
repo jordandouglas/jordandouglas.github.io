@@ -38,6 +38,7 @@
 #include <math.h>
 #include <cmath>
 #include <list>
+#include <deque>
 
 #include <stdio.h>
 #include <string.h>
@@ -52,6 +53,12 @@ const double _kBT = 1.380649e-23 * 310;
 const double _preExp = 1e6;	
 const double _PI = 3.14159265359;	
 const int _nBasesToTranscribeInit = 4;
+
+
+const double _midpointModelConstant = -14.37;
+const double _sealingModelConstant = -13.61;
+const double _meltingModelConstant = -18.31;
+const double _absoluteModelConstant = 0;
 
 
 // Command line arguments
@@ -100,7 +107,7 @@ int _numExperimentalObservations = 0;
 
 
 // Models
-list<Model> modelsToEstimate;
+deque<Model> modelsToEstimate;
 Model* currentModel = new Model();
 
 
@@ -601,7 +608,7 @@ void Settings::print(){
 
 	// Print all models
 	cout << "Models:" << endl;
-	for (list<Model>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+	for (deque<Model>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
 		(*it).print();
 	}
 
@@ -902,7 +909,7 @@ void Settings::sampleModel(){
 	double cumsum = 0;
 	//if (modelsToEstimate.size() > 1 && currentModel->getID() != "-1") cumsum += currentModel->getPriorProb();
 
-	for (list<Model>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+	for (deque<Model>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
 		//if (modelsToEstimate.size() > 1 && (*it).getID() == currentModel->getID()) continue; // Ensure that current model is not sampled
 		cumsum += (*it).getPriorProb();
 		if (runifNum < cumsum){
@@ -920,7 +927,7 @@ void Settings::sampleModel(){
 
 void Settings::setModel(string modelID){
 
-	for (list<Model>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+	for (deque<Model>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
 		if ((*it).getID() == modelID) {
 			currentModel = &(*it);
 			break;
@@ -928,6 +935,32 @@ void Settings::setModel(string modelID){
 	}
 
 }
+
+
+
+Model* Settings::getModel(string modelID){
+
+	for (deque<Model>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+		if ((*it).getID() == modelID) {
+			return &(*it);
+		}
+	}
+
+	return nullptr;
+
+}
+
+
+bool Settings::checkIfModelExists(string modelID){
+
+	for (deque<Model>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+		if ((*it).getID() == modelID) return true;
+	}
+	return false;
+
+}
+
+
 
 
 

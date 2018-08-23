@@ -154,7 +154,7 @@ void BayesianCalculations::printMarginalGeometricMedians(vector<PosteriorDistrib
 	if (modelsToEstimate.size()) {
 
 
-		for (list<Model>::iterator model = modelsToEstimate.begin(); model != modelsToEstimate.end(); ++model){
+		for (deque<Model>::iterator model = modelsToEstimate.begin(); model != modelsToEstimate.end(); ++model){
 
 			// Compile a list of states which use this model
 			list<PosteriorDistributionSample*> statesThisModel;
