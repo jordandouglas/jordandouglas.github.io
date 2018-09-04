@@ -2326,7 +2326,7 @@ function startTrials_controller(){
 							//MESSAGE_LISTENER[msgID].remove = false;
 
 							var progressProportion = result.N / ntrials;
-							$("#progressSimSpan").attr("title", "Completed " + (result.N-1) + " out of " + ntrials + " trials.");  
+							$("#progressSimSpan").attr("title", "Completed " + result.N + " out of " + ntrials + " trials.");  
 							if ($("#counterProgress").html() != Math.floor(progressProportion * 100)) {
 								renderParameters(); // Update parameters at the end of each trial
 								activateModel_changeView(result.currentModelID) // Update currently sampled model at end of each trial
