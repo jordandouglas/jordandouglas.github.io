@@ -133,7 +133,7 @@ function init(){
 		running_ABC = false;
 		$("#nbasesToSimulate").val(30);
 		$("#translocationSummaryContainer").hide(100);
-		$("#currentTranslocationModel").val("sealingBarriers");
+		$("#currentTranslocationModel").val("HIBU_barriers");
 		maxHeight = 10000;
 		nTimes20SequencesToDisplay = 1;
 
@@ -2309,8 +2309,12 @@ function closeNav() {
 
 				 			    <option value="absoluteBarriers">Absolute barriers</option>
 				 				<option value="midpointBarriers">Midpoint barriers</option>
-				 				<option value="meltingBarriers">Melting bubble</option>
-				 				<option value="sealingBarriers">Sealing bubble</option>
+				 				<optgroup label="Hybrid/bubble melting:">
+					 				<option value="HIBI_barriers">hIbI model</option>
+					 				<option value="HIBU_barriers">hIbU model</option>
+					 				<option value="HUBI_barriers">hUbI model</option>
+					 				<option value="HUBU_barriers">hUbU model</option>
+				 				</optgroup>
 
 							</select>
 				 		</td>
