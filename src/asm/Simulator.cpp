@@ -752,6 +752,8 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			}
 
 
+			free(rates);
+
 			
 
 			//if (s->get_nascentLength() == 3984 && s->get_mRNAPosInActiveSite() == 0 && this->nTrialsCompletedGUI > 1400){

@@ -72,7 +72,9 @@ class Model{
 
 		Model();
 		Model* clone();
+		void clear();
 		string toJSON();
+		string toJSON_compact();
 		void print();
 		void setID(string id);
 		string getID();

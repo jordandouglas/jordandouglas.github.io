@@ -634,10 +634,12 @@ void PosteriorDistributionSample::loadFromLogFile(string filename){
         	if (currentLine == numLines) {
         		splitLine = Settings::split(line, '\t');
         		parseFromLogFileLine(splitLine, headerLineSplit);
+        		splitLine.clear();
         	}
         }
 
         logfile.close();
+        headerLineSplit.clear();
 
     }
 
@@ -698,6 +700,7 @@ void PosteriorDistributionSample::setParametersFromState(){
 			paramID = splitLine.at(0);
 			string instanceNum_str = splitLine.at(1).substr(8); // Remove "instance"
 			int instanceNum = stoi(instanceNum_str.substr(0, instanceNum_str.size()-1)); // Remove ")"
+			splitLine.clear();
 
 			Parameter* param = Settings::getParameterByName(paramID);
 			if (param != nullptr){

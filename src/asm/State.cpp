@@ -1696,9 +1696,7 @@ void State::fuseBulgeRight(int S, SlippageLandscapes* DOMupdates){
 		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
 
 			int leftBoundary = this->bulgedBase.at(fuseWith) - this->bulgeSize.at(fuseWith);
-			if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
-				Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary+1, "m")->getX(), this->bulgeSize.at(fuseWith), true, 0);
-			}
+			Coordinates::position_bulge(leftBoundary, Coordinates::getNucleotide(leftBoundary+1, "m")->getX(), this->bulgeSize.at(fuseWith), true, 0);
 
 		}
 		
@@ -2629,6 +2627,7 @@ int State::getLeftBulgeBoundary(){
 
 
 double State::calculateTranslocationFreeEnergy(bool ignoreParametersAndSettings){
+	//cout << "calculateTranslocationFreeEnergy" << endl;
 	double freeEnergy = FreeEnergy::getFreeEnergyOfHybrid(this) - FreeEnergy::getFreeEnergyOfTranscriptionBubble(this);
 	if (!ignoreParametersAndSettings && this->mRNAPosInActiveSite == 1) freeEnergy += DGPost->getVal(true);
 	return freeEnergy;	
@@ -2637,7 +2636,7 @@ double State::calculateTranslocationFreeEnergy(bool ignoreParametersAndSettings)
 
 double State::calculateForwardTranslocationFreeEnergyBarrier(bool ignoreParametersAndSettings){
 
-
+	//cout << "calculateForwardTranslocationFreeEnergyBarrier" << endl;
 	double barrierHeight = 0;
 	
 
@@ -2680,7 +2679,7 @@ double State::calculateForwardTranslocationFreeEnergyBarrier(bool ignoreParamete
 double State::calculateBackwardTranslocationFreeEnergyBarrier(bool ignoreParametersAndSettings){
 
 	double barrierHeight = 0;
-	
+	//cout << "calculateBackwardTranslocationFreeEnergyBarrier" << endl;
 	
 	// Do not back translocate if it will cause the bubble to be open on the 3' end
 	if (this->getLeftTemplateBaseNumber() - bubbleLeft->getVal(true) -1 <= 2){

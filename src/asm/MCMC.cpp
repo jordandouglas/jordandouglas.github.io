@@ -41,7 +41,6 @@ using namespace std;
 
 list<ExperimentalData*>::iterator MCMC::currentExperiment;
 list<Parameter*> MCMC::parametersToEstimate;
-bool MCMC::estimatingModel;
 bool MCMC::hasAchievedBurnin;
 bool MCMC::hasAchievedPreBurnin;
 bool MCMC::hasFailedBurnin;
@@ -75,7 +74,6 @@ void MCMC::initMCMC(){
 	Settings::sampleAll();
 
 	// Build a list of parameters which need to be estimated
-	MCMC::estimatingModel = modelsToEstimate.size() > 1;
 	MCMC::parametersToEstimate.clear();
 	MCMC::hasAchievedBurnin = false;
 	MCMC::hasAchievedPreBurnin = false;
@@ -166,7 +164,6 @@ void MCMC::cleanup(){
 
 
 	MCMC::parametersToEstimate.clear();
-	MCMC::estimatingModel = false;
 	MCMC::hasAchievedBurnin = false;
 	MCMC::hasAchievedPreBurnin = false;
 	MCMC::hasFailedBurnin = false;
@@ -286,7 +283,7 @@ void MCMC::perform_1_iteration(int n){
 		delete MCMC::currentMCMCstate;
 		MCMC::currentMCMCstate = MCMC::previousMCMCstate;
 		MCMC::currentMCMCstate->setStateNumber(n);
-		if (MCMC::estimatingModel) Settings::setModel(MCMC::currentMCMCstate->get_modelIndicator());
+		if (_sampleModels) Settings::setModel(MCMC::currentMCMCstate->get_modelIndicator());
 
 
 
@@ -321,7 +318,7 @@ void MCMC::makeProposal(){
 
 	// Determine how many parameters there are
 	int nParams = parametersToEstimate.size();
-	int nParamsIncludingModelIndicator = MCMC::estimatingModel ? nParams + 1 : nParams;
+	int nParamsIncludingModelIndicator = _sampleModels ? nParams + 1 : nParams;
 	double runifNum = (int)(Settings::runif() * (nParamsIncludingModelIndicator)); // Random integer in range [0, nParamsIncludingModelIndicator-1]
 
 	// Change the model indicator
@@ -373,7 +370,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistributionSample* this_M
 	for (list<Parameter*>::iterator it = parametersToEstimate.begin(); it != parametersToEstimate.end(); ++it){
 		this_MCMCState->addParameterEstimate((*it)->getID(), (*it)->getTrueVal());
 	}
-	if (MCMC::estimatingModel) this_MCMCState->set_modelIndicator(currentModel->getID());
+	if (_sampleModels) this_MCMCState->set_modelIndicator(currentModel->getID());
 
 
 
@@ -404,6 +401,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistributionSample* this_M
 
 
 	this_MCMCState->addSimulatedAndObservedValue(simulationResults, (*currentExperiment));
+	simulationResults->clear();
 	delete simulationResults;
 
 	if (this_MCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
@@ -418,6 +416,8 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistributionSample* this_M
 		ntrialsPerDatapoint = MCMC::getNTrials();
 		simulationResults = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
 		this_MCMCState->addSimulatedAndObservedValue(simulationResults, (*currentExperiment));
+
+		simulationResults->clear();
 		delete simulationResults;
 
 		if (this_MCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) {
@@ -454,7 +454,23 @@ double MCMC::calculateLogPriorProbability(){
 
 	double logPrior = 0;
 
-	if (MCMC::estimatingModel) logPrior += log(currentModel->getPriorProb());
+	 
+	// Model prior
+	if (_sampleModels){
+
+		// Calculate model weight sum
+		double weightSum = 0;
+		for (deque<Model*>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+			weightSum += (*it)->getPriorProb();
+		}
+
+
+		logPrior += log(currentModel->getPriorProb() / weightSum);
+
+	}
+
+
+	// Parameter priors
 	for (list<Parameter*>::iterator it = parametersToEstimate.begin(); it != parametersToEstimate.end(); ++it){
 		logPrior += (*it)->calculateLogPrior();
 	}
@@ -489,7 +505,7 @@ bool MCMC::nextExperiment(){
 	Settings::clearParameterHardcodings();
 	currentModel->activateModel();
 	if ((*currentExperiment)->next()) {
-		//cout << "Next setting" << endl;
+		cout << "Next setting" << endl;
 		//Settings::print();
 		return true;
 	}

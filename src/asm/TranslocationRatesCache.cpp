@@ -51,6 +51,7 @@ void TranslocationRatesCache::initTranslocationRates(string templateSequence){
 
 double TranslocationRatesCache::get_meanGibbsEnergyBarrier(){
 
+	//cout << "get_meanGibbsEnergyBarrier" << endl;
 	if (this->meanGibbsEnergyBarrier == -INF) this->meanGibbsEnergyBarrier = FreeEnergy::calculateMeanBarrierHeight();
 
 	return this->meanGibbsEnergyBarrier;
@@ -175,6 +176,10 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		// RNA unfolding barrier heights 
 		if (fwd && rates.at(1) != 0) RNAunfoldingBarrier = exp(-this->getDownstreamRNABlockadeBarrierHeight(state));
 		else if (!fwd && rates.at(0) != 0) RNAunfoldingBarrier = exp(-this->getUpstreamRNABlockadeBarrierHeight(state));
+
+
+
+		//cout << "Calculated rates " << kfwd << "," << kbck << " for index " <<  rowNum << "," << colNum << endl;
 
 
 		if (fwd) return kfwd * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd * RNAunfoldingBarrier;

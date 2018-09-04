@@ -593,8 +593,14 @@ string Parameter::toJSON(){
 
 	string JSON = "'" + this->getID() + "':{";
 
+	double valJSON = 0;
+
+	if (this->isHardcoded) valJSON = this->hardcodedVal + this->normalisationAdditiveTerm;
+	else valJSON = this->val + this->normalisationAdditiveTerm;
+
+
 	JSON += "'distribution':'" + this->distributionName + "',";
-	JSON += "'val':" + to_string(this->val) + ",";
+	JSON += "'val':" + to_string(valJSON) + ",";
 	JSON += "'name':'" + this->name + "',";
 	JSON += "'title':'" + this->title + "',";
 	JSON += "'integer':" + string(this->integer ? "true" : "false") + ",";

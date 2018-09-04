@@ -36,7 +36,6 @@ class MCMC{
 
 	static list<ExperimentalData*>::iterator currentExperiment;
 	static list<Parameter*> parametersToEstimate;
-	static bool estimatingModel;
 	static double epsilon; // The current chi-squared threshold
 	static bool hasAchievedBurnin;
 	static bool hasAchievedPreBurnin;

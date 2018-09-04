@@ -557,7 +557,7 @@ extern "C" {
 		currentSequence->initRNAunfoldingTable();
 
 
-		messageFromWasmToJS("", msgID);
+		messageFromWasmToJS("{'ID':'" + currentModel->getID()  + "'}", msgID);
 	}
 
 
@@ -582,6 +582,8 @@ extern "C" {
 
 		_animationSpeed = speed;
 		messageFromWasmToJS("", msgID);
+
+		free(speed);
 	}
 
 
@@ -601,6 +603,9 @@ extern "C" {
 
 		_currentStateGUI->setNextBaseToAdd(ntpToAdd_str);
 		messageFromWasmToJS("", msgID);
+
+		// Clean up
+		free(ntpToAdd);
 	}
 
 
@@ -640,6 +645,9 @@ extern "C" {
 		cout << "Finished parsing XML" << endl;
 
 		messageFromWasmToJS(parametersJSON, msgID);
+
+		// Clean up
+		free(XMLdata);
 
 	}
 
@@ -717,7 +725,13 @@ extern "C" {
 
 		messageFromWasmToJS("{'succ':true}", msgID);
 
-		return;
+
+		// Clean up
+		free(newSeq);
+		free(newTemplateType);
+		free(newPrimerType);
+
+
 
 	}
 
@@ -735,6 +749,10 @@ extern "C" {
 		}
 
 		messageFromWasmToJS("", msgID);
+
+
+		// Clean up
+		free(seqID);
 
 	}
 
@@ -759,6 +777,10 @@ extern "C" {
 		Settings::activatePolymerase(polID);
 		messageFromWasmToJS("{" + currentModel->toJSON() + "}", msgID);
 
+
+		// Clean up
+		free(polID);
+
 	}
 
 
@@ -766,6 +788,11 @@ extern "C" {
 
 	// Save the distribution and its arguments of a parameter (and samples it)
 	void EMSCRIPTEN_KEEPALIVE saveParameterDistribution(char* paramID, char* distributionName, char* distributionArgNames, double* distributionArgValues, int nArgs) {
+
+
+		// Parameter is being changed -> revert to default model so it does not change the currently sampled model
+		Settings::setModel("default");
+
 
 		string paramID_s = string(paramID);
 		if (paramID_s == "hybridLen" || paramID_s == "bubbleLeft" || paramID_s == "bubbleRight") _needToReinitiateAnimation = true;
@@ -782,14 +809,18 @@ extern "C" {
 				param->setDistributionParameter(argName, argVal);
 			}
 
+			argNames.clear();
+
 			param->sample();
 
 
 		}
 
 
-		
-		
+		// Clean up
+		free(paramID);
+		free(distributionName);
+		free(distributionArgNames);
 
 	}
 
@@ -801,6 +832,10 @@ extern "C" {
 		if (param) return param->getVal(true);
 		cout << "Cannot find parameter " << string(paramID) << "!" << endl;
 		exit(0);
+
+
+		// Clean up
+		free(paramID);
 		return 0;
 
 	}
@@ -909,6 +944,7 @@ extern "C" {
 
 		messageFromWasmToJS(bendJSON, msgID);
 
+
 	}
 
 
@@ -917,7 +953,7 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE initABC(int msgID){
 
 
-		cout << "Initialising ABC" << endl;
+		cout << "Initialising ABC..." << endl;
 
 		_GUI_STOP = false;
 		_GUI_simulating = true;
@@ -945,6 +981,9 @@ extern "C" {
 
 
 		messageFromWasmToJS(toReturnJSON, msgID);
+
+
+		cout << "Initialised ABC." << endl;
 
 
 	}
@@ -1156,6 +1195,7 @@ extern "C" {
 					lineSplit = Settings::split(lines.at(lineNum), '&');
 	        		state->parseFromLogFileLine(lineSplit, headerLineSplit);
 	        		_GUI_posterior.push_back(state);
+	        		lineSplit.clear();
 
 				}
 
@@ -1168,6 +1208,8 @@ extern "C" {
 				}
 
 			}
+
+			headerLineSplit.clear();
 
         }
 
@@ -1182,13 +1224,17 @@ extern "C" {
 		// Notify the plots that ABC is in effect
 		Plots::prepareForABC();
 
-
+		lines.clear();
 
 		// Clear the output string
 		_ABCoutputToPrint.str("");
 		_ABCoutputToPrint.clear();
 
 		messageFromWasmToJS(toReturnJSON, msgID);
+
+
+		// Clean up
+		free(tsvInput);
 
 
 	}
@@ -1285,6 +1331,11 @@ extern "C" {
 		messageFromWasmToJS(toReturnJSON, msgID);
 
 		cout << "Gel calibration initialised" << endl;
+
+
+		// Clean up
+		free(priors);
+
 	}
 
 
@@ -1488,7 +1539,12 @@ extern "C" {
 	
 	// Saves the current model settings
 	void EMSCRIPTEN_KEEPALIVE setModelSettings(int msgID, char* modelSettingNames, char* modelSettingVals){
-		
+
+
+		// User has made a change to the model -> revert to the default model (if models are being compared) 
+		Settings::setModel("default");
+
+
 		vector<string> settings = Settings::split(string(modelSettingNames), ','); // Split by , to get values
 		vector<string> values = Settings::split(string(modelSettingVals), ','); // Split by , to get values
 		for (int i = 0; i < settings.size(); i ++) {
@@ -1520,6 +1576,10 @@ extern "C" {
 		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
 		currentSequence->initRNAunfoldingTable();
 
+
+		settings.clear();
+		values.clear();
+
 		// Hide and show parameters
 		Settings::updateParameterVisibilities();
 		
@@ -1530,6 +1590,11 @@ extern "C" {
 
 
 		messageFromWasmToJS(parametersJSON, msgID);
+
+
+		// Clean up
+		free(modelSettingNames);
+		free(modelSettingVals);
 		
 		
 	}
@@ -1655,9 +1720,30 @@ extern "C" {
 			}
 		}
 
-		JSON += "},'model':{" + currentModel->toJSON() + "}}";
+		JSON += "},'model':{" + currentModel->toJSON_compact() + "}}";
 		messageFromWasmToJS(JSON, msgID);
 	}
+
+
+
+	// Inform the WASM whether the model should be sampled 
+	void EMSCRIPTEN_KEEPALIVE userChangeModelSampling(int toSample, int msgID){
+
+		if (toSample){
+			_sampleModels = true;
+			Settings::sampleModel();
+		} 
+
+		else {
+			_sampleModels = false;
+			Settings::setModel("default");
+
+		}
+
+		string modelSampledJSON = "{" + currentModel->toJSON()  + "}";
+		messageFromWasmToJS(modelSampledJSON, msgID);
+	}
+
 
 
 	// Activates the currently selected model
@@ -1667,74 +1753,124 @@ extern "C" {
 
 		// If there are no models on the list to estimate, then add the current model to this list as the default model, and with weight 0
 		if (modelsToEstimate.size() == 0){
-			currentModel->setID("defualt");
+			currentModel->setID("default");
 			currentModel->setPriorProb(0);
-			modelsToEstimate.push_back(*currentModel);
+			modelsToEstimate.push_back(currentModel);
 		}
 
 
-
-		// Create the new model
-		Model* newModel;
 		string modelID_str = to_string(modelID);
-		if (!Settings::checkIfModelExists(modelID_str)){
-			newModel = currentModel->clone();
-			newModel->setID(modelID_str);
-			newModel->setPriorProb(modelWeight >= 0 ? modelWeight : 0);
-			modelsToEstimate.push_back(*newModel);
-		}
-		else newModel = Settings::getModel(modelID_str);
-
-
-		// Update the model settings
-		vector<string> modelSettings = Settings::split(string(modelDescription), ',');
-		for (int i = 0; i < modelSettings.size(); i ++){
-
-
-			vector<string> tokens = Settings::split(modelSettings.at(i), '=');
-			if (tokens.size() != 2) continue;
-
-
-			string setting = tokens.at(0);
-			string val = tokens.at(1);
-
-			cout << setting << "=" << val << endl; 
-
-			if (setting == "allowBacktracking") newModel->set_allowBacktracking(val == "true");
-			else if (setting == "allowHypertranslocation") newModel->set_allowHypertranslocation(val == "true");
-			else if (setting == "allowInactivation") newModel->set_allowInactivation(val == "true");
-			else if (setting == "allowBacktrackWithoutInactivation") newModel->set_allowBacktrackWithoutInactivation(val == "true");
-			else if (setting == "allowGeometricCatalysis") newModel->set_allowGeometricCatalysis(val == "true");
-			else if (setting == "subtractMeanBarrierHeight") newModel->set_subtractMeanBarrierHeight(val == "true");
-			else if (setting == "allowDNAbending") newModel->set_allowDNAbending(val == "true");
-			else if (setting == "allowmRNAfolding") newModel->set_allowmRNAfolding(val == "true");
-			else if (setting == "allowMisincorporation") newModel->set_allowMisincorporation(val == "true");
-			else if (setting == "useFourNTPconcentrations") newModel->set_useFourNTPconcentrations(val == "true");
-			else if (setting == "NTPbindingNParams") newModel->set_NTPbindingNParams(atoi(val.c_str()));
-			else if (setting == "currentTranslocationModel") newModel->set_currentTranslocationModel(val);
-			else if (setting == "currentBacksteppingModel") newModel->set_currentBacksteppingModel(val);
-			else if (setting == "currentRNABlockadeModel") newModel->set_currentRNABlockadeModel(val);
-			else if (setting == "currentInactivationModel") newModel->set_currentInactivationModel(val);
-			else if (setting == "assumeBindingEquilibrium") newModel->set_assumeBindingEquilibrium(val == "true");
-			else if (setting == "assumeTranslocationEquilibrium") newModel->set_assumeTranslocationEquilibrium(val == "true");
-
-
-		}
-
-
+		Settings::parseModel(modelID_str, modelWeight, string(modelDescription));
 
 		// Activate this model
+		//Settings::clearParameterHardcodings();
 		Settings::setModel(modelID_str);
+		//currentModel->activateModel();
+		//Settings::updateParameterVisibilities();
 
-
-		cout << "newModel " << endl;
-		newModel->print();
-
-
-		cout << "\n\n\ncurrentModel " << endl;
-		currentModel->print();
+		// Sample all parameters
+		for (int i = 0; i < Settings::paramList.size(); i ++){
+			Settings::paramList.at(i)->sample();
+		}
 
 		messageFromWasmToJS("", msgID);
+
+		// Clean up
+		free(modelDescription);
+	}
+
+
+
+	// Load in all the models
+	void EMSCRIPTEN_KEEPALIVE sendModels(char* modelIDs, char* modelWeights, char* modelDescription, int msgID){
+
+
+		// If there are no models on the list to estimate, then add the current model to this list as the default model, and with weight 0
+		if (modelsToEstimate.size() == 0){
+			currentModel->setID("default");
+			currentModel->setPriorProb(0);
+			modelsToEstimate.push_back(currentModel);
+		}
+
+
+		// Split the model details into tokens
+		vector<string> modelIDs_tokens = Settings::split(modelIDs, '|');
+		vector<string> modelWeights_tokens = Settings::split(modelWeights, '|');
+		vector<string> modelDescription_tokens = Settings::split(modelDescription, '|');
+
+		if (modelIDs_tokens.size() != modelWeights_tokens.size() || modelIDs_tokens.size() != modelDescription_tokens.size() || modelIDs_tokens.size() != modelDescription_tokens.size()){
+			cout << "Model parsing error!" << endl;
+			messageFromWasmToJS("", msgID);
+		}
+
+
+		// Parse all the models
+		for (int i = 0; i < modelIDs_tokens.size(); i ++){
+
+			string modelID = modelIDs_tokens.at(i);
+			double modelWeight = stof(modelWeights_tokens.at(i));
+			string modelDescription = modelDescription_tokens.at(i);
+
+			// Parse the model and save it in the list of models
+			Settings::parseModel(modelID, modelWeight, modelDescription);
+
+		}
+
+		modelIDs_tokens.clear();
+		modelWeights_tokens.clear();
+		modelDescription_tokens.clear();
+
+
+
+		//if (currentModel == nullptr) Settings::setModel("default");
+
+
+		// Update the settings to reflect that of the currently selected model
+		Settings::clearParameterHardcodings();
+		currentModel->activateModel();
+		Settings::updateParameterVisibilities();
+
+
+
+		// Sample all parameters
+		for (int i = 0; i < Settings::paramList.size(); i ++){
+			Settings::paramList.at(i)->sample();
+		}
+
+
+		messageFromWasmToJS("", msgID);
+
+
+		// Clean up
+		free(modelIDs);
+		free(modelWeights);
+		free(modelDescription);
+
+	}
+
+
+
+
+	// Returns a JSON string with all the information about the models being estimated
+	void EMSCRIPTEN_KEEPALIVE getEstimatedModels(int msgID){
+
+
+
+		// If there are no models on the list to estimate return the empty string
+		// Otherwise return a string containing a list of all models
+		string models_JSON = "{'models':[";
+
+
+		// Iterate through all models to estimate (except for the default model)
+		for (deque<Model*>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+			if ((*it)->getID() == "default") continue;
+			models_JSON += "{" + (*it)->toJSON() + "},";
+		} 
+			
+		if (models_JSON.substr(models_JSON.length()-1, 1) == ",") models_JSON = models_JSON.substr(0, models_JSON.length() - 1);
+		models_JSON += "]}";
+		messageFromWasmToJS(models_JSON, msgID);
+
 	}
 
 
@@ -1819,9 +1955,14 @@ extern "C" {
 		toReturnJSON += "'animationTime':" + to_string(Coordinates::getAnimationTime()) + ",";
 		//toReturnJSON += "'plots':" + plotsJSON + ",";
 		toReturnJSON += "'stop':" + string(toStop ?  "true" : "false") + ",";
-		toReturnJSON += "'realTime':" + to_string(time);
+		toReturnJSON += "'realTime':" + to_string(time) + ",";
+		toReturnJSON += "'currentModelID':'" + currentModel->getID() + "'";
+
+
 		toReturnJSON += "}";
 		messageFromWasmToJS(toReturnJSON, msgID);
+
+
 			
 		
 	}
@@ -1914,7 +2055,8 @@ extern "C" {
 		toReturnJSON += "'animationTime':" + to_string(Coordinates::getAnimationTime()) + ",";
 		//toReturnJSON += "'plots':" + plotsJSON + ",";
 		toReturnJSON += "'stop':" + string(toStop ?  "true" : "false") + ",";
-		toReturnJSON += "'realTime':" + to_string(time);
+		toReturnJSON += "'realTime':" + to_string(time) + ",";
+		toReturnJSON += "'currentModelID':'" + currentModel->getID() + "'";
 		toReturnJSON += "}";
 		messageFromWasmToJS(toReturnJSON, msgID);
 
@@ -1936,6 +2078,10 @@ extern "C" {
 		string plotsJSON = Plots::getPlotDataAsJSON();
 		messageFromWasmToJS(plotsJSON, msgID);
 
+
+		// Clean up
+		free(value);
+
 	}
 
 
@@ -1945,6 +2091,10 @@ extern "C" {
 		Plots::savePlotSettings(plotNum, string(values_str));
 		string plotsJSON = Plots::getPlotDataAsJSON();
 		messageFromWasmToJS(plotsJSON, msgID);
+
+
+		// Clean up
+		free(values_str);
 
 	}
 

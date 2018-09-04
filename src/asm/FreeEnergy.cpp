@@ -380,6 +380,8 @@ vector<string> FreeEnergy::getHybridIntermediateString(vector<string> hybridStri
 		int template_baseNum = atoi(split_vector.at(0).c_str());
 		int nascent_baseNum = atoi(split_vector.at(1).c_str());
 
+		split_vector.clear();
+
 
 		if (template_baseNum - leftTemplate1 < hybridStrings1.at(0).length()) Tbase = hybridStrings1.at(0).substr(template_baseNum - leftTemplate1, 1);
 		else Tbase = hybridStrings2.at(0).substr(template_baseNum - leftTemplate2, 1);

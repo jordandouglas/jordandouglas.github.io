@@ -109,8 +109,9 @@ extern list<ExperimentalData*> experiments;
 extern int _numExperimentalObservations;
 
 // Model
-extern deque<Model> modelsToEstimate;
+extern deque<Model*> modelsToEstimate;
 extern Model* currentModel;
+extern bool _sampleModels; 
 
 
 // User interface information
@@ -193,6 +194,7 @@ class Settings{
 		static void sampleAll();
 		static void sampleModel();
 		static void setModel(string modelID);
+		static void deleteModel(string modelID);
 		static Model* getModel(string modelID);
 		static bool checkIfModelExists(string modelID);
 		static Parameter* getParameterByName(string paramID);
@@ -205,6 +207,7 @@ class Settings{
 		static void resetUnfoldingTables();
 		static list<PosteriorDistributionSample*> getPosteriorDistributionByID(int fitID);
 		static void addToPosteriorDistribution(int fitID, PosteriorDistributionSample* obj);
+		static void parseModel(string modelID, double modelWeight, string modelDescription);
 	
 
 		// Utilities

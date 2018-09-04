@@ -107,8 +107,9 @@ int _numExperimentalObservations = 0;
 
 
 // Models
-deque<Model> modelsToEstimate;
+deque<Model*> modelsToEstimate;
 Model* currentModel = new Model();
+bool _sampleModels = false;
 
 
 // Parameters
@@ -590,10 +591,25 @@ string Settings::toJSON(){
 
 		if (parametersJSON.substr(parametersJSON.length()-1, 1) == ",") parametersJSON = parametersJSON.substr(0, parametersJSON.length() - 1);
 		parametersJSON += "}";
-
 	parametersJSON += "}";
 
 
+
+	// Iterate through all models to estimate (except for the default model)
+	if (modelsToEstimate.size() > 0){
+
+		parametersJSON += ",'modelsToEstimate':[";
+
+		for (deque<Model*>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+			if ((*it)->getID() == "default" || (*it)->getID() == "-1") continue;
+			parametersJSON += "{'id':" + (*it)->getID() + ",";
+			parametersJSON += "'weight':" + to_string((*it)->getPriorProb()) + ",";
+			parametersJSON += "'description':{" + (*it)->toJSON_compact() + "}},";
+		} 
+
+		if (parametersJSON.substr(parametersJSON.length()-1, 1) == ",") parametersJSON = parametersJSON.substr(0, parametersJSON.length() - 1);
+		parametersJSON += "]";
+	}
 
 	return parametersJSON;
 
@@ -608,8 +624,8 @@ void Settings::print(){
 
 	// Print all models
 	cout << "Models:" << endl;
-	for (deque<Model>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
-		(*it).print();
+	for (deque<Model*>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+		(*it)->print();
 	}
 
 
@@ -729,7 +745,9 @@ double Settings::getLognormalCDF(double x, double mu, double sigma){
 */
 
 void Settings::updateParameterVisibilities(){
-	
+
+	if (!_USING_GUI) return;
+
 	// How many NTP concentrations to use
 	if (currentModel->get_useFourNTPconcentrations()){
 		NTPconc->hide();
@@ -902,37 +920,148 @@ Parameter* Settings::getParameterByName(string paramID){
 void Settings::sampleModel(){
 
 
+	if (!_sampleModels) return;
+
 	// Delete any parameter hardcodings
 	Settings:clearParameterHardcodings();
 
-	double runifNum = Settings::runif();
+
+	// Calculate model weight sum
+	double weightSum = 0;
+	for (deque<Model*>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+		weightSum += (*it)->getPriorProb();
+	}
+
+	double runifNum = Settings::runif() * weightSum;
 	double cumsum = 0;
 	//if (modelsToEstimate.size() > 1 && currentModel->getID() != "-1") cumsum += currentModel->getPriorProb();
 
-	for (deque<Model>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+	for (deque<Model*>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
 		//if (modelsToEstimate.size() > 1 && (*it).getID() == currentModel->getID()) continue; // Ensure that current model is not sampled
-		cumsum += (*it).getPriorProb();
+		cumsum += (*it)->getPriorProb();
 		if (runifNum < cumsum){
-			(*it).activateModel(); // Apply new parameter hardcodings and other model settings
-			currentModel = &(*it);
+			Settings::setModel((*it)->getID());
 			//cout << "Sampled model " << currentModel->getID() << endl;
 			break;
 		}
 	}
-
-
 
 }
 
 
 void Settings::setModel(string modelID){
 
-	for (deque<Model>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
-		if ((*it).getID() == modelID) {
-			currentModel = &(*it);
+
+	Settings::clearParameterHardcodings();
+
+	for (deque<Model*>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+		if ((*it)->getID() == modelID) {
+			currentModel = (*it);
+			//cout << "Setting model to model " << modelID << endl;
 			break;
 		}
 	}
+
+
+	// Activate this model
+	currentModel->activateModel();
+	Settings::updateParameterVisibilities();
+	currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
+	currentSequence->initRNAunfoldingTable();
+
+}
+
+
+
+// Deletes the model and removes its entry from the list
+void Settings::deleteModel(string modelID){
+
+	if (modelID == "default") return;
+	if (modelID == currentModel->getID()) {
+		//cout << "Resetting to default because we need to delete " << modelID << endl;
+		Settings::setModel("default");
+	}
+	for (deque<Model*>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+		if ((*it)->getID() == modelID){
+			(*it)->clear();
+			delete (*it);
+			modelsToEstimate.erase(it);
+			break;
+		}
+	}
+
+
+}
+
+
+
+// Parse the model described in the string and add it to the list of models
+void Settings::parseModel(string modelID, double modelWeight, string modelDescription){
+
+
+	bool isCurrentModel = modelID == currentModel->getID();
+
+	// Reset the model to the default model and then the model description will specifiy changes from the default model
+	Settings::deleteModel(modelID);
+	Model* newModel = currentModel->clone();
+	newModel->setID(modelID);
+	newModel->setPriorProb(modelWeight >= 0 ? modelWeight : 0);
+	modelsToEstimate.push_back(newModel);
+	//newModel = Settings::getModel(modelID);
+	//newModel->setPriorProb(modelWeight);
+
+	if (isCurrentModel) Settings::setModel(modelID);
+
+
+
+	// Update the model settings
+	vector<string> modelSettings = Settings::split(string(modelDescription), ',');
+	for (int i = 0; i < modelSettings.size(); i ++){
+
+
+		vector<string> tokens = Settings::split(modelSettings.at(i), '=');
+		if (tokens.size() != 2) continue;
+
+
+		string setting = tokens.at(0);
+		string val = tokens.at(1);
+
+		//cout << setting << "=" << val << endl; 
+
+
+		// Model setting
+		if (setting == "allowBacktracking") newModel->set_allowBacktracking(val == "true");
+		else if (setting == "allowHypertranslocation") newModel->set_allowHypertranslocation(val == "true");
+		else if (setting == "allowInactivation") newModel->set_allowInactivation(val == "true");
+		else if (setting == "allowBacktrackWithoutInactivation") newModel->set_allowBacktrackWithoutInactivation(val == "true");
+		else if (setting == "allowGeometricCatalysis") newModel->set_allowGeometricCatalysis(val == "true");
+		else if (setting == "subtractMeanBarrierHeight") newModel->set_subtractMeanBarrierHeight(val == "true");
+		else if (setting == "allowDNAbending") newModel->set_allowDNAbending(val == "true");
+		else if (setting == "allowmRNAfolding") newModel->set_allowmRNAfolding(val == "true");
+		else if (setting == "allowMisincorporation") newModel->set_allowMisincorporation(val == "true");
+		else if (setting == "useFourNTPconcentrations") newModel->set_useFourNTPconcentrations(val == "true");
+		else if (setting == "NTPbindingNParams") newModel->set_NTPbindingNParams(atoi(val.c_str()));
+		else if (setting == "currentTranslocationModel") newModel->set_currentTranslocationModel(val);
+		else if (setting == "currentBacksteppingModel") newModel->set_currentBacksteppingModel(val);
+		else if (setting == "currentRNABlockadeModel") newModel->set_currentRNABlockadeModel(val);
+		else if (setting == "currentInactivationModel") newModel->set_currentInactivationModel(val);
+		else if (setting == "assumeBindingEquilibrium") newModel->set_assumeBindingEquilibrium(val == "true");
+		else if (setting == "assumeTranslocationEquilibrium") newModel->set_assumeTranslocationEquilibrium(val == "true");
+
+
+		// Parameter hardcoding
+		else if (Settings::getParameterByName(setting) != nullptr){
+			newModel->addParameterHardcoding(setting, val);
+		}
+
+		tokens.clear();
+
+	}
+
+
+	modelSettings.clear();
+
+
 
 }
 
@@ -940,9 +1069,9 @@ void Settings::setModel(string modelID){
 
 Model* Settings::getModel(string modelID){
 
-	for (deque<Model>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
-		if ((*it).getID() == modelID) {
-			return &(*it);
+	for (deque<Model*>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+		if ((*it)->getID() == modelID) {
+			return (*it);
 		}
 	}
 
@@ -953,8 +1082,8 @@ Model* Settings::getModel(string modelID){
 
 bool Settings::checkIfModelExists(string modelID){
 
-	for (deque<Model>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
-		if ((*it).getID() == modelID) return true;
+	for (deque<Model*>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+		if ((*it)->getID() == modelID) return true;
 	}
 	return false;
 

@@ -33,7 +33,7 @@ using namespace std;
 
 Model::Model(){
 
-	id = "-1";
+	id = "default";
 	double modelPrior = 1;
 	allowBacktracking = false;
 	allowHypertranslocation = false;
@@ -68,6 +68,7 @@ Model* Model::clone(){
 
 	// Copy model settings
 	Model* clonedModel = new Model();
+	clonedModel->setID(this->id);
 	clonedModel->allowBacktracking = this->allowBacktracking;
 	clonedModel->allowHypertranslocation = this->allowHypertranslocation;
 	clonedModel->allowInactivation = this->allowInactivation;
@@ -116,6 +117,8 @@ void Model::addParameterHardcoding(string paramID, string value){
 	}
 
 	else parameterHardcodings[paramID] = atof(value.c_str());
+
+	split_vector.clear();
 }
 
 
@@ -155,7 +158,11 @@ string Model::toJSON(){
 	//cout << "Getting translocation model " << this->currentTranslocationModel << "." << endl;
 	
 	string JSON = "";
-	
+
+	JSON += "'ID':'" + this->id + "',";
+
+
+	// Model settings
 	JSON += "'allowBacktracking':" + string(this->allowBacktracking ? "true" : "false") + ",";
 	JSON += "'allowHypertranslocation':" + string(this->allowHypertranslocation ? "true" : "false") + ",";
 	JSON += "'allowInactivation':" + string(this->allowInactivation ? "true" : "false") + ",";
@@ -174,12 +181,66 @@ string Model::toJSON(){
 	JSON += "'currentBacksteppingModel':'" + this->currentBacksteppingModel + "',";
 	JSON += "'assumeBindingEquilibrium':" + string(this->assumeBindingEquilibrium ? "true" : "false") + ",";
 	JSON += "'allowDNAbending':" + string(this->allowDNAbending ? "true" : "false") + ",";
-	JSON += "'assumeTranslocationEquilibrium':" + string(this->assumeTranslocationEquilibrium ? "true" : "false");
+	JSON += "'assumeTranslocationEquilibrium':" + string(this->assumeTranslocationEquilibrium ? "true" : "false") + ",";
+
+
+
+	// Parameter hardcordings
+	for(std::map<string, double>::iterator iter = this->parameterHardcodings.begin(); iter != this->parameterHardcodings.end(); ++iter){
+		string paramID =  iter->first;
+		double hcval = iter->second;
+		JSON += "'" + paramID + "':" + to_string(hcval) + ",";
+	}
+
+
+	// Prior weight
+	JSON += "'weight':" + to_string(this->modelPrior);
 
 	
 	return JSON;
 	
 }
+
+
+
+// Converts the model settings into a JSON string for use by javascript (not wrapped in { })
+string Model::toJSON_compact(){
+
+
+	//cout << "Getting translocation model " << this->currentTranslocationModel << "." << endl;
+	
+	string JSON = "";
+	
+	JSON += "'allowBacktracking':" + string(this->allowBacktracking ? "true" : "false") + ",";
+	JSON += "'allowHypertranslocation':" + string(this->allowHypertranslocation ? "true" : "false") + ",";
+	JSON += "'allowInactivation':" + string(this->allowInactivation ? "true" : "false") + ",";
+	JSON += "'allowBacktrackWithoutInactivation':" + string(this->allowBacktrackWithoutInactivation ? "true" : "false") + ",";
+	JSON += "'allowGeometricCatalysis':" + string(this->allowGeometricCatalysis ? "true" : "false") + ",";
+	JSON += "'subtractMeanBarrierHeight':" + string(this->subtractMeanBarrierHeight ? "true" : "false") + ",";
+	JSON += "'allowmRNAfolding':" + string(this->allowmRNAfolding ? "true" : "false") + ",";
+	JSON += "'useFourNTPconcentrations':" + string(this->useFourNTPconcentrations ? "true" : "false") + ",";
+	JSON += "'currentTranslocationModel':'" + this->currentTranslocationModel + "',";
+	JSON += "'currentRNABlockadeModel':'" + this->currentRNABlockadeModel + "',";
+	JSON += "'currentInactivationModel':'" + this->currentInactivationModel + "',";
+	JSON += "'currentBacksteppingModel':'" + this->currentBacksteppingModel + "',";
+	JSON += "'assumeBindingEquilibrium':" + string(this->assumeBindingEquilibrium ? "true" : "false") + ",";
+	JSON += "'assumeTranslocationEquilibrium':" + string(this->assumeTranslocationEquilibrium ? "true" : "false");
+
+
+	// Parameter hardcordings
+	for(std::map<string, double>::iterator iter = this->parameterHardcodings.begin(); iter != this->parameterHardcodings.end(); ++iter){
+		string paramID =  iter->first;
+		double hcval = iter->second;
+		JSON += ",'" + paramID + "':" + to_string(hcval);
+	}
+
+
+	
+	return JSON;
+	
+}
+
+
 
 void Model::print(){
 
@@ -232,8 +293,11 @@ void Model::print(){
 }
 
 
-
-
+// Clears the lists in preparation for deletion 
+void Model::clear(){
+	this->parameterHardcodings.clear();
+	this->parameterInstanceMappings.clear();
+}
 
 
 double Model::getTranslocationModelConstant(){

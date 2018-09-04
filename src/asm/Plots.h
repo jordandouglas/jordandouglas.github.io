@@ -37,7 +37,7 @@ class Plots{
 
 
 	static int currentSimNumber;
-
+	static bool plotsInit;
 
 	static const size_t maximumBytesJSON;
 	static string plotDataJSON;

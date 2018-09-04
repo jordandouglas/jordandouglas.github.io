@@ -406,6 +406,8 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 				else this->xRange = "[" + to_string(xMin) + "," + to_string(xMax) + "]";
 			}
 
+			tuple.clear();
+
 		}
 
 
@@ -428,6 +430,8 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 				if (yMax <= 0 || yMin < 0) this->yRange = "automaticY";
 				else this->yRange = "[" + to_string(yMin) + "," + to_string(yMax) + "]";
 			}
+
+			tuple.clear();
 
 
 		}
@@ -461,6 +465,8 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 				if (! (xMax <= 0 || xMin < 0)) this->xRange = "[" + to_string(xMin) + "," + to_string(xMax) + "]";
 			}
 
+			tuple.clear();
+
 		}
 
 
@@ -492,6 +498,9 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 
 				this->xRange = "[" + to_string(xMin) + "," + to_string(xMax) + "]";
 			}
+
+
+			tuple.clear();
 
 		}
 
@@ -540,6 +549,9 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 				this->xRange = "[" + to_string(xMin) + "," + to_string(xMax) + "]";
 			}
 
+
+			tuple.clear();
+
 		}
 
 
@@ -561,6 +573,9 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 
 				this->yRange = "[" + to_string(yMin) + "," + to_string(yMax) + "]";
 			}
+
+
+			tuple.clear();
 
 		}
 
@@ -668,6 +683,8 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 				if (! (xMax < 0 || xMin < 0)) this->xRange = "[" + to_string(xMin) + "," + to_string(xMax) + "]";
 			}
 
+			tuple.clear();
+
 		}
 
 
@@ -690,13 +707,16 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 				this->yRange = "[" + to_string(yMin) + "," + to_string(yMax) + "]";
 			}
 
+
+			tuple.clear();
+
 		}
 
 
 
 	}
 
-
+	values.clear();
 
 }
 

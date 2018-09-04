@@ -88,6 +88,8 @@ vector<PosteriorDistributionSample*> BayesianCalculations::loadLogFile(string lo
         		states.clear();
         	}
 
+        	splitLine.clear();
+
         }
 
 
@@ -101,6 +103,9 @@ vector<PosteriorDistributionSample*> BayesianCalculations::loadLogFile(string lo
 
         states_vector.at(5)->printHeader(false);
         states_vector.at(5)->print(false);
+
+
+        headerLineSplit.clear();
 
         return states_vector;
 
@@ -154,12 +159,12 @@ void BayesianCalculations::printMarginalGeometricMedians(vector<PosteriorDistrib
 	if (modelsToEstimate.size()) {
 
 
-		for (deque<Model>::iterator model = modelsToEstimate.begin(); model != modelsToEstimate.end(); ++model){
+		for (deque<Model*>::iterator model = modelsToEstimate.begin(); model != modelsToEstimate.end(); ++model){
 
 			// Compile a list of states which use this model
 			list<PosteriorDistributionSample*> statesThisModel;
 			for (int j = 0; j < states.size(); j++) {
-				if (states.at(j)->get_modelIndicator() == (*model).getID()) statesThisModel.push_back(states.at(j));
+				if (states.at(j)->get_modelIndicator() == (*model)->getID()) statesThisModel.push_back(states.at(j));
 			}
 
 
@@ -171,7 +176,7 @@ void BayesianCalculations::printMarginalGeometricMedians(vector<PosteriorDistrib
 
 
 			// Print geometric median
-			cout << "\n------ Calculating geometric median for Model " << (*model).getID() << "------" << endl;
+			cout << "\n------ Calculating geometric median for Model " << (*model)->getID() << "------" << endl;
 			BayesianCalculations::getGeometricMedian(statesThisModel_vector, true, false);
 			cout << "------------------------------------------------------\n" << endl;
 

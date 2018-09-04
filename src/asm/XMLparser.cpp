@@ -310,6 +310,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 						string times = string(experimentEle->Attribute("times"));
 						vector<string> times_split = Settings::split(times, ',');
 						numObservations = times_split.size();
+						times_split.clear();
 					}
 
 				}
@@ -394,7 +395,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 							}
 
 							experiment->addTimeGelLane(laneNum, time, densities, rectTop, rectLeft, rectWidth, rectHeight, rectAngle, simulateLane, laneInterceptY);
-							
+							splitStr.clear();
 						}
 
 						else cout << "Cannot parse lane " << laneNum << " because there are no densities." << endl;
@@ -448,6 +449,8 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 					}
 
+					times_split.clear();
+
 				}
 
 
@@ -479,6 +482,8 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 							cout << "Error: cannot parse experimental observations." << endl;
 							exit(0);
 						}
+
+						split_vector.clear();
 
 
 					}
@@ -586,25 +591,20 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 				}
 
 
-				modelsToEstimate.push_back(*model);
+				modelsToEstimate.push_back(model);
 
 
 			}
 
 
 
-
-			// Normalise prior weights into probabilities
-			for (deque<Model>::iterator it=modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
-				(*it).setPriorProb((*it).getPriorProb() / weightSum);
-			}
 
 
 			// Sample a model and its parameters randomly
 			Settings::sampleModel();
+			_sampleModels = true;
 
-
-		} else modelsToEstimate.push_back(*currentModel);
+		} else modelsToEstimate.push_back(currentModel);
 
 
 	}

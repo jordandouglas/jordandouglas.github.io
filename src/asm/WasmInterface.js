@@ -174,7 +174,6 @@ loadSessionFromXML = function(xmlData, msgID = null){
 	}
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 
-
 	
 	Module.ccall("loadSessionFromXML", null, ["string", "number"], [xmlData, msgID]);
 }
@@ -197,8 +196,8 @@ getSaveSessionData = function(msgID = null){
 refresh = function(msgID = null){
 
 	// Create the callback function
-	var toDoAfterCall = function(){
-		if (msgID != null) postMessage(msgID + "~X~done" );
+	var toDoAfterCall = function(resultStr){
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr );
 	}
 
 	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
@@ -764,6 +763,52 @@ activateModel = function(modelID, modelWeight, modelDescription, msgID = null){
 
 }
 
+// Send through all the models and their information to the WASM module
+sendModels = function(modelIDs, modelWeights, modelDescriptions, msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log(JSON.parse(resultStr));
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	Module.ccall("sendModels", null, ["string", "string", "string", "number"], [modelIDs, modelWeights, modelDescriptions, msgID]);
+
+
+}
+
+// Returns a JSON string with all the information about the models being estimated
+getEstimatedModels = function(msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log(JSON.parse(resultStr));
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	Module.ccall("getEstimatedModels", null, ["number"], [msgID]);
+
+
+}
+
+
+// Inform the WASM whether the model should be sampled 
+userChangeModelSampling = function(toSample, msgID = null){
+
+	// Create the callback function
+	var toDoAfterCall = function(resultStr){
+		//console.log(JSON.parse(resultStr));
+		if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+
+	}
+	WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+	Module.ccall("userChangeModelSampling", null, ["number", "number"], [toSample, msgID]);
+
+
+}
+
 
 
 // Perform N simulations and then return to js after a timeout (~1000ms) has been reached to check if user has requested to stop
@@ -824,8 +869,8 @@ resumeTrials = function(msgID = null){
 		// Create the callback function
 		var toDoAfterCall = function(resultStr){
 			var result = JSON.parse(resultStr);
-			// Exit now
 
+			// Exit now
 			if (result.stop){
 				if (msgID != null) {
 					postMessage(msgID + "~X~" + resultStr);
