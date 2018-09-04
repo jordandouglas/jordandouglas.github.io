@@ -409,14 +409,29 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 				else if (experimentType == "pauseEscape"){
 
-					int pauseSite = 0;
 					double Emax = 0;
 					double Emin = 0;
 					double t12 = 0;
 
 					if (experimentEle->Attribute("pauseSite")) {
-						pauseSite = atoi(experimentEle->Attribute("pauseSite"));
-						experiment->set_pauseSite(pauseSite);
+						vector<string> pauseSiteSplit = Settings::split(string(experimentEle->Attribute("pauseSite")), '-');
+
+						// 1 pause site (max == min)
+						if (pauseSiteSplit.size() == 1){
+							int pauseSite = stoi(pauseSiteSplit.at(0));
+							experiment->set_pauseSiteMin(pauseSite);
+							experiment->set_pauseSiteMax(pauseSite);
+						}
+
+						// A range of pause sites (max > min)
+						else if (pauseSiteSplit.size() == 2){
+							int pauseSite_min = stoi(pauseSiteSplit.at(0));
+							int pauseSite_max = stoi(pauseSiteSplit.at(1));
+							experiment->set_pauseSiteMin(pauseSite_min);
+							experiment->set_pauseSiteMax(pauseSite_max);
+						}
+
+						pauseSiteSplit.clear();
 					}
 
 					if (experimentEle->Attribute("Emax")) {

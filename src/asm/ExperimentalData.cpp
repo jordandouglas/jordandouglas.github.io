@@ -46,7 +46,8 @@ ExperimentalData::ExperimentalData(int id, string dataType, int nObs){
 	this->currentExperiment = -1;
 	this->sequenceID = _seqID;
 
-	this->pauseSite = 0;
+	this->pauseSiteMin = 0;
+	this->pauseSiteMax = 0;
 	this->Emax = 0;
 	this->Emin = 0;
 	this->t12 = 0;
@@ -133,7 +134,11 @@ string ExperimentalData::toJSON(){
 	JSON += "'UTPconc':" + to_string(this->UTPconc_local) + ",";
 	JSON += "'force':" + to_string(this->force) + ",";
 	if (this->dataType == "pauseEscape") {
-		JSON += "'pauseSite':" + to_string(this->pauseSite) + ",";
+
+		// One pause site or a range of pause sites?
+		if (this->pauseSiteMin == this->pauseSiteMax) JSON += "'pauseSite':" + to_string(this->pauseSiteMin) + ",";
+		else JSON += "'pauseSite':'" + to_string(this->pauseSiteMin) + "-" + to_string(this->pauseSiteMax) + "',";
+
 		JSON += "'halt':" + to_string(this->halt) + ",";
 		JSON += "'Emax':" + to_string(this->Emax) + ",";
 		JSON += "'Emin':" + to_string(this->Emin) + ",";
@@ -337,8 +342,11 @@ void ExperimentalData::set_force(double val) {
 void ExperimentalData::set_halt(int val) {
 	this->halt = val;
 }
-void ExperimentalData::set_pauseSite(int val) {
-	this->pauseSite = val;
+void ExperimentalData::set_pauseSiteMin(int val) {
+	this->pauseSiteMin = val;
+}
+void ExperimentalData::set_pauseSiteMax(int val) {
+	this->pauseSiteMax = val;
 }
 void ExperimentalData::set_Emax(double val) {
 	this->Emax = val;
@@ -377,8 +385,11 @@ double ExperimentalData::get_force() {
 int ExperimentalData::get_halt() {
 	return this->halt;
 }
-int ExperimentalData::get_pauseSite() {
-	return this->pauseSite;
+int ExperimentalData::get_pauseSiteMin() {
+	return this->pauseSiteMin;
+}
+int ExperimentalData::get_pauseSiteMax() {
+	return this->pauseSiteMax;
 }
 double ExperimentalData::get_Emax() {
 	return this->Emax;

@@ -1076,11 +1076,14 @@ extern "C" {
 		// Convert to JSON
 		string toReturnJSON = "{'state':" + to_string(geometricMedian->getStateNumber()) + ",";
 		toReturnJSON += "'chiSquared':" + to_string(geometricMedian->get_chiSquared()) + ",";
+
+		// Estimated model
+		if (_sampleModels) toReturnJSON += "'model':'" + geometricMedian->get_modelIndicator() + "',";
+
 		toReturnJSON += "'paramNamesAndMedians':{";
 
 
-
-		// Iteratet through each parameter in the gemoetric median
+		// Iteratet through each parameter in the geometric median
 		for (int i = 0; i < geometricMedian->getParameterNames().size(); i++){
 			string paramID = geometricMedian->getParameterNames().at(i);
 			cout << "param " << paramID << endl;

@@ -505,7 +505,7 @@ bool MCMC::nextExperiment(){
 	Settings::clearParameterHardcodings();
 	currentModel->activateModel();
 	if ((*currentExperiment)->next()) {
-		cout << "Next setting" << endl;
+		//cout << "Next setting" << endl;
 		//Settings::print();
 		return true;
 	}

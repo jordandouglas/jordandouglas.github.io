@@ -56,7 +56,8 @@ class ExperimentalData{
 
 
 	// Pause escape only
-	int pauseSite;
+	int pauseSiteMin; // If the pause site is a range of sites then this is the first site. Else this is the actual site
+	int pauseSiteMax; 
 	double Emax;
 	double Emin;
 	double t12;
@@ -87,7 +88,8 @@ class ExperimentalData{
 		void set_UTPconc(double val);
 		void set_force(double val);
 		void set_halt(int val);
-		void set_pauseSite(int val);
+		void set_pauseSiteMin(int val);
+		void set_pauseSiteMax(int val);
 		void set_Emax(double val);
 		void set_Emin(double val);
 		void set_t12(double val);
@@ -101,7 +103,8 @@ class ExperimentalData{
 		double get_UTPconc();
 		double get_force();
 		int get_halt();
-		int get_pauseSite();
+		int get_pauseSiteMin();
+		int get_pauseSiteMax();
 		double get_Emax();
 		double get_Emin();
 		double get_t12();

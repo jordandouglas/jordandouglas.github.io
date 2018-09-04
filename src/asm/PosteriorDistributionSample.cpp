@@ -328,7 +328,8 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 
 
 		// Calculate observed probability of being at the current site at the current time (under the log-linear model fit to the original data)
-		int pauseSite =  observed->get_pauseSite();
+		int pauseSiteMin =  observed->get_pauseSiteMin();
+		int pauseSiteMax =  observed->get_pauseSiteMax();
 		//double Emax = observed->get_Emax();
 		//double rate = log(2) / observed->get_t12();
 		//double time = observed->getCurrentSettingX();
@@ -341,7 +342,7 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 		list<int> simulatedLengths = simulated->get_transcriptLengths();
 		for (list<int>::iterator it = simulatedLengths.begin(); it != simulatedLengths.end(); ++it){
 			int len = *it;
-			if (len == pauseSite) simVal++;
+			if (len >= pauseSiteMin && len <= pauseSiteMax) simVal++;
 		}
 		simVal = simVal / simulatedLengths.size();
 
