@@ -581,6 +581,12 @@ div.vertical{
 
 }
 
+optgroup {
+	font-family: "Arial";
+	font-size:14px;
+    color: white;
+}
+
 .dropdown-disabled {
     position: relative; 
 	font-family: "Arial";
