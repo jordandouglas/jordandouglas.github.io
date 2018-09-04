@@ -30,6 +30,27 @@ optgroup {
 	color:black;
 }
 
+.modelSelected{
+	background-color:#858280;
+	cursor:auto;
+    color: white;
+    padding: 5px 0px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+	vertical-align: middle; 
+	width:110px;
+}
+
+
+.modelSelectedTextarea{
+	background-color:#008cba;
+    color: white;
+}
+
+
+
 canvas {
 	Vertical-align: middle;
 }
