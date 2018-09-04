@@ -245,7 +245,7 @@ function getAbcDataObject(which = "ABC"){
 
 		// Pause escape data
 		if (dataType == "pauseEscape"){
-			abcDataObjectForModel["fits"][fitID]["pauseSite"] = parseFloat($("#pauseEscape_site_" + fitID).val());
+			abcDataObjectForModel["fits"][fitID]["pauseSite"] = $("#pauseEscape_site_" + fitID).val();
 			abcDataObjectForModel["fits"][fitID]["Emax"] = parseFloat($("#pauseEscape_Emax_" + fitID).val());
 			abcDataObjectForModel["fits"][fitID]["Emin"] = parseFloat($("#pauseEscape_Emin_" + fitID).val());
 			abcDataObjectForModel["fits"][fitID]["t12"] = parseFloat($("#pauseEscape_t12_" + fitID).val());
@@ -429,12 +429,37 @@ function validateExperimentalDataInput(ele){
 		var valid = true;
 
 
-		var pauseSite = parseFloat($("#pauseEscape_site_" + fitID).val());
+
+
 		var Emax = parseFloat($("#pauseEscape_Emax_" + fitID).val());
 		var Emin = parseFloat($("#pauseEscape_Emin_" + fitID).val());
 		var t12 = parseFloat($("#pauseEscape_t12_" + fitID).val());
 
-		if (pauseSite == null || pauseSite <= 0) return false;
+
+		// Parse the pause site
+		var pauseSite = null;
+		var pauseSite_split = $("#pauseEscape_site_" + fitID).val().trim().split("-");
+		//console.log("pauseSite_split", pauseSite_split, $("#pauseEscape_site_" + fitID).val().trim());
+
+		if (pauseSite_split.length == 1){
+			pauseSite = parseFloat(pauseSite_split[0]);
+			if (isNaN(pauseSite) || pauseSite <= 0) return false;
+		}
+
+
+		else if (pauseSite_split.length == 2){
+			var site1 = parseFloat(pauseSite_split[0]);
+			var site2 = parseFloat(pauseSite_split[1]);
+			if (isNaN(site1) || isNaN(site2) || site1 <= 0 || site2 <= 0 || site1 >= site2) return false;
+
+			pauseSite = pauseSite_split[0] + "-" + pauseSite_split[1];
+			
+		}
+
+
+
+
+		if (pauseSite == null) return false;
 
 
 		var dataValues = $(ele).val();
@@ -1029,11 +1054,11 @@ function getABCpauseSiteTemplate(fitID){
 
 						<tr>
 							<td style="text-align:right;">
-					 			Pause site:  
+					 			Pause sites:  
 					 		</td>
 
 					 		<td>
-					 			<input type="number" id="pauseEscape_site_` + fitID + `" min=1 onChange="validateAllAbcDataInputs()" title="The position of the pause site (compulsary)"
+					 			<input id="pauseEscape_site_` + fitID + `" onChange="validateAllAbcDataInputs()" title="The position(s) of the pause site. Enter a single pause site eg. 62, or a contiguous range which constitutes the pause site eg. 31-38."
 							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> 
 							</td>
 					 	</tr>
@@ -2383,7 +2408,7 @@ function drawPauseEscapeCanvas(fitID, pauseSite = "", Emax = 0, Emin = 0, t12 = 
 		var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
 		ctx.translate(ylabXPos, ylabYPos);
 		ctx.rotate(-Math.PI/2);
-		ctx.fillText("[Site " + pauseSite + "]", 0 ,0);
+		ctx.fillText("[Site" + (isNaN(pauseSite) ? "s " : " ") + pauseSite + "]", 0 ,0);
 		ctx.restore();
 
 	});
@@ -4686,13 +4711,14 @@ function getPosteriorSummaryTemplate(){
 
 
 				<span style='font-size: 30px; cursor:pointer; position:fixed; left:64.5vw; top:20.5vh' onclick='closePosteriorSummaryPopup()'>&times;</span>
-				<div style='padding:2; font-size:18px;'> Sample parameters from the posterior and summarise the posterior into a single value </div>
+				<div style='padding:2; font-size:18px;'> Summarise the posterior distribution with a single state (the geometric median). </div>
 				<table cellpadding=10 style='width:90%; margin:auto;'>
 				
 					<tr>
 						<td style="vertical-align:top" title="The geometric median is the posterior sample which is closest in Euclidean space to all other posterior samples. The parameters are first normalised into z-scores."> 
 							<b>Geometric median:</b>
 
+							<div id="geometricMedianCalculating">Computing geometric median...</div>
 
 							<div id="geometricMedianDIV" style="display:none">
 								<br>
@@ -4717,11 +4743,11 @@ function getPosteriorSummaryTemplate(){
 							</td>
 						</div>
 							
-						<td  style="vertical-align:top"> 
+						<!--<td  style="vertical-align:top"> 
 							<b>Sample from posterior:</b>
 							
 							
-						</td>
+						</td>-->
 					</tr>
 
 					
@@ -4750,8 +4776,7 @@ function posteriorSummary(){
 	//popupHTML = popupHTML.replace("XX_plotNum_XX", plotNum);
 	//popupHTML = popupHTML.replace("XX_plotName_XX", $("#selectPlot" + plotNum + " :selected").text());
 	$(popupHTML).appendTo('body');
-
-
+	$("#geometricMedianCalculating").html("Computing geometric median...");
 
 	getPosteriorSummaryData_controller(function(result){
 		
@@ -4764,9 +4789,24 @@ function posteriorSummary(){
 			return;
 		}
 
+		$("#geometricMedianCalculating").hide(50);
 		$("#geometricMedianStateVal").html(result.state);
 		$("#geometricMedianX2Val").html(roundToSF(result.chiSquared, 4));
+		if (result.model != null) {
 
+			$("#geometricMedianTable").append(`
+
+				<tr style="background-color:white">
+					<td>
+						Model
+					</td>
+
+					<td>
+						` + result.model + `
+					</td>
+				</tr>
+			`);
+		}
 
 		for (var paramID in paramNamesAndMedians){
 
