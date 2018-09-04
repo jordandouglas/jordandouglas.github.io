@@ -53,7 +53,7 @@ Model::Model(){
 	//modelIsActive = false;
 
 
-	currentTranslocationModel = "sealingBarriers";
+	currentTranslocationModel = "HIBU_barriers";
 	currentRNABlockadeModel = "terminalBlockade";
 	currentInactivationModel = "sequenceIndependent";
 	currentBacksteppingModel = "backstep0";
@@ -302,8 +302,10 @@ void Model::clear(){
 
 double Model::getTranslocationModelConstant(){
 
-	if (currentTranslocationModel == "sealingBarriers") return _sealingModelConstant;
-	if (currentTranslocationModel == "meltingBarriers") return _meltingModelConstant;
+	if (currentTranslocationModel == "HIBU_barriers") return _HIBUConstant;
+	if (currentTranslocationModel == "HIBI_barriers") return _HIBIConstant;
+	if (currentTranslocationModel == "HUBU_barriers") return _HUBUConstant;
+	if (currentTranslocationModel == "HUBI_barriers") return _HUBIConstant;
 	if (currentTranslocationModel == "midpointBarriers") return _midpointModelConstant;
 	if (currentTranslocationModel == "absoluteBarriers") return _absoluteModelConstant;
 	return 0;
@@ -449,6 +451,12 @@ bool Model::get_allowMultipleBulges(){
 
 
 Model* Model::set_currentTranslocationModel(string val){
+
+	// For parsing XML files from old versions
+	if (val == "meltingBarriers") val = "HIBI_barriers"; 
+	else if (val == "sealingBarriers") val = "HIBU_barriers"; 
+
+
 	if (val != this->currentTranslocationModel) Settings::resetRateTables(); // Need to reset the translocation rate cache when this is changed
 	this->currentTranslocationModel = val;
 	//cout << "Setting translocation model to " << val << "." << " aka " <<  this->currentTranslocationModel << endl;

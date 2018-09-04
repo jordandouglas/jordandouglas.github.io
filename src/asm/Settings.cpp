@@ -47,7 +47,7 @@ using namespace std;
 
 
 // Constants
-const int INF = 100000000;
+const int INF = 1e16;
 const double _RT = 0.6156;
 const double _kBT = 1.380649e-23 * 310;
 const double _preExp = 1e6;	
@@ -56,8 +56,10 @@ const int _nBasesToTranscribeInit = 4;
 
 
 const double _midpointModelConstant = -14.37;
-const double _sealingModelConstant = -13.61;
-const double _meltingModelConstant = -18.31;
+const double _HIBIConstant = -15.96;
+const double _HIBUConstant = -11.26;
+const double _HUBIConstant = -13.52;
+const double _HUBUConstant = -8.819;
 const double _absoluteModelConstant = 0;
 
 

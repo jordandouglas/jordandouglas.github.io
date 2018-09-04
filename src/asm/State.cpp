@@ -2654,7 +2654,10 @@ double State::calculateForwardTranslocationFreeEnergyBarrier(bool ignoreParamete
 		barrierHeight += (this->calculateTranslocationFreeEnergy(true) + stateAfterForwardtranslocation->calculateTranslocationFreeEnergy(true)) / 2;
 	}
 
-	else if (currentModel->get_currentTranslocationModel() == "meltingBarriers" || currentModel->get_currentTranslocationModel() == "sealingBarriers"){
+	else if (	currentModel->get_currentTranslocationModel() == "HIBI_barriers"
+			 || currentModel->get_currentTranslocationModel() == "HIBU_barriers"
+			 || currentModel->get_currentTranslocationModel() == "HUBI_barriers"
+			 || currentModel->get_currentTranslocationModel() == "HUBU_barriers"){
 		barrierHeight += FreeEnergy::getFreeEnergyOfIntermediateState(this, stateAfterForwardtranslocation);
 		barrierHeight -= FreeEnergy::getFreeEnergyOfTranscriptionBubbleIntermediate(this, stateAfterForwardtranslocation); // Subtract the free energy which we would gain if the intermediate transcription bubble was sealed
 	}
@@ -2701,7 +2704,10 @@ double State::calculateBackwardTranslocationFreeEnergyBarrier(bool ignoreParamet
 		barrierHeight += (this->calculateTranslocationFreeEnergy(true) + stateAfterBackwardtranslocation->calculateTranslocationFreeEnergy(true)) / 2;
 	}
 
-	else if (currentModel->get_currentTranslocationModel() == "meltingBarriers" || currentModel->get_currentTranslocationModel() == "sealingBarriers"){
+	else if (	currentModel->get_currentTranslocationModel() == "HIBI_barriers"
+			 || currentModel->get_currentTranslocationModel() == "HIBU_barriers"
+			 || currentModel->get_currentTranslocationModel() == "HUBI_barriers"
+			 || currentModel->get_currentTranslocationModel() == "HUBU_barriers"){
 		barrierHeight += FreeEnergy::getFreeEnergyOfIntermediateState(this, stateAfterBackwardtranslocation);
 		barrierHeight -= FreeEnergy::getFreeEnergyOfTranscriptionBubbleIntermediate(this, stateAfterBackwardtranslocation); // Subtract the free energy which we would gain if the intermediate transcription bubble was sealed
 	}

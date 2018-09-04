@@ -59,8 +59,10 @@ extern const int _nBasesToTranscribeInit;
 // These terms are subtracted from the translocation barrier height of the respective model when normalising
 // Calculated using the rpob gene with transcription bubble 9/1/1
 extern const double _midpointModelConstant;
-extern const double _sealingModelConstant;
-extern const double _meltingModelConstant;
+extern const double _HIBIConstant;
+extern const double _HIBUConstant;
+extern const double _HUBIConstant;
+extern const double _HUBUConstant;
 extern const double _absoluteModelConstant;
 
 

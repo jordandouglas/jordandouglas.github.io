@@ -179,7 +179,7 @@ double FreeEnergy::getFreeEnergyOfTranscriptionBubbleIntermediate(State* state1,
 
 
 	// Take the intersection of missing basepairs if going for the sealing model
-	if (currentModel->get_currentTranslocationModel() == "sealingBarriers"){
+	if (currentModel->get_currentTranslocationModel() == "HIBU_barriers" || currentModel->get_currentTranslocationModel() == "HUBU_barriers"){
 		leftmostTemplatePos ++;
 		leftmostComplementPos ++;
 		rightmostTemplatePos --;
@@ -353,11 +353,30 @@ vector<string> FreeEnergy::getHybridIntermediateString(vector<string> hybridStri
 	// Build a list of basepairs between template and hybrid in each sequence
 	list<string> basepairs1 = FreeEnergy::getBasePairs(hybridStrings1[0], hybridStrings1[1], leftTemplate1, leftNascent1);
 	list<string> basepairs2 = FreeEnergy::getBasePairs(hybridStrings2[0], hybridStrings2[1], leftTemplate2, leftNascent2);
+	list<string> basepairsIntermediate;
 
-	// Find the basepairs which are in both sets (ie. the intersection)
-	list<string> basepairsIntermediate = getListIntersection(basepairs1, basepairs2);
+	// Take union of hybrid basepairs between the two states (HU__)
+	if (currentModel->get_currentTranslocationModel().substr(0,2) == "HU"){
 
-	//list<string> basepairsIntermediate = getListUnion(basepairs1, basepairs2);
+		basepairsIntermediate = getListUnion(basepairs1, basepairs2);
+
+	}
+
+	// Take intersection of hybrid basepairs between the two states (HI__)
+	else if (currentModel->get_currentTranslocationModel().substr(0,2) == "HI"){
+
+		basepairsIntermediate = getListIntersection(basepairs1, basepairs2);
+
+	}
+
+	else {
+
+		cout << "ERROR: FreeEnergy::getHybridIntermediateString was called but union / intersection was not specified." << endl;
+		exit(0);
+
+	}
+
+
 
 
 	string strIntermediateT = "";
