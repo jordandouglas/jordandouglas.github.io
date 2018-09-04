@@ -285,6 +285,10 @@ function executeFunctionFromString(fnStr){
 function refresh_controller(resolve_fn = function(x) {}){
 
 
+
+	
+
+
 	if (WEB_WORKER == null) {
 		var toCall = () => new Promise((resolve) => WW_JS.refresh_WW(resolve));
 		toCall().then((x) => resolve_fn(x));
@@ -307,7 +311,7 @@ function refresh_controller(resolve_fn = function(x) {}){
 		var msgID = res[1];
 		
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall(fnStr).then(() => resolve_fn());
+		toCall(fnStr).then((result) => resolve_fn(result));
 		
 	}
 
@@ -1030,7 +1034,9 @@ function submitDistribution_controller(resolve = function() {}){
 			refresh();
 			return;
 		}
-		
+
+
+		activateModel_changeView("default");
 		
 		// If the value has changed and this parameter requires refreshing on change, then refresh
 		var needToRefresh = PHYSICAL_PARAMETERS_LOCAL[paramID]["refreshOnChange"] != null && PHYSICAL_PARAMETERS_LOCAL[paramID]["refreshOnChange"];
@@ -2294,71 +2300,80 @@ function startTrials_controller(){
 			
 		// Run simulations in Webassembly if service is available
 		else{
-			
-			var res = stringifyFunction("startTrials", [ntrials], true);
-			var fnStr = "wasm_" + res[0];
-			var msgID = res[1];
 
-			var resolve = function(result){
+			sendModels_controller(function() {
+
+
+				var res = stringifyFunction("startTrials", [ntrials], true);
+				var fnStr = "wasm_" + res[0];
+				var msgID = res[1];
+
+				var resolve = function(result){
+
+					
+
+					//drawPlotsFromData(result.plots);
+					drawPlots();
+					setNextBaseToAdd_controller();
+
+					var toDoAfterObjectRender = function() {
+
+						if (result.stop) {
+							updateDOM(result);
+							MESSAGE_LISTENER[msgID] = null;
+						}
+						else{
+							//MESSAGE_LISTENER[msgID].remove = false;
+
+							var progressProportion = result.N / ntrials;
+							$("#progressSimSpan").attr("title", "Completed " + (result.N-1) + " out of " + ntrials + " trials.");  
+							if ($("#counterProgress").html() != Math.floor(progressProportion * 100)) {
+								renderParameters(); // Update parameters at the end of each trial
+								activateModel_changeView(result.currentModelID) // Update currently sampled model at end of each trial
+							}
+
+
+							$("#counterProgress").html(Math.floor(progressProportion * 100));
+							var canvas = document.getElementById("progressSimCanvas");
+							var ctx = canvas.getContext("2d");
+							ctx.fillStyle = "#858280"; 
+							ctx.fillRect(0,0,progressProportion*90,22); 
+							ctx.fill();
+
+							//$("#output_asm").append("<div style='padding:5 5'>Velocity: " + roundToSF(result.meanVelocity, 4) + "bp/s; Time taken: " + roundToSF(result.realTime, 4) + "s; n complete = " + result.N + "</div>"); 
+
+
+							// Go back to the model when done
+							if (result.animationTime > 0){
+								var resumeTrialsFnStr = "wasm_" + stringifyFunction("resumeTrials", [msgID]);
+								callWebWorkerFunction(resumeTrialsFnStr, null, null, false);
+							}
+
+						}
+
+					};
+
+					if(!result.stop && result.animationTime != 0) renderObjects(false, toDoAfterObjectRender);
+					else toDoAfterObjectRender();
+
+
+				}
 				
-				//drawPlotsFromData(result.plots);
-				drawPlots();
-				setNextBaseToAdd_controller();
 
-				var toDoAfterObjectRender = function() {
+				callWebWorkerFunction(fnStr, resolve, msgID, false);
 
-					if (result.stop) {
-						updateDOM(result);
-						MESSAGE_LISTENER[msgID] = null;
-					}
-					else{
-						//MESSAGE_LISTENER[msgID].remove = false;
-						if ($("#counterProgress").html() != Math.floor(result.N)) {
-							renderParameters(); // Update parameters at the end of each trial
-						}
+				// Render every animationFrame unless ultrafast or hidden
+				if ($("#PreExp").val() != "ultrafast" && $("#PreExp").val() != "hidden") {
+					simulationRenderingController = true;
+					//renderObjectsUntilReceiveMessage(msgID);
+				}
 
-						var progressProportion = result.N / ntrials;
-						$("#counterProgress").html(Math.floor(progressProportion * 100));
+				// If hidden mode then the model will tell us when to render
+				else{
+					simulationRenderingController = false;
+				}
 
-						$("#progressSimCanvas").attr("title", "Completed " + result.N + " out of " + ntrials + " simulations");
-						var canvas = document.getElementById("progressSimCanvas");
-						var ctx = canvas.getContext("2d");
-						ctx.fillStyle = "#858280"; 
-						ctx.fillRect(0,0,progressProportion*90,22); 
-						ctx.fill();
-
-						//$("#output_asm").append("<div style='padding:5 5'>Velocity: " + roundToSF(result.meanVelocity, 4) + "bp/s; Time taken: " + roundToSF(result.realTime, 4) + "s; n complete = " + result.N + "</div>"); 
-
-
-						// Go back to the model when done
-						if (result.animationTime > 0){
-							var resumeTrialsFnStr = "wasm_" + stringifyFunction("resumeTrials", [msgID]);
-							callWebWorkerFunction(resumeTrialsFnStr, null, null, false);
-						}
-
-					}
-
-				};
-
-				if(!result.stop && result.animationTime != 0) renderObjects(false, toDoAfterObjectRender);
-				else toDoAfterObjectRender();
-
-
-			}
-			
-
-			callWebWorkerFunction(fnStr, resolve, msgID, false);
-
-			// Render every animationFrame unless ultrafast or hidden
-			if ($("#PreExp").val() != "ultrafast" && $("#PreExp").val() != "hidden") {
-				simulationRenderingController = true;
-				//renderObjectsUntilReceiveMessage(msgID);
-			}
-
-			// If hidden mode then the model will tell us when to render
-			else{
-				simulationRenderingController = false;
-			}
+			});
 
 		}
 
@@ -2875,6 +2890,7 @@ function loadSession_controller(XMLData, resolve = function() { }){
 
 			// Reset the ABC DOM
 			initABCpanel();
+			initModelComparisonpanel();
 
 			if (experimentalData["ntrials"] != null) {
 				if (experimentalData["inferenceMethod"] == "ABC") $("#ABCntrials").val(experimentalData["ntrials"]);
@@ -2993,6 +3009,21 @@ function loadSession_controller(XMLData, resolve = function() { }){
 			validateAllAbcDataInputs();
 		
 			
+		}
+
+
+		// Estimated models
+		if (result["modelsToEstimate"]){
+
+
+			console.log("modelsToEstimate", result.modelsToEstimate);
+			for (var i = 0; i < result.modelsToEstimate.length; i ++){
+				var model = result.modelsToEstimate[i];
+				populateModelDescription(model.weight, model.description);
+			}
+
+			sendModels_controller();
+
 		}
 
 
@@ -3307,6 +3338,161 @@ function getNTPparametersAndSettings_controller(resolve = function(){}){
 
 
 
+
+
+function getParametersAndModelSettings_compact_controller(resolve = function(){}){
+
+	
+	if (WEB_WORKER_WASM == null){
+		resolve("ERROR");
+	}else{
+
+		var res = stringifyFunction("getParametersAndModelSettings_compact", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((JSON) => resolve(JSON));
+
+	}
+
+
+}
+
+
+// Send through all the models and their information to the WASM module
+function sendModels_controller(resolve = function() { } ){
+
+	if (numberModelsBuilt <= 1) {
+		resolve();
+		return;
+	}
+
+	// Make a list of all model weights, descriptions and ids
+	var modelIDs = [];
+	var modelWeights = []; 
+	var modelDescriptions = [];  // Remove all white spaces here because C++ is annoying
+	for (var i = 1; i < numberModelsBuilt; i ++){
+		modelIDs.push(i);
+		modelWeights.push($("#modelWeight_" + i).val());
+		modelDescriptions.push($("#modelBuildingDescription_" + i).val().replace(/ /g,''));
+	}
+
+
+
+	modelIDs = modelIDs.join("|");
+	modelWeights = modelWeights.join("|");
+	modelDescriptions = modelDescriptions.join("|");
+
+
+
+	if (WEB_WORKER_WASM == null){
+		
+
+	}else{
+
+		var res = stringifyFunction("sendModels", [modelIDs, modelWeights, modelDescriptions], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then(() => resolve());
+
+	}
+
+
+
+
+}
+
+
+
+
+// Send through all the models and their information to the WASM module
+function getEstimatedModels_controller(resolve = function() { } ){
+
+	
+	if (WEB_WORKER_WASM == null){
+		
+
+	}else{
+
+		var res = stringifyFunction("getEstimatedModels", [], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((str) => resolve(str));
+
+	}
+
+
+
+
+}
+
+
+
+
+
+
+function activateModel_controller(modelID, modelWeight, modelDescription, resolve = function(){}){
+
+	
+	if (WEB_WORKER_WASM == null){
+		
+
+	}else{
+
+		var res = stringifyFunction("activateModel", [modelID, modelWeight, modelDescription], true);
+		var fnStr = "wasm_" + res[0];
+		var msgID = res[1];
+		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+		toCall().then((result) => resolve(result));
+
+	}
+
+
+}
+
+
+function userChangeModelSampling_controller(){
+
+
+	var updateDom = function(result){
+
+		// Update the DOM to reflect the change in model
+		console.log("userChangeModelSampling_controller", result);
+		activateModel_changeView(result.ID);
+		renderParameters();
+		updateModelDOM(result);
+
+	}
+
+
+	var toSample = $("#sampleModelsChk").prop("checked");
+	if (WEB_WORKER_WASM == null){
+		
+
+	}else{
+
+		// Send through the current model settings before toggling
+		sendModels_controller(function() {
+
+
+			var res = stringifyFunction("userChangeModelSampling", [toSample], true);
+			var fnStr = "wasm_" + res[0];
+			var msgID = res[1];
+			var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+			toCall().then((result) => updateDom(result));
+
+
+		});
+
+	}
+
+}
+
+
+
+
 function userInputModel_controller(){
 
 	
@@ -3334,6 +3520,7 @@ function userInputModel_controller(){
 
 
 		refreshNavigationCanvases();
+		activateModel_changeView(mod.ID);
 		
 		updateModelDOM(mod);
 	};

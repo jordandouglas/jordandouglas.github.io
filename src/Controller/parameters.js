@@ -53,8 +53,13 @@ function renderParameters_givenParameters(PHYSICAL_PARAMETERS_LOCAL){
 			$("#" + paramID + "_container").show(100);
 		}
 
+		// If the textbox is being focused do not update the parameter
+		if ($("#" + paramID).is(':focus')) continue;
+
+
 		//console.log("Setting", "#" + paramID, "to", roundToSF(PHYSICAL_PARAMETERS_LOCAL[paramID]["val"], 3));
 		if (PHYSICAL_PARAMETERS_LOCAL[paramID]["binary"] == null || PHYSICAL_PARAMETERS_LOCAL[paramID]["binary"] == false){
+
 			
 			if (PHYSICAL_PARAMETERS_LOCAL[paramID]["distribution"] != "Fixed" || !simulating || WEB_WORKER_WASM != null) $("#" + paramID).val(roundToSF(PHYSICAL_PARAMETERS_LOCAL[paramID]["val"], 3));
 			

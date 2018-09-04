@@ -39,6 +39,22 @@ function showABCPanelFn(){
 }
 
 
+function showModelBuildingPanelFn(){
+
+	if($("#showModelBuildingPanel").val() == "-"){
+		$("#showModelBuildingPanel").val("+");
+		$("#ModelBuildingTableDIV").slideUp(100);
+	}
+	else{
+		$("#showModelBuildingPanel").val("-");
+		$("#ModelBuildingTableDIV").slideDown(100);
+	}
+
+}
+
+
+
+
 function showNavigationPanel(){
 
 	if($("#showNavigationPanel").val() == "-"){
@@ -1222,11 +1238,67 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 			}
 
 
-		saveXML.writeEndElement();
-		saveXML.writeEndDocument();
-		
-		//console.log( saveXML.flush());
-		callback(saveXML.flush());
+		// Model comparison
+		sendModels_controller(function() {
+			getEstimatedModels_controller(function(result){
+
+
+
+				// There are models to compare
+				if (result.models.length > 0){
+
+					// Close the previous node
+					saveXML.writeEndElement(); 
+					saveXML.writeEndElement();
+
+
+					// Start the estimated models node
+					saveXML.writeStartElement("estimated-models");
+					for (var i = 0; i < result.models.length; i++){
+
+						var model = result.models[i];
+
+						// Create a new model tag
+						saveXML.writeStartElement("model" + (i+1));
+
+							// Model ID and weight
+							saveXML.writeAttributeString("id", model.ID);
+							saveXML.writeAttributeString("weight", model.weight);
+
+							for (var property in model){
+
+								if (property == "ID" || property == "weight") continue;
+								saveXML.writeAttributeString(property, model[property]);
+
+							}
+
+
+
+						// Close the tag
+						saveXML.writeEndElement();
+						
+						
+					}
+
+
+
+				}
+
+
+
+				saveXML.writeEndElement();
+				saveXML.writeEndDocument();
+				
+				//console.log( saveXML.flush());
+				callback(saveXML.flush());
+
+
+			});
+
+		});
+
+
+
 		
 		
 	});

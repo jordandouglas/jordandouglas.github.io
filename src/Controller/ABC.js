@@ -1033,7 +1033,7 @@ function getABCpauseSiteTemplate(fitID){
 					 		</td>
 
 					 		<td>
-					 			<input type="number" id="pauseEscape_site_` + fitID + `" min=1 onChange="validateAllAbcDataInputs()" title="The position of the pause site (mandatory)"
+					 			<input type="number" id="pauseEscape_site_` + fitID + `" min=1 onChange="validateAllAbcDataInputs()" title="The position of the pause site (compulsary)"
 							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> 
 							</td>
 					 	</tr>
@@ -1083,7 +1083,7 @@ function getABCpauseSiteTemplate(fitID){
 
 					 Time samples:
 					<textarea class="ABCinputData pauseEscapeInputData" id="pauseEscapeInputData_` + fitID + `" onChange="validateAllAbcDataInputs()" style="font-size:14px; padding: 5 10;  width: 200px; height: 80px; max-width:200px; max-height:500px; min-height:100px; min-width:200px"  
-					title="Input the times when samples were taken (mandatory)." placeholder="Example: 1,2,5,10,60,120"></textarea>
+					title="Input the times when samples were taken (compulsary)." placeholder="Example: 1,2,5,10,60,120"></textarea>
 					<br><br >
 					<span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
 						Input the times when samples were taken (units s), seperated with commas. 
