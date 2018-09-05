@@ -586,17 +586,23 @@ void MCMC::setPreviousState(PosteriorDistributionSample* state){
 
 
 
-	// Check if burnin has failed
 	double cutoff = log(_chiSqthreshold_min / _chiSqthreshold_0) / log(_chiSqthreshold_gamma) + 500;
-	if (state->getStateNumber() > cutoff) MCMC::hasFailedBurnin = true;
 
 
 	// Check if burnin has been achieved
-	if ( MCMC::epsilon <= _chiSqthreshold_min && MCMC::previousMCMCstate->get_chiSquared() <= MCMC::epsilon) MCMC::hasAchievedBurnin = true;
+	if (MCMC::epsilon <= _chiSqthreshold_min && MCMC::previousMCMCstate->get_chiSquared() <= MCMC::epsilon) MCMC::hasAchievedBurnin = true;
+
+
+	// Check if burnin has failed
+	else if (state->getStateNumber() > cutoff) MCMC::hasFailedBurnin = true;
+	
 
 	// Check if pre-burnin has been achieved
 	if (MCMC::epsilon <= _chiSqthreshold_min * 2) MCMC::hasAchievedPreBurnin = true;
-		
+
+
+	// The state where convergence was achieved
+	if (MCMC::hasAchievedBurnin) MCMC::nStatesUntilBurnin = ceil(cutoff - 500) / logEvery;
 
 
 }

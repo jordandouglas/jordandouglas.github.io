@@ -22,12 +22,13 @@
 
 #include "SimPol_vRNA_interface.h"
 
+#include <iostream>
+
 float vRNA_MFE_value = 0;
 
 
 
 void vRNA_init(const char* templateSequence){
-
 }
 
 

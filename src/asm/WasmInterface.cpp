@@ -1516,9 +1516,9 @@ extern "C" {
 		string posteriorsJSON = "{";
 
 		if (_GUI_posterior.size() > 0) posteriorsJSON += "'0':'SimPol MCMC-ABC',";
-		for(std::map<int, list<PosteriorDistributionSample*>>::iterator iter = _gelPosteriorDistributions.begin(); iter != _gelPosteriorDistributions.end(); ++iter){
+		for (std::map<int, list<PosteriorDistributionSample*>>::iterator iter = _gelPosteriorDistributions.begin(); iter != _gelPosteriorDistributions.end(); ++iter){
 			int id = iter->first;
-			 posteriorsJSON += "'" + to_string(id) + "':'Gel calibration " + to_string(id) + "',";
+			posteriorsJSON += "'" + to_string(id) + "':'Gel calibration " + to_string(id) + "',";
 		}
 
 		if (posteriorsJSON.substr(posteriorsJSON.length()-1, 1) == ",") posteriorsJSON = posteriorsJSON.substr(0, posteriorsJSON.length() - 1);

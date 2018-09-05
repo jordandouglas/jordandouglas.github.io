@@ -47,7 +47,7 @@ using namespace std;
 
 
 // Constants
-const int INF = 1e16;
+const int INF = 1e8;
 const double _RT = 0.6156;
 const double _kBT = 1.380649e-23 * 310;
 const double _preExp = 1e6;	
@@ -477,7 +477,9 @@ bool Settings::setSequence(string seqID){
 	_translocationRatesCache = currentSequence->getRatesCache();
 
 
-	if (PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
+
+	// vRNA_init contains a memory leak. As a temporary workaround will not call this function during ABC 
+	if (!_RUNNING_ABC && PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
 
 
 	return true;

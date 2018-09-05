@@ -752,7 +752,6 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			}
 
 
-			free(rates);
 
 			
 

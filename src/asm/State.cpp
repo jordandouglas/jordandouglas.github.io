@@ -2197,6 +2197,7 @@ float State::foldDownstream(){
 
 
 void State::fold(bool fold5Prime, bool fold3Prime){
+
 	cout << "Folding" << endl;
 
 	// Fold the 5' (ie. upstream) mRNA and store the structure string
@@ -2211,7 +2212,7 @@ void State::fold(bool fold5Prime, bool fold3Prime){
 
 
 	// Fold the 3' (ie. downstream) mRNA  and store the structure string
-	if (false && fold3Prime){
+	if (fold3Prime){
 
 		this->_3primeMFE = this->foldDownstream();
 		if (this->_3primeMFE) {

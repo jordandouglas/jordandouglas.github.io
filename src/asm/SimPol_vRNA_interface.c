@@ -42,6 +42,7 @@ vrna_fold_compound_t* vc; // Contains information on the sequence and the DP mat
 
 
 // Initialise the ViennaRNA suite for RNA folding
+// LEAK: this function contains a memory leak somewhere
 void vRNA_init(const char* nascentSequence){
 
 
