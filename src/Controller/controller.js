@@ -1054,13 +1054,12 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 
 		// Model settings
 		saveXML.writeStartElement('elongation-model');
-		saveXML.writeAttributeString('id', ELONGATION_MODEL["id"]);
 
 
 		// All model properties
 		for (var modelProperty in ELONGATION_MODEL){
 
-			if (modelProperty == "id" || modelProperty == "name") continue;
+			if (modelProperty == "id" || modelProperty == "ID" || modelProperty == "name" || modelProperty == "weight") continue;
 			saveXML.writeStartElement(modelProperty);
 			saveXML.writeAttributeString('val', ELONGATION_MODEL[modelProperty]);
 			saveXML.writeEndElement();

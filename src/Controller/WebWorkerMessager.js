@@ -2959,6 +2959,7 @@ function loadSession_controller(XMLData, resolve = function() { }){
 
 					$("#pauseEscape_site_" + fitID).val(experimentalData["fits"][fitID]["pauseSite"]);
 					$("#pauseEscape_Emax_" + fitID).val(experimentalData["fits"][fitID]["Emax"]);
+					$("#pauseEscape_Emin_" + fitID).val(experimentalData["fits"][fitID]["Emin"]);
 					$("#pauseEscape_t12_" + fitID).val(experimentalData["fits"][fitID]["t12"]);
 
 					var inputString = experimentalData["fits"][fitID]["vals"].join(",");
