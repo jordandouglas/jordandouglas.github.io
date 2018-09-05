@@ -1307,6 +1307,22 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 
 
 
+function getLoaderTemplate(id, msg = ""){
+	return `
+		<table  id="` + id + `" title="Loading...">
+			<tr>
+				<td>
+					<div class="loader"></div> 
+				</td>
+				<td>
+					` + msg + `
+				</td>
+			</tr>
+		</table>
+	`;
+}
+
+
 
 // Loads a session from the XML file stored at url
 function loadSessionFromURL(url, resolve = function() { }){
@@ -1369,6 +1385,7 @@ function loadSession(fileLocation = null){
 
 
 }
+
 
 
 

@@ -4703,6 +4703,8 @@ function closePosteriorSummaryPopup(){
 function getPosteriorSummaryTemplate(){
 
 
+	
+
 	return `
 
 		<div id='posteriorSummaryPopup' style='background-color:#008cba; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:20vh; z-index:5'>
@@ -4718,7 +4720,8 @@ function getPosteriorSummaryTemplate(){
 						<td style="vertical-align:top" title="The geometric median is the posterior sample which is closest in Euclidean space to all other posterior samples. The parameters are first normalised into z-scores."> 
 							<b>Geometric median:</b>
 
-							<div id="geometricMedianCalculating">Computing geometric median...</div>
+							<span id="geometricMedianCalculating" style="display:none">
+							</span>
 
 							<div id="geometricMedianDIV" style="display:none">
 								<br>
@@ -4776,20 +4779,32 @@ function posteriorSummary(){
 	//popupHTML = popupHTML.replace("XX_plotNum_XX", plotNum);
 	//popupHTML = popupHTML.replace("XX_plotName_XX", $("#selectPlot" + plotNum + " :selected").text());
 	$(popupHTML).appendTo('body');
-	$("#geometricMedianCalculating").html("Computing geometric median...");
+
+
+	// Show the loading icon only if it takes a while to load, otherwise the fast flickering is annoying to look at
+	var hasLoaded = false;
+	setTimeout(function(){
+
+		if (!hasLoaded) {
+			$("#geometricMedianCalculating").html(getLoaderTemplate("geometricMedianLoader", "Computing geometric median..."));
+			$("#geometricMedianCalculating").show(50);
+		}
+
+	}, 100);
 
 	getPosteriorSummaryData_controller(function(result){
-		
+
+		hasLoaded = true;
 		var paramNamesAndMedians = result.paramNamesAndMedians;
 
-
+		$("#geometricMedianCalculating").hide(50);
+		
 		$("#geometricMedianDIV").show(50);
 		if (result.state == null) {
 			$("#geometricMedianDIV").html("No information is available at this time.");
 			return;
 		}
 
-		$("#geometricMedianCalculating").hide(50);
 		$("#geometricMedianStateVal").html(result.state);
 		$("#geometricMedianX2Val").html(roundToSF(result.chiSquared, 4));
 		if (result.model != null) {
