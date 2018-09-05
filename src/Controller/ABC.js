@@ -253,9 +253,9 @@ function getAbcDataObject(which = "ABC"){
 
 				// Nascent sequence
 				var seq = $("#pauseEscapeSeq_" + fitID).val().trim().toUpperCase().replace(/[^ACGTU]/gi, '');
-				seq = complementSequence(seq, $("#SelectTemplateType").val().substr(2, 5) == "RNA");
-
+				seq = complementSequenceFn(seq, $("#SelectTemplateType").val().substr(2, 5) == "RNA");
 				if (seq != "") abcDataObjectForModel["fits"][fitID]["seq"] = seq;
+
 			}
 
 			abcDataObjectForModel["fits"][fitID]["haltPosition"] = parseFloat($("#ABC_haltPosition_" + fitID).val());
@@ -1211,7 +1211,7 @@ function getABCpauseSiteTemplate(fitID){
 					 	<tr title='Use the same sequence selected in &#9776; Parameters or a different sequence?'  >
 						 
 							<td style="text-align:right; font-size:13px">
-					 			Same sequence
+					 			Same seq
 					 		</td>
 							 
 					 		<td colspan=3>
@@ -1219,7 +1219,7 @@ function getABCpauseSiteTemplate(fitID){
 							 		 <input class="modelSetting" type="checkbox" id="pauseEscapeUseNewSeq_` + fitID + `" OnChange="$('#pauseEscapeSeqRow_` + fitID + `').toggle()"> </input>
 							 		 <span class="slider round notboolean"></span>
 								</label> 
-								<span style="font-size:13px; vertical-align:middle" >New sequence</span>
+								<span style="font-size:13px; vertical-align:middle" >New seq</span>
 					 		</td>
 						
 					 	</tr>

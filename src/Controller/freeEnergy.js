@@ -42,15 +42,15 @@ function refreshFreeEnergy(){
 
 }
 
-function complementSequence(seq, toRNA = true){
+function complementSequenceFn(seq, toRNA = true){
+
 
 
 	seq = seq.replace(/[C]/gi, "X").replace(/[G]/gi, "C").replace(/[X]/gi, "G");
 
 
-
 	if (toRNA) seq = seq.replace(/[A]/gi, "X").replace(/[TU]/gi, "A").replace(/[X]/gi, "U");
-	else if (toRNA) seq = seq.replace(/[A]/gi, "X").replace(/[TU]/gi, "A").replace(/[X]/gi, "T");
+	else seq = seq.replace(/[A]/gi, "X").replace(/[TU]/gi, "A").replace(/[X]/gi, "T");
 
 
 	return seq;
