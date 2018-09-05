@@ -62,6 +62,8 @@ void MCMC::initMCMC(){
 
 	if (MCMC::initialised) return;
 
+	_RUNNING_ABC = true;
+
 	cout << "\nInitialising MCMC..." << endl;
 	bool printToFile = outputFilename != "";
 
