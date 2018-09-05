@@ -40,6 +40,7 @@
 <script language='JavaScript' type='text/JavaScript' src="src/Resources/XMLWriter-master/XMLWriter.js"></script>
 <script language='JavaScript' type="text/javascript" src="src/Resources/xml_for_script-3.1/jsXMLParser/xmlsax.js"></script>
 <script language='JavaScript' type="text/javascript" src="src/Resources/hammer.js"></script>
+<script language='JavaScript' type="text/javascript" src="src/Resources/dropzone.js"></script>
 
 <script language='JavaScript' type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/2.3.3/fabric.min.js"></script>
 
@@ -105,6 +106,19 @@
 
 <script language='JavaScript' type='text/JavaScript'>
 
+
+// Select all text upon focusing on an input
+/*
+$(function(){
+    $(document).on('focus','input[type=number]',function(){ 
+    	document.getSelection().removeAllRanges();
+    	this.select(); 
+  	});
+});
+$(function(){
+    $(document).on('blur','input[type=number]',function(){ document.getSelection().removeAllRanges(); });
+});
+*/
 
 
 function init(){
@@ -288,7 +302,8 @@ function init(){
 		//{
 		    //initWebAssembly();
 		//});
-		
+
+
 		
 		
 	}catch(e){
@@ -821,7 +836,8 @@ window.onkeyup = function(e) {
 	}else if (key == 27 && !e.ctrlKey && !e.shiftKey) { // Escape
 		stop_controller();
 		closeAllDialogs();
-		bendDNA_controller();
+		//bendDNA_controller();
+
 
 		var abcDataObjectForModel = getAbcDataObject();
 		console.log("abcDataObjectForModel", abcDataObjectForModel);
@@ -3184,7 +3200,7 @@ function closeNav() {
 
 		<div id="main">
 			
-		   
+		 
 			
 			<div id="header" class="header">
 				<table style="width:100%">
@@ -3227,7 +3243,6 @@ function closeNav() {
 				</table>
 			</div>
 			
-
 
 
 			
@@ -3746,7 +3761,7 @@ function closeNav() {
 							<tr>
 								
 
-								<td>
+								<td style="display:none">
 									<div style="position:relative; vertical-align:top;">
 										
 										<b>Inference Method:</b><br>
@@ -3821,7 +3836,7 @@ function closeNav() {
 										<tr>
 											<td>
 												&gamma; =
-												<input type="number" id="MCMC_chiSqthreshold_gamma" min=0 max=1 value=0.999 title="Exponential decrease in chi-squared threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+												<input type="number" id="MCMC_chiSqthreshold_gamma" min=0 max=1 step="0.0001" value=0.999 title="Exponential decrease in chi-squared threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 
@@ -4032,7 +4047,6 @@ function closeNav() {
 			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
 			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
 			
-
 
 
 				<div class="header">
