@@ -202,7 +202,7 @@ int main(int argc, char** argv) {
 
 	// Perform MCMC
 	if (doMCMC){
-		MCMC::initMCMC();
+		MCMC::initMCMC(false);
 		MCMC::beginMCMC();
 	}
 

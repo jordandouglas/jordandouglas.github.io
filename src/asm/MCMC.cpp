@@ -57,7 +57,7 @@ PosteriorDistributionSample* MCMC::previousMCMCstate;
 PosteriorDistributionSample* MCMC::currentMCMCstate;
 
 
-void MCMC::initMCMC(){
+void MCMC::initMCMC(bool uploadingLogFile){
 
 
 	if (MCMC::initialised) return;
@@ -111,7 +111,7 @@ void MCMC::initMCMC(){
 
 
 	// Otherwise perform the first MCMC trial on the initial state
-	else{
+	else if (!uploadingLogFile){
 
 		MCMC::metropolisHastings(0, MCMC::previousMCMCstate, nullptr);
 		MCMC::previousMCMCstate->printHeader(printToFile);
@@ -121,7 +121,7 @@ void MCMC::initMCMC(){
 
 
 
-	if(_USING_GUI) _GUI_posterior.push_back(MCMC::previousMCMCstate->clone(true));
+	if(_USING_GUI && !uploadingLogFile) _GUI_posterior.push_back(MCMC::previousMCMCstate->clone(true));
 
 
 	cout << "Estimating the following " << parametersToEstimate.size() << " parameters:" << endl;
@@ -137,9 +137,10 @@ void MCMC::initMCMC(){
 
 
 	// Intialise epsilon to the initial threshold value
-	MCMC::initialStateNum = MCMC::previousMCMCstate->getStateNumber() + 1;
-	MCMC::epsilon = max(_chiSqthreshold_0 * pow(_chiSqthreshold_gamma, MCMC::initialStateNum-1), _chiSqthreshold_min);
-
+	if (!uploadingLogFile){
+		MCMC::initialStateNum = MCMC::previousMCMCstate->getStateNumber() + 1;
+		MCMC::epsilon = max(_chiSqthreshold_0 * pow(_chiSqthreshold_gamma, MCMC::initialStateNum-1), _chiSqthreshold_min);
+	}
 
 	MCMC::initialised = true;
 

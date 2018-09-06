@@ -967,7 +967,7 @@ extern "C" {
 		//Settings::print();
 
 		// Initialise MCMC
-		MCMC::initMCMC();
+		MCMC::initMCMC(false);
 
 		_currentLoggedPosteriorDistributionID = 0;
 
@@ -1160,7 +1160,7 @@ extern "C" {
 
 
 		cout << "uploadABC" << endl;
-		MCMC::initMCMC();
+		MCMC::initMCMC(true);
 		
 		vector<string> lines = Settings::split(string(tsvInput), '!');
 		bool success = false;

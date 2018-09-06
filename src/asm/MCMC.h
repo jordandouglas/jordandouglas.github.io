@@ -62,7 +62,7 @@ class MCMC{
 	public:
 
 
-		static void initMCMC();
+		static void initMCMC(bool uploadingLogFile);
 		static void beginMCMC();
 		static void perform_1_iteration(int n);
 		static int getPreviousStateNumber();
