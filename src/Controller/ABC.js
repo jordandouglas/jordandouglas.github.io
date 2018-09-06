@@ -4627,7 +4627,7 @@ function uploadABCFromURL(url){
 		    if (xhttp == null || xhttp.responseXML == "") return;
 		   
 		    //console.log("xhttp.responseText", xhttp.responseText);
-			var TSVstring = e.target.result.replace(/(\r\n|\n|\r)/gm,"!");
+			var TSVstring = xhttp.responseXML.replace(/(\r\n|\n|\r)/gm,"!");
 			TSVstring = TSVstring.replace(/(\t)/gm, "&");
 			
 		   uploadABC_controller(TSVstring);
