@@ -1336,7 +1336,7 @@ function loadSessionFromURL(url, resolve = function() { }){
 
 			//console.log("xhttp.responseText", xhttp.responseText);
 			var XMLstring = xhttp.responseText.replace(/(\r\n|\n|\r)/gm,"");
-			loadSessionFromString(XMLstring);
+			loadSessionFromString(XMLstring, resolve);
 
 		   
 		}
