@@ -45,7 +45,7 @@
 		<downstreamWindow val="12" distribution="Fixed" fixedDistnVal="12">5′ DNA curvature window</downstreamWindow>
 		<haltPosition val="14" distribution="Fixed" fixedDistnVal="14">Halt position (nt)</haltPosition>
 	</parameters>
-	<ABC inferenceMethod="MCMC" ntrials="1000000" testsPerData="1000" chiSqthreshold_min="0.03" chiSqthreshold_0="0.2" chiSqthreshold_gamma="0.9999" burnin="-1" logEvery="100" showRejectedParameters="false">
+	<ABC inferenceMethod="MCMC" ntrials="1000000" testsPerData="1000" chiSqthreshold_min="0.03" chiSqthreshold_0="0.2" chiSqthreshold_gamma="0.9999" burnin="-1" logEvery="20" showRejectedParameters="false">
 		<fit1 dataType="pauseEscape" ATPconc="1000" CTPconc="1000" GTPconc="1000" UTPconc="1000" pauseSite="62" Emax="0.45" t12="10" halt="60" times="7,14,21,28,70" seq="CCCAGAGAGACCAATCTGGTCTAGACTCGGACCCTCGAGAGACCGATCGATCCCTTGGGTGACGAATTCGGAGTTATTTCGAA" />
 		<fit2 dataType="pauseEscape" ATPconc="1000" CTPconc="1000" GTPconc="1000" UTPconc="1000" pauseSite="62" Emax="0" t12="1" halt="60" times="7,14,21,28,70" seq="CCCAGAGAGACCAATCTGGTCTAGACTCGGACCCTCGAGAGACCGATCGATTCCGGCCCTGACGAATTCGGAGTTATTTCGAA" />
 		<fit3 dataType="pauseEscape" ATPconc="1000" CTPconc="1000" GTPconc="1000" UTPconc="1000" pauseSite="62" Emax="0" t12="1" halt="60" times="7,14,21,28,70" seq="CCCAGAGAGACCAATCTGGTCTAGACTCGGACCCTCGAGAGACCGATCGATTAAGGCCCTGACGAATTCGGAGTTATTTCGAA" />
