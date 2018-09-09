@@ -518,7 +518,7 @@ function addNormalPrior(){
 	var sd = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["normalSdVal"]);
 
 	if (meanVal == null || isNaN(meanVal)) meanVal = roundToSF(currentVal);
-	if (sd == null || isNaN(sd) || sd <= 0) sd = roundToSF(meanVal * 0.25);
+	if (sd == null || isNaN(sd) || sd <= 0) sd = Math.abs(roundToSF(meanVal * 0.25));
 	
 	if (sd == 0) sd = 1;
 

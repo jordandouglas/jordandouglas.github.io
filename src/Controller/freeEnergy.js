@@ -229,8 +229,8 @@ function updateModelDOM(elongation_model_temp){
 	//else $("#deactivateUponMisincorporation_container").hide(100);
 
 
-	//if(elongation_model_temp["allowHypertranslocation"]) $("#DGHyperDag_container").show(300);
-	//else  $("#DGHyperDag_container").hide(0);
+	if(elongation_model_temp["allowHypertranslocation"]) $("#DGHyperDag_container").show(300);
+	else  $("#DGHyperDag_container").hide(0);
 
 
 	

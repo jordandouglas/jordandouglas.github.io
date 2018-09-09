@@ -2535,6 +2535,8 @@ function saveSettings_controller(){
 			}
 
 
+			values.push($("#priorUnderlayChk").prop("checked"));
+
 			console.log("values", values);
 
 			functionToCallAfterSaving  = function() { plot_parameter_heatmap(plotNum); };

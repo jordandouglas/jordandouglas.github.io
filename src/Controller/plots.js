@@ -1836,7 +1836,7 @@ function maximumFromList(list){
 
 
 // Assumes that values are sorted
-function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = "", ylab = "Probability density", hoverLabels = false, canvasSizeMultiplier = 1, logSpace = false, col = "#008CBA"){
+function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = "", ylab = "Probability density", hoverLabels = false, canvasSizeMultiplier = 1, logSpace = false, underlayFn = null, col = "#008CBA"){
 
 	if (canvasDivID != null && $("#" + canvasDivID).is( ":hidden" )) return;
 	
@@ -1939,8 +1939,8 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 			var y0 = 0;
 			var minBinVal = binSize * binID + minVal;
 			var maxBinVal = binSize * (binID+1) + minVal;
-		
-		
+			
+			
 			// The largest bin's lower bound should be inclusive but all other bin's upper bound should be non-inclusive
 			if (binID == nbins-1){
 				for (var j = 0; j < values.length; j ++){
@@ -1960,12 +1960,16 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 		}
 
 		var ymin = logSpace ? minimumFromList(barHeights) : 0;
-		var ymax = roundToSF(maximumFromList(barHeights) * 1.2); // Math.min(Math.ceil(Math.max.apply(Math, barHeights) * 10.5) / 10, 1);
+		var ymax = roundToSF(maximumFromList(barHeights)); // Math.min(Math.ceil(Math.max.apply(Math, barHeights) * 10.5) / 10, 1);
 		
-	
+
+		// Prior distribution underlay (if applicable)
+		drawHistogramPriorUnderlay(canvas, ctx, underlayFn, binSize, nbins, minVal, axisGap, binGap, heightScale);
+
+
+
 		// Plot the bars and add the hover events
 		ctx.globalAlpha = 0.6;
-		//var cols = ["#008CBA", "#009900", "#008CBA", "#009900",];
 		for(var binID = 0; binID < nbins; binID ++){
 			var x0 = widthScale * binID + axisGap + binGap * (binID+1);
 			ctx.fillStyle = col;
@@ -1982,7 +1986,7 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 		        x = e.clientX - rect.left,
 		        y = e.clientY - rect.top;
 			
-			histogram_mouse_over(x, y, canvas, ctx, binID, nbins, heightScale, widthScale, barHeights, minVal, ymax, col, binGap, axisGap, binSize, canvasSizeMultiplier); 
+			histogram_mouse_over(x, y, canvas, ctx, binID, nbins, heightScale, widthScale, barHeights, minVal, ymax, col, binGap, axisGap, binSize, canvasSizeMultiplier, underlayFn); 
 			add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbins, widthScale, heightScale, binGap, ymax, canvasSizeMultiplier);
 			add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLabels, canvasSizeMultiplier * 20, canvasSizeMultiplier * 3);
 			
@@ -1991,7 +1995,7 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 
 
 		canvas.onmouseleave = function(e){
-			histogram(values, canvasID, canvasDivID, xRange, xlab, ylab, hoverLabels, canvasSizeMultiplier, logSpace, col);
+			histogram(values, canvasID, canvasDivID, xRange, xlab, ylab, hoverLabels, canvasSizeMultiplier, logSpace, underlayFn, col);
 		};
 	
 
@@ -2016,7 +2020,7 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 	        	x = e.clientX - rect.left,
 	        	y = e.clientY - rect.top;
 			if (values.length > 5){
-					histogram_mouse_over(x, y, canvas, ctx, binID, nbins, heightScale, widthScale, barHeights, minVal, ymax, col, binGap, axisGap, binSize, canvasSizeMultiplier); 
+					histogram_mouse_over(x, y, canvas, ctx, binID, nbins, heightScale, widthScale, barHeights, minVal, ymax, col, binGap, axisGap, binSize, canvasSizeMultiplier, underlayFn); 
 					add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbins, widthScale, heightScale, binGap, ymax, canvasSizeMultiplier);
 			}
 			newMouseMoveEvent = add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLabels, canvasSizeMultiplier * 20, canvasSizeMultiplier * 3);
@@ -2031,8 +2035,52 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 }
 
 
+function drawHistogramPriorUnderlay(canvas, ctx, underlayFn, binSize, nbins, minVal, axisGap, binGap, heightScale){
 
-function histogram_mouse_over(x, y, canvas, ctx, binID, nbins, heightScale, widthScale, barHeights, minVal, ymax, col, binGap, axisGap, binSize, canvasSizeMultiplier) {
+	// Plot the prior distribution underlay if there is one
+	if (underlayFn != null){
+
+		var maxX = binSize * (nbins+1) + minVal;
+		var underlayScale = (maxX - minVal) / (canvas.width - axisGap);
+
+		ctx.globalAlpha = 0.6;
+		ctx.fillStyle = "#228B22";
+		ctx.beginPath();
+		ctx.moveTo(axisGap, canvas.height - axisGap);
+
+		// Find the maximum density in the prior curve
+		var maxY_prior = 0;
+		for (var xPix = axisGap; xPix < canvas.width; xPix++){
+			var x = underlayScale * (xPix-axisGap-binGap) + minVal;
+			var y = underlayFn(x);
+			maxY_prior = Math.max(maxY_prior, y);
+		}
+
+
+		// Plot the prior curve
+		//console.log("underlayFn maxX", minVal, maxX);
+		for (var xPix = axisGap; xPix < canvas.width; xPix++){
+
+			var x = underlayScale * (xPix-axisGap-binGap) + minVal;
+			var y = underlayFn(x) / maxY_prior;
+
+			var yPix = canvas.height - axisGap - y * heightScale; // -axisGap;
+			ctx.lineTo(xPix, yPix);
+
+		}
+
+		ctx.lineTo(canvas.width, canvas.height - axisGap);
+
+		//ctx.stroke();
+		ctx.fill();
+
+
+	}
+
+}
+
+
+function histogram_mouse_over(x, y, canvas, ctx, binID, nbins, heightScale, widthScale, barHeights, minVal, ymax, col, binGap, axisGap, binSize, canvasSizeMultiplier, underlayFn) {
 
 
 	if (simulating) return;
@@ -2040,6 +2088,11 @@ function histogram_mouse_over(x, y, canvas, ctx, binID, nbins, heightScale, widt
 	
 	var textbox = "";
 	ctx.clearRect(0, 0, canvas.width, canvas.height); 
+
+
+	// Prior distribution underlay (if applicable)
+	drawHistogramPriorUnderlay(canvas, ctx, underlayFn, binSize, nbins, minVal, axisGap, binGap, heightScale);
+
 	
 	for(var binID = 0; binID < nbins; binID ++){
 		
@@ -2066,7 +2119,7 @@ function histogram_mouse_over(x, y, canvas, ctx, binID, nbins, heightScale, widt
 
 			// Add the bar
 			ctx.fillStyle = col;
-				ctx.fill();
+			ctx.fill();
 			
 			
 		}
@@ -2217,6 +2270,7 @@ function add_histogram_axes(canvasID, canvas, ctx, axisGap, xlab, ylab, hoverLab
 	
 	
 	if (!hoverLabels){
+
 		// X title
 		ctx.fillStyle = "black";
 		ctx.textBaseline="top"; 
@@ -3205,7 +3259,22 @@ function plot_parameter_heatmap(plotNumCustom = null){
 
 		// If y is probability make a histogram 
 		if (xvals != null && PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParamY"] == "probability"){
-			histogram(xvals, "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"], xLab, "Probability density", false, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"]);
+
+
+			// Prior underlay?
+			var underlayFn = null;
+			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom].priorUnderlay){
+				console.log("Adding a prior underlay");
+				var sd = 1;
+				var meanVal = 8;
+				underlayFn = function(x){
+					return 1 / (Math.sqrt(2 * Math.PI * sd * sd)) * Math.exp(-(x-meanVal) * (x-meanVal) / (2 * sd * sd));
+				}
+			}
+
+
+
+			histogram(xvals, "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"], xLab, "Probability density", false, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], false, underlayFn);
 			return;
 		}
 
@@ -4685,6 +4754,21 @@ function pauseSiteYVariableTemplate(){
 }
 
 
+function priorDistributionUnderlayTemplate(){
+
+	return `
+		<div style="display:none">
+			<div id="priorDistributionUnderlayDIV" style="display:none">
+				<label style="cursor:pointer; line-height:22px"  title = "Plot the prior density of this parameter under the histogram."> 
+					<input class="variable"  type="checkbox" onChange="userChangeModelSampling_controller()" id="priorUnderlayChk"></input> 
+					Show prior distribution
+				</label>
+			</div>
+		<div>
+	`;
+
+}
+
 
 function pauseSiteOptionsTemplate(){
 
@@ -4742,7 +4826,7 @@ function customPlotSelectParameterTemplate(){
 		Calculated per trial.
 
 
-		` + parameterPlotSiteSpecificTemplate("X") + `
+		` + parameterPlotSiteSpecificTemplate("X") + priorDistributionUnderlayTemplate() + `
 
 	`;
 	
@@ -4883,6 +4967,7 @@ function updateParameterPlotSettings(forceDeleteDistnToShow = false){
 		if ($("#customParamY").val() != "probability"){
 			$("#settingCell4").show(300)
 			$("#settingCell5").show(300);
+			$("#priorDistributionUnderlayDIV").hide(0);
 
 			// Only show the colour selection box when the z-axis variable has been selected
 			if ($("#customParamZ").val() != "none"){
@@ -4895,10 +4980,19 @@ function updateParameterPlotSettings(forceDeleteDistnToShow = false){
 
 		}
 		else{
+
 			$("#settingCell4").hide(0);
 			$("#settingCell5").hide(0);
 			$("#settingCell6").hide(0);
 			$("#settingCell7").hide(0);
+
+			// Show the 'prior underlay' option
+			var xVal = $("#customParamX").val();
+			if (xVal != "velocity" && xVal != "catalyTime" && xVal != "totalTime" && xVal != "nascentLen") $("#priorDistributionUnderlayDIV").show(300);
+			else $("#priorDistributionUnderlayDIV").hide(0);
+
+
+
 		}
 
 
@@ -4908,6 +5002,7 @@ function updateParameterPlotSettings(forceDeleteDistnToShow = false){
 		$("#settingCell5").hide(0);
 		$("#settingCell6").hide(0);
 		$("#settingCell7").hide(0);
+		$("#priorDistributionUnderlayDIV").hide(0);
 	}
 
 
@@ -5237,6 +5332,10 @@ function populateHeatmapSettingsParameterDropdowns(plotNum, posteriorFromModel =
 		// Z axis colouring
 		$("#settingCell7").html(heatmapZAxisLegend());
 		$("#zColouring").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["zColouring"]);
+
+
+		// Prior underlay
+		$("#priorUnderlayChk").prop('checked', (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["priorUnderlay"]));
 
 
 		// Y-axis attribute
