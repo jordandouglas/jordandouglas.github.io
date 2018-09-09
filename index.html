@@ -2239,53 +2239,6 @@ function closeNav() {
 
 
 
-				 	<tr id="DGHyperDag_container" style="display:none">
-
-						<td style="text-align:left; font-size:10px; float:left; width:20px">
-				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#GDagSlide_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
-				 		</td>
-
-						<td style="text-align:right; width:110px">
-				 			&Delta;G<sub>hyper</sub> = 
-				 		</td>
-
-				 		<td>
-							<input class="variable"  type="number" id="DGHyperDag" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
-			 			</td>
-
-
-				 		<td>
-							<input type=image id='DGHyperDag_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
-				 		</td>
-
-				 	</tr>
-
-
-			 		<tr id="GsecondarySitePenalty_container">
-
-						<td style="text-align:left; font-size:10px; float:left; width:20px">
-				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
-				 		</td>
-
-						<td style="text-align:right; width:110px">
-				 			&Delta;G<sub>NTP2</sub> = 
-				 		</td>
-
-				 		<td>
-							<input class="variable"  type="number" id="GsecondarySitePenalty" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">
-			 			</td>
-
-
-				 		<td>
-							<input type=image id='GsecondarySitePenalty_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
-				 		</td>
-
-				 	</tr>
-
-
-
-
-
 				 	<tr id="barrierPos_container">
 
 						<td style="text-align:left; font-size:10px; float:left; width:20px">
@@ -2643,6 +2596,55 @@ function closeNav() {
 
 
 					</tr>
+
+
+
+
+					<tr id="allowHypertranslocation_container"  title="Can the polymerase translocate far forwards (hypertranslocation) during the simulation?">
+
+
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+
+				 		<td colspan=3>
+		 					<label class="switch">
+						 	 <input class="modelSetting" type="checkbox" id="allowHypertranslocation" OnChange="userInputModel_controller()"> </input>
+						 	 <span class="slider round"></span>
+
+							</label> 
+							<span style="font-size:15px; vertical-align:middle"> Enable hypertranslocation</span>
+
+				 		</td>
+
+				 	</tr>
+
+
+
+
+
+				 	<tr id="DGHyperDag_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#GDagSlide_ParamHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			&Delta;G<sup>&dagger;</sup><sub>&tau;&plus;</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="DGHyperDag" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
+			 			</td>
+
+
+				 		<td>
+							<input type=image id='DGHyperDag_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="src/Images/distn.png" class="distn"> 
+				 		</td>
+
+				 	</tr>
 
 
 					
@@ -3061,27 +3063,6 @@ function closeNav() {
 
 
 
-
-						<tr id="allowHypertranslocation_container"  title="Can the polymerase translocate far forwards (hypertranslocation) during the simulation?">
-
-
-
-							<td style="text-align:left; font-size:10px; float:left; width:20px">
-					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="src/Images/help.png"></a>
-					 		</td>
-
-
-					 		<td colspan=3>
-			 					<label class="switch">
-							 	 <input class="modelSetting" type="checkbox" id="allowHypertranslocation" OnChange="userInputModel_controller()"> </input>
-							 	 <span class="slider round"></span>
-
-								</label> 
-								<span style="font-size:15px; vertical-align:middle"> Enable hypertranslocation</span>
-
-					 		</td>
-
-					 	</tr>
 
 
 
