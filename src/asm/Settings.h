@@ -162,6 +162,8 @@ extern Parameter *RateActivate;
 extern Parameter *RateDeactivate;
 extern Parameter *deltaGDaggerHybridDestabil;
 extern Parameter *deltaGDaggerBacktrack;
+extern Parameter *DGHyperDag;
+
 extern Parameter *RateCleave;
 extern Parameter *CleavageLimit;
 

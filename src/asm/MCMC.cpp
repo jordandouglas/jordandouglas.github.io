@@ -87,6 +87,7 @@ void MCMC::initMCMC(bool uploadingLogFile){
 	MCMC::tryToEstimateParameter(GDagSlide);
 	MCMC::tryToEstimateParameter(DGPost);
 	MCMC::tryToEstimateParameter(deltaGDaggerBacktrack);
+	MCMC::tryToEstimateParameter(DGHyperDag);
 	MCMC::tryToEstimateParameter(barrierPos);
 	MCMC::tryToEstimateParameter(kCat);
 	MCMC::tryToEstimateParameter(Kdiss);

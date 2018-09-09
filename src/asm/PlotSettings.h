@@ -63,6 +63,8 @@ class PlotSettings{
 	string xData;
 	string yData;
 	string zData;
+	bool priorUnderlay;
+
 
 	// Recording sites for parameter heatmap
 	string sitesToRecordX;

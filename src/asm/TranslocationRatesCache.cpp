@@ -130,12 +130,14 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		double RNAunfoldingBarrier = 1;
 		
 		
-
-		double hypertranslocationGradientForward = 1; // Modify the rate of hypertranslocating forwards
-		double hypertranslocationGradientBackwards = 1; // Modify the rate of translocating backwards when in a hypertranslocated state
+		double hypertranslocationModifier = 1;
+		//double hypertranslocationGradientForward = 1; // Modify the rate of hypertranslocating forwards
+		//double hypertranslocationGradientBackwards = 1; // Modify the rate of translocating backwards when in a hypertranslocated state
 		if (currentModel->get_allowHypertranslocation()){
-			//if (compactState[1] > 0) hypertranslocationGradientForward = Math.exp(-PARAMS_JS.PHYSICAL_PARAMETERS["DGHyperDag"]["val"] * 0.5);
-			//if (compactState[1] > 1) hypertranslocationGradientBackwards = Math.exp(PARAMS_JS.PHYSICAL_PARAMETERS["DGHyperDag"]["val"] * 0.5);
+			//if (state->get_mRNAPosInActiveSite() > 0) hypertranslocationGradientForward = exp(-DGHyperDag->getVal() * 0.5);
+			//if (state->get_mRNAPosInActiveSite() > 1) hypertranslocationGradientBackwards = exp(DGHyperDag->getVal() * 0.5);
+			if ((fwd && state->get_mRNAPosInActiveSite() > 0) || (!fwd && state->get_mRNAPosInActiveSite() > 1)) hypertranslocationModifier =  exp(-DGHyperDag->getVal(false));
+
 		}
 
 
@@ -156,8 +158,8 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 
 			//if (rates[0] >= INF || rates[1] >= INF || forceGradientFwd >= INF || forceGradientBck >= INF || GDagRateModifier >= INF)
 				//cout << "rates[0]: " << rates[0] << ", rates[1]: " << rates[1] << ", forceGradientFwd: " << forceGradientFwd << " forceGradientBck: " << forceGradientBck << " GDagRateModifier: " << GDagRateModifier << endl;
-			if (fwd) return rates.at(1) * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd * RNAunfoldingBarrier;
-			else return rates.at(0) * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck * RNAunfoldingBarrier;
+			if (fwd) return rates.at(1) * DGPostModifier * GDagRateModifier * hypertranslocationModifier * forceGradientFwd * RNAunfoldingBarrier;
+			else return rates.at(0) * DGPostModifier * GDagRateModifier * hypertranslocationModifier * forceGradientBck * RNAunfoldingBarrier;
 		}
 
 
@@ -182,8 +184,8 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		//cout << "Calculated rates " << kfwd << "," << kbck << " for index " <<  rowNum << "," << colNum << endl;
 
 
-		if (fwd) return kfwd * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd * RNAunfoldingBarrier;
-		else return kbck * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck * RNAunfoldingBarrier;
+		if (fwd) return kfwd * DGPostModifier * GDagRateModifier * hypertranslocationModifier * forceGradientFwd * RNAunfoldingBarrier;
+		else return kbck * DGPostModifier * GDagRateModifier * hypertranslocationModifier * forceGradientBck * RNAunfoldingBarrier;
 
 		
 		

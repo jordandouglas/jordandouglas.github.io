@@ -140,6 +140,8 @@ Parameter* RateActivate = new Parameter("RateActivate", false, "inclusive", "Rat
 Parameter* RateDeactivate = new Parameter("RateDeactivate", false, "inclusive", "Rate of inactivation (s\u207B\u00B9)", "Rate constant of polymerase entering the catalytically unactive state", "k_[U]  (s^[\u22121\u2009])");
 Parameter* deltaGDaggerHybridDestabil = new Parameter("deltaGDaggerHybridDestabil", false, "false", "\u0394G\u2020\u03C0", "Gibbs energy barrier of hybrid destabilisation, which causes catalytic inactivation.");
 Parameter* deltaGDaggerBacktrack = new Parameter("deltaGDaggerBacktrack", false, "false", "\u0394G\u2020\U0001D70F-", "Additive Gibbs energy barrier height of backtracking. Added onto the value of \u0394G\u2020\U0001D70F.", "\u0394G_{\U0001D70F-}^{\u2020}  (k_{B}T)");
+Parameter* DGHyperDag = new Parameter("DGHyperDag", false, "false", "\u0394G\u2020\U0001D70F+", "Additive Gibbs energy barrier height of hypertranslocation. Added onto the value of \u0394G\u2020\U0001D70F.", "\u0394G_{\U0001D70F+}^{\u2020}  (k_{B}T)");
+
 
 
 Parameter* RateCleave = new Parameter("RateCleave", false, "inclusive", "Rate of cleavage (s\u207B\u00B9)", "Rate constant of cleaving the dangling 3\u2032 end of the nascent strand when backtracked", "k_[cleave]  (s^[\u22121\u2009])");
@@ -156,7 +158,7 @@ Parameter* downstreamWindow = new Parameter("downstreamWindow", true, "exclusive
 
 
 
-vector<Parameter*> Settings::paramList(26); // Number of parameters
+vector<Parameter*> Settings::paramList(27); // Number of parameters
 
 CRandomMersenne* Settings::SFMT;
 
@@ -218,6 +220,7 @@ void Settings::init(){
 	RateDeactivate->setDistributionParameter("fixedDistnVal", 0.05);
 	deltaGDaggerHybridDestabil->setDistributionParameter("fixedDistnVal", -1);
 	deltaGDaggerBacktrack->setDistributionParameter("fixedDistnVal", 0);
+	DGHyperDag->setDistributionParameter("fixedDistnVal", 0);
 	RateCleave->setDistributionParameter("fixedDistnVal", 0);
 	CleavageLimit->setDistributionParameter("fixedDistnVal", 10);
 
@@ -271,7 +274,7 @@ void Settings::init(){
 	paramList.at(23) = upstreamWindow;
 	paramList.at(24) = downstreamWindow;
 	paramList.at(25) = haltPosition;
-
+	paramList.at(26) = DGHyperDag;
 
 
 	// Create the polymerase objects
@@ -411,7 +414,7 @@ void Settings::setParameterList(vector<Parameter*> params){
 	downstreamWindow = paramList.at(24);
 
 	haltPosition = paramList.at(25);
-
+	DGHyperDag = paramList.at(26);
 
 
 	/*
@@ -667,6 +670,7 @@ void Settings::print(){
 	RateCleave->print();
 	CleavageLimit->print();
 	deltaGDaggerHybridDestabil->print();
+	DGHyperDag->print();
 	deltaGDaggerBacktrack->print();
 
 	upstreamCurvatureCoeff->print();
@@ -812,6 +816,13 @@ void Settings::updateParameterVisibilities(){
 	}
 
 
+	// Hypertranslocation
+		if (currentModel->get_allowHypertranslocation()){
+		DGHyperDag->show();
+	}else{
+		DGHyperDag->hide();
+	}
+
 
 
 
@@ -904,6 +915,7 @@ Parameter* Settings::getParameterByName(string paramID){
 	if (paramID == "CleavageLimit") return CleavageLimit;
 	if (paramID == "deltaGDaggerHybridDestabil") return deltaGDaggerHybridDestabil;
 	if (paramID == "deltaGDaggerBacktrack") return deltaGDaggerBacktrack;
+	if (paramID == "DGHyperDag") return DGHyperDag;
 	if (paramID == "upstreamCurvatureCoeff") return upstreamCurvatureCoeff;
 	if (paramID == "downstreamCurvatureCoeff") return downstreamCurvatureCoeff;
 	if (paramID == "upstreamWindow") return upstreamWindow;

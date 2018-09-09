@@ -499,6 +499,7 @@ extern "C" {
 		landscapeJSON += "}";
 	
 
+
 		messageFromWasmToJS(landscapeJSON, msgID);
 
 	}
@@ -511,6 +512,7 @@ extern "C" {
 
 		_showRNAfold_GUI = showFolding;
 		if (!showFolding) _currentStateGUI->unfold();
+
 
 		messageFromWasmToJS("", msgID);
 	}
@@ -1788,6 +1790,7 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE sendModels(char* modelIDs, char* modelWeights, char* modelDescription, int msgID){
 
 
+
 		// If there are no models on the list to estimate, then add the current model to this list as the default model, and with weight 0
 		if (modelsToEstimate.size() == 0){
 			currentModel->setID("default");
@@ -1807,8 +1810,12 @@ extern "C" {
 		}
 
 
+
+
 		// Parse all the models
 		for (int i = 0; i < modelIDs_tokens.size(); i ++){
+
+
 
 			string modelID = modelIDs_tokens.at(i);
 			double modelWeight = stof(modelWeights_tokens.at(i));
@@ -1818,6 +1825,7 @@ extern "C" {
 			Settings::parseModel(modelID, modelWeight, modelDescription);
 
 		}
+
 
 		modelIDs_tokens.clear();
 		modelWeights_tokens.clear();
@@ -1845,9 +1853,13 @@ extern "C" {
 
 
 		// Clean up
-		free(modelIDs);
-		free(modelWeights);
-		free(modelDescription);
+		if (modelIDs_tokens.size() > 0){
+			free(modelIDs);
+			free(modelWeights);
+			free(modelDescription);
+		}
+
+
 
 	}
 

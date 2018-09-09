@@ -100,6 +100,7 @@ PlotSettings::PlotSettings(int plotNumber, string name){
 		this->siteRecordingX = nullptr;
 		this->siteRecordingY = nullptr;
 		this->siteRecordingZ = nullptr;
+		this->priorUnderlay = false;
 
 	}
 
@@ -339,6 +340,7 @@ string PlotSettings::toJSON(){
 		settingsJSON += "'customParamY':'" + this->customParamY + "',";
 		settingsJSON += "'metricZ':'" + this->metricZ + "',";
 		settingsJSON += "'zColouring':'" + this->zColouring + "',";
+		settingsJSON += "'priorUnderlay':" + string(this->priorUnderlay ? "true" : "false") + ",";
 		settingsJSON += "'xData':" + this->xData + ",";
 		settingsJSON += "'yData':" + this->yData + ",";
 		settingsJSON += "'zData':" + this->zData + ",";
@@ -647,6 +649,10 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 				this->siteRecordingZ = new ParameterHeatmapData("catalyTime", "Mean cat. time at sites (s)");
 			}
 		}
+
+
+		cout << "values.at(11) " << values.at(11) << endl;
+		this->priorUnderlay = values.at(11) == "true";
 
 
 

@@ -194,7 +194,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 				else if (paramID == "deltaGDaggerBacktrack") param = deltaGDaggerBacktrack; 
 				else if (paramID == "RateCleave") param = RateCleave; 
 				else if (paramID == "CleavageLimit") param = CleavageLimit; 
-
+				else if (paramID == "DGHyperDag") param = DGHyperDag; 
 
 
 				else continue;
@@ -598,7 +598,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 						else if (attrName == "deltaGDaggerHybridDestabil") model->addParameterHardcoding("deltaGDaggerHybridDestabil", value); 
 						else if (attrName == "RateCleave") model->addParameterHardcoding("RateCleave", value); 
 						else if (attrName == "CleavageLimit") model->addParameterHardcoding("CleavageLimit", value); 
-
+						else if (attrName == "DGHyperDag") model->addParameterHardcoding("DGHyperDag", value); 
 
 					}
 
