@@ -536,8 +536,8 @@ div.vertical{
 
 .panelInner{
 	padding: 5px 5px;
-	%background-color: white;
-	background-color:ebe9e7;
+	background-color: white;
+	%background-color:ebe9e7;
 
 }
 
