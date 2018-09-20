@@ -183,6 +183,9 @@ renderPauseSitesOnAlignment = function(){
                 //console.log(siteNum, "site", site);
                 site.css("background-color", "black");
                 site.addClass("nucleotideHighlighted");
+
+
+                $("#e" + siteNum).html("*");
                 
             }
 
@@ -205,7 +208,19 @@ renderPauseSitesOnAlignment = function(){
 function getMSAheaderTemplate(nsites){
 
 
+    var evidenceRow = `
+
+     <tr style="font-size:16px">
+            <td><td>
+            <td title="Strength of evidence of a pause site." style="text-align:right">Evidence:</td> 
+
+
+    `;
+
 	var row = `
+
+
+        
 
 		<tr style="font-size:16px">
 			<td title="The weight of the sequence, calculated from the phylogenetic tree." style="text-align:right;">Weight<td>
@@ -215,18 +230,21 @@ function getMSAheaderTemplate(nsites){
 
 
 	for (var i = 0; i < nsites; i ++){
-
+    
 
 		row += `<td style="width: 20px;text-align:center; position:relative">`;
 
-		if ((i+1) % 10 == 1)  row += `<span style="position:absolute; top:5; left:2">` + (i+1) + `</span>`;
+		if ((i+1) % 10 == 1)  row += `<span style="position:absolute; top:0; left:2">` + (i+1) + `</span>`;
 
 		row += `</td>`;
+
+        evidenceRow += `<td id="e` + (i+1) + `"></td>`;
+
 
 	}
 
 
-	return row + `</tr>`;
+	return evidenceRow + `</tr>` + row + `</tr>`;
 
 
 } 
