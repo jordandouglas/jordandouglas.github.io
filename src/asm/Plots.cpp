@@ -86,6 +86,7 @@ double Plots::totaltimeElapsed = 0;
 double Plots::totaltimeElapsedThisTrial = 0;
 bool Plots::sitewisePlotHidden = false;
 bool Plots::plotsAreHidden = false;
+bool Plots::sendCopiedSequences = true;
 bool Plots::arrestTimeoutReached = false;
 double Plots::timeWaitedUntilNextTranslocation = 0;
 double Plots::timeWaitedUntilNextCatalysis = 0;
@@ -284,7 +285,7 @@ void Plots::updateParameterPlotData(State* state){
 		// Add a new value for this parameter
 		else for (int i = 0; i < Settings::paramList.size(); i ++){
 			if ((*it)->getID() == Settings::paramList.at(i)->getID()){
-				(*it)->addValue(Settings::paramList.at(i)->getVal(false));
+				(*it)->addValue(Settings::paramList.at(i)->getVal(true));
 				break;
 			}
 		}
@@ -433,7 +434,7 @@ void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, doubl
 string Plots::getPlotDataAsJSON(){
 
 
-	if (_USING_GUI && Plots::plotsAreHidden && Plots::sitewisePlotHidden) return "{'moreData':false}";
+	if (_USING_GUI && Plots::plotsAreHidden && Plots::sitewisePlotHidden && !Plots::sendCopiedSequences) return "{'moreData':false}";
 	if (!Plots::plotsInit)  return "{'moreData':false}";
 	//cout << "getPlotDataAsJSON" << endl;
 
@@ -443,7 +444,7 @@ string Plots::getPlotDataAsJSON(){
 	bool pauseHistogram_needsData = false;
 	bool pausePerSite_needsData = false;
 	bool parameterHeatmap_needsData = false;
-	bool terminatedSequences_needsData = Plots::unsentCopiedSequences.size() > 0;
+	bool terminatedSequences_needsData = Plots::unsentCopiedSequences.size() > 0 && Plots::sendCopiedSequences;
 	for (int pltNum = 0; pltNum < Plots::plotSettings.size(); pltNum++){
 		if (!Plots::plotsAreHidden && Plots::plotSettings.at(pltNum) != nullptr && (Plots::plotSettings.at(pltNum)->getName() == "distanceVsTime" || Plots::plotSettings.at(pltNum)->getName() == "velocityHistogram")) distanceVsTime_needsData = true;
 		else if (!Plots::plotsAreHidden && Plots::plotSettings.at(pltNum) != nullptr && Plots::plotSettings.at(pltNum)->getName() == "pauseHistogram") pauseHistogram_needsData = true;
@@ -976,6 +977,13 @@ void Plots::hideAllPlots(bool toHide){
 }
 
 
+// Determine whether to stop sending copied sequences through to the controller
+void Plots::set_sendCopiedSequences(bool toSend){
+    Plots::sendCopiedSequences = toSend;
+}
+
+
+
 
 // Returns a JSON string which contains information on all the cache sizes
 string Plots::getCacheSizeJSON(){
@@ -1149,3 +1157,36 @@ void Plots::setTracePlotPosteriorByID(int id){
 	}
 
 }
+
+
+
+// Get a JSON string of time to catalysis per site
+string Plots::timeToCatalysisPerSite_toJSON(){
+
+    string JSON = "{'TTC':[";
+
+
+    for (int baseNum = 0; baseNum < Plots::timeToCatalysisPerSite.size(); baseNum ++){
+        JSON += to_string(Plots::timeToCatalysisPerSite.at(baseNum) / Plots::npauseSimulations);
+        if (baseNum < Plots::timeToCatalysisPerSite.size()-1) JSON += ",";
+    }
+    JSON += "]}";
+    return JSON;
+
+
+}
+
+
+
+
+vector<double> Plots::getTimeToCatalysisPerSite(){
+
+    vector<double> meanTTC(Plots::timeToCatalysisPerSite.size());
+
+    for (int baseNum = 0; baseNum < Plots::timeToCatalysisPerSite.size(); baseNum ++){
+        meanTTC.at(baseNum) = Plots::timeToCatalysisPerSite.at(baseNum) / Plots::npauseSimulations;
+    }
+
+    return meanTTC;
+}
+

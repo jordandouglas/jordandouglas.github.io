@@ -400,6 +400,11 @@ void Parameter::makeProposal(){
 
 
 
+
+	// Proposal width
+	double proposalScale = proposalWidth->getVal(false);
+
+
 	// If this is a metaparameter, uniformly at random select an instance to make a proposal on 
 	if (this->isMetaParameter) {
 		double runifNum = min((int)(Settings::runif() * this->instances.size()), (int)this->instances.size()-1); // Random integer in range [0, ninstances-1]
@@ -435,7 +440,7 @@ void Parameter::makeProposal(){
 
 			// Wrap the value so that it bounces back into the right range
 			stepSize = this->distributionParameters["uniformDistnUpperVal"] - this->distributionParameters["uniformDistnLowerVal"];
-			newVal = this->val + x * stepSize;
+			newVal = this->val + x * stepSize * proposalScale;
 			//newVal = Settings::wrap(newVal, this->distributionParameters["uniformDistnLowerVal"],  this->distributionParameters["uniformDistnUpperVal"]);
 			this->val = newVal;
 		}
@@ -450,7 +455,7 @@ void Parameter::makeProposal(){
 
 			// Use the standard deviation as the step size
 			stepSize =  this->distributionParameters["normalSdVal"];
-			newVal = this->val + x * stepSize;
+			newVal = this->val + x * stepSize * proposalScale;
 			this->val = newVal;
 
 		}
@@ -459,7 +464,7 @@ void Parameter::makeProposal(){
 
 			// Use the standard deviation of the normal as the step size, and perform the step in normal space then transform back into a lognormal
 			stepSize = this->distributionParameters["lognormalSdVal"];
-			newVal = exp(log(this->val) + x * stepSize);
+			newVal = exp(log(this->val) + x * stepSize * proposalScale);
 			this->val = newVal;
 
 		}	

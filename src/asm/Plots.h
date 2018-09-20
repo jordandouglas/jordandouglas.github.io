@@ -75,6 +75,7 @@ class Plots{
 	static list<string> unsentCopiedSequences;
 	static const int maxNumberCopiedSequences;
 	static int numberCopiedSequences;
+    static bool sendCopiedSequences;
 
 
 	// Miscellaneous information
@@ -111,12 +112,15 @@ class Plots{
 
 		static void hideSitewisePlot(bool hide);
 		static void hideAllPlots(bool hide);
+        static void set_sendCopiedSequences(bool toSend);
 		static string getCacheSizeJSON();
 		static void deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata, bool sequences_cleardata);
 		static void recordSite(int siteThatWasJustCatalysed, double timeToCatalysis);
 		static void addCopiedSequence(string sequence);
 		static void prepareForABC();
 		static void setTracePlotPosteriorByID(int id);
+        static string timeToCatalysisPerSite_toJSON();
+        static vector<double> getTimeToCatalysisPerSite();
 
 };
 

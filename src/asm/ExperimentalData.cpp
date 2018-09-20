@@ -53,6 +53,11 @@ ExperimentalData::ExperimentalData(int id, string dataType, int nObs){
 	this->t12 = 0;
 
 
+	// Pause sites
+	this->timeOfArrest = 0;
+	this->abundance = 0;
+
+
 	ntrials.resize(nObs);
 	if (dataType == "timeGel") {
 		lanes.resize(nObs);
@@ -105,6 +110,16 @@ void ExperimentalData::addDatapoint(double setting, double observation, int n){
 }
 
 
+// Pause sites only
+void ExperimentalData::addDatapoint(double time, double abundance, vector<int> observedLengths){
+
+	this->timeOfArrest = time;
+	this->abundance = abundance;
+	this->abundantLengths = observedLengths;
+
+}
+
+
 double ExperimentalData::getCurrentSettingX(){
 	return settingsX.at(this->currentExperiment);
 }
@@ -146,6 +161,18 @@ string ExperimentalData::toJSON(){
 	}
 
 
+
+	if (this->dataType == "pauseSites") {
+
+
+		JSON += "'halt':" + to_string(this->halt) + ",";
+		JSON += "'time':" + to_string(this->timeOfArrest) + ",";
+		JSON += "'abundance':" + to_string(this->abundance) + ",";
+
+	}
+
+
+
 	// Using own sequence?
 	if (this->sequenceID != _seqID){
 		JSON += "'seq':'" + Settings::getSequence(this->sequenceID)->get_complementSequence() + "',";
@@ -160,7 +187,7 @@ string ExperimentalData::toJSON(){
 	for (int i = 0; i < nobservations; i ++){
 
 
-		if (this->dataType != "pauseEscape") JSON += "{";
+		if (this->dataType != "pauseEscape" && this->dataType != "pauseSites") JSON += "{";
 
 		if (this->dataType == "forceVelocity"){
 			JSON += "'force':" + to_string(settingsX.at(i)) + ",";
@@ -178,11 +205,16 @@ string ExperimentalData::toJSON(){
 		}
 
 
+		else if (this->dataType == "pauseSites"){
+			JSON += to_string(abundantLengths.at(i)) + ",";
+		}
+
+
 		else if (this->dataType == "timeGel"){
 			JSON += this->lanes.at(i)->toJSON();
 		}
 
-		if (this->dataType != "pauseEscape") JSON += "},";
+		if (this->dataType != "pauseEscape" && this->dataType != "pauseSites") JSON += "},";
 		
 
 	}
@@ -294,6 +326,20 @@ void ExperimentalData::applySettings(){
 	}
 
 
+	else if (this->dataType == "pauseSites"){
+		ATPconc->hardcodeValue(this->ATPconc_local);
+		CTPconc->hardcodeValue(this->CTPconc_local);
+		GTPconc->hardcodeValue(this->GTPconc_local);
+		UTPconc->hardcodeValue(this->UTPconc_local);
+		FAssist->hardcodeValue(this->force);
+		haltPosition->hardcodeValue(this->halt);
+
+		// Set the cutoff time to that of this experiment
+		arrestTime->hardcodeValue(this->timeOfArrest);
+
+	}
+
+
 
 	else if (this->dataType == "timeGel"){
 		ATPconc->hardcodeValue(this->ATPconc_local);
@@ -315,6 +361,13 @@ void ExperimentalData::applySettings(){
 
 // Return the current observation
 double ExperimentalData::getObservation() {
+
+	// Assumes that all specified transcript lengths are uniformly distributed and sum to a total of 'abundance' 
+	if (this->dataType == "pauseSites") {
+		return this->abundance / this->abundantLengths.size();
+	}
+
+
 	return this->observationsY.at(this->currentExperiment);
 }
 
@@ -402,4 +455,6 @@ double ExperimentalData::get_t12() {
 	return this->t12;
 }
 
-
+vector<int> ExperimentalData::get_abundantLengths() {
+	return this->abundantLengths;
+}

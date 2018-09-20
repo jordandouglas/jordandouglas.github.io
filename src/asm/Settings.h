@@ -32,6 +32,8 @@
 #include "Polymerase.h"
 #include "SlippageLandscapes.h"
 #include "PosteriorDistributionSample.h"
+#include "MultipleSequenceAlignment.h"
+
 
 #include <random>
 #include <string>
@@ -50,7 +52,7 @@ extern const double _RT;
 extern const double _kBT;
 extern const double _preExp;
 extern const double _PI;
-extern const int INF;
+extern const double INF;
 extern const int _nBasesToTranscribeInit;
 
 
@@ -135,6 +137,9 @@ extern list<PosteriorDistributionSample*> _GUI_posterior;
 extern map<int, list<PosteriorDistributionSample*>> _gelPosteriorDistributions; // All posterior distributions for gel calibrations
 
 
+// PhyloPause
+extern MultipleSequenceAlignment* _PP_multipleSequenceAlignment;
+
 
 // Parameters
 extern Parameter *NTPconc;
@@ -174,6 +179,8 @@ extern Parameter *downstreamWindow;
 
 extern Parameter* rnaFoldDistance;
 
+extern Parameter* proposalWidth;
+
 
 
 class Settings{
@@ -206,6 +213,7 @@ class Settings{
 		static vector<Parameter*> getParamListClone();
 		static string toJSON();
 		static bool setSequence(string seqID);
+        static void setSequence(Sequence* seq);
 		static Sequence* getSequence(string seqID);
 		static void resetRateTables();
 		static void resetUnfoldingTables();
@@ -229,7 +237,7 @@ class Settings{
     	static void sortedPush(std::vector<int> &cont, int value);
     	static void sortedPush(std::vector<double> &cont, double value);
     	static int indexOf(deque<int> arr, int val);
-
+        static string trim(string str);
 
     	static void renormaliseParameters();
 

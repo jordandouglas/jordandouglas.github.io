@@ -543,7 +543,7 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 
 
 		double rate = _translocationRatesCache->getTranslocationRates(this, true);
-		if (rate >= INF) cout << "a kfwd = infinity" << endl;
+		if (rate >= INF) cout << "a kfwd = infinity" << this->mRNAPosInActiveSite << "," << this->get_nascentLength() << " rate: " << rate << endl;
 		return rate;
 
 	}
@@ -561,7 +561,7 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 	//cout << "rate = " << groundEnergy << " - " << forwardHeight << " = " << _preExp * exp(-(forwardHeight - groundEnergy)) << endl;
 
 	double rate = _preExp * exp(-(forwardHeight - groundEnergy));
-	if (rate >= INF) cout << "b kfwd = infinity" << endl;
+	if (rate >= INF) cout << "b kfwd = infinity " << this->mRNAPosInActiveSite << "," << this->get_nascentLength()<< " rate: " << rate << endl;
 	return rate;
 	
 
@@ -721,13 +721,18 @@ double State::calculateBackwardRate(bool lookupFirst, bool ignoreStateRestrictio
 	
 	double groundEnergy = this->calculateTranslocationFreeEnergy(true);
 	double backwardHeight = this->calculateBackwardTranslocationFreeEnergyBarrier(true);
+
+
 	if (backwardHeight >= INF) return 0;
-	
-	
+
+
 	// Calculate rate
-	return _preExp * exp(-(backwardHeight - groundEnergy));
+	double rate = _preExp * exp(-(backwardHeight - groundEnergy));
+	if (rate >= INF) cout << "kbck = infinity " << this->mRNAPosInActiveSite << "," << this->get_nascentLength() << " rate: " << rate << endl;
 
 	
+	return rate;
+
 
 }
 

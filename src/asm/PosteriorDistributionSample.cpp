@@ -318,7 +318,7 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 
 
 		this->simulatedDensities.at(this->currentObsNum) = simulatedLengthProbabilityDensities;
-		this->simulatedValues.at(this->currentObsNum) = chiSqLane;
+		this->simulatedValues.at(this->currentObsNum) = to_string(chiSqLane);
 		this->chiSquared += chiSqLane;
 
 
@@ -348,7 +348,7 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 
 		//cout << "t = " << observed->getCurrentSettingX() << "; simVal = " << simVal << "; obsVal = " << obsVal << endl;
 
-		this->simulatedValues.at(this->currentObsNum) = simVal;
+		this->simulatedValues.at(this->currentObsNum) = to_string(simVal);
 
 		this->chiSquared += pow(simVal - obsVal, 2);
 		/*
@@ -364,6 +364,70 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 	}
 
 
+
+	// Compare the transcript lengths at this time with the known pause sites
+	else if (observed->getDataType() == "pauseSites"){
+
+
+		
+		vector<int> observedLengths = observed->get_abundantLengths(); 
+
+
+		// Initialise simulated length abundance
+		vector<double> simulatedLengthProbabilities(observedLengths.size());
+		for (int i = 0; i < observedLengths.size(); i ++) simulatedLengthProbabilities.at(i) = 0;
+
+			
+
+		// Calculate simulated probability of being at each frequent length 
+		list<int> simulatedLengths = simulated->get_transcriptLengths();
+		for (list<int>::iterator it = simulatedLengths.begin(); it != simulatedLengths.end(); ++it){
+			int len = *it;
+			for (int i = 0; i < observedLengths.size(); i ++){
+				if (len == observedLengths.at(i)) {
+					simulatedLengthProbabilities.at(i) += 1.0/simulatedLengths.size(); // Abundant transcript length has been simulated
+					break;
+				}
+			}
+		}
+
+
+
+
+		// Compute the RSS (only comparing the proportion of abundant transcript lengths, not the rare ones)
+		double simRSS = 0;
+		double obsVal = observed->getObservation(); // The observed proportion of each "abundant transcript" 
+		for (int i = 0; i < simulatedLengthProbabilities.size(); i ++){
+			simRSS += pow(simulatedLengthProbabilities.at(i) - obsVal, 2);
+		}
+
+
+		// Convert the probability vector to a string
+		std::ostringstream probabilityVector;
+		probabilityVector << std::fixed;
+		 
+		// Set precision to 2 digits
+		probabilityVector << std::setprecision(2);
+		probabilityVector << "[";
+		 
+
+		for (int i = 0; i < simulatedLengthProbabilities.size(); i ++){
+			probabilityVector << simulatedLengthProbabilities.at(i);
+			if (i < simulatedLengthProbabilities.size()-1) probabilityVector << ",";
+		}
+		probabilityVector << "]";
+
+		this->simulatedValues.at(this->currentObsNum) = probabilityVector.str();
+
+		this->chiSquared += simRSS;
+	
+
+	}
+
+
+
+
+
 	// Otherwise compare simulated and observed velocities
 	else {
 		
@@ -371,7 +435,7 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 		double simVal = simulated->get_meanVelocity();
 		double obsVal = observed->getObservation();
 
-		this->simulatedValues.at(this->currentObsNum) = simVal;
+		this->simulatedValues.at(this->currentObsNum) = to_string(simVal);
 
 		// Calculate accumulative chi-squared. Want to ensure that 0/0 = 0 and not infinity
 		if (simVal == 0) this->chiSquared = INF;
@@ -509,7 +573,7 @@ void PosteriorDistributionSample::print(bool toFile){
 	
 	// Print simulated values
 	for (int i = 0; i < this->simulatedValues.size(); i ++){
-		if (isWASM) WASM_string += to_string(simulatedValues.at(i)) + gapUnit;
+		if (isWASM) WASM_string += "'" + simulatedValues.at(i) + "'" + gapUnit;
 		else (_USING_GUI ? _ABCoutputToPrint :toFile ? logFile  : cout) << simulatedValues.at(i) << gapUnit;
 	}
 
@@ -546,7 +610,7 @@ string PosteriorDistributionSample::toJSON(){
 		// Simulated values
 		JSON += "'simulatedValues':[";
 		for (int i = 0; i < this->simulatedValues.size(); i ++){
-			JSON += to_string(this->simulatedValues.at(i)) + ",";
+			JSON += "'" + this->simulatedValues.at(i) + "',";
 		}
 		if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
 
@@ -669,7 +733,7 @@ void PosteriorDistributionSample::parseFromLogFileLine(vector<string> splitLine,
 		else if (header == "logPrior") this->logPriorProb = stof(value);
 		else if (header == "chiSquared") this->chiSquared = stof(value);
 		else if (std::regex_match (header, velocityMatch)) {
-			simulatedValues.at(simulatedVal) = stof(value); // Parse velocity
+			simulatedValues.at(simulatedVal) = value; // Parse value
 			simulatedVal++;
 		}
 		else {

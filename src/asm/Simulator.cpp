@@ -205,8 +205,11 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
 	double meanMeanVelocity = 0;
 	double meanMeanTime = 0;
 	double result[3];
+
+    cout << nTrialsTotalGUI << endl;
+
 	for (int n = 1; n <= nTrialsTotalGUI; n ++){
-		//if (n == 1 || n % 100 == 0) cout << "Starting trial " << n << endl;
+		if (n == 1 || n % 100 == 0) cout << "Starting trial " << n << endl;
 		//cout << "Starting trial " << n << endl;
 
 
@@ -275,7 +278,7 @@ void Simulator::resume_trials_GUI(double* toReturn){
 	result[2] = 0;
 
 	for (int n = nTrialsCompletedGUI+1; n <= nTrialsTotalGUI; n ++){
-		//if (n == 1 || n % 100 == 0) cout << "Starting trial " << n << endl;
+		if (n == 1 || n % 100 == 0) cout << "Starting trial " << n << endl;
 		//cout << "Starting trial " << n << endl;
 
 		performSimulation(_currentStateGUI, result);

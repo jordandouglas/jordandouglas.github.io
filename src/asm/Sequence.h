@@ -47,15 +47,21 @@ class Sequence{
 	bool rateTableBuilt;
 	bool RNAunfoldingTableBuilt;
 
+    // PhyloPause
+    double weight; 
+    int nsitesMSA;
+    string MSAsequence;
 
 	public:
-		Sequence(string seqID, string TemplateType, string PrimerType, string templateSequence);
+		Sequence(string seqID, string TemplateType, string PrimerType, string templateSequence); // Normal sequence (ACGTU only)
+        Sequence(string seqID, string MSAsequence); // MSA sequence (gaps allowed)
 		string get_templateSequence();
 		string get_complementSequence();
 		string getID();
 		TranslocationRatesCache* getRatesCache();
 		void initRateTable();
 		void initRNAunfoldingTable();
+        int get_nsitesMSA();
 
 		void flagForRateTableRebuilding();
 		void flagForUnfoldingTableRebuilding();
@@ -71,11 +77,8 @@ class Sequence{
 
 		string toJSON();
 		void print();
-
-
-
+        string get_MSAsequence();
+        void deconstructRateTable();
 };
-
-
 
 #endif

@@ -61,7 +61,13 @@ class ExperimentalData{
 	double Emax;
 	double Emin;
 	double t12;
-	
+
+	// Pause sites
+	double timeOfArrest;
+	double abundance;
+	vector<int> abundantLengths; 
+
+
 
 	public:
 		
@@ -78,6 +84,7 @@ class ExperimentalData{
 		void addTimeGelLane(int laneNum, double time, vector<double> densities, double rectTop, double rectLeft, double rectWidth, double rectHeight, double rectAngle, bool simulateLane, double laneInterceptY);
 		void addDatapoint(double setting, double observation);
 		void addDatapoint(double setting, double observation, int n);
+		void addDatapoint(double time, double abundance, vector<int> observedLengths);
 		void print();
 		string toJSON();
 		void clear();
@@ -109,6 +116,7 @@ class ExperimentalData{
 		double get_Emin();
 		double get_t12();
 		double getCurrentSettingX();
+		vector<int> get_abundantLengths(); 
 
 };
 

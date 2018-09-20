@@ -29,6 +29,7 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <iomanip>
 #include <vector>
 
 using namespace std;
@@ -47,7 +48,7 @@ class PosteriorDistributionSample {
 	double logPosterior;
 	string modelIndicator;
 	map<string, double> parameterEstimates;
-	vector<double> simulatedValues; // eg. Velocities
+	vector<string> simulatedValues; // eg. Velocities
 	vector<vector<double>> simulatedDensities; 
 
 

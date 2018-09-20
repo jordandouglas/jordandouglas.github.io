@@ -45,7 +45,32 @@ Sequence::Sequence(string seqID, string TemplateType, string PrimerType, string 
 	this->RNAunfoldingTableBuilt = false;
 	this->translocationRatesCache = new TranslocationRatesCache();
 
+    this->MSAsequence = "";
+    this->weight = 0;
+    this->nsitesMSA = 0;
+}
 
+// MSA sequence (gaps allowed)
+Sequence::Sequence(string seqID, string MSAsequence){
+
+    this->seqID = seqID;
+    this->nascent_RNA = true;
+    this->template_RNA = false;
+    this->nascent_SS = true;
+    this->template_SS = false;
+
+    this->MSAsequence = MSAsequence;
+
+    // The sequence parsed is the nascent sequence not the template sequence
+    this->complementSequence = this->correctSequence(MSAsequence, this->template_RNA);
+    this->templateSequence = Settings::complementSeq(this->complementSequence, this->template_RNA);
+
+    this->rateTableBuilt = false;
+    this->RNAunfoldingTableBuilt = false;
+    this->translocationRatesCache = new TranslocationRatesCache();
+
+    this->weight = 1;
+    this->nsitesMSA = this->MSAsequence.size();
 
 }
 
@@ -74,6 +99,14 @@ void Sequence::initRateTable(){
 }
 
 
+// Delete the rate table for this sequence to clear some memory
+void Sequence::deconstructRateTable(){
+    if (!this->rateTableBuilt) return;
+    this->translocationRatesCache->clear();
+    this->flagForRateTableRebuilding();
+}
+
+
 // Initialise the RNA unfolding barrier heights table for this sequence
 void Sequence::initRNAunfoldingTable(){
 
@@ -92,11 +125,12 @@ double Sequence::getMeanTranslocationBarrierHeight(){
 }
 
 
-// Remove newlines from sequence and replace A with U (if RNA) or U with A (if DNA), and any non matches with X
+// Remove newlines and gaps from sequence and replace A with U (if RNA) or U with A (if DNA), and any non matches with X
 string Sequence::correctSequence(string seq, bool isRNA){
 	if (isRNA) replace(seq.begin(), seq.end(), 'T', 'U');
 	else replace(seq.begin(), seq.end(), 'U', 'T');
 	seq.erase(remove(seq.begin(), seq.end(), '\n'), seq.end());
+    seq.erase(remove(seq.begin(), seq.end(), '-'), seq.end());
 	return seq;
 }
 
@@ -104,8 +138,10 @@ string Sequence::correctSequence(string seq, bool isRNA){
 string Sequence::toJSON(){
 	string nascentType = string(this->nascent_SS ? "ss" : "ds") + string(this->nascent_RNA ? "RNA" : "DNA");
 	string templateType = string(this->template_SS ? "ss" : "ds") + string(this->template_RNA ? "RNA" : "DNA");
-	string parametersJSON = "'" + seqID  + "':{'seq':'" + this->templateSequence + "','template':'" + templateType + "','primer':'" + nascentType + "'}";
-	return parametersJSON;
+	string parametersJSON = "'" + seqID  + "':{'seq':'" + this->templateSequence + "','template':'" + templateType + "','primer':'" + nascentType + "','MSAsequence':'" + this->MSAsequence + "'";
+    if (this->weight != 0) parametersJSON += ",'weight':" + to_string(this->weight);
+    parametersJSON += "}";
+    return parametersJSON;
 }
 
 
@@ -157,4 +193,13 @@ bool Sequence::nascentIsSS(){
 }
 bool Sequence::templateIsSS(){
 	return this->template_SS;
+}
+
+
+int Sequence::get_nsitesMSA(){
+    return this->nsitesMSA;
+}
+
+string Sequence::get_MSAsequence(){
+    return this->MSAsequence;
 }

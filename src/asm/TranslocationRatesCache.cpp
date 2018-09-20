@@ -49,6 +49,9 @@ void TranslocationRatesCache::initTranslocationRates(string templateSequence){
 }
 
 
+
+
+
 double TranslocationRatesCache::get_meanGibbsEnergyBarrier(){
 
 	//cout << "get_meanGibbsEnergyBarrier" << endl;
@@ -595,4 +598,29 @@ void TranslocationRatesCache::buildDownstreamRNABlockadeTable(string templSequen
 	for (int i = 0; i < templSequence.length(); i ++){
 		this->downstreamRNABlockadeTable[i] = -INF; 
 	}
+}
+
+
+
+
+// Clear and delete all translocation rate related caches
+void TranslocationRatesCache::clear(){
+
+
+    // Clear the translocation table
+    for(unsigned int i = 0; i < this->translocationRateTable.size(); ++i){
+        for (unsigned int j = 0; j < this->translocationRateTable.at(i).size(); ++j){
+            this->translocationRateTable.at(i).at(j).clear();
+        }
+        this->translocationRateTable.at(i).clear();
+    }
+    this->translocationRateTable.clear();
+
+
+    // Clear the backtrack table
+    for (unsigned int i = 0; i < this->backtrackRateTable.size(); ++i){
+        this->backtrackRateTable.at(i).clear();
+    }
+    this->backtrackRateTable.clear();
+
 }

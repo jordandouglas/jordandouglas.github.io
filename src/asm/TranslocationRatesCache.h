@@ -65,7 +65,7 @@ class TranslocationRatesCache{
 
 		TranslocationRatesCache();
 		void initTranslocationRates(string templateSequence);
-
+        void clear();
 
 };
 

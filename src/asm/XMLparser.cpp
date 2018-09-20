@@ -314,6 +314,20 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 					}
 
 				}
+
+				else if (experimentType == "pauseSites"){
+
+					// Count number of lengths in the list
+					if (experimentEle->Attribute("lengths")){
+						string lengths = string(experimentEle->Attribute("lengths"));
+						vector<string> lengths_split = Settings::split(lengths, ',');
+						numObservations = lengths_split.size();
+						lengths_split.clear();
+					}
+
+				}
+
+
 				else{
 					for (const TiXmlAttribute* attr = experimentEle->FirstAttribute(); attr; attr=attr->Next()) {
 						string attrName = attr->Name();
@@ -465,6 +479,45 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 					}
 
 					times_split.clear();
+
+				}
+
+
+
+
+
+
+				else if (experimentType == "pauseSites"){
+
+					double time = 0;
+					double abundance = 0;
+
+
+					if (experimentEle->Attribute("time")) {
+						time = atof(experimentEle->Attribute("time"));
+					}
+
+					if (experimentEle->Attribute("abundance")) {
+						abundance = atof(experimentEle->Attribute("abundance"));
+					}
+
+
+
+					// The frequently observed lengths at this time
+					string lengths = string(experimentEle->Attribute("lengths"));
+					vector<string> lengths_split = Settings::split(lengths, ',');
+					vector<int> observedLengths(numObservations);
+
+					for (int obsNum = 0; obsNum < numObservations; obsNum ++){
+
+						double len = stoi(lengths_split.at(obsNum));
+						observedLengths.at(obsNum) = len;
+
+					}
+
+					experiment->addDatapoint(time, abundance, observedLengths);
+
+					lengths_split.clear();
 
 				}
 

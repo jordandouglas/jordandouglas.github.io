@@ -47,7 +47,7 @@ using namespace std;
 
 
 // Constants
-const int INF = 1e8;
+const double INF = 1e16;
 const double _RT = 0.6156;
 const double _kBT = 1.380649e-23 * 310;
 const double _preExp = 1e6;	
@@ -158,7 +158,10 @@ Parameter* downstreamWindow = new Parameter("downstreamWindow", true, "exclusive
 
 
 
-vector<Parameter*> Settings::paramList(27); // Number of parameters
+Parameter* proposalWidth = new Parameter("proposalWidth", false, "exclusive", "Proposal width", "Scale width of MCMC proposals, relative to the width of the prior distribution.");
+
+
+vector<Parameter*> Settings::paramList(28); // Number of parameters
 
 CRandomMersenne* Settings::SFMT;
 
@@ -180,6 +183,10 @@ SlippageLandscapes* _slippageLandscapesToSendToDOM;
 ostringstream _ABCoutputToPrint;
 list<PosteriorDistributionSample*> _GUI_posterior;
 map<int, list<PosteriorDistributionSample*>> _gelPosteriorDistributions; // All posterior distributions for gel calibrations
+
+
+// PhyloPause
+MultipleSequenceAlignment* _PP_multipleSequenceAlignment;
 
 
 void Settings::init(){
@@ -215,6 +222,9 @@ void Settings::init(){
 	RateBind->setDistributionParameter("fixedDistnVal", 0.5);
 
 	arrestTime->setDistributionParameter("fixedDistnVal", 0);
+	proposalWidth->setDistributionParameter("proposalWidth", 0);
+
+
 
 	RateActivate->setDistributionParameter("fixedDistnVal", 0.1);
 	RateDeactivate->setDistributionParameter("fixedDistnVal", 0.05);
@@ -275,6 +285,9 @@ void Settings::init(){
 	paramList.at(24) = downstreamWindow;
 	paramList.at(25) = haltPosition;
 	paramList.at(26) = DGHyperDag;
+
+	paramList.at(27) = proposalWidth;
+
 
 
 	// Create the polymerase objects
@@ -417,6 +430,10 @@ void Settings::setParameterList(vector<Parameter*> params){
 	DGHyperDag = paramList.at(26);
 
 
+	proposalWidth = paramList.at(27);
+
+
+
 	/*
 	upstreamCurvatureCoeff = paramList.at(19);
 	downstreamCurvatureCoeff = paramList.at(20);
@@ -463,29 +480,34 @@ void Settings::initSequences(){
 bool Settings::setSequence(string seqID){
 
 	if (sequences.find(seqID) == sequences.end()) return false;
-
-
-	currentSequence = sequences[seqID];
-
-	
-
-	_seqID = currentSequence->getID();
-	templateSequence = currentSequence->get_templateSequence();
-	complementSequence = currentSequence->get_complementSequence();
-	TemplateType = currentSequence->get_templateType();
-	PrimerType = currentSequence->get_primerType();
-
-	currentSequence->initRateTable();
-	currentSequence->initRNAunfoldingTable();
-	_translocationRatesCache = currentSequence->getRatesCache();
-
-
-
-	// vRNA_init contains a memory leak. As a temporary workaround will not call this function during ABC 
-	if (!_RUNNING_ABC && PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
-
-
+    Settings::setSequence(sequences[seqID]); 
 	return true;
+
+}
+
+
+
+void Settings::setSequence(Sequence* seq){
+
+
+    currentSequence = seq;
+
+    _seqID = currentSequence->getID();
+    templateSequence = currentSequence->get_templateSequence();
+    complementSequence = currentSequence->get_complementSequence();
+    TemplateType = currentSequence->get_templateType();
+    PrimerType = currentSequence->get_primerType();
+
+    currentSequence->initRateTable();
+    currentSequence->initRNAunfoldingTable();
+    _translocationRatesCache = currentSequence->getRatesCache();
+
+
+
+    // vRNA_init contains a memory leak. As a temporary workaround will not call this function during ABC 
+    if (!_RUNNING_ABC && PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
+
+
 
 }
 
@@ -873,6 +895,7 @@ void Settings::sampleAll(){
 	// Samples a model
 	sampleModel();
 
+      
 
 }
 
@@ -906,6 +929,7 @@ Parameter* Settings::getParameterByName(string paramID){
 	if (paramID == "DGPost") return DGPost;
 	if (paramID == "barrierPos") return barrierPos;
 	if (paramID == "arrestTime") return arrestTime;
+	if (paramID == "proposalWidth") return proposalWidth;
 	if (paramID == "kCat") return kCat;
 	if (paramID == "Kdiss") return Kdiss;
 	if (paramID == "RateBind") return RateBind;
@@ -1142,8 +1166,22 @@ bool Settings::strIsNumber(const string& s){
     return( strspn( s.c_str(), "-.0123456789" ) == s.size() );
 }
 
+// Trim a string (copy)
+string Settings::trim(string s){
 
+    // Right trim
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+        return !std::isspace(ch);
+    }));
 
+    // Left trim
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+
+    return s;
+
+}
 
 
 // Insert an element into the right position of a sorted vector of integers
