@@ -1139,6 +1139,7 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 				var dataType =  $("#forceVelocityInputData_" + fitID).length > 0 ? "forceVelocity" : 
 						$("#ntpVelocityInputData_" + fitID).length > 0 ? "ntpVelocity" : 
 						$("#pauseEscapeInputData_" + fitID).length > 0 ? "pauseEscape" : 
+						$("#pauseSitesInputData_" + fitID).length > 0 ? "pauseSites" : 
 						$(".timeGelInputData_" + fitID).length > 0 ? "timeGel" : null;
 
 				saveXML.writeStartElement(fitID);
@@ -1174,6 +1175,17 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 						saveXML.writeAttributeString("halt", abcDataObjectForModel["fits"][fitID]["haltPosition"]);
 						var pauseEscapeTimes = abcDataObjectForModel["fits"][fitID]["vals"].join(",");
 						saveXML.writeAttributeString("times", pauseEscapeTimes);
+						if (abcDataObjectForModel["fits"][fitID]["seq"] != null) saveXML.writeAttributeString("seq", abcDataObjectForModel["fits"][fitID]["seq"]);
+					}
+
+
+
+					if (dataType == "pauseSites"){
+						saveXML.writeAttributeString("time", abcDataObjectForModel["fits"][fitID]["time"]);
+						saveXML.writeAttributeString("abundance", abcDataObjectForModel["fits"][fitID]["abundance"]);
+						saveXML.writeAttributeString("halt", abcDataObjectForModel["fits"][fitID]["haltPosition"]);
+						var lengths = abcDataObjectForModel["fits"][fitID]["vals"].join(",");
+						saveXML.writeAttributeString("lengths", lengths);
 						if (abcDataObjectForModel["fits"][fitID]["seq"] != null) saveXML.writeAttributeString("seq", abcDataObjectForModel["fits"][fitID]["seq"]);
 					}
 
@@ -1436,6 +1448,8 @@ function loadSessionFromString(XMLstring, resolve = function() { }){
 
 	XMLstring = XMLToString(xmlDoc).replace(/(\r\n|\n|\r)/gm,"");
 	loadSession_controller(XMLstring, resolve);
+
+    return true;
 
 
 }

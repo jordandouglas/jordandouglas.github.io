@@ -25,20 +25,25 @@ MESSAGE_LISTENER = {};
 
 function register_WebWorker(resolve = function() { }){
 
-	
+
 	WEB_WORKER = null;
 	WEB_WORKER_WASM = null;
 	if(typeof(Worker) !== "undefined") {
         	if(WEB_WORKER == null) {
 				try {
 
-					 	 // Setup webworker for webassembly
+
+
+					 	// Setup webworker for webassembly
 					    if (USE_WASM) WEB_WORKER_WASM = new Worker("src/asm/WasmInterface.js");
+
+
             			WEB_WORKER = new Worker("src/Model/WebWorker.js");
+
+
 
             			// Tell the WebWorker to initialise
    						callWebWorkerFunction(function() { WW_JS.init_WW(true); });
-
 
 
 				} catch(err){
@@ -2970,6 +2975,26 @@ function loadSession_controller(XMLData, resolve = function() { }){
 					if (experimentalData["fits"][fitID]["seq"] != null) {
 						$("#pauseEscapeUseNewSeq_" + fitID).click();
 						$("#pauseEscapeSeq_" + fitID).val(experimentalData["fits"][fitID]["seq"]);
+					}
+
+				}
+
+
+
+				else if(dataType == "pauseSites"){
+
+
+					$("#pauseSites_time_" + fitID).val(experimentalData["fits"][fitID]["time"]);
+					$("#pauseSites_abundance_" + fitID).val(experimentalData["fits"][fitID]["abundance"]);
+
+
+					textAreaString = experimentalData["fits"][fitID]["vals"].join(",");
+
+					
+
+					if (experimentalData["fits"][fitID]["seq"] != null) {
+						$("#pauseSitesUseNewSeq_" + fitID).click();
+						$("#pauseSitesSeq_" + fitID).val(experimentalData["fits"][fitID]["seq"]);
 					}
 
 				}

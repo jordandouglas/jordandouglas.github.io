@@ -226,6 +226,7 @@ function getAbcDataObject(which = "ABC"){
 		var dataType =  $("#forceVelocityInputData_" + fitID).length > 0 ? "forceVelocity" : 
 						$("#ntpVelocityInputData_" + fitID).length > 0 ? "ntpVelocity" : 
 						$("#pauseEscapeInputData_" + fitID).length > 0 ? "pauseEscape" : 
+						$("#pauseSitesInputData_" + fitID).length > 0 ? "pauseSites" : 
 						$(".timeGelInputData_" + fitID).length > 0 ? "timeGel" : null;
 
 
@@ -238,6 +239,8 @@ function getAbcDataObject(which = "ABC"){
 		abcDataObjectForModel["fits"][fitID]["CTPconc"] = parseFloat($("#CTPconc_" + fitID).val());
 		abcDataObjectForModel["fits"][fitID]["GTPconc"] = parseFloat($("#GTPconc_" + fitID).val());
 		abcDataObjectForModel["fits"][fitID]["UTPconc"] = parseFloat($("#UTPconc_" + fitID).val());
+
+		// Parse the settings
 
 
 		// NTP velocity data also has a force 
@@ -261,6 +264,26 @@ function getAbcDataObject(which = "ABC"){
 			abcDataObjectForModel["fits"][fitID]["haltPosition"] = parseFloat($("#ABC_haltPosition_" + fitID).val());
 		}
 
+
+		// Pause escape data
+		if (dataType == "pauseSites"){
+			abcDataObjectForModel["fits"][fitID]["time"] = $("#pauseSites_time_" + fitID).val();
+			abcDataObjectForModel["fits"][fitID]["abundance"] = parseFloat($("#pauseSites_abundance_" + fitID).val());
+			if ($("#pauseSitesUseNewSeq_" + fitID).is(":checked")){
+
+				// Nascent sequence
+				var seq = $("#pauseSitesSeq_" + fitID).val().trim().toUpperCase().replace(/[^ACGTU]/gi, '');
+				seq = complementSequenceFn(seq, $("#SelectTemplateType").val().substr(2, 5) == "RNA");
+				if (seq != "") abcDataObjectForModel["fits"][fitID]["seq"] = seq;
+
+			}
+
+			abcDataObjectForModel["fits"][fitID]["haltPosition"] = parseFloat($("#ABC_haltPosition_" + fitID).val());
+		}
+
+
+
+		// Parse the actual values
 
 		// Time gel requires parsing the densities from the image
 		if (dataType == "timeGel"){
@@ -304,9 +327,30 @@ function getAbcDataObject(which = "ABC"){
 		}
 
 
+		else if (dataType == "pauseSites"){
+
+			var dataValues = $("#" + dataType + "InputData_" + fitID).val();
+			var splitValues = dataValues.split("\n");
+
+			var splitTimes = splitValues[0].split(",");
+			abcDataObjectForModel["fits"][fitID].vals = [];
+			for (var i = 0; i < splitTimes.length; i ++){
+
+				var time = parseFloat(splitTimes[i].trim());
+				abcDataObjectForModel["fits"][fitID].vals.push(time);
+
+			}
+
+
+			abcDataObjectForModel["fits"][fitID].vals.sort(function(a,b) { return a - b; });
+
+
+		}
+
+
 
 		// Velocity or pause-escape data
-		else{ 
+		else { 
 
 
 
@@ -409,6 +453,7 @@ function validateExperimentalDataInput(ele){
 	var dataType =  $(ele).attr("id").indexOf("forceVelocity") != -1 ? "forceVelocity" : 
 					$(ele).attr("id").indexOf("ntpVelocity") != -1 ? "ntpVelocity" :
 					$(ele).attr("id").indexOf("pauseEscape") != -1 ? "pauseEscape" : 
+					$(ele).attr("id").indexOf("pauseSites") != -1 ? "pauseSites" : 
 					$(ele).attr("id").indexOf("timeGel") != -1 ?  "timeGel" : null;
 
 
@@ -422,6 +467,43 @@ function validateExperimentalDataInput(ele){
 		if (fabricCanvas == null || !fabricCanvas.calibrated) return false;
 		return true;
 	}
+
+
+
+
+
+	else if (dataType == "pauseSites"){
+
+
+
+		var time = parseFloat($("#pauseSites_time_" + fitID).val());
+		var abundance = parseFloat($("#pauseSites_abundance_" + fitID).val());
+
+		if (isNaN(time) || isNaN(abundance) || time <= 0 || abundance <= 0 || abundance > 1) return false;
+
+
+		// Parse the pause sites
+		var pauseSites = [];
+		var pauseSites_split = $("#pauseSitesInputData_" + fitID).val().trim().split(",");
+		if (pauseSites_split.length == 0) return false;
+		for (var i = 0; i < pauseSites_split.length; i ++){
+
+			var site = parseFloat(pauseSites_split[i]);
+			if (isNaN(site) || site <= 0) return false;
+			pauseSites.push(site);
+
+		}
+
+		// Draw the plot
+		drawPauseSitesCanvas(fitID, pauseSites, time, abundance);
+
+
+		return true;
+
+	}
+
+
+
 
 
 	else if (dataType == "pauseEscape"){
@@ -700,6 +782,10 @@ function getNewCurveButtonsTemplate(){
 
 					<input type=button onClick='addNewABCData("pauseEscape")' value='+ Pause escape data' title="Add maximal pause probability and/or half life data about a pause site" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
 					<br><br>
+
+
+					<input type=button onClick='addNewABCData("pauseSites")' value='+ Pause sites' title="Enumerate all abundant transcript lengths after a given period of time" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
+					<br><br>
 					
 				</div>
 
@@ -737,6 +823,13 @@ function addNewABCData(type = "forceVelocity"){
 		case "timeGel":
 			HTMLtemplate = getTimeGelTemplateLeft(fitID);
 			break;
+
+
+		case "pauseSites":
+			HTMLtemplate = getPauseSitesTemplate(fitID);
+			break;
+
+
 
 
 
@@ -1040,6 +1133,193 @@ function getABCntpVelocityCurveTemplate(fitID){
 
 
 
+
+function getPauseSitesTemplate(fitID){
+	return `
+		<tr fitID="` + fitID + `" class="ABCcurveRow pauseSitesRow"> <!-- style="background-color:#b3b3b3;"> -->
+
+
+			<td class="` + fitID + `" style="width:200px; text-align:center; vertical-align:top">
+				<br><br>
+				<div style="font-size:18px;">Transcript lengths at time</div><br>
+
+
+				<table style="width:250px; margin:auto">
+
+						<tr>
+							<td style="text-align:right;">
+					 			Time: 
+					 		</td>
+
+					 		<td>
+					 			<input type="number" id="pauseSites_time_` + fitID + `" min=0 onChange="validateAllAbcDataInputs()" title="Duration of transcription elongation before the transcript lengths are measured."
+							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> s
+							</td>
+					 	</tr>
+
+
+					 	<tr>
+							<td style="text-align:right;">
+					 			Abundance:
+					 		</td>
+
+					 		<td>
+					 			<input type="number" id="pauseSites_abundance_` + fitID + `" value=0.5 step=0.1 min=0 max=1 onChange="validateAllAbcDataInputs()"  title="The proportion of all transcript lengths which are one of the specified lengths."
+								 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> 
+							</td>
+					 	</tr>
+
+
+					 </table>
+
+
+					<br>
+					Transcript lengths:
+					<textarea class="ABCinputData pauseSitesInputData" id="pauseSitesInputData_` + fitID + `" onChange="validateAllAbcDataInputs()" style="font-size:14px; padding: 5 10;  width: 200px; height: 80px; max-width:200px; max-height:500px; min-height:100px; min-width:200px"  
+					title="Input all frequently observed transcript lengths after this duration of time." placeholder="Example: 10, 23, 40"></textarea>
+					<br><br >
+					<span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
+						Input all frequently observed transcript lengths after this duration of time (units nt), seperated with commas. 
+					</span>
+
+			</td>
+
+
+			<td class="` + fitID + `" style="width:300px; text-align:center; vertical-align:top">
+
+				<div style="font-size:20px;">
+					Transcript lengths curve
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="src/Images/help.png"></a>
+						
+				</div>
+
+					
+					<canvas id="pauseSitesCurve_` + fitID + `" width=300 height=300> </canvas>
+
+			</td>
+
+
+
+			<td class="` + fitID + `" style="text-align:center; vertical-align:top">
+
+					<input type=button id='deleteExperiment_` + fitID + `' class='minimise' style='float:right'  value='&times;' onClick=deleteExperiment("` + fitID + `") title='Delete this experiment'>
+
+				
+					<table style="width:250px; margin:auto">
+
+						<tr>
+							<td colspan=2 style="text-align:center;">
+
+								<div style="font-size:18px;">NTP Concentrations</div>
+							</td>
+
+						</tr>
+
+						<tr>
+							<td style="text-align:right;">
+					 			[ATP] = 
+					 		</td>
+
+					 		<td>
+					 			<input class="variable" value=100   type="number" id="ATPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
+							</td>
+					 	</tr>
+
+
+					 	<tr>
+							<td style="text-align:right;">
+					 			[CTP] = 
+					 		</td>
+
+					 		<td>
+					 			<input class="variable" value=100  type="number"  id="CTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+							</td>
+					 	</tr>
+
+
+
+
+					 	<tr>
+							<td style="text-align:right;">
+					 			[GTP] = 
+					 		</td>
+
+					 		<td>
+								<input class="variable" value=100 type="number"  id="GTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+							</td>
+					 	</tr>
+
+
+
+					 	<tr>
+							<td style="text-align:right;">
+					 			[UTP] = 
+					 		</td>
+
+					 		<td>
+								<input class="variable" value=100 type="number" id="UTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
+							</td>
+					 	</tr>
+
+
+					 	<tr>
+							<td style="text-align:right;">
+								<br><br>
+					 			Halt: 
+					 		</td>
+
+					 		<td>
+					 			<br><br>
+								<input type="number" id="ABC_haltPosition_` + fitID + `" value=0 title="The template position where the polymerase starts transcription from. Set to 0 to leave as transcription bubble default."
+							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> nt
+							</td>
+					 	</tr>
+
+
+					 	<tr title='Use the same sequence selected in &#9776; Parameters or a different sequence?'  >
+						 
+							<td style="text-align:right; font-size:13px">
+					 			Same seq
+					 		</td>
+							 
+					 		<td colspan=3>
+						 		<label class="switch">
+							 		 <input class="modelSetting" type="checkbox" id="pauseSitesUseNewSeq_` + fitID + `" OnChange="$('#pauseSitesSeqRow_` + fitID + `').toggle()"> </input>
+							 		 <span class="slider round notboolean"></span>
+								</label> 
+								<span style="font-size:13px; vertical-align:middle" >New seq</span>
+					 		</td>
+						
+					 	</tr>
+
+
+
+					 	<tr id="pauseSitesSeqRow_` + fitID + `" style="display:none">
+							<td style="text-align:right;" colspan=2>
+					 			<textarea id="pauseSitesSeq_` + fitID + `" title="Please enter a sequence" style="max-width: 100%; width: 100%; height: 120px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input nascent sequence 5' to 3'..."></textarea> 
+							</td>
+					 	</tr>
+
+
+
+
+
+
+					 </table>
+
+
+
+			</td>
+
+		</tr>
+
+
+
+	`;
+}
+
+
+
 function getABCpauseSiteTemplate(fitID){
 	return `
 		<tr fitID="` + fitID + `" class="ABCcurveRow pauseEscapeRow"> <!-- style="background-color:#b3b3b3;"> -->
@@ -1097,7 +1377,7 @@ function getABCpauseSiteTemplate(fitID){
 
 					 		<td>
 								<input type="number" id="pauseEscape_t12_` + fitID + `"  min=0 onChange="validateAllAbcDataInputs()" title="The half-life of the pause (s). Leave blank if unknown."
-							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"></td>
+							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA">s</td>
 					 	</tr>
 
 
@@ -1853,7 +2133,7 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 				ctx.beginPath();
 				var xPrime = widthScale * (forces[0] - xmin) + axisGap;
-				var yPrime = plotHeight + margin - heightScale * (posteriorVelocities[startingObsNum] - ymin);
+				var yPrime = plotHeight + margin - heightScale * (parseFloat(posteriorVelocities[startingObsNum]) - ymin);
 				ctx.moveTo(xPrime, yPrime);
 
 
@@ -1863,7 +2143,7 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 					
 					var index = startingObsNum + forceNum;
 					var xPrime = widthScale * (forces[forceNum] - xmin) + axisGap;
-					var yPrime = plotHeight + margin - heightScale * (posteriorVelocities[index] - ymin);
+					var yPrime = plotHeight + margin - heightScale * (parseFloat(posteriorVelocities[index]) - ymin);
 					//console.log("Plotting starting", index);
 					ctx.lineTo(xPrime, yPrime);
 				}
@@ -2050,14 +2330,14 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 
 				ctx.beginPath();
 				var xPrime = widthScale * (concentrations[0] - xmin) + axisGap;
-				var yPrime = plotHeight + margin - heightScale * (posteriorVelocities[startingObsNum] - ymin);
+				var yPrime = plotHeight + margin - heightScale * (parseFloat(posteriorVelocities[startingObsNum]) - ymin);
 				ctx.moveTo(xPrime, yPrime);
 
 
 				for (var concNum = 1; concNum < concentrations.length; concNum++ ){
 					var index = startingObsNum + concNum;
 					var xPrime = widthScale * (concentrations[concNum] - xmin) + axisGap;
-					var yPrime = plotHeight + margin - heightScale * (posteriorVelocities[index] - ymin);
+					var yPrime = plotHeight + margin - heightScale * (parseFloat(posteriorVelocities[index]) - ymin);
 
 					ctx.lineTo(xPrime, yPrime);
 				}
@@ -2166,6 +2446,265 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 	});
 
 }
+
+
+
+
+function drawPauseSitesCanvas(fitID, pauseSites, time, abundance){
+
+
+	console.log("drawPauseSitesCanvas", fitID, pauseSites, time, abundance);
+	return;
+
+	var canvas = $("#pauseSitesCurve_" + fitID)[0];
+	if (canvas == null) return;
+
+	var ctx = canvas.getContext('2d');
+
+	var canvasSizeMultiplier = 1;
+	var axisGap = 45 * canvasSizeMultiplier;
+	var margin = 3 * canvasSizeMultiplier;
+
+
+
+	getPosteriorDistribution_controller(function(result){
+
+
+		var abcDataObjectForModel = getAbcDataObject();
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		if (timesList != null){
+
+			var plotWidth = canvas.width - axisGap - margin;
+			var plotHeight = canvas.height - axisGap - margin;
+
+
+
+			var xmin = 0;
+			var xmax = roundToSF(maximumFromList(timesList), 2, "ceil");
+			var ymin = 0;
+			var ymax = 1; // roundToSF(maximumFromList(timesList) * 1.3, 3, "ceil");
+
+
+			// Refine xmax and xmin and select positions to add ticks
+			var xlabPos = [];
+			var xResult = getNiceAxesNumbers(xmin, xmax, plotWidth, true);
+			xmin = xResult["min"]
+			xmax = xResult["max"]
+			var widthScale = xResult["widthOrHeightScale"]
+			xlabPos = xResult["vals"]
+			//console.log("xResult", xResult);
+
+			var ylabPos = [];
+			var yResult = getNiceAxesNumbers(ymin, ymax, plotHeight, false);
+			ymin = yResult["min"]
+			ymax = yResult["max"]
+			var heightScale = yResult["widthOrHeightScale"]
+			ylabPos = yResult["vals"]
+			//console.log("yResult", yResult);
+
+
+
+			// X min and max
+			var axisPointMargin = 5 * canvasSizeMultiplier;
+			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+			ctx.textBaseline="top"; 
+			var tickLength = 10 * canvasSizeMultiplier;
+			ctx.lineWidth = 1 * canvasSizeMultiplier;
+
+			for (var labelID = 0; labelID < xlabPos.length; labelID++){
+				var x0 = widthScale * (xlabPos[labelID] - xmin) + axisGap;
+				ctx.textAlign= labelID == 0 ? "left" : "center";
+				ctx.fillText(xlabPos[labelID], x0, canvas.height - axisGap + axisPointMargin);
+
+				// Draw a tick on the axis
+				ctx.beginPath();
+				ctx.moveTo(x0, canvas.height - axisGap - tickLength/2);
+				ctx.lineTo(x0, canvas.height - axisGap + tickLength/2);
+				ctx.stroke();
+
+			}
+
+
+			// Y min and max
+			ctx.textBaseline="bottom"; 
+
+			ctx.save()
+			ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
+			ctx.rotate(-Math.PI/2);
+			for (var labelID = 0; labelID < ylabPos.length; labelID++){
+				var y0 = heightScale * (ylabPos[labelID] - ymin);
+				ctx.fillText(ylabPos[labelID], y0, 0);
+
+				// Draw a tick on the axis
+				ctx.beginPath();
+				ctx.moveTo(y0, axisPointMargin - tickLength/2);
+				ctx.lineTo(y0, axisPointMargin + tickLength/2);
+				ctx.stroke();
+
+
+			}
+			ctx.restore();
+
+
+
+
+
+			// Plot the posterior distribution of curves
+			var posterior = result["posterior"];
+			
+
+			ctx.globalAlpha = 0.4;
+			ctx.strokeStyle = "#008CBA";
+			ctx.lineWidth = 1 * canvasSizeMultiplier;
+
+
+
+
+			// Find the starting and stopping index of these posterior velocities in the list
+			var fitIDs = [];
+			for (var fitID_temp in abcDataObjectForModel["fits"]) fitIDs.push(fitID_temp);
+			fitIDs.sort();
+			var startingObsNum = 0;
+			for (var fitNum = 0; fitNum < fitIDs.length; fitNum++){
+				if (fitIDs[fitNum] == fitID) break;
+				startingObsNum += abcDataObjectForModel["fits"][fitIDs[fitNum]]["vals"].length;
+			}
+
+			
+			// If MCMC then account for the burn-in
+			for (var postNum = result.burnin; result.burnin >= 0 && postNum < posterior.length; postNum++){
+
+
+				var posteriorConcProbs = posterior[postNum]["simulatedValues"];
+
+
+				ctx.beginPath();
+				var xPrime = widthScale * (timesList[0] - xmin) + axisGap;
+				var yPrime = plotHeight + margin - heightScale * (parseFloat(posteriorConcProbs[startingObsNum]) - ymin);
+				ctx.moveTo(xPrime, yPrime);
+
+
+				for (var timeNum = 1; timeNum < timesList.length; timeNum++ ){
+					var index = startingObsNum + timeNum;
+					var xPrime = widthScale * (timesList[timeNum] - xmin) + axisGap;
+					var yPrime = plotHeight + margin - heightScale * (parseFloat(posteriorConcProbs[index]) - ymin);
+					ctx.lineTo(xPrime, yPrime);
+				}
+
+
+				ctx.stroke();
+
+
+
+			}
+
+
+
+			// Add the pause escape curve to the plot
+			ctx.globalAlpha = 1;
+			ctx.strokeStyle = "black";
+
+			ctx.beginPath();
+			ctx.moveTo(axisGap, Emax);
+
+			var rate = Math.log(2) / t12;
+			for (var xPrime = axisGap; xPrime < widthScale * (xmax - xmin) + axisGap; xPrime++){
+				var x = (xPrime - axisGap) / widthScale + xmin;
+				var y = (Emax - Emin) * Math.exp(-x * rate) + Emin;
+				var yPrime = plotHeight + margin - heightScale * (y - ymin);
+				ctx.lineTo(xPrime, yPrime);
+				
+			}
+			ctx.stroke();
+
+
+
+			// Draw a black circle on the curve at each sample time
+			for (var i = 0; i < timesList.length; i ++){
+
+				var time = timesList[i];
+				var xPrime = widthScale * (time - xmin) + axisGap;
+				var y = (Emax - Emin) * Math.exp(-time * rate) + Emin;
+				var yPrime = plotHeight + margin - heightScale * (y - ymin);
+
+
+				ctx.beginPath();
+				ctx_ellipse(ctx, xPrime, yPrime, 3 * canvasSizeMultiplier, 3 * canvasSizeMultiplier, 0, 0, 2 * Math.PI);
+				ctx.fill();
+
+
+			}
+			
+
+
+			/*
+
+			for (var obsNum = 0; obsNum < concentrations.length; obsNum++){
+					
+				var xPrime = widthScale * (concentrations[obsNum] - xmin) + axisGap;
+				var yPrime = plotHeight + margin - heightScale * (velocities[obsNum] - ymin);
+
+
+				// Add circle
+				ctx.beginPath();
+				ctx.fillStyle = "black"; // ;
+				ctx_ellipse(ctx, xPrime, yPrime, 3 * canvasSizeMultiplier, 3 * canvasSizeMultiplier, 0, 0, 2 * Math.PI);
+				ctx.fill();
+
+
+			}
+			*/	
+
+
+		}
+
+
+
+		// Axes
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = 2 * canvasSizeMultiplier;
+		ctx.beginPath();
+		ctx.moveTo(axisGap, margin);
+		ctx.lineTo(axisGap, canvas.height - axisGap);
+		ctx.lineTo(canvas.width - margin, canvas.height - axisGap);
+		ctx.stroke();
+
+		
+
+		// X label
+		ctx.fillStyle = "black";
+		ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+		ctx.textAlign="center"; 
+		ctx.textBaseline="top"; 
+		var xlabXPos = (canvas.width - axisGap) / 2 + axisGap;
+		var xlabYPos = canvas.height - axisGap / 2;
+		ctx.fillText("Elongation time (s)", xlabXPos, xlabYPos);
+
+		
+		// Y label
+		ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+		ctx.textAlign="center"; 
+		ctx.textBaseline="bottom"; 
+		ctx.save()
+		var ylabXPos = 2 * axisGap / 4;
+		var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
+		ctx.translate(ylabXPos, ylabYPos);
+		ctx.rotate(-Math.PI/2);
+		ctx.fillText("[Site" + (isNaN(pauseSite) ? "s " : " ") + pauseSite + "]", 0 ,0);
+		ctx.restore();
+
+	});
+
+
+
+
+
+
+}
+
+
+
 
 
 
@@ -2298,14 +2837,14 @@ function drawPauseEscapeCanvas(fitID, pauseSite = "", Emax = 0, Emin = 0, t12 = 
 
 				ctx.beginPath();
 				var xPrime = widthScale * (timesList[0] - xmin) + axisGap;
-				var yPrime = plotHeight + margin - heightScale * (posteriorConcProbs[startingObsNum] - ymin);
+				var yPrime = plotHeight + margin - heightScale * (parseFloat(posteriorConcProbs[startingObsNum]) - ymin);
 				ctx.moveTo(xPrime, yPrime);
 
 
 				for (var timeNum = 1; timeNum < timesList.length; timeNum++ ){
 					var index = startingObsNum + timeNum;
 					var xPrime = widthScale * (timesList[timeNum] - xmin) + axisGap;
-					var yPrime = plotHeight + margin - heightScale * (posteriorConcProbs[index] - ymin);
+					var yPrime = plotHeight + margin - heightScale * (parseFloat(posteriorConcProbs[index]) - ymin);
 					ctx.lineTo(xPrime, yPrime);
 				}
 
@@ -4927,7 +5466,12 @@ function addNewABCRows(lines){
 			for (var j = 0; j < lineSplit.length; j++){
 
 				var paddedLineSplit = (padded + lineSplit[j]).slice(-padded.length);
-				lineWithAmpersandPadding += paddedLineSplit;
+
+				if (lineSplit[j].length > padded.length){
+					paddedLineSplit = "<span title='" + lineSplit[j] + "'>" + paddedLineSplit + "</span>";
+				}
+
+				lineWithAmpersandPadding += paddedLineSplit + "&";
 
 			}
 
