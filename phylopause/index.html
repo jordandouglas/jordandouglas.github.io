@@ -1,0 +1,406 @@
+
+<!--
+    --------------------------------------------------------------------
+    --------------------------------------------------------------------
+    This file is part of SimPol.
+
+    SimPol is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    SimPol is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with SimPol.  If not, see <http://www.gnu.org/licenses/>. 
+    --------------------------------------------------------------------
+    --------------------------------------------------------------------
+-->
+
+
+
+
+<html>
+<head>
+<title>PhyloPause</title>
+<!--<link rel="icon" href="../src/Images/transcribe.png">-->
+<meta name="viewport" content="width=device-width, initial-scale=0.41, maximum-scale=1" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="../src/Resources/phylo.css">
+<script language='JavaScript' type='text/JavaScript' src="../src/Resources/mersenne-twister.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Resources/jquery-3.1.1.min.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/Alignment.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/PhyloPause.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/Session.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/WebWorkerMessager.js"></script>
+<script type="text/javascript" src="../src/Resources/gifplayer-master/dist/jquery.gifplayer.js"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-106202043-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+<script language='JavaScript' type='text/JavaScript'>
+
+
+function init(){
+
+    PP_simulating = false;
+    mersenneTwister = new MersenneTwister();
+    WEB_WORKER_WASM = null;
+    USE_WASM = true;
+
+	$(".uploadAlignmentFirst").hide(0);
+	$(".beforeUploadingAlignment").show(0);
+
+
+    var toDoAfterWWRegistration = function(){
+
+        console.log("WASM registered")
+
+        // Upload the default session file
+        loadSessionFromURL("phylopause.xml");
+            
+    }
+
+
+    var registerWW = () => new Promise((resolve) => register_WebWorker(resolve));
+    registerWW().then(() => toDoAfterWWRegistration());
+
+}
+
+
+
+
+
+
+
+
+function minimiseSection(element, setTo = null){
+
+	var toHide = $(element).attr("id");
+	var currentlyShown = $(element).val() == "+";
+	toHide = toHide.substring(0, toHide.length-3); // Remove 'Btn' from the end
+	console.log(toHide, currentlyShown);
+
+	
+	if(setTo == false || (setTo == null && !currentlyShown)){
+		$(element).val("+");
+		$("#" + toHide).hide(setTo == null ? 300 : 0);
+	}
+	else{
+		$(element).val("-");
+		$("#" + toHide).show(setTo == null ? 300 : 0);
+	}
+
+}
+
+
+
+
+function getLoaderTemplate(id, msg = ""){
+	return `
+		<table  id="` + id + `" title="Loading...">
+			<tr>
+				<td>
+					<div class="loader"></div> 
+				</td>
+				<td>
+					` + msg + `
+				</td>
+			</tr>
+		</table>
+	`;
+}
+
+
+
+</script>
+
+</head>
+
+<body onload="init()">
+	<div id="screenContainer" style="position:relative">
+		<div id="screen" style="opacity:1;">
+
+
+				
+
+			<div id="main" style="background-color:white">
+				
+				
+				<div id="header" class="header" style="width:100%; ">
+					<table style="margin: 0px auto; width:100%">
+						
+
+						
+						<tr>
+							<td style="height:30px; width: 30%; vertical-align:bottom; ">
+								
+								
+							</td>
+
+							<td  style="text-align:center; font-size: 20px; vertical-align:top; font-family: 'Palatino'; width: 40%;"> 
+								<div style="width:100%; text-align:center">
+									<a href="" target="_blank" style="text-decoration: none; vertical-align:middle; width:300px">
+										<img src="../src/Images/phylopause.png" style="height:110px; vertical-align:middle;">
+									</a>
+									
+									
+									
+									
+									
+								</div>
+										
+							</td>
+							
+							
+
+							<td style="height:30px; width: 30%; vertical-align:bottom; text-align:right;"> 
+								<span class="noselect" style="padding:5 5; background-color:#A5CF19; padding: 5 5; color:white;" title="Go to SimPol - an algorithm for simulating and performing inference on RNA polymerases."><a target="_blank" href="../" style="text-decoration:none; color:white; ">SimPol</a></span> &nbsp;
+								<span class="noselect" style="padding:5 5; background-color:#0B522D; padding: 5 5; color:white;" title="Go to PhyloPause - an algorithm for predicting pause sites using phylogenetic information.">PhyloPause</span> &nbsp;
+								<span class="noselect" style="padding:5 5; background-color:#A5CF19; padding: 5 5; color:white;" title="Introductory tutorials and other information about SimPol."><a target="_blank" href="../download" style="text-decoration:none; color:white;">About</a></span> &nbsp;
+								<span class="noselect" style="padding:5 5; background-color:#A5CF19; padding: 5 5; color:white;" title="Download the source code from GitHub."><a target="_blank" href="../download" style="text-decoration:none; color:white;">Download</a></span> &nbsp;
+								<span class="noselect" style="padding:5 5; background-color:#A5CF19; padding: 5 5; color:white;" title="Contact the developers of SimPol."><a target="_blank" href="../contact" style="text-decoration:none; color:white; ">Contact us</a></span> &nbsp;
+							</td>
+
+
+
+						</tr>
+
+						
+					</table>
+				</div>
+
+
+
+				<br><br>
+
+
+
+			<div  class="panelOuter" style=" margin-left:50px; margin-right:50px">
+				<div class="panelInner">
+
+					<span class="noselect"  style="font-size:18px; font-family:Bookman;">
+						<input type=button id='importSettingsBtn' class='minimise' value='-' onClick="minimiseSection(this)">
+						<b style="color:#0B522D">Import files</b>
+						&nbsp;&nbsp;&nbsp;
+
+
+						<div id="importSettings" style="padding: 20 10">
+							<br>
+							<div  id="uploadAlignmentDIV"  style="background-color:white; padding: 20 10; border-style:solid; border-color:#0B522D">
+
+
+								<div style="font-size:20px; vertical-align:middle"> 1. Upload a nucleotide alignment 
+
+									<span class="uploadAlignmentFirst greenTick" style="display:none" title="Successful upload"> &#10004; </span>
+
+									<input type=button id='uploadAlignmentBtn' onClick=uploadAlignment() value='Select file' title=".fasta" class="operation" style="z-index: 100; float:right; width:100px"> 
+									<input style="display:none" type="file" id="uploadAlignment" accept=".fasta"> 
+
+								<br><br></div>
+
+
+						 		<div style="display:none" class="uploadAlignmentFirst"> Alignment successfully uploaded. </div>
+
+						 		<div class="beforeUploadingAlignment"> Upload a nucleotide multiple sequence alignment in .fasta format. </div>
+
+
+							</div>
+
+							<br>
+							<div id="uploadTreeDIV" class="uploadAlignmentFirst" style="display:none; background-color:white; padding: 20 10; border-style:solid; border-color:#0B522D">
+
+								
+								<div style="font-size:20px"> 2. Upload a tree (optional) 
+
+									<span id="uploadTreeTick" class="greenTick" style="display:none" title="Successful upload"> &#10004; </span>
+									<input type=button id='uploadTreeBtn' onClick=uploadTree() value='Select file' title=".nexus" class="operation" style="z-index: 100; float:right; width:100px"> 
+								<br><br></div>
+
+								Upload a phylogenetic tree containing all the leaves in the above alignment in .nexus format.
+
+
+							</div>
+
+							<br>
+							<div id="uploadSessionDIV" class="uploadAlignmentFirst" style="display:none; background-color:white; padding: 20 10; border-style:solid; border-color:#0B522D">
+
+								
+								<div style="font-size:20px"> 3. Upload a SimPol session file (optional) 
+									<span class="uploadSessionFirst greenTick" style="display:none" title="Successful upload"> &#10004; </span>
+
+                                    <input type=button id='uploadSessionBtn' onClick=uploadSession() value='Select file' title=".xml" class="operation" style="z-index: 100; float:right; width:100px"> 
+                                    <input style="display:none" type="file" id="uploadSession" accept=".xml"> 
+
+                                <br><br></div>
+
+								<div class="beforeUploadingSession">
+                                      Upload a SimPol session file containing all the model and parameter settings to use for pause site prediction in .xml format.
+                                </div>   
+
+                                <div style="display:none" class="uploadSessionFirst">
+                                      SimPol session successfully uploaded.
+                                </div>   
+
+
+							</div>
+
+
+
+						</div>
+
+					</span>
+					
+
+					</div>
+				</div>
+
+
+
+
+			<br><br>
+
+			<div  class="panelOuter" style=" margin-left:50px; margin-right:50px">
+				<div class="panelInner">
+
+					<span class="noselect"  style="font-size:18px; font-family:Bookman;">
+						<input type=button id='conservationSectionBtn' class='minimise' value='-' onClick="minimiseSection(this)">
+						<b style="color:#0B522D">Conservation of transcriptional pause sites </b>
+						&nbsp;&nbsp;&nbsp;
+                         <input class="uploadAlignmentFirst operation" type=button id='beginPhyloPause' onClick="beginPhyloPause(false);" value=" Begin PhyloPause" title="Use SimPol to predict the locations of pause sites in each sequence in the alignment." style="z-index: 100; float:right; width:160px; display:none"> 
+
+
+						<div id="conservationSection" style="padding: 20 20">
+
+
+                                <div style="display:none" class="uploadAlignmentFirst"> 
+                                    When you are ready to start the transcription simulations press Begin. This will be executed clientside (ie. using your CPU) and may take a while to finish.
+                                </div>
+
+
+
+                                <div class="beginPhyloPauseFirst" style="display:none; color:#808D82"> 
+
+
+                                    <table>
+                                            <tr>
+                                                  <td style="width:200px">
+                                                     <div style="position:relative; width:220px">
+                                                        <canvas id="progressSimCanvas" style="z-index:1; position:absolute; left:0; border-style:solid; border-colour:black" width="200px" height="30px"></canvas>
+                                                        <span id="progressSimSpan" style="font-size: 20px; cursor:auto; z-index:2; color:black; text-align:center; position:absolute; left:0; top:6; width:100%"></span> 
+                                                    </div>
+                                                 </td>
+
+                                                <td>
+                                                       <br><br>
+                                                    <span id="nTrialsComplete">0</span> out of <span id="nTrialsTotal">0</span> simulation trials have completed for <span id="currentSequenceProgress">the current sequence</span>. <br>
+                                                    <span id="nSequencesComplete">0</span> out of <span id="nSequencesTotal">0</span> sequences are complete. <br>
+                                                </td>
+                                  
+                                        </tr>
+
+                                    </table>
+                                        
+                                </div>
+                               
+
+
+                                <div class="beforeUploadingAlignment"> 
+                                    Upload a multiple sequence alignment to start the party 
+                                </div>
+
+
+                                    
+                            <div  id="conservationMSA_DIV"  class='scrollbar' style='scrollbar-x-position: top; overflow-x: scroll; position:relative; width:100%;'>
+
+    							
+                                <br><br>
+                             
+                                   
+                                        
+
+    							<div style="display:none" id="alignmentLoading"></div>
+
+    							<table id="conservationMSA" style="font-size:20px; font-family: 'Courier New';" cellpadding=2 cellspacing=0> 
+
+
+
+    							</table>
+
+
+                            </div>
+
+
+						</div>
+
+					</span>
+					
+
+				</div>
+			</div>
+
+
+
+
+   
+
+			   
+				
+
+	
+	
+	
+	
+	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
+	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
+
+	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
+	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
+
+
+	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
+	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
+
+
+	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
+	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
+
+
+	
+	
+		<div class="header">
+			PhyloPause, Centre for Computational Evolution & School of Biological Sciences, University of Auckland
+		</div>
+	
+
+
+		</div>
+	</div>
+
+
+</div>
+</body>
+</html>
