@@ -43,7 +43,7 @@ class PhyloTree {
 
     PhyloTreeNode* root;
     string parseNewickRecurse(PhyloTreeNode* node, string newick);
-    string newick_str;
+
 
     public:
         PhyloTree();
@@ -52,7 +52,7 @@ class PhyloTree {
         string parseFromNexus(string nexus);
         void clear();
         vector<PhyloTreeNode*> getLeaves();
-        string get_newick_str();
+        string getNewick();
         PhyloTreeNode* getMRCA(PhyloTreeNode* node1, PhyloTreeNode* node2);
 
 };

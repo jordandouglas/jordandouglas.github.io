@@ -201,3 +201,14 @@ double PhyloTreeNode::getDistanceToRoot(){
 PhyloTreeNode* PhyloTreeNode::getParent(){
     return this->parent;
 }
+
+
+
+// Get a newick string
+string PhyloTreeNode::getNewick(){
+
+    if (this->isLeaf()) return this->ID + ":" + to_string(this->time);
+
+    return "(" + this->leftChild->getNewick() +  "," + this->rightChild->getNewick() + "):" + to_string(this->time);
+
+}

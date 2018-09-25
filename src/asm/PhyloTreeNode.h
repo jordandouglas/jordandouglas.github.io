@@ -65,7 +65,7 @@ class PhyloTreeNode {
         void print();
         double getDistanceToRoot();
         PhyloTreeNode* getParent();
-
+        string getNewick();
 
 };
 

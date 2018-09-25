@@ -35,7 +35,6 @@ using namespace std;
 PhyloTree::PhyloTree() {
 
     this->root = nullptr;
-    this->newick_str = "";
     
 }
 
@@ -204,7 +203,6 @@ string PhyloTree::parseFromNexus(string nexus) {
 
 
 
-    this->newick_str = newick;
     return "";
 
 }
@@ -338,8 +336,8 @@ void PhyloTree::clear(){
 
 
 // Get the newick string
-string PhyloTree::get_newick_str(){
-    return this->newick_str;
+string PhyloTree::getNewick(){
+    return this->root->getNewick();
 }
 
 
