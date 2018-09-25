@@ -187,7 +187,7 @@ map<int, list<PosteriorDistributionSample*>> _gelPosteriorDistributions; // All 
 
 // PhyloPause
 MultipleSequenceAlignment* _PP_multipleSequenceAlignment;
-
+PhyloTree* _PP_tree;
 
 void Settings::init(){
 

@@ -27,7 +27,8 @@
 #include "PauseSiteUtil.h"
 #include "MultipleSequenceAlignment.h"
 #include "Settings.h"
-
+#include "PhyloTreeNode.h"
+#include "Eigen/Dense"
 
 #include <regex>
 #include <algorithm>
@@ -35,6 +36,7 @@
 #include <string> 
 
 using namespace std;
+using Eigen::MatrixXd;
 
 MultipleSequenceAlignment::MultipleSequenceAlignment(){
 
@@ -134,7 +136,7 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
     if (currentSequenceStr != ""){
 
         Sequence* currentSeq = new Sequence(currentAccession, currentSequenceStr);
-       alignment_list.push_back(currentSeq);
+        alignment_list.push_back(currentSeq);
         currentSequenceStr = "";
     }
            
@@ -144,6 +146,8 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
     vector<Sequence*> temp { std::begin(alignment_list), std::end(alignment_list) };
     this->alignment = temp;
     alignment_list.clear();
+
+
 
 
 
@@ -166,6 +170,13 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
     }
 
     fasta_split.clear();
+
+
+
+    // Set the default weight of each sequence to 1/nseqs
+    for (int i = 0; i < this->alignment.size(); i ++){
+        this->alignment.at(i)->set_weight(1.0 / this->alignment.size());
+    }
 
 
 
@@ -211,7 +222,7 @@ string MultipleSequenceAlignment::toJSON(){
 // Returns a JSON string of double array of pause sites
 string MultipleSequenceAlignment::pauseSites_toJSON(){
 
-
+    
 
     // Return an object of lists  acc:[site1, site2, ...]
     // Where each element refers to the pause sites in that sequence
@@ -363,3 +374,156 @@ void MultipleSequenceAlignment::PhyloPause(Simulator* simulator, int* result){
 
 
 }
+
+
+
+vector<vector<bool>*> MultipleSequenceAlignment::get_pauseSitesInAlignment(){
+    return this->pauseSitesInAlignment;
+}
+
+
+Sequence* MultipleSequenceAlignment::getSequenceAtIndex(int index){
+    return this->alignment.at(index);
+}
+
+
+
+
+// Check that the leaf sequence names are the same as those in the multiple sequence alignment
+string MultipleSequenceAlignment::treeTipNamesAreConsistentWithMSA(PhyloTree* tree){
+
+    vector<PhyloTreeNode*> leaves = tree->getLeaves();
+
+    if (leaves.size() != this->get_nseqs()) return "ERROR: different number of tips in tree and multiple sequence alignment.";
+
+    for (int leafIndex = 0; leafIndex < leaves.size(); leafIndex ++){
+
+
+        //leaves.at(leafIndex)->print();
+
+        string accession = leaves.at(leafIndex)->getID();
+
+        // Check that this leaf is on the MSA
+        bool leafIsInAlignment = false;
+        for (int seqIndex = 0; seqIndex < this->get_nseqs(); seqIndex ++){
+
+            Sequence* seq = this->getSequenceAtIndex(seqIndex);
+            if (seq->getID().substr(1) == accession){
+                leaves.at(leafIndex)->setSequence(seq);
+                leafIsInAlignment = true;
+                break;
+            }
+
+        }
+
+        // Does not match a sequence -> return error
+        if (!leafIsInAlignment) return "ERROR: leaf " + accession + " is not in the multiple sequence alignment.";
+
+
+    }
+
+
+    return "";
+
+}
+       
+
+// Calculate the information weight of each sequence in the aligment, using a tree
+void MultipleSequenceAlignment::calculateLeafWeights(PhyloTree* tree){
+
+
+
+    vector<PhyloTreeNode*> leaves = tree->getLeaves();
+    vector<PhyloTreeNode*> leaves_ordered(leaves.size());
+
+
+    // Sort the leaves list into the same order as the rows of the MSA
+    for (int seqIndex = 0; seqIndex < this->get_nseqs(); seqIndex ++){
+
+        // Find the matching node
+        Sequence* seq = this->getSequenceAtIndex(seqIndex);
+        PhyloTreeNode* match = nullptr;
+        for (int leafIndex = 0; leafIndex < leaves.size(); leafIndex ++){
+
+            string accession = leaves.at(leafIndex)->getID();
+            if (seq->getID().substr(1) == accession){
+                match = leaves.at(leafIndex);
+                break;
+            }
+
+        }
+
+        if (match == nullptr) {
+            cout << "ERROR: cannot find " << seq->getID().substr(1) << " in the tree" << endl;
+            exit(0);
+        }
+
+
+        leaves_ordered.at(seqIndex) = match;
+
+
+    }
+
+
+
+    // Calculate distance between each leaf and the root
+    vector<double> distanceToRoot(this->get_nseqs());
+    for (int i = 0; i < distanceToRoot.size(); i ++){
+        distanceToRoot.at(i) = leaves_ordered.at(i)->getDistanceToRoot();
+        cout << "Distance from " << this->getSequenceAtIndex(i)->getID() << " to root " << distanceToRoot.at(i) << endl;
+    }
+
+
+
+    // Build a pairwise correlation matrix
+    MatrixXd correlation(this->get_nseqs(), this->get_nseqs());
+    for (int i = 0; i < this->get_nseqs(); i ++){
+        for (int j = 0; j < this->get_nseqs(); j ++){
+            correlation(i,j) = 1;
+        }
+    }
+
+    //cout << correlation << endl;
+
+    // Calculate the distance between each pair of nodes' MRCA and the root
+    for (int i = 0; i < this->get_nseqs(); i ++){
+
+        for (int j = i+1; j < this->get_nseqs(); j ++){
+
+            // Find the MRCA of these two leaves
+            PhyloTreeNode* mrca = tree->getMRCA(leaves_ordered.at(i), leaves_ordered.at(j));
+
+
+            // Calculate distance between this node and the root
+            double distance_ij = mrca->getDistanceToRoot();
+
+
+            // Correlation = shared distance^2 / (distance1 * distance2)
+            correlation(i,j) = (distance_ij * distance_ij) / (distanceToRoot.at(i) * distanceToRoot.at(j));
+            correlation(j,i) = correlation(i,j);
+
+        }
+
+
+    }
+
+
+
+    // The weight of sequence i is the sum of all entries in row i of the inverse of the correlation matrix
+    MatrixXd correlation_inverse = correlation.inverse();
+    //cout << correlation_inverse << endl;
+
+    for (int i = 0; i < this->get_nseqs(); i ++){
+
+        double weight_i = 0;
+        for (int j = 0; j < this->get_nseqs(); j ++){
+            weight_i += correlation_inverse(i,j);
+        }
+
+
+        this->alignment.at(i)->set_weight(weight_i);
+
+    }
+
+
+} 

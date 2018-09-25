@@ -21,13 +21,13 @@
 -*/
 
 
-#ifndef PAUSESITEUTIL_H
-#define PAUSESITEUTIL_H
+#ifndef PHYLOTREE_CLASS_H
+#define PHYLOTREE_CLASS_H
 
 
-#include "Sequence.h"
-#include "MultipleSequenceAlignment.h"
-#include "Settings.h"
+
+#include "PhyloTreeNode.h"
+
 
 
 #include <string>
@@ -36,22 +36,33 @@
 
 using namespace std;
 
-// Contains information on a set of experimental observations
-class PauseSiteUtil {
 
-    static double TCC_THRESHOLD;
 
+class PhyloTree {
+
+
+    PhyloTreeNode* root;
+    string parseNewickRecurse(PhyloTreeNode* node, string newick);
+    string newick_str;
 
     public:
-
-        // Identify which sites in the selected sequences are pause sites, by comparing to a standard
-        static vector<bool>* identifyPauseSites(Sequence* seq, vector<double> timesToCatalysis);
-
-        // Evidence that each site is a pause site
-        static vector<int> calculateEvidence(MultipleSequenceAlignment* MSA);
+        PhyloTree();
 
 
+        string parseFromNexus(string nexus);
+        void clear();
+        vector<PhyloTreeNode*> getLeaves();
+        string get_newick_str();
+        PhyloTreeNode* getMRCA(PhyloTreeNode* node1, PhyloTreeNode* node2);
 
 };
 
+
+
+
 #endif
+
+
+
+
+

@@ -203,3 +203,15 @@ int Sequence::get_nsitesMSA(){
 string Sequence::get_MSAsequence(){
     return this->MSAsequence;
 }
+
+double Sequence::get_weight(){
+    return this->weight;
+}
+
+void Sequence::set_weight(double wgt){
+    this->weight = wgt;
+}
+
+
+
+

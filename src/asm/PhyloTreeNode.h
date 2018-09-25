@@ -21,35 +21,50 @@
 -*/
 
 
-#ifndef PAUSESITEUTIL_H
-#define PAUSESITEUTIL_H
-
+#ifndef PHYLOTREENODE_H
+#define PHYLOTREENODE_H
 
 #include "Sequence.h"
-#include "MultipleSequenceAlignment.h"
-#include "Settings.h"
 
 
 #include <string>
 #include <vector>
-#include <list>
 
 using namespace std;
 
-// Contains information on a set of experimental observations
-class PauseSiteUtil {
+// A leaf, root or internal vertex of a tree
+class PhyloTreeNode {
 
-    static double TCC_THRESHOLD;
+
+    PhyloTreeNode* parent;
+    PhyloTreeNode* leftChild;
+    PhyloTreeNode* rightChild;
+    string ID;
+    Sequence* sequence;
+
+    // Height of node and rate/time of incident branch
+    double rate;
+    double time;
 
 
     public:
 
-        // Identify which sites in the selected sequences are pause sites, by comparing to a standard
-        static vector<bool>* identifyPauseSites(Sequence* seq, vector<double> timesToCatalysis);
+        PhyloTreeNode();
 
-        // Evidence that each site is a pause site
-        static vector<int> calculateEvidence(MultipleSequenceAlignment* MSA);
 
+        void addChildren(PhyloTreeNode* left, PhyloTreeNode* right);
+        bool isLeaf();
+        bool isRoot();
+        Sequence* getSequence();
+        string getID();
+        void setID(string ID);
+        void parseNode(string newick);
+        void setSequence(Sequence* seq);
+
+        list<PhyloTreeNode*> getLeaves();
+        void print();
+        double getDistanceToRoot();
+        PhyloTreeNode* getParent();
 
 
 };

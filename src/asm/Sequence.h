@@ -79,6 +79,10 @@ class Sequence{
 		void print();
         string get_MSAsequence();
         void deconstructRateTable();
+        double get_weight();
+        void set_weight(double wgt);
+
+
 };
 
 #endif

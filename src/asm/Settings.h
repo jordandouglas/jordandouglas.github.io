@@ -33,6 +33,7 @@
 #include "SlippageLandscapes.h"
 #include "PosteriorDistributionSample.h"
 #include "MultipleSequenceAlignment.h"
+#include "PhyloTree.h"
 
 
 #include <random>
@@ -139,7 +140,7 @@ extern map<int, list<PosteriorDistributionSample*>> _gelPosteriorDistributions; 
 
 // PhyloPause
 extern MultipleSequenceAlignment* _PP_multipleSequenceAlignment;
-
+extern PhyloTree* _PP_tree;
 
 // Parameters
 extern Parameter *NTPconc;

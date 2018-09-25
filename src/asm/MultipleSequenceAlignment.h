@@ -29,6 +29,7 @@
 #include "Sequence.h"
 #include "Simulator.h"
 #include "Plots.h"
+#include "PhyloTree.h"
 
 
 #include <string>
@@ -57,6 +58,12 @@ class MultipleSequenceAlignment{
         void PhyloPause(Simulator* simulator, int* result);
         string getCurrentSequence();
         string pauseSites_toJSON();
+        vector<vector<bool>*> get_pauseSitesInAlignment();
+        Sequence* getSequenceAtIndex(int index);
+        void calculateLeafWeights(PhyloTree* tree);
+        string treeTipNamesAreConsistentWithMSA(PhyloTree* tree); // Check that the leaf sequence names are the same as those in the multiple sequence alignment
+        
+
 
 };
 

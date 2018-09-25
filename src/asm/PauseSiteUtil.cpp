@@ -78,3 +78,47 @@ vector<bool>* PauseSiteUtil::identifyPauseSites(Sequence* seq, vector<double> ti
 
 
 
+
+ vector<int> PauseSiteUtil::calculateEvidence(MultipleSequenceAlignment* MSA){
+
+
+    vector<vector<bool>*> pauseSites = MSA->get_pauseSitesInAlignment();
+
+    // Scale from 0 to 3 of evidence strength
+    vector<int> evidence(MSA->get_nsites());
+    
+
+    for (int alignment_index = 0; alignment_index < MSA->get_nsites(); alignment_index++){
+
+
+        
+
+
+        // Calculate phylogenetically weighted evidence that this site is a pause site
+        double evidenceAtSite = 0;
+        for (int sequence_index = 0;  sequence_index < MSA->get_nseqs(); sequence_index++){
+
+
+            //cout << "alignment_index " << alignment_index << " sequence_index " << sequence_index << endl;
+            Sequence* seq = MSA->getSequenceAtIndex(sequence_index);
+
+            if (pauseSites.at(sequence_index) == nullptr || pauseSites.at(sequence_index) == NULL) continue;
+
+            if (pauseSites.at(sequence_index)->at(alignment_index)) {
+                evidenceAtSite += seq->get_weight();
+            }
+        }
+
+        evidenceAtSite = evidenceAtSite; // /MSA->get_nseqs();
+        evidence.at(alignment_index) = evidenceAtSite < 0.5 ? 0 : evidenceAtSite < 1 ? 1 : 2;
+
+    }
+
+
+
+    return evidence;
+
+
+ }
+
+
