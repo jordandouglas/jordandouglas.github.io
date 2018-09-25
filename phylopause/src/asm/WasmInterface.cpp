@@ -161,7 +161,7 @@ extern "C" {
         _PP_multipleSequenceAlignment->calculateLeafWeights(_PP_tree);
 
 
-        messageFromWasmToJS("{'newick':'" + _PP_tree->get_newick_str() + "'}", msgID);
+        messageFromWasmToJS("{'newick':'" + _PP_tree->getNewick() + "'}", msgID);
 
     }
 

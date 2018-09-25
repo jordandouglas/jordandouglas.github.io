@@ -31,13 +31,15 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" type="text/css" href="../src/Resources/phylo.css">
 <script language='JavaScript' type='text/JavaScript' src="../src/Resources/mersenne-twister.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Resources/jsPhyloSVG/raphael-min.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Resources/jsPhyloSVG/jsphylosvg-min.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="../src/Resources/jquery-3.1.1.min.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/Alignment.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/PhyloPause.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/Session.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/PhyloTree.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/WebWorkerMessager.js"></script>
-<script type="text/javascript" src="../src/Resources/gifplayer-master/dist/jquery.gifplayer.js"></script>
+
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -88,6 +90,11 @@ function init(){
 
     var registerWW = () => new Promise((resolve) => register_WebWorker(resolve));
     registerWW().then(() => toDoAfterWWRegistration());
+
+
+
+
+            
 
 }
 
@@ -326,6 +333,8 @@ function getLoaderTemplate(id, msg = ""){
 					</div>
 				</div>
 
+                    
+
 
 
 
@@ -412,6 +421,45 @@ function getLoaderTemplate(id, msg = ""){
 
 
 
+
+
+             
+            <br><br>
+
+            <div  class="panelOuter" style=" margin-left:50px; margin-right:50px">
+                <div class="panelInner">
+
+                    <span class="noselect"  style="font-size:18px; font-family:Bookman;">
+                        <input type=button id='treeSectionBtn' class='minimise' value='+' onClick="minimiseSection(this)">
+                        <b style="color:#0B522D">Phylogenetic tree </b>
+
+                        <div id="treeSection" style="display:none; padding: 20 20">
+
+
+
+                               <div class="beforeUploadingTree"> 
+                                    No tree available.
+                               </div>
+                                    
+
+                              <div style="display:none" id="svgCanvas" class="uploadTreeFirst"> 
+
+
+                              </div>
+
+                             
+
+
+                        </div>
+
+                    </span>
+                    
+
+                </div>
+            </div>
+
+
+   
 
    
 

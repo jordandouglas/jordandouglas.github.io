@@ -17,9 +17,3 @@ emcc -s WASM=1 -o simpol_asm.html -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', '
 
 
 
-
-
-emcc -s WASM=1 -o simpol_asm.html -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'Pointer_stringify']" -s -O1 -O2 -O3 -std=c++11 -fpermissive  -s ALLOW_MEMORY_GROWTH=1 -s WASM_MEM_MAX=1073741824 -s NO_EXIT_RUNTIME=1 WasmInterface.cpp ../../../src/asm/cimpol.cpp ../../../src/asm/MultipleSequenceAlignment.cpp ../../../src/asm/PauseSiteUtil.cpp ../../../src/asm/WasmMessenger.cpp  ../../../src/asm/Plots.cpp ../../../src/asm/Sequence.cpp ../../../src/asm/Parameter.cpp ../../../src/asm/HTMLobject.cpp ../../../src/asm/Coordinates.cpp ../../../src/asm/MCMC.cpp ../../../src/asm/ExperimentalData.cpp ../../../src/asm/Polymerase.cpp ../../../src/asm/PosteriorDistributionSample.cpp ../../../src/asm/XMLparser.cpp ../../../src/asm/Model.cpp ../../../src/asm/Simulator.cpp ../../../src/asm/GelCalibrationSearch.cpp  ../../../src/asm/State.cpp ../../../src/asm/Settings.cpp ../../../src/asm/FreeEnergy.cpp ../../../src/asm/PlotSettings.cpp ../../../src/asm/SlippageLandscapes.cpp ../../../src/asm/ParameterHeatmapData.cpp ../../../src/asm/TranslocationRatesCache.cpp ../../../src/asm/randomc/mersenne.cpp ../../../src/asm/tinyxml/tinystr.cpp ../../../src/asm/tinyxml/tinyxml.cpp ../../../src/asm/tinyxml/tinyxmlerror.cpp ../../../src/asm/tinyxml/tinyxmlparser.cpp ../../../src/asm/SimulatorPthread.cpp ../../../src/asm/SimulatorResultSummary.cpp ../../../src/asm/BayesianCalculations.cpp ../../../src/asm/GelLaneData.cpp  ../../../src/asm/PhyloTree.cpp ../../../src/asm/Vienna.bc ../../../src/asm/bendit.bc
-
-
-

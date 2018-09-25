@@ -83,7 +83,7 @@ function parseTree(nexus_str){
             });
 
             // Draw the tree
-            renderTree(); 
+            renderTree(parseResult.newick); 
 
         }
 
@@ -105,12 +105,65 @@ function parseTree(nexus_str){
 
 
 
-// Draw the tree
-function renderTree(resolve = function() { }){
+// Draw the tree using the jsPhyloSVG libary
+// http://www.jsphylosvg.com/
+// https://github.com/guyleonard/jsPhyloSVG
+// Smits SA, Ouverney CC, 2010. jsPhyloSVG: A Javascript Library for Visualizing Interactive and Vector-Based Phylogenetic Trees on the Web. PLoS ONE 5(8): e12267. doi:10.1371/journal.pone.0012267
+
+
+function renderTree(newick, resolve = function() { }){
 
     
-    console.log("renderTree");
+    console.log("renderTree", newick);
+
+
+
+
+    var dataObject = { newick: newick + ";" };
+    phylocanvas = new Smits.PhyloCanvas(
+        dataObject,
+        'svgCanvas', 
+        1500, 1000
+    );
+
+
+    console.log("phylocanvas", phylocanvas);
+
+
+
 
     resolve();
 
 }
+
+
+Smits.PhyloCanvas.Render.Style = {
+    line: {
+        "stroke":       '#0B522D',
+        "stroke-width": 2
+    },
+    text: {
+        "font-family":  'Arial',
+        "font-size":    14,
+        "text-anchor":  'start'
+    },
+    path: {
+        "stroke":       '#0B522D',
+        "stroke-width": 3   
+    },
+    connectedDash : {
+        "stroke":           '#0B522D',
+        "stroke-dasharray": ". "
+    },
+    textSecantBg : {
+        "fill":     '#A5CF19',
+        "stroke":   '#A5CF19'
+    },
+    highlightedEdgeCircle : {
+        "fill":     '#A5CF19'
+    },
+    barChart : {
+        fill:       '#003300',
+        stroke:     '#DDD'
+    }
+}       
