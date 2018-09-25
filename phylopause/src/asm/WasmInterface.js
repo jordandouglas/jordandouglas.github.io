@@ -200,6 +200,38 @@ parseMSA = function(fasta, msgID = null){
 }
 
 
+// Get the weight of each sequence
+getSequenceWeights = function(msgID = null){
+
+    // Create the callback function
+    var toDoAfterCall = function(resultStr){
+        if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+    }
+    WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+    
+    Module.ccall("getSequenceWeights", null, ["number"], [msgID]);
+
+}
+
+
+
+
+
+// Parse a tree in .nexus format
+parseTree = function(nexus, msgID = null){
+
+    // Create the callback function
+    var toDoAfterCall = function(resultStr){
+        if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+    }
+    WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+    
+    Module.ccall("parseTree", null, ["string", "number"], [nexus, msgID]);
+}
+
+
 
 
 

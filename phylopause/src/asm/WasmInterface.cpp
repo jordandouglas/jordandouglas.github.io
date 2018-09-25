@@ -28,7 +28,8 @@
 #include "../../../src/asm/TranslocationRatesCache.h"
 #include "../../../src/asm/Plots.h"
 #include "../../../src/asm/MultipleSequenceAlignment.h"
-
+#include "../../../src/asm/PauseSiteUtil.h"
+#include "../../../src/asm/PhyloTree.h"
 
 
 #include <emscripten.h>
@@ -75,6 +76,7 @@ extern "C" {
 		_USING_GUI = true;
         _animationSpeed = "hidden";
         _PP_multipleSequenceAlignment = new MultipleSequenceAlignment();
+        _PP_tree = new PhyloTree();
 
 	}
 
@@ -137,9 +139,62 @@ extern "C" {
 
 
 
+    // Parse a tree from a nexus string
+    void EMSCRIPTEN_KEEPALIVE parseTree(char* nexus, int msgID){
+
+
+        _PP_tree->clear();
+
+        // Parse each sequence in the multiple sequence alignment
+        string errorMsg = _PP_tree->parseFromNexus(string(nexus));
+        if (errorMsg != "") messageFromWasmToJS("{'error':'" + errorMsg + "'}", msgID);
+
+
+        errorMsg = _PP_multipleSequenceAlignment->treeTipNamesAreConsistentWithMSA(_PP_tree);
+        if (errorMsg != "") {
+            _PP_tree->clear();
+            messageFromWasmToJS("{'error':'" + errorMsg + "'}", msgID);
+        }
+
+
+        // Recompute the sequence weights
+        _PP_multipleSequenceAlignment->calculateLeafWeights(_PP_tree);
+
+
+        messageFromWasmToJS("{'newick':'" + _PP_tree->get_newick_str() + "'}", msgID);
+
+    }
+
+
+
+
+    // Get the weight of each sequence
+    void EMSCRIPTEN_KEEPALIVE getSequenceWeights(int msgID){
+        messageFromWasmToJS(_PP_multipleSequenceAlignment->toJSON(), msgID);
+    }
+
+
+
+
+
     // Return a JSON string of the cumulatively calculated pause sites
     void EMSCRIPTEN_KEEPALIVE getPauseSites(int msgID){
-        messageFromWasmToJS(_PP_multipleSequenceAlignment->pauseSites_toJSON(), msgID);
+
+        string JSON = "{'evidence':[";
+        vector<int> evidence = PauseSiteUtil::calculateEvidence(_PP_multipleSequenceAlignment);
+        for(int i = 0; i < evidence.size(); i ++){
+            JSON += to_string(evidence.at(i));
+            if (i < evidence.size() - 1) JSON += ",";
+        }
+
+
+        JSON += "],'pauseSites':";
+        JSON += _PP_multipleSequenceAlignment->pauseSites_toJSON();
+        JSON += "}";
+
+
+
+        messageFromWasmToJS(JSON, msgID);
     }
 
 
@@ -150,7 +205,7 @@ extern "C" {
 
 
         if (init) {
-            cout << "Intialising startPhyloPause" << endl;
+            cout << "Intialising PhyloPause" << endl;
             if (_interfaceSimulator != nullptr) delete _interfaceSimulator;
             _interfaceSimulator = new Simulator();
             _GUI_STOP = false;

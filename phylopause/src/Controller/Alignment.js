@@ -160,15 +160,53 @@ function renderAlignment(resolve = function() { }){
 }
 
 
+
+
+
+// Update the sequence weights with the appropriate values
+function renderSequenceWeights(resolve = function() { }){
+
+    getSequenceWeights_controller(function(result){
+
+        console.log("result", result);
+
+        NUCLEOTIDE_ALIGNMENT = result.alignment;
+        NUCLEOTIDE_ALIGNMENT_NSITES = result.nsites;
+        NUCLEOTIDE_ALIGNMENT_NSEQS = result.nseqs;
+
+        for (var acc in NUCLEOTIDE_ALIGNMENT){
+
+            // Change the weight html
+            var seq = NUCLEOTIDE_ALIGNMENT[acc];
+            var row = $(`[rowid="` + acc.substr(1) + `"]`);
+            var weight_element = row.children(`[colid="wgt"]`);
+
+
+            var weight = roundToSF(parseFloat(seq.weight), 2);
+            weight_element.html(weight);
+
+
+        }   
+
+        resolve();
+
+    });
+
+}
+
+
 // Add pause sites to the multiple sequence alignment on the DOM
 renderPauseSitesOnAlignment = function(){
 
 
 
-    getPauseSites_controller(function(pauseSites){
+    getPauseSites_controller(function(result){
 
 
-       // console.log("pauseSites", pauseSites);
+        console.log("result", result);
+        var pauseSites = result.pauseSites;
+
+        // Plot whether each cell is a pause site or not
         for (var acc in pauseSites){
 
             var row = $(`[rowid="` + acc.substr(1) + `"]`);
@@ -185,14 +223,25 @@ renderPauseSitesOnAlignment = function(){
                 site.addClass("nucleotideHighlighted");
 
 
-                $("#e" + siteNum).html("*");
+
                 
             }
 
 
-
         }
 
+
+        // Pause site evidence
+        for (var i = 0; i < result.evidence.length; i ++){
+
+            var siteNum = i + 1;
+            if (result.evidence[i] == 1) $("#e" + siteNum).html("*");
+            else if (result.evidence[i] == 2) $("#e" + siteNum).html(`*<br style="line-height:10px">*`);
+            else $("#e" + siteNum).html("");
+
+
+
+        }
 
     });
 
@@ -254,9 +303,9 @@ function getMSArowTemplate(name, weight, seq){
 
 
 	var row = `
-
+    
 		<tr rowid="` + name + `">
-			<td style="font-size:16px; text-align:center; color:#808D82;">` + weight + `<td>
+			<td style="font-size:16px; text-align:center; color:#808D82;" colid="wgt">` + weight + `<td>
 			<td style="font-size:16px; text-align:right"> ` + name + `&nbsp;&nbsp;</td> 
 
 	`;
@@ -286,3 +335,5 @@ function getMSArowTemplate(name, weight, seq){
 
 
 } 
+
+

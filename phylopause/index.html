@@ -35,6 +35,7 @@
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/Alignment.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/PhyloPause.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/Session.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/PhyloTree.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/WebWorkerMessager.js"></script>
 <script type="text/javascript" src="../src/Resources/gifplayer-master/dist/jquery.gifplayer.js"></script>
 
@@ -117,7 +118,45 @@ function minimiseSection(element, setTo = null){
 }
 
 
+function log(num, base = null){
+    
+    if (num == 0) return 0;
+    if (base == null) return Math.log(Math.abs(num));
+    return Math.log(Math.abs(num)) / Math.log(base);
+    
+    
+}
 
+
+
+function roundToSF(val, sf=2, ceilOrFloor = "none"){
+    
+    var magnitude = Math.floor(log(val, 10));
+
+
+    if (val < 0 && ceilOrFloor == "ceil") ceilOrFloor = "floor";
+    else if (val < 0 && ceilOrFloor == "floor") ceilOrFloor = "ceil";
+
+    var num = val * Math.pow(10, sf-magnitude);
+    if (ceilOrFloor == "ceil") num = Math.ceil(num)
+    else if (ceilOrFloor == "floor") num = Math.floor(num)
+    else num = Math.round(num);
+
+    num = num * Math.pow(10, magnitude-sf);
+    
+    // Sometimes this picks up a trailing .00000000001 which we want to remove
+
+    var expectedStringLength = 0;
+    if (magnitude >= 0) expectedStringLength = magnitude >= sf ? magnitude+1 : sf+2; // Add 1 for the decimal point
+    else expectedStringLength = 2 -magnitude + sf;
+    if (num < 0) expectedStringLength++; // Also need the negative symbol
+
+
+    num = parseFloat(num.toString().substring(0, expectedStringLength+1));
+    
+    return num;
+        
+}
 
 function getLoaderTemplate(id, msg = ""){
 	return `
@@ -236,11 +275,20 @@ function getLoaderTemplate(id, msg = ""){
 								
 								<div style="font-size:20px"> 2. Upload a tree (optional) 
 
-									<span id="uploadTreeTick" class="greenTick" style="display:none" title="Successful upload"> &#10004; </span>
-									<input type=button id='uploadTreeBtn' onClick=uploadTree() value='Select file' title=".nexus" class="operation" style="z-index: 100; float:right; width:100px"> 
-								<br><br></div>
+									<span class="uploadTreeFirst greenTick" style="display:none" title="Successful upload"> &#10004; </span>
+									<input type=button id='uploadTreeBtn' onClick=uploadTree() value='Select file' title=".nexus, .nxs, .nex" class="operation" style="z-index: 100; float:right; width:100px"> 
+                                    <input style="display:none" type="file" id="uploadTree" accept=".nexus, .nex, .nxs"> 
 
-								Upload a phylogenetic tree containing all the leaves in the above alignment in .nexus format.
+                                <br><br></div>
+
+                                        
+                                <div style="display:none" class="uploadTreeFirst"> Tree successfully uploaded. </div>
+
+                                        
+                                 <div class="beforeUploadingTree"> 
+                                    Upload a phylogenetic tree containing all the leaves in the above alignment in .nexus format.
+                                </div>
+								
 
 
 							</div>

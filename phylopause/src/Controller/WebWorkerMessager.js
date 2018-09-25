@@ -349,6 +349,39 @@ function parseMSA_controller(fasta, resolve = function(x) { }){
 }
 
 
+function parseTree_controller(nexus, resolve = function(x) { }){
+
+
+    if (WEB_WORKER_WASM != null) {
+
+        var res = stringifyFunction("parseTree", [nexus], true);
+        var fnStr = "wasm_" + res[0];
+        var msgID = res[1];
+        var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+        toCall().then((result) => resolve(result));
+
+
+    }
+    
+}
+
+
+function getSequenceWeights_controller(resolve = function(){ }){
+
+
+    if (WEB_WORKER_WASM != null) {
+
+        var res = stringifyFunction("getSequenceWeights", [], true);
+        var fnStr = "wasm_" + res[0];
+        var msgID = res[1];
+        var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+        toCall().then((result) => resolve(result));
+
+
+    }
+
+
+}
 
 
 
