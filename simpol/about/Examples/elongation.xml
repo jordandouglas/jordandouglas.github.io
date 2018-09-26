@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<session datetime="2018_2_25-17.26.46" N="100" speed="medium">
+	<sequence seqID="Buchnera aphidicola murC1 EU274658" TemplateType="dsDNA" PrimerType="ssRNA" seq="GGAAGACTATTAGGTCTTTAATATCGTCGATTTTTTTTTTGTAAGGATATGATAATTCTCGACTTTA" />
+	<plots hidden="false">
+		<plot1 name="distanceVsTime" plotFunction="plotTimeChart" xRange="automaticX" yRange="automaticY" />
+		<plot2 name="velocityHistogram" plotFunction="plot_velocity_distribution" displayBottomProportionOf="1" windowSize="1" xRange="automaticX" timeSpaceX="linearSpace" timeSpaceY="linearSpace" />
+		<plot3 name="pauseHistogram" plotFunction="plot_pause_distribution" displayBottomProportionOf="1" perTime="perCatalysis" xRange="0,1" timeSpaceX="null" timeSpaceY="null" />
+	</plots>
+	<elongation-model id="simpleBrownian">
+		<allowBacktracking val="false" />
+		<allowHypertranslocation val="false" />
+		<allowInactivation val="false" />
+		<allowBacktrackWithoutInactivation val="false" />
+		<deactivateUponMisincorporation val="false" />
+		<allowGeometricCatalysis val="false" />
+		<allowmRNAfolding val="false" />
+		<allowMisincorporation val="false" />
+		<useFourNTPconcentrations val="false" />
+		<NTPbindingNParams val="2" />
+		<assumeBindingEquilibrium val="true" />
+		<currentTranslocationModel val="sealingBarriers" />
+		<assumeTranslocationEquilibrium val="false" />
+	</elongation-model>
+	<parameters>
+		<NTPconc val="1000" distribution="Fixed" fixedDistnVal="1000">[NTP] (μM)</NTPconc>
+		<FAssist val="0" distribution="Fixed" fixedDistnVal="0" uniformDistnLowerVal="-10" uniformDistnUpperVal="30">Force  (pN)</FAssist>
+		<hybridLen val="9" distribution="Fixed" fixedDistnVal="9">Hybrid length (bp)</hybridLen>
+		<bubbleLeft val="2" distribution="Fixed" fixedDistnVal="2">Bubble length left (bp)</bubbleLeft>
+		<bubbleRight val="1" distribution="Fixed" fixedDistnVal="1">Bubble length right (bp)</bubbleRight>
+		<GDagSlide val="9" distribution="Fixed" fixedDistnVal="9" uniformDistnLowerVal="9" uniformDistnUpperVal="15">ΔΔG†t</GDagSlide>
+		<DGPost val="-2" distribution="Fixed" fixedDistnVal="-2" uniformDistnLowerVal="-4" uniformDistnUpperVal="4">ΔΔGt1</DGPost>
+		<barrierPos val="1.7" distribution="Fixed" fixedDistnVal="1.7" uniformDistnLowerVal="0" uniformDistnUpperVal="3.4" normalSdVal="0.4">Barrier height position </barrierPos>
+		<kCat val="30" distribution="Fixed" fixedDistnVal="30" uniformDistnLowerVal="0" uniformDistnUpperVal="100" normalSdVal="5" lognormalMeanVal="3.454" lognormalSdVal="0.587">Rate of catalysis (s⁻¹)</kCat>
+		<Kdiss val="35" distribution="Fixed" fixedDistnVal="35" uniformDistnLowerVal="0" uniformDistnUpperVal="100" lognormalMeanVal="3.454" lognormalSdVal="0.587">KD (μM)</Kdiss>
+		<arrestTime val="60" distribution="Fixed" fixedDistnVal="60">Arrest timeout  (s)</arrestTime>
+	</parameters>
+	<ABC inferenceMethod="undefined" ntrials="undefined" testsPerData="undefined" showRejectedParameters="false" />
+</session>
