@@ -84,6 +84,31 @@ function init(){
 
         // Upload the default session file
         loadSessionFromURL("phylopause.xml");
+
+
+
+        if (location.href.indexOf("?") != -1){
+            
+            var search = location.search.substring(1);
+            var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+
+            console.log("JSONurl", JSONurl);
+
+            // Load alignment first
+            if (JSONurl.a != null){
+
+                var alignmentURL = "http://www.polymerase.nz/phylopause/about/Examples/" + JSONurl.a;
+                uploadAlignmentFromURL(alignmentURL, function() {
+
+
+
+                });
+            }
+
+            
+        }
+
+            
             
     }
 

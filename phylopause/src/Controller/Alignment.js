@@ -29,6 +29,35 @@ NUCLEOTIDE_ALIGNMENT_NSEQS = 0;
 
 
 
+
+
+
+
+
+
+// Upload an alignment from a URL
+function uploadAlignmentFromURL(url, resolve = function() { }){
+    
+    console.log("Trying to open", url);
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          
+            if (xhttp == null || xhttp.responseXML == "") return;
+            
+            parseAlignment(xhttp.responseText, resolve);
+           
+        }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.send();
+    
+    
+}
+
+
+
+
 // Upload an alignment
 function uploadAlignment(fileLocation = null){
 	
@@ -68,7 +97,7 @@ function uploadAlignment(fileLocation = null){
 
 
 
-function parseAlignment(align_str){
+function parseAlignment(align_str, resolve = function() { }){
 
 
 
@@ -97,7 +126,7 @@ function parseAlignment(align_str){
          
 
             renderAlignment(); 
-
+            resolve();
          
 
 
