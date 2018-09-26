@@ -101,6 +101,16 @@ function init(){
                 uploadAlignmentFromURL(alignmentURL, function() {
 
 
+                    // Check if there is a tree
+                    if (JSONurl.t != null){
+
+                        var treeURL = "http://www.polymerase.nz/phylopause/about/Examples/" + JSONurl.t;
+                        uploadTreeFromURL(treeURL, function() {
+
+
+                        });
+
+                    }
 
                 });
             }
