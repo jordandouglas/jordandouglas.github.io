@@ -2723,11 +2723,11 @@ function sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab = "
 			// Add x axis labels
 			ctx.globalAlpha = 1;
 			if (site == hoverOver) ctx.font = "bold " + canvasSizeMultiplier * 30 + "px Courier";
-			else ctx.font = "bold " + canvasSizeMultiplier * 22 + "px Courier";
+			else ctx.font = "bold " + canvasSizeMultiplier * 20 + "px Courier";
 			
 			ctx.textAlign="center"; 
 			ctx.textBaseline="top"; 
-			ctx.fillText(baseName, xVal + baseHeight/2, canvas.height - axisGap);
+			ctx.fillText(baseName, xVal + baseHeight/2, canvas.height - axisGap + 5);
 			
 
 		}
