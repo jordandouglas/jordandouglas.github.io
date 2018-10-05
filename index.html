@@ -1,8 +1,8 @@
-
-<!--
-    --------------------------------------------------------------------
-    --------------------------------------------------------------------
-    This file is part of SimPol.
+﻿
+<!-- 
+	--------------------------------------------------------------------
+	--------------------------------------------------------------------
+	This file is part of SimPol.
 
     SimPol is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,29 +20,72 @@
     --------------------------------------------------------------------
 -->
 
+  
 
 
 
 <html>
 <head>
-<title>Polymerase online</title>
-<!--<link rel="icon" href="../src/Images/transcribe.png">-->
+<title>SimPol</title>
+
+<link rel="icon" href="../src/Images/transcribe.png">
 <meta name="viewport" content="width=device-width, initial-scale=0.41, maximum-scale=1" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rel="stylesheet" type="text/css" href="src/Resources/styles.css">
-<script language='JavaScript' type='text/JavaScript' src="src/Resources/jquery-3.1.1.min.js"></script>
+<meta name="Simpol" content="An interactive graphical simulator of nucleic acid polymerases. Contains JavaScript implementations of kinetic models of transcription elongation.">
+<link rel="stylesheet" type="text/css" href="../src/Resources/styles.css">
+
+<script language='JavaScript' type='text/JavaScript' src="../src/Resources/mersenne-twister.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Resources/jstat.min.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Resources/random.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Resources/XMLWriter-master/XMLWriter.js"></script>
+<script language='JavaScript' type="text/javascript" src="../src/Resources/xml_for_script-3.1/jsXMLParser/xmlsax.js"></script>
+<script language='JavaScript' type="text/javascript" src="../src/Resources/hammer.js"></script>
 
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      processEscapes: true
-    }
-  });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script language='JavaScript' type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/2.3.3/fabric.min.js"></script>
 
+
+
+
+<!--<script language='JavaScript' type='text/JavaScript' src='src/Resources/d3.v4.min.js'></script> -->
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<!--<script language='JavaScript' type='text/JavaScript' src='http://d3js.org/d3.v4.min.js'></script> -->
+<!-- <script language='JavaScript' type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.bundle.min.js"></script> -->
+<script language='JavaScript' type="text/javascript" src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.js"></script>
+<script language='JavaScript' type="text/javascript" src ="https://rawgit.com/eligrey/canvas-toBlob.js/master/canvas-toBlob.js"></script>
+
+
+<script language='JavaScript' type='text/JavaScript' src="../src/Resources/jquery-3.1.1.min.js"></script>
+<!--<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>-->
+
+
+
+<script language='JavaScript' type='text/JavaScript' src="../src/Model/WebWorker.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Model/sequences.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Model/freeEnergy.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Model/parameters.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Model/operators.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Model/simulator.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Model/plots.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Model/MFE.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Model/ABC.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Model/MCMC.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Model/stateEncoding.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="../src/Model/XMLparser.js"></script>
+
+
+<!--<script language='JavaScript' type='text/JavaScript' src="src/Controller/webassembly.js"></script>-->
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/WebWorkerMessager.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/plots.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/freeEnergy.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/parameters.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/controller.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/MFE.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/navigationPanel.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/ABC.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/ModelComparison.js"></script>
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -55,17 +98,1155 @@
 
 </script>
 
+<!--<script async type="text/javascript" src="src/asm/simpol_asm.js"></script>-->
+
+
+
+
 
 <script language='JavaScript' type='text/JavaScript'>
 
 
+// Select all text upon focusing on an input
+/*
+$(function(){
+    $(document).on('focus','input[type=number]',function(){ 
+    	document.getSelection().removeAllRanges();
+    	this.select(); 
+  	});
+});
+$(function(){
+    $(document).on('blur','input[type=number]',function(){ document.getSelection().removeAllRanges(); });
+});
+*/
+
+
 function init(){
+	
+	/*
+	$( "#bases" ).resizable({
+    	minHeight: 250,
+    	maxHeight: 600,
+    	minWidth: "100%",
+    	maxWidth: "100%"
+  	});
+	*/
+	// jstat library for gamma   - http://wiki.q-researchsoftware.com/wiki/Accessing_Common_Distributions_When_Writing_JavaScript_in_Q#Density_7				
+	//	 - https://github.com/jstat/jstat
+
+
+	nrefreshes = 1;
+
+
+	try{
+
+		
+		msgID_simulation = null;
+		simulationRenderingController = false;
+		simulating = false;
+		running_ABC = false;
+		$("#nbasesToSimulate").val(30);
+		$("#translocationSummaryContainer").hide(100);
+		$("#currentTranslocationModel").val("HIBU_barriers");
+		maxHeight = 10000;
+		nTimes20SequencesToDisplay = 1;
+
+		NTPtoAdd = "A";
+		mersenneTwister = new MersenneTwister();
+
+
+		ABClines = [];
+		ABClinesAcceptedOnly = [];
+		nTimes30ABCrowsToDisplay = 1;
+
+
+		hideSlip = [true];
+		hideTSlip = true;
+		hideBind = true;
+		hidePause = true;
+
+		renderingObjects = false;
+		WEB_WORKER = null;
+
+
+		USE_WASM = false;
+		USE_WASM = true;
+
+		// Use webassembly? Defaults to false unless specified in url
+		if (location.href.indexOf("?") != -1){
+			var search = location.search.substring(1);
+			var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
+
+			if (JSONurl.wasm != null){
+				USE_WASM = JSONurl.wasm == "true";
+			}
+		}
+
+		addWebworkerRegistrationHTML();
+
+		var toDoAfterWWRegistration = function(){
+
+
+			ANIMATION_TIME_controller = 1;
+
+			wait = (time) => new Promise((resolve) => setTimeout(resolve, time));
+			renderGraphicsEveryNsteps = 20;
+			actionsUntilNextUpdate = renderGraphicsEveryNsteps;
+
+			initPlots();
+			$("#PreExp").val("medium");
+			SPEED_controller = $("#PreExp").val();
+			displayTP = true;
+			ALLOW_ANIMATIONS = true;
+			simulatedInsertDistribution = [];
+			setSequenceOptions(function() {
+
+
+				setModelOptions();
+				dontAddLoadingHTML = false;
+				
+				
+
+				// Load a session specified in the url
+				if (location.href.indexOf("?") != -1){
+					
+					var search = location.search.substring(1);
+					var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
+
+					if (JSONurl.s != null){
+						var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/" + JSONurl.s;
+						var toDoAfterLoadSession = function() {
+							
+							if (JSONurl.p != null){
+								
+								var posteriorFileLocation = "http://www.polymerase.nz/simpol/about/Examples/" + JSONurl.p;
+								uploadABCFromURL(posteriorFileLocation);
+							}
+							
+						};
+
+
+						loadSessionFromURL(sessionFileLocation, toDoAfterLoadSession);
+					}
+
+					else userChangeSequence();
+
+					
+				}else{
+					userChangeSequence();
+				}
+
+				terminatedSequences = [];
+				maxNumberTerminatedSequences = 200;
+				largestTerminatedSequence = null;
+				terminationInsertPositions = [];
+				numSeqsDisplayed = 0;
+				basesToDisplayTimes100 = 1;
+				//refreshNTP();
+
+
+
+
+
+				removeWebworkerRegistrationHTML();
+				movedToolbarRight = true;
+
+
+
+				if(WEB_WORKER_WASM != null) populatePolymeraseDropdown();
+
+				IS_MOBILE = false; 
+				IS_MOBILE = (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent) 
+		   			 || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0,4)));
+
+					 
+				// On desktop make the toolbar draggable
+				if (!IS_MOBILE){
+					//$("#theToolbar").draggable({
+						//containment: "#main",
+						//cursor: "crosshair"
+					//});
+				}
+				
+				// On a mobile device make the toolbar static
+				else{
+					$("#theToolbar").css("position", "absolute");
+					//$("#theToolbar").css("top", "180px");
+				}
+					 
+
+		   		// Add swiping support esp. for mobile devices using hammer.js library
+		   		if (IS_MOBILE){
+			   		var myElement = document.getElementById('mySidenav');
+					var mc = new Hammer(myElement);
+					mc.on("swipeleft", function(ev) { // Close the navigation menu when it is swiped
+					   	closeNav();
+					});
+				}
+
+
+				barchart(true);
+				initABCpanel();
+				initModelComparisonpanel();
+				callWebWorkerFunction(stringifyFunction("WW_JS.refresh_WW", []));
+			});
+		
+
+		};
+		var registerWW = () => new Promise((resolve) => register_WebWorker(resolve));
+		registerWW().then(() => toDoAfterWWRegistration());
+
+
+		// Load in the webassembly code
+		//$.getScript('src/asm/simpol_asm.js', function()
+		//{
+		    //initWebAssembly();
+		//});
+
+
+		
+		
+	}catch(e){
+	
+		console.log("Caught error:", e);
+		$("#badBrowser").show(true);
+		return;
+		
+		
+	}
+
+
+
+}
+
+
+
+
+function minimiseSection(element, setTo = null){
+
+	var toHide = $(element).attr("id");
+	toHide = toHide.substring(0, toHide.length-3); // Remove 'Btn' from the end
+	//console.log(toHide);
+
+	
+	if(setTo == false || (setTo == null && $(element).attr("disp") == "false")){
+		$(element).html("&plus;")
+		$("#" + toHide).hide(setTo == null ? 0 : 0);
+		$(element).attr("disp", true);
+	}
+	else{
+		$(element).html("&minus;")
+		$("#" + toHide).show(setTo == null ? 0 : 0);
+		$(element).attr("disp", false);
+	}
+
+}
+
+
+function addSequenceLoadingHTML(){
+
+	dontAddLoadingHTML = false;
+
+	// Don't add it straight away - wait a little bit first in case the sequence loads very fast
+	var addHTML = function(){
+
+		if (dontAddLoadingHTML) return;
+
+		var xPos = 380 + ($("#bases").scrollLeft() == null ? 0 : $("#bases").scrollLeft());
+
+		var html = `
+			<div id="sequnceLoadingNotification" style="position:absolute; padding:5 5; left:` + xPos + `px; top:130px; background-color:#FFFFB2;; zIndex=2; text-align:center">
+				&#10711; Loading sequence &#10711;
+			</div>
+		`;
+
+		$("#bases_container").append(html);
+	};
+	wait(50).then(() => addHTML());
+
+
+}
+
+
+function removeSequenceLoadingHTML(){
+	dontAddLoadingHTML = true;
+	$("#sequnceLoadingNotification").remove();
+}
+
+
+
+
+function addWebworkerRegistrationHTML(){
+
+
+	var msg = USE_WASM ? "Instantiating WebAssembly" : "Establishing Web Worker";
+
+	var html = `
+		<div id="registerWW" style="position:absolute; padding:5 5; left: 380px; top:130px; background-color:#FFFFB2;; zIndex=2; text-align:center">
+			&#10711; ` + msg + ` &#10711;
+		</div>
+	`;
+
+	$("#bases_container").append(html);
+
+	$(".toolbar").hide(true);
+
+}
+
+
+function removeWebworkerRegistrationHTML(){
+	$("#registerWW").remove();
+	$(".toolbar").show(true);
+}
+
+
+
+
+function setSequenceOptions(callback = function() { }){
+
+
+	getAllSequences_controller(function(all_sequences){
+
+		var dropdown = document.getElementById('SelectSequence');
+		$("#SelectSequence").empty();
+		console.log("Adding sequences", all_sequences);
+		for (var seq in all_sequences){
+			var opt = document.createElement('option');
+			opt.value = seq;
+			opt.innerHTML = seq;
+			dropdown.appendChild(opt);
+		}
+		
+		var opt = document.createElement('option');
+		opt.value = "$user";
+		opt.innerHTML = "Input sequence...";
+		dropdown.appendChild(opt);
+
+
+		callback();
+
+	});
+	
+}
+
+
+function submitCustomSequence(resolveAfterRefresh = function() { }){
+
+
+	var newSeq = $("#UserSequence").val().replace(/\n/g,'');
+	if (newSeq == "") return;
+
+
+	stop_controller(function() {
+
+
+		var templateType = $("#SelectTemplateType").val();
+		var primerType = $("#SelectPrimerType").val();
+		var inputSequenceIsNascent = $('input[name="inputSeqType"][value="inputNascentSeq"]').prop("checked");
+		showFoldedRNA_controller(false);
+		
+
+		var toCall = (newSequenceID, newTemplateType, newPrimerType) => new Promise((resolve) => userInputSequence_controller(newSequenceID, newTemplateType, primerType, inputSequenceIsNascent, resolve));
+		toCall(newSeq, templateType, primerType, inputSequenceIsNascent).then((result) => {
+
+			if (!result.succ) return;
+
+			var refr = () => new Promise((resolve) => refresh(resolve));
+			var sequenceChangeRefreshTemp = function(){
+				sequenceChangeRefresh();
+				refreshPlotDataSequenceChangeOnly_controller(function(){
+
+					$("#translocationSummaryContainer").hide(100);
+					$("#ABCoutput").html("");
+					$("#downloadABC").hide(50);
+					$("#uploadABC").show(50);
+					$("#ABCacceptancePercentage_span").hide(50);
+					$("#ABC_showRejectedParameters_span").hide(50);
+					$("#nRowsToDisplayABC").hide(50);
+					$("#ABCacceptance_span").hide(50);
+					resolveAfterRefresh();
+					drawPlots(true);
+					
+				});
+
+
+			};
+			refr().then(() => sequenceChangeRefreshTemp());
+			
+			
+			refreshNTP();
+			clearSequences();
+			
+			if (document.getElementById("SelectPrimerType").value.substring(2) == "RNA") $("#ntpT").val("U");
+			else $("#ntpT").val("T");
+
+
+
+			if ($("#SelectPrimerType").val().substring(2) == "DNA") $("#mRNAFoldingBg").hide(true);
+			else $("#mRNAFoldingBg").show(true);
+
+
+		});
+
+	});
+
+	
+}
+
+function userChangeSequence(resolveAfterRefresh = function() { }){
+	
+	if (document.getElementById("SelectSequence").value == "$user"){
+
+		$("#userChangeSequence").show(300);
+		$("#SelectTemplateType").prop("disabled", false);
+		$("#SelectPrimerType").prop("disabled", false);
+		$("#SelectTemplateType").removeClass("dropdown-disabled");
+		$("#SelectPrimerType").removeClass("dropdown-disabled");
+		
+		refreshNTP();
+		//barchart(true);
+
+
+
+	}else{
+		
+		
+		console.log("Changing sequence");
+		$("#userChangeSequence").hide(300);
+
+
+		var sequenceID = $("#SelectSequence").val();
+
+
+
+		var toCall = (newSequenceID) => new Promise((resolve) => userSelectSequence_controller(newSequenceID, null, null, resolve));
+		toCall(sequenceID).then((uselessVar) => {
+			showFoldedRNA_controller(false);
+			
+
+			var refr = () => new Promise((resolve) => refresh(resolve));
+			var sequenceChangeRefreshTemp = function(){
+
+
+				
+
+				refreshPlotDataSequenceChangeOnly_controller(function(){
+					sequenceChangeRefresh();
+					$("#translocationSummaryContainer").hide(100);
+					$("#ABCoutput").html("");
+					$("#downloadABC").hide(50);
+					$("#uploadABC").show(50);
+					$("#ABCacceptancePercentage_span").hide(50);
+					$("#ABC_showRejectedParameters_span").hide(50);
+					$("#nRowsToDisplayABC").hide(50);
+					$("#ABCacceptance_span").hide(50);
+					resolveAfterRefresh();
+					drawPlots(true);
+				});
+			};
+			refr().then(() => sequenceChangeRefreshTemp());
+
+			refreshNTP();
+			clearSequences();
+			//barchart(true);
+			
+			if (document.getElementById("SelectPrimerType").value.substring(2) == "RNA") $("#ntpT").val("U");
+			else $("#ntpT").val("T");
+
+
+			if ($("#SelectPrimerType").val().substring(2) == "DNA") $("#mRNAFoldingBg").hide(true);
+			else $("#mRNAFoldingBg").show(true);
+
+		});
+
+	}
+	
+	
+	//plot_pause_distribution();
+	//plot_time_vs_site();
+	
+
+	
+	
+}
+
+
+
+function resetBtn(){
+	stop_controller(function() { refresh(); });
+}
+
+
+
+
+function refresh(resolve = function(){}){
+
+		addSequenceLoadingHTML();
+
+		nTimes20SequencesToDisplay = 1;
+		nrefreshes++;
+		if (nrefreshes > 100) {
+			nrefreshes = 0;
+			return;
+		}
+
+
+		actionsUntilNextUpdate = renderGraphicsEveryNsteps;
+		console.log("Refreshing", nrefreshes);
+		nucleoproteinPhase = -1;
+
+
+		//document.getElementById("randomOutput").value = "";
+		if (document.getElementById("SelectSequence").value != "$user"){
+			if (SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["template"] != "") {
+				document.getElementById("SelectTemplateType").value = SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["template"];
+				$("#SelectTemplateType").prop("disabled", true);
+				$("#SelectTemplateType").addClass("dropdown-disabled");
+			}else $("#SelectTemplateType").attr('disabled', false);
+		
+			if (SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["primer"] != "") {
+				document.getElementById("SelectPrimerType").value = SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["primer"];
+				$("#SelectPrimerType").prop("disabled", true);
+				$("#SelectPrimerType").addClass("dropdown-disabled");
+			} else 	$("#SelectPrimerType").attr('disabled', false);
+
+
+
+		} else{
+			$("#SelectTemplateType").prop("disabled", false);
+			$("#SelectPrimerType").prop("disabled", false);
+			$("#SelectTemplateType").removeClass("dropdown-disabled");
+			$("#SelectPrimerType").removeClass("dropdown-disabled");
+		
+			if (document.getElementById("UserSequence").value == "") return;
+		
+		}
+
+
+	
+		// Delete all extra slip landscapes
+		var s = 1;
+		while (true){
+			//console.log("hmmm", s, $("#slippageTR" + s).length);
+			if ($("#slippageTR" + s).length == 0) break
+			delete_slipping_landscape(s);
+			s++;
+		}
+	
+
+		document.getElementById('bases').innerHTML  = "";
+		disabledButtons = false;
+
+		TbulgePos = 0;
+		TbulgedBase = -1;
+		TbulgeSize = 0;
+
+	
+		slideAnimationFrameID = 0;
+		slipAnimationFrameID = 0;
+		bindAnimationFrameID = 0;
+		activationAnimationFrameID = 0;
+		ANIMATION_TIME_controller = 1;
+	
+
+
+		slipHtrough= 0;
+		TslipH = 0;
+		TslipHtrough= 0;
+	
+
+	
+		rateOfBindingNextBase = 0;
+
+	
+		refreshFreeEnergy();
+		specialSite = 0;
+
+	
+
+		$(".simulateRow").show(true); 
+
+
+
+
+
+
+		if ($("#SelectPrimerType").val() == "ssRNA") $("#foldBtnDiv").show(true); // Can only fold ssRNA
+		else $("#foldBtnDiv").hide(true);
+
+
+		var toDoAfterRefresh = function(result){
+
+
+			activateModel_changeView(result.ID);
+
+
+			//renderObjects();
+			//refreshPlotData();
+			
+			
+			//refreshNTP();
+			update_parameters();
+			//sample_parameters_controller();
+			renderParameters();
+			// userInputModel_controller();
+			changeSpeed_controller();
+			setNextBaseToAdd_controller();
+
+			sendModels_controller(function() {
+
+				getElongationModels_controller(function(mod) {
+
+					activateModel_changeView(mod.ID);
+					updateModelDOM(mod);
+
+				});
+
+			});
+			
+			//return;
+
+
+			/*
+			toggleSlip(0);
+			toggleSlip(0);
+			toggleSlipT();
+			toggleSlipT();
+			*/
+		
+		
+			//plotTimeChart(0, true);
+		
+
+			//transcribe_controller(2, true);
+			var afterRender = function(){
+				//if ($("#foldBtnDiv").hasClass("toolbarIconDisabled")) {
+					//showFoldedRNA_controller(true);
+				//}
+				update_sliding_curve(0)
+				resolve();
+
+			}
+			renderObjects(false, afterRender);
+	
+			refreshNavigationCanvases();
+
+			for (var i = 0; i < 10; i ++){
+				//console.log("rand", new Random().normal(10, 15));
+			}
+		
+		};
+
+
+		var toCall = () => new Promise((resolve) => refresh_controller(resolve));
+		toCall().then((result) => toDoAfterRefresh(result));
+
+
+		//toDoAfterRefresh();
+	
+
+}
+
+
+
+function changeInputSequenceType(){
+
+
+	if ($('input[name="inputSeqType"][value="inputTemplateSeq"]').prop("checked")){
+		$("#UserSequence").attr("placeholder", "Input template sequence 3' to 5' and then Submit...");
+	}else{
+		$("#UserSequence").attr("placeholder", "Input nascent sequence 5' to 3' and then Submit...");
+	}
+
+}
+
+
+function setNTP(ntpType){
+
+	//console.log("setNTP", ntpType);
+	if (simulating) return;
+
+	var ntpTypeHTML = ntpType;
+	if (ntpTypeHTML == "U") ntpTypeHTML = "T";
+	var allBases = ["A", "C", "G", "T"];
+	for (var i = 0; i < 4; i ++){
+		$("#ntp" + allBases[i]).removeClass("ntp-selected");
+	}
+	$("#ntp" + ntpTypeHTML).addClass("ntp-selected");
+	
+	
+	NTPtoAdd = ntpType;
+
+
+}
+
+function userChangeNTPType(ntpType){
+
+
+	userSetNextBaseToAdd_controller(ntpType);
+	setNTP(ntpType);
+
+
+}
+
+
+// Disable the default function of the left and right arrow keys (unless in a textbox)
+window.addEventListener("keydown", function(e) {
+    if(!$("textarea").is(':focus') && !$("input").is(':focus') && [37, 39].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
+}, false);
+
+
+
+window.onkeyup = function(e) {
+
+
+	if ($("textarea").is(':focus') || $("input").is(':focus')) return;
+
+    var key = e.keyCode ? e.keyCode : e.which;
+	
+	if (key == 39 && !simulating) { // Right arrow
+		if (e.ctrlKey && !e.shiftKey) slip_right_controller(); // Ctrl + right = slippage
+		else if (e.shiftKey) bindNTP_controller(); // Shift + right = bind/catalyse
+		else forward_controller();
+	}else if (key == 37 && !simulating) { // Left arrow
+		if (e.ctrlKey && !e.shiftKey) slip_left_controller(); // Ctrl + left = slippage
+		else if (e.shiftKey) releaseNTP_controller(); // Shift + left = release/decay
+		else backwards_controller();
+	}
+
+
+	else if (key == 82 && !simulating && !e.ctrlKey && !e.shiftKey) { // R 
+		refresh();
+	}
+
+
+	/*
+	else if (key == 32) { // Space
+		bindNTP_controller();
+	}else if (key == 8) { // Backspace
+		releaseNTP_controller();
+		renderParameters();
+	}
+	*/
+	else if (key == 78 && !simulating && !e.ctrlKey && !e.shiftKey) { // n
+		$("#nbasesToSimulate").focus();
+		$("#nbasesToSimulate").select();
+	}else if (key == 27 && !e.ctrlKey && !e.shiftKey) { // Escape
+		stop_controller();
+		closeAllDialogs();
+		//bendDNA_controller();
+
+
+		var abcDataObjectForModel = getAbcDataObject();
+		console.log("abcDataObjectForModel", abcDataObjectForModel);
+
+		//console.log("trueSlidingPeakHeights", trueSlidingPeakHeights, "trueSlidingTroughHeights", trueSlidingTroughHeights);
+		//getSlidingHeights_controller(function(result){ console.log(result)});
+		//addNotificationMessage("Hello there", 100, 100);
+
+		//console.log(JSON.stringify({XXX:{XXX: "there"}, YYY: "hello"}));
+	}else if(key == 8 || key == 46){ // Delete and backspace
+		for (var fitID in gelFabricCanvases){
+			deleteFabricCanvasSelection(fitID); // Delete all selected objects in time gel canvases
+		}
+
+	}
+	
 
    
+}
 
 
-            
 
+
+
+function toggleSlip(S = 0){
+	
+	if ($("#hideSlip" + S) == null){
+		hideSlip.splice(S, 1);
+		return;
+	}
+	
+	
+	if(document.getElementById("hideSlip" + S).value == "-"){
+		document.getElementById("hideSlip" + S).value = "+";
+		$("#slipCanvas" + S).attr("height", 0);
+		hideSlip[S] = true;
+	}
+	else{
+		document.getElementById("hideSlip" + S).value = "-";
+		hideSlip[S] = false;
+		$("#slipCanvas" + S).attr("height", 100);
+	}
+	draw_slipping_plot(0, S);
+	
+}
+
+function toggleSlipT(){
+	
+	if(document.getElementById("ThideSlip").value == "-"){
+		document.getElementById("ThideSlip").value = "+";
+		hideTSlip = true;
+	}
+	else{
+		document.getElementById("ThideSlip").value = "-";
+		hideTSlip = false;
+	}
+	draw_Tslipping_plot(0);
+	
+}
+
+
+
+
+
+
+function draw_slipping_plot(dx, S = 0){
+
+	if(hideSlip[S]) {
+		var canvas = $('#slipCanvas' + S)[0];
+		var ctx = canvas.getContext('2d');
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		return;
+	}
+	draw_a_landscape_plot(dx, slippingPeakHeights[S], slippingTroughHeights[S], "#008CBA", "slipCanvas" + S, -26, 25 + PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"]);
+}
+
+
+function draw_Tslipping_plot(dx){
+	if(hideTSlip) {
+		var canvas = $('#TslipCanvas')[0];
+		var ctx = canvas.getContext('2d');
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		return;
+	}
+	draw_a_landscape_plot(dx, slippingPeakHeights[0], slippingTroughHeights[0], "#008CBA", "TslipCanvas", -23, 25 + PHYSICAL_PARAMETERS["GDaggerDiffuse"]["val"]);
+}
+	
+
+function disable_all_buttons(){
+
+	var buttons = document.getElementsByTagName('input');
+	for (var i = 0; i < buttons.length; i++) {
+		if (buttons[i].type == "button" && buttons[i].className != "minimise") buttons[i].disabled = true;
+	}
+	disabledButtons = true;
+
+
+	// Disable the reaction arrows
+	$(".navArrow").attr("src", "../src/Images/arrowGrey.png");
+	$(".navArrow").css("cursor", "not-allowed");
+
+	$("#ntpA").attr("disabled", false);
+	$("#ntpC").attr("disabled", false);
+	$("#ntpG").attr("disabled", false);
+	$("#ntpT").attr("disabled", false);
+	$("#viewModelBtn").attr("disabled", false);
+	$(".errorBtn").attr("disabled", false);
+	$(".ABCbtn").attr("disabled", false);
+	$("#viewNTPmodelBtn").attr("disabled", false);
+
+
+
+}
+
+function reactivate_buttons(){
+	disabledButtons = false;
+
+
+	// Temp TODO
+	$("select:visible").prop('disabled', false);
+	$("input:visible").prop('disabled', false);
+
+	$(".ABCbtn").prop('disabled', false);
+
+	// Re-enable the reaction arrows
+	$(".navArrow").attr("src", "../src/Images/arrow.png");
+	$(".navArrow").css("cursor", "pointer");
+	
+	document.getElementById("trans").disabled = false;
+	document.getElementById("stutter").disabled = false;
+	document.getElementById("nbasesToSimulate").disabled = false;
+	document.getElementById("startTrials").disabled = false;
+	
+	
+}
+
+
+
+
+
+
+
+function removeNotification(element){
+	$(element).parent().parent().remove();
+}
+
+
+// Add a message to any position of the screen. User may close the message by pressing OK. Specify position in absolute coordinates
+function addNotificationMessage(msg, x, y, w = 220){
+
+	var notificationHTML = `
+	
+		<div style='position:absolute; left:` + x + `px; top:` + y + `; width:` + w + `px'>
+			
+			<div class="errorMsg" style='position:relative; padding:3 3'>
+				
+				` + msg + `
+				<input type="button" class="errorBtn" style="background-color: #008CBA; color: white; cursor:pointer; vertical-align: middle; width:40px;" onclick='removeNotification(this)' value="OK">
+				
+			</div>
+		</div>
+	
+	`;
+	
+	
+	$("#main").append(notificationHTML);
+
+
+}
+
+
+
+function deleteHiddenModeNotification(){
+	$("#hiddenNotification").remove();
+}
+
+
+// Changes to hidden mode and shows a notification to explain why
+function changeToHiddenModeAndShowNotification(){
+	
+	$("#PreExp").val("hidden");
+	var x = $("#PreExp").offset().left + 100;
+	var y = $("#PreExp").offset().top - 20 + "px";
+
+	addNotificationMessage("That is a very big sequence to animate! We have switched to hidden mode to improve performance.", x, y);
+
+	
+}
+
+
+
+function moveScrollBar(moveTo = "#pol"){
+
+	//document.getElementById("bases").scrollLeft = document.getElementById("pol").offsetLeft - 1000;
+	//var destX = document.getElementById("pol").offsetLeft + "px";
+
+
+	if ($(moveTo).length == 0) return;
+
+
+	var dx = -$("#mySidenav").width();
+	
+	var x = ($(moveTo).offset().left + $("#bases").scrollLeft() - 800) + dx;
+
+	if (x - $("#bases").scrollLeft() < 0 && x - $("#bases").scrollLeft() >= -75) return; 
+
+
+	// Unlock the scrollbar
+	if (simulating) unlockTheScrollbar("#bases");
+
+
+	// Move scrollbar of bases panel
+	$("#bases").finish();
+	$("#bases").animate( {scrollLeft: x + "px"}, ANIMATION_TIME_controller);
+
+
+	// Lock it again
+	if (simulating) lockTheScrollbar("#bases");
+	
+
+
+}
+
+
+function unlockTheScrollbar(selector){
+	return;
+	$(selector).css('overflow','auto');
+	$(selector).attr('scroll','yes');
+}
+
+
+function lockTheScrollbar(selector){
+	return;
+	$(selector).css('overflow','hidden');
+	$(selector).attr('scroll','no');
+}
+
+
+
+
+
+function update_slipping_curve(dir, S = 0, recurse = true){
+
+
+	return;
+
+	var time = new Date();
+	window.requestAnimationFrame(function() {
+		update_slipping_curve_timer(time.getMilliseconds(), dir, S);
+	});
+
+	toggleSlip(S);
+	toggleSlip(S);
+
+	// Also update all the other slipping curves
+	if (recurse){
+		for (var s = 0; s < bulgePos.length; s ++){
+			if (s != S) update_slipping_curve(0, s, false);
+		}
+	}
+
+}
+
+
+function update_slipping_curve_timer(startTime, dir, S = 0){
+
+	currentTime = new Date().getMilliseconds();
+	if (currentTime < startTime) currentTime += 1000;
+	fractionToMoveBy = Math.min(( currentTime - startTime) / (ANIMATION_TIME_controller * 0.9), 1);
+	
+	if (dir == 0) { // Vertical sync
+		
+		slippingPeakHeightsTemp = update_slippingPeakHeights(S);
+		slippingTroughHeightsTemp = update_slippingTroughHeights(S);
+		
+		// Take only a fraction of the total change
+		for (p = 0; p < slippingPeakHeightsTemp.length; p++){
+			slippingPeakHeights[S][p] += (slippingPeakHeightsTemp[p] - slippingPeakHeights[S][p]) * fractionToMoveBy;
+		}
+		
+		for (p = 0; p < slippingTroughHeightsTemp.length; p++){
+			slippingTroughHeights[S][p] += (slippingTroughHeightsTemp[p] - slippingTroughHeights[S][p]) * fractionToMoveBy;
+		}
+		draw_slipping_plot(0, S);
+		
+		if ( fractionToMoveBy == 1 ) return;
+		
+		slipAnimationFrameID = window.requestAnimationFrame(function() {
+			update_slipping_curve_timer(startTime, dir, S);
+		});
+		
+		return;
+	
+	}
+	
+	// Horizontal sync
+	
+
+	draw_slipping_plot(dir * 4/2 * Math.PI * fractionToMoveBy, S);
+	
+	
+	if ( fractionToMoveBy == 1 ) {
+	
+		slippingPeakHeights[S] = update_slippingPeakHeights(S);
+		slippingTroughHeights[S] = update_slippingTroughHeights(S);
+		//console.log(S, "slippingTroughHeights", slippingTroughHeights[S]);
+		//console.log(getHybridString(rightGBase, rightMBase, [], [bulgePos]));
+		
+		draw_slipping_plot(0, S);
+
+		return;
+	}
+	
+	window.requestAnimationFrame(function() {
+		update_slipping_curve_timer(startTime, dir, S);
+	});
+}
+
+
+
+function create_new_slipping_landscape(graphID){
+	
+	//if (!allowMultipleBulges) return;
+
+	//console.log("create_new_slipping_landscape", graphID);
+
+	/*
+	$("#primerSlipCanvasCellSpacer" + (graphID-1)).after('<td class="landscape" id="primerSlipCanvasCell' + graphID + '"> ' + get_slippage_cell_canvas_html(graphID) + ' </td> \
+	<td class="spacer" id="primerSlipCanvasCellSpacer' + graphID + '"></td>');
+	
+	$("#primerSlipBtnCellSpacer" + (graphID-1)).after('<td class="landscape" id="primerSlipBtnCell' + graphID + '"> ' + get_slippage_cell_btn_html(graphID) + ' </td>\
+	<td class="spacer" id="primerSlipBtnCellSpacer' + graphID + '"></td>');
+	*/
+
+
+
+	var canvasHTML = `
+	<td id="slippageTR` + graphID + `" style="width:25%; vertical-align:top" class="slippageCell">
+
+		<br><br>
+		<div style="font-size:18px; font-family:Arial; vertical-align:top">
+			Slippage
+		</div> <br><br>
+		<div id="slippageCanvasDIV` + graphID + `" style="position:relative; margin:auto; width: 450px">
+			<canvas id="slippageCanvas` + graphID + `" height=50 width=450></canvas>
+		</div><br>
+
+	</td>`;
+
+	$("#slippageTR" + (graphID-1)).after(canvasHTML);
+
+
+	/* Add back later
+	slippingPeakHeights.push(update_slippingPeakHeights(graphID));
+	slippingTroughHeights.push(update_slippingTroughHeights(graphID));
+	*/
+	
+}
+
+
+
+
+
+function get_slippage_cell_btn_html(S){
+	
+	return '<input type=button class = "operation" id="dbl' + S + '" onClick=slip_left_controller(' + S + ') value="Form bulge" class="operation" >\
+				Slippage \
+				<input type=button class = "operation" id="dbr' + S + '" onClick=slip_right_controller(' + S + ') value="Absorb bulge" class="operation" >\
+				<input type=button id="hideSlip' + S + '" class="minimise"  value="+" onClick=toggleSlip(' + S + ')>\
+			</td>';
+	
+}
+
+
+function get_slippage_cell_canvas_html(S){
+	
+	return '<canvas id="slipCanvas' + S + '" width="410px" height="0px"></canvas>';
+	
+}
+
+
+function delete_slipping_landscape(toDelete){
+	
+	//console.log("Deleting landscape", toDelete);
+
+	/*
+	$("#primerSlipBtnCell" + toDelete).remove();
+	$("#primerSlipBtnCellSpacer" + toDelete).remove();
+	$("#primerSlipCanvasCell" + toDelete).remove();
+	$("#primerSlipCanvasCellSpacer" + toDelete).remove();
+	*/
+
+
+	$("#slippageTR" + toDelete).remove();
+
+
+}
+
+
+
+
+function reset_slipping_landscape(S){
+
+
+	/* TODO add back
+	slippingPeakHeights[S] = update_slippingPeakHeights(S);
+	slippingTroughHeights[S] = update_slippingTroughHeights(S);
+	*/
+	
 }
 
 
@@ -75,250 +1256,2824 @@ function init(){
 
 
 
+
+function form_bulge_T(form_left){
+
+
+	console.log("forming", form_left);
+
+	
+	//if (form_left && mRNAPosInActiveSite == -1 && bulgePos == 0){
+	if (form_left && TbulgePos == 0){
+
+		// Move 2nd last base to between the 2nd and 3rd to last positions, and last base into 2nd last position
+		if (NTPbound){
+			delete_HTMLobj_controller("m" + mRNALength);
+			if (ALLOW_SLIP_ANIMATIONS) delete_TP(mRNALength, "m");
+			NTPbound = false;
+		}
+
+
+		TbulgedBase = rightGBase;
+		TbulgePos = 1;
+
+		move_nt_controller(TbulgedBase, "g", -12, -25);
+		for (i = TbulgedBase + 1; i < nbases; i ++){
+			if (i > rightGBase && i-rightGBase <= hillLengthRight) move_nt_controller(i, "g", -25, 52/hillLengthRight);
+			else move_nt_controller(i, "g", -25, 0);
+		}
+		
+		
+		if ($("#SelectTemplateType").val().substring(0,2) == "ds"){
+			for (var i = 0; i < nbases; i ++){
+				//move_obj_from_id_controller("o" + i, -25, 0);
+			}
+		}
+		
+		rightGBase ++;
+		TbulgeSize = 1;
+		
+
+		// If pol moves out of special site then change its picture
+		if (nucleoproteinPhase == -1 && rightGBase != specialSite-2){
+			polMol = document.getElementById('pol');
+			polMol.setAttribute('src', "../src/Images/pol.png");
+		}
+		
+		
+		
+		
+		update_Tslipping_curve(-1);
+		update_slipping_curve(0);
+		update_sliding_curve(0);
+
+	}
+	
+	else if (!form_left && TbulgePos == 0 && leftGBase > 1) {
+
+		TbulgedBase = leftGBase;
+
+		move_nt_controller(leftGBase, "g", 13, -25);
+		for (i = TbulgedBase - 1; i >= 0; i --){
+			if (TbulgedBase-i <= hillLengthLeft) move_nt_controller(i, "g", 25, 52/hillLengthLeft);
+			else move_obj_from_id_controller(i, "g", 25, 0);
+		}
+		
+		if ($("#SelectTemplateType").val().substring(0,2) == "ds"){
+			for (var i = 0; i < nbases; i ++){
+				//move_obj_from_id_controller("o" + i, 25, 0);
+			}
+		}
+		
+		TbulgePos = hybridLen - 1;
+	
+		TbulgeSize = 1;
+		leftGBase --;
+		
+		
+		update_Tslipping_curve(-1);
+		update_slipping_curve(0);
+		update_sliding_curve(0);
+
+	}
+	
+
+
+}
+
+
+function diffuse_left_T(){
+
+
+	
+	
+	if (terminated) return false;
+	
+	if (TbulgePos > 0 && TbulgePos < hybridLen - 1){
+
+
+		console.log("diff");
+	
+		// Move bulged base into 1 position before it, and that one into bulge
+		if (TbulgeSize == 1){
+			move_nt_controller(TbulgedBase, "g", -13, 25);
+			move_nt_controller(TbulgedBase-1, "g", -12, -25);
+			TbulgePos ++;
+			TbulgedBase --;
+		}
+
+
+		// Move right bulged base back into the hybrid 1 to the left, and move that one into the bulge. The left bulged base moves left slightly
+		if(TbulgeSize == 2 && TbulgePos < hybridLen - 2){
+			move_nt_controller(TbulgedBase, "g", -22, -25);
+			move_nt_controller(TbulgedBase-1, "g", -6, 0);
+			move_nt_controller(TbulgedBase-2, "g", -22, 25);
+			TbulgePos ++;
+			TbulgedBase --;
+		}
+
+		
+		
+		
+		update_Tslipping_curve(-1);
+		update_slipping_curve(0);
+		update_sliding_curve(0);
+	}
+	
+	//else if (bulgePos == 0 && mRNAPosInActiveSite < hybridLen - 2) form_bulge(true);
+	else if (TbulgePos == 0) form_bulge_T(true);
+	else if (TbulgePos == hybridLen - 1) absorb_T(false);
+	
+
+}
+
+
+
+function diffuse_right_T(){
+
+	
+	if (terminated) return false;
+
+	//if (TbulgePos - Math.max(0, mRNAPosInActiveSite) == 1) Tabsorb(true);
+	if (TbulgePos == 1) absorb_T(true);
+
+	else if (TbulgePos < hybridLen && TbulgeSize == 1 && TbulgePos > 1){
+
+
+		// Move bulged base into 1 position after it, and that one into bulge
+		move_nt_controller(TbulgedBase, "g", +12, 25);
+
+		// If the next base does not exist then we are hypertranslocated and should destroy the bulge
+		if (!move_nt_controller(TbulgedBase+1, "g", +13, -25)) {
+			TbulgePos = 0;
+			TbulgedBase = -1;
+			//mRNAPosInActiveSite --;
+			TbulgeSize = 0;
+		}else{
+			TbulgePos --;
+			TbulgedBase ++;
+		}
+		
+
+		if (NTPbound && TbulgePos == 1){
+			delete_HTMLobj_controller("m" + mRNALength);
+			if (ALLOW_SLIP_ANIMATIONS) delete_TP(mRNALength, "m");
+			NTPbound = false;
+		}
+		
+		
+		update_Tslipping_curve(1);
+		update_slipping_curve(0);
+		update_sliding_curve(0);
+
+
+	}
+	else if (TbulgePos == 0) form_bulge_T(false);
+
+
+
+}
+
+
+function absorb_T(absorb_right = false){
+
+	console.log("abs");
+	
+	if (!absorb_right && TbulgePos == hybridLen - 1){
+
+		// Shift every leftward base 1 to the left
+		move_nt_controller(TbulgedBase, "g", -13, 25);
+		for (i = TbulgedBase - 1; i >= 0; i --){
+			if (TbulgedBase-i <= hillLengthLeft) move_nt_controller(i, "g", -25, -52/hillLengthLeft);
+			else move_nt_controller(i, "g", -25, 0);
+		}	
+		
+		
+		if ($("#SelectTemplateType").val().substring(0,2) == "ds"){
+			for (var i = 0; i < nbases; i ++){
+				//move_obj_from_id_controller("o" + i, -25, 0);
+			}
+		}
+
+
+		TbulgePos = 0;
+		TbulgedBase = -1;
+		TbulgeSize = 0;
+		leftGBase ++;
+		
+		
+		update_Tslipping_curve(-1);
+		update_slipping_curve(0);
+		update_sliding_curve(0);
+		
+	}
+
+
+	// If backtracked, then bulge is absorbed when at position 1
+	// If not backtracked, then bulge is absorbed when at position 2
+	//else if (absorb_right && TbulgePos - Math.max(0, mRNAPosInActiveSite) == 1 && !(TbulgePos == 2 && NTPbound)){ //;
+	else if (absorb_right && TbulgePos == 1 && !(TbulgePos == 2 && NTPbound)){
+
+		// Shift every rightward base 1 to the right
+		move_nt_controller(TbulgedBase, "g", 12, 25);
+		for (i = TbulgedBase + 1; i < nbases; i ++){
+			if (i-TbulgedBase <= hillLengthRight) move_nt_controller(i, "g", 25, -52/hillLengthRight);
+			else move_nt_controller(i, "g", 25, 0);
+		}	
+		
+		if ($("#SelectTemplateType").val().substring(0,2) == "ds"){
+			for (var i = 0; i < nbases; i ++){
+				//move_obj_from_id_controller("o" + i, 25, 0);
+			}
+		}
+
+
+		TbulgePos = 0;
+		TbulgedBase = -1;
+		TbulgeSize = 0;
+		//mRNAPosInActiveSite --;
+
+		rightGBase --;
+		
+		
+		if (nucleoproteinPhase == -1 && rightGBase == specialSite-1){
+			polMol = document.getElementById('pol');
+			polMol.setAttribute('src', "../src/Images/polS.png");
+		}
+		
+		
+		
+		update_Tslipping_curve(-1);
+		update_slipping_curve(0);
+		update_sliding_curve(0);
+		
+	}
+
+}
+
+
+
+function update_Tslipping_curve(n){
+	draw_Tslipping_plot(0);
+}
+
+
+
+
+function hideButtonAndShowStopButton(toHide){
+
+	// toHide \in {"simulate", "transcribe", "stutter"}
+
+	// Makes toHide hidden and displays the stop button associated with it
+	if (toHide != null){
+		$("#" + toHide + "Btn").hide(50);
+		$("#stopBtn_" + toHide).show(50);
+	}
+
+	// Makes the other possible values entries turn grey 
+	var btns = ["simulate", "transcribe", "stutter"]
+	for (var i = 0; i < btns.length; i ++){
+		if (btns[i] == toHide) continue;
+		$("#" + btns[i] + "Btn").addClass("toolbarIconDisabled");
+		$("#" + btns[i] + "Btn").css("cursor", "auto");
+	}
+
+}
+
+
+function hideStopButtonAndShow(toShow){
+
+
+	// Makes toShow no longer hidden and hides the stop button associated with it
+	if(toShow == "transcribe" || toShow == "simulate" || $("#SelectPrimerType").val().substring(0,2) == "ss") $("#" + toShow + "Btn").show(50);
+	$("#stopBtn_" + toShow).hide(50);
+
+
+	// Makes the other possible values entries turn back from grey 
+	var btns = ["simulate", "transcribe", "stutter"]
+	for (var i = 0; i < btns.length; i ++){
+		if (btns[i] == toShow) continue;
+		$("#" + btns[i] + "Btn").removeClass("toolbarIconDisabled");
+		$("#" + btns[i] + "Btn").css("cursor", "pointer");
+	}
+
+}
+
+
+function openNav() {
+	
+	
+	
+	if (document.getElementById("mySidenav").style.width == "380px"){
+		closeNav();
+		return;
+	}
+
+
+	// Move the toolbar rightwards unless it will go over the right side of the page
+	if(parseFloat($("#theToolbar").offset().left) < parseFloat($("#main").width()) - 500){
+	
+		movedToolbarRight = true;
+		$("#theToolbar").css("transition", "0.5s");
+		document.getElementById("theToolbar").style.left = parseFloat(document.getElementById("theToolbar").style.left) + 380 + "px";
+		setTimeout(function(){
+			$("#theToolbar").css("transition", "");
+		}, 500);
+
+	}else movedToolbarRight = false;
+	
+	document.getElementById("mySidenav").style.width = "380px";
+	document.getElementById("main").style.marginLeft = "380px";
+	document.getElementById("paramsTab").style.marginLeft = "380px";
+
+
+	$("#bases_container").animate({
+    	width: '-=30px'
+	}, 100);
+
+	
+
+	$("#hiddenNotification").animate( {left: "+=" + 380}, 100 );
+
+}
+
+
+function closeNav() {
+	
+	
+	
+	
+	
+	// Move the toolbar leftwards if we moved it right when the navigation was opened
+	if (movedToolbarRight){
+		$("#theToolbar").css("transition", "0.5s");
+		document.getElementById("theToolbar").style.left = parseFloat(document.getElementById("theToolbar").style.left) - 380 + "px";
+		setTimeout(function(){
+			$("#theToolbar").css("transition", "");
+		}, 500);
+	}
+	
+	
+	
+	
+
+	document.getElementById("mySidenav").style.width = "0";
+	document.getElementById("main").style.marginLeft= "0";
+	document.getElementById("paramsTab").style.marginLeft = "0";
+
+	
+	$("#bases_container").animate({
+        width: '+=30px'
+    }, 100);
+	
+
+
+	$("#hiddenNotification").animate( {left: "+=" + -380}, 100 );
+
+};
+
+
+
 </script>
 
 </head>
-
 <body onload="init()">
-	<div id="screenContainer" style="position:relative">
-		<div id="screen" style="opacity:1;">
 
 
-				
+	<div style="width:100%">
 
-			<div id="main" style="background-color:white">
+
+			
+
+			<div id="screenContainer" style="position:relative">
+			<div id="screen" style="opacity:1;">
+
+			<div id="mySidenav" class="sidenav">
+				<a href="javascript:void(0)" title="Close" class="closebtn" onclick="closeNav()">&times;</a>
+
+			  
+			  
+			 <div  class="parameter-bg">
+				 <div class="parameter-title noselect" style="font-size: 28px;">Parameters &amp; Settings
+						  
+					</div>
+				 
+				 </div>
+				  <br>
+
+
+
+
+			<div  class="parameter-bg">
 				
-				
-				<div id="header" class="header" style="width:100%; ">
-					<table style="margin: 0px auto; width:100%">
+				<div class="parameter-title">
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#sequenceSelection"><img class="helpIcon" src="../src/Images/help.png"></a>
+
+					<span id="SequenceSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3;  float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
+					Sequence Options
+				</div>
+
+
+			
+				<div id="SequenceSettings">
+					 <br> Select sequence: <select class="dropdown" style="width: 350px;" name="SelectSequence" id = "SelectSequence" title="Select a sequence" OnChange="stop_controller(function() { userChangeSequence(); }); ">
+					</select>
 						
-
+					Template: <select class="dropdown" name="SelectTemplateType" id="SelectTemplateType" OnChange="stop_controller(function() { submitCustomSequence(); });">
+							  <option value="ssRNA">ssRNA</option>
+							  <option value="ssDNA">ssDNA</option>
+							  <option value="dsRNA">dsRNA</option>
+							  <option value="dsDNA">dsDNA</option>
+						</select>
 						
-						<tr>
-							<td style="width: 30%; vertical-align:bottom">
+						&nbsp;Nascent type: <select class="dropdown" name="SelectPrimerType" id="SelectPrimerType" OnChange="stop_controller(function() { submitCustomSequence(); });">
+							  <option value="ssRNA">ssRNA</option>
+							  <option value="ssDNA">ssDNA</option>
+							  <option value="dsRNA">dsRNA</option>
+							  <option value="dsDNA">dsDNA</option>
+						</select>
+						
+						
+					<br> 
+						<div id="userChangeSequence" style="display:none"> <br>
+							<textarea id="UserSequence" title="Please submit a sequence" style="max-width: 350px; width: 350px; height: 100px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input template sequence 3' to 5' and then Submit..."></textarea> 
+								&nbsp;&nbsp;
+								<div style="width:100%; margin:auto; text-align:center; line-height:25px; font-family:Arial;  vertical-align:bottom">
 								
-								
-							</td>
-
-							<td  style="text-align:center; vertical-align:top; font-family: 'Palatino'; width: 40%;"> 
-								<div style="width:100%; text-align:center; color:#414b4b">
 									
-									<div style="font-size: 70px; margin-bottom: -5px "> polymerase.nz </div>
-									<div style="font-size: 25px; "> An online nucleic acid polymerase </div>
-									
-									
+									<label style="font-size:16px;"><input type="radio" onclick="changeInputSequenceType()" name="inputSeqType" value="inputTemplateSeq"  checked=true> </input> Template </label>
+									<label style="font-size:16px;"><input type="radio" onclick="changeInputSequenceType()" name="inputSeqType" value="inputNascentSeq">  </input> Nascent  </label>
+									<span class="noselect" style="padding:2 5; background-color:#008CBA; color:white; cursor:pointer; font-size:16px; float:right;" onClick="submitCustomSequence()" title="Submit sequence">Submit</span> 
 								</div>
-										
-							</td>
-							
-							
-							<td style="height:30px; width: 30%; vertical-align:bottom; text-align:right;"> 
+						</div>
+						<br>
+					</div>
+					<br>
+			</div>
 
-                             <a href="https://webassembly.org/" target="_blank" style="text-decoration: none;">
-                                    <img src="src/Images/wasmlogo.png" style="width:50px" title="Compiled with WebAssembly"></img>
-                                </a>&nbsp;
-                                <a href="https://github.com/jordandouglas/jordandouglas.github.io" target="_blank" style="text-decoration: none;">
-                                    <img src="src/Images/GitHub-Mark-64px.png" style="width:50px" title="Available on GitHub"></img>
-                                </a>
-                                    
-							</td>
+			 
+			<br> 
 
 
 
-						</tr>
+			<div class="parameter-bg" id="polymeraseSelectionDiv" style="display:none">
+				
+				<div class="parameter-title">
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#polymeraseSelection"><img class="helpIcon" src="../src/Images/help.png"></a>
 
+					<span id="PolymeraseSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
+					
+					Polymerase
+				</div>
+
+				<div id="PolymeraseSettings">
+
+				<br>Select polymerase: <select class="dropdown" style="width: 350px;" id = "SelectPolymerase" title="Select which polymerase to use. Different polymerases have different initial parameter estimates but these can be edited" OnChange="stop_controller(function() { userChangePolymerase_controller() }); ">
+				</select>
+
+				</div>
+				<br>
+			</div><br>
+
+			
+			
+			
+			
+			
+			
+			
+			<div class="parameter-bg">
+				
+				<div class="parameter-title" >
+				<span id="ExpeirmentalConditionsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
+				Experimental Conditions</div> 
+
+
+				<table style="width:100%;" id="ExpeirmentalConditions">
+
+
+
+
+
+
+					<tr id="useFourNTPconcentrations_container" title="Do you want one concentration for all 4 NTPs or one concentration for each one?">
+
+
+						<td style="text-align:left; font-size:10px; float:left;">
+							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; " href="about/#useFourNTPconcentrations_paramHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						 
+						 
+						<td style="text-align:right; font-size:13px">
+				 			1 concentration  
+				 		</td>
+						 
+				 		<td colspan=3>
+					 		<label class="switch">
+						 		 <input class="modelSetting" type="checkbox" id="useFourNTPconcentrations" OnChange="userInputModel_controller()"> </input>
+						 		 <span class="slider round notboolean"></span>
+							</label> 
+							<span style="font-size:13px; vertical-align:middle" >4 concentrations</span>
+				 		</td>
 						
-					</table>
+
+
+					</tr>
+				
+
+
+
+					<tr id="NTPconc_container" style="display:none">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#NTPconc_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			<span id="NTPname"></span> = 
+				 		</td>
+
+				 		<td>
+				 			<input class="variable"   type="number" onChange="update_this_parameter_controller(this)" id="NTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
+						</td>
+
+
+				 		<td>
+				 			<input type=image id='NTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+						</td>
+
+				 	</tr>
+
+
+
+					<tr id="ATPconc_container" style="display:none">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#ATPconc_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			<span id="ATPname"></span> = 
+				 		</td>
+
+				 		<td>
+				 			<input class="variable"   type="number" onChange="update_this_parameter_controller(this)" id="ATPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
+						</td>
+
+
+				 		<td>
+				 			<input type=image id='ATPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+						</td>
+
+				 	</tr>
+
+
+				 	<tr id="CTPconc_container" style="display:none">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#CTPconc_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right;  width:110px">
+				 			<span id="CTPname"></span> = 
+				 		</td>
+
+				 		<td>
+				 			<input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="CTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+						</td>
+
+
+				 		<td>
+							<input type=image id='CTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+						</td>
+
+				 	</tr>
+
+
+
+
+				 	<tr id="GTPconc_container" style="display:none">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#GTPconc_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right;  width:110px">
+				 			<span id="GTPname"></span> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="GTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+						</td>
+
+
+				 		<td>
+							<input type=image id='GTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+				 			
+						</td>
+
+				 	</tr>
+
+
+
+				 	<tr id="UTPconc_container" style="display:none">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#UTPconc_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right;  width:110px">
+				 			<span id="UTPname"></span> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="UTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
+						</td>
+
+
+				 		<td>
+							<input type=image id='UTPconc_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+						</td>
+
+				 	</tr>
+
+
+
+			 		<tr id="FAssist_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#FAssist_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			F<sub>assist</sub> = 
+				 		</td>
+
+				 		<td>
+							<input type="number" class="variable"  id="FAssist" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">pN
+			 			</td>
+
+
+				 		<td>
+							<input type=image id='FAssist_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn"> 
+				 		</td>
+
+				 	</tr>
+
+
+
+
+
+			 		<tr id="haltPosition_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#FAssist_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			Halt: 
+				 		</td>
+
+				 		<td>
+							<input type="number" class="variable"  id="haltPosition" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">nt
+			 			</td>
+
+
+				 		<td>
+							<input type=image id='haltPosition_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn"> 
+				 		</td>
+
+				 	</tr>
+
+
+
+				 </table>
+
+
+				<br>
+			</div>
+			<br>
+			
+			<div class="parameter-bg">
+				<div class="parameter-title">
+				<span id="StructuralSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
+				Structural Parameters </div>  
+
+
+				<table style="width:100%;" id="StructuralSettings">
+
+					<tr id="hybridLen_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#hybridLen_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			Hybrid length:
+				 		</td>
+
+				 		<td>
+			    			<input class="variable"  type="number"  id="hybridLen" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
+						</td>
+
+
+				 		<td>
+							<input type=image id='hybridLen_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+						</td>
+
+				 	</tr>
+
+
+
+					<tr id="bubbleLeft_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#bubbleLeft_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			Bubble size 3&prime;:
+				 		</td>
+
+				 		<td>
+				 			<input class="variable"  type="number"  id="bubbleLeft" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
+		    			</td>
+
+
+				 		<td>
+							<input type=image id='bubbleLeft_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">
+						</td>
+
+				 	</tr>
+
+
+
+					<tr id="bubbleRight_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#bubbleRight_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			Bubble size 5&prime;:
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number"  id="bubbleRight" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
+		    			</td>
+
+
+				 		<td>
+							<input type=image id='bubbleRight_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">
+						</td>
+
+				 	</tr>
+
+
+				 </table>
+
+
+				 <br>
+			</div>
+
+
+			<br>
+			<div class="parameter-bg">
+				<div class="parameter-title">
+				<span id="NTPincorporationSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
+				NTP Incorporation Parameters 
 				</div>
 
 
 
-				<br><br>
 
-
-                <div class="panelOuter" style="margin-left:50px; margin-right:50px">
-                    <div class="panelInner">
-
-                        <span  style="font-size:80px; font-family:Arial;">
-                          
-
-                            <div style="padding: 20 10; font-size: 18px;  text-align:justify">
-                                
-                              <span style="font-size: 20px; font-family: 'Palatino'; color:#414b4b">polymerase.nz</span> is a free online suite for simulating nucleic acid polymerases -- mainly RNA polymerases. 
-
-                             This website is open-source and free under the GNU license. Everything has been written in JavaScript and C++ and can be downloaded
-                              from GitHub, however  &gt;95% of the programs functionality can be executed here without the need to download.
-
-
-                            </div>
+				<table style="width:100%;" id="NTPincorporationSettings">
 
 
 
-                        </span>
-                        
 
-                    </div>
-                </div>
+					<tr id="Kdiss_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Kdiss_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							K<sub>D</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="Kdiss"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='Kdiss_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
+
+
+				 	<tr id="kCat_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kCat_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							k<sub>cat</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="kCat"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='kCat_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
 
 
 
-                    <br><br>
 
-			<table style="width:100%" cellpadding=0 >
+
+					<tr id="assumeBindingEquilibrium_container"  title="Assume that binding NTP is an equilibrium process?">
+
+
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+				 		<td colspan=3>
+		 					<label class="switch">
+					 	 		<input class="modelSetting" type="checkbox" id="assumeBindingEquilibrium" OnChange="userInputModel_controller()"> </input>
+					 	 		<span class="slider round"></span>
+
+							</label> 
+							<span style="font-size:15px; vertical-align:middle" >Assume NTP binding at equilibrium</span>
+
+				 		</td>
+
+				 	</tr>
+
+
+				 	<tr id="RateBind_container" style="display:none">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateBind_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							k<sub>bind</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="RateBind"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='RateBind_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
+
+					
+
+
+
+
+
+
+
+
+		 		</table>
+
+
+				
+				<br>
+			</div>
+			
+
+
+
+
+
+			<br>
+			<div class="parameter-bg">
+
+
+				<div class="parameter-title">
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#translocation_ModelHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+					<span id="TranslocationSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
+					Translocation Parameters 
+					
+					
+					 
+				</div>
+
+
+			
+
+				<table style="width:100%; display:none" id="TranslocationSettings">
+
+
+
+	
+		
+		
+
+
+					<tr id="GDagSlide_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#GDagSlide_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			&Delta;G<sup>&dagger;</sup><sub>&#120591;</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="GDagSlide" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
+			 			</td>
+
+
+				 		<td>
+							<input type=image id='GDagSlide_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn"> 
+				 		</td>
+
+				 	</tr>
+
+
+
+				 	<tr id="DGPost_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#GDagSlide_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			&Delta;G<sub>&#120591;1</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="DGPost" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
+			 			</td>
+
+
+				 		<td>
+							<input type=image id='DGPost_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn"> 
+				 		</td>
+
+				 	</tr>
+
+
+
+
+				 	<tr id="barrierPos_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#barrierPos_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			&delta;<sub>1</sub> = 
+				 		</td>
+
+				 		<td>
+							<input type="number" step="0.1" min="0" max = "3.4" class="variable"  id="barrierPos" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">&#x212b;
+			 			</td>
+
+
+				 		<td>
+							<input type=image id='barrierPos_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn"> 
+				 		</td>
+
+				 	</tr>
+
+
+
+
+
+
+				 	<tr id="currentTranslocationModel_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#translocation_ModelHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						<td colspan = 3 style="text-align:center">
+
+				 			Barrier height model:
+				 			<select class="dropdown modelSetting" style="width:150px;"  id = "currentTranslocationModel" title="Select which model to use for estimating translocation free energy barrier heights" OnChange="userInputModel_controller()">
+
+				 			    <option value="absoluteBarriers">Absolute barriers</option>
+				 				<option value="midpointBarriers">Midpoint barriers</option>
+				 				<optgroup label="Hybrid/bubble melting:">
+					 				<option value="HIBI_barriers">hIbI model</option>
+					 				<option value="HIBU_barriers">hIbU model</option>
+					 				<option value="HUBI_barriers">hUbI model</option>
+					 				<option value="HUBU_barriers">hUbU model</option>
+				 				</optgroup>
+
+							</select>
+				 		</td>
+
+
+				 	</tr>
+
+
+
+
+					<tr id="assumeTranslocationEquilibrium_container"  title="Do you want to assume that translocation between the pretranslocated and posttranslocated states is in equilibrium?">
+
+
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#GDagSlide_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+				 		<td colspan=3>
+		 					<label class="switch">
+					 	 		<input class="modelSetting" type="checkbox" id="assumeTranslocationEquilibrium" OnChange="userInputModel_controller()"> </input>
+					 	 		<span class="slider round"></span>
+
+							</label> 
+							<span style="font-size:15px; vertical-align:middle" >Assume translocation equilibrium</span>
+
+				 		</td>
+
+
+				 	</tr>
+
+
+
+					<tr title="Do you want to assume that translocation between the pretranslocated and posttranslocated states is in equilibrium?">
+
+
+
+						<td colspan=3 style="text-align:right">
+						 	Translocation kinetic summary
+				 		</td>
+
+
+
+				 		<td>
+							<input type=image id="calculateTranslocationBtn" title="Calculate translocation summary" onClick="translocationCalculationSummary()" src="../src/Images/calculator.png" style="padding: 3 3; vertical-align:middle; height:25px; cursor:pointer;">
+						</td>
+
+
+				 	</tr>
+
+
+
+					<tr id="translocationSummaryContainer" style="display:none">
+
+						<td colspan = 4 style="position:relative; text-align:left; font-size:14px; padding: 10 10; background-color:#ebe9e7; width:100%">
+				 			<div title = "Close" class="blueCloseBtn" onclick='$("#translocationSummaryContainer").hide(100);'>&times;</div>
+							<div title = "Rate of translocation from the pretranslocated into the posttranslocated state, averaged across the whole sequence (arithmetic mean)."> Mean forward translocation rate: <span id="meanForwardRate"></span> s<sup>-1</sup> </div> 
+							<div title = "Rate of translocation from the posttranslocated into the pretranslocated state, averaged across the whole sequence (arithmetic mean)."> Mean backward translocation rate: <span id="meanBackwardsRate"></span> s<sup>-1</sup> </div>
+							<div title = "Rate of translocation from the pretranslocated into the posttranslocated state divided by the rate of the reverse reaction, averaged across the whole sequence (geometric mean)."> Mean forward equilibrium constant: <span id="meanEquilibriumConstantFwdOverBck"></span> </div> 
+							<div title = "Rate of translocation from the posttranslocated into the pretranslocated state divided by the rate of the reverse reaction, averaged across the whole sequence (geometric mean)."> Mean backward equilibrium constant: <span id="meanEquilibriumConstant"></span> </div> 
+							<div title = "Gibbs energy of the translocation transition state, averaged across the whole sequence (arithmetic mean). These &Delta;G terms are relative to that of the fully basepaired template and a free unpaired nascent strand."> Mean Gibbs energy of transition state: <span id="meanBarrierHeight"></span> k<sub>B</sub>T </div> 
+							
+
+				 		</td>
+
+				 	</tr>
+
+
+
+				 		
+
+
+
+
+
+				 </table>
+
+
+				 <br>
+
+				 
+			</div>
+			
+
+			
+			<br>
+			<div class="parameter-bg">
+				<div class="parameter-title">
+				<span id="PauseParametersSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
+				Pause Parameters 
+				</div>  
+
+
+
+				<table style="width:100%; display:none" id="PauseParametersSettings">
+
+
+
+					<tr id="allowInactivation_container"  title="Can the polymerase enter a catalytically inactive state (during the simulation)?">
+
+
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+				 		<td colspan=3>
+		 					<label class="switch">
+					 	 		<input class="modelSetting" type="checkbox" id="allowInactivation" OnChange="userInputModel_controller()"> </input>
+					 	 		<span class="slider round"></span>
+
+							</label> 
+							<span style="font-size:15px; vertical-align:middle" >Enable inactivation</span>
+
+				 		</td>
+
+
+
+
+				 	</tr>
+					
+					
+					<tr style="display:none" id="currentInactivationModel_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#translocation_ModelHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+						</td>
+
+						<td colspan = 3 style="text-align:center">
+
+							Model:
+							<select class="dropdown modelSetting" style="" id="currentInactivationModel" title="Select which model to use for polymerase inactivation" OnChange="userInputModel_controller()">
+
+								<option value="sequenceIndependent">Sequence independent</option>
+								<option value="hybridDestabilisation">Hybrid destabilisation</option>
+
+							</select>
+						</td>
+
+
+					</tr>
+
+
+
+					<tr style="display:none" id="RateDeactivate_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kU_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							k<sub>U</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="RateDeactivate"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='RateDeactivate_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
+
+
+
+
+					<tr style="display:none" id="deltaGDaggerHybridDestabil_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kU_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							&Delta;G<sup>&dagger;</sup><sub>&pi;</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="deltaGDaggerHybridDestabil"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='deltaGDaggerHybridDestabil_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
+
+
+
+				 	<tr style="display:none" id="RateActivate_container">
+
+
+				 		<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kA_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							k<sub>A</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="RateActivate" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='RateActivate_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">
+				 		</td>
+
+				 	</tr>
+
+
+
+
+				 	<tr id="allowBacktracking_container" title="Can the polymerase translocate far backwards (backtracking) during the simulation?">
+
+
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+				 		<td colspan=3>
+		 					<label class="switch">
+						 	 <input class="modelSetting" type="checkbox" id="allowBacktracking" OnChange="userInputModel_controller()"> </input>
+						 	 <span class="slider round"></span>
+
+							</label> 
+							<span style="font-size:15px; vertical-align:middle" > Enable backtracking </span>
+
+				 		</td>
+
+				 	</tr>
+
+
+
+				 	<tr id="allowBacktrackWithoutInactivation_container" title="Can the polymerase backtrack without entering the inactive state first (during the simulation)?">
+
+
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+				 		<td colspan=3>
+		 					<label class="switch">
+					 		 <input class="modelSetting" type="checkbox" id="allowBacktrackWithoutInactivation" OnChange="userInputModel_controller()"> </input>
+					 	 	<span class="slider round"></span>
+
+							</label> 
+							<span style="font-size:15px; vertical-align:middle" > Enable backtracking without inactivation</span>
+							<br> <br style="line-height:5px">
+
+				 		</td>
+
+				 	</tr>
+
+
+
+					<tr style="display:none" id="deltaGDaggerBacktrack_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kU_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							&Delta;G<sup>&dagger;</sup><sub>&tau;&minus;</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="deltaGDaggerBacktrack"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='deltaGDaggerBacktrack_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
+
+
+
+
+					<tr id="currentBacksteppingModel_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#translocation_ModelHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+						</td>
+
+						<td colspan = 3 style="text-align:center">
+
+							Backstep model:
+							<select class="dropdown modelSetting" style="" id="currentBacksteppingModel" title="Select which model to use for backtracking" OnChange="userInputModel_controller()">
+
+								<option value="backstep0">0 &rightarrow; -1 barrier </option>
+								<option value="backstep1">-1 &rightarrow; -2 barrier </option>
+
+							</select>
+						</td>
+
+
+					</tr>
+
+
+
+
+					<tr id="allowHypertranslocation_container"  title="Can the polymerase translocate far forwards (hypertranslocation) during the simulation?">
+
+
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+				 		<td colspan=3>
+		 					<label class="switch">
+						 	 <input class="modelSetting" type="checkbox" id="allowHypertranslocation" OnChange="userInputModel_controller()"> </input>
+						 	 <span class="slider round"></span>
+
+							</label> 
+							<span style="font-size:15px; vertical-align:middle"> Enable hypertranslocation</span>
+
+				 		</td>
+
+				 	</tr>
+
+
+
+
+
+				 	<tr id="DGHyperDag_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#GDagSlide_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+						<td style="text-align:right; width:110px">
+				 			&Delta;G<sup>&dagger;</sup><sub>&tau;&plus;</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="DGHyperDag" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
+			 			</td>
+
+
+				 		<td>
+							<input type=image id='DGHyperDag_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn"> 
+				 		</td>
+
+				 	</tr>
+
+
+					
+	
+
+
+
+
+
+
+		 		</table>
+
+
+				
+				<span style="display:none"> <br> &Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>special</sub> = <input class="variable"  type="number" title="Free energy barrier height of sliding in or out of the edit site" name="GDaggerSpecial" id="GDaggerSpecial" value=0 style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T <br> </span>  
+				
+				<!--
+				<div id="kUspecial_container">
+				 	<span style="">k<sup>`</sup><sub style='position: relative; left: -.20em;'>U</sub> = <input class="variable"  type="number"  id="kUspecial"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> </span> 
+					<input type=image id='kUspecial_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  		
+				</div>
+				
+				<div id="kAspecial_container">
+					<span style="">k<sup>`</sup><sub style='position: relative; left: -.20em;'>A</sub> = <input class="variable"  type="number" id="kAspecial" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> </span>  
+					<input type=image id='kAspecial_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">   
+				</div>
+				-->
+				
+				<span style="display:none">Special site = <input class="variable"  type="number" name="specialSite" id="specialSite" value=33 style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"></span>
+				
+				<br>
+				
+			</div>
+
+
+
+			<!--
+			<br>
+			<div class="parameter-bg">
+				<div class="parameter-title">DNA Bending </div>  <br> 
+
+
+
+				<table style="width:100%">
+
+
+
+					<tr id="allowDNAbending_container"  title="Calculate double-stranded DNA curvature?">
+
+
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+				 		<td colspan=3>
+		 					<label class="switch">
+					 	 		<input class="modelSetting" type="checkbox" id="allowDNAbending" OnChange="userInputModel_controller()"> </input>
+					 	 		<span class="slider round"></span>
+
+							</label> 
+							<span style="font-size:15px; vertical-align:middle" >Enable DNA curvature</span>
+
+				 		</td>
+
+
+
+
+				 	</tr>
+
+
+
+					<tr id="upstreamCurvatureCoeff_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kU_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							&Delta;G<sub>3&prime;bend</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="upstreamCurvatureCoeff"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='upstreamCurvatureCoeff_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
+
+
+
+
+				 	<tr id="downstreamCurvatureCoeff_container">
+
+
+				 		<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kA_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							&Delta;G<sub>5&prime;bend</sub> = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="downstreamCurvatureCoeff" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='downstreamCurvatureCoeff_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">
+				 		</td>
+
+				 	</tr>
+
+
+					<tr id="upstreamWindow_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kU_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							3&prime; window = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="upstreamWindow"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='upstreamWindow_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
+
+
+
+					<tr id="downstreamWindow_container">
+
+						<td style="text-align:left; font-size:10px; float:left; width:20px">
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kU_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 		</td>
+
+
+						<td style="text-align:right; width:110px">
+							5&prime; window = 
+				 		</td>
+
+				 		<td>
+							<input class="variable"  type="number" id="downstreamWindow"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+				 		</td>
+
+
+				 		<td>
+							<input type=image id='downstreamWindow_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+				 		</td>
+
+				 	</tr>
+
+
+		 		</table>
+
+
+			
+				
+			</div>
+			-->
+
+
+			<div id="mRNAFoldingBg" style="display:none">
+				<br>
+				<div  class="parameter-bg">
+					
+					<div class="parameter-title">
+					<span id="RNAfoldingSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
+					RNA Folding Settings 
+					</div> 
+
+
+
+					<table style="width:100%; display:none" id="RNAfoldingSettings">
+
+
+
+						<tr  id="rnaFoldDistance_container">
+
+							<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#hybridLen_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+					 		</td>
+
+							<td style="text-align:right; width:110px">
+					 			Fold distance:
+					 		</td>
+
+					 		<td>
+				    			<input class="variable"  type="number"  id="rnaFoldDistance" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
+							</td>
+
+
+					 		<td>
+								<input type=image id='rnaFoldDistance_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+							</td>
+
+					 	</tr>
+
+
+
+						<tr id="allowmRNAfolding_container"  title="Do you want the mRNA to fold automatically during the simulation? This will place constraints upon backwards translocation.">
+
+
+							<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="../src/Images/help.png"></a>
+					 		</td>
+
+
+					 		<td colspan=3>
+			 					<label class="switch">
+							 	 <input class="modelSetting" type="checkbox" id="allowmRNAfolding" OnChange="userInputModel_controller()"> </input>
+							 	 <span class="slider round"></span>
+
+								</label> 
+								<span style="font-size:15px; vertical-align:middle">Enable mRNA folding</span>
+
+					 		</td>
+
+					 	</tr>
+
+
+
+
+					 	<tr style="display:none" id="currentRNABlockadeModel_container">
+
+							<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#translocation_ModelHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+					 		</td>
+
+							<td colspan = 3 style="text-align:center">
+
+					 			RNA blockade model:
+					 			<select class="dropdown modelSetting" style="width:150px;" id = "currentRNABlockadeModel" title="Select which model to use as a blockade for translocation" OnChange="userInputModel_controller()">
+
+					 				<option value="terminalBlockade">Terminal blockade</option>
+					 				<option value="intersectionBlockade">Intersection blockade</option>
+					 				<option value="midpointBlockade">Midpoint blockade</option>
+
+								</select>
+					 		</td>
+
+
+					 	</tr>
+
+
+
+
+					 	<!--
+					 	<tr id="nbpToFold_container">
+
+
+					 		<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#nbpToFold_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+					 		</td>
+
+
+							<td style="text-align:right; font-size:14px">
+								Number of bases to fold = 
+					 		</td>
+
+					 		<td>
+								<input class="variable"  type="number" id="nbpToFold"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  nt</sup> 
+					 		</td>
+
+
+					 		<td>
+								<input type=image id='nbpToFold_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+					 			
+					 		</td>
+
+					 	</tr>
+					 	-->
+
+				 	</table>
+
+
+					<div id="nbpToFold_desc" style="display:none">
+						<br><br>The first simulation may take longer as we calculate the MFE structure of the nascent strand. 
+					</div>
+					<br>
+				</div>
+
+			</div>
+
+
+
+			<br>
+			<div class="parameter-bg">
+				
+				<div class="parameter-title">
+					<span id="cleavageSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
+					Cleavage Parameters 
+				</div>  
+
+
+
+				<table style="width:100%; display:none"  id="cleavageSettings">
+
+
+
+						<tr id="RateCleave_container">
+
+
+					 		<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateCleave_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+					 		</td>
+
+
+							<td style="text-align:right; width:110px">
+								k<sub>cleave</sub> = 
+					 		</td>
+
+					 		<td>
+								<input class="variable"  type="number" id="RateCleave" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+					 		</td>
+
+
+					 		<td>
+								<input type=image id='RateCleave_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">
+					 		</td>
+
+					 	</tr>
+
+
+
+					 	<tr id="CleavageLimit_container">
+
+
+					 		<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#RateCleave_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+					 		</td>
+
+
+							<td style="text-align:right; width:110px">
+								&lambda;<sub>cleave</sub> = 
+					 		</td>
+
+					 		<td>
+								<input class="variable"  type="number" id="CleavageLimit" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  nt 
+					 		</td>
+
+
+					 		<td>
+								<input type=image id='CleavageLimit_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">
+					 		</td>
+
+					 	</tr>
+
+
+
+
+
+				</table>
+				<br>
+			</div>
+
+
+
+
+
+
+
+			<br>
+			<div class="parameter-bg">
+				
+				<div class="parameter-title">
+				<span id="advancedModelSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
+				Advanced Model Settings 
+				 </div>
+
+
+
+
+					<table style="width:100%; display:none" id="advancedModelSettings">
+
+
+						
+
+
+						<tr id="arrestTime_container">
+
+							<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#arrestTime_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+					 		</td>
+
+							<td style="text-align:right; width:110px">
+					 			Arrest time: 
+					 		</td>
+
+					 		<td>
+								<input type="number" class="variable" id="arrestTime" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">s
+				 			</td>
+
+
+					 		<td>
+								<input type=image id='arrestTime_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn"> 
+					 		</td>
+
+					 	</tr>
+
+
+
+						<tr id="proposalWidth_container">
+
+							<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#arrestTime_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+					 		</td>
+
+							<td style="text-align:right; width:110px">
+					 			Proposal width:
+					 		</td>
+
+					 		<td>
+								<input type="number" min=0 step=0.1 class="variable" id="proposalWidth" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">
+				 			</td>
+
+
+					 		<td>
+					 		</td>
+
+					 	</tr>
+
+
+
+
+
+					 	<tr id="allowGeometricCatalysis_container" title="Do you want to enable the geometric elongation speed boost? This will improve performance however some information will be lost eg. backwards translocation, NTP release.">
+
+
+							<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="../src/Images/help.png"></a>
+					 		</td>
+
+
+					 		<td colspan=3>
+			 					<label class="switch">
+						 		 <input class="modelSetting" type="checkbox" id="allowGeometricCatalysis" OnChange="userInputModel_controller()"> </input>
+						 	 	<span class="slider round"></span>
+
+								</label> 
+								<span style="font-size:15px; vertical-align:middle" > Enable geometric reaction sampling </span>
+
+
+					 		</td>
+
+					 	</tr>
+
+
+
+
+						<tr id="subtractMeanBarrierHeight_container"  title="Subtract the mean Gibbs energy barrier height (across the sequence) of the translocation transition state. This will make comparisons between different translocation models more meaningful.">
+
+
+
+							<td style="text-align:left; font-size:10px; float:left; width:20px">
+					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="../src/Images/help.png"></a>
+					 		</td>
+
+
+					 		<td colspan=3>
+			 					<label class="switch">
+							 	 <input class="modelSetting" type="checkbox" id="subtractMeanBarrierHeight" OnChange="userInputModel_controller()"> </input>
+							 	 <span class="slider round"></span>
+
+								</label> 
+								<span style="font-size:15px; vertical-align:middle"> Normalise translocation barriers </span>
+								<br> <br style="line-height:5px">
+					 		</td>
+
+					 	</tr>
+
+
+
+				 	
+
+
+
+					 </table>
+
+		
+				<br>
+			</div>
+			<br>
+			
+			
+			
+			<div style="display:none" class="parameter-bg">
+				
+				<div class="parameter-title">Slippage Parameters </div>
+				
+				<div id="GDaggerDiffuse_container">
+				 	<br>&Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>bulgePrimer</sub> = <input class="variable"  type="number" id="GDaggerDiffuse"  style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T </input> 
+					<input type=image id='GDaggerDiffuse_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn"> 
+				</div>
+				
+				
+				<span style="display:none"> <br>&Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>formation</sub> = <input class="variable"  type="number" title="Free energy barrier height of bulge formation only" name="GDaggerForm" id="GDaggerForm" value=1000 style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T </input> </span>
+
+
+			<span style="display:none"><br>&Delta;G<sub>bulge</sub> = <input class="variable"  type="number" title="Free energy change of having a bulge in the primer" name="GBulge" id="GBulge" value=0 style="vertical-align: middle; 
+			text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T</span>
+			
+				
+				
+			</div>
+		<br>
+
+
+
+
+
+			<div class="parameter-bg" style="display:none">
+				<div class="parameter-title">Template Slippage Parameters </div>
+				 <br>&Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>bulgeTemplate</sub> = <input class="variable"  type="number" title="Free energy barrier height of bulge formation and diffusion in the template sequence" name="GDaggerDiffuseT" id="GDaggerDiffuseT" value=14 style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T
+
+					<span style="display:none"><br>&Delta;G<sub>bulge</sub> = <input class="variable"  type="number" title="Free energy change of having a bulge in the primer" name="GBulge" id="GBulge" value=0 style="vertical-align: middle; 
+					text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T</span>
+				
+			</div>
+
+
+
+			
+			
+			 
+			
+			<br><br><br>
+			
+
+			
+			
+			</div>
+			
+			
+			
+		
+			
+
+		<div id="main">
+			
+		 
+			
+			<div id="header" class="header">
+				<table style="width:100%">
+					
+
+					
+					<tr>
+						<td style="height:30px; width: 30%; vertical-align:bottom; ">
+							<div id="mfeOutput" style="font-family:'Courier New'; "> </div>
+							
+							
+						</td>
+
+
+
+
+                        <td  style="text-align:center; font-size: 20px; vertical-align:top; font-family: 'Palatino'; width: 40%;"> 
+                                <div style="width:100%; text-align:center;">
+
+                                        <a href="" target="_blank" style="text-decoration:none;  color:#414b4b" title="Launch SimPol">
+                                            <div style="font-size: 90px; margin-bottom: -20px "> SimPol </div>
+                                            <div style="font-size: 20px; "> Simulation of Nucleic Acid Polymerases </div>
+                                        </a>
+                                    
+                                    
+                                </div>
+                                        
+                            </td>
+                            
+                            
+
+                            <td style="height:30px; width: 30%; vertical-align:bottom; text-align:right;"> 
+
+
+
+                              <a href="../../"  target="_blank" style="text-decoration:none; color:white; ">
+                                    <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#008CBA; padding: 8 8;" title="Go back home">Home</span> 
+                              </a>&nbsp;
+                                <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#b20000; padding: 8 8; color:white" title="Launch SimPol">SimPol</span> 
+                              &nbsp;
+                             <a href="about/"  target="_blank" style="text-decoration:none; color:white; ">
+                                    <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#008cba; padding: 8 8;  color:white; " title="Introductory tutorials and other information about SimPol">About</span>
+                                </a>    
+                         
+                                    
+                            </td>
+
+
+
+
+					</tr>
+
+					
+				</table>
+			</div>
+			
+
+
+			
+			<div class="errorMsg" id="badBrowser" style="display:none"> There was a javascript error which will prevent this page from operating. Please update your web browser. If this problem persists then send us information about the bug to support@polymerase.nz </div>
+			
+			<div class="errorMsg" id="browserWWdisabled" style="display:none">This program employs a Web Worker to improve page responsivity and performance. 
+			There was a problem connecting. For maximum performance please upgrade your browser or change your browser settings to allow the Web Worker to register. </div>
+
+			<div class="errorMsg" id="webassemblyNotRegister"  style="display:none"> This program uses WebAssembly to maximise performance. Your browser is not allowing WebAssembly to instantiate. Some features may not be supported and those which are
+					may have reduced performance. We recommend you upgrade your browser or change  browser settings to support WebAssembly. </div>
+			
+			
+			<div class="errorMsg" id="landscapeRequest" style="font-size: 25px;">
+				We recommend you view this page in landscape mode! </div>
+				
+				
+			
+
+				
+				
+			<div id="paramsTab" style="transition:0.5s; position:fixed; left: -5px; top: 300px; transform: rotate(-90deg); transform-origin: left top 0; padding: 5 10; background-color:#008cba; color:white; border-radius: 0 0 10px 10px; z-index:3">
+				<span id="openNavBtn" title="Toggle parameter side-navigation menu" style="text-align:right;  font-size:20px;cursor:pointer; font-color: #858280;" onclick="openNav();" class="noselect">&#9776; Parameters</span>
+			</div>
+
+			
+			<div id="theToolbar" class="noselect" style="position:fixed; top:320px; left:10px; z-index:5;">
+				<table class="toolbar" cellpadding=3 style="border-radius: 10px;">
+						
+
+					<tr style="height:20px">
+						<td></td>
+						<td></td>
+					</tr>
+						
+					<tr>
+						<td>
+							<div class="toolbarIcon" style="cursor:pointer;" onClick="resetBtn();" title="Reinitiate the polymerase"> <img id='refresh'   src="../src/Images/reset.png" style="padding:0 0; width:35px; height:35px"> </div>
+						</td>
+
+
+						<td>
+							<div id="simulateBtn" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="startTrials_controller()" title="Perform N simulations stochastically"> <img id='startTrials'   src="../src/Images/dice.png" style="vertical-align: middle; width:35px; height:35px;">   </div>
+							<div id="stopBtn_simulate" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="../src/Images/stop.png" style="width:35px; height:35px;"> </div>
+						</td>
+
+
+					</tr>
+					<tr>
+
+						
+
+						<td>
+							<div class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="clearKineticDataCache();" title="Clear data from the cache" > 
+								<img id='deleteAllData' src="../src/Images/close.png" style="padding:5 0; height:25px;">
+							</div>
+						</td>
+
+
+						<td>
+							<div id="transcribeBtn" class="toolbarIcon" style="cursor:pointer;" onClick=transcribe_controller()  title="Copy the next N bases"> <img id='trans'  src="../src/Images/transcribe.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
+							<div id="stopBtn_transcribe" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="../src/Images/stop.png" style="width:35px; height:35px;"> </div>
+						
+						</td>
+
+					</tr>
+					<tr>
+
+						<td>
+							<div id="foldBtnDiv" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="showFoldedRNA_controller()" title="Fold the mRNA (using the ViennaRNA suite)"> <img  src="../src/Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
+						</td>
+
+						<td>
+							<div id="stutterBtn" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick=stutter_controller() title="Stutter N times (iteratively copy the current base N times)" > <img id='stutter'  src="../src/Images/stutter.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
+							<div id="stopBtn_stutter" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="../src/Images/stop.png" style="width:35px; height:35px;"> </div>
+						
+						</td>
+
+
+					<tr>
+						<td colspan=2>
+							<div id="progressToolbarCell" class="toolbarIcon" style="width:90px; height:22px; vertical-align:middle; background-color:#424f4f; color:white"> 
+
+
+								<div style="position:relative">
+									<canvas id="progressSimCanvas" style="display:none; z-index:1; position:absolute; left:0" width="90px" height="22px"></canvas>
+									<span id="progressSimSpan" style="font-size: 16px; display:none; cursor:auto; z-index:2; color:white; text-align:center; position:absolute; left:0; width:100%"></span> 
+								</div>
+
+								<span id="numSimSpan" title="Number of simulations to perform (if you press simulate), or number of bases to copy (if you press copy), or number of times to stutter (if you press stutter)"> 
+									<b>N = </b><input type="number" name="nbasesToSimulate" min="1" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:left; width: 60px; background-color: #858280; color:white"> 
+								</span> 
+							</div>
+						</td>
+
+					</tr>
+					
+					
+
+
+					<tr>
+						<td colspan=2>
+							<div class="toolbarIcon">
+								<select class="dropdown" title="Duration of each reaction" id = "PreExp" OnChange="changeSpeed_controller();" style="vertical-align: middle; text-align:right;">
+									<option value="slow">Slow</option>
+									<option value="medium">Medium</option>
+									<option value="fast">Fast</option>
+									<!--<option value="ultrafast">Ultrafast</option>-->
+									<option value="hidden">Hidden</option>
+								</select>
+							</div>
+						</td>
+
+					</tr>
+					
+					
+					</tr>
+
+
+					
+					<tr>
+						<td>
+							<div class="toolbarIcon" style="cursor:pointer;" onClick="saveSession();" title="Download the current session in xml format"> <img id='saveSessionID'   src="../src/Images/downloadGreen.png" style="padding:5 0; height:25px;"> </div>
+						</td>
+
+						<td>
+							<div class="toolbarIcon" style="cursor:pointer;" onClick="loadSession();" title="Upload a session in xml format" > 
+								<img id='loadSessionID' class="rotate180" src="../src/Images/downloadGreen.png" style="padding:5 0; height:25px;">
+							</div>
+							<input style="display:none" type="file" id="uploadSessionFile" accept=".xml"> 
+						</td>
+					</tr>
+					
+					
+					<tr style="height:20px">
+						<td>
+							<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#toolbarHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+						</td>
+						<td></td>
+					</tr>
+
+				</table>
+			</div>
+
+
+			<br><br>
+
+
+			<div id="navigationPanel"  class="panelOuter" style="margin-left:130px;">
+				<div class="panelInner">
+
+					<span style="font-size:18px; font-family:Bookman;">
+						<input type=button id='showNavigationPanel' class='minimise' value='-' onClick=showNavigationPanel()> 
+						<b class="noselect">Navigation panel</b> 
+							<span style="font-size:12px; font-family:Arial; vertical-align:middle"> - Press any of the arrows below to apply a reaction </span>
+	 						<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#navigationPanelHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+							
+							</span>
+	 
+						<input type=button id='viewModelBtn' onClick=viewModel() value='View model diagram' title="View the kinetic diagram of this model" class="operation" style="z-index: 100; float:right; width:160px">
+						<!--<input type=image id='viewModelBtn' title="View the kinetic diagram of this model" onClick="viewModel()" src="../src/Images/diagram.png" style="padding: 3 3; width:50px; height:25px; vertical-align: middle; ">-->
+					</span>
+
+						
+							<div class="noselect" id="navigationPanelTable" class="scrollbar" style="overflow-x:scroll; width:100%; position:relative">
+							<table  cellspacing="0" style="width:100%;">
+
+
+								<tr style="text-align:center;">
+
+
+									<td style="width:25%; vertical-align:top">
+
+										<div style="font-size:18px; font-family:Arial;">
+											Translocation
+										</div>
+
+										<div id="translocationCanvasDIV" style="position:relative; margin:auto; width: 350px">
+											<canvas id="translocationLandscapeCanvas" height=100 width=350 ></canvas>
+											<canvas id="translocationCanvas" height=60 width=350 ></canvas>
+										</div>
+
+
+									</td>
+
+
+									<td style="width:25%; vertical-align:top">
+										<div style="width:100%;">
+										
+											<div style="font-size:18px; font-family:Arial; vertical-align:top">
+												Nucleotide incorporation
+											</div> <br>
+
+											<div id="ntpCanvasDIV" style="position:relative; margin:auto; width: 350px">
+												<canvas id="ntpCanvas"  height=70 width=350></canvas>
+											</div><br>
+
+
+											Base to add:
+											<input type=button id='ntpA' onClick=userChangeNTPType('A') value='A' title="Set the NTP to A" class="ntp ntp-selected">
+											<input type=button id='ntpC' onClick=userChangeNTPType('C') value='C' title="Set the NTP to C" class="ntp">
+											<input type=button id='ntpG' onClick=userChangeNTPType('G') value='G' title="Set the NTP to G" class="ntp">
+											<input type=button id='ntpT' onClick=userChangeNTPType('T') value='T' title="Set the NTP to T" class="ntp">
+										</div>
+
+									</td>
+
+
+									<td style="width:25%; vertical-align:top">
+
+										<div style="font-size:18px; font-family:Arial; vertical-align:top">
+											Deactivation
+										</div> <br>
+										<div id="deactivationCanvasDIV" style="position:relative; margin:auto; width: 300px">
+											<canvas id="deactivationCanvas"  height=70 width=300></canvas>
+										</div><br>
+
+
+									</td>
+
+
+
+									<td style="width:25%; vertical-align:top">
+
+
+										<div style="font-size:18px; font-family:Arial; vertical-align:top">
+											Cleavage
+										</div> <br>
+										<div id="cleavageCanvasDIV"  style="position:relative; margin:auto; width: 300px">
+											<canvas id="cleavageCanvas"  height=70 width=300></canvas>
+										</div><br>
+
+
+									</td>
+
+
+
+
+								</tr>
+
+
+
+								<tr id="slippageLandscapesTR" style="text-align:center;">
+
+
+									<td id="slippageTR0" style="width:25%; vertical-align:top" class="slippageCell">
+
+										<br><br>
+										<div style="font-size:18px; font-family:Arial; vertical-align:top">
+											Slippage
+										</div> <br><br>
+										<div id="slippageCanvasDIV0" style="position:relative; margin:auto; width: 450px">
+											<canvas id="slippageCanvas0"  height=50 width=450></canvas>
+										</div><br>
+
+
+									</td>
+
+
+
+
+								</tr>
+
+
+
+							
+							
+							</table> 	
+						</div>
+						<br><br>
+					</div>
+				</div>
+
+
+			<table style="width:100%;">
+
 
 
 				<tr>
+					<td style="width:130px"></td>
+					<td id="bases_container" style="position:relative;">
 
-
-					<td style="width:50%">
-						<div class="panelOuter" style="margin-left:50px; margin-right:50px">
-							<div class="panelInner">
-
-								<span  style="font-size:80px; font-family:Arial;">
-									<a href="simpol/" style="text-decoration: none; text-align:center; vertical-align:middle; width:300px">
-										<div style="color:#008cba; width:100%">SimPol</div>
-									</a>
-
-
-									<div style="padding: 20 10; font-size: 18px;  text-align:justify">
-										
-				
-										<b>An engine for visualising, simulating,  and performing inference on the kinetics of nucleic acid polymerases.</b> 
-
-										
-
-										The copying of nucleic acids is a fundamental biological process studied by a range of people -- including
-										students, molecular biologists, and evolutionary biologists. <br><br>
-
-
-										<b style="color:#008cba">SimPol</b> is a sandbox for students and researchers alike to
-										hone their understanding of transcription and other nucleic acid copying processes. This is achieved with
-										the ability to manually apply a range of reactions to the polymerase, or by simulating the system as a Markov process. 
-
-										The kinetic and thermodynamic parameters which govern these processes can be modified and the effects can be displayed
-										with a range of live-updating plots.
-
-										 <br><br>
-
-                                        <b style="color:#008cba">SimPol</b> also comes with a Bayesian inference engine that can be used to fit these parameters
-                                         to single-molecule data.
-
-
-                                         <br><br>
-
-                                         <div style="float:right">
-                                             <a href="simpol/" style="text-decoration:none; color:white; ">
-                                                <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#008CBA; padding: 8 8;" title="Launch SimPol">Launch</span> 
-                                              </a>&nbsp;
-                                             <a href="simpol/about" style="text-decoration:none; color:white; ">
-                                                <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#008CBA; padding: 8 8;" title="Introductory tutorials and other information about SimPol">Read manual</span>
-                                             </a>
-                                        </div>
-                                                
-                                        <br>
-                                                
-									</div>
-
-
-									<a href="simpol/" target="_blank" style="display:none; text-decoration: none; vertical-align:middle; width:300px">
-										<img src="src/Images/logo.png" style="height:110px; vertical-align:middle;">
-									</a>
-
-
-								</span>
+							<div class="scrollbar" id="bases" style="height:300px; width:100%; display:block; overflow-x:scroll; overflow-y:auto; position:relative">
 								
-
-							</div>
-						</div>
-
-					</td>
-
-
-					<td style="width:50%">
-						<div class="panelOuter" style=" margin-left:50px; margin-right:50px">
-							<div class="panelInner">
-
-								<span   style="font-size:80px; font-family:Arial;">
-
-									<a href="phylopause/" style="text-decoration: none;  text-align:center; vertical-align:middle; width:300px">
-										<div style="color:#A5CF19; width:100%">PhyloPause</div>
-									</a>
-
-									<div style="padding: 20 10; font-size: 18px; text-align:justify">
-										
-				
-										<b>A predictor of transcriptional pause sites in a DNA template using thermodynamic and phylogenetic information. </b>
-
-										RNA polymerases do not travel at homogeneous speeds along the template during transcription. While the average transcription
-										elongation velocity is typically between 10-100 bp/s for prokaryotes and eukaryotes, there are sites in the template
-										which take an average of seconds or even minutes to transcribe. These positions are known as pause sites and can play 											important regualtory roles in transcription. <br><br>
-										<b style="color:#A5CF19">PhyloPause</b> uses <b style="color:#008cba">SimPol</b> to make pause site predictions on each sequence in a multiple sequence alignment,
-										and then calculates a phylogenetic average of the evidence that any given site in the DNA template is a transcriptional 
-										pause site. <br><br>
-
-
-
-                                          <div style="float:right">
-
-                                            <a href="phylopause/" style="text-decoration:none; color:white; ">
-                                                <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#A5CF19; padding: 8 8;" title="Launch PhyloPause">Launch</span> 
-                                              </a>&nbsp;
-                                             <a href="phylopause/about" style="text-decoration:none; color:white; ">
-                                                <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#A5CF19; padding: 8 8;" title="Introductory tutorials and other information about PhyloPause">Read manual</span>
-                                             </a>
-                                                    
-                                        </div>
-                                                
-                                        <br>
-
-									</div>
-
-									<a href="phylopause/" target="_blank" style="display:none; text-decoration: none; vertical-align:middle; width:300px">
-										<img src="src/Images/phylopause.png" style="height:110px; vertical-align:middle;">
-									</a>
-
-
-
-								</span>
-								
-
-							</div>
-						</div>
-
+							</div> 
 					</td>
 				</tr>
 
-                    </table
 
-			   
+			</table>
+			<br>
+
+
+
+
+
+			<div id="plots4"  class="panelOuter" style=" margin-left:130px;">
+				<div class="panelInner">
+
+					<span class="noselect"  style="font-size:18px; font-family:Bookman;">
+						<input type=button id='showSitewisePlot' class='minimise' value='+' onClick="showSitewisePlot()">
+						<b>Sitewise panel</b>
+						&nbsp;&nbsp;&nbsp;
+						<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot4" OnChange="selectPlot(4);" style="vertical-align: middle; text-align:right;">
+								  <option value="none">Display a sitewise plot...</option>
+								  <option value="pauseSite">Time per site</option>
+								  <!--<option value="abortionSite">Arrest probability per site</option>-->
+								  <!--<option value="misincorporationSite">Misincorporations per site</option>-->
+						</select>
+						<span id="plot4Buttons" style="display:none; font-size:16px">
+							&nbsp;&nbsp;&nbsp;
+
+							<input type=image id='plotOptions4' title="Change the settings of this plot" onClick=plotOptions(4) src="../src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px;">  
+
+							&nbsp;&nbsp;
+							<input type=button id='minus100Sites' class='minimise dropdown-disabled' style='width:50px'  value='&larr;120' onClick=minus100Sites() title='See previous 120 sites'>
+							&nbsp;Showing sites <span id='numSitesDisplayed'></span> out of <span id='numSitesTotal'>0</span>&nbsp;
+							<input type=button id='plus100Sites' class='minimise dropdown-disabled' style='width:50px'  value='120&rarr;' onClick=plus100Sites() title='See next 120 sites'>
+
+							&nbsp;&nbsp;<input type=image id='downloadPlot4' title="Download the data displayed in this plot" onClick=downloadPlot(4) src="../src/Images/download.png" style="vertical-align: middle; height:20px;">  
+						</span>
+
+
+
+					</span>
+					
+
+					<div class="scrollbar" id="plotDIV4"  style="display:none; width: 95%; height:170px; display:block; overflow-x:scroll; overflow-y:auto;  position:relative"> 
+						<div id="plotCanvasContainer4" style="position:absolute"> 
+							<canvas height=150 id="plotCanvas4" style="position:absolute">
+						</div> 
+					</div> 
+					</div>
+				</div>
+
+			<br><br>
+			<div id="plots123"  class="panelOuter" style="margin-left:130px;">
+				<div class="panelInner">
+
+					<span class="noselect"  style="font-size:18px; font-family:Bookman;">
+						<input type=button id='showPlots' class='minimise' value='-' onClick="showPlots()">
+						<b>Plot panel</b>
+
+						<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
+							- Visualise the simulation output in real-time
+						</span>
+							
+
+					</span>
+
+						<div id="plotsTableDIV" class="scrollbar" style="width: 100%; position: relative; display: block; overflow-x: scroll;">
+						<table  style="width:100%">
+							<tr style="text-align:center;">
+							
+									
+							
+								<td style="width:33%; vertical-align: top; ">
+										
+
+											<div id="plotDIV1" style="display:none">
+												<br>
+												<div id="plotLabel1"></div>
+												<div id="plotCanvasContainer1"> 
+													<canvas id="plotCanvas1" width="500px" height="300px"></canvas> 
+												</div>
+											</div>
+										
+											<br>
+												<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot1" OnChange="selectPlot(1);" style="vertical-align: middle; text-align:right;">
+															  <option value="none">Display a plot...</option>
+															  <option value="distanceVsTime">Distance vs time</option>
+															  <option value="pauseHistogram">Time histogram</option>
+															  <option value="velocityHistogram">Velocity histogram</option>
+															  <option value="parameterHeatmap">Parameter plot</option>
+												</select>
+											
+
+											<input type=image id='plotOptions1' title="Change the settings of this plot" onClick=plotOptions(1) src="../src/Images/gear.png" style="cursor: pointer; vertical-align: middle; width:20px; height:20px; display:none">  
+											<input type=image id='downloadPlot1' title="Download the data displayed in this plot" onClick=downloadPlot(1) src="../src/Images/download.png" style="vertical-align: middle; cursor: pointer; height:20px; display:none">  
+											<a id="helpPlot1" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="../src/Images/help.png"></a>
+							
+
+
+
+								</td>
+								
+								
+								<td style="width:33%; vertical-align: top;">
+
+
+										<div id="plotDIV2" style="display:none">
+											<br>
+											<div id="plotLabel2"></div>
+											<div id="plotCanvasContainer2"> 
+												<canvas id="plotCanvas2" width="500px" height="300px"></canvas>
+											</div>
+										</div>
+
+
+										<br>
+											<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot2" OnChange="selectPlot(2);" style="vertical-align: middle; text-align:right;">
+															  <option value="none">Display a plot...</option>
+															  <option value="distanceVsTime">Distance vs time</option>
+															  <option value="pauseHistogram">Time histogram</option>
+															  <option value="velocityHistogram">Velocity histogram</option>
+															  <option value="parameterHeatmap">Parameter plot</option>
+											</select>
+										
+										<input type=image id='plotOptions2' title="Change the settings of this plot" onClick=plotOptions(2) src="../src/Images/gear.png" style="cursor: pointer;vertical-align: middle; width:20px; height:20px; display:none">  
+										<input type=image id='downloadPlot2' title="Download the data displayed in this plot" onClick=downloadPlot(2) src="../src/Images/download.png" style="cursor: pointer;vertical-align: middle;  height:20px; display:none ">  
+										<a id="helpPlot2" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="../src/Images/help.png"></a>
+							
+										
+										
+										
+
+
+
+								</td>
+								
+
+								
+								<td style="width:33%; vertical-align: top;">
+
+
+									<div id="plotDIV3"  style="display:none">
+										<br>
+										<div id="plotLabel3"></div>
+										<div id="plotCanvasContainer3"> 
+											<canvas id="plotCanvas3" width="500px" height="300px"></canvas>
+										</div>
+									</div>
+
+									<br>
+										<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot3" OnChange="selectPlot(3);" style="vertical-align: middle; text-align:right;">
+															  <option value="none">Display a plot...</option>
+															  <option value="distanceVsTime">Distance vs time</option>
+															  <option value="pauseHistogram">Time histogram</option>
+															  <option value="velocityHistogram">Velocity histogram</option>
+															  <option value="parameterHeatmap">Parameter plot</option>
+													
+										</select>
+									
+									<input type=image id='plotOptions3' title="Change the settings of this plot" onClick=plotOptions(3) src="../src/Images/gear.png" style="cursor: pointer;vertical-align: middle; width:20px; height:20px; display:none">  
+									<input type=image id='downloadPlot3' title="Download the data displayed in this plot" onClick=downloadPlot(3) src="../src/Images/download.png" style="cursor: pointer;display:none; vertical-align: middle; height:20px; ">  
+									<a id="helpPlot3" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="../src/Images/help.png"></a>
+							
+									
+									
+									
+
+								
+								</td>
+								
+
+								
+							
+							</tr>
+
+
+						</table>
+					</div>
+					
+				</div>
+			</div>
+
+
+
+
+
+
+
+			<br><br>
+			<div id="ABCpanel"  class="panelOuter" style="margin-left:130px;">
+				<div class="panelInner">
+
+				<span class="noselect"  style="font-size:18px; font-family:Bookman;">
+					<input type=button id='showABCPanel' class='minimise' value='+' onClick=showABCPanelFn()> 
+					<b class="noselect">Approximate Bayesian Computation</b> 
+						<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
+							- Fit the parameters to experimental data using Markov-chain-Monte-Carlo approximate Bayesian computation (MCMC-ABC)
+						</span>
+ 						<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#setupABC_ABCSectionHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+						
+
+ 
+				</span>
+
+					
+					<div id="ABCPanelTableDIV"  class="scrollbar" style="display:none; overflow-x:scroll; width:100%; position:relative">
+
+						<br>
+
+						<table style="width:100%; vertical-align:top">
+
+							<tr style="vertical-align:top">
+								<td>
+									<table id="ABCPanelTable1" style="position:relative; display:block; width:50%; vertical-align:top" cellspacing="0" cellpadding="10" >
+									</table>
+								</td>
+
+								<td>
+									<table id="ABCPanelTable2" style="position:relative; display:block; width:50%; vertical-align:top" cellspacing="0" cellpadding="10" >
+									</table>
+								</td>
+							</tr>
+
+						</table>
+
+
+
+						<br><br>
+
+
+						<table padding=5 cellpadding=10 style="vertical-align:top">
+
+							<tr>
+								
+
+								<td style="display:none">
+									<div style="position:relative; vertical-align:top;">
+										
+										<b>Inference Method:</b><br>
+										<input type="range" min="1" max="2" value="2" class="rangeslider noselect" style="width:100px" OnChange="toggleMCMC()" id="ABC_useMCMC" title="Use the R-ABC or MCMC-ABC algorithm to fit the data">
+										<table style="margin-left: 30px; height: 100px; margin-top: -26px;">
+											<tr>
+												<td>
+													Rejection ABC
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+													Markov-chain-Monte-Carlo ABC
+												</td>
+											</tr>
+
+										
+										
+										</table>
+										 
+									</div>
+								</td>
+							
+
+								<td style="vertical-align:top; text-align:right">
+
+									<b style="text-align:right">Length settings</b><br>
+									<table style="text-align:right;  float:right">
+										
+										<tr>
+											<td>
+												Number of MCMC iterations:
+												<input type="number" id="MCMCntrials" min=0 value=10000 title="Number of iterations to run the MCMC chain for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008cba">
+											</td>
+										</tr>
+
+
+
+										<tr>
+											<td>
+												Number of trials per data point:
+												<input type="number" id="MCMC_ntestsperdata" min=1 value=5 title="Number of tests to perform at each force/NTP setting. The mean velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008cba">
+											</td>
+										</tr>
+									
+									
+									</table>
+
+								</td>
+
+
+
+								<td style="vertical-align:top; text-align:right">
+
+									<b style="text-align:right">Threshold settings</b><br>
+									<table style="text-align:right; float:right">
+										<tr>
+											<td>
+												&isin;<sub>min</sub> =
+												<input type="number" id="MCMC_chiSqthreshold_min" min=0 value=12 title="Chi-squared threshold which must be met to accept a point into the posterior" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+											</td>
+										</tr>
+										
+										<tr>
+											<td>
+												&isin;<sub>0</sub> =
+												<input type="number" id="MCMC_chiSqthreshold_0" min=0 value=1000 title="Initial chi-squared threshold. This will be decreased every iteration until reaching the minimum threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+											</td>
+										</tr>
+										
+										<tr>
+											<td>
+												&gamma; =
+												<input type="number" id="MCMC_chiSqthreshold_gamma" min=0 max=1 step="0.0001" value=0.999 title="Exponential decrease in chi-squared threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+											</td>
+										</tr>
+
+									
+									</table>
+
+								</td>
+
+
+
+								<td style="vertical-align:top; text-align:right">
+
+									<b style="text-align:right">Chain settings</b><br>
+									<table style="text-align:right; float:right">
+										<tr>
+											<td>
+												Burn-in (%):
+												<input type="number" id="MCMC_burnin" onChange="update_burnin_controller();" min=0 max=100 value=-1 title="Percentage of points to throw away before reaching the posterior distribution. Set to -1 to allow Simpol to select burn-in automatically" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+											</td>
+										</tr>
+										
+										<tr>
+											<td>
+												Log every (states):
+												<input type="number" id="MCMC_logevery" min=1 value=20 title="How often do you want to log the current position" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+											</td>
+										</tr>
+										
+									</table>
+
+								</td>
+
+
+
+
+
+								<td style="vertical-align:middle; text-align:right">
+
+									
+									<table style="text-align:center">
+										<tr>
+
+
+											<td>
+												<input type=button id="posteriorSummary_btn" onClick="posteriorSummary()" value='Posterior Summary' title="Extract values from the posterior distribution" class="operation" style="background-color:#008cba; width: 200px"> 
+												<br><br>
+												<input type=button id="beginMCMC_btn" onClick="beginABC()" value='Begin MCMC-ABC' title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="operation beginABC_btn" style="background-color:#008cba; width: 180px"> 
+
+											</td>
+
+										</tr>
+
+										
+									</table>
+
+								</td>
+
+
+
+							<tr>
+						</table>
+						<br>
+
+						<div style="padding: 5 10">
+
+
+
+
+
+							<span id="selectLoggedPosteriorDistnDIV" style="display:none">
+								<legend><b>Posterior distribution:</b></legend>
+								<select class="dropdown" title="Which posterior distribution do you want to display?" id="selectLoggedPosteriorDistn" onChange="setCurrentLoggedPosteriorDistributionID_controller()" style="vertical-align: middle; text-align:right; min-width: 150px">
+								</select>
+							</span>
+
+							&nbsp;&nbsp;
+							<span>
+								<input type=image id="uploadABC" class="rotate180" title="Upload an ABC output in .log format" onClick="uploadABC();" src="../src/Images/download.png" style="cursor: pointer; vertical-align: middle; height:20px; ">  
+									<input style="display:none" type="file" id="uploadABCinput" accept=".log"> 
+								<input type=image id="downloadABC" title="Download the ABC output (displayed below) in .log format" onClick=downloadABC() src="../src/Images/download.png" style="cursor: pointer; display:none; vertical-align: middle; height:20px; ">  
+							</span>
+
+							&nbsp;&nbsp;
+							<span id="nRowsToDisplayABC" style="margin-left:10px;">
+								<input type=button id='minusABCrows' class='minimise dropdown-disabled' style='width:40px'  value='&larr;30' onClick=minusABCrows() title='See previous 30 rows'>
+								&nbsp;Displaying lines <span id='numABCrowsDisplayed'>0</span> out of <span id='numABCrowsGenerated'>0</span>&nbsp;
+								<input type=button id='plusABCrows' class='minimise dropdown-disabled' style='width:40px'  value='30&rarr;' onClick=plusABCrows() title='See next 30 rows'>
+							</span>
+
+							&nbsp;&nbsp;
+							<span id="ABCacceptanceDIV" style="display:none" title="Accumulative acceptance probability. This value is reset once burn-in has been achieved (if using MCMC).">
+								Acceptance rate: <span id="ABCacceptanceVal"> </span>%
+							</span>
+
+
+							&nbsp;&nbsp;
+							<span id="currentEpsilonDIV" style="display:none" title="Current value of epsilon. Convergence can only be achieved after the current epsilon is equal to the minimum epsilon.">
+								&epsilon; = <span id="currentEpsilonVal">  </span>
+							</span>
+
+							&nbsp;&nbsp;
+							<span id="burninStatusDIV" style="display:none">
+								Status: <span id="burninStatusVal" style="color:red">  </span>
+							</span>
+
+							<br><br>
+
+							<div id="ABCoutput" style="width:95%; font-family:'Courier New'; background-color:white; color: black; font-size: 14px; padding: 10 20; height: 600px; overflow-y:scroll; overflow-x:scroll">
+
+							</div>
+			
+						</div>
+
+
+					</div>
+				</div>
+
+			</div>
+
+
+
+
+
+
+			<br><br>
+			<div id="ModelBuildingPanel"  class="panelOuter" style="margin-left:130px;">
+				<div class="panelInner">
+
+				<span class="noselect"  style="font-size:18px; font-family:Bookman;">
+					<input type=button id='showModelBuildingPanel' class='minimise' value='+' onClick=showModelBuildingPanelFn()> 
+					<b class="noselect">Model comparison</b> 
+						<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
+							- Create and save different models. These models can be compared using MCMC-ABC
+						</span>
+
+						<label style="cursor:pointer; float:right; vertical-align:top"  title = "Check to sample the model from the list of models below. Each model will be sampled with probability proportional to its weight."> 
+							<input class="variable"  type="checkbox" onChange="userChangeModelSampling_controller()" style="cursor:pointer;" id="sampleModelsChk">Sample models</input> 
+						</label> <br>
+ 
+				</span>
+
+					
+					<div id="ModelBuildingTableDIV"  class="scrollbar" style="display:none; overflow-x:scroll; width:100%; position:relative">
+
+						<br>
+
+						<table id="ModelBuildingTable" style="width:100%; vertical-align:top;  background-color:white" cellpadding=5 rowpadding=5>
+
+
+
+						</table>
+
+
+
+					</div>
+				</div>
+
+			</div>
+
+
+
+
+
+
+
+			<br><br>
+			<div style="margin-left:130px;">
+
+				<div id="sequences" class="panelOuter" style="position:relative; transition: 0s;">
+
+					<div class="panelInner">
+
+						<div class="noselect" style='font-size:16px; font-family:Bookman;'>
+							<input type=button class='minimise' id='hideSequences'  value='+' title='Hide/show the sequence window' onClick=toggleSequences()>
+							<span style='font-size:18px; '><b>Copied sequences</b> &nbsp;&nbsp;&nbsp;</span>
+							<span id="terminatedSequencesDescription" style="display:none">
+								<input type=button id='minus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='&larr;20' onClick=minusSequences() title='See previous 20 sequences'>
+								 &nbsp;Displaying seqs <span id='numSeqsDisplayed'>0</span> out of <span id='numSeqsSimulated'>0</span>&nbsp; 
+								<input type=button id='plus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='20&rarr;' onClick=plusSequences() title='See next 20 sequences'>
+								&nbsp;&nbsp;&nbsp;
+								<input type="image" style="vertical-align: middle; height:20px;  padding: 5 0; display:none; cursor: pointer" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="../src/Images/download.png"> </input>
+							</span>
+
+						</div>
+
+						<div id='sequencesTableDIV' class='scrollbar' style='overflow-x: scroll; position:relative; width:100%;'></div>
+
+
+					</div>
+
+
+				</div>
+
+			</div>
+
+
+
+
+
+			<div id="output_asm" style="margin-left:130px; width:100%; height: 100px; overflow-y: scroll; background-color:black; color:white; display:none">
 				
-
-	
-	
-	
-	
-	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
-	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
-
-	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
-	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
+			</div>
 
 
 
+			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
+			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
+			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
+			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
+			
 
 
-	
-	
-		<div class="header">
-			polymerase.nz | Centre for Computational Evolution & School of Biological Sciences, University of Auckland | 2018 
+				<div class="header">
+					SimPol | Centre for Computational Evolution & School of Biological Sciences, University of Auckland | 2018
+				</div>
+
+
 		</div>
-	
+		</div>
 
 
 		</div>
 	</div>
-
-
-</div>
 </body>
 </html>
