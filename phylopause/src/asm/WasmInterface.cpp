@@ -145,7 +145,7 @@ extern "C" {
 
         _PP_tree->clear();
 
-        // Parse each sequence in the multiple sequence alignment
+        // Parse the tree
         string errorMsg = _PP_tree->parseFromNexus(string(nexus));
         if (errorMsg != "") messageFromWasmToJS("{'error':'" + errorMsg + "'}", msgID);
 
@@ -179,7 +179,7 @@ extern "C" {
 
     // Return a JSON string of the cumulatively calculated pause sites
     void EMSCRIPTEN_KEEPALIVE getPauseSites(int msgID){
-
+        
         string JSON = "{'evidence':[";
         vector<int> evidence = PauseSiteUtil::calculateEvidence(_PP_multipleSequenceAlignment);
         for(int i = 0; i < evidence.size(); i ++){
@@ -232,7 +232,7 @@ extern "C" {
         int result[3]; 
 
         // Perform simulations continuously and then send information back and pause once every 1000ms
-        _PP_multipleSequenceAlignment->PhyloPause(_interfaceSimulator, result);
+        _PP_multipleSequenceAlignment->PhyloPause_GUI(_interfaceSimulator, result);
 
 
         // Create JSON string
