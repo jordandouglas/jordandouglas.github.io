@@ -2,7 +2,7 @@
 
 cd /home/jdou557/Documents/Sequences/emsdk
 source ./emsdk_env.sh --build=Release
-cd /home/jdou557/Documents/Cimpol/SimPol/SimPol/SimpolC/simpol/asm
+cd /home/jdou557/Documents/Cimpol/SimPol/SimPol/SimpolC/simpol/src/asm
 
 
 

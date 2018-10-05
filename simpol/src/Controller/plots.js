@@ -2201,7 +2201,7 @@ function add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbi
 
 	var binsEvery = nbins < 5 ? 1 : nbins < 10 ? 2 : nbins < 15 ? 3 : 4;
 	var tickLength = 6 * canvasSizeMultiplier;
-	ctx.lineWidth = 1;
+	ctx.lineWidth = 1 * canvasSizeMultiplier;
 	for (i = 1; i <= nbins; i += binsEvery){
 
 		var x0 = widthScale * (i-1) + axisGap + binGap * (i) + canvasSizeMultiplier;
@@ -4108,7 +4108,7 @@ function downloadPlotInFormat(){
 		// Create a copy of the canvas pointer
 
 		PLOT_DATA["whichPlotInWhichCanvas"][5] = JSON.parse(JSON.stringify(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]));
-		PLOT_DATA["whichPlotInWhichCanvas"][5]["canvasSizeMultiplier"] = 10; // How much bigger is this canvas than the original?
+		PLOT_DATA["whichPlotInWhichCanvas"][5]["canvasSizeMultiplier"] = 4; // How much bigger is this canvas than the original?
 
 		
 		// Call the function which makes the plot (it will be saved to the temporary canvas)

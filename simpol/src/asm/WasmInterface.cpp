@@ -1,4 +1,4 @@
-/* 
+﻿/* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
 	This file is part of SimPol.
@@ -2187,12 +2187,12 @@ extern "C" {
 	
 	// Set the input file name for subsequent use by main()
 	void EMSCRIPTEN_KEEPALIVE setInputFilename(char* filename){
-		inputXMLfilename = string(filename);
+		_inputXMLfilename = string(filename);
 	}
 	
 	// Set the output file name for subsequent use by main()
-	void EMSCRIPTEN_KEEPALIVE setOutputFilename(char* filename){
-		outputFilename = string(filename);
+	void EMSCRIPTEN_KEEPALIVE set_outputFilename(char* filename){
+		_outputFilename = string(filename);
 	}
 	
 
