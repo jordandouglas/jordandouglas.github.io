@@ -25,7 +25,8 @@
 
 #include <iostream>
 #include <string>
-
+#include <algorithm>
+#include <fstream>
 
 using namespace std;
 
@@ -40,10 +41,47 @@ PhyloTree::PhyloTree() {
 
 
 
+// Load in the tree file
+string PhyloTree::parseFromNexusFile(string filename){
+
+
+    ifstream treeFile;
+    string line = "";
+    treeFile.open(filename);
+
+    // Create a string which contains all the lines in the file, where each line is concatenated with a |
+    // The reason I am using | instead of \n is because of the difficulties in parsing \n from JavaScript to WebAssembly
+    string nexus = "";
+    if(treeFile.is_open()) {
+
+         while(getline(treeFile, line)){
+            nexus += line + "|";
+         }
+
+    }
+
+    else {
+
+        cout << "Cannot parse file " << filename << endl;
+        exit(0);
+
+    }
+
+
+
+    // Parse the contents
+    return this->parseFromNexus(nexus);
+
+
+
+
+}
+
+
 // Load the tree nodes and attributes from a nexus string
 string PhyloTree::parseFromNexus(string nexus) {
 
-    cout << "Parsing nexus " << nexus << endl;
+    //cout << "Parsing nexus " << nexus << endl;
 
 
     vector<string> nexus_split = Settings::split(nexus, '|'); // | used a line break

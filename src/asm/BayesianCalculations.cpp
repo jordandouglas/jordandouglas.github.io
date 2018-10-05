@@ -44,7 +44,7 @@ vector<PosteriorDistributionSample*> BayesianCalculations::loadLogFile(string lo
 
 	
 	ifstream logfile;
-	string line;
+	string line = "";
     logfile.open(logFileName);
     list<PosteriorDistributionSample*> states;
     if(logfile.is_open()) {
@@ -53,8 +53,8 @@ vector<PosteriorDistributionSample*> BayesianCalculations::loadLogFile(string lo
 
 
 		// Parse header
-    	// getline(logfile, line);
-    	while (line != "") getline(logfile, line);
+    	//getline(logfile, line);
+    	while (line == "") getline(logfile, line);
     	vector<string> headerLineSplit = Settings::split(line, '\t');
 
     	//cout << "line: " << line << endl;
@@ -323,7 +323,7 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistributionSampl
 	bool samplingFromPosterior = posteriorDistribution.size() > 0;
 	cout << "Sampling new data " << ntrials_sim << " times...\n" << endl;
 
-	if (outputFilename != "") cout << "Printing results to " << outputFilename << endl;
+	if (_outputFilename != "") cout << "Printing results to " << _outputFilename << endl;
 
 	// Perform N trials
 	for (int n = 1; n <= ntrials_sim; n ++){
@@ -361,7 +361,7 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistributionSampl
 
 		}
 
-		if (n == 1) state->printHeader(outputFilename != "");
+		if (n == 1) state->printHeader(_outputFilename != "");
 
 
 
@@ -388,7 +388,7 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistributionSampl
 		}
 
 
-		state->print(outputFilename != "");
+		state->print(_outputFilename != "");
 		delete state;
 
 	}

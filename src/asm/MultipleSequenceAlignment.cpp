@@ -29,11 +29,15 @@
 #include "Settings.h"
 #include "PhyloTreeNode.h"
 #include "Eigen/Dense"
+#include "SimulatorResultSummary.h"
+#include "SimulatorPthread.h"
 
 #include <regex>
 #include <algorithm>
 #include <locale> 
 #include <string> 
+#include <fstream>
+
 
 using namespace std;
 using Eigen::MatrixXd;
@@ -57,13 +61,50 @@ int MultipleSequenceAlignment::get_nsites(){
 }
 
 
+
+// Parse the .fasta 
+string MultipleSequenceAlignment::parseFromFastaFile(string filename){
+
+    
+    ifstream fastaFile;
+    string line = "";
+    fastaFile.open(filename);
+
+    // Create a string which contains all the lines in the file, where each line is concatenated with a |
+    // The reason I am using | instead of \n is because of the difficulties in parsing \n from JavaScript to WebAssembly
+    string fasta = "";
+    if(fastaFile.is_open()) {
+
+         while(getline(fastaFile, line)){
+            fasta += line + "|";
+         }
+
+    }
+
+    else {
+
+        cout << "Cannot parse file " << filename << endl;
+        exit(0);
+
+    }
+
+
+
+    // Parse the contents
+    return this->parseFromFasta(fasta);
+
+
+
+
+}
+
 // Parse the list of sequences in the alignment from a fasta string
 // Returns an error message if there are any problems
 string MultipleSequenceAlignment::parseFromFasta(string fasta){
 
     this->clear();
 
-    cout << "Parsing .fasta " << fasta << endl;
+    //cout << "Parsing .fasta " << fasta << endl;
 
 
     vector<string> fasta_split = Settings::split(fasta, '|'); // | used a line break
@@ -288,8 +329,70 @@ string MultipleSequenceAlignment::getCurrentSequence(){
 
 }
 
+
+
+
+
 // Perform simulations on each sequence in the alignment
-void MultipleSequenceAlignment::PhyloPause(Simulator* simulator, int* result){
+void MultipleSequenceAlignment::PhyloPause(){
+
+   
+
+    bool timeoutReached = false;
+    for (currentSequenceForSimulation = 0; currentSequenceForSimulation < this->alignment.size(); currentSequenceForSimulation++){
+
+
+        Sequence* currentSeq = this->alignment.at(currentSequenceForSimulation);
+
+        // Initialise the simulator
+            
+        
+        this->initialisedSimulator = true;
+
+        cout << "Starting sequence " << (currentSequenceForSimulation + 1) << " out of " << this->alignment.size() << endl;
+
+        // Activate the sequence
+        Plots::deletePlotData(_currentStateGUI, true, true, true, true, true, true);
+        Settings::setSequence(currentSeq);
+
+
+        // Reinitialise plot data every time sequence changes
+        Plots::init(); 
+
+
+        // Perform multi-threaded simulation
+        SimulatorResultSummary* simulationResults = SimulatorPthread::performNSimulations(ntrials_sim, false);
+
+           
+            
+      
+        vector<bool>* isPauseSite = PauseSiteUtil::identifyPauseSites(currentSeq, Plots::getTimeToCatalysisPerSite());
+        this->pauseSitesInAlignment.at(currentSequenceForSimulation) = isPauseSite;
+
+        // Clear the rate table to liberate memory
+        currentSeq->deconstructRateTable();
+
+
+        // Print to file?
+        if (_outputFilename != ""){
+            PauseSiteUtil::writePauseSitesToFile(_outputFilename, currentSeq, Plots::getTimeToCatalysisPerSite());
+        }
+
+        //this->initialisedSimulator = false;
+    }
+
+
+
+}
+
+
+
+
+
+
+
+// Perform simulations on each sequence in the alignment. GUI only
+void MultipleSequenceAlignment::PhyloPause_GUI(Simulator* simulator, int* result){
 
    
 
@@ -306,7 +409,8 @@ void MultipleSequenceAlignment::PhyloPause(Simulator* simulator, int* result){
             
             this->initialisedSimulator = true;
 
-            cout << "Starting " << ntrials_sim << " for sequence " << currentSeq->getID() << endl;
+            //cout << "Starting " << ntrials_sim << " for sequence " << currentSeq->getID() << endl;
+            cout << "Starting sequence " << (currentSequenceForSimulation + 1) << " out of " << this->alignment.size() << endl;
 
             // Activate the sequence
             Plots::deletePlotData(_currentStateGUI, true, true, true, true, true, true);
@@ -470,7 +574,7 @@ void MultipleSequenceAlignment::calculateLeafWeights(PhyloTree* tree){
     vector<double> distanceToRoot(this->get_nseqs());
     for (int i = 0; i < distanceToRoot.size(); i ++){
         distanceToRoot.at(i) = leaves_ordered.at(i)->getDistanceToRoot();
-        cout << "Distance from " << this->getSequenceAtIndex(i)->getID() << " to root " << distanceToRoot.at(i) << endl;
+        //cout << "Distance from " << this->getSequenceAtIndex(i)->getID() << " to root " << distanceToRoot.at(i) << endl;
     }
 
 

@@ -37,7 +37,7 @@ class BayesianCalculations{
 
 
 	public:
-		static vector<PosteriorDistributionSample*> loadLogFile(string outputFilename, double epsilon);
+		static vector<PosteriorDistributionSample*> loadLogFile(string _outputFilename, double epsilon);
 		static PosteriorDistributionSample* getGeometricMedian(vector<PosteriorDistributionSample*> states, bool print, bool printBanners);
 		static void printMarginalGeometricMedians(vector<PosteriorDistributionSample*> states);
 		static void sampleFromPosterior(vector<PosteriorDistributionSample*> posteriorDistribution);

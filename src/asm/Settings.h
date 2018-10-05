@@ -85,10 +85,12 @@ extern string _currentPolymerase;
 
 
 // Command line arguments
-extern string inputXMLfilename;
-extern string outputFilename;
+extern string _inputXMLfilename;
+extern string _outputFilename;
 extern string _inputLogFileName;
 extern string _plotFolderName;
+extern string _inputFastaFileName;
+extern string _inputTreeFileName;
 extern bool isWASM;
 extern bool _resumeFromLogfile;
 extern bool _printSummary;
@@ -141,6 +143,7 @@ extern map<int, list<PosteriorDistributionSample*>> _gelPosteriorDistributions; 
 // PhyloPause
 extern MultipleSequenceAlignment* _PP_multipleSequenceAlignment;
 extern PhyloTree* _PP_tree;
+extern bool _USING_PHYLOPAUSE;
 
 // Parameters
 extern Parameter *NTPconc;

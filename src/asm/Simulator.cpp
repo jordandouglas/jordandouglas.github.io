@@ -94,7 +94,7 @@ void Simulator::perform_N_Trials(SimulatorResultSummary* summary, State* state, 
 		result[1] = 0;
 		result[2] = 0;
 		clonedState = state->clone();
-		if (_plotFolderName != "" && !_RUNNING_ABC) Plots::refreshPlotData(clonedState); // New simulation -> refresh plot data
+		if (_plotFolderName != "" && !_RUNNING_ABC || _USING_PHYLOPAUSE) Plots::refreshPlotData(clonedState); // New simulation -> refresh plot data
 		performSimulation(clonedState, result);
 		if (!_RUNNING_ABC) Plots::updateParameterPlotData(clonedState); // Update parameter plot before starting next trial
 
@@ -170,7 +170,7 @@ list<int> Simulator::sample_action_GUI(){
 		delete _currentStateGUI;
 		_currentStateGUI = new State(true, true);
 		this->nTrialsCompletedGUI++;
-		if (!_RUNNING_ABC) Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
+		if (!_RUNNING_ABC || _USING_PHYLOPAUSE) Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
 		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
 		currentSequence->initRNAunfoldingTable();
 
@@ -217,7 +217,7 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
 		result[1] = 0;
 		result[2] = 0;
 
-		if (!_RUNNING_ABC) Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
+		if (!_RUNNING_ABC || _USING_PHYLOPAUSE) Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
 		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
 		currentSequence->initRNAunfoldingTable();
 		performSimulation(_currentStateGUI, result);
@@ -312,7 +312,7 @@ void Simulator::resume_trials_GUI(double* toReturn){
 		result[2] = 0;
 
 
-		if (!_RUNNING_ABC) Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
+		if (!_RUNNING_ABC || _USING_PHYLOPAUSE) Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
 		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
 		currentSequence->initRNAunfoldingTable();
 
@@ -850,7 +850,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				if (actionsToDoList[i] == -2) break;
 
 				// Update the plots immediately before the final reaction in the list has been applied
-				if ((_USING_GUI || _plotFolderName != "") && (i == 2 || actionsToDoList[i+1] == -2) && !_RUNNING_ABC) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, reactionTime);
+				if ((_USING_PHYLOPAUSE || _USING_GUI || _plotFolderName != "") && (i == 2 || actionsToDoList[i+1] == -2) && !_RUNNING_ABC) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, reactionTime);
 
 				if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
 				else this->actionsToReturn.push_back(actionsToDoList[i]);
@@ -1001,7 +1001,7 @@ double Simulator::geometricTranslocationSampling(State* s){
 		if (actionsToDoList[i] == -2) break;
 
 		// Update the plots immediately before the final reaction in the list has been applied
-		if ((_USING_GUI || _plotFolderName != "") && (i == 1 || actionsToDoList[i+1] == -2) && !_RUNNING_ABC) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, totalReactionTime);
+		if ((_USING_PHYLOPAUSE || _USING_GUI || _plotFolderName != "") && (i == 1 || actionsToDoList[i+1] == -2) && !_RUNNING_ABC) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, totalReactionTime);
 
 		if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
 		else this->actionsToReturn.push_back(actionsToDoList[i]);
@@ -1124,7 +1124,7 @@ double Simulator::geometricTranslocationBindingSampling(State* s){
 		if (actionsToDoList[i] == -2) break;
 
 		// Update the plots immediately before the final reaction in the list has been applied
-		if ((_USING_GUI || _plotFolderName != "") && (i == 1 || actionsToDoList[i+1] == -2) && !_RUNNING_ABC) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, totalReactionTime);
+		if ((_USING_PHYLOPAUSE || _USING_GUI || _plotFolderName != "") && (i == 1 || actionsToDoList[i+1] == -2) && !_RUNNING_ABC) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, totalReactionTime);
 
 		if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
 		else this->actionsToReturn.push_back(actionsToDoList[i]);
@@ -1313,7 +1313,7 @@ double Simulator::geometricBindingSampling(State* s){
 		if (actionsToDoList[i] == -2) break;
 
 		// Update the plots immediately before the final reaction in the list has been applied
-		if ((_USING_GUI || _plotFolderName != "") && (i == 2 || actionsToDoList[i+1] == -2) && !_RUNNING_ABC) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, totalReactionTime);
+		if ((_USING_PHYLOPAUSE || _USING_GUI || _plotFolderName != "") && (i == 2 || actionsToDoList[i+1] == -2) && !_RUNNING_ABC) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, totalReactionTime);
 
 		if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
 		else this->actionsToReturn.push_back(actionsToDoList[i]);

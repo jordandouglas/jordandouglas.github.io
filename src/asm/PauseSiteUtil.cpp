@@ -22,6 +22,8 @@
 
 #include "PauseSiteUtil.h"
 
+#include <fstream>
+#include <sstream>
 #include <iostream>
 #include <string>
 
@@ -32,6 +34,35 @@ using namespace std;
 double PauseSiteUtil::TCC_THRESHOLD = 3; // Mean time to catalysis (s) required to classify this as a pause site
 
 
+void PauseSiteUtil::writePauseSitesToFile(string filename, Sequence* seq, vector<double> timesToCatalysis) {
+
+
+    // Attempt to open up file. Append
+    ofstream outputFile;
+    outputFile.open(filename, ios_base::app);
+    if (!outputFile.is_open()) {
+        cout << "Cannot open file " << filename << endl;
+        exit(0);
+    }
+    outputFile.precision(4);
+    outputFile.setf(ios::fixed);
+    outputFile.setf(ios::showpoint); 
+
+   
+    outputFile << seq->getID() << "\n";
+
+    for (int i = 0; i < timesToCatalysis.size(); i ++){
+
+        outputFile << timesToCatalysis.at(i);
+        if (i < timesToCatalysis.size() - 1) outputFile << ",";
+    }
+
+    outputFile << endl;
+   
+    outputFile.close();
+
+}
+
 // Identify which sites in the selected sequences are pause sites, by comparing to a standard
 vector<bool>* PauseSiteUtil::identifyPauseSites(Sequence* seq, vector<double> timesToCatalysis) {
     
@@ -39,8 +70,14 @@ vector<bool>* PauseSiteUtil::identifyPauseSites(Sequence* seq, vector<double> ti
     vector<bool>* isPauseSite = new vector<bool>();
     isPauseSite->resize(MSAsequence.size());
 
-
+    /*
     cout << "identifyPauseSites " << MSAsequence.size() << "," << isPauseSite->size() << "," << timesToCatalysis.size() << endl;
+
+    for (int i = 0; i < timesToCatalysis.size(); i ++){
+        cout << timesToCatalysis.at(i) << ",";
+    }
+    cout << endl;
+    */
 
     // Which sites in the ALIGNED sequence are pause sites?
     int non_aligned_index = 0;

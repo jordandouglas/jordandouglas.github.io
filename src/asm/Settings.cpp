@@ -64,10 +64,12 @@ const double _absoluteModelConstant = 0;
 
 
 // Command line arguments
-string outputFilename = "";
-string inputXMLfilename = "";
+string _outputFilename = "";
+string _inputXMLfilename = "";
 string _inputLogFileName = "";
 string _plotFolderName = "";
+string _inputFastaFileName = "";
+string _inputTreeFileName = "";
 bool isWASM = false;
 bool _resumeFromLogfile = false;
 bool _printSummary = false;
@@ -188,6 +190,7 @@ map<int, list<PosteriorDistributionSample*>> _gelPosteriorDistributions; // All 
 // PhyloPause
 MultipleSequenceAlignment* _PP_multipleSequenceAlignment;
 PhyloTree* _PP_tree;
+bool _USING_PHYLOPAUSE = false;
 
 void Settings::init(){
 

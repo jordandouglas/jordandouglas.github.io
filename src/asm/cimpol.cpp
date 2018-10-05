@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
 		
 		else if(arg == "-xml" && i+1 < argc) {
 			i++;
-			inputXMLfilename = string(argv[i]);
+			_inputXMLfilename = string(argv[i]);
 			//char filename[] = "/home/jdou557/Documents/Cimpol/SimpolC/SimpolC/about/Examples/benchmark.xml";
 			//char filename[] = "/home/jdou557/Documents/Cimpol/SimpolC/SimpolC/models12.xml";
 
@@ -104,7 +104,7 @@ int main(int argc, char** argv) {
 		
 		else if(arg == "-logO" && i+1 < argc) {
 			i++;
-			outputFilename = string(argv[i]);
+			_outputFilename = string(argv[i]);
 		}
 
 
@@ -138,18 +138,18 @@ int main(int argc, char** argv) {
 		exit(0);
 	}
 
-	if (_printSummary && inputXMLfilename == ""){
+	if (_printSummary && _inputXMLfilename == ""){
 		cout << "You have enabled summary mode. Please specify an input xml file with -xml" << endl;
 		exit(0);
 	}
 
 
-	if (_sampleFromLikelihood && _printSummary && inputXMLfilename == ""){
+	if (_sampleFromLikelihood && _printSummary && _inputXMLfilename == ""){
 		cout << "You have enabled posterior sampling mode using the geometric median. Please specify an input log file with -logI" << endl;
 		exit(0);
 	}
 
-	if (_sampleFromLikelihood && inputXMLfilename == ""){
+	if (_sampleFromLikelihood && _inputXMLfilename == ""){
 		cout << "You have enabled posterior sampling mode. Please specify an input xml file with -xml" << endl;
 		exit(0);
 	}
@@ -167,9 +167,9 @@ int main(int argc, char** argv) {
 	}
 
 
-	if (inputXMLfilename != ""){
-		char* filename = new char[inputXMLfilename.length() + 1];
-		strcpy(filename, inputXMLfilename.c_str());
+	if (_inputXMLfilename != ""){
+		char* filename = new char[_inputXMLfilename.length() + 1];
+		strcpy(filename, _inputXMLfilename.c_str());
 		bool succ = XMLparser::parseXMLFromFilename(filename);
 		delete [] filename;
 		if (!succ) exit(1);
@@ -218,7 +218,7 @@ int main(int argc, char** argv) {
 			cout << "Sampling new data using geometric median parameters" << endl;
 		}
 		else if (!_printSummary && statesPostBurnin.size() > 0) cout << "Sampling new data using parameters in posterior distribution " << _inputLogFileName << endl;
-		else cout << "Sampling new data using parameters specified by " << inputXMLfilename << endl;
+		else cout << "Sampling new data using parameters specified by " << _inputXMLfilename << endl;
 		BayesianCalculations::sampleFromPosterior(statesPostBurnin);
 	}
 

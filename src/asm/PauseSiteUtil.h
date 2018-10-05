@@ -44,6 +44,9 @@ class PauseSiteUtil {
 
     public:
 
+        // Write the pause sites to a file
+        static void writePauseSitesToFile(string filename, Sequence* seq, vector<double> timesToCatalysis) ;
+
         // Identify which sites in the selected sequences are pause sites, by comparing to a standard
         static vector<bool>* identifyPauseSites(Sequence* seq, vector<double> timesToCatalysis);
 

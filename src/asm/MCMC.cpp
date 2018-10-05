@@ -65,7 +65,7 @@ void MCMC::initMCMC(bool uploadingLogFile){
 	_RUNNING_ABC = true;
 
 	cout << "\nInitialising MCMC..." << endl;
-	bool printToFile = outputFilename != "";
+	bool printToFile = _outputFilename != "";
 
 
 	// Reset GUI list of posterior distribution samples
@@ -106,7 +106,7 @@ void MCMC::initMCMC(bool uploadingLogFile){
 
 	// Load initial state from file
 	if (_resumeFromLogfile){
-		MCMC::previousMCMCstate->loadFromLogFile(outputFilename);
+		MCMC::previousMCMCstate->loadFromLogFile(_outputFilename);
 		MCMC::previousMCMCstate->setParametersFromState();
 	}
 
@@ -302,7 +302,7 @@ void MCMC::perform_1_iteration(int n){
 
 	// Log
 	if (n % logEvery == 0){
-		MCMC::currentMCMCstate->print(outputFilename != "");
+		MCMC::currentMCMCstate->print(_outputFilename != "");
 		if(_USING_GUI) {
 			_GUI_posterior.push_back(MCMC::currentMCMCstate->clone(true));
 			if (MCMC::hasAchievedBurnin && MCMC::nStatesUntilBurnin == -1) MCMC::nStatesUntilBurnin = _GUI_posterior.size() - 1;

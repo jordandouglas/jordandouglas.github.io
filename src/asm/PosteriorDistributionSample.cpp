@@ -473,9 +473,9 @@ void PosteriorDistributionSample::printHeader(bool toFile){
 	// Attempt to open up file if applicable. Do not append
 	ofstream* logFile;
 	if (toFile && !_USING_GUI) {
-		logFile = new ofstream(outputFilename);
+		logFile = new ofstream(_outputFilename);
 		if (!logFile->is_open()) {
-			cout << "Cannot open file " << outputFilename << endl;
+			cout << "Cannot open file " << _outputFilename << endl;
 			exit(0);
 		}
 	}
@@ -541,10 +541,10 @@ void PosteriorDistributionSample::print(bool toFile){
 	// Attempt to open up file if applicable. Append to end of file
 	ofstream logFile;
 	if (toFile && !_USING_GUI) {
-		//logFile = new ofstream(outputFilename);
-		logFile.open(outputFilename, ios_base::app);
+		//logFile = new ofstream(_outputFilename);
+		logFile.open(_outputFilename, ios_base::app);
 		if (!logFile.is_open()) {
-			cout << "Cannot open file " << outputFilename << endl;
+			cout << "Cannot open file " << _outputFilename << endl;
 			exit(0);
 		}
 		logFile.precision(10);

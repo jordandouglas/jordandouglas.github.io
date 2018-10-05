@@ -102,6 +102,16 @@ vector<PlotSettings*> Plots::plotSettings(4);
 // Must call this function when the sequence changes
 void Plots::init(){
 
+
+
+    // Pause time per site plot
+    Plots::npauseSimulations = 0;
+    Plots::timeToCatalysisPerSite.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
+    for (int baseNum = 0; baseNum < Plots::timeToCatalysisPerSite.size(); baseNum ++) {
+        Plots::timeToCatalysisPerSite.at(baseNum) = 0.0;
+    }
+
+
 	if (!_USING_GUI) return;
 	Plots::plotsInit = true;
 
@@ -125,16 +135,10 @@ void Plots::init(){
 	Plots::catalysisTimesSize = 0;
 
 
-	// Pause time per site plot
-	Plots::npauseSimulations = 0;
-	Plots::timeToCatalysisPerSite.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
-	for (int baseNum = 0; baseNum < Plots::timeToCatalysisPerSite.size(); baseNum ++) {
-		Plots::timeToCatalysisPerSite.at(baseNum) = 0.0;
-	}
+
 
 
 	// Dwell time per site plot
-	Plots::npauseSimulations = 0;
 	Plots::dwellTimePerSite.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
 	for (int baseNum = 0; baseNum < Plots::dwellTimePerSite.size(); baseNum ++) {
 		Plots::dwellTimePerSite.at(baseNum) = 0.0;
@@ -185,6 +189,20 @@ void Plots::init(){
 void Plots::refreshPlotData(State* state){
 
 
+
+
+    // Miscellaneous information
+    Plots::arrestTimeoutReached = false;
+    Plots::totaltimeElapsedThisTrial = 0;
+    Plots::timeElapsed = 0;
+    Plots::timeWaitedUntilNextTranslocation = 0;
+    Plots::timeWaitedUntilNextCatalysis = 0;
+
+    // Pause time per site plot
+    Plots::npauseSimulations ++;
+
+
+
 	if (state == nullptr || !_USING_GUI || !Plots::plotsInit) return;
 
 
@@ -230,17 +248,9 @@ void Plots::refreshPlotData(State* state){
 	}
 
 
-	// Pause time per site plot
-	Plots::npauseSimulations ++;
 
 
-	// Miscellaneous information
-	Plots::arrestTimeoutReached = false;
-	Plots::totaltimeElapsedThisTrial = 0;
-	Plots::timeElapsed = 0;
-	Plots::timeWaitedUntilNextTranslocation = 0;
-	Plots::timeWaitedUntilNextCatalysis = 0;
-
+   
 
 
 }
@@ -313,6 +323,20 @@ void Plots::resetTimeToCatalysis(){
 
 void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, double reactionTime) {
 
+    // Still need to record time to catalysis in PhyloPause even if there is no GUI
+    if (_USING_PHYLOPAUSE || _USING_GUI){
+
+        Plots::timeWaitedUntilNextCatalysis += reactionTime;
+        bool thereWasACatalysis = lastAction == 3 && (state->NTPbound() || currentModel->get_assumeBindingEquilibrium());
+        if (thereWasACatalysis) {
+            
+            //cout << "updatePlotData " << Plots::timeWaitedUntilNextCatalysis << endl;
+           // if (state->getRightTemplateBaseNumber() == 50) cout << "50" << endl;
+            if (state->getRightTemplateBaseNumber() < Plots::timeToCatalysisPerSite.size()) Plots::timeToCatalysisPerSite.at(state->getRightTemplateBaseNumber()) += Plots::timeWaitedUntilNextCatalysis;
+            if (!_USING_GUI) Plots::timeWaitedUntilNextCatalysis = 0;
+        }
+    }
+
 
 	if (state == nullptr || !_USING_GUI || !Plots::plotsInit) return;
 
@@ -323,7 +347,6 @@ void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, doubl
 
 	Plots::totaltimeElapsed += reactionTime;
 	Plots::timeWaitedUntilNextTranslocation += reactionTime;
-	Plots::timeWaitedUntilNextCatalysis += reactionTime;
 	Plots::totaltimeElapsedThisTrial += reactionTime;
 
 
@@ -412,8 +435,6 @@ void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, doubl
 
 		}
 
-		//cout << "thereWasACatalysis " << rightHybridBase << " , " << Plots::timeToCatalysisPerSite.at(rightHybridBase) << endl;
-		if (rightHybridBase < Plots::timeToCatalysisPerSite.size()) Plots::timeToCatalysisPerSite.at(rightHybridBase) += Plots::timeWaitedUntilNextCatalysis;
 
 
 		// Site specificity recording
@@ -1182,7 +1203,6 @@ string Plots::timeToCatalysisPerSite_toJSON(){
 vector<double> Plots::getTimeToCatalysisPerSite(){
 
     vector<double> meanTTC(Plots::timeToCatalysisPerSite.size());
-
     for (int baseNum = 0; baseNum < Plots::timeToCatalysisPerSite.size(); baseNum ++){
         meanTTC.at(baseNum) = Plots::timeToCatalysisPerSite.at(baseNum) / Plots::npauseSimulations;
     }

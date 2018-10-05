@@ -48,7 +48,7 @@ class PhyloTree {
     public:
         PhyloTree();
 
-
+        string parseFromNexusFile(string filename);
         string parseFromNexus(string nexus);
         void clear();
         vector<PhyloTreeNode*> getLeaves();

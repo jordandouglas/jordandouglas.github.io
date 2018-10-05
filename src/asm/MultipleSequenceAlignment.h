@@ -53,9 +53,11 @@ class MultipleSequenceAlignment{
         int get_nseqs();
         int get_nsites();
         string parseFromFasta(string fasta);
+        string parseFromFastaFile(string filename);
         string toJSON();
         void clear();
-        void PhyloPause(Simulator* simulator, int* result);
+        void PhyloPause();
+        void PhyloPause_GUI(Simulator* simulator, int* result);
         string getCurrentSequence();
         string pauseSites_toJSON();
         vector<vector<bool>*> get_pauseSitesInAlignment();

@@ -25,7 +25,7 @@
 
 #include <iostream>
 #include <string>
-
+#include <algorithm>
 
 using namespace std;
 
@@ -46,7 +46,7 @@ PhyloTreeNode::PhyloTreeNode() {
 void PhyloTreeNode::addChildren(PhyloTreeNode* left, PhyloTreeNode* right){
 
 
-    cout << "Node has children" << endl;
+    //cout << "Node has children" << endl;
 
     this->leftChild = left;
     this->rightChild = right;
