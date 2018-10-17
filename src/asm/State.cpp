@@ -1019,7 +1019,7 @@ State* State::cleave(){
 		this->nextTemplateBaseToCopy -= nbasesCleaved;
 		this->nascentSequence = this->nascentSequence.substr(0, newLength);
 		this->mRNAPosInActiveSite = 0;
-		return this->activate();
+		return this; //->activate();
 
 	}
 

@@ -363,10 +363,11 @@ void MultipleSequenceAlignment::PhyloPause(){
         // Perform multi-threaded simulation
         SimulatorResultSummary* simulationResults = SimulatorPthread::performNSimulations(ntrials_sim, false);
 
+
            
-            
+        vector<vector<double>> timeToCatalysisPerSite = Plots::getTimeToCatalysisPerSite();
       
-        vector<bool>* isPauseSite = PauseSiteUtil::identifyPauseSites(currentSeq, Plots::getTimeToCatalysisPerSite());
+        vector<bool>* isPauseSite = PauseSiteUtil::identifyPauseSites(currentSeq, timeToCatalysisPerSite);
         this->pauseSitesInAlignment.at(currentSequenceForSimulation) = isPauseSite;
 
         // Clear the rate table to liberate memory
@@ -375,7 +376,7 @@ void MultipleSequenceAlignment::PhyloPause(){
 
         // Print to file?
         if (_outputFilename != ""){
-            PauseSiteUtil::writePauseSitesToFile(_outputFilename, currentSeq, Plots::getTimeToCatalysisPerSite());
+            PauseSiteUtil::writePauseSitesToFile(_outputFilename, currentSeq, timeToCatalysisPerSite);
         }
 
         //this->initialisedSimulator = false;

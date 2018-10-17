@@ -65,6 +65,11 @@ class Plots{
 	static int npauseSimulations;
 	static vector<double> timeToCatalysisPerSite;
 	static vector<double> dwellTimePerSite;
+    static vector<double> timePerTranscriptLength;
+
+
+    // PhyloPause pause distribution per plot data
+    static vector<list<double>> phyloPauseTimePerSite;
 
 
 	// Parameter heatmap data
@@ -103,6 +108,7 @@ class Plots{
 		
 		static void init();
 		static void refreshPlotData(State* state); // Prepare for the next simulation
+        static void update_timeWaitedUntilNextCatalysis(int baseNumber);
 		static void updatePlotData(State* state, int lastAction, int* actionsToDo, double reactionTime); // Sends through information from the current simulation into the plot
 		static string getPlotDataAsJSON(); // Returns the plot data in JSON format. Will modify the class
 		static void userSelectPlot(int plotNum, string value, bool deleteData);
@@ -120,7 +126,7 @@ class Plots{
 		static void prepareForABC();
 		static void setTracePlotPosteriorByID(int id);
         static string timeToCatalysisPerSite_toJSON();
-        static vector<double> getTimeToCatalysisPerSite();
+        static vector<vector<double>> getTimeToCatalysisPerSite();
 
 };
 

@@ -34,8 +34,39 @@ using namespace std;
 double PauseSiteUtil::TCC_THRESHOLD = 3; // Mean time to catalysis (s) required to classify this as a pause site
 
 
-void PauseSiteUtil::writePauseSitesToFile(string filename, Sequence* seq, vector<double> timesToCatalysis) {
 
+void PauseSiteUtil::writeSequenceToFile(string filename, Sequence* seq) {
+
+
+    if (filename == "") return;
+
+    // Attempt to open up file. Append
+    ofstream outputFile;
+    outputFile.open(filename, ios_base::app);
+    if (!outputFile.is_open()) {
+        cout << "Cannot open file " << filename << endl;
+        exit(0);
+    }
+    outputFile.precision(4);
+    outputFile.setf(ios::fixed);
+    outputFile.setf(ios::showpoint); 
+
+   
+    outputFile << ">" << seq->getID() << "\n";
+    outputFile << seq->get_complementSequence() << "\n";
+
+   
+    outputFile.close();
+
+}
+
+
+
+
+void PauseSiteUtil::writePauseSitesToFile(string filename, Sequence* seq, vector<vector<double>> timesToCatalysis) {
+
+
+    if (filename == "") return;
 
     // Attempt to open up file. Append
     ofstream outputFile;
@@ -53,7 +84,7 @@ void PauseSiteUtil::writePauseSitesToFile(string filename, Sequence* seq, vector
 
     for (int i = 0; i < timesToCatalysis.size(); i ++){
 
-        outputFile << timesToCatalysis.at(i);
+        outputFile << timesToCatalysis.at(i).at(2) << "(" << timesToCatalysis.at(i).at(3) << ")";
         if (i < timesToCatalysis.size() - 1) outputFile << ",";
     }
 
@@ -63,8 +94,31 @@ void PauseSiteUtil::writePauseSitesToFile(string filename, Sequence* seq, vector
 
 }
 
+
+
+void PauseSiteUtil::writePauseSiteToFile(string filename, int nmutsToNoSelectivePressure, double medianPauseSite, double standardError) {
+
+
+    if (filename == "") return;
+
+    // Attempt to open up file. Append
+    ofstream outputFile;
+    outputFile.open(filename, ios_base::app);
+    if (!outputFile.is_open()) {
+        cout << "Cannot open file " << filename << endl;
+        exit(0);
+    }
+    outputFile.precision(4);
+    outputFile.setf(ios::fixed);
+    outputFile.setf(ios::showpoint); 
+    outputFile << nmutsToNoSelectivePressure << ":" << medianPauseSite << "(" << standardError << "),";
+    outputFile.close();
+
+}
+
+
 // Identify which sites in the selected sequences are pause sites, by comparing to a standard
-vector<bool>* PauseSiteUtil::identifyPauseSites(Sequence* seq, vector<double> timesToCatalysis) {
+vector<bool>* PauseSiteUtil::identifyPauseSites(Sequence* seq, vector<vector<double>> timesToCatalysis) {
     
     string MSAsequence = seq->get_MSAsequence();
     vector<bool>* isPauseSite = new vector<bool>();
@@ -96,8 +150,8 @@ vector<bool>* PauseSiteUtil::identifyPauseSites(Sequence* seq, vector<double> ti
             }
 
 
-            // Pause site if time-to-catalysis exceeds a threshold
-            double TTC = timesToCatalysis.at(non_aligned_index);
+            // Pause site if median time-to-catalysis exceeds a threshold
+            double TTC = timesToCatalysis.at(non_aligned_index).at(2);
             isPauseSite->at(alignment_index) = TTC > PauseSiteUtil::TCC_THRESHOLD;
             non_aligned_index ++;
 

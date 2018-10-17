@@ -254,10 +254,9 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 
 		
 	}
-		
-
 
 }
+
 
 
 void TranslocationRatesCache::buildTranslocationRateTable(string templSequence){

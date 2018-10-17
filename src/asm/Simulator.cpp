@@ -408,6 +408,11 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 			//cout << "In-simulation timeout reached " << timeElapsed << endl;
 
+
+            // Label the next nucleotide as having been transcribed (so that an arrests do not underinflate pause times)
+            Plots::update_timeWaitedUntilNextCatalysis(s->get_nascentLength() + 1);
+
+
 			// If timeout has been reached then return the current time elapsed
 			toReturn[0] = s->get_nascentLength(); // Returns the final transcript length instead of velocity
 			toReturn[1] += timeElapsed; // Total time taken

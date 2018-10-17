@@ -73,7 +73,7 @@ double FreeEnergy::getFreeEnergyOfHybrid(State* state){
 		
 		
 		//cout << "Looking for " << dictKey << " found " << energy << endl;
-		if (basepairingEnergy.find(dictKey) == basepairingEnergy.end()) hybridFreeEnergy += 1; // TODO: need to find dGU basepairing parameters 
+		if (basepairingEnergy.find(dictKey) == basepairingEnergy.end()) hybridFreeEnergy += 1;
 		else hybridFreeEnergy += energy * danglingEndMultipler;
 
 

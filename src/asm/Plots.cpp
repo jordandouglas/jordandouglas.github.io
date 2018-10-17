@@ -64,6 +64,9 @@ list<double> Plots::catalysisTimesThisTrial;
 int Plots::npauseSimulations = 0;
 vector<double> Plots::timeToCatalysisPerSite;
 vector<double> Plots::dwellTimePerSite;
+vector<double> Plots::timePerTranscriptLength;
+
+vector<list<double>> Plots::phyloPauseTimePerSite;
 
 
 
@@ -103,13 +106,16 @@ vector<PlotSettings*> Plots::plotSettings(4);
 void Plots::init(){
 
 
+    if (_USING_PHYLOPAUSE){
 
-    // Pause time per site plot
-    Plots::npauseSimulations = 0;
-    Plots::timeToCatalysisPerSite.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
-    for (int baseNum = 0; baseNum < Plots::timeToCatalysisPerSite.size(); baseNum ++) {
-        Plots::timeToCatalysisPerSite.at(baseNum) = 0.0;
+        Plots::phyloPauseTimePerSite.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
+        for (int baseNum = 0; baseNum < Plots::phyloPauseTimePerSite.size(); baseNum ++) {
+            Plots::phyloPauseTimePerSite.at(baseNum).clear();
+        }
+
     }
+
+
 
 
 	if (!_USING_GUI) return;
@@ -145,7 +151,19 @@ void Plots::init(){
 	}
 
 
+    // Time per transcript length
+    Plots::timePerTranscriptLength.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
+    for (int baseNum = 0; baseNum < Plots::timePerTranscriptLength.size(); baseNum ++) {
+        Plots::timePerTranscriptLength.at(baseNum) = 0.0;
+    }
 
+
+    // Pause time per site plot
+    Plots::npauseSimulations = 0;
+    Plots::timeToCatalysisPerSite.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
+    for (int baseNum = 0; baseNum < Plots::timeToCatalysisPerSite.size(); baseNum ++) {
+        Plots::timeToCatalysisPerSite.at(baseNum) = 0.0;
+    }
 
 
 	// Parameter heatmap data. Need to add recorded metrics as well as the values of the parameters
@@ -321,21 +339,36 @@ void Plots::resetTimeToCatalysis(){
 }
 
 
+
+// Updates the timeWaitedUntilNextCatalysis or timeToCatalysisPerSite object at the current site. Only call this method when updatePlotData should not be called
+void Plots::update_timeWaitedUntilNextCatalysis(int baseNumber){
+    if (_USING_PHYLOPAUSE && baseNumber < Plots::phyloPauseTimePerSite.size()) Plots::phyloPauseTimePerSite.at(baseNumber).push_back(Plots::timeWaitedUntilNextCatalysis);
+    else if (baseNumber < Plots::timeToCatalysisPerSite.size()) {
+        Plots::timeToCatalysisPerSite.at(baseNumber) += Plots::timeWaitedUntilNextCatalysis;
+        Plots::recordSite(baseNumber, Plots::timeWaitedUntilNextCatalysis);
+    }
+
+
+    Plots::timeWaitedUntilNextCatalysis = 0;
+}
+
+
 void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, double reactionTime) {
 
-    // Still need to record time to catalysis in PhyloPause even if there is no GUI
-    if (_USING_PHYLOPAUSE || _USING_GUI){
+
+    // Phylopause -> record time to catalysis at this site and add to list for this site
+    if (_USING_PHYLOPAUSE){
 
         Plots::timeWaitedUntilNextCatalysis += reactionTime;
         bool thereWasACatalysis = lastAction == 3 && (state->NTPbound() || currentModel->get_assumeBindingEquilibrium());
         if (thereWasACatalysis) {
-            
-            //cout << "updatePlotData " << Plots::timeWaitedUntilNextCatalysis << endl;
-           // if (state->getRightTemplateBaseNumber() == 50) cout << "50" << endl;
-            if (state->getRightTemplateBaseNumber() < Plots::timeToCatalysisPerSite.size()) Plots::timeToCatalysisPerSite.at(state->getRightTemplateBaseNumber()) += Plots::timeWaitedUntilNextCatalysis;
-            if (!_USING_GUI) Plots::timeWaitedUntilNextCatalysis = 0;
+            Plots::phyloPauseTimePerSite.at(state->getRightTemplateBaseNumber()).push_back(Plots::timeWaitedUntilNextCatalysis);
+            Plots::timeWaitedUntilNextCatalysis = 0;
         }
+
+        return;
     }
+
 
 
 	if (state == nullptr || !_USING_GUI || !Plots::plotsInit) return;
@@ -344,7 +377,7 @@ void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, doubl
 	int rightHybridBase = state->getRightTemplateBaseNumber();
 	int numActions = sizeof(actionsToDo) / sizeof(actionsToDo[0]);
 
-
+    Plots::timeWaitedUntilNextCatalysis += reactionTime;
 	Plots::totaltimeElapsed += reactionTime;
 	Plots::timeWaitedUntilNextTranslocation += reactionTime;
 	Plots::totaltimeElapsedThisTrial += reactionTime;
@@ -353,6 +386,12 @@ void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, doubl
 	//cout << "reactionTime " << reactionTime << endl;
 
 	//cout << "timeWaitedUntilNextTranslocation " << Plots::timeWaitedUntilNextTranslocation << endl;
+
+
+
+    // Time per transcript length
+    if (state->get_nascentLength() < Plots::timePerTranscriptLength.size()) Plots::timePerTranscriptLength.at(state->get_nascentLength()) += reactionTime;
+
 
 
 	// If there has been a translocation action, add it to the distance~time chart, and update the time spent at this site
@@ -397,6 +436,8 @@ void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, doubl
 			if (rightHybridBase < Plots::dwellTimePerSite.size()) Plots::dwellTimePerSite.at(rightHybridBase) += Plots::timeWaitedUntilNextTranslocation;
 
 
+            
+
     		Plots::timeWaitedUntilNextTranslocation = 0;
 			Plots::velocity = Plots::totalDisplacement / Plots::totaltimeElapsed;
 
@@ -435,6 +476,8 @@ void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, doubl
 
 		}
 
+
+        if (state->getRightTemplateBaseNumber() < Plots::timeToCatalysisPerSite.size()) Plots::timeToCatalysisPerSite.at(state->getRightTemplateBaseNumber()) += Plots::timeWaitedUntilNextCatalysis;
 
 
 		// Site specificity recording
@@ -644,6 +687,21 @@ string Plots::getPlotDataAsJSON(){
 				}
 				Plots::plotDataJSON += "]";
 			}
+
+
+
+            else if (Plots::plotSettings.at(3)->get_pauseSiteYVariable() == "timePerTranscriptLength") {
+
+                // Dwell time per site
+                Plots::plotDataJSON += ",'pauseTimePerSite':[";
+                for (int baseNum = 0; baseNum < Plots::timePerTranscriptLength.size(); baseNum ++){
+                    Plots::plotDataJSON += to_string(Plots::timePerTranscriptLength.at(baseNum));
+                    if (baseNum < Plots::timePerTranscriptLength.size()-1) Plots::plotDataJSON += ",";
+                }
+                Plots::plotDataJSON += "]";
+            }
+
+
 
 
 
@@ -1103,11 +1161,18 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 
 
 		// Dwell time per site plot
-		Plots::npauseSimulations = 1;
 		Plots::dwellTimePerSite.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
 		for (int baseNum = 0; baseNum < Plots::dwellTimePerSite.size(); baseNum ++) {
 			Plots::dwellTimePerSite.at(baseNum) = 0.0;
 		}
+
+
+        // Time per transcript length
+        Plots::timePerTranscriptLength.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
+        for (int baseNum = 0; baseNum < Plots::timePerTranscriptLength.size(); baseNum ++) {
+            Plots::timePerTranscriptLength.at(baseNum) = 0.0;
+        }
+
 
 
 	}
@@ -1199,14 +1264,61 @@ string Plots::timeToCatalysisPerSite_toJSON(){
 
 
 
+// Returns a vector of tuples. Each tuple contains the mean and standard error of time to catalysis at that site
+vector<vector<double>> Plots::getTimeToCatalysisPerSite(){
 
-vector<double> Plots::getTimeToCatalysisPerSite(){
 
-    vector<double> meanTTC(Plots::timeToCatalysisPerSite.size());
-    for (int baseNum = 0; baseNum < Plots::timeToCatalysisPerSite.size(); baseNum ++){
-        meanTTC.at(baseNum) = Plots::timeToCatalysisPerSite.at(baseNum) / Plots::npauseSimulations;
+    vector<vector<double>> TTC(Plots::phyloPauseTimePerSite.size()-1);
+    for (int baseNum = 1; baseNum < Plots::phyloPauseTimePerSite.size(); baseNum ++){
+        TTC.at(baseNum-1).resize(4); // Mean, standard error of mean, median, standard error of median
+
+        if (Plots::phyloPauseTimePerSite.at(baseNum).size() == 0){
+            TTC.at(baseNum-1).at(0) = 0;
+            TTC.at(baseNum-1).at(1) = 0;
+            TTC.at(baseNum-1).at(2) = 0;
+            TTC.at(baseNum-1).at(3) = 0; 
+            continue;
+        }
+
+
+        // Calculate mean
+        double meanTTC = 0;
+        for (list<double>::iterator it = Plots::phyloPauseTimePerSite.at(baseNum).begin(); it != Plots::phyloPauseTimePerSite.at(baseNum).end(); ++it){
+            meanTTC += *it;
+        }
+        meanTTC = meanTTC / Plots::phyloPauseTimePerSite.at(baseNum).size();
+
+
+        // Calculate median
+        Plots::phyloPauseTimePerSite.at(baseNum).sort();
+        list<double>::iterator med = Plots::phyloPauseTimePerSite.at(baseNum).begin();
+        std::advance(med, floor(Plots::phyloPauseTimePerSite.at(baseNum).size() / 2));
+        double median = *med;
+
+
+        // Calculate variance
+        double variance = 0;
+        for (list<double>::iterator it = Plots::phyloPauseTimePerSite.at(baseNum).begin(); it != Plots::phyloPauseTimePerSite.at(baseNum).end(); ++it){
+            variance += pow(*it - meanTTC, 2);
+        }
+        variance = variance / Plots::phyloPauseTimePerSite.at(baseNum).size();
+
+
+        // Standard error of mean
+        double standardError = sqrt(variance / Plots::phyloPauseTimePerSite.at(baseNum).size());
+
+
+
+        TTC.at(baseNum-1).at(0) = meanTTC;
+        TTC.at(baseNum-1).at(1) = standardError;
+        TTC.at(baseNum-1).at(2) = median;
+        TTC.at(baseNum-1).at(3) = 1.253 * standardError; // Standard error of median is 1.253 * standard error of mean
+
+
     }
 
-    return meanTTC;
+
+
+    return TTC;
 }
 

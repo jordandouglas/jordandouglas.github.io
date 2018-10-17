@@ -58,6 +58,7 @@ class Sequence{
 		string get_templateSequence();
 		string get_complementSequence();
 		string getID();
+        void setID(string id);
 		TranslocationRatesCache* getRatesCache();
 		void initRateTable();
 		void initRNAunfoldingTable();
@@ -81,6 +82,7 @@ class Sequence{
         void deconstructRateTable();
         double get_weight();
         void set_weight(double wgt);
+        void clear();
 
 
 };

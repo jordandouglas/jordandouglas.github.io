@@ -106,6 +106,12 @@ void Sequence::deconstructRateTable(){
     this->flagForRateTableRebuilding();
 }
 
+void Sequence::clear(){
+    this->translocationRatesCache->clear();
+    delete this->translocationRatesCache;
+
+}
+
 
 // Initialise the RNA unfolding barrier heights table for this sequence
 void Sequence::initRNAunfoldingTable(){
@@ -172,6 +178,10 @@ string Sequence::get_complementSequence(){
 string Sequence::get_templateType(){
 	string templateType = string(this->template_SS ? "ss" : "ds") + string(this->template_RNA ? "RNA" : "DNA");
 	return templateType;
+}
+
+void Sequence::setID(string id){
+    this->seqID = id;
 }
 
 

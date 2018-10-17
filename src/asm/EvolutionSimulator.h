@@ -21,14 +21,13 @@
 -*/
 
 
-#ifndef PAUSESITEUTIL_H
-#define PAUSESITEUTIL_H
+#ifndef EVOLUTION_SIMULATOR_H
+#define EVOLUTION_SIMULATOR_H
+
+
 
 
 #include "Sequence.h"
-#include "MultipleSequenceAlignment.h"
-#include "Settings.h"
-
 
 #include <string>
 #include <vector>
@@ -36,31 +35,17 @@
 
 using namespace std;
 
-// Contains information on a set of experimental observations
-class PauseSiteUtil {
+// For simulating mutations (natural selection or neutral evolution) in a sequence over time, and checking the pause duration of a site during evolution
+class EvolutionSimulator {
 
-    static double TCC_THRESHOLD;
-
+    
+    static vector<double> getPauseTime(Sequence* seq, int pauseSite);
 
     public:
 
-        // Write the sequence to a file
-        static void writeSequenceToFile(string filename, Sequence* seq);
-
-        // Write the pause sites to a file
-        static void writePauseSitesToFile(string filename, Sequence* seq, vector<vector<double>> timesToCatalysis);
-
-        // Write this generations pause information to a file
-        static void writePauseSiteToFile(string filename, int nmutsToNoSelectivePressure, double medianPauseSite, double standardError);
-
-        // Identify which sites in the selected sequences are pause sites, by comparing to a standard
-        static vector<bool>* identifyPauseSites(Sequence* seq, vector<vector<double>> timesToCatalysis);
-
-        // Evidence that each site is a pause site
-        static vector<int> calculateEvidence(MultipleSequenceAlignment* MSA);
-
+       static void simulateEvolution(Sequence* seq, int pauseSite, int nGenerations, int nLineages, double transitionTransversionRatio, string outputFile);
+       static void generateSequencesWithPauseSite(double pauseThreshold, int seqLen, int pauseSite, int nattempts, string outputFile);
 
 
 };
-
 #endif

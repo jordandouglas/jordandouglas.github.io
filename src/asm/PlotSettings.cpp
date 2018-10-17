@@ -70,7 +70,7 @@ PlotSettings::PlotSettings(int plotNumber, string name){
 	else if (this->name == "pauseSite"){
 		this->pauseSiteYVariable = "catalysisTimes";
 		this->plotFunction = "plot_time_vs_site";
-		this->yAxis = "timePercentage";
+		this->yAxis = "timeSeconds";
 	}
 
 
