@@ -545,7 +545,7 @@ function viewModel(){
 		if (WEB_WORKER_WASM != null) ELONGATION_MODEL_TEMP = result;
 		else ELONGATION_MODEL_TEMP = result["ELONGATION_MODELS"][result["currentElongationModel"]];
 
-		popupHTML = popupHTML.replace("XX_NAME_XX", ELONGATION_MODEL_TEMP["name"]);
+		//popupHTML = popupHTML.replace("XX_NAME_XX", ELONGATION_MODEL_TEMP["name"]);
 
 		console.log("Backtracking is allowed:", ELONGATION_MODEL_TEMP["allowBacktracking"]);
 		console.log("Hypertranslocation is allowed:", ELONGATION_MODEL_TEMP["allowHypertranslocation"]);
@@ -640,7 +640,7 @@ function getModelDiagramTemplate(){
 	return `
 		<div id='popup_model' style='background-color:#008cba; padding: 10 10; position:absolute; width: 1200px; left:380; top:20vh; z-index:5;'>
 			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
-				<span style='font-size: 30px'> Kinetic diagram for XX_NAME_XX </span>
+				<span style='font-size: 30px'> Kinetic diagram </span>
 				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeModelDiagramPopup()'>&times;</span>
 				<div style='padding:2; font-size:22px;'> XX_DESC_XX </div>
 

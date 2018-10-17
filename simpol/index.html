@@ -214,12 +214,12 @@ function init(){
 					var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
 
 					if (JSONurl.s != null){
-						var sessionFileLocation = "http://www.polymerase.nz/about/Examples/" + JSONurl.s;
+						var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/" + JSONurl.s;
 						var toDoAfterLoadSession = function() {
 							
 							if (JSONurl.p != null){
 								
-								var posteriorFileLocation = "http://www.polymerase.nz/about/Examples/" + JSONurl.p;
+								var posteriorFileLocation = "http://www.polymerase.nz/simpol/about/Examples/" + JSONurl.p;
 								uploadABCFromURL(posteriorFileLocation);
 							}
 							

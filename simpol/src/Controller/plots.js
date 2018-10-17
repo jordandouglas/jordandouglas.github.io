@@ -2417,14 +2417,16 @@ function plot_time_vs_site(){
 		var ymin = 1000000;
 		var labelFn = function(site, val){
 
-			var preString = PLOT_DATA["whichPlotInWhichCanvas"][4].pauseSiteYVariable == "catalysisTimes" ? "time to catalysis" : "time";
+			var preString = PLOT_DATA["whichPlotInWhichCanvas"][4].pauseSiteYVariable == "catalysisTimes" ? "time to catalysis at " + site : 
+                            PLOT_DATA["whichPlotInWhichCanvas"][4].pauseSiteYVariable == "dwellTimes" ?  "dwell time at " + site :
+                            "time where nascent strand has length " + site.substring(1);
 			switch (PLOT_DATA["whichPlotInWhichCanvas"][4]["yAxis"]){
 				case "timePercentage":
 					if (val <= 0) return "";
-					return "Total " + preString + " at " + site + ": " + roundToSF(val / pauseSum * 100) + "%";
+					return "Total " + preString + ": " + roundToSF(val / pauseSum * 100) + "%";
 				case "timeSeconds":
 					if (val <= 0) return "";
-					return "Mean " + preString + " at " + site + ": " + roundToSF(val / PLOT_DATA["npauseSimulations"]) + "s";
+					return "Mean " + preString + ": " + roundToSF(val / PLOT_DATA["npauseSimulations"]) + "s";
 				case "logTimeSeconds":
 					if (val <= ymin) return "";
 					//console.log("Log time", pauseSum, "normal time", 
@@ -4749,6 +4751,9 @@ function pauseSiteYVariableTemplate(){
 		<legend><b>Variable (y-axis)</b></legend>
 		<label style="cursor:pointer"> <input type="radio" name="pauseSiteYVariable" value="catalysisTimes">Time to catalysis<br> </label>
 		<label style="cursor:pointer"> <input type="radio" name="pauseSiteYVariable" value="dwellTimes">Time spent at site<br> </label>
+        <label style="cursor:pointer"> <input type="radio" name="pauseSiteYVariable" value="timePerTranscriptLength">Time per transcript length<br> </label>
+
+
 	`;
 
 }
