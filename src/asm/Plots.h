@@ -36,97 +36,102 @@
 class Plots{
 
 
-	static int currentSimNumber;
-	static bool plotsInit;
+	int currentSimNumber;
+	bool plotsInit;
 
-	static const size_t maximumBytesJSON;
-	static string plotDataJSON;
+	size_t maximumBytesJSON;
+	string plotDataJSON;
 
 	// Distance versus time plot data
-	static int distanceVsTimeSize;
-	static const int distanceVsTimeSizeMax;
-	static list<list<vector<double>>> distanceVsTimeData; // Position of the polymerase over all time
-	static list<list<vector<double>>> distanceVsTimeDataUnsent; // Data which has not yet been sent to the DOM (subset of distanceVsTimeData)
-	static vector<int> distancesTravelledOnEachTemplate; // Sorted list of distances travelled. Sorted so that it is easy to calculate the median
-	static vector<double> timesSpentOnEachTemplate; // Sorted list of times taken per template. Sorted so that it is easy to calculate the median
+	int distanceVsTimeSize;
+	int distanceVsTimeSizeMax;
+	list<list<vector<double>>> distanceVsTimeData; // Position of the polymerase over all time
+	list<list<vector<double>>> distanceVsTimeDataUnsent; // Data which has not yet been sent to the DOM (subset of distanceVsTimeData)
+	vector<int> distancesTravelledOnEachTemplate; // Sorted list of distances travelled. Sorted so that it is easy to calculate the median
+	vector<double> timesSpentOnEachTemplate; // Sorted list of times taken per template. Sorted so that it is easy to calculate the median
 
 
 
 	// Catalysis time histogram data
-	static int catalysisTimesSize;
-	static int const catalysisTimesSizeMax;
-	static list<list<double>> catalysisTimes;
-	static list<list<double>> catalysisTimesUnsent;
-	static list<double> catalysisTimesThisTrial;
+	int catalysisTimesSize;
+	int catalysisTimesSizeMax;
+	list<list<double>> catalysisTimes;
+	list<list<double>> catalysisTimesUnsent;
+	list<double> catalysisTimesThisTrial;
 
 
 
 	// Pause time per site plot data
-	static int npauseSimulations;
-	static vector<double> timeToCatalysisPerSite;
-	static vector<double> dwellTimePerSite;
-    static vector<double> timePerTranscriptLength;
+	int npauseSimulations;
+	vector<double> timeToCatalysisPerSite;
+	vector<double> dwellTimePerSite;
+    vector<double> timePerTranscriptLength;
+    list<vector<double>> proportionTimePerTranscriptLength;
 
 
     // PhyloPause pause distribution per plot data
-    static vector<list<double>> phyloPauseTimePerSite;
+    vector<list<double>> phyloPauseTimePerSite;
 
 
 	// Parameter heatmap data
-	static list<ParameterHeatmapData*> parametersPlotData;
+	list<ParameterHeatmapData*> parametersPlotData;
 
 
 	// Copied sequences (only the ones that have not been sent to the controller)
-	static list<string> unsentCopiedSequences;
-	static const int maxNumberCopiedSequences;
-	static int numberCopiedSequences;
-    static bool sendCopiedSequences;
+	list<string> unsentCopiedSequences;
+	int maxNumberCopiedSequences;
+	int numberCopiedSequences;
+    bool sendCopiedSequences;
 
 
 	// Miscellaneous information
-	static double timeElapsed;
-	static double velocity;
-	static int totalDisplacement;
-	static double totaltimeElapsed;
-	static double totaltimeElapsedThisTrial;
-	//static int nabortionSimulations;
-	//static int nMisincorporationSimulations;
-	static bool sitewisePlotHidden;
-	static bool plotsAreHidden;
-	static bool arrestTimeoutReached;
-	static double timeWaitedUntilNextTranslocation;
-	static double timeWaitedUntilNextCatalysis;
+	double timeElapsed;
+	double velocity;
+	int totalDisplacement;
+	double totaltimeElapsed;
+	double totaltimeElapsedThisTrial;
+	//int nabortionSimulations;
+	//int nMisincorporationSimulations;
+	bool sitewisePlotHidden;
+	bool plotsAreHidden;
+	bool arrestTimeoutReached;
+	double timeWaitedUntilNextTranslocation;
+	double timeWaitedUntilNextCatalysis;
 
 
 	// Plot settings
-	static vector<PlotSettings*> plotSettings;
+	vector<PlotSettings*> plotSettings;
 
 
 
 	public:
 
-		
-		static void init();
-		static void refreshPlotData(State* state); // Prepare for the next simulation
-        static void update_timeWaitedUntilNextCatalysis(int baseNumber);
-		static void updatePlotData(State* state, int lastAction, int* actionsToDo, double reactionTime); // Sends through information from the current simulation into the plot
-		static string getPlotDataAsJSON(); // Returns the plot data in JSON format. Will modify the class
-		static void userSelectPlot(int plotNum, string value, bool deleteData);
-		static void savePlotSettings(int plotNum, string values_str);
-		static void updateParameterPlotData(State* state);
-		static void resetTimeToCatalysis();
 
-		static void hideSitewisePlot(bool hide);
-		static void hideAllPlots(bool hide);
-        static void set_sendCopiedSequences(bool toSend);
-		static string getCacheSizeJSON();
-		static void deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata, bool sequences_cleardata);
-		static void recordSite(int siteThatWasJustCatalysed, double timeToCatalysis);
-		static void addCopiedSequence(string sequence);
-		static void prepareForABC();
-		static void setTracePlotPosteriorByID(int id);
-        static string timeToCatalysisPerSite_toJSON();
-        static vector<vector<double>> getTimeToCatalysisPerSite();
+        Plots();
+		
+		void init();
+		void refreshPlotData(State* state); // Prepare for the next simulation
+        void update_timeWaitedUntilNextCatalysis(int baseNumber);
+		void updatePlotData(State* state, int lastAction, int* actionsToDo, double reactionTime); // Sends through information from the current simulation into the plot
+		string getPlotDataAsJSON(); // Returns the plot data in JSON format. Will modify the class
+		void userSelectPlot(int plotNum, string value, bool deleteData);
+		void savePlotSettings(int plotNum, string values_str);
+		void updateParameterPlotData(State* state);
+		void resetTimeToCatalysis();
+
+		void hideSitewisePlot(bool hide);
+		void hideAllPlots(bool hide);
+        void set_sendCopiedSequences(bool toSend);
+		string getCacheSizeJSON();
+        void clear();
+		void deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata, bool sequences_cleardata);
+		void recordSite(int siteThatWasJustCatalysed, double timeToCatalysis);
+		void addCopiedSequence(string sequence);
+		void prepareForABC();
+		void setTracePlotPosteriorByID(int id);
+        string timeToCatalysisPerSite_toJSON();
+        vector<vector<double>> getTimeToCatalysisPerSite();
+        list<vector<double>> getProportionOfTimePerLength();
 
 };
 

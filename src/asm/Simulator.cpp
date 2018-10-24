@@ -41,7 +41,7 @@ using namespace std;
 
 
 
-Simulator::Simulator(){
+Simulator::Simulator(Plots* plots){
 
 	// Each simulator instance has its own mersenne twister instance to allow multithreading
 	random_device rd; 
@@ -49,7 +49,14 @@ Simulator::Simulator(){
 
 	simulateForSeconds = -1;
 	this->animatingGUI = false;
+    this->simulator_plots = plots;
 
+}
+
+
+
+Plots* Simulator::getPlots(){
+    return this->simulator_plots;
 }
 
 
@@ -61,7 +68,7 @@ void Simulator::perform_N_Trials(SimulatorResultSummary* summary, State* state, 
 	int N = summary->get_ntrials();
 
 	// Generate plots?
-	if (_plotFolderName != "" && !_RUNNING_ABC) Plots::init();
+	if (_RECORD_PAUSE_TIMES || (_plotFolderName != "" && !_RUNNING_ABC)) this->simulator_plots->init();
 
 
 	//currentModel->print();
@@ -94,9 +101,9 @@ void Simulator::perform_N_Trials(SimulatorResultSummary* summary, State* state, 
 		result[1] = 0;
 		result[2] = 0;
 		clonedState = state->clone();
-		if (_plotFolderName != "" && !_RUNNING_ABC || _USING_PHYLOPAUSE) Plots::refreshPlotData(clonedState); // New simulation -> refresh plot data
+		if ((_plotFolderName != "" && !_RUNNING_ABC) || _RECORD_PAUSE_TIMES) this->simulator_plots->refreshPlotData(clonedState); // New simulation -> refresh plot data
 		performSimulation(clonedState, result);
-		if (!_RUNNING_ABC) Plots::updateParameterPlotData(clonedState); // Update parameter plot before starting next trial
+		if (_RECORD_PAUSE_TIMES || !_RUNNING_ABC) this->simulator_plots->updateParameterPlotData(clonedState); // Update parameter plot before starting next trial
 
 		//cout << "Finished trial and length is " << clonedState->get_nascentLength() << endl;
 		summary->add_transcriptLength(clonedState->get_nascentLength());
@@ -165,12 +172,12 @@ list<int> Simulator::sample_action_GUI(){
 	// Move onto next trial if terminated
 	if (_currentStateGUI->isTerminated()) {
 
-		if (!_RUNNING_ABC) Plots::updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
+		if (!_RUNNING_ABC) this->simulator_plots->updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
 		Settings::sampleAll(); // Resample the parameters
 		delete _currentStateGUI;
 		_currentStateGUI = new State(true, true);
 		this->nTrialsCompletedGUI++;
-		if (!_RUNNING_ABC || _USING_PHYLOPAUSE) Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
+		if (!_RUNNING_ABC || _RECORD_PAUSE_TIMES) this->simulator_plots->refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
 		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
 		currentSequence->initRNAunfoldingTable();
 
@@ -217,7 +224,7 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
 		result[1] = 0;
 		result[2] = 0;
 
-		if (!_RUNNING_ABC || _USING_PHYLOPAUSE) Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
+		if (!_RUNNING_ABC || _RECORD_PAUSE_TIMES) this->simulator_plots->refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
 		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
 		currentSequence->initRNAunfoldingTable();
 		performSimulation(_currentStateGUI, result);
@@ -241,7 +248,7 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
 			meanMeanTime += result[1];
 
 
-			if (!_RUNNING_ABC) Plots::updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
+			if (!_RUNNING_ABC) this->simulator_plots->updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
 			Settings::sampleAll(); // Resample the parameters
 			delete _currentStateGUI;
 			_currentStateGUI = new State(true, true);
@@ -303,7 +310,7 @@ void Simulator::resume_trials_GUI(double* toReturn){
 
 
 		// Restart from initial state for the next simulation
-		if (!_RUNNING_ABC) Plots::updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
+		if (!_RUNNING_ABC) this->simulator_plots->updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
 		Settings::sampleAll(); // Resample the parameters
 		delete _currentStateGUI;
 		_currentStateGUI = new State(true, true);
@@ -312,7 +319,7 @@ void Simulator::resume_trials_GUI(double* toReturn){
 		result[2] = 0;
 
 
-		if (!_RUNNING_ABC || _USING_PHYLOPAUSE) Plots::refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
+		if (!_RUNNING_ABC || _RECORD_PAUSE_TIMES) this->simulator_plots->refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
 		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
 		currentSequence->initRNAunfoldingTable();
 
@@ -410,7 +417,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
             // Label the next nucleotide as having been transcribed (so that an arrests do not underinflate pause times)
-            Plots::update_timeWaitedUntilNextCatalysis(s->get_nascentLength() + 1);
+            this->simulator_plots->update_timeWaitedUntilNextCatalysis(s->get_nascentLength() + 1);
 
 
 			// If timeout has been reached then return the current time elapsed
@@ -855,7 +862,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				if (actionsToDoList[i] == -2) break;
 
 				// Update the plots immediately before the final reaction in the list has been applied
-				if ((_USING_PHYLOPAUSE || _USING_GUI || _plotFolderName != "") && (i == 2 || actionsToDoList[i+1] == -2) && !_RUNNING_ABC) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, reactionTime);
+				if ((_RECORD_PAUSE_TIMES || (_USING_GUI && !_RUNNING_ABC) || _plotFolderName != "") && (i == 2 || actionsToDoList[i+1] == -2)) this->simulator_plots->updatePlotData(s, actionsToDoList[i], actionsToDoList, reactionTime);
 
 				if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
 				else this->actionsToReturn.push_back(actionsToDoList[i]);
@@ -1006,7 +1013,7 @@ double Simulator::geometricTranslocationSampling(State* s){
 		if (actionsToDoList[i] == -2) break;
 
 		// Update the plots immediately before the final reaction in the list has been applied
-		if ((_USING_PHYLOPAUSE || _USING_GUI || _plotFolderName != "") && (i == 1 || actionsToDoList[i+1] == -2) && !_RUNNING_ABC) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, totalReactionTime);
+		if ((_RECORD_PAUSE_TIMES || (_USING_GUI && !_RUNNING_ABC) || _plotFolderName != "") && (i == 1 || actionsToDoList[i+1] == -2)) this->simulator_plots->updatePlotData(s, actionsToDoList[i], actionsToDoList, totalReactionTime);
 
 		if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
 		else this->actionsToReturn.push_back(actionsToDoList[i]);
@@ -1129,7 +1136,7 @@ double Simulator::geometricTranslocationBindingSampling(State* s){
 		if (actionsToDoList[i] == -2) break;
 
 		// Update the plots immediately before the final reaction in the list has been applied
-		if ((_USING_PHYLOPAUSE || _USING_GUI || _plotFolderName != "") && (i == 1 || actionsToDoList[i+1] == -2) && !_RUNNING_ABC) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, totalReactionTime);
+		if ((_RECORD_PAUSE_TIMES || (_USING_GUI && !_RUNNING_ABC) || _plotFolderName != "") && (i == 1 || actionsToDoList[i+1] == -2)) this->simulator_plots->updatePlotData(s, actionsToDoList[i], actionsToDoList, totalReactionTime);
 
 		if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
 		else this->actionsToReturn.push_back(actionsToDoList[i]);
@@ -1318,7 +1325,7 @@ double Simulator::geometricBindingSampling(State* s){
 		if (actionsToDoList[i] == -2) break;
 
 		// Update the plots immediately before the final reaction in the list has been applied
-		if ((_USING_PHYLOPAUSE || _USING_GUI || _plotFolderName != "") && (i == 2 || actionsToDoList[i+1] == -2) && !_RUNNING_ABC) Plots::updatePlotData(s, actionsToDoList[i], actionsToDoList, totalReactionTime);
+		if ((_RECORD_PAUSE_TIMES || (_USING_GUI && !_RUNNING_ABC) || _plotFolderName != "") && (i == 2 || actionsToDoList[i+1] == -2)) this->simulator_plots->updatePlotData(s, actionsToDoList[i], actionsToDoList, totalReactionTime);
 
 		if (!this->animatingGUI) executeAction(s, actionsToDoList[i]);
 		else this->actionsToReturn.push_back(actionsToDoList[i]);

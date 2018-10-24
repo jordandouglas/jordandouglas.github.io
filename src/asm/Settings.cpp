@@ -53,6 +53,8 @@ const double _kBT = 1.380649e-23 * 310;
 const double _preExp = 1e6;	
 const double _PI = 3.14159265359;	
 const int _nBasesToTranscribeInit = 4;
+const int _N_THRESHOLDS_ROC_CURVE = 100;
+const int _N_GRID_SQUARES_ROC_CURVE = 500;
 
 
 const double _midpointModelConstant = -14.37;
@@ -108,7 +110,7 @@ bool _RUNNING_ABC = false;
 // Experimental data
 list<ExperimentalData*> experiments;
 int _numExperimentalObservations = 0;
-
+bool _RECORD_PAUSE_TIMES = false;
 
 // Models
 deque<Model*> modelsToEstimate;
@@ -185,6 +187,7 @@ SlippageLandscapes* _slippageLandscapesToSendToDOM;
 ostringstream _ABCoutputToPrint;
 list<PosteriorDistributionSample*> _GUI_posterior;
 map<int, list<PosteriorDistributionSample*>> _gelPosteriorDistributions; // All posterior distributions for gel calibrations
+Plots* _GUI_PLOTS;
 
 
 // PhyloPause
@@ -504,6 +507,8 @@ void Settings::setSequence(Sequence* seq){
     currentSequence->initRateTable();
     currentSequence->initRNAunfoldingTable();
     _translocationRatesCache = currentSequence->getRatesCache();
+
+    //currentSequence->print();
 
 
 

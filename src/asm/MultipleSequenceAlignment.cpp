@@ -352,12 +352,12 @@ void MultipleSequenceAlignment::PhyloPause(){
         cout << "Starting sequence " << (currentSequenceForSimulation + 1) << " out of " << this->alignment.size() << endl;
 
         // Activate the sequence
-        Plots::deletePlotData(_currentStateGUI, true, true, true, true, true, true);
+        _GUI_PLOTS->deletePlotData(_currentStateGUI, true, true, true, true, true, true);
         Settings::setSequence(currentSeq);
 
 
         // Reinitialise plot data every time sequence changes
-        Plots::init(); 
+        _GUI_PLOTS->init(); 
 
 
         // Perform multi-threaded simulation
@@ -365,7 +365,7 @@ void MultipleSequenceAlignment::PhyloPause(){
 
 
            
-        vector<vector<double>> timeToCatalysisPerSite = Plots::getTimeToCatalysisPerSite();
+        vector<vector<double>> timeToCatalysisPerSite = _GUI_PLOTS->getTimeToCatalysisPerSite();
       
         vector<bool>* isPauseSite = PauseSiteUtil::identifyPauseSites(currentSeq, timeToCatalysisPerSite);
         this->pauseSitesInAlignment.at(currentSequenceForSimulation) = isPauseSite;
@@ -414,11 +414,11 @@ void MultipleSequenceAlignment::PhyloPause_GUI(Simulator* simulator, int* result
             cout << "Starting sequence " << (currentSequenceForSimulation + 1) << " out of " << this->alignment.size() << endl;
 
             // Activate the sequence
-            Plots::deletePlotData(_currentStateGUI, true, true, true, true, true, true);
+            _GUI_PLOTS->deletePlotData(_currentStateGUI, true, true, true, true, true, true);
             Settings::setSequence(currentSeq);
 
         
-            Plots::init(); // Reinitialise plot data every time sequence changes
+            _GUI_PLOTS->init(); // Reinitialise plot data every time sequence changes
 
 
             if (_USING_GUI){
@@ -461,7 +461,7 @@ void MultipleSequenceAlignment::PhyloPause_GUI(Simulator* simulator, int* result
 
 
         // Sequence completed. Save the TTC information and move on to the next sequence
-        vector<bool>* isPauseSite = PauseSiteUtil::identifyPauseSites(currentSeq, Plots::getTimeToCatalysisPerSite());
+        vector<bool>* isPauseSite = PauseSiteUtil::identifyPauseSites(currentSeq, _GUI_PLOTS->getTimeToCatalysisPerSite());
         this->pauseSitesInAlignment.at(currentSequenceForSimulation) = isPauseSite;
 
         // Clear the rate table to liberate memory

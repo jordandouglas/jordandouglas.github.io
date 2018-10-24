@@ -51,6 +51,11 @@ class PosteriorDistributionSample {
 	vector<string> simulatedValues; // eg. Velocities
 	vector<vector<double>> simulatedDensities; 
 
+    // Pause sites only
+    list<double> meanDwellTimes_pauseSites;
+    list<double> meanDwellTimes_notpauseSites;
+    bool haveCalculatedAUC;
+
 
     public:
     	PosteriorDistributionSample(int sampleNum, int numExperimentalObservations, bool ABC);
@@ -71,6 +76,7 @@ class PosteriorDistributionSample {
     	vector<string> getParameterNames();
     	//void addSimulatedAndObservedValue(double simVal, double obsVal);
     	void addSimulatedAndObservedValue(SimulatorResultSummary* simulated, ExperimentalData* observed);
+        void calculateAUC();
     	void parseFromLogFileLine(vector<string> splitLine, vector<string> headerLineSplit);
     	bool isABC();
 		

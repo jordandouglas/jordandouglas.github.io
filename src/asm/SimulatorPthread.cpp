@@ -22,6 +22,7 @@
 
 
 #include "SimulatorPthread.h"
+#include "Plots.h"
 
 using namespace std;
 
@@ -32,7 +33,8 @@ void SimulatorPthread::init(){
 
 	simulators.resize(N_THREADS);
 	for (int i = 0; i < N_THREADS; i++){
-   		simulators.at(i) = new Simulator();
+        Plots* simulator_plots = new Plots();
+   		simulators.at(i) = new Simulator(simulator_plots);
    	}
 
 
@@ -49,6 +51,7 @@ SimulatorResultSummary* SimulatorPthread::performNSimulations(int N, bool verbos
 	if (N_THREADS == 1){
 		SimulatorResultSummary* result = new SimulatorResultSummary(N);
 		SimulatorPthread::createThreadAndSimulate(1, result, verbose);
+        result->compute_meanRelativeTimePerLength();
 		return result;
 	}
 
@@ -91,6 +94,11 @@ SimulatorResultSummary* SimulatorPthread::performNSimulations(int N, bool verbos
    		mergedResult->add_transcriptLengths(results.at(i)->get_transcriptLengths());
 
 
+
+        // Merge times at each transcript length
+        mergedResult->add_proportionOfTimePerLength(results.at(i)->get_proportionOfTimePerLength());
+
+
    		//cout << velocities.at(i)[0] << endl;
    		delete threads.at(i);
    		//results.at(i).clear();
@@ -100,7 +108,7 @@ SimulatorResultSummary* SimulatorPthread::performNSimulations(int N, bool verbos
    	}
 
 
-	
+	mergedResult->compute_meanRelativeTimePerLength();
 	results.clear();
 	threads.clear();
 
@@ -122,6 +130,8 @@ void SimulatorPthread::createThreadAndSimulate(int threadNum, SimulatorResultSum
 
     State* initialState = new State(true);
     SimulatorPthread::simulators.at(threadNum-1)->perform_N_Trials(summary, initialState, verbose);
+    summary->add_proportionOfTimePerLength(SimulatorPthread::simulators.at(threadNum-1)->getPlots()->getProportionOfTimePerLength());
+    SimulatorPthread::simulators.at(threadNum-1)->getPlots()->clear();
    	delete initialState;
 
 

@@ -63,9 +63,7 @@ class ExperimentalData{
 	double t12;
 
 	// Pause sites
-	double timeOfArrest;
-	double abundance;
-	vector<int> abundantLengths; 
+    vector<int> pauseSiteIndices;
 
 
 
@@ -101,7 +99,7 @@ class ExperimentalData{
 		void set_Emin(double val);
 		void set_t12(double val);
 		void set_sequenceID(string seqID);
-
+        void set_pauseSiteIndices(vector<int> pauseSites);
 
 
 		double get_ATPconc();
@@ -116,7 +114,7 @@ class ExperimentalData{
 		double get_Emin();
 		double get_t12();
 		double getCurrentSettingX();
-		vector<int> get_abundantLengths(); 
+		vector<int> get_pauseSiteIndices(); 
 
 };
 

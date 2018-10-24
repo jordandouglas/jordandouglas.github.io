@@ -54,9 +54,7 @@ ExperimentalData::ExperimentalData(int id, string dataType, int nObs){
 
 
 	// Pause sites
-	this->timeOfArrest = 0;
-	this->abundance = 0;
-
+    this->pauseSiteIndices.resize(0);
 
 	ntrials.resize(nObs);
 	if (dataType == "timeGel") {
@@ -111,12 +109,8 @@ void ExperimentalData::addDatapoint(double setting, double observation, int n){
 
 
 // Pause sites only
-void ExperimentalData::addDatapoint(double time, double abundance, vector<int> observedLengths){
-
-	this->timeOfArrest = time;
-	this->abundance = abundance;
-	this->abundantLengths = observedLengths;
-
+void ExperimentalData::set_pauseSiteIndices(vector<int> pauseSites){
+	this->pauseSiteIndices = pauseSites;
 }
 
 
@@ -162,16 +156,6 @@ string ExperimentalData::toJSON(){
 
 
 
-	if (this->dataType == "pauseSites") {
-
-
-		JSON += "'halt':" + to_string(this->halt) + ",";
-		JSON += "'time':" + to_string(this->timeOfArrest) + ",";
-		JSON += "'abundance':" + to_string(this->abundance) + ",";
-
-	}
-
-
 
 	// Using own sequence?
 	if (this->sequenceID != _seqID){
@@ -206,7 +190,10 @@ string ExperimentalData::toJSON(){
 
 
 		else if (this->dataType == "pauseSites"){
-			JSON += to_string(abundantLengths.at(i)) + ",";
+            for (int j = 0; j < this->pauseSiteIndices.size(); j ++){
+                JSON += to_string(this->pauseSiteIndices.at(j));
+                if (j < this->pauseSiteIndices.size() - 1) JSON += ",";
+            }
 		}
 
 
@@ -289,7 +276,7 @@ void ExperimentalData::applySettings(){
 
 	// Select the appropriate sequence
 	Settings::setSequence(this->sequenceID);
-
+    _RECORD_PAUSE_TIMES = false;
 
 	if (this->dataType == "forceVelocity"){
 		double currentXVal = this->settingsX.at(this->currentExperiment);
@@ -334,8 +321,8 @@ void ExperimentalData::applySettings(){
 		FAssist->hardcodeValue(this->force);
 		haltPosition->hardcodeValue(this->halt);
 
-		// Set the cutoff time to that of this experiment
-		arrestTime->hardcodeValue(this->timeOfArrest);
+		// Inform the simulator to cache transcript length times
+        _RECORD_PAUSE_TIMES = true;
 
 	}
 
@@ -360,14 +347,7 @@ void ExperimentalData::applySettings(){
 
 
 // Return the current observation
-double ExperimentalData::getObservation() {
-
-	// Assumes that all specified transcript lengths are uniformly distributed and sum to a total of 'abundance' 
-	if (this->dataType == "pauseSites") {
-		return this->abundance / this->abundantLengths.size();
-	}
-
-
+double ExperimentalData::getObservation() {   
 	return this->observationsY.at(this->currentExperiment);
 }
 
@@ -455,6 +435,6 @@ double ExperimentalData::get_t12() {
 	return this->t12;
 }
 
-vector<int> ExperimentalData::get_abundantLengths() {
-	return this->abundantLengths;
+vector<int> ExperimentalData::get_pauseSiteIndices() {
+	return this->pauseSiteIndices;
 }

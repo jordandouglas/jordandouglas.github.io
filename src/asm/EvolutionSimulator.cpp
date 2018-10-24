@@ -264,11 +264,11 @@ void EvolutionSimulator::generateSequencesWithPauseSite(double pauseThreshold, i
 vector<double> EvolutionSimulator::getPauseTime(Sequence* seq, int pauseSite){
 
     // Activate the sequence and calculate fitness
-    Plots::deletePlotData(_currentStateGUI, true, true, true, true, true, true);
+    _GUI_PLOTS->deletePlotData(_currentStateGUI, true, true, true, true, true, true);
     Settings::setSequence(seq);
-    Plots::init(); 
+    _GUI_PLOTS->init(); 
     SimulatorPthread::performNSimulations(ntrials_sim, false);
-    vector<vector<double>> timeToCatalysisPerSite = Plots::getTimeToCatalysisPerSite();
+    vector<vector<double>> timeToCatalysisPerSite = _GUI_PLOTS->getTimeToCatalysisPerSite();
 
     return timeToCatalysisPerSite.at(pauseSite - 1);
 

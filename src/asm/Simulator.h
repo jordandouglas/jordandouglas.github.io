@@ -24,6 +24,7 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
+#include "Plots.h"
 #include "State.h"
 #include "randomc/randomc.h"
 #include "SimulatorResultSummary.h"
@@ -50,8 +51,8 @@ class Simulator{
 	bool animatingGUI;
 	list<int> actionsToReturn;
 
-	// Timer
-	//void timer_start(unsigned int interval);
+	// Plots object
+    Plots* simulator_plots;
 
 
 	// Store the number of trials remaining and the current state for GUI purposes
@@ -66,7 +67,7 @@ class Simulator{
     CRandomMersenne* sfmt;
 
     public:
-    	Simulator();
+    	Simulator(Plots* plots);
     	void perform_N_Trials(SimulatorResultSummary* resultSummary, State* state, bool verbose);
     	int getNtrialsTotal_GUI();
     	int getNtrialsCompleted_GUI();
@@ -76,6 +77,7 @@ class Simulator{
     	void resume_trials_GUI(double* toReturn);
     	double rexp(double rate);
     	double runif();
+        Plots* getPlots();
 
 };
 

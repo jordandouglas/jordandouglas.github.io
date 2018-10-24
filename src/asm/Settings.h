@@ -24,6 +24,8 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+
+#include "Plots.h"
 #include "Model.h"
 #include "ExperimentalData.h"
 #include "randomc/randomc.h"
@@ -55,7 +57,8 @@ extern const double _preExp;
 extern const double _PI;
 extern const double INF;
 extern const int _nBasesToTranscribeInit;
-
+extern const int _N_THRESHOLDS_ROC_CURVE;
+extern const int _N_GRID_SQUARES_ROC_CURVE;
 
 
 // Translocation model constants. 
@@ -114,6 +117,8 @@ extern bool _RUNNING_ABC;
 // Experimental data
 extern list<ExperimentalData*> experiments;
 extern int _numExperimentalObservations;
+extern bool _RECORD_PAUSE_TIMES;
+
 
 // Model
 extern deque<Model*> modelsToEstimate;
@@ -138,7 +143,7 @@ extern SlippageLandscapes* _slippageLandscapesToSendToDOM;
 extern ostringstream _ABCoutputToPrint;
 extern list<PosteriorDistributionSample*> _GUI_posterior;
 extern map<int, list<PosteriorDistributionSample*>> _gelPosteriorDistributions; // All posterior distributions for gel calibrations
-
+extern Plots* _GUI_PLOTS;
 
 // PhyloPause
 extern MultipleSequenceAlignment* _PP_multipleSequenceAlignment;

@@ -500,7 +500,7 @@ State* State::terminate(){
 				Coordinates::delete_nt(i, "m");
 			}
 		}
-		Plots::addCopiedSequence(this->nascentSequence);
+		_GUI_PLOTS->addCopiedSequence(this->nascentSequence);
 
 	}
 
@@ -1014,7 +1014,7 @@ State* State::cleave(){
 
 
 		// Reset the 'time until catalysis' or this will make the interpretation of the time to catalysis sitewise plot less meaningful 
-		if (this->isGuiState) Plots::resetTimeToCatalysis();
+		if (this->isGuiState) _GUI_PLOTS->resetTimeToCatalysis();
 
 		this->nextTemplateBaseToCopy -= nbasesCleaved;
 		this->nascentSequence = this->nascentSequence.substr(0, newLength);

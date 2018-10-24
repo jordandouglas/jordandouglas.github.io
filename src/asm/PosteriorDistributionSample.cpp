@@ -42,6 +42,7 @@ PosteriorDistributionSample::PosteriorDistributionSample(int sampleNum, int numE
 	this->currentObsNum = 0;
 	this->logPriorProb = 1;
 	this->modelIndicator = "";
+    this->haveCalculatedAUC = false;
 
 	this->ABC = ABC;
 	if (!this->ABC){
@@ -162,6 +163,187 @@ vector<string> PosteriorDistributionSample::getParameterNames(){
 
 	vector<string> paramIDs_vector{ std::begin(paramIDs), std::end(paramIDs) };
 	return paramIDs_vector;
+
+}
+
+
+// Calculate the AUC of this state and add 1-AUC to the X2
+// Only applicable if pause sites are being fit to, and if the AUC has not already been calculated
+void PosteriorDistributionSample::calculateAUC(){
+
+    if ((this->meanDwellTimes_pauseSites.size() == 0 && this->meanDwellTimes_notpauseSites.size() == 0) || this->haveCalculatedAUC) return;
+    this->haveCalculatedAUC = true;
+
+
+
+    // If there are no dwell times on pause sites and/or non-pause sites then the simulation probably terminated at the very beginning
+    // When there are no instances of a class, the true/false positive rate is undefined (cannot divide by 0)
+    // In this case set AUC to 0
+    if (this->meanDwellTimes_pauseSites.size() == 0 || this->meanDwellTimes_notpauseSites.size() == 0) {
+        double AUC = 0;
+        cout << "AUC " << AUC << endl;
+        this->chiSquared += 1-AUC;
+        return;
+    }
+
+
+    // Sort the pause and non-pause dwell time lists
+    this->meanDwellTimes_pauseSites.sort();
+    this->meanDwellTimes_notpauseSites.sort();
+
+    // Find the maximum and minimum relative dwell times in either list
+    double maxDwellTime = max(this->meanDwellTimes_pauseSites.back(), this->meanDwellTimes_notpauseSites.back());
+    double minDwellTime = min(this->meanDwellTimes_pauseSites.back(), this->meanDwellTimes_notpauseSites.back());
+
+
+    if (isinf(maxDwellTime) || isinf(minDwellTime)){
+        double AUC = 0;
+        cout << "AUC " << AUC << endl;
+        this->chiSquared += 1-AUC;
+        return;
+    }
+
+    //cout << "calculateAUC " << maxDwellTime << "," << minDwellTime << "," << isinf(maxDwellTime) << endl; 
+
+    /*
+    if (isinf(maxDwellTime)){
+        cout << "pauses: " << endl;
+        for (list<double>::iterator it = this->meanDwellTimes_pauseSites.begin(); it != this->meanDwellTimes_pauseSites.end(); ++it){
+            cout << (*it) << ",";
+        }
+        cout << endl;
+
+        cout << "not pauses: " << endl;
+        for (list<double>::iterator it = this->meanDwellTimes_notpauseSites.begin(); it != this->meanDwellTimes_notpauseSites.end(); ++it){
+            cout << (*it) << ",";
+        }
+        cout << endl;
+
+    }
+    */
+
+
+    // Initialise ROC curve object
+    vector<vector<double>> ROC_curve(_N_THRESHOLDS_ROC_CURVE + 1);
+    for (int i = 0; i < ROC_curve.size(); i ++){
+        ROC_curve.at(i).resize(2); // False positive rate, true positive rate
+    }
+    double threshold_grid_size = maxDwellTime / _N_THRESHOLDS_ROC_CURVE;
+
+
+    // Initialise iterators of sorted lists
+    list<double>::iterator pauseIterator = this->meanDwellTimes_pauseSites.begin();
+    list<double>::iterator nonPauseIterator = this->meanDwellTimes_notpauseSites.begin();
+    int nPausesBelowThreshold = 0;
+    int nNonpausesBelowThreshold = 0;
+
+    // Calculate the AUC of a ROC curve. Search a fixed number of thresholds from min to max dwell time
+    for (int i = 0; i <= _N_THRESHOLDS_ROC_CURVE; i ++){
+        double threshold = threshold_grid_size * i;
+
+        // False positive rate = proportion of non-pauses which have a relative time >= threshold
+        while( (*nonPauseIterator) < threshold && nonPauseIterator != this->meanDwellTimes_notpauseSites.end()) {
+            nNonpausesBelowThreshold ++;
+            if (nonPauseIterator == this->meanDwellTimes_notpauseSites.end()) break;
+            ++ nonPauseIterator;
+        }
+
+
+
+        // True positive rate = proportion of pauses which have a relative time >= threshold
+        while( (*pauseIterator) < threshold && pauseIterator != this->meanDwellTimes_pauseSites.end()) {
+            nPausesBelowThreshold ++;
+            if (pauseIterator == this->meanDwellTimes_pauseSites.end()) break;
+            ++ pauseIterator;
+        }
+
+
+
+        // Calculate true and false positive rates
+        double FP_rate = 1 - 1.0*nNonpausesBelowThreshold / this->meanDwellTimes_notpauseSites.size();
+        double TP_rate = 1 - 1.0*nPausesBelowThreshold / this->meanDwellTimes_pauseSites.size();
+        ROC_curve.at(i).at(0) = FP_rate;
+        ROC_curve.at(i).at(1) = TP_rate;
+    }
+
+
+
+
+    // Calculate the AUC by iterating across the x-axis in a grid
+    double widthPerGridSquare = 1.0 / _N_GRID_SQUARES_ROC_CURVE;
+    double AUC = 0;
+    for (int gridIndex = 0; gridIndex < _N_GRID_SQUARES_ROC_CURVE; gridIndex ++){
+
+        // X-axis value is the middle-x of this grid square
+        double x = (gridIndex + 0.5) * widthPerGridSquare;
+
+
+        // Find the two points on the ROC curve which flank this x-value
+        double leftFlankIndex = -1;
+        double rightFlankIndex = -1;
+        for (int i = 0; i < ROC_curve.size() - 1; i ++){
+            if (ROC_curve.at(i+1).at(0) <= x && ROC_curve.at(i).at(0) > x){
+                leftFlankIndex = i+1;
+                rightFlankIndex = i;
+                break;
+            }
+        }
+
+
+        //cout << "x = " << x << " is flanked by " << ROC_curve.at(leftFlankIndex).at(0) << " and " << ROC_curve.at(rightFlankIndex).at(0) << endl;
+
+
+        // Horizontal line
+        double y;
+        if (ROC_curve.at(leftFlankIndex).at(1) == ROC_curve.at(rightFlankIndex).at(1)) y = ROC_curve.at(rightFlankIndex).at(0);
+
+        // Vertical line - take mid point
+        else if (ROC_curve.at(leftFlankIndex).at(0) == ROC_curve.at(rightFlankIndex).at(0))  y = (ROC_curve.at(leftFlankIndex).at(1) + ROC_curve.at(rightFlankIndex).at(1)) / 2;
+
+
+        // Sloped line y = mx + c. Find the value of y where x intersects the straight line connecting these two flanking points
+        else {
+
+            double m = (ROC_curve.at(rightFlankIndex).at(1) - ROC_curve.at(leftFlankIndex).at(1)) / (ROC_curve.at(rightFlankIndex).at(0) - ROC_curve.at(leftFlankIndex).at(0));
+            double c = ROC_curve.at(rightFlankIndex).at(1) - m*ROC_curve.at(rightFlankIndex).at(0);
+            y = m*x + c;
+
+        }
+
+
+        //cout << "y = " << y << endl;
+        AUC += y * widthPerGridSquare;
+
+    }
+
+
+    cout << "1-AUC " << 1-AUC << endl;
+
+    /*
+    cout << "FP = c(";
+    for (int i = 0; i < ROC_curve.size(); i ++){
+        cout << ROC_curve.at(i).at(0);
+        if (i < ROC_curve.size() - 1) cout << ",";
+    }
+    cout << ")" << endl;
+
+
+    cout << "TP = c(";
+    for (int i = 0; i < ROC_curve.size(); i ++){
+        cout << ROC_curve.at(i).at(1);
+        if (i < ROC_curve.size() - 1) cout << ",";
+    }
+    cout << ")" << endl;
+    */
+
+
+    // Ensure AUC does not go over 1 due to numerical integration
+    AUC = min(AUC, 1.0);
+
+
+    // Add 1-AUC to the X2
+    this->chiSquared += 1-AUC;
+
 
 }
 
@@ -368,59 +550,32 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 	// Compare the transcript lengths at this time with the known pause sites
 	else if (observed->getDataType() == "pauseSites"){
 
+        vector<double> relativeDwellTimes = simulated->get_meanRelativeTimePerLength();
 
-		
-		vector<int> observedLengths = observed->get_abundantLengths(); 
+        // Do not calculate X2 until the very end of all experiments. Cache the relative dwell times and come back to them later
+        vector<int> pauseSiteIndices = observed->get_pauseSiteIndices();
+        for (int i = 1; i < relativeDwellTimes.size(); i ++){
 
+            // Ignore edge effects (ie. if mean time = 0)
+            if (relativeDwellTimes.at(i) <= 0) continue;
 
-		// Initialise simulated length abundance
-		vector<double> simulatedLengthProbabilities(observedLengths.size());
-		for (int i = 0; i < observedLengths.size(); i ++) simulatedLengthProbabilities.at(i) = 0;
+            // Is this site an observed pause site?
+            bool isPauseSite = false;
+            for (int j = 0; j < pauseSiteIndices.size(); j ++){
+                if (i == pauseSiteIndices.at(j)){
+                    isPauseSite = true;
+                    break;
+                }
+            }
 
-			
-
-		// Calculate simulated probability of being at each frequent length 
-		list<int> simulatedLengths = simulated->get_transcriptLengths();
-		for (list<int>::iterator it = simulatedLengths.begin(); it != simulatedLengths.end(); ++it){
-			int len = *it;
-			for (int i = 0; i < observedLengths.size(); i ++){
-				if (len == observedLengths.at(i)) {
-					simulatedLengthProbabilities.at(i) += 1.0/simulatedLengths.size(); // Abundant transcript length has been simulated
-					break;
-				}
-			}
-		}
+            if (isPauseSite) this->meanDwellTimes_pauseSites.push_back(relativeDwellTimes.at(i));
+            else this->meanDwellTimes_notpauseSites.push_back(relativeDwellTimes.at(i));
 
 
+        }
 
-
-		// Compute the RSS (only comparing the proportion of abundant transcript lengths, not the rare ones)
-		double simRSS = 0;
-		double obsVal = observed->getObservation(); // The observed proportion of each "abundant transcript" 
-		for (int i = 0; i < simulatedLengthProbabilities.size(); i ++){
-			simRSS += pow(simulatedLengthProbabilities.at(i) - obsVal, 2);
-		}
-
-
-		// Convert the probability vector to a string
-		std::ostringstream probabilityVector;
-		probabilityVector << std::fixed;
-		 
-		// Set precision to 2 digits
-		probabilityVector << std::setprecision(2);
-		probabilityVector << "[";
-		 
-
-		for (int i = 0; i < simulatedLengthProbabilities.size(); i ++){
-			probabilityVector << simulatedLengthProbabilities.at(i);
-			if (i < simulatedLengthProbabilities.size()-1) probabilityVector << ",";
-		}
-		probabilityVector << "]";
-
-		this->simulatedValues.at(this->currentObsNum) = probabilityVector.str();
-
-		this->chiSquared += simRSS;
-	
+        
+	    this->chiSquared += 0;
 
 	}
 

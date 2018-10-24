@@ -23,9 +23,11 @@
 #ifndef SIMULATORRESULTSUMMARY_H
 #define SIMULATORRESULTSUMMARY_H
 
+
+
 #include <string>
 #include <list>
-
+#include <vector>
 
 using namespace std;
 
@@ -37,6 +39,9 @@ class SimulatorResultSummary{
 	double meanVelocity;
 	double meanTimeElapsed;
 	list<int> transcriptLengths;
+    list<vector<double>> proportionOfTimePerLength;
+    vector<double> meanRelativeTimePerLength;
+
 
 	public:
 
@@ -47,7 +52,10 @@ class SimulatorResultSummary{
 		void add_transcriptLengths(list<int> l);
 		void clear();
 
-
+        void add_proportionOfTimePerLength(list<vector<double>> newProportionsOfTimePerLength);
+        list<vector<double>> get_proportionOfTimePerLength();
+        void compute_meanRelativeTimePerLength();
+        vector<double> get_meanRelativeTimePerLength();
 		int get_ntrials();
 		double get_meanVelocity();
 		double get_meanTimeElapsed();

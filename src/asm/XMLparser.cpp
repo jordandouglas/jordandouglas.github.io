@@ -317,13 +317,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 				else if (experimentType == "pauseSites"){
 
-					// Count number of lengths in the list
-					if (experimentEle->Attribute("lengths")){
-						string lengths = string(experimentEle->Attribute("lengths"));
-						vector<string> lengths_split = Settings::split(lengths, ',');
-						numObservations = lengths_split.size();
-						lengths_split.clear();
-					}
+					numObservations = 1;
 
 				}
 
@@ -355,8 +349,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 					string templateType = experimentEle->Attribute("TemplateType") ? experimentEle->Attribute("TemplateType") : TemplateType;
 					string primerType = experimentEle->Attribute("PrimerType") ? experimentEle->Attribute("PrimerType") : PrimerType;
 					string seqID = "Sequence for experiment " + to_string(experiments.size()+1); 
-
-					Sequence* newSeq = new Sequence(seqID, templateType, primerType, templateSeq);
+					Sequence* newSeq = new Sequence(seqID, templateType, primerType, Settings::complementSeq(templateSeq, templateType.substr(2) == "RNA"));
 					sequences[seqID] = newSeq;
 					experiment->set_sequenceID(seqID);
 
@@ -489,35 +482,23 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 				else if (experimentType == "pauseSites"){
 
-					double time = 0;
-					double abundance = 0;
 
 
-					if (experimentEle->Attribute("time")) {
-						time = atof(experimentEle->Attribute("time"));
-					}
+                    // Read in the indices
+                    if (experimentEle->Attribute("indices")){
 
-					if (experimentEle->Attribute("abundance")) {
-						abundance = atof(experimentEle->Attribute("abundance"));
-					}
+                        vector<string> indices_split = Settings::split(experimentEle->Attribute("indices"), ',');
+                        vector<int> indices_vector(indices_split.size());
+                        for (int i = 0; i < indices_split.size(); i ++){
+                            indices_vector.at(i) = stoi(indices_split.at(i));
+                        }
+
+                        experiment->set_pauseSiteIndices(indices_vector);
+                        indices_split.clear();
 
 
+                    }
 
-					// The frequently observed lengths at this time
-					string lengths = string(experimentEle->Attribute("lengths"));
-					vector<string> lengths_split = Settings::split(lengths, ',');
-					vector<int> observedLengths(numObservations);
-
-					for (int obsNum = 0; obsNum < numObservations; obsNum ++){
-
-						double len = stoi(lengths_split.at(obsNum));
-						observedLengths.at(obsNum) = len;
-
-					}
-
-					experiment->addDatapoint(time, abundance, observedLengths);
-
-					lengths_split.clear();
 
 				}
 
