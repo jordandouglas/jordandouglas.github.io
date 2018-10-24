@@ -78,6 +78,7 @@ extern "C" {
 
 	void EMSCRIPTEN_KEEPALIVE initGUI(bool isMobile){
 		_USING_GUI = true;
+        _GUI_PLOTS = new Plots();
 		//_currentStateGUI = new State(true, true);
 	}
 
@@ -551,7 +552,7 @@ extern "C" {
 		_currentStateGUI = new State(true, true);
 
 		// Refresh plot
-		Plots::refreshPlotData(_currentStateGUI);
+		_GUI_PLOTS->refreshPlotData(_currentStateGUI);
 
 
 		// Ensure that the current sequence's translocation rate cache is up to date
@@ -722,7 +723,7 @@ extern "C" {
 		Settings::setSequence("$user");
 		delete _currentStateGUI;
 		_currentStateGUI = new State(true, true);
-		Plots::init(); // Reinitialise plot data every time sequence changes
+		_GUI_PLOTS->init(); // Reinitialise plot data every time sequence changes
 
 
 		messageFromWasmToJS("{'succ':true}", msgID);
@@ -745,7 +746,7 @@ extern "C" {
 		else {
 			delete _currentStateGUI;
 			_currentStateGUI = new State(true, true);
-			Plots::init(); // Reinitialise plot data every time sequence changes
+			_GUI_PLOTS->init(); // Reinitialise plot data every time sequence changes
 
 			cout << "done" << endl;
 		}
@@ -965,7 +966,7 @@ extern "C" {
 		_ABCoutputToPrint.clear();
 
 
-		Plots::prepareForABC();
+		_GUI_PLOTS->prepareForABC();
 		//Settings::print();
 
 		// Initialise MCMC
@@ -1227,7 +1228,7 @@ extern "C" {
 
 
 		// Notify the plots that ABC is in effect
-		Plots::prepareForABC();
+		_GUI_PLOTS->prepareForABC();
 
 		lines.clear();
 
@@ -1324,7 +1325,7 @@ extern "C" {
 
 
 		// Ensure that a trace plot is showing this posterior distribution
-		Plots::setTracePlotPosteriorByID(fitID);
+		_GUI_PLOTS->setTracePlotPosteriorByID(fitID);
 
 
 
@@ -1908,7 +1909,7 @@ extern "C" {
 		_interfaceSimulation_startTime = chrono::system_clock::now();
 		
 		// Prepare for simulating
-		_interfaceSimulator = new Simulator();
+		_interfaceSimulator = new Simulator(_GUI_PLOTS);
 		_interfaceSimulator->initialise_GUI_simulation(N, 1000);
 
 
@@ -1958,7 +1959,7 @@ extern "C" {
 
 
 		// Get relevant plot data string (if all plots are invisible etc. then this string should be {})
-		//string plotsJSON = Plots::getPlotDataAsJSON();
+		//string plotsJSON = _GUI_PLOTS->getPlotDataAsJSON();
 
 
 		// Stop timer
@@ -1993,7 +1994,7 @@ extern "C" {
 
 		// Check if told to stop
 		if (_GUI_STOP){
-			string plotsJSON = Plots::getPlotDataAsJSON();
+			string plotsJSON = _GUI_PLOTS->getPlotDataAsJSON();
 			string toReturnJSON = "{'stop':true, 'plots':" + plotsJSON + "}";
 			_GUI_STOP = false;
 			_GUI_simulating = false;
@@ -2057,7 +2058,7 @@ extern "C" {
 
 
 		// Get relevant plot data string (if all plots are invisible etc. then this string should be {})
-		//string plotsJSON = Plots::getPlotDataAsJSON();
+		//string plotsJSON = _GUI_PLOTS->getPlotDataAsJSON();
 
 
 		// Stop timer
@@ -2081,7 +2082,7 @@ extern "C" {
 
 	// Return any unsent plot data as well as the plot display settings
 	void EMSCRIPTEN_KEEPALIVE getPlotData(int msgID){
-		string JSON = Plots::getPlotDataAsJSON();
+		string JSON = _GUI_PLOTS->getPlotDataAsJSON();
 		messageFromWasmToJS(JSON, msgID);
 	}
 
@@ -2089,8 +2090,8 @@ extern "C" {
 	// User selects which plot should be displayed in a certain plot slot
 	void EMSCRIPTEN_KEEPALIVE userSelectPlot(int plotNum, char* value, int deleteData, int msgID){
 
-		Plots::userSelectPlot(plotNum, string(value), deleteData == 1);
-		string plotsJSON = Plots::getPlotDataAsJSON();
+		_GUI_PLOTS->userSelectPlot(plotNum, string(value), deleteData == 1);
+		string plotsJSON = _GUI_PLOTS->getPlotDataAsJSON();
 		messageFromWasmToJS(plotsJSON, msgID);
 
 
@@ -2103,8 +2104,8 @@ extern "C" {
 	// User saves plot settings for a given plot
 	void EMSCRIPTEN_KEEPALIVE savePlotSettings(int plotNum, char* values_str, int msgID){
 		
-		Plots::savePlotSettings(plotNum, string(values_str));
-		string plotsJSON = Plots::getPlotDataAsJSON();
+		_GUI_PLOTS->savePlotSettings(plotNum, string(values_str));
+		string plotsJSON = _GUI_PLOTS->getPlotDataAsJSON();
 		messageFromWasmToJS(plotsJSON, msgID);
 
 
@@ -2118,19 +2119,19 @@ extern "C" {
 
 	// Show or hide the sitewise plot
 	void EMSCRIPTEN_KEEPALIVE showSitewisePlot(int hidden){
-		Plots::hideSitewisePlot(hidden == 1);
+		_GUI_PLOTS->hideSitewisePlot(hidden == 1);
 	}
 
 	// User shows or hides all plots
 	void EMSCRIPTEN_KEEPALIVE showPlots(int hidden){
-		Plots::hideAllPlots(hidden == 1);
+		_GUI_PLOTS->hideAllPlots(hidden == 1);
 	}
 
 
 
 	// Returns an object which contains the sizes of each object in the cache that can be cleared
 	void EMSCRIPTEN_KEEPALIVE getCacheSizes(int msgID){
-		string cacheSizeJSON = Plots::getCacheSizeJSON();
+		string cacheSizeJSON = _GUI_PLOTS->getCacheSizeJSON();
 		messageFromWasmToJS(cacheSizeJSON, msgID);
 	}
 
@@ -2138,13 +2139,13 @@ extern "C" {
 	// Delete the specified plot data (ie. clear the cache) 
 	void EMSCRIPTEN_KEEPALIVE deletePlots(bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata, bool sequences_cleardata, int msgID){
 
-		Plots::deletePlotData(_currentStateGUI, distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata);
+		_GUI_PLOTS->deletePlotData(_currentStateGUI, distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata);
 
 		if (ABC_cleardata){
 			MCMC::cleanup();
 		}
 
-		string plotsJSON = Plots::getPlotDataAsJSON();
+		string plotsJSON = _GUI_PLOTS->getPlotDataAsJSON();
 		messageFromWasmToJS(plotsJSON, msgID);
 	}
 

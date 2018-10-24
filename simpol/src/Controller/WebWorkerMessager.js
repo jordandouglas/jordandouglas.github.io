@@ -2988,14 +2988,10 @@ function loadSession_controller(XMLData, resolve = function() { }){
 					$("#pauseSites_abundance_" + fitID).val(experimentalData["fits"][fitID]["abundance"]);
 
 
-					textAreaString = experimentalData["fits"][fitID]["vals"].join(",");
-
+					textAreaString = convertListToCommaString(experimentalData["fits"][fitID]["vals"]);
 					
 
-					if (experimentalData["fits"][fitID]["seq"] != null) {
-						$("#pauseSitesUseNewSeq_" + fitID).click();
-						$("#pauseSitesSeq_" + fitID).val(experimentalData["fits"][fitID]["seq"]);
-					}
+					$("#pauseSitesSeq_" + fitID).val(experimentalData["fits"][fitID]["seq"]);
 
 				}
 
@@ -3022,15 +3018,15 @@ function loadSession_controller(XMLData, resolve = function() { }){
 
 
 				// Add the NTP concentrations and chiSq threshold to the DOM
-				$("#ATPconc_" + fitID).val(experimentalData["fits"][fitID]["ATPconc"]);
-				$("#CTPconc_" + fitID).val(experimentalData["fits"][fitID]["CTPconc"]);
-				$("#GTPconc_" + fitID).val(experimentalData["fits"][fitID]["GTPconc"]);
-				$("#UTPconc_" + fitID).val(experimentalData["fits"][fitID]["UTPconc"]);
+				if (experimentalData["fits"][fitID]["ATPconc"] != null) $("#ATPconc_" + fitID).val(experimentalData["fits"][fitID]["ATPconc"]);
+				if (experimentalData["fits"][fitID]["CTPconc"] != null) $("#CTPconc_" + fitID).val(experimentalData["fits"][fitID]["CTPconc"]);
+				if (experimentalData["fits"][fitID]["GTPconc"] != null) $("#GTPconc_" + fitID).val(experimentalData["fits"][fitID]["GTPconc"]);
+				if (experimentalData["fits"][fitID]["UTPconc"] != null) $("#UTPconc_" + fitID).val(experimentalData["fits"][fitID]["UTPconc"]);
 				if (dataType == "ntpVelocity") $("#ABC_force_" + fitID).val(experimentalData["fits"][fitID]["force"]);
 				if (dataType == "pauseEscape") $("#ABC_haltPosition_" + fitID).val(experimentalData["fits"][fitID]["halt"]);
 
 
-				if (dataType != "timeGel" && dataType != "pauseEscape") $("#" + dataType + "InputData_" + fitID).val(textAreaString);
+				if (dataType != "timeGel" && dataType != "pauseEscape") $("#" + dataType + "InputData_" + fitID).val(textAreaString.trim());
 
 			}
 

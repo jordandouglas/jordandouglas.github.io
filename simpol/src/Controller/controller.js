@@ -1146,10 +1146,12 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 
 
 					saveXML.writeAttributeString("dataType", dataType);
-					saveXML.writeAttributeString("ATPconc", abcDataObjectForModel["fits"][fitID]["ATPconc"]);
-					saveXML.writeAttributeString("CTPconc", abcDataObjectForModel["fits"][fitID]["CTPconc"]);
-					saveXML.writeAttributeString("GTPconc", abcDataObjectForModel["fits"][fitID]["GTPconc"]);
-					saveXML.writeAttributeString("UTPconc", abcDataObjectForModel["fits"][fitID]["UTPconc"]);
+                    if (!isNaN(abcDataObjectForModel["fits"][fitID]["ATPconc"])) {
+                      	saveXML.writeAttributeString("ATPconc", abcDataObjectForModel["fits"][fitID]["ATPconc"]);
+    					saveXML.writeAttributeString("CTPconc", abcDataObjectForModel["fits"][fitID]["CTPconc"]);
+    					saveXML.writeAttributeString("GTPconc", abcDataObjectForModel["fits"][fitID]["GTPconc"]);
+    					saveXML.writeAttributeString("UTPconc", abcDataObjectForModel["fits"][fitID]["UTPconc"]);
+                    }
 					if (dataType == "ntpVelocity") saveXML.writeAttributeString("force", abcDataObjectForModel["fits"][fitID]["force"]);
 
 
@@ -1181,12 +1183,11 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 
 
 					if (dataType == "pauseSites"){
-						saveXML.writeAttributeString("time", abcDataObjectForModel["fits"][fitID]["time"]);
-						saveXML.writeAttributeString("abundance", abcDataObjectForModel["fits"][fitID]["abundance"]);
-						saveXML.writeAttributeString("halt", abcDataObjectForModel["fits"][fitID]["haltPosition"]);
-						var lengths = abcDataObjectForModel["fits"][fitID]["vals"].join(",");
-						saveXML.writeAttributeString("lengths", lengths);
-						if (abcDataObjectForModel["fits"][fitID]["seq"] != null) saveXML.writeAttributeString("seq", abcDataObjectForModel["fits"][fitID]["seq"]);
+                        console.log(abcDataObjectForModel["fits"][fitID]);
+                        console.log(convertListToCommaString(abcDataObjectForModel["fits"][fitID]["vals"]));
+						saveXML.writeAttributeString("seq", abcDataObjectForModel["fits"][fitID]["seq"]);
+                        saveXML.writeAttributeString("indices", abcDataObjectForModel["fits"][fitID]["vals"].join(","));
+                        
 					}
 
 

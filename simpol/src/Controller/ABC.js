@@ -267,18 +267,12 @@ function getAbcDataObject(which = "ABC"){
 
 		// Pause escape data
 		if (dataType == "pauseSites"){
-			abcDataObjectForModel["fits"][fitID]["time"] = $("#pauseSites_time_" + fitID).val();
-			abcDataObjectForModel["fits"][fitID]["abundance"] = parseFloat($("#pauseSites_abundance_" + fitID).val());
-			if ($("#pauseSitesUseNewSeq_" + fitID).is(":checked")){
 
-				// Nascent sequence
-				var seq = $("#pauseSitesSeq_" + fitID).val().trim().toUpperCase().replace(/[^ACGTU]/gi, '');
-				seq = complementSequenceFn(seq, $("#SelectTemplateType").val().substr(2, 5) == "RNA");
-				if (seq != "") abcDataObjectForModel["fits"][fitID]["seq"] = seq;
+			// Nascent sequence
+			var seq = $("#pauseSitesSeq_" + fitID).val().trim().toUpperCase().replace(/[^ACGTU]/gi, '');
+			if (seq != "") abcDataObjectForModel["fits"][fitID]["seq"] = seq;
+            
 
-			}
-
-			abcDataObjectForModel["fits"][fitID]["haltPosition"] = parseFloat($("#ABC_haltPosition_" + fitID).val());
 		}
 
 
@@ -329,20 +323,11 @@ function getAbcDataObject(which = "ABC"){
 
 		else if (dataType == "pauseSites"){
 
-			var dataValues = $("#" + dataType + "InputData_" + fitID).val();
-			var splitValues = dataValues.split("\n");
-
-			var splitTimes = splitValues[0].split(",");
-			abcDataObjectForModel["fits"][fitID].vals = [];
-			for (var i = 0; i < splitTimes.length; i ++){
-
-				var time = parseFloat(splitTimes[i].trim());
-				abcDataObjectForModel["fits"][fitID].vals.push(time);
-
-			}
-
-
-			abcDataObjectForModel["fits"][fitID].vals.sort(function(a,b) { return a - b; });
+  
+      
+            // Parse the pause sites
+            var pauseSites = convertCommaStringToList($("#pauseSitesInputData_" + fitID).val().trim());
+			abcDataObjectForModel["fits"][fitID].vals = pauseSites;
 
 
 		}
@@ -456,7 +441,6 @@ function validateExperimentalDataInput(ele){
 					$(ele).attr("id").indexOf("pauseSites") != -1 ? "pauseSites" : 
 					$(ele).attr("id").indexOf("timeGel") != -1 ?  "timeGel" : null;
 
-
 	var fitID = $(ele).attr("id").split("_")[1];
 
 
@@ -475,27 +459,17 @@ function validateExperimentalDataInput(ele){
 	else if (dataType == "pauseSites"){
 
 
+        
+        // Check there is a sequence
+        var seq = $("#pauseSitesSeq_" + fitID).val().trim().toUpperCase().replace(/[^ACGTU]/gi, '');
+        if (seq == "") return false;
 
-		var time = parseFloat($("#pauseSites_time_" + fitID).val());
-		var abundance = parseFloat($("#pauseSites_abundance_" + fitID).val());
-
-		if (isNaN(time) || isNaN(abundance) || time <= 0 || abundance <= 0 || abundance > 1) return false;
-
-
+      
 		// Parse the pause sites
-		var pauseSites = [];
-		var pauseSites_split = $("#pauseSitesInputData_" + fitID).val().trim().split(",");
-		if (pauseSites_split.length == 0) return false;
-		for (var i = 0; i < pauseSites_split.length; i ++){
+		var pauseSites = convertCommaStringToList($("#pauseSitesInputData_" + fitID).val().trim());
 
-			var site = parseFloat(pauseSites_split[i]);
-			if (isNaN(site) || site <= 0) return false;
-			pauseSites.push(site);
 
-		}
-
-		// Draw the plot
-		drawPauseSitesCanvas(fitID, pauseSites, time, abundance);
+        if (pauseSites.length == 0) return false;
 
 
 		return true;
@@ -780,8 +754,8 @@ function getNewCurveButtonsTemplate(){
 					<!--<input type=button onClick='addNewABCData("timeGel")' value='+ Time gel' title="Upload a gel of transcript lengths over time" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
 					<br><br>-->
 
-					<input type=button onClick='addNewABCData("pauseEscape")' value='+ Pause escape data' title="Add maximal pause probability and/or half life data about a pause site" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
-					<br><br>
+					<!--<input type=button onClick='addNewABCData("pauseEscape")' value='+ Pause escape data' title="Add maximal pause probability and/or half life data about a pause site" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
+					<br><br>-->
 
 
 					<input type=button onClick='addNewABCData("pauseSites")' value='+ Pause sites' title="Enumerate all abundant transcript lengths after a given period of time" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
@@ -1140,55 +1114,29 @@ function getPauseSitesTemplate(fitID){
 
 
 			<td class="` + fitID + `" style="width:200px; text-align:center; vertical-align:top">
-				<br><br>
-				<div style="font-size:18px;">Transcript lengths at time</div><br>
+				<br><br><br>
 
 
-				<table style="width:250px; margin:auto">
-
-						<tr>
-							<td style="text-align:right;">
-					 			Time: 
-					 		</td>
-
-					 		<td>
-					 			<input type="number" id="pauseSites_time_` + fitID + `" min=0 onChange="validateAllAbcDataInputs()" title="Duration of transcription elongation before the transcript lengths are measured."
-							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> s
-							</td>
-					 	</tr>
+                    <b>Pause site indices:</b>
 
 
-					 	<tr>
-							<td style="text-align:right;">
-					 			Abundance:
-					 		</td>
-
-					 		<td>
-					 			<input type="number" id="pauseSites_abundance_` + fitID + `" value=0.5 step=0.1 min=0 max=1 onChange="validateAllAbcDataInputs()"  title="The proportion of all transcript lengths which are one of the specified lengths."
-								 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> 
-							</td>
-					 	</tr>
+                    <textarea class="ABCinputData pauseSitesInputData" id="pauseSitesInputData_` + fitID + `" onChange="validateAllAbcDataInputs()" style="font-size:14px; padding: 5 10;  width: 200px; height: 200px; max-width:200px; max-height:500px; min-height:100px; min-width:200px"  
+                    title="Input all pause sites in this sequence" placeholder="Example.                                  20, 30, 41-45"></textarea>
+                    <br><br>
+                    <span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
+                        Enter the pause site indices for this sequence. The index of a pause site is the length of the mRNA
+                        when the pause begins. 
+                    </span>
 
 
-					 </table>
-
-
-					<br>
-					Transcript lengths:
-					<textarea class="ABCinputData pauseSitesInputData" id="pauseSitesInputData_` + fitID + `" onChange="validateAllAbcDataInputs()" style="font-size:14px; padding: 5 10;  width: 200px; height: 80px; max-width:200px; max-height:500px; min-height:100px; min-width:200px"  
-					title="Input all frequently observed transcript lengths after this duration of time." placeholder="Example: 10, 23, 40"></textarea>
-					<br><br >
-					<span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
-						Input all frequently observed transcript lengths after this duration of time (units nt), seperated with commas. 
-					</span>
 
 			</td>
 
 
 			<td class="` + fitID + `" style="width:300px; text-align:center; vertical-align:top">
-
+            
 				<div style="font-size:20px;">
-					Transcript lengths curve
+					Pause sites
 					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
 						
 				</div>
@@ -1207,96 +1155,14 @@ function getPauseSitesTemplate(fitID){
 				
 					<table style="width:250px; margin:auto">
 
-						<tr>
-							<td colspan=2 style="text-align:center;">
 
-								<div style="font-size:18px;">NTP Concentrations</div>
-							</td>
+                 
+					 	<tr id="pauseSitesSeqRow_` + fitID + `"">
+                            <br><br><br>
 
-						</tr>
-
-						<tr>
-							<td style="text-align:right;">
-					 			[ATP] = 
-					 		</td>
-
-					 		<td>
-					 			<input class="variable" value=100   type="number" id="ATPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
-							</td>
-					 	</tr>
-
-
-					 	<tr>
-							<td style="text-align:right;">
-					 			[CTP] = 
-					 		</td>
-
-					 		<td>
-					 			<input class="variable" value=100  type="number"  id="CTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
-							</td>
-					 	</tr>
-
-
-
-
-					 	<tr>
-							<td style="text-align:right;">
-					 			[GTP] = 
-					 		</td>
-
-					 		<td>
-								<input class="variable" value=100 type="number"  id="GTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
-							</td>
-					 	</tr>
-
-
-
-					 	<tr>
-							<td style="text-align:right;">
-					 			[UTP] = 
-					 		</td>
-
-					 		<td>
-								<input class="variable" value=100 type="number" id="UTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
-							</td>
-					 	</tr>
-
-
-					 	<tr>
-							<td style="text-align:right;">
-								<br><br>
-					 			Halt: 
-					 		</td>
-
-					 		<td>
-					 			<br><br>
-								<input type="number" id="ABC_haltPosition_` + fitID + `" value=0 title="The template position where the polymerase starts transcription from. Set to 0 to leave as transcription bubble default."
-							 class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> nt
-							</td>
-					 	</tr>
-
-
-					 	<tr title='Use the same sequence selected in &#9776; Parameters or a different sequence?'  >
-						 
-							<td style="text-align:right; font-size:13px">
-					 			Same seq
-					 		</td>
-							 
-					 		<td colspan=3>
-						 		<label class="switch">
-							 		 <input class="modelSetting" type="checkbox" id="pauseSitesUseNewSeq_` + fitID + `" OnChange="$('#pauseSitesSeqRow_` + fitID + `').toggle()"> </input>
-							 		 <span class="slider round notboolean"></span>
-								</label> 
-								<span style="font-size:13px; vertical-align:middle" >New seq</span>
-					 		</td>
-						
-					 	</tr>
-
-
-
-					 	<tr id="pauseSitesSeqRow_` + fitID + `" style="display:none">
+                            <b>Sequence:</b>
 							<td style="text-align:right;" colspan=2>
-					 			<textarea id="pauseSitesSeq_` + fitID + `" title="Please enter a sequence" style="max-width: 100%; width: 100%; height: 120px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input nascent sequence 5' to 3'..."></textarea> 
+					 			<textarea id="pauseSitesSeq_` + fitID + `"  onChange="validateAllAbcDataInputs()" title="Please enter a sequence" style="max-width: 250px; width: 250px; height: 200px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input nascent sequence 5' to 3'..."></textarea> 
 							</td>
 					 	</tr>
 
