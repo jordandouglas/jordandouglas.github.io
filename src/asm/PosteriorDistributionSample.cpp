@@ -171,8 +171,11 @@ vector<string> PosteriorDistributionSample::getParameterNames(){
 // Only applicable if pause sites are being fit to, and if the AUC has not already been calculated
 void PosteriorDistributionSample::calculateAUC(){
 
+
     if ((this->meanDwellTimes_pauseSites.size() == 0 && this->meanDwellTimes_notpauseSites.size() == 0) || this->haveCalculatedAUC) return;
     this->haveCalculatedAUC = true;
+
+
 
 
 
@@ -181,7 +184,7 @@ void PosteriorDistributionSample::calculateAUC(){
     // In this case set AUC to 0
     if (this->meanDwellTimes_pauseSites.size() == 0 || this->meanDwellTimes_notpauseSites.size() == 0) {
         double AUC = 0;
-        cout << "AUC " << AUC << endl;
+        cout << "1-AUC " << 1-AUC << endl;
         this->chiSquared += 1-AUC;
         return;
     }
@@ -196,9 +199,9 @@ void PosteriorDistributionSample::calculateAUC(){
     double minDwellTime = min(this->meanDwellTimes_pauseSites.back(), this->meanDwellTimes_notpauseSites.back());
 
 
-    if (isinf(maxDwellTime) || isinf(minDwellTime)){
+    if (isinf(maxDwellTime) || isinf(minDwellTime) || isnan(maxDwellTime) || isnan(minDwellTime)){
         double AUC = 0;
-        cout << "AUC " << AUC << endl;
+        cout << "1-AUC " << 1-AUC << endl;
         this->chiSquared += 1-AUC;
         return;
     }
@@ -206,21 +209,21 @@ void PosteriorDistributionSample::calculateAUC(){
     //cout << "calculateAUC " << maxDwellTime << "," << minDwellTime << "," << isinf(maxDwellTime) << endl; 
 
     /*
-    if (isinf(maxDwellTime)){
-        cout << "pauses: " << endl;
+    //if (isinf(maxDwellTime)){
+        cout << "P= c(" << endl;
         for (list<double>::iterator it = this->meanDwellTimes_pauseSites.begin(); it != this->meanDwellTimes_pauseSites.end(); ++it){
             cout << (*it) << ",";
         }
-        cout << endl;
+        cout << ")" << endl;
 
-        cout << "not pauses: " << endl;
+        cout << "NP = c(" << endl;
         for (list<double>::iterator it = this->meanDwellTimes_notpauseSites.begin(); it != this->meanDwellTimes_notpauseSites.end(); ++it){
             cout << (*it) << ",";
         }
-        cout << endl;
+         cout << ")" << endl;
 
-    }
-    */
+   // }
+   */
 
 
     // Initialise ROC curve object
@@ -554,6 +557,10 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 
         // Do not calculate X2 until the very end of all experiments. Cache the relative dwell times and come back to them later
         vector<int> pauseSiteIndices = observed->get_pauseSiteIndices();
+        double meanPauseTime = 0;
+        double meanNonPauseTime = 0;
+        int nPauses = 0;
+        int nNonpauses = 0;
         for (int i = 1; i < relativeDwellTimes.size(); i ++){
 
             // Ignore edge effects (ie. if mean time = 0)
@@ -568,13 +575,23 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
                 }
             }
 
-            if (isPauseSite) this->meanDwellTimes_pauseSites.push_back(relativeDwellTimes.at(i));
-            else this->meanDwellTimes_notpauseSites.push_back(relativeDwellTimes.at(i));
+            if (isPauseSite) {
+                this->meanDwellTimes_pauseSites.push_back(relativeDwellTimes.at(i));
+                meanPauseTime += relativeDwellTimes.at(i);
+                nPauses++;
+            }
+            else {
+                this->meanDwellTimes_notpauseSites.push_back(relativeDwellTimes.at(i));
+                meanNonPauseTime += relativeDwellTimes.at(i);
+                nNonpauses++;
+            }
 
 
         }
 
-        
+        meanPauseTime = meanPauseTime / nPauses;
+        meanNonPauseTime = meanNonPauseTime / nNonpauses;
+        this->simulatedValues.at(this->currentObsNum) = to_string(meanPauseTime / meanNonPauseTime);
 	    this->chiSquared += 0;
 
 	}

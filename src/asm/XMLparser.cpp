@@ -329,7 +329,6 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 					}
 				}
 				if (numObservations == 0) continue;
-				
 
 				_numExperimentalObservations += numObservations;
 				ExperimentalData* experiment = new ExperimentalData(experiments.size() + 1, experimentType, numObservations);
@@ -597,7 +596,8 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 						else if (attrName == "NTPbindingNParams") model->set_NTPbindingNParams(atoi(value.c_str()));
 						else if (attrName == "currentTranslocationModel") model->set_currentTranslocationModel(value);
 						else if (attrName == "currentInactivationModel") model->set_currentInactivationModel(value);
-						else if (attrName == "currentRNABlockadeModel") model->set_currentRNABlockadeModel(value);
+                        else if (attrName == "currentBacksteppingModel") model->set_currentBacksteppingModel(value);
+                        else if (attrName == "currentRNABlockadeModel") model->set_currentRNABlockadeModel(value);
 						else if (attrName == "assumeBindingEquilibrium") model->set_assumeBindingEquilibrium(value == "true");
 						else if (attrName == "assumeTranslocationEquilibrium") model->set_assumeTranslocationEquilibrium(value == "true");
 						
