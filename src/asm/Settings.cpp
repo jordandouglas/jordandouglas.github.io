@@ -513,7 +513,9 @@ void Settings::setSequence(Sequence* seq){
 
 
     // vRNA_init contains a memory leak. As a temporary workaround will not call this function during ABC 
-    if (!_RUNNING_ABC && PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
+    if (PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
+
+
 
 
 

@@ -2129,8 +2129,6 @@ float State::foldDownstream(){
 		if (false && this->_3primeStructure == "" && length_3prime > 12){
 
 
-
-
 			// Allocate memory for coordinates of 3' end
 			float* XY = (float *) calloc(2*length_3prime+1, sizeof(float));
 
@@ -2221,7 +2219,7 @@ void State::fold(bool fold5Prime, bool fold3Prime){
 
 		this->_3primeMFE = this->foldDownstream();
 		if (this->_3primeMFE) {
-			// cout << "3' fold free energy: " << this->_3primeMFE << "kBT with structure " << this->_3primeStructure << endl;
+			 cout << "3' fold free energy: " << this->_3primeMFE << "kBT with structure " << this->_3primeStructure << endl;
 		}
 
 	}

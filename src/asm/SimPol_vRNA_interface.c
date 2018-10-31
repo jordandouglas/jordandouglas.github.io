@@ -38,7 +38,7 @@
 const double vRNA_RT = 0.6156;
 float vRNA_MFE_value = 0;
 vrna_md_t md; // Model details
-vrna_fold_compound_t* vc; // Contains information on the sequence and the DP matrices
+vrna_fold_compound_t* vc_cached; // Contains information on the sequence and the DP matrices
 
 
 // Initialise the ViennaRNA suite for RNA folding
@@ -52,28 +52,28 @@ void vRNA_init(const char* nascentSequence){
 	set_model_details(&md);
 
 	// Clean up
-    if (vc) vrna_fold_compound_free(vc);
+    if (vc_cached) vrna_fold_compound_free(vc_cached);
 
-	// Allocate memory to fold the entire sequence (unless inserts have taken place)
-	vc = vrna_fold_compound(nascentSequence, &md, 1);
+	// Allocate memory to fold the entire sequence (unless inserts due to slippage exist)
+	vc_cached = vrna_fold_compound(nascentSequence, &md, 1);
 
 
 	// Default all entries in the DP matrices to infinity so that we know they have not yet been set
 	// Modified from the code in dp_matrices.c -> mfe_matrices_alloc_default()
 	int i;
 	int n, m;
-	n = m = vc->length;
+	n = m = vc_cached->length;
 	int size          = ((n + 1) * (m + 2)) / 2;
  	int lin_size      = n + 2;
 
- 	if (vc->matrices->evaluated) for (i = 0; i < size; i ++) vc->matrices->evaluated[i] = 0;
-	if (vc->matrices->f5) for (i = 0; i < lin_size; i ++) vc->matrices->f5[i] = INF;
-	if (vc->matrices->f3) for (i = 0; i < lin_size; i ++) vc->matrices->f3[i] = INF;
-	if (vc->matrices->fc) for (i = 0; i < lin_size; i ++) vc->matrices->fc[i] = INF;
-	if (vc->matrices->c) for (i = 0; i < size; i ++) vc->matrices->c[i] = INF;
-	if (vc->matrices->fML) for (i = 0; i < size; i ++) vc->matrices->fML[i] = INF;
-	if (vc->matrices->fM1) for (i = 0; i < size; i ++) vc->matrices->fM1[i] = INF;
-	if (vc->matrices->fM2) for (i = 0; i < lin_size; i ++) vc->matrices->fM2[i] = INF;
+ 	if (vc_cached->matrices->evaluated) for (i = 0; i < size; i ++) vc_cached->matrices->evaluated[i] = 0;
+	if (vc_cached->matrices->f5) for (i = 0; i < lin_size; i ++) vc_cached->matrices->f5[i] = INF;
+	if (vc_cached->matrices->f3) for (i = 0; i < lin_size; i ++) vc_cached->matrices->f3[i] = INF;
+	if (vc_cached->matrices->fc) for (i = 0; i < lin_size; i ++) vc_cached->matrices->fc[i] = INF;
+	if (vc_cached->matrices->c) for (i = 0; i < size; i ++) vc_cached->matrices->c[i] = INF;
+	if (vc_cached->matrices->fML) for (i = 0; i < size; i ++) vc_cached->matrices->fML[i] = INF;
+	if (vc_cached->matrices->fM1) for (i = 0; i < size; i ++) vc_cached->matrices->fM1[i] = INF;
+	if (vc_cached->matrices->fM2) for (i = 0; i < lin_size; i ++) vc_cached->matrices->fM2[i] = INF;
 
 
 
@@ -84,26 +84,13 @@ void vRNA_init(const char* nascentSequence){
 // Dynamic programming data structures in vRNA will persist between subsequent calls of this function
 float vRNA_compute_MFE(char* sequence, char* structure, int length){
 
-
-	// Convert the string sequence into a vrna_fold_compound_t object
-	//vrna_fold_compound_t *vc = vrna_fold_compound(sequence, &md, 1);
-
-
 	// Set the length and sequence of vc to the current sequence
-	vc->length    = length;
-  	vc->sequence  = strdup(sequence);
-
-
-
-	//if (structureGlobal) free(structureGlobal);
-	//char* structure = (char *) vrna_alloc(sizeof(char) * (length+1));
+	vc_cached->length    = length;
+  	vc_cached->sequence  = strdup(sequence);
 
 
 	// Compute MFE structure
-	vRNA_MFE_value = (double) vrna_mfe(vc, structure) / vRNA_RT;
-
-
-	//free(sequence);
+	vRNA_MFE_value = (double) vrna_mfe(vc_cached, structure) / vRNA_RT;
 
 
 	return vRNA_MFE_value;
@@ -117,9 +104,8 @@ float vRNA_compute_MFE_no_cache(char* sequence, char* structure, int length){
 
 
 
-
 	// Allocate memory to fold the current sequence
-	vrna_fold_compound_t*  vc_temp = vrna_fold_compound(sequence, &md, 1);
+    vrna_fold_compound_t*  vc_temp = vrna_fold_compound(sequence, &md, 1);
 
 	// Set the length and sequence of vc to the current sequence
 	vc_temp->length    = length;
@@ -135,7 +121,8 @@ float vRNA_compute_MFE_no_cache(char* sequence, char* structure, int length){
  	int lin_size      = n + 2;
 
 
- 	if (vc->matrices->evaluated) for (i = 0; i < size; i ++) vc->matrices->evaluated[i] = 0;
+    vc_temp->type = VRNA_VC_TYPE_SINGLE;
+ 	if (vc_temp->matrices->evaluated) for (i = 0; i < size; i ++) vc_temp->matrices->evaluated[i] = 0;
 	if (vc_temp->matrices->f5) for (i = 0; i < lin_size; i ++) vc_temp->matrices->f5[i] = INF;
 	if (vc_temp->matrices->f3) for (i = 0; i < lin_size; i ++) vc_temp->matrices->f3[i] = INF;
 	if (vc_temp->matrices->fc) for (i = 0; i < lin_size; i ++) vc_temp->matrices->fc[i] = INF;
@@ -149,12 +136,8 @@ float vRNA_compute_MFE_no_cache(char* sequence, char* structure, int length){
 	vRNA_MFE_value = (double) vrna_mfe(vc_temp, structure) / vRNA_RT;
 
 
-	//free(sequence);
-
-
 	// Clean up
     vrna_fold_compound_free(vc_temp);
-
 
 	return vRNA_MFE_value;
 	
@@ -205,7 +188,6 @@ void vRNA_get_coordinates(char* structure, float* XY, int length){
 	}
 
 	// Clean-up
-	free(l);
 	free(pair_table_g);
 	free(X); 
 	free(Y);
@@ -219,11 +201,11 @@ float vRNA_eval(char* sequence, char* structure){
 
 
 	// Allocate memory to fold the current sequence
-	vrna_fold_compound_t*  vc = vrna_fold_compound(sequence, &md, 1);
-	float energy = vrna_eval_structure_v(vc, structure, 0, NULL);
+	vrna_fold_compound_t*  vc_cached = vrna_fold_compound(sequence, &md, 1);
+	float energy = vrna_eval_structure_v(vc_cached, structure, 0, NULL);
 
 	// Clean up
-    vrna_fold_compound_free(vc);
+    vrna_fold_compound_free(vc_cached);
 
 	return energy / vRNA_RT;
 }	

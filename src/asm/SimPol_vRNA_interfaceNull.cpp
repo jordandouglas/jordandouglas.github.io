@@ -29,26 +29,26 @@ float vRNA_MFE_value = 0;
 
 
 void vRNA_init(const char* templateSequence){
-	//cout << "vRNA_init" << endl;
+	cout << "vRNA_init" << endl;
 }
 
 
 float vRNA_compute_MFE(char* sequence, char* structure, int length){
-	//cout << "vRNA_compute_MFE" << endl;
+	cout << "vRNA_compute_MFE" << endl;
 	return 0;
 }
 
 float vRNA_compute_MFE_no_cache(char* sequence, char* structure, int length){
-	//cout << "vRNA_compute_MFE_no_cache" << endl;
+	cout << "vRNA_compute_MFE_no_cache" << endl;
 	return 0;
 }
 
 void vRNA_get_coordinates(char* structure, float* XY, int length){
-	//cout << "vRNA_get_coordinates" << endl;
+	cout << "vRNA_get_coordinates" << endl;
 }
 
 
 float vRNA_eval(char* sequence, char* structure){
 	cout << "vRNA_eval" << endl;
-	//return 0;
+	return 0;
 }	

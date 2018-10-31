@@ -399,7 +399,7 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 		string structure = clone->get_5primeStructure();
 		if (structure.substr(structure.length()-1, 1) == ")") barrierHeight = INF;
 
-		cout << "terminalBlockade " << structure << ":" << barrierHeight << endl;
+		cout << "terminalBlockade " << currentSequence->getID() << " " << structure << ":" << barrierHeight << endl;
 
 	}
 
@@ -418,7 +418,7 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 		float upstream_MFE = stateBck->get_5primeStructureMFE();
 		string upstream_structure = stateBck->get_5primeStructure();
 
-		if (this_structure.length() < 5) barrierHeight = 0;
+		if (this_structure.length() < 5 || upstream_structure.length() < 5) barrierHeight = 0;
 
 
 		// Midpoint blockade: take the free energy of the two neighbouring structures and average them out
@@ -459,6 +459,9 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 
 
 	this->upstreamRNABlockadeTable[pos] = barrierHeight;
+
+    cout << "upstream " << barrierHeight << endl;
+
 	return barrierHeight;
 
 
@@ -473,7 +476,7 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 
 	//cout << "getDownstreamRNABlockadeBarrierHeight" << endl;
 
-	if (true || !currentModel->get_allowmRNAfolding()) return 0;
+	if (!currentModel->get_allowmRNAfolding()) return 0;
 
 
 

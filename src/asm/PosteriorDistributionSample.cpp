@@ -177,8 +177,6 @@ void PosteriorDistributionSample::calculateAUC(){
 
 
 
-
-
     // If there are no dwell times on pause sites and/or non-pause sites then the simulation probably terminated at the very beginning
     // When there are no instances of a class, the true/false positive rate is undefined (cannot divide by 0)
     // In this case set AUC to 0
@@ -284,7 +282,11 @@ void PosteriorDistributionSample::calculateAUC(){
         // Find the two points on the ROC curve which flank this x-value
         double leftFlankIndex = -1;
         double rightFlankIndex = -1;
-        for (int i = 0; i < ROC_curve.size() - 1; i ++){
+        if (ROC_curve.at(0).at(0) <= x) {
+            leftFlankIndex = 0;
+            rightFlankIndex = 0;
+        }
+        else for (int i = 0; i < ROC_curve.size() - 1; i ++){
             if (ROC_curve.at(i+1).at(0) <= x && ROC_curve.at(i).at(0) > x){
                 leftFlankIndex = i+1;
                 rightFlankIndex = i;
@@ -294,7 +296,10 @@ void PosteriorDistributionSample::calculateAUC(){
 
 
         //cout << "x = " << x << " is flanked by " << ROC_curve.at(leftFlankIndex).at(0) << " and " << ROC_curve.at(rightFlankIndex).at(0) << endl;
-
+        if (leftFlankIndex == -1 || rightFlankIndex == -1){
+            cout << leftFlankIndex << "," << rightFlankIndex << endl;
+            continue;
+        }
 
         // Horizontal line
         double y;
@@ -591,7 +596,9 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 
         meanPauseTime = meanPauseTime / nPauses;
         meanNonPauseTime = meanNonPauseTime / nNonpauses;
-        this->simulatedValues.at(this->currentObsNum) = to_string(meanPauseTime / meanNonPauseTime);
+        double ratio = meanPauseTime / meanNonPauseTime;
+        if (isnan(ratio) || isinf(ratio)) ratio = 0;
+        this->simulatedValues.at(this->currentObsNum) = to_string(ratio);
 	    this->chiSquared += 0;
 
 	}
