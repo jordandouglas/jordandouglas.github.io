@@ -185,8 +185,6 @@ int main(int argc, char** argv) {
 	if (PrimerType == "ssRNA") vRNA_init(complementSequence.c_str());
 
 
-    //complementSequence = Settings::complementSeq(templateSequence, TemplateType.substr(2) == "RNA");
-
 	
 	 // If no arguments then exit now
     if (argc == 1) {
@@ -202,6 +200,8 @@ int main(int argc, char** argv) {
 
 	// Perform MCMC
 	if (doMCMC){
+
+        if (_outputFilename != "") cout << "Saving to " << _outputFilename << endl;
 		MCMC::initMCMC(false);
 		MCMC::beginMCMC();
 	}
