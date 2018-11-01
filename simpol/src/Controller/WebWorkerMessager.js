@@ -741,6 +741,16 @@ function userSelectSequence_controller(newSequenceID, newTemplateType, newPrimer
 }
 
 
+function setNThreads_contoller(n){
+
+    if (WEB_WORKER_WASM != null){
+        var fnStr = stringifyFunction("setNThreads", [n]);
+        callWebWorkerFunction(fnStr);
+    }
+
+}
+
+
 function refreshPlotDataSequenceChangeOnly_controller(resolve = function() { }){
 
 
@@ -934,7 +944,6 @@ function get_PHYSICAL_PARAMETERS_controller(resolve = function(dict) {}){
 	else  {
 
 
-		callWebWorkerFunction(stringifyFunction("PARAMS_JS.get_PHYSICAL_PARAMETERS_WW", []));
 	
 		var res = stringifyFunction("getAllParameters", [], true);
 		var fnStr = "wasm_" + res[0];
