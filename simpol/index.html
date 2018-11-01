@@ -180,6 +180,11 @@ function init(){
 			if (JSONurl.wasm != null){
 				USE_WASM = JSONurl.wasm == "true";
 			}
+
+
+            if (JSONurl.nthreads != null) setNThreads_contoller(JSONurl.nthreads);
+
+            
 		}
 
 		addWebworkerRegistrationHTML();
