@@ -116,6 +116,9 @@ getCppArrayFromDict = function(dict, dataType = "double"){
 
 
 
+setNThreads = function(n){
+    Module.ccall("setNThreads", null, ["number"], [n]);
+}
 
 
 // Toggle between displaying or not displaying the folded mRNA

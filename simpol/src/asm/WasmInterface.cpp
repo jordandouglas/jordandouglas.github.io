@@ -35,6 +35,8 @@
 #include "../../../src/asm/PosteriorDistributionSample.h"
 #include "../../../src/asm/GelLaneData.h"
 #include "../../../src/asm/GelCalibrationSearch.h"
+#include "../../../src/asm/SimulatorPthread.h"
+
 
 
 #include <emscripten.h>
@@ -949,6 +951,13 @@ extern "C" {
 
 
 	}
+
+
+    void EMSCRIPTEN_KEEPALIVE setNThreads(int n){
+        cout << "Setting nthreads to " << n << endl;
+        N_THREADS = n;
+        SimulatorPthread::init(); 
+    }
 
 
 
