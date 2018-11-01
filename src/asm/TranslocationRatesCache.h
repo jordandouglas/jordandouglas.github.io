@@ -43,7 +43,7 @@ class TranslocationRatesCache{
 
 
 		double* upstreamRNABlockadeTable;
-		double* downstreamRNABlockadeTable;
+        vector<vector<double>> downstreamRNABlockadeTable;
 
 
 		double getUpstreamRNABlockadeBarrierHeight(State* state);

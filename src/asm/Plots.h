@@ -118,7 +118,7 @@ class Plots{
 		void savePlotSettings(int plotNum, string values_str);
 		void updateParameterPlotData(State* state);
 		void resetTimeToCatalysis();
-
+        void onTerminate(State* state, double totalTime, double arrestTimeVal);
 		void hideSitewisePlot(bool hide);
 		void hideAllPlots(bool hide);
         void set_sendCopiedSequences(bool toSend);

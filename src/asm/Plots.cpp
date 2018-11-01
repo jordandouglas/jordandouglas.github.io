@@ -385,6 +385,16 @@ void Plots::update_timeWaitedUntilNextCatalysis(int baseNumber){
 }
 
 
+
+// When the simulation terminates record the proportion of time spent at this length according to how long left until arrest
+void Plots::onTerminate(State* state, double totalTime, double arrestTimeVal){
+    if (_RECORD_PAUSE_TIMES && (totalTime < arrestTimeVal || arrestTimeVal == 0)) {
+        if (arrestTimeVal == 0) this->proportionTimePerTranscriptLength.back().at(state->get_nascentLength()) = INF;
+        else this->proportionTimePerTranscriptLength.back().at(state->get_nascentLength()) = arrestTimeVal - totalTime + this->proportionTimePerTranscriptLength.back().at(state->get_nascentLength());
+    }
+}
+
+
 void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, double reactionTime) {
 
 

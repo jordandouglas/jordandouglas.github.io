@@ -45,7 +45,7 @@
 #include <ctime>
 #include <thread>
 #include <sstream>
-
+#include <thread>
 
 using namespace std;
 
@@ -100,6 +100,7 @@ extern bool _printSummary;
 extern bool _sampleFromLikelihood;
 extern bool _marginalModel;
 
+
 // ABC information
 extern string inferenceMethod;
 extern int ntrials_abc;
@@ -118,6 +119,11 @@ extern bool _RUNNING_ABC;
 extern list<ExperimentalData*> experiments;
 extern int _numExperimentalObservations;
 extern bool _RECORD_PAUSE_TIMES;
+
+
+// Thead mutex lock
+extern pthread_mutex_t MUTEX_LOCK_DOWNSTREAM; 
+extern pthread_mutex_t MUTEX_LOCK_UPSTREAM; 
 
 
 // Model

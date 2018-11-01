@@ -63,6 +63,9 @@ State::State(bool init, bool guiState){
 }
 
 
+
+
+
 State* State::setToInitialState(){
 
 
@@ -173,6 +176,8 @@ string State::toJSON(){
 	return JSON;
 
 }
+
+
 
 
 State* State::print(){
@@ -1915,7 +1920,7 @@ float State::foldUpstream(){
 
 
 	if (PrimerType != "ssRNA" || this->leftNascentBase - rnaFoldDistance->getVal(true) <= 3 || this->terminated){
-		cout << "Cannot fold 5'" << endl;
+		//cout << "Cannot fold 5'" << endl;
 
 		// Set the folded bases to 'unfolded' mode so the DOM can render them differently
 		for (int i = 0; this->_5primeStructure.length() > 0 && i <= this->_5primeStructure.length(); i ++){
@@ -2201,14 +2206,14 @@ float State::foldDownstream(){
 
 void State::fold(bool fold5Prime, bool fold3Prime){
 
-	cout << "Folding" << endl;
+	//cout << "Folding" << endl;
 
 	// Fold the 5' (ie. upstream) mRNA and store the structure string
 	if (fold5Prime){
 
 		this->_5primeMFE = this->foldUpstream();
 		if (this->_5primeMFE) {
-			 cout << "5' fold free energy: " << this->_5primeMFE << "kBT with structure " << this->_5primeStructure << endl;
+			 //cout << "5' fold free energy: " << this->_5primeMFE << "kBT with structure " << this->_5primeStructure << endl;
 		}
 
 	}
@@ -2219,7 +2224,7 @@ void State::fold(bool fold5Prime, bool fold3Prime){
 
 		this->_3primeMFE = this->foldDownstream();
 		if (this->_3primeMFE) {
-			 cout << "3' fold free energy: " << this->_3primeMFE << "kBT with structure " << this->_3primeStructure << endl;
+			 //cout << "3' fold free energy: " << this->_3primeMFE << "kBT with structure " << this->_3primeStructure << endl;
 		}
 
 	}

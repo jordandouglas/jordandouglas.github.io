@@ -96,6 +96,8 @@ class State{
 	float foldUpstream();
 	float foldDownstream();
 	int findBondsRecurse(int index, string structureString, int index0BaseNumber);
+
+
 	
 
     public:
@@ -110,7 +112,6 @@ class State{
     	list<int> getTranscribeActions(int N);
     	State* stutter(int N);
 		list<int> getStutterActions(int N);
-
 
     	// Reactions and their rates
 		State* forward();

@@ -36,7 +36,6 @@
 
 
 const double vRNA_RT = 0.6156;
-float vRNA_MFE_value = 0;
 vrna_md_t md; // Model details
 vrna_fold_compound_t* vc_cached; // Contains information on the sequence and the DP matrices
 
@@ -90,7 +89,7 @@ float vRNA_compute_MFE(char* sequence, char* structure, int length){
 
 
 	// Compute MFE structure
-	vRNA_MFE_value = (double) vrna_mfe(vc_cached, structure) / vRNA_RT;
+	float vRNA_MFE_value = (double) vrna_mfe(vc_cached, structure) / vRNA_RT;
 
 
 	return vRNA_MFE_value;
@@ -133,7 +132,7 @@ float vRNA_compute_MFE_no_cache(char* sequence, char* structure, int length){
 
 
 	// Compute MFE structure
-	vRNA_MFE_value = (double) vrna_mfe(vc_temp, structure) / vRNA_RT;
+	float vRNA_MFE_value = (double) vrna_mfe(vc_temp, structure) / vRNA_RT;
 
 
 	// Clean up

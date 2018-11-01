@@ -34,7 +34,7 @@ void SimulatorPthread::init(){
 	simulators.resize(N_THREADS);
 	for (int i = 0; i < N_THREADS; i++){
         Plots* simulator_plots = new Plots();
-   		simulators.at(i) = new Simulator(simulator_plots);
+        simulators.at(i) = new Simulator(simulator_plots);
    	}
 
 
@@ -72,6 +72,10 @@ SimulatorResultSummary* SimulatorPthread::performNSimulations(int N, bool verbos
 	}
 
 
+    // Create thread mutex lock
+    pthread_mutex_init(&MUTEX_LOCK_DOWNSTREAM, NULL);
+    pthread_mutex_init(&MUTEX_LOCK_UPSTREAM, NULL);
+
 
 	// Create threads
    	for (int i = 0; i < N_THREADS; i++){
@@ -83,6 +87,11 @@ SimulatorResultSummary* SimulatorPthread::performNSimulations(int N, bool verbos
    	for (int i = 0; i < N_THREADS; i++){
    		threads.at(i)->join();
    	}
+
+
+    // Destroy the mutex lock
+    pthread_mutex_destroy(&MUTEX_LOCK_DOWNSTREAM); 
+    pthread_mutex_destroy(&MUTEX_LOCK_UPSTREAM); 
 
 
    	// Merge results into a single mean result
@@ -129,6 +138,7 @@ void SimulatorPthread::createThreadAndSimulate(int threadNum, SimulatorResultSum
 
 
     State* initialState = new State(true);
+    cout << "Peforming " << summary->get_ntrials() << " on thread " << threadNum << endl;
     SimulatorPthread::simulators.at(threadNum-1)->perform_N_Trials(summary, initialState, verbose);
     summary->add_proportionOfTimePerLength(SimulatorPthread::simulators.at(threadNum-1)->getPlots()->getProportionOfTimePerLength());
     SimulatorPthread::simulators.at(threadNum-1)->getPlots()->clear();

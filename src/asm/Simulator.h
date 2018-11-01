@@ -40,7 +40,7 @@ using namespace std;
 class Simulator{
 
 
-
+    int simulator_number;
 	void performSimulation(State* state, double* toReturn);
 	void executeAction(State* s, int reactionToDo);
 	double geometricTranslocationSampling(State* s);

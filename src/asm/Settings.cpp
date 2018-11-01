@@ -112,6 +112,12 @@ list<ExperimentalData*> experiments;
 int _numExperimentalObservations = 0;
 bool _RECORD_PAUSE_TIMES = false;
 
+
+
+// Thead mutex lock
+pthread_mutex_t MUTEX_LOCK_DOWNSTREAM; 
+pthread_mutex_t MUTEX_LOCK_UPSTREAM; 
+
 // Models
 deque<Model*> modelsToEstimate;
 Model* currentModel = new Model();
@@ -511,12 +517,7 @@ void Settings::setSequence(Sequence* seq){
     //currentSequence->print();
 
 
-
-    // vRNA_init contains a memory leak. As a temporary workaround will not call this function during ABC 
     if (PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
-
-
-
 
 
 }

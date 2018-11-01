@@ -55,6 +55,7 @@ Simulator::Simulator(Plots* plots){
 
 
 
+
 Plots* Simulator::getPlots(){
     return this->simulator_plots;
 }
@@ -912,6 +913,11 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 	//cout << s->get_initialLength() << ";" "distanceTravelled = " << distanceTravelled << endl;
 	toReturn[0] = velocity;
 	toReturn[2] = 1; // Success
+
+
+
+    // If it terminated before reaching the end of the sequence then set the proportion of time spent at this final length accordingly
+    simulator_plots->onTerminate(s, timeElapsed, arrestTime->getVal(true));
 	
 }
 
