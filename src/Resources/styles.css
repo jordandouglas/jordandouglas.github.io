@@ -106,18 +106,13 @@ canvas {
 
 
 @media screen and (orientation:portrait) {
-  #landscapeRequest {
-	display:block;
-  }
 
 
 }
 
 
 @media screen and (orientation:landscape) {
-  #landscapeRequest {
-	display:none;
-  }
+
 }
 
 

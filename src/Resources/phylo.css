@@ -106,18 +106,14 @@ canvas {
 
 
 @media screen and (orientation:portrait) {
-  #landscapeRequest {
-	display:block;
-  }
+
 
 
 }
 
 
 @media screen and (orientation:landscape) {
-  #landscapeRequest {
-	display:none;
-  }
+
 }
 
 
@@ -813,7 +809,8 @@ input:checked + .slider:before {
 .greenTick {
 	background-color:#A5CF19; 
 	color:#0B522D; 
-	padding: 2 5; 
+	padding: 5 5; 
+    font-size: 20px;
 	border-radius: 30px;
  }
 
