@@ -494,7 +494,7 @@ function submitCustomSequence(resolveAfterRefresh = function() { }){
 }
 
 function userChangeSequence(resolveAfterRefresh = function() { }){
-	
+
 	if (document.getElementById("SelectSequence").value == "$user"){
 
 		$("#userChangeSequence").show(300);
@@ -528,7 +528,6 @@ function userChangeSequence(resolveAfterRefresh = function() { }){
 			var sequenceChangeRefreshTemp = function(){
 
 
-				
 
 				refreshPlotDataSequenceChangeOnly_controller(function(){
 					sequenceChangeRefresh();
@@ -3837,14 +3836,14 @@ function closeNav() {
 										<tr>
 											<td>
 												&isin;<sub>min</sub> =
-												<input type="number" id="MCMC_chiSqthreshold_min" min=0 value=12 title="Chi-squared threshold which must be met to accept a point into the posterior" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+												<input type="number" id="MCMC_chiSqthreshold_min" min=0 value=3 title="Chi-squared threshold which must be met to accept a point into the posterior" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 										
 										<tr>
 											<td>
 												&isin;<sub>0</sub> =
-												<input type="number" id="MCMC_chiSqthreshold_0" min=0 value=1000 title="Initial chi-squared threshold. This will be decreased every iteration until reaching the minimum threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+												<input type="number" id="MCMC_chiSqthreshold_0" min=0 value=100 title="Initial chi-squared threshold. This will be decreased every iteration until reaching the minimum threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 										
@@ -3876,7 +3875,7 @@ function closeNav() {
 										<tr>
 											<td>
 												Log every (states):
-												<input type="number" id="MCMC_logevery" min=1 value=20 title="How often do you want to log the current position" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+												<input type="number" id="MCMC_logevery" min=1 value=100 title="How often do you want to log the current position" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 										

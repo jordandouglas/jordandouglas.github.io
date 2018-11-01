@@ -8,7 +8,7 @@ vrna_wd_option=$vrna_wd_option"/"
 echo "The vRNA library should be saved at $vrna_library_loc/libViennaRNA.so"
 
 
-g++ $vrna_wd_option -Wall -std=c++11 -O3 -fpermissive -pthread   cimpol.cpp  \
+g++ $vrna_wd_option -std=c++11 -O3 -fpermissive -pthread   cimpol.cpp  \
  ../../../src/asm/HTMLobject.cpp ../../../src/asm/Coordinates.cpp  \
   ../../../src/asm/Parameter.cpp ../../../src/asm/SlippageLandscapes.cpp ../../../src/asm/XMLparser.cpp \
   ../../../src/asm/ParameterHeatmapData.cpp ../../../src/asm/Plots.cpp ../../../src/asm/PlotSettings.cpp \

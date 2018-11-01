@@ -742,20 +742,24 @@ function userSelectSequence_controller(newSequenceID, newTemplateType, newPrimer
 
 
 function refreshPlotDataSequenceChangeOnly_controller(resolve = function() { }){
-	
+
+
 
 	if (WEB_WORKER == null) {
 		var toCall = () => new Promise((resolve) => PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW(resolve));
 		toCall().then(() => resolve());
 
-	}else{
+	}else if (WEB_WORKER_WASM == null){
 		var res = stringifyFunction("PLOTS_JS.refreshPlotDataSequenceChangeOnly_WW", [null], true);
 		var fnStr = res[0];
 		var msgID = res[1];
 
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 		toCall(fnStr).then(() => resolve());
-	}
+	}else{
+        resolve();
+
+    }
 	
 	
 }
@@ -2836,6 +2840,8 @@ function loadSession_controller(XMLData, resolve = function() { }){
 			
 		var openPlots = function(){
 
+
+         console.log("openPlots");
 			// Open up the appropriate plots
 			//PLOT_DATA = {};
 			//PLOT_DATA["whichPlotInWhichCanvas"] = result["whichPlotInWhichCanvas"];
@@ -2872,7 +2878,7 @@ function loadSession_controller(XMLData, resolve = function() { }){
 		$("#SelectSequence").val(seqObject["seqID"]);
 		$("#SelectTemplateType").val(seqObject["template"]);
 		$("#SelectPrimerType").val(seqObject["primer"]);
-		userChangeSequence(openPlots);
+
 
 
 		if (seqObject["seqID"] == "$user") {
@@ -2880,6 +2886,8 @@ function loadSession_controller(XMLData, resolve = function() { }){
 			$('input[name="inputSeqType"][value="inputTemplateSeq"]').click()
 			submitCustomSequence(openPlots);
 		}
+
+        else userChangeSequence(openPlots);
 
 
 		// Current polymerase
@@ -3808,7 +3816,7 @@ function beginABC_controller(abcDataObjectForModel){
 			loadSessionFromString(XMLData, function() {
 			//loadSession_controller(XMLData.replace(/(\r\n|\n|\r)/gm,""), function() {
 
-
+                console.log("STARTING ABC");
 				onABCStart();
 
 				var toDoAfterInit = function(result){
