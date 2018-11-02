@@ -161,7 +161,7 @@ int main(int argc, char** argv) {
 	if (!isWASM){
 		Settings::init();
 		currentModel = new Model();
-		Settings::activatePolymerase("polII");
+		Settings::activatePolymerase("RNAP");
 		Settings::sampleAll();
 		Settings::initSequences();
 	}
