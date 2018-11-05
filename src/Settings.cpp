@@ -115,8 +115,8 @@ bool _RECORD_PAUSE_TIMES = false;
 
 
 // Thead mutex lock
-pthread_mutex_t MUTEX_LOCK_DOWNSTREAM; 
-pthread_mutex_t MUTEX_LOCK_UPSTREAM; 
+pthread_mutex_t MUTEX_LOCK_VRNA; 
+
 
 // Models
 deque<Model*> modelsToEstimate;
@@ -366,7 +366,7 @@ void Settings::initPolymerases(){
 	_polymerases.at(2) = T7pol;
 
 
-	// Activate the Yeast polymerase II as the default
+	// Activate the Ecoli RNAP as the default
 	if (_currentPolymerase == "") Settings::activatePolymerase("RNAP");
 
 }

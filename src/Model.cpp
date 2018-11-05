@@ -126,6 +126,9 @@ void Model::addParameterHardcoding(string paramID, string value){
 void Model::activateModel(){
 
 
+    //cout << "Activating model " << this->id << " with folding " << this->allowmRNAfolding <<  endl;
+
+
 	// Set parameters to their correct instance (if applicable)
 	for(std::map<string, int>::iterator iter = this->parameterInstanceMappings.begin(); iter != this->parameterInstanceMappings.end(); ++iter){
 		string paramID =  iter->first;
