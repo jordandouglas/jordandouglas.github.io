@@ -86,6 +86,7 @@ class ExperimentalData{
 		void print();
 		string toJSON();
 		void clear();
+        bool doingROCanalysis();
 
 		void set_ATPconc(double val);
 		void set_CTPconc(double val);

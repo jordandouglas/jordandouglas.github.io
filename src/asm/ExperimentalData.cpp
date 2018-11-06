@@ -346,6 +346,12 @@ void ExperimentalData::applySettings(){
 }
 
 
+// Does this experiment require a ROC analysis?
+bool ExperimentalData::doingROCanalysis(){
+    return this->dataType == "pauseSites";
+} 
+
+
 // Return the current observation
 double ExperimentalData::getObservation() {   
 	return this->observationsY.at(this->currentExperiment);

@@ -169,7 +169,7 @@ vector<string> PosteriorDistributionSample::getParameterNames(){
 
 // Calculate the AUC of this state and add 1-AUC to the X2
 // Only applicable if pause sites are being fit to, and if the AUC has not already been calculated
-void PosteriorDistributionSample::calculateAUC(){
+void PosteriorDistributionSample::calculateAUC(string printROCToFile){
 
 
     if ((this->meanDwellTimes_pauseSites.size() == 0 && this->meanDwellTimes_notpauseSites.size() == 0) || this->haveCalculatedAUC) return;
@@ -194,7 +194,7 @@ void PosteriorDistributionSample::calculateAUC(){
 
     // Find the maximum and minimum relative dwell times in either list
     double maxDwellTime = max(this->meanDwellTimes_pauseSites.back(), this->meanDwellTimes_notpauseSites.back());
-    double minDwellTime = min(this->meanDwellTimes_pauseSites.back(), this->meanDwellTimes_notpauseSites.back());
+    double minDwellTime = min(this->meanDwellTimes_pauseSites.front(), this->meanDwellTimes_notpauseSites.front());
 
 
     if (isinf(maxDwellTime) || isinf(minDwellTime) || isnan(maxDwellTime) || isnan(minDwellTime)){
@@ -206,22 +206,7 @@ void PosteriorDistributionSample::calculateAUC(){
 
     //cout << "calculateAUC " << maxDwellTime << "," << minDwellTime << "," << isinf(maxDwellTime) << endl; 
 
-    /*
-    //if (isinf(maxDwellTime)){
-        cout << "P= c(" << endl;
-        for (list<double>::iterator it = this->meanDwellTimes_pauseSites.begin(); it != this->meanDwellTimes_pauseSites.end(); ++it){
-            cout << (*it) << ",";
-        }
-        cout << ")" << endl;
-
-        cout << "NP = c(" << endl;
-        for (list<double>::iterator it = this->meanDwellTimes_notpauseSites.begin(); it != this->meanDwellTimes_notpauseSites.end(); ++it){
-            cout << (*it) << ",";
-        }
-         cout << ")" << endl;
-
-   // }
-   */
+    
 
 
     // Initialise ROC curve object
@@ -230,7 +215,28 @@ void PosteriorDistributionSample::calculateAUC(){
         ROC_curve.at(i).resize(2); // False positive rate, true positive rate
     }
     double threshold_grid_size = maxDwellTime / _N_THRESHOLDS_ROC_CURVE;
-
+    
+    
+    
+    // Precompute thresholds
+    list<double> nonpausetimes_temp = this->meanDwellTimes_notpauseSites;
+    list<double> allDwellTimes = this->meanDwellTimes_pauseSites;
+    allDwellTimes.merge(nonpausetimes_temp);
+    allDwellTimes.sort();
+    vector<double> thresholds(_N_THRESHOLDS_ROC_CURVE + 1);
+    double nPointsPerThreshold = (1.0 * allDwellTimes.size()) / _N_THRESHOLDS_ROC_CURVE;
+    for (int thr_index = 0; thr_index < thresholds.size() - 1 ; thr_index++){
+        
+        
+        list<double>::iterator it = allDwellTimes.begin();
+        std::advance(it, floor(nPointsPerThreshold * thr_index));
+        thresholds.at(thr_index) = (*it);
+        //cout << thr_index << ":" << floor(nPointsPerThreshold * thr_index) << ":" << (*it) << endl;
+    
+    }
+    thresholds.at(thresholds.size() - 1) = maxDwellTime;
+    //cout << "nPointsPerThreshold " << nPointsPerThreshold << " maxDwellTime " << maxDwellTime << endl;
+    
 
     // Initialise iterators of sorted lists
     list<double>::iterator pauseIterator = this->meanDwellTimes_pauseSites.begin();
@@ -239,8 +245,8 @@ void PosteriorDistributionSample::calculateAUC(){
     int nNonpausesBelowThreshold = 0;
 
     // Calculate the AUC of a ROC curve. Search a fixed number of thresholds from min to max dwell time
-    for (int i = 0; i <= _N_THRESHOLDS_ROC_CURVE; i ++){
-        double threshold = threshold_grid_size * i;
+    for (int i = 0; i < thresholds.size(); i ++){
+        double threshold = thresholds.at(i);
 
         // False positive rate = proportion of non-pauses which have a relative time >= threshold
         while( (*nonPauseIterator) < threshold && nonPauseIterator != this->meanDwellTimes_notpauseSites.end()) {
@@ -326,6 +332,35 @@ void PosteriorDistributionSample::calculateAUC(){
 
 
     cout << "1-AUC " << 1-AUC << endl;
+    
+    
+    // Print the TP and FP rates
+    if (printROCToFile != ""){
+    
+        
+        ofstream rocFile;
+        rocFile.open(printROCToFile, ios_base::app);
+        if (!rocFile.is_open()) {
+            cout << "Cannot open file " << printROCToFile << endl;
+            exit(0);
+        }
+        rocFile.precision(10);
+        rocFile.setf(ios::fixed);
+        rocFile.setf(ios::showpoint); 
+        
+        
+        rocFile << "===NewSimulation===" << endl;
+        rocFile << "FP\tTP" << endl;
+        for (int i = 0; i < ROC_curve.size(); i ++){
+            rocFile << ROC_curve.at(i).at(0) << "\t" << ROC_curve.at(i).at(1) << endl;
+        }
+        rocFile << endl;
+            
+        
+        
+    }
+    
+    
 
     /*
     cout << "FP = c(";
@@ -896,7 +931,6 @@ void PosteriorDistributionSample::parseFromLogFileLine(vector<string> splitLine,
 	regex velocityMatch("(V)([0-9]+)$");
 
 	int simulatedVal = 0;
-	//cout << headerLineSplit.size() << "," << splitLine.size() << endl;
 
 	for (int i = 0; i < headerLineSplit.size(); i ++){
 

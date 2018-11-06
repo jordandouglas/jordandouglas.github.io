@@ -53,7 +53,7 @@ const double _kBT = 1.380649e-23 * 310;
 const double _preExp = 1e6;	
 const double _PI = 3.14159265359;	
 const int _nBasesToTranscribeInit = 4;
-const int _N_THRESHOLDS_ROC_CURVE = 500;
+const int _N_THRESHOLDS_ROC_CURVE = 5000;
 const int _N_GRID_SQUARES_ROC_CURVE = 1000;
 
 
@@ -115,8 +115,8 @@ bool _RECORD_PAUSE_TIMES = false;
 
 
 // Thead mutex lock
-pthread_mutex_t MUTEX_LOCK_DOWNSTREAM; 
-pthread_mutex_t MUTEX_LOCK_UPSTREAM; 
+pthread_mutex_t MUTEX_LOCK_VRNA; 
+
 
 // Models
 deque<Model*> modelsToEstimate;
@@ -366,7 +366,7 @@ void Settings::initPolymerases(){
 	_polymerases.at(2) = T7pol;
 
 
-	// Activate the Yeast polymerase II as the default
+	// Activate the Ecoli RNAP as the default
 	if (_currentPolymerase == "") Settings::activatePolymerase("RNAP");
 
 }

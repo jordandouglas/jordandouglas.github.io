@@ -122,8 +122,7 @@ extern bool _RECORD_PAUSE_TIMES;
 
 
 // Thead mutex lock
-extern pthread_mutex_t MUTEX_LOCK_DOWNSTREAM; 
-extern pthread_mutex_t MUTEX_LOCK_UPSTREAM; 
+extern pthread_mutex_t MUTEX_LOCK_VRNA; 
 
 
 // Model

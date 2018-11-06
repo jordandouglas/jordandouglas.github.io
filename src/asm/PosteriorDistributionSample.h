@@ -76,7 +76,7 @@ class PosteriorDistributionSample {
     	vector<string> getParameterNames();
     	//void addSimulatedAndObservedValue(double simVal, double obsVal);
     	void addSimulatedAndObservedValue(SimulatorResultSummary* simulated, ExperimentalData* observed);
-        void calculateAUC();
+        void calculateAUC(string printROCToFile);
     	void parseFromLogFileLine(vector<string> splitLine, vector<string> headerLineSplit);
     	bool isABC();
 		

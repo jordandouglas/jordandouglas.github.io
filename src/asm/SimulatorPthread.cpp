@@ -73,8 +73,7 @@ SimulatorResultSummary* SimulatorPthread::performNSimulations(int N, bool verbos
 
 
     // Create thread mutex lock
-    pthread_mutex_init(&MUTEX_LOCK_DOWNSTREAM, NULL);
-    pthread_mutex_init(&MUTEX_LOCK_UPSTREAM, NULL);
+    pthread_mutex_init(&MUTEX_LOCK_VRNA, NULL);
 
 
 	// Create threads
@@ -90,8 +89,7 @@ SimulatorResultSummary* SimulatorPthread::performNSimulations(int N, bool verbos
 
 
     // Destroy the mutex lock
-    pthread_mutex_destroy(&MUTEX_LOCK_DOWNSTREAM); 
-    pthread_mutex_destroy(&MUTEX_LOCK_UPSTREAM); 
+    pthread_mutex_destroy(&MUTEX_LOCK_VRNA); 
 
 
    	// Merge results into a single mean result
@@ -138,7 +136,7 @@ void SimulatorPthread::createThreadAndSimulate(int threadNum, SimulatorResultSum
 
 
     State* initialState = new State(true);
-    cout << "Peforming " << summary->get_ntrials() << " on thread " << threadNum << endl;
+    //cout << "Peforming " << summary->get_ntrials() << " on thread " << threadNum << endl;
     SimulatorPthread::simulators.at(threadNum-1)->perform_N_Trials(summary, initialState, verbose);
     summary->add_proportionOfTimePerLength(SimulatorPthread::simulators.at(threadNum-1)->getPlots()->getProportionOfTimePerLength());
     SimulatorPthread::simulators.at(threadNum-1)->getPlots()->clear();

@@ -365,7 +365,6 @@ void TranslocationRatesCache::buildBacktrackRateTable(string templSequence){
 
 double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state){
 
-	//cout << "getUpstreamRNABlockadeBarrierHeight" << endl;
 
 	if (!currentModel->get_allowmRNAfolding()) return 0;
 
@@ -384,11 +383,11 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
     if (N_THREADS > 1) {
 
         // Lock the thread
-        pthread_mutex_lock(&MUTEX_LOCK_UPSTREAM); 
+        pthread_mutex_lock(&MUTEX_LOCK_VRNA); 
 
         // Double check that the value still does not need to be calculated
         if (this->upstreamRNABlockadeTable[pos] != -INF) {
-            pthread_mutex_unlock(&MUTEX_LOCK_UPSTREAM); 
+            pthread_mutex_unlock(&MUTEX_LOCK_VRNA); 
             return this->upstreamRNABlockadeTable[pos];
         }
 
@@ -483,7 +482,7 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
     //cout << "upstream " << barrierHeight << endl;
 
     // Unlock the thread
-    if (N_THREADS > 1) pthread_mutex_unlock(&MUTEX_LOCK_UPSTREAM); 
+    if (N_THREADS > 1) pthread_mutex_unlock(&MUTEX_LOCK_VRNA); 
 
 	return barrierHeight;
 
@@ -507,9 +506,8 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 	int pos = state->getRightNascentBaseNumber() - 1 + rnaFoldDistance->getVal(true);
 	if (pos < 0 || pos+1 > state->get_nascentLength() /* || pos >= templateSequence.length()*/) return 0;
 
-    int h = (int)hybridLen->getVal(true);
-    int rowNum = state->get_nascentLength() - (h-1);
-    int colNum = state->get_mRNAPosInActiveSite() - (-state->get_nascentLength() + h);
+    int rowNum = state->get_nascentLength() - 1;
+    int colNum = state->get_mRNAPosInActiveSite() + state->get_nascentLength();
 
     /*
     cout << "-INF " << -INF <<  " rowNum " << rowNum << " colNum " << colNum << " len: ";
@@ -523,11 +521,11 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
     if (N_THREADS > 1) {
 
         // Lock the thread
-        pthread_mutex_lock(&MUTEX_LOCK_DOWNSTREAM); 
+        pthread_mutex_lock(&MUTEX_LOCK_VRNA); 
 
         // Double check that the value still does not need to be calculated
         if (this->downstreamRNABlockadeTable.at(rowNum).at(colNum) != -INF) {
-            pthread_mutex_unlock(&MUTEX_LOCK_DOWNSTREAM); 
+            pthread_mutex_unlock(&MUTEX_LOCK_VRNA); 
             return this->downstreamRNABlockadeTable.at(rowNum).at(colNum);
         }
 
@@ -621,7 +619,7 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
     //cout << "downstream " << barrierHeight << endl;
 
     // Unlock the thread
-    if (N_THREADS > 1) pthread_mutex_unlock(&MUTEX_LOCK_DOWNSTREAM);
+    if (N_THREADS > 1) pthread_mutex_unlock(&MUTEX_LOCK_VRNA);
 
 
 	return barrierHeight;
@@ -652,24 +650,20 @@ void TranslocationRatesCache::buildDownstreamRNABlockadeTable(string templSequen
 
     // Element i,j: the mRNA currently has length i and the polymerase position is j
     if (hybridLen == nullptr || (int)hybridLen->getVal(true) <= 0) return;
-    int h = (int)hybridLen->getVal(true);
 
-    int nLengths = templSequence.length() - h + 1;
+    int nLengths = templSequence.length();
     if (nLengths <= 0) return;
 
     this->downstreamRNABlockadeTable.clear();
 
     this->downstreamRNABlockadeTable.resize(nLengths);
-    for(int nascentLen = h; nascentLen < templSequence.length(); nascentLen ++){
+    for(int nascentLen = 1; nascentLen <= nLengths; nascentLen ++){
 
-        int nPositions = nascentLen - h + 1;
-        int rowNum = nascentLen - (h-1);
-        this->downstreamRNABlockadeTable.at(rowNum).resize(nPositions);
+        int rowNum = nascentLen - 1;
+        this->downstreamRNABlockadeTable.at(rowNum).resize(nascentLen);
 
-        for (int activeSitePos = -nascentLen + h; activeSitePos <= 0; activeSitePos ++){
-            int colNum = activeSitePos - (-nascentLen + h);
-
-            //cout << rowNum << "," << colNum << " " << nLengths << "," << nPositions << endl;
+        for (int activeSitePos = -nascentLen; activeSitePos < 0; activeSitePos ++){
+            int colNum = activeSitePos + nascentLen;
             this->downstreamRNABlockadeTable.at(rowNum).at(colNum) = -INF;
         }
         

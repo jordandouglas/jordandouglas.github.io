@@ -72,9 +72,13 @@ vector<PosteriorDistributionSample*> BayesianCalculations::loadLogFile(string lo
         	// Parse state
           	PosteriorDistributionSample* state = new PosteriorDistributionSample(0, _numExperimentalObservations, true);
           	splitLine = Settings::split(line, '\t');
+            if (splitLine.size() != headerLineSplit.size()) {
+                cout << "ERROR: cannot parse line:\n" << line << endl;
+                exit(0);
+            }
         	state->parseFromLogFileLine(splitLine, headerLineSplit);
 
-
+            //state->print(false);
 
 
         	// Check if X2 <= epsilon. If so then add to the list. 
@@ -100,11 +104,15 @@ vector<PosteriorDistributionSample*> BayesianCalculations::loadLogFile(string lo
 
 
         vector<PosteriorDistributionSample*> states_vector{ std::begin(states), std::end(states) };
-
-        states_vector.at(5)->printHeader(false);
-        states_vector.at(5)->print(false);
-
-
+        
+        /*
+        if (states_vector.size() > 0){
+            states_vector.at(0)->printHeader(false);
+            states_vector.at(0)->print(false);
+        }
+        */
+        
+        
         headerLineSplit.clear();
 
         return states_vector;
@@ -322,9 +330,46 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistributionSampl
 
 	bool samplingFromPosterior = posteriorDistribution.size() > 0;
 	cout << "Sampling new data " << ntrials_sim << " times...\n" << endl;
-
-	if (_outputFilename != "") cout << "Printing results to " << _outputFilename << endl;
-
+    
+    string ROCoutputfile = "";
+	if (_outputFilename != "") {
+    
+    
+        cout << "Printing results to " << _outputFilename << endl;
+    
+        // Check if any of the experiments are using a ROC analysis
+        bool ROCanalysis = false;
+        for (list<ExperimentalData*>::iterator it = experiments.begin(); it != experiments.end(); ++it){
+            if ((*it)->doingROCanalysis()){
+                ROCanalysis = true;
+                break;
+            }
+        }
+        
+        if (ROCanalysis) {
+    
+            vector<string> fileNameSplit = Settings::split(_outputFilename, '.');
+            if (fileNameSplit.size() == 1) ROCoutputfile = _outputFilename + "_ROC";
+            else {
+            
+                for (int i = 0; i < fileNameSplit.size()-1; i ++){
+                    ROCoutputfile += fileNameSplit.at(i);
+                    if (i < fileNameSplit.size() - 2) ROCoutputfile += ".";
+                }
+                ROCoutputfile += "_ROC." + fileNameSplit.at(fileNameSplit.size() - 1);
+            
+            }
+            
+            cout << "Printing ROC analysis results to " << ROCoutputfile << endl;
+            
+        }
+        
+        
+    }
+    
+    
+    
+    
 	// Perform N trials
 	for (int n = 1; n <= ntrials_sim; n ++){
 
@@ -386,6 +431,10 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistributionSampl
 			state->addSimulatedAndObservedValue(simulationResults, MCMC::getCurrentExperiment());
 
 		}
+        
+        
+        // Finished all experiments. Calculate the AUC of this state (if evaluating pause sites)
+        state->calculateAUC(ROCoutputfile);
 
 
 		state->print(_outputFilename != "");
