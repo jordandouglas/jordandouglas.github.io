@@ -112,7 +112,7 @@ BIBLIOGRAPHY["beaumont2010approximate"] = {name: `Beaumont, Mark A. "Approximate
 
 BIBLIOGRAPHY["rambaut2015tracer"] = {name: `Rambaut, A., Suchard, M.A., Xie, D. and Drummond, A.J., 2015. Tracer v1. 6. 2014.`, DOI: "XXXX"}; // No DOI?
 
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
+BIBLIOGRAPHY["haas2017bringing"] = {name: `Haas, Andreas, et al. "Bringing the web up to speed with WebAssembly." ACM SIGPLAN Notices. Vol. 52. No. 6. ACM, 2017.`, DOI: "10.1145/3062341.3062363"};
 
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 
