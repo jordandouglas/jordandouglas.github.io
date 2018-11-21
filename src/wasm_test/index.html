@@ -1,0 +1,89 @@
+
+
+
+<html>
+<head>
+<title>WASM test</title>
+<!--<link rel="icon" href="../src/Images/transcribe.png">-->
+<meta name="viewport" content="width=device-width, initial-scale=0.41, maximum-scale=1" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="src/Resources/styles.css">
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+<script language="JavaScript" type="text/JavaScript" src="wasm_interface/WebWorkerMessager.js"></script>
+
+<script language='JavaScript' type='text/JavaScript'>
+
+
+function init(){
+
+   
+	var toDoAfterWWRegistration = function(){
+
+		console.log("I have finished instantiating webassembly");
+
+
+	}
+	
+
+	var registerWW = () => new Promise((resolve) => register_WebWorker(resolve));
+	registerWW().then(() => toDoAfterWWRegistration());
+
+
+            
+
+}
+
+function addNumbers(){
+
+	var n1 = $("#n1").val();
+	var n2 = $("#n2").val();
+
+	alert("Adding " + n1 + " and " + n2);
+
+
+	add_controller(n1, n2, function(result){
+
+		console.log(result);
+		$("#result").html(result.sum);
+		alert("The sky is", result.sky);
+
+
+	});
+
+	
+
+}
+
+
+
+
+
+
+</script>
+
+</head>
+
+<body onload="init()">
+	<div id="screenContainer" style="position:relative">
+		<div id="screen" style="opacity:1;">
+
+
+
+			n1 = <input type="number" value=5 id="n1"> &nbsp;&nbsp;
+
+			n2 = <input type="number" value=6 id="n2"> &nbsp;&nbsp;
+
+
+			<br><br> <span onclick="addNumbers()" style="height:20px; padding: 5 5; background-colour:#d3d3d3">Add</span>
+
+	
+			<br><br> <span id="result"></span>
+
+				
+		</div>
+	</div>
+
+
+</div>
+</body>
+</html>
