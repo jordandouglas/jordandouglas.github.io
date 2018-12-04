@@ -355,6 +355,7 @@ function drawDeactivationCanvas(){
 		// Below the arrow is a button to perform the reaction manually
 		var activated = result.activated;
 		var NTPbound = result.NTPbound;
+        var operationApplicable = result.operationApplicable;
 		var kA = result["kA"];
 		var kU = result["kU"];
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -431,7 +432,7 @@ function drawDeactivationCanvas(){
 		var onClick = activated ? "deactivate_controller()" : "activate_controller()";
 
 		if (NTPbound || !result.allowDeactivation) rate = 0; // Cannot deactivate if NTP bound
-		plotArrowButton_navigationPanel(ctx, "activBtn", fromX, plotHeight / 2, activated ? "right" : "left", activated ? "Deactivate" : "Activate", rate, onClick, activated ? "Send the polymerase into a catalytically inactive state" : "Bring the polymerase back into its catalytically active form", spacingBetweenStates, canvas, !NTPbound);
+		plotArrowButton_navigationPanel(ctx, "activBtn", fromX, plotHeight / 2, activated ? "right" : "left", activated ? "Deactivate" : "Activate", rate, onClick, activated ? "Send the polymerase into a catalytically inactive intermediate state" : "Bring the polymerase back into its catalytically active intermediate state", spacingBetweenStates, canvas, operationApplicable);
 
 
 
