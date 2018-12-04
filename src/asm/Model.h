@@ -57,6 +57,7 @@ class Model{
 	string currentRNABlockadeModel;
 	string currentInactivationModel;
 	string currentBacksteppingModel;
+    int currentBacksteppingModel_int;
 
 	int NTPbindingNParams;
 	//bool modelIsActive;
@@ -126,7 +127,7 @@ class Model{
 		string get_currentInactivationModel();
 		Model* set_currentBacksteppingModel(string val);
 		string get_currentBacksteppingModel();
-
+        int get_currentBacksteppingModel_int();
 
 		Model* set_NTPbindingNParams(int val);
 		int get_NTPbindingNParams();

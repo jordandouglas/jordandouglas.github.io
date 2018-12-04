@@ -58,7 +58,6 @@ extern const double _PI;
 extern const double INF;
 extern const int _nBasesToTranscribeInit;
 extern const int _N_THRESHOLDS_ROC_CURVE;
-extern const int _N_GRID_SQUARES_ROC_CURVE;
 
 
 // Translocation model constants. 

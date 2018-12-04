@@ -461,6 +461,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 		// If NTP is not bound and we are in pre/posttranslocated state, and user has requested to assume translocation equilibrium but NOT binding
 		bool justTranslocationEquilibrium =  !currentModel->get_assumeBindingEquilibrium()
 											&&  currentModel->get_assumeTranslocationEquilibrium() 
+                                            && s->get_activated()
 											&& (s->get_mRNAPosInActiveSite() == 0 || s->get_mRNAPosInActiveSite() == 1) && !s->NTPbound();
 
 
@@ -468,6 +469,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 		// If we are in pre/posttranslocated state, and user has requested to assume translocation equilibrium AND binding equilibrium
 		bool bindingAndTranslocationEquilibrium =   currentModel->get_assumeBindingEquilibrium()
 													&& currentModel->get_assumeTranslocationEquilibrium() 
+                                                    && s->get_activated()
 													&& (s->get_mRNAPosInActiveSite() == 0 || s->get_mRNAPosInActiveSite() == 1) && !s->NTPbound();
 
 
@@ -496,7 +498,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 
 			// Geometric sampling speed boost for when just binding is kinetic (or both kinetic but backtracking/hypertranslocation are not prohibited)
-			else if ((nothingEquilibrium && s->get_mRNAPosInActiveSite() == 1) || justTranslocationEquilibrium){
+			else if (!currentModel->get_allowInactivation() && ((nothingEquilibrium && s->get_mRNAPosInActiveSite() == 1) || justTranslocationEquilibrium)){
 				geometricTime = geometricBindingSampling(s);
 			}
 
@@ -573,7 +575,6 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 				kBindOrCat = s->calculateCatalysisRate(true) * probabilityBound; // Can only catalyse if NTP bound
 				kFwd = kFwd * probabilityUnbound; // Can only translocate if NTP is not bound
 				kBck = kBck * probabilityUnbound;
-				kDeactivate = kDeactivate * probabilityUnbound; // Can only deactivate if NTP is not bound
 
 
 			}
@@ -623,6 +624,10 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 				kFwd = k1_2 * probabilityPosttranslocated; // Can only enter hypertranslocated state from posttranslocated
 				kBck = k0_minus1 * probabilityPretranslocated; // Can only backtrack from pretranslocated
+                
+                
+                // Can only deactivate from the pretranslocatd (or backstep1 state)
+                kDeactivate = kDeactivate * probabilityPretranslocated;
 
 
 			}
@@ -724,7 +729,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 				kFwd = k1_2 * probabilityPosttranslocated; // Can only enter hypertranslocated state from posttranslocated
 				kBck = k0_minus1 * probabilityPretranslocated; // Can only backtrack from pretranslocated
-				kDeactivate = kDeactivate * (probabilityPosttranslocated + probabilityPretranslocated); // Can only deactivate from post and pretranslocated states
+				kDeactivate = kDeactivate * probabilityPretranslocated; // Can only deactivate pretranslocated (or backstep1) state
 
 
 
@@ -940,9 +945,8 @@ double Simulator::geometricTranslocationSampling(State* s){
 	s->forward();
 
 
-	// Deactivate rate
-	double kDeactivate = s->calculateDeactivateRate(false);
-
+	double kDeactivate = s->calculateDeactivateRate(true);
+    if (currentModel->get_currentBacksteppingModel_int() == -1) kDeactivate = 0;
 
 	//s->print();
 	//cout << "geometricTranslocationSampling kbck " << kBck << endl;
@@ -966,7 +970,6 @@ double Simulator::geometricTranslocationSampling(State* s){
 	// Mofify the rates
 	double kcat = s->calculateCatalysisRate(true) * probabilityBound; // Can only catalyse if NTP bound
 	kBck = kBck * probabilityUnbound; // Can only translocate if NTP is not bound
-	double kDeactPost = kDeactivate * probabilityUnbound; // Can only deactivate in postranslocated state if NTP is not bound (or any time in pretranslocated state)
 
 
 
@@ -976,7 +979,7 @@ double Simulator::geometricTranslocationSampling(State* s){
 	double kBckInact = kBck * kDeactivate / kFwdInact;
 
 
-	double rate = kBck + kcat + kDeactPost;
+	double rate = kBck + kcat;
 
 
 	// Keep sampling until it is NOT back-forward
@@ -1006,13 +1009,7 @@ double Simulator::geometricTranslocationSampling(State* s){
 		actionsToDoList[0] = 3;
 		actionsToDoList[1] = 3;
 	}
-
-
-	// Otherwise just deactivate from the posttranslocated position
-	else {
-		actionsToDoList[0] = 5;
-	}
-
+   
 
 	// Apply the reaction(s) unless in animation mode
 	for (int i = 0; i < 2; i ++){
@@ -1057,8 +1054,9 @@ double Simulator::geometricTranslocationBindingSampling(State* s){
 	//cout << "geometricTranslocationBindingSampling " << endl;// << kBck << " kFwd " << kFwd << endl;
 
 
-	// Rate of going back then forward, vs back then deactivate
-	double kDeactivate = s->calculateDeactivateRate(false);
+	// Rate of going back then forward, vs back, then deactivate
+	double kDeactivate = s->calculateDeactivateRate(true);
+    if (currentModel->get_currentBacksteppingModel_int() == -1) kDeactivate = 0;
 	double kFwdInact = kFwd + kDeactivate;
 	double kBckFwd = kBck * kFwd / kFwdInact;
 	double kBckInact = kBck * kDeactivate / kFwdInact;
@@ -1073,7 +1071,7 @@ double Simulator::geometricTranslocationBindingSampling(State* s){
 	double rateBindCat = kBind * kcat / rateRelCat;
 
 	double rate_bindRelease_or_backforward = rateBindRelease + kBckFwd;
-	double rate = kBind + kBck + kDeactivate;
+	double rate = kBind + kBck; // + kDeactivate;
 
 
 	// Keep sampling until it is NOT bind-release or back-forward 
@@ -1128,11 +1126,11 @@ double Simulator::geometricTranslocationBindingSampling(State* s){
 	}
 
 
-	// Deactivate from posttranslocated position
+	
 	else{
 
-		// To do: deactivate
-		actionsToDoList[0] = 5;
+		cout << "ERROR 4242" << endl;
+        exit(0);
 
 	}
 
@@ -1175,7 +1173,8 @@ double Simulator::geometricBindingSampling(State* s){
 	double kRelease = s->calculateReleaseNTPRate(true);
 	double kBind = s->calculateBindOrCatNTPrate(true);
 	double kcat = s->calculateCatalysisRate(true);
-	double kDeactivate = s->calculateDeactivateRate(false);
+	double kDeactivate = s->calculateDeactivateRate(true);
+    if (currentModel->get_currentBacksteppingModel_int() == -1) kDeactivate = 0;
 
 	//s->print();
 	//cout << "geometricBindingSampling " << s->get_mRNAPosInActiveSite() << endl;
@@ -1227,14 +1226,15 @@ double Simulator::geometricBindingSampling(State* s){
 		kBind = kBind * probabilityPosttranslocated;
 		//kcat = kcat * probabilityPosttranslocated;
 		kBck = k0_minus1 * probabilityPretranslocated; // Can only backtrack from pretranslocated
-
-		//kDeactivate = kDeactivate*probabilityPretranslocated + probabilityPosttranslocated*probabilityPosttranslocated;
+        
+        // Can only deactivate form pretranslocated position (or backstep1)
+		kDeactivate = kDeactivate*probabilityPretranslocated;
 
 
 	}
 	//cout << "kBind=" << kBind << endl;
 
-
+    // THIS WILL NOT WORK IF TRANSLOCATION NOT AT EQUILIBRIUM
 	double rateRelCat = kRelease + kcat;
 	double rateBindRelease = kBind * kRelease / rateRelCat;
 	double rate = kBck + kFwd + kBind + kDeactivate; // + kRelease

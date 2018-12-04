@@ -53,8 +53,7 @@ const double _kBT = 1.380649e-23 * 310;
 const double _preExp = 1e6;	
 const double _PI = 3.14159265359;	
 const int _nBasesToTranscribeInit = 4;
-const int _N_THRESHOLDS_ROC_CURVE = 5000;
-const int _N_GRID_SQUARES_ROC_CURVE = 1000;
+const int _N_THRESHOLDS_ROC_CURVE = 100;
 
 
 const double _midpointModelConstant = -14.37;
@@ -146,8 +145,8 @@ Parameter* kCat = new Parameter("kCat", false, "inclusive", "Rate of catalysis (
 Parameter* Kdiss = new Parameter("Kdiss", false, "exclusive", "KD (\u03bcM)", "Dissociation constant of NTP",  "K_{D}  (\u03bcM)");
 Parameter* RateBind = new Parameter("RateBind", false, "inclusive", "Rate of binding  (\u03bcM\u207B\u00B9 s\u207B\u00B9)", "Second order rate constant of binding the correct NTP", "k_{bind} (\u03bcM^{\u22121} s^{\u22121\u2009})");
 
-Parameter* RateActivate = new Parameter("RateActivate", false, "inclusive", "Rate of activation (s\u207B\u00B9)", "Rate constant of polymerase leaving the catalytically unactive state", "k_[A]  (s^[\u22121\u2009])");
-Parameter* RateDeactivate = new Parameter("RateDeactivate", false, "inclusive", "Rate of inactivation (s\u207B\u00B9)", "Rate constant of polymerase entering the catalytically unactive state", "k_[U]  (s^[\u22121\u2009])");
+Parameter* RateActivate = new Parameter("RateActivate", false, "inclusive", "Rate of activation (s\u207B\u00B9)", "Rate constant of polymerase leaving the intermediate state", "k_[A]  (s^[\u22121\u2009])");
+Parameter* RateDeactivate = new Parameter("RateDeactivate", false, "inclusive", "Rate of inactivation (s\u207B\u00B9)", "Rate constant of polymerase entering the intermediate state", "k_[U]  (s^[\u22121\u2009])");
 Parameter* deltaGDaggerHybridDestabil = new Parameter("deltaGDaggerHybridDestabil", false, "false", "\u0394G\u2020\u03C0", "Gibbs energy barrier of hybrid destabilisation, which causes catalytic inactivation.");
 Parameter* deltaGDaggerBacktrack = new Parameter("deltaGDaggerBacktrack", false, "false", "\u0394G\u2020\U0001D70F-", "Additive Gibbs energy barrier height of backtracking. Added onto the value of \u0394G\u2020\U0001D70F.", "\u0394G_{\U0001D70F-}^{\u2020}  (k_{B}T)");
 Parameter* DGHyperDag = new Parameter("DGHyperDag", false, "false", "\u0394G\u2020\U0001D70F+", "Additive Gibbs energy barrier height of hypertranslocation. Added onto the value of \u0394G\u2020\U0001D70F.", "\u0394G_{\U0001D70F+}^{\u2020}  (k_{B}T)");
@@ -842,7 +841,7 @@ void Settings::updateParameterVisibilities(){
 
 
 	// Backtracking allowed?
-	if (currentModel->get_allowBacktracking() || currentModel->get_currentBacksteppingModel() == "backstep1"){
+	if (currentModel->get_allowBacktracking() || currentModel->get_currentBacksteppingModel_int() == -1){
 		deltaGDaggerBacktrack->show();
 	}else{
 		deltaGDaggerBacktrack->hide();

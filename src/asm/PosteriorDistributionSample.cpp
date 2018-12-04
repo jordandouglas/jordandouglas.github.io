@@ -243,6 +243,8 @@ void PosteriorDistributionSample::calculateAUC(string printROCToFile){
     list<double>::iterator nonPauseIterator = this->meanDwellTimes_notpauseSites.begin();
     int nPausesBelowThreshold = 0;
     int nNonpausesBelowThreshold = 0;
+    
+    
 
     // Calculate the AUC of a ROC curve. Search a fixed number of thresholds from min to max dwell time
     for (int i = 0; i < thresholds.size(); i ++){
@@ -276,57 +278,18 @@ void PosteriorDistributionSample::calculateAUC(string printROCToFile){
 
 
 
-    // Calculate the AUC by iterating across the x-axis in a grid
-    double widthPerGridSquare = 1.0 / _N_GRID_SQUARES_ROC_CURVE;
+    // Calculate the AUC by iterating across the x-axis values
     double AUC = 0;
-    for (int gridIndex = 0; gridIndex < _N_GRID_SQUARES_ROC_CURVE; gridIndex ++){
+    for (int i = 0; i < ROC_curve.size()-1; i ++){
+    
+        double x0 = ROC_curve.at(i).at(0);
+        double y0 = ROC_curve.at(i).at(1);
+        double x1 = ROC_curve.at(i+1).at(0);
+        double y1 = ROC_curve.at(i+1).at(1);
+        
+        double trapezoid_area = std::abs(x1 - x0) * (y0 + y1) / 2;
+        AUC += trapezoid_area;
 
-        // X-axis value is the middle-x of this grid square
-        double x = (gridIndex + 0.5) * widthPerGridSquare;
-
-
-        // Find the two points on the ROC curve which flank this x-value
-        double leftFlankIndex = -1;
-        double rightFlankIndex = -1;
-        if (ROC_curve.at(0).at(0) <= x) {
-            leftFlankIndex = 0;
-            rightFlankIndex = 0;
-        }
-        else for (int i = 0; i < ROC_curve.size() - 1; i ++){
-            if (ROC_curve.at(i+1).at(0) <= x && ROC_curve.at(i).at(0) > x){
-                leftFlankIndex = i+1;
-                rightFlankIndex = i;
-                break;
-            }
-        }
-
-
-        //cout << "x = " << x << " is flanked by " << ROC_curve.at(leftFlankIndex).at(0) << " and " << ROC_curve.at(rightFlankIndex).at(0) << endl;
-        if (leftFlankIndex == -1 || rightFlankIndex == -1){
-            cout << leftFlankIndex << "," << rightFlankIndex << endl;
-            continue;
-        }
-
-        // Horizontal line
-        double y;
-        if (ROC_curve.at(leftFlankIndex).at(1) == ROC_curve.at(rightFlankIndex).at(1)) y = ROC_curve.at(rightFlankIndex).at(0);
-
-        // Vertical line - take mid point
-        else if (ROC_curve.at(leftFlankIndex).at(0) == ROC_curve.at(rightFlankIndex).at(0))  y = (ROC_curve.at(leftFlankIndex).at(1) + ROC_curve.at(rightFlankIndex).at(1)) / 2;
-
-
-        // Sloped line y = mx + c. Find the value of y where x intersects the straight line connecting these two flanking points
-        else {
-
-            double m = (ROC_curve.at(rightFlankIndex).at(1) - ROC_curve.at(leftFlankIndex).at(1)) / (ROC_curve.at(rightFlankIndex).at(0) - ROC_curve.at(leftFlankIndex).at(0));
-            double c = ROC_curve.at(rightFlankIndex).at(1) - m*ROC_curve.at(rightFlankIndex).at(0);
-            y = m*x + c;
-
-        }
-
-
-        //cout << "y = " << y << endl;
-        AUC += y * widthPerGridSquare;
 
     }
 
@@ -350,13 +313,31 @@ void PosteriorDistributionSample::calculateAUC(string printROCToFile){
         
         
         rocFile << "===NewSimulation===" << endl;
+        
+        
         rocFile << "FP\tTP" << endl;
         for (int i = 0; i < ROC_curve.size(); i ++){
             rocFile << ROC_curve.at(i).at(0) << "\t" << ROC_curve.at(i).at(1) << endl;
         }
         rocFile << endl;
-            
         
+        
+        
+        /*
+        for(list<double>::iterator it = this->meanDwellTimes_pauseSites.begin(); it != this->meanDwellTimes_pauseSites.end(); ++it){
+            rocFile << *it << ",";
+        }
+        rocFile << 0 << endl;
+        
+        
+        for(list<double>::iterator it = this->meanDwellTimes_notpauseSites.begin(); it != this->meanDwellTimes_notpauseSites.end(); ++it){
+            rocFile << *it << ",";
+        }
+        rocFile << 0 << endl;
+        */
+        
+            
+        rocFile.close();
         
     }
     

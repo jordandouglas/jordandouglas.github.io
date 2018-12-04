@@ -121,10 +121,10 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 			/*
 
 			// If in the 0 position and going backwards and the backtracking barrier is between 0 and -1, apply the backtrack penalty
-			if (state->get_mRNAPosInActiveSite() == 0 && !fwd && currentModel->get_currentBacksteppingModel() == "backstep0") backtrackBarrier += deltaGDaggerBacktrack->getVal(true);
+			if (state->get_mRNAPosInActiveSite() == 0 && !fwd && currentModel->get_currentBacksteppingModel_int() == 0) backtrackBarrier += deltaGDaggerBacktrack->getVal(true);
 
 			// If in the -1 position and (going backwards and the backtracking barrier is between -1 and -2) OR (the backtracking barrier is between 0 and -1), apply the backtrack penalty
-			else if (state->get_mRNAPosInActiveSite() == -1 && ((!fwd && currentModel->get_currentBacksteppingModel() == "backstep1") || currentModel->get_currentBacksteppingModel() == "backstep0")) backtrackBarrier += deltaGDaggerBacktrack->getVal(true);
+			else if (state->get_mRNAPosInActiveSite() == -1 && ((!fwd && currentModel->get_currentBacksteppingModel_int() == -1) || currentModel->get_currentBacksteppingModel_int() == 0)) backtrackBarrier += deltaGDaggerBacktrack->getVal(true);
 
 			*/
 		} 

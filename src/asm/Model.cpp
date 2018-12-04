@@ -57,6 +57,7 @@ Model::Model(){
 	currentRNABlockadeModel = "terminalBlockade";
 	currentInactivationModel = "sequenceIndependent";
 	currentBacksteppingModel = "backstep0";
+    currentBacksteppingModel_int = 0;
 	NTPbindingNParams = 2;
 
 }
@@ -85,6 +86,7 @@ Model* Model::clone(){
 	clonedModel->currentRNABlockadeModel = this->currentRNABlockadeModel;
 	clonedModel->currentInactivationModel = this->currentInactivationModel;
 	clonedModel->currentBacksteppingModel = this->currentBacksteppingModel;
+    clonedModel->currentBacksteppingModel_int = this->currentBacksteppingModel_int;
 	clonedModel->allowMultipleBulges = this->allowMultipleBulges;
 	clonedModel->allowDNAbending = this->allowDNAbending;
 
@@ -492,12 +494,15 @@ string Model::get_currentInactivationModel(){
 
 Model* Model::set_currentBacksteppingModel(string val){
 	this->currentBacksteppingModel = val;
+    this->currentBacksteppingModel_int = (val == "backstep0" ? 0 : -1);
 	return this;
 }
 string Model::get_currentBacksteppingModel(){
 	return this->currentBacksteppingModel;
 }
-
+int Model::get_currentBacksteppingModel_int(){
+    return this->currentBacksteppingModel_int;
+}
 
 
 

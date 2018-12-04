@@ -378,8 +378,6 @@ State* State::forward(){
 		// If bulge will move too far to the left then absorb it
 		DOMupdates = new SlippageLandscapes();
 
-
-
 		for (int s = 0; s < this->bulgePos.size(); s++){
 			if (this->partOfBulgeID.at(s) != s) continue;
 			if (this->bulgePos.at(s) > 0 && this->bulgePos.at(s) == hybridLen->getVal(true) - 1) this->absorb_bulge(s, false, true, DOMupdates);
@@ -458,8 +456,8 @@ State* State::forward(){
 
 	}
 
-	// Only move forward if NTP is not bound
-	if (!this->NTPbound()) {
+	// Only move forward if NTP is not bound // and not in intermediate state
+	if (!this->NTPbound()){ //} && !(currentModel->get_allowInactivation() && !this->activated && this->mRNAPosInActiveSite == currentModel->get_currentBacksteppingModel_int())) {
 
 		this->mRNAPosInActiveSite ++; 
 		this->leftTemplateBase ++; 
@@ -468,6 +466,11 @@ State* State::forward(){
 		this->rightNascentBase ++; 
 
 	}
+    
+    
+    // Activate the polymerase if permitted in the new state
+    this->activate();
+    
 
 	if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal(true)-1) ||
 		(this->mRNAPosInActiveSite <= 1 && this->rightTemplateBase > templateSequence.length())) this->terminate();
@@ -539,11 +542,9 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 		if (!currentModel->get_allowHypertranslocation() && this->mRNAPosInActiveSite >= 1) return 0;
 
 
-		// Check if going from backtracked to pretranslocated is permitted while activated
-		//if (currentModel->get_allowBacktracking() && currentModel->get_allowInactivation() && !currentModel->get_allowBacktrackWithoutInactivation() && this->activated && this->mRNAPosInActiveSite == -1) return 0;
-		if (currentModel->get_allowBacktracking() && currentModel->get_allowInactivation() && !currentModel->get_allowBacktrackWithoutInactivation() && this->activated){
-			if (this->mRNAPosInActiveSite == -1 && currentModel->get_currentBacksteppingModel() == "backstep0") return 0;
-			if (this->mRNAPosInActiveSite == -2 && currentModel->get_currentBacksteppingModel() == "backstep1") return 0;
+		// Cannot translocate forwards out of the intermediate state
+		if (currentModel->get_allowInactivation() && !this->activated && this->mRNAPosInActiveSite == currentModel->get_currentBacksteppingModel_int()){
+            return 0;
 		}
 
 
@@ -663,8 +664,9 @@ State* State::backward(){
 
 	}
 
-
-	if (!this->NTPbound()) {  // Only move backwards if NTP is not bound
+    
+    // Only move backwards if NTP is not bound // and not going into the intermediate state
+	if (!this->NTPbound()){ // && !(currentModel->get_allowInactivation() && this->activated && this->mRNAPosInActiveSite == currentModel->get_currentBacksteppingModel_int())) {  
 
 		this->mRNAPosInActiveSite --;
 		this->leftTemplateBase --; 
@@ -705,16 +707,15 @@ double State::calculateBackwardRate(bool lookupFirst, bool ignoreStateRestrictio
 		// Check if backtracking is permitted
 		if (!currentModel->get_allowBacktracking()){
 			if (this->mRNAPosInActiveSite < 0) return 0;
-			if (this->mRNAPosInActiveSite == 0 && currentModel->get_currentBacksteppingModel() == "backstep0") return 0; // Can go freely from 0 to -1 if backstep1 mode
+			if (this->mRNAPosInActiveSite == 0 && currentModel->get_currentBacksteppingModel_int() == 0) return 0; // Can go freely from 0 to -1 if backstep1 mode
 		} 
-
-		// Check if backtracking is permitted while activated
-		// if (currentModel->get_allowBacktracking() && currentModel->get_allowInactivation() && !currentModel->get_allowBacktrackWithoutInactivation() && this->activated && this->mRNAPosInActiveSite == 0) return 0;
-		if (currentModel->get_allowBacktracking() && currentModel->get_allowInactivation() && !currentModel->get_allowBacktrackWithoutInactivation() && this->activated){
-			if (this->mRNAPosInActiveSite == 0 && currentModel->get_currentBacksteppingModel() == "backstep0") return 0;
-			if (this->mRNAPosInActiveSite == -1 && currentModel->get_currentBacksteppingModel() == "backstep1") return 0;
-		}
-
+        
+        
+        
+        // Cannot translocate backwards into the intermediate state
+        if (currentModel->get_allowInactivation() && this->activated && this->mRNAPosInActiveSite == currentModel->get_currentBacksteppingModel_int()){ 
+            return 0;
+        }
 
 
 
@@ -916,9 +917,10 @@ double State::calculateReleaseNTPRate(bool ignoreStateRestrictions){
 // Activate the polymerase from its catalytically inactive state
 State* State::activate(){
 
-
-	if (!this->activated){
-		
+    // Can only activate when in pretranslocated (or backstep1) state but will allow activation if translocated after this point 
+    // in case user has moved polymerase
+	if (!this->activated && this->mRNAPosInActiveSite >= currentModel->get_currentBacksteppingModel_int()){
+        
 		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
 			
 			// Change the pol picture back to the default pol
@@ -936,7 +938,7 @@ State* State::activate(){
 
 double State::calculateActivateRate(bool ignoreStateRestrictions){
 
-	if (ignoreStateRestrictions || !this->activated){
+	if (ignoreStateRestrictions || (!this->activated && this->mRNAPosInActiveSite == currentModel->get_currentBacksteppingModel_int())){
 
 		// Sequence dependent and independent have the same rate
 		return RateActivate->getVal(true);
@@ -946,10 +948,11 @@ double State::calculateActivateRate(bool ignoreStateRestrictions){
 }
 
 
-// Deactivate the polymerase by putting it into a catalytically inactive state
+// Deactivate the polymerase by putting it into a catalytically inactive state (intermediate state)
 State* State::deactivate(){
 
-	if (!this->NTPbound() && this->activated){
+    int deactivateFrom = currentModel->get_currentBacksteppingModel_int();
+	if (this->activated && this->mRNAPosInActiveSite == deactivateFrom){
 		
 		if (this->isGuiState && _applyingReactionsGUI && _animationSpeed != "hidden"){
 			
@@ -967,14 +970,18 @@ State* State::deactivate(){
 
 
 double State::calculateDeactivateRate(bool ignoreStateRestrictions){
-	if (currentModel->get_allowInactivation() && (ignoreStateRestrictions || (this->activated && !this->NTPbound()))) {
+
+	if (!currentModel->get_allowInactivation()) return 0;
+    
+    if (ignoreStateRestrictions || (this->activated && this->mRNAPosInActiveSite == currentModel->get_currentBacksteppingModel_int())) {
 
 		// Sequence independent
 		if (currentModel->get_currentInactivationModel() == "sequenceIndependent") {
+            
 			return RateDeactivate->getVal(true);
 		}
 
-
+        /*
 		// Sequence dependent
 		else if (currentModel->get_currentInactivationModel() == "hybridDestabilisation"){
 
@@ -989,7 +996,9 @@ double State::calculateDeactivateRate(bool ignoreStateRestrictions){
 			if (this->mRNAPosInActiveSite == 1) relativeBarrierHeight = relativeBarrierHeight - DGPost->getVal(true);
 			return _preExp * exp(-relativeBarrierHeight);
 		}
-
+        */
+        
+        
 	}
 
 	return 0;
@@ -1000,7 +1009,7 @@ double State::calculateDeactivateRate(bool ignoreStateRestrictions){
 // Cleave the 3' end of the nascent strand (if the polymerase is backtracked) and reactivates the polymerase
 State* State::cleave(){
 
-	int maxPos = currentModel->get_currentBacksteppingModel() == "backstep0" ? 0 : -1;
+	int maxPos = currentModel->get_currentBacksteppingModel_int();
 	if (this->mRNAPosInActiveSite < maxPos && (CleavageLimit->getVal(true) == 0|| this->mRNAPosInActiveSite >= -CleavageLimit->getVal(true))){
 
 		int newLength = this->nascentSequence.length() + this->mRNAPosInActiveSite;
@@ -1024,7 +1033,7 @@ State* State::cleave(){
 		this->nextTemplateBaseToCopy -= nbasesCleaved;
 		this->nascentSequence = this->nascentSequence.substr(0, newLength);
 		this->mRNAPosInActiveSite = 0;
-		return this; //->activate();
+		return this->activate();
 
 	}
 
@@ -1036,7 +1045,7 @@ State* State::cleave(){
 double State::calculateCleavageRate(bool ignoreStateRestrictions){
 
 
-	int maxPos = currentModel->get_currentBacksteppingModel() == "backstep0" ? 0 : -1;
+	int maxPos = currentModel->get_currentBacksteppingModel_int();
 	if (ignoreStateRestrictions || (this->mRNAPosInActiveSite < maxPos && (CleavageLimit->getVal(true) == 0|| this->mRNAPosInActiveSite >= -CleavageLimit->getVal(true)))) return RateCleave->getVal(true);
 	return 0;
 }
