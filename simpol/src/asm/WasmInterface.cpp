@@ -613,8 +613,7 @@ extern "C" {
 		_currentStateGUI->setNextBaseToAdd(ntpToAdd_str);
 		messageFromWasmToJS("", msgID);
 
-		// Clean up
-		free(ntpToAdd);
+
 	}
 
 
@@ -655,8 +654,7 @@ extern "C" {
 
 		messageFromWasmToJS(parametersJSON, msgID);
 
-		// Clean up
-		free(XMLdata);
+
 
 	}
 
@@ -735,10 +733,7 @@ extern "C" {
 		messageFromWasmToJS("{'succ':true}", msgID);
 
 
-		// Clean up
-		free(newSeq);
-		free(newTemplateType);
-		free(newPrimerType);
+
 
 
 
@@ -759,10 +754,7 @@ extern "C" {
 
 		messageFromWasmToJS("", msgID);
 
-
-		// Clean up
-		free(seqID);
-
+      
 	}
 
 
@@ -787,8 +779,6 @@ extern "C" {
 		messageFromWasmToJS("{" + currentModel->toJSON() + "}", msgID);
 
 
-		// Clean up
-		free(polID);
 
 	}
 
@@ -826,11 +816,6 @@ extern "C" {
 		}
 
 
-		// Clean up
-		free(paramID);
-		free(distributionName);
-		free(distributionArgNames);
-
 	}
 
 
@@ -843,8 +828,6 @@ extern "C" {
 		exit(0);
 
 
-		// Clean up
-		free(paramID);
 		return 0;
 
 	}
@@ -1252,8 +1235,6 @@ extern "C" {
 		messageFromWasmToJS(toReturnJSON, msgID);
 
 
-		// Clean up
-		free(tsvInput);
 
 
 	}
@@ -1352,8 +1333,6 @@ extern "C" {
 		cout << "Gel calibration initialised" << endl;
 
 
-		// Clean up
-		free(priors);
 
 	}
 
@@ -1611,9 +1590,6 @@ extern "C" {
 		messageFromWasmToJS(parametersJSON, msgID);
 
 
-		// Clean up
-		free(modelSettingNames);
-		free(modelSettingVals);
 		
 		
 	}
@@ -1794,8 +1770,7 @@ extern "C" {
 
 		messageFromWasmToJS("", msgID);
 
-		// Clean up
-		free(modelDescription);
+
 	}
 
 
@@ -1866,12 +1841,6 @@ extern "C" {
 		messageFromWasmToJS("", msgID);
 
 
-		// Clean up
-		if (modelIDs_tokens.size() > 0){
-			free(modelIDs);
-			free(modelWeights);
-			free(modelDescription);
-		}
 
 
 
@@ -2108,8 +2077,6 @@ extern "C" {
 		messageFromWasmToJS(plotsJSON, msgID);
 
 
-		// Clean up
-		free(value);
 
 	}
 
@@ -2121,10 +2088,7 @@ extern "C" {
 		string plotsJSON = _GUI_PLOTS->getPlotDataAsJSON();
 		messageFromWasmToJS(plotsJSON, msgID);
 
-
-		// Clean up
-		free(values_str);
-
+      
 	}
 
 
