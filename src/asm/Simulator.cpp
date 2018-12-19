@@ -436,9 +436,6 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			(s->get_mRNAPosInActiveSite() == 0 && s->getRightTemplateBaseNumber() == templateSequence.length()) ){
 		
 
-		//		if (this->mRNAPosInActiveSite > (int)(hybridLen->getVal(true)-1) ||
-	//	(this->mRNAPosInActiveSite <= 1 && this->rightTemplateBase > templateSequence.length())) this->terminate();
-
 			if (!this->animatingGUI) {
 				s->terminate();
 				break;
@@ -748,12 +745,18 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			//cout << endl;
 
 			
-			
+			// No operations
 			if (rateSum <= 0){
-				cout << "No operations to apply" << endl;
-				s->print();
-				exit(1);
-				break;
+				// cout << "No operations to apply" << endl;
+                
+	            if (!this->animatingGUI) {
+                    s->terminate();
+                    break;
+                }
+                else {
+                    this->actionsToReturn.push_back(6); // 6 = terminate
+                    return;
+                }
 			}
  			
 			

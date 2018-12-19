@@ -24,6 +24,8 @@
 
 #include <iostream>
 #include <list>
+#include <math.h>
+#include <algorithm>
 
 
 using namespace std;
@@ -95,36 +97,57 @@ void SimulatorResultSummary::compute_meanRelativeTimePerLength(){
     for (int i = 0; i < this->meanRelativeTimePerLength.size(); i ++){
         this->meanRelativeTimePerLength.at(i) = 0;
     }
+    
+    
+    bool useMean = false;
+    
+    
+    if (useMean) {
 
+    
+        // Mean time at each position this simulation
+        for (list<vector<double>>::iterator it = this->proportionOfTimePerLength.begin(); it != this->proportionOfTimePerLength.end(); ++it){
 
-    double meanTimeOnGene = 0;
-    for (list<vector<double>>::iterator it = this->proportionOfTimePerLength.begin(); it != this->proportionOfTimePerLength.end(); ++it){
-
-
-        // Calculate total time on this gene this simulation
-        double totalTimeThisSimulation = 0;
-        for (int i = 0; i < it->size(); i ++){
-            totalTimeThisSimulation += it->at(i);
+           
+            for (int i = 0; i < this->meanRelativeTimePerLength.size(); i ++){
+                this->meanRelativeTimePerLength.at(i) = this->meanRelativeTimePerLength.at(i) + it->at(i) / this->proportionOfTimePerLength.size() ; // / totalTimeThisSimulation;
+            }
+            
         }
-        meanTimeOnGene += totalTimeThisSimulation;
-
-
-        // Proportion of time at each position this simulation
+        
+    
+    }
+    
+    else {
+    
+        // Median time at each position this simulation
+        vector<double> timesThisLength(this->proportionOfTimePerLength.size());
+        double median = 0;
         for (int i = 0; i < this->meanRelativeTimePerLength.size(); i ++){
-            this->meanRelativeTimePerLength.at(i) = this->meanRelativeTimePerLength.at(i) + it->at(i) / totalTimeThisSimulation;
-
+            
+            
+            int n = 0;
+            for (list<vector<double>>::iterator it = this->proportionOfTimePerLength.begin(); it != this->proportionOfTimePerLength.end(); ++it){
+                timesThisLength.at(n) = it->at(i); // Time at site i in simulation n
+                n++;
+            }
+            
+            // Sort
+            std::sort(timesThisLength.begin(), timesThisLength.end());
+            
+            
+            // Take median time
+            if (timesThisLength.size() % 2 == 1) median = timesThisLength.at(floor(timesThisLength.size() / 2.0));
+            else median = (timesThisLength.at(timesThisLength.size() / 2) + timesThisLength.at(timesThisLength.size() / 2 - 1)) / 2;
+            
+            
+            this->meanRelativeTimePerLength.at(i) = median;
+            
+            
         }
-        //cout << endl;
-
-
+        
+    
     }
-    meanTimeOnGene = meanTimeOnGene / this->proportionOfTimePerLength.size();
-
-    // Normalise gene by dividing each relative time by the mean time spent on this gene
-    for (int i = 0; i < this->meanRelativeTimePerLength.size(); i ++){
-        this->meanRelativeTimePerLength.at(i) = this->meanRelativeTimePerLength.at(i) * meanTimeOnGene / this->meanRelativeTimePerLength.size();
-    }
-
 
 
 }

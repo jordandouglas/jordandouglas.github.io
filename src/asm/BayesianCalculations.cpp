@@ -240,8 +240,9 @@ PosteriorDistributionSample* BayesianCalculations::getGeometricMedian(vector<Pos
 
 
 		// Normalise into z-scores
+        double zscore;
 		for (int j = 0; j < normalisedStates.size(); j++) {
-			double zscore = (normalisedStates.at(j)->getParameterEstimate(paramID) - mean) / sd;
+			zscore = (normalisedStates.at(j)->getParameterEstimate(paramID) - mean) / sd;
 			normalisedStates.at(j)->addParameterEstimate(paramID, zscore);
 		}
 
@@ -250,15 +251,17 @@ PosteriorDistributionSample* BayesianCalculations::getGeometricMedian(vector<Pos
 
 	// Calculate the euclidean distance between all pairs of samples
 	double** euclideanDistances = new double*[normalisedStates.size()];
+    PosteriorDistributionSample* state_j;
+    PosteriorDistributionSample* state_k;
 	for (int j = 0; j < states.size(); j++) euclideanDistances[j] = new double[normalisedStates.size()];
 
 	// For each state j
 	for (int j = 0; j < states.size(); j++) {
-		PosteriorDistributionSample* state_j = normalisedStates.at(j);
+		state_j = normalisedStates.at(j);
 
 		// For each state k>j
 		for (int k = j+1; k < states.size(); k++) {
-			PosteriorDistributionSample* state_k = normalisedStates.at(k);
+			state_k = normalisedStates.at(k);
 
 			// For each parameter
 			double distance = 0;
@@ -271,8 +274,18 @@ PosteriorDistributionSample* BayesianCalculations::getGeometricMedian(vector<Pos
 		 	distance = std::sqrt(distance);
 			euclideanDistances[j][k] = distance;
 			euclideanDistances[k][j] = distance;
+            
+            
+            //state_j->clear();
+            //state_k->clear();
+            
+           
+            //delete state_k;
 
 		}
+        
+        
+        //delete state_j;
 
 	}
 
@@ -421,7 +434,10 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistributionSampl
 
 		SimulatorResultSummary* simulationResults = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
 		state->addSimulatedAndObservedValue(simulationResults, MCMC::getCurrentExperiment());
-
+        
+        
+        simulationResults->clear();
+        delete simulationResults;
 
 		while (MCMC::nextExperiment()){
 
@@ -429,6 +445,10 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistributionSampl
 			ntrialsPerDatapoint = MCMC::getNTrialsPostBurnin();
 			simulationResults = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
 			state->addSimulatedAndObservedValue(simulationResults, MCMC::getCurrentExperiment());
+            
+            
+            simulationResults->clear();
+            delete simulationResults;
 
 		}
         

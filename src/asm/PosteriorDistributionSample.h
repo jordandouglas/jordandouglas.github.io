@@ -85,6 +85,7 @@ class PosteriorDistributionSample {
     	string toJSON();
     	void loadFromLogFile(string filename);
     	void setParametersFromState();
+        //void clear();
 
 
 };

@@ -573,7 +573,10 @@ Parameter* Parameter::setDistributionParameter(string name, double value){
 	if (this->isMetaParameter) return this;
 	if (this->distributionParameters.find(name) == this->distributionParameters.end()) return this; // Do not add if not one of the canonical parameters
 	if (!value && value != 0) return this; // Do not add if this is not a number
-
+    
+    
+    //cout << this->id << ":" << name << "=" << value << endl;
+    
 
 	// Check number is not out of range
 	if (name == "fixedDistnVal" && ((this->zeroTruncated == "exclusive" && value <= 0) || (this->zeroTruncated == "inclusive" && value <  0))) return this;
