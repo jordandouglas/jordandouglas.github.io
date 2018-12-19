@@ -349,7 +349,7 @@ extern "C" {
 		string activationJSON = "{";
 		activationJSON += "'NTPbound':" + string(_currentStateGUI->NTPbound() ? "true" : "false") + ",";
         
-        bool operationApplicable = _currentStateGUI->get_mRNAPosInActiveSite() == currentModel->get_currentBacksteppingModel_int();
+        bool operationApplicable = _currentStateGUI->get_mRNAPosInActiveSite() == 0;
         activationJSON += "'operationApplicable':" + string(operationApplicable ? "true" : "false") + ",";
         
 		activationJSON += "'activated':" + string(_currentStateGUI->get_activated() ? "true" : "false") + ",";
@@ -365,9 +365,9 @@ extern "C" {
 	// Returns all data needed to draw the cleavage navigation canvas
 	void EMSCRIPTEN_KEEPALIVE getCleavageCanvasData(int msgID){
 
-		int maxPos = currentModel->get_currentBacksteppingModel_int();
+		
 		string activationJSON = "{";
-		activationJSON += "'canCleave':" + string( (_currentStateGUI->get_mRNAPosInActiveSite() < maxPos && (CleavageLimit->getVal(true) == 0|| _currentStateGUI->get_mRNAPosInActiveSite() >= -CleavageLimit->getVal(true)))  ? "true" : "false") + ",";
+		activationJSON += "'canCleave':" + string( (_currentStateGUI->get_mRNAPosInActiveSite() < 0 && (CleavageLimit->getVal(true) == 0|| _currentStateGUI->get_mRNAPosInActiveSite() >= -CleavageLimit->getVal(true)))  ? "true" : "false") + ",";
 		activationJSON += "'kcleave':" + to_string(_currentStateGUI->calculateCleavageRate(false));
 		activationJSON += "}";
 		messageFromWasmToJS(activationJSON, msgID);
