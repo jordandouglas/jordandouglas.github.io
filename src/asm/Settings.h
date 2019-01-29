@@ -64,10 +64,10 @@ extern const int _N_THRESHOLDS_ROC_CURVE;
 // These terms are subtracted from the translocation barrier height of the respective model when normalising
 // Calculated using the rpob gene with transcription bubble 9/1/1
 extern const double _midpointModelConstant;
-extern const double _HIBIConstant;
-extern const double _HIBUConstant;
-extern const double _HUBIConstant;
-extern const double _HUBUConstant;
+extern const double _HIGIConstant;
+extern const double _HIGUConstant;
+extern const double _HUGIConstant;
+extern const double _HUGUConstant;
 extern const double _absoluteModelConstant;
 
 

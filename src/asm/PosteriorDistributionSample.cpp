@@ -186,6 +186,17 @@ void PosteriorDistributionSample::calculateAUC(string printROCToFile){
         this->chiSquared += 1-AUC;
         return;
     }
+    
+    
+    // If any given gene has a zero ratio between pause-times and non-pause-times, set AUC to 0
+    for (int i = 0; i < this->simulatedValues.size(); i ++){
+        if (stof(this->simulatedValues.at(i)) == 0){
+            double AUC = 0;
+            cout << "gene_" << i << ": 1-AUC " << 1-AUC << endl;
+            this->chiSquared += 1-AUC;
+            return;
+        }
+    }
 
 
     // Sort the pause and non-pause dwell time lists
@@ -260,7 +271,7 @@ void PosteriorDistributionSample::calculateAUC(string printROCToFile){
 
 
         // True positive rate = proportion of pauses which have a relative time >= threshold
-        while( (*pauseIterator) < threshold && pauseIterator != this->meanDwellTimes_pauseSites.end()) {
+        while( (*pauseIterator) < threshold && pauseIterator != this->meanDwellTimes_pauseSites.end()) { 
             nPausesBelowThreshold ++;
             if (pauseIterator == this->meanDwellTimes_pauseSites.end()) break;
             ++ pauseIterator;

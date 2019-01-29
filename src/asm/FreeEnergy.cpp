@@ -179,7 +179,7 @@ double FreeEnergy::getFreeEnergyOfTranscriptionBubbleIntermediate(State* state1,
 
 
 	// Take the intersection of missing basepairs if going for the sealing model
-	if (currentModel->get_currentTranslocationModel() == "HIBU_barriers" || currentModel->get_currentTranslocationModel() == "HUBU_barriers"){
+	if (currentModel->get_currentTranslocationModel() == "HIGU_barriers" || currentModel->get_currentTranslocationModel() == "HUGU_barriers"){
 		leftmostTemplatePos ++;
 		leftmostComplementPos ++;
 		rightmostTemplatePos --;

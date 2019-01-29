@@ -57,10 +57,10 @@ const int _N_THRESHOLDS_ROC_CURVE = 100;
 
 
 const double _midpointModelConstant = -14.37;
-const double _HIBIConstant = -15.96;
-const double _HIBUConstant = -11.26;
-const double _HUBIConstant = -13.52;
-const double _HUBUConstant = -8.819;
+const double _HIGIConstant = -15.96;
+const double _HIGUConstant = -11.26;
+const double _HUGIConstant = -13.52;
+const double _HUGUConstant = -8.819;
 const double _absoluteModelConstant = 0;
 
 

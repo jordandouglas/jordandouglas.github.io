@@ -83,6 +83,9 @@ void vRNA_init(const char* nascentSequence){
 // Dynamic programming data structures in vRNA will persist between subsequent calls of this function
 float vRNA_compute_MFE(char* sequence, char* structure, int length){
 
+
+    //printf("Computing %s\n", strdup(sequence));
+
 	// Set the length and sequence of vc to the current sequence
 	vc_cached->length    = length;
   	vc_cached->sequence  = strdup(sequence);
@@ -90,8 +93,7 @@ float vRNA_compute_MFE(char* sequence, char* structure, int length){
 
 	// Compute MFE structure
 	float vRNA_MFE_value = (double) vrna_mfe(vc_cached, structure) / vRNA_RT;
-
-
+    
 	return vRNA_MFE_value;
 	
 }
