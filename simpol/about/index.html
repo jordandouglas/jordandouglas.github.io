@@ -79,6 +79,10 @@ function init(){
 	}
 	
 	
+    // Contents
+    printContents();
+            
+            
 	// Draw the model diagram canvases
 	drawModelDiagrams();
 	
@@ -151,6 +155,42 @@ function drawModelDiagrams(){
 
 }
 
+            
+function printContents(){
+
+    // Find all elements with section or subsection classes
+    var sects = $(".section, .subsection");
+    var sectNum = 0;
+    var subsectNum = 0;
+    for (var i = 0; i < sects.length; i ++){
+            
+        var ele = $(sects[i]);
+            
+        // Give it an id
+        var HTML = $(ele).html().trim()
+        var id = HTML.split(" ").join("_");
+        ele.attr("id", id);
+        var isSect = ele.hasClass("section");
+        var a_tag = "<a href='#" + id + "' style='text-decoration:none; color:" + (isSect ? "#008cba" : "black") + "'>" + HTML + "</a>";
+          
+        // Add the html to the contents section
+        if (isSect){
+            sectNum++;
+            $("#contents").append("<div style='font-size:18px; color:#008cba'>" + sectNum + " " + a_tag + "</div>");
+            subsectNum = 1;
+        }else{
+            $("#contents").append("<div style='font-size:16px'>&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + " " + a_tag + "</div>");
+            subsectNum++;
+        }
+        
+        
+            
+    }
+    
+
+
+
+}
 
 function setImageSizes(){
 
@@ -356,24 +396,39 @@ function addCitations(){
 						This webpage contains tutorials on how to use SimPol and is hopefully friendly to all users.   <br><br>
 						
 						
-					
-
-						
 				
 					</div>
 				</div>
+                    
+                    
+                    
+                    
+                    
+                    
+                    <br>
+                <div class="about-block" style="width:70%; margin:auto">
+                    <div class="about-block-inner">
+                        <div class="block-subtitle" style="font-size:45px">Contents</div> <br>
+                    
+                            <div style="border-style:solid; padding: 10; width: 30%; border-width: 1px; border-color:#008cba"  id="contents"></div>
+                        
+                
+                    </div>
+                </div>
 				
 
 
 <br><br><br>
 				<div class="main-block" >
 					<div class="main-block-inner">
-						<div class="block-title"> <span id='gettingStartedBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="false" onClick="minimiseSection(this)">&minus;</span> Getting Started </div> 
+						<div class="block-title"> <span id='gettingStartedBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="false" onClick="minimiseSection(this)">&minus;</span> 
+                            <span class="section">Getting Started</span>
+                        </div> 
 						<div id="gettingStarted">
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div id="sequenceSelection" class="block-subtitle"> Sequence selection </div> <br>
+									<div id="sequenceSelection" class="subsection block-subtitle"> Sequence selection </div> <br>
 									
 									
 									<img src="../../src/TutorialImages/sequenceParams.png" style="width:350px; padding: 10 30;" align=left></img>
@@ -395,7 +450,7 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div class="block-subtitle"> Polymerase structure </div> <br>
+									<div class="subsection block-subtitle"> Polymerase structure </div> <br>
 								
 									Polymerases read the template strand (ie. the gene) in the 3&prime; &rarr; 5&prime; direction, and copy it to create the nascent strand (eg. mRNA) which grows in the 5&prime; &rarr; 3&prime; direction. 
                                     The transcription bubble consists of a hybrid between the nascent strand and the template strand within the polymerase, and a set of unpaired 
@@ -413,7 +468,7 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div  class="about-block-inner">
-									<div id="navigationPanelHelp" class="block-subtitle" > Applying chemical reactions </div> <br>
+									<div id="navigationPanelHelp" class="subsection block-subtitle" > Applying chemical reactions </div> <br>
 								
 									
 									You can control the polymerase directly using the Navigation panel at the top of the main page. You should play around with the different reactions to see how they work. You may wish to
@@ -505,7 +560,7 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div id="toolbarHelp" class="block-subtitle"> The toolbar </div> <br>
+									<div id="toolbarHelp" class="subsection block-subtitle"> The toolbar </div> <br>
 									<table class="toolbar" cellpadding=3 style="position:absolute; vertical-align:middle">
 										
 										<tr>
@@ -631,7 +686,7 @@ function addCitations(){
                         
                         
                             <span id='statespaceSectionBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
-                                State Space 
+                                <span class="section">State Space</span>
                             </div> 
                             <div id="statespaceSection" style="display:none">          
                                 <br><br>
@@ -653,7 +708,10 @@ function addCitations(){
                 <br><br><br><br>
 				<div class="main-block" >
 					<div class="main-block-inner">
-						<div class="block-title"> <span id='displayingPlotsBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span> Plots </div> 
+						<div class="block-title"> <span id='displayingPlotsBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span> 
+                        
+                         <span class="section">Plots</span>
+                        </div> 
 						<div id="displayingPlots"  style="display:none">
 						
 						
@@ -674,7 +732,7 @@ function addCitations(){
 							
 								<div  class="about-block">
 									<div class="about-block-inner"  style="vertical-align:middle;">
-										<div  id="distanceVsTime_PlotHelp" class="block-subtitle"> Distance vs time </div> <br>
+										<div  id="distanceVsTime_PlotHelp" class="subsection block-subtitle"> Distance vs time </div> <br>
 										
 											<img src="../../src/TutorialImages/distanceVsTime.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
 											
@@ -690,7 +748,7 @@ function addCitations(){
 								<br><br><br>
 								<div class="about-block">
 									<div class="about-block-inner">
-										<div  id="pauseHistogram_PlotHelp"  class="block-subtitle"> Time histogram </div> <br><br>
+										<div  id="pauseHistogram_PlotHelp"  class="subsection block-subtitle"> Time histogram </div> <br><br>
 										
 										
 											<img src="../../src/TutorialImages/pauseHistogram.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30; margin:auto; float:right"></img>
@@ -706,7 +764,7 @@ function addCitations(){
 								<br><br><br>
 								<div class="about-block">
 									<div class="about-block-inner" >
-										<div  id="velocityHistogram_PlotHelp" class="block-subtitle"> Velocity histogram </div> <br>
+										<div  id="velocityHistogram_PlotHelp" class="subsection block-subtitle"> Velocity histogram </div> <br>
 											<br>
 										
 											<img src="../../src/TutorialImages/velocityHistogram1s.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
@@ -727,7 +785,7 @@ function addCitations(){
 								<br><br><br>
 								<div class="about-block">
 									<div class="about-block-inner">
-										<div id="parameterHeatmap_PlotHelp"  class="block-subtitle"> Parameter plot </div> <br>
+										<div id="parameterHeatmap_PlotHelp"  class="subsection block-subtitle"> Parameter plot </div> <br>
 										
 										<img src="../../src/TutorialImages/customPlot2.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
 										<img src="../../src/TutorialImages/customPlot1.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
@@ -775,7 +833,7 @@ function addCitations(){
 								<br><br><br>
 								<div class="about-block">
 									<div class="about-block-inner" >
-										<div  id="tracePlot_PlotHelp" class="block-subtitle"> MCMC trace </div> <br>
+										<div  id="tracePlot_PlotHelp" class="subsection block-subtitle"> MCMC trace </div> <br>
 											<br>
 											<img src="../../src/TutorialImages/tracePlot2.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
 											<img src="../../src/TutorialImages/tracePlot.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
@@ -795,7 +853,7 @@ function addCitations(){
 								<br><br><br>
 								<div class="about-block">
 									<div class="about-block-inner">
-										<div class="block-subtitle"> Dwell time per site </div> <br>
+										<div class="subsection block-subtitle"> Dwell time per site </div> <br>
 									</div>
 								</div>		
 																										
@@ -806,7 +864,9 @@ function addCitations(){
 				<br><br><br><br>
 				<div class="main-block" >
 					<div class="main-block-inner">
-						<div class="block-title"><span id='parametersBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span> Parameters &amp; Settings </div> 
+						<div class="block-title"><span id='parametersBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span> 
+                            <span class="section">Parameters and Settings </span>
+                        </div> 
 						<div id="parameters"  style="display:none">
 				
 		
@@ -820,7 +880,7 @@ function addCitations(){
 											
 												<div class="parameter-bg" style="font-size:18px">
 													
-													<div class="parameter-title" style="font-size:30px">Experimental Conditions </div>  
+													<div class="subsection parameter-title" style="font-size:30px">Experimental Conditions </div>  
 													<div class="parameter-title" style="font-size:18px">The concentrations of NTP (or dNTP if the nascent strand is DNA), and the size of the assisting force applied to the system</div>  <br> 
 														<div class="paramHelp" id="useFourNTPconcentrations_paramHelp">
 															<table style="">
@@ -869,7 +929,7 @@ function addCitations(){
 												<br><br>
 												<div class="parameter-bg" style="font-size:18px">
 													
-													<div class="parameter-title" style="font-size:30px">Structural Parameters </div>  
+													<div class="subsection parameter-title" style="font-size:30px">Structural Parameters </div>  
 													<div class="parameter-title" style="font-size:18px">Basepairing configuration within the transcription bubble and polymerase.</div>  <br> 
 													
 														<div class="paramHelp" id="hybridLen_ParamHelp">
@@ -893,7 +953,7 @@ function addCitations(){
                                         <br><br>
                                                 <div class="parameter-bg" style="font-size:18px">
                                                     
-                                                    <div class="parameter-title" style="font-size:30px">NTP Incorporation Parameters </div>  
+                                                    <div class="subsection parameter-title" style="font-size:30px">NTP Incorporation Parameters </div>  
                                                     <div class="parameter-title" style="font-size:18px">Kinetics of binding/releasing NTP, and catalysing polymerisation.</div>  <br> 
                                                         
                                                         <div class="paramHelp" id="Kdissociate_ParamHelp">
@@ -932,7 +992,7 @@ function addCitations(){
 												<br><br>
 												<div class="parameter-bg" style="font-size:18px">
 													
-													<div class="parameter-title" style="font-size:30px">Translocation Parameters </div>  
+													<div class="subsection parameter-title" style="font-size:30px">Translocation Parameters </div>  
 													<div class="parameter-title" style="font-size:18px">Energetics of translocation reactions and forces.</div>  <br> 
 														<div class="paramHelp" id="GDagSlide_ParamHelp">
 															<b style="font-size:20px">$\Delta G^\dagger_{\tau}$</b> - free energy barrier height of translocation. To translocate forwards or backwards, several
@@ -959,7 +1019,7 @@ function addCitations(){
 												<br><br>
 												<div class="parameter-bg" style="font-size:18px">
 													
-													<div class="parameter-title" style="font-size:30px">Pause Parameters </div>  
+													<div class="subsection parameter-title" style="font-size:30px">Pause Parameters </div>  
 													<div class="parameter-title" style="font-size:18px">Kinetics of entering/exiting a catalytically inactive state.</div>  <br> 
 														<div class="paramHelp" id="kU_ParamHelp">
 															<b style="font-size:20px">$k_{U}$</b> - rate constant of polymerase entering the inactive state / intermediate state. This state acts as an intermediate
@@ -974,7 +1034,7 @@ function addCitations(){
                                                  <br><br>
                                                 <div class="parameter-bg" style="font-size:18px">
                                                         
-                                                        <div class="parameter-title" style="font-size:30px">RNA Folding Settings  </div>  
+                                                        <div class="subsection parameter-title" style="font-size:30px">RNA Folding Settings  </div>  
                                                         <div class="parameter-title" style="font-size:18px">Settings behind folding the nascent RNA strand.</div>  <br> 
                                                         
                                                             <div class="paramHelp">
@@ -993,7 +1053,7 @@ function addCitations(){
                                                 <br><br>
                                                 <div class="parameter-bg" style="font-size:18px">
                                                     
-                                                    <div class="parameter-title" style="font-size:30px">Cleavage Parameters </div>  
+                                                    <div class="subsection parameter-title" style="font-size:30px">Cleavage Parameters </div>  
                                                     <div class="parameter-title" style="font-size:18px">Model for cleaving the nascent strand while backtracked.</div>  <br> 
                                                        <div class="paramHelp" id="RateCleave_ParamHelp">
                                                             <b style="font-size:20px">$k_{cleave}$</b> - rate constant of cleaving the 3<sup>&prime;</sup> end of the nascent strand when the polymerase is backtracked. 
@@ -1011,7 +1071,7 @@ function addCitations(){
 												<br><br>
 												<div class="parameter-bg" style="font-size:18px">
 													
-													<div class="parameter-title" style="font-size:30px">Advanced Model Settings</div>  
+													<div class="subsection parameter-title" style="font-size:30px">Advanced Model Settings</div>  
 													<div class="parameter-title" style="font-size:18px">Other parameters relating to the algorithm and model.</div>  <br> 
 													
                                             
@@ -1038,7 +1098,7 @@ function addCitations(){
 								<br><br>
 								<div class="about-block">
 									<div class="about-block-inner">
-										<div id="priorDistribution_ParamHelp" class="block-subtitle" > Adding a prior distribution to a parameter</div> <br>
+										<div id="priorDistribution_ParamHelp" class="subsection block-subtitle" > Adding a prior distribution to a parameter</div> <br>
 											
 											
 											
@@ -1075,14 +1135,16 @@ function addCitations(){
 				<br><br><br><br>
 				<div class="main-block" >
 					<div class="main-block-inner">
-						<div class="block-title"><span id='kineticsBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>  Simulating </div> 
+						<div class="block-title"><span id='kineticsBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>  
+                            <span class="section">Simulating</span>
+                        </div> 
 						<div id="kinetics"  style="display:none">
 						
 						
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div class="block-subtitle" > Equilibrium and the Boltzmann distribution </div> <br>
+									<div class="subsection block-subtitle" > Equilibrium and the Boltzmann distribution </div> <br>
 								
 										Gibb's free energy, $\Delta G$, describes how energetically favourable a state is. A system will spend more time in states which have low free energies. 
 										Suppose we have a single molecule which can exist in a number of chemical states. When the system has reached equilibrium, the probability of the molecule being in state $s$ 
@@ -1120,7 +1182,7 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div class="block-subtitle" > Kinetics and the Arrhenius equation </div> <br>
+									<div class="subsection block-subtitle" > Kinetics and the Arrhenius equation </div> <br>
 								
 										
 										Chemical kinetics is the study of rates of chemical processes, and how long reactions take to occur. A chemical reaction can be described with a rate constant $k$ (units s$^{-1}$). 
@@ -1153,7 +1215,7 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div class="block-subtitle"> Poisson processes: how a reaction is randomly sampled </div> <br>
+									<div class="subsection block-subtitle"> Poisson processes: how a reaction is randomly sampled </div> <br>
 								
 									A critical assumption is that these reactions are Poisson processes; the amount of time until a reaction occurs is independent of all other reactions and independent of how long you have already waited. 
 									If you were to keep flipping a coin until it landed on tails, the probability of getting tails on the next flip is not affected by how many times you have already flipped, and is not affected by how 
@@ -1194,7 +1256,7 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div id="polymerisation_ModelHelp" class="block-subtitle" > Kinetics of nucleotide incorporation</div> <br>
+									<div id="polymerisation_ModelHelp" class="subsection block-subtitle" > Kinetics of nucleotide incorporation</div> <br>
 										
 										Adding the next base onto the $3^\prime$ end of the nascent strand requires one translocation step (detailed in the next section) and at least three chemical steps<cite val="erie1992single"></cite>.
 										
@@ -1302,7 +1364,7 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div id="translocation_ModelHelp" class="block-subtitle" > Calculating translocation rates</div> <br>
+									<div id="translocation_ModelHelp" class="subsection block-subtitle" > Calculating translocation rates</div> <br>
 								
 										Basepairs may need to be broken in order for the polymerase to translocate forwards (right) or backwards (left) from its current position. For example, consider the state below. 
 										<br><br>
@@ -1355,7 +1417,7 @@ function addCitations(){
 											We use a pre-exponential constant of $A = 10^6$ s<sup>-1</sup>.	SimPol has three models for estimating the $\Delta G^\dagger_{x,y}$ term. <br><br><br>
 										
 									<div style="padding: 10 10; background-color:#ebe9e7">		
-										<div id="translocation_ModelHelp" class="block-subtitle" style="font-size:30px; text-align:left"> 1. Midpoint model</div> 
+										<div id="translocation_ModelHelp" class="subsection block-subtitle" style="font-size:30px; text-align:left"> i. Midpoint model</div> 
 										
 										
 										
@@ -1378,7 +1440,7 @@ function addCitations(){
 										
 										
 									<div style="padding: 10 10; background-color:#ebe9e7">
-										<div id="translocation_ModelHelp" class="block-subtitle" style="font-size:30px; text-align:left"> 2. Melting model</div> 
+										<div id="translocation_ModelHelp" class="subsection block-subtitle" style="font-size:30px; text-align:left"> ii. Melting model</div> 
 										
 										
 										
@@ -1404,7 +1466,7 @@ function addCitations(){
 									
 									
 									<div style="padding: 10 10; background-color:#ebe9e7">
-										<div id="translocation_ModelHelp" class="block-subtitle" style="font-size:30px; text-align:left"> 3. Sealing model</div> 
+										<div id="translocation_ModelHelp" class="subsection block-subtitle" style="font-size:30px; text-align:left"> iii. Sealing model</div> 
 										
 										
 										
@@ -2006,7 +2068,7 @@ function addCitations(){
 						
 						
 							<span id='performanceBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
-							Software Information 
+							<span class="section">Software Information</span> 
 						</div> 
 						<div id="performance"  style="display:none">
 				
@@ -2014,7 +2076,7 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div class="block-subtitle" > Web browser performance </div> <br>
+									<div class="subsection block-subtitle" > Web browser performance </div> <br>
 										
 										Rendering elements onto the screen (for example polymerase motion, plots, simulated sequences) can be computationally costly and can slow down the whole program.  If you are running a complex simulation on a 
 										long sequence over a large number of trials, you may notice the simulation begin to slow down eventually. Maximising the performance of this program requires you as the user to regulate when rendering does or 
@@ -2458,7 +2520,7 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div id="fromCommandLine_performance" class="block-subtitle"> Running SimPol from the command line </div> <br>
+									<div id="fromCommandLine_performance" class="subsection block-subtitle"> Running SimPol from the command line </div> <br>
 	
 										<div style="padding: 10 10; background-color:#ebe9e7" >
 											<b> 1. Generate a SimPol session file.</b> Go to <a href="http://www.polymerase.nz">SimPol</a> in your web browser and configure the number of trials, parameters, model settings, ABC settings, etc.
@@ -2865,7 +2927,7 @@ function addCitations(){
             
             
                 <span id='simpolLiteratureSectionBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
-                    SimPol in the Literature 
+                    <span class="section">SimPol in the Literature </span>
                 </div> 
                 <div id="simpolLiteratureSection" style="display:none">          
                     <br><br>
@@ -2893,7 +2955,7 @@ function addCitations(){
 			
 			
 				<span id='referencesSectionBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
-				References 
+				    <span class="section">References</span>
 				</div> 
 					<div id="referencesSection" style="display:none">
 						<br><br>
