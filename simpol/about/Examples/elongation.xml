@@ -10,7 +10,6 @@
 		<allowBacktracking val="false" />
 		<allowHypertranslocation val="false" />
 		<allowInactivation val="false" />
-		<allowBacktrackWithoutInactivation val="false" />
 		<deactivateUponMisincorporation val="false" />
 		<allowGeometricCatalysis val="false" />
 		<allowmRNAfolding val="false" />

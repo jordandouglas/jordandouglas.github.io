@@ -1661,7 +1661,7 @@ function closeNav() {
 			  
 			  
 			 <div  class="parameter-bg">
-				 <div class="parameter-title noselect" style="font-size: 28px;">Parameters &amp; Settings
+				 <div class="parameter-title" style="font-size: 28px;">Parameters &amp; Settings
 						  
 					</div>
 				 
@@ -1710,7 +1710,7 @@ function closeNav() {
 									
 									<label style="font-size:16px;"><input type="radio" onclick="changeInputSequenceType()" name="inputSeqType" value="inputTemplateSeq"  checked=true> </input> Template </label>
 									<label style="font-size:16px;"><input type="radio" onclick="changeInputSequenceType()" name="inputSeqType" value="inputNascentSeq">  </input> Nascent  </label>
-									<span class="noselect" style="padding:2 5; background-color:#008CBA; color:white; cursor:pointer; font-size:16px; float:right;" onClick="submitCustomSequence()" title="Submit sequence">Submit</span> 
+									<span style="padding:2 5; background-color:#008CBA; color:white; cursor:pointer; font-size:16px; float:right;" onClick="submitCustomSequence()" title="Submit sequence">Submit</span> 
 								</div>
 						</div>
 						<br>
@@ -2532,31 +2532,6 @@ function closeNav() {
 				 		</td>
 
 				 	</tr>
-
-
-
-				 	<tr id="allowBacktrackWithoutInactivation_container" title="Can the polymerase backtrack without entering the inactive state first (during the simulation)?">
-
-
-
-						<td style="text-align:left; font-size:10px; float:left; width:20px">
-				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#RateBind_help"><img class="helpIcon" src="../src/Images/help.png"></a>
-				 		</td>
-
-
-				 		<td colspan=3>
-		 					<label class="switch">
-					 		 <input class="modelSetting" type="checkbox" id="allowBacktrackWithoutInactivation" OnChange="userInputModel_controller()"> </input>
-					 	 	<span class="slider round"></span>
-
-							</label> 
-							<span style="font-size:15px; vertical-align:middle" > Enable backtracking without inactivation</span>
-							<br> <br style="line-height:5px">
-
-				 		</td>
-
-				 	</tr>
-
 
 
 					<tr style="display:none" id="deltaGDaggerBacktrack_container">
@@ -3413,7 +3388,7 @@ function closeNav() {
 
 					<span style="font-size:18px; font-family:Bookman;">
 						<input type=button id='showNavigationPanel' class='minimise' value='-' onClick=showNavigationPanel()> 
-						<b class="noselect">Navigation panel</b> 
+						<b>Navigation panel</b> 
 							<span style="font-size:12px; font-family:Arial; vertical-align:middle"> - Press any of the arrows below to apply a reaction </span>
 	 						<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#navigationPanelHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
 							
@@ -3424,7 +3399,7 @@ function closeNav() {
 					</span>
 
 						
-							<div class="noselect" id="navigationPanelTable" class="scrollbar" style="overflow-x:scroll; width:100%; position:relative">
+							<div id="navigationPanelTable" class="scrollbar" style="overflow-x:scroll; width:100%; position:relative">
 							<table  cellspacing="0" style="width:100%;">
 
 
@@ -3559,7 +3534,7 @@ function closeNav() {
 			<div id="plots4"  class="panelOuter" style=" margin-left:130px;">
 				<div class="panelInner">
 
-					<span class="noselect"  style="font-size:18px; font-family:Bookman;">
+					<span style="font-size:18px; font-family:Bookman;">
 						<input type=button id='showSitewisePlot' class='minimise' value='+' onClick="showSitewisePlot()">
 						<b>Sitewise panel</b>
 						&nbsp;&nbsp;&nbsp;
@@ -3599,7 +3574,7 @@ function closeNav() {
 			<div id="plots123"  class="panelOuter" style="margin-left:130px;">
 				<div class="panelInner">
 
-					<span class="noselect"  style="font-size:18px; font-family:Bookman;">
+					<span style="font-size:18px; font-family:Bookman;">
 						<input type=button id='showPlots' class='minimise' value='-' onClick="showPlots()">
 						<b>Plot panel</b>
 
@@ -3736,11 +3711,11 @@ function closeNav() {
 			<div id="ABCpanel"  class="panelOuter" style="margin-left:130px;">
 				<div class="panelInner">
 
-				<span class="noselect"  style="font-size:18px; font-family:Bookman;">
+				<span  style="font-size:18px; font-family:Bookman;">
 					<input type=button id='showABCPanel' class='minimise' value='+' onClick=showABCPanelFn()> 
-					<b class="noselect">Approximate Bayesian Computation</b> 
+					<b>Approximate Bayesian Computation</b> 
 						<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
-							- Fit the parameters to experimental data using Markov-chain-Monte-Carlo approximate Bayesian computation (MCMC-ABC)
+							- Fit the parameters to experimental data using approximate Bayesian computation (ABC)
 						</span>
  						<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#setupABC_ABCSectionHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
 						
@@ -3983,9 +3958,9 @@ function closeNav() {
 			<div id="ModelBuildingPanel"  class="panelOuter" style="margin-left:130px;">
 				<div class="panelInner">
 
-				<span class="noselect"  style="font-size:18px; font-family:Bookman;">
+				<span  style="font-size:18px; font-family:Bookman;">
 					<input type=button id='showModelBuildingPanel' class='minimise' value='+' onClick=showModelBuildingPanelFn()> 
-					<b class="noselect">Model comparison</b> 
+					<b>Model comparison</b> 
 						<span style="font-size:12px; font-family:Arial; vertical-align:middle"> 
 							- Create and save different models. These models can be compared using MCMC-ABC
 						</span>
@@ -4027,7 +4002,7 @@ function closeNav() {
 
 					<div class="panelInner">
 
-						<div class="noselect" style='font-size:16px; font-family:Bookman;'>
+						<div style='font-size:16px; font-family:Bookman;'>
 							<input type=button class='minimise' id='hideSequences'  value='+' title='Hide/show the sequence window' onClick=toggleSequences()>
 							<span style='font-size:18px; '><b>Copied sequences</b> &nbsp;&nbsp;&nbsp;</span>
 							<span id="terminatedSequencesDescription" style="display:none">
