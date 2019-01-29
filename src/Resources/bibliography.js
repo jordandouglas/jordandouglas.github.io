@@ -114,11 +114,8 @@ BIBLIOGRAPHY["rambaut2015tracer"] = {name: `Rambaut, A., Suchard, M.A., Xie, D. 
 
 BIBLIOGRAPHY["haas2017bringing"] = {name: `Haas, Andreas, et al. "Bringing the web up to speed with WebAssembly." ACM SIGPLAN Notices. Vol. 52. No. 6. ACM, 2017.`, DOI: "10.1145/3062341.3062363"};
 
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
-
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
-
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
+BIBLIOGRAPHY["douglas2018bayesian"] = {name: `Douglas, Jordan, Richard Kingston, and Alexei Drummond. "Bayesian inference and comparison of stochastic transcription elongation models." bioRxiv (2018): 499277.`, DOI: "10.1101/499277 "};
+BIBLIOGRAPHY["lisica2016mechanisms"] = {name: `Lisica, Ana, et al. "Mechanisms of backtrack recovery by RNA polymerases I and II." Proceedings of the National Academy of Sciences (2016): 201517011.`, DOI: "10.1073/pnas.1517011113"};
 
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 
