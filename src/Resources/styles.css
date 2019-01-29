@@ -271,7 +271,9 @@ div.vertical{
 
 
 .block-title{
-	text-align:center; 
+    padding-top:10px;
+    padding-bottom:2px;
+	text-align:left; 
 	font-size:45px; 
 	font:bold; 
 	color:#008CBA;
@@ -282,6 +284,7 @@ div.vertical{
 	height:30px; 
 	font-size:20;
 	cursor:pointer;
+    margin: 10px;
 	
 }
 
@@ -289,14 +292,16 @@ div.vertical{
 
 
 .block-subtitle{
-	text-align:center; 
-	font-size:40px; 
+	text-align:left; 
+	font-size:32px; 
 	font:bold; 
-	color:#008CBA
+	color:#008CBA;
+    display: inline-block;
+    padding-bottom:5px;
 }
 
 .block-subsubtitle{
-	text-align:center; 
+	text-align:left; 
 	font-size:20px; 
 	color:#008CBA
 }
@@ -637,8 +642,10 @@ optgroup {
 }
 
 
-.helpSelected  {
+.helpSelected {
 	background-color:#708090;
+    border-radius: 8px;
+    padding: 5;
 	color:white;
 }
 
