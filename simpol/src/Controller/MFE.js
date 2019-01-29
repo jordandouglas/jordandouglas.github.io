@@ -259,7 +259,7 @@ function renderSecondaryStructure(){
 		 var nodeImage = MFE_node.append("image")
 		     .attr("xlink:href", d => "../src/Images/" + d.src + ".png")
 		     .attr("height", "22px")
-		     .attr("width", d => d.fixed ? 0 : d.src == "5RNA" ? "77px" : "22px" )
+		     .attr("width", d => d.fixed ? 0 : d.src == "5RNA" ? "77px" : "22px" );
 		     //.attr("x", d => d.fixed ? d.fx - $("#bases").scrollLeft() : d.x)
 		     //.attr("y", d => d.fixed ? d.fy : d.y);
 

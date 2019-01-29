@@ -222,8 +222,6 @@ function updateModelDOM(elongation_model_temp){
 	else $("#barrierPos_container").show(100);
 
 
-	if (elongation_model_temp["allowBacktracking"] && elongation_model_temp["allowInactivation"]) $("#allowBacktrackWithoutInactivation_container").show(100);
-	else $("#allowBacktrackWithoutInactivation_container").hide(100);
 
 	//if (elongation_model_temp["allowInactivation"]) $("#deactivateUponMisincorporation_container").show(100);
 	//else $("#deactivateUponMisincorporation_container").hide(100);
@@ -288,11 +286,6 @@ function updateModelDOM(elongation_model_temp){
 		$("#upstreamWindow_container").hide(0);
 	}
 
-
-
-
-	if (elongation_model_temp["id"] == "twoSiteBrownian") $("#GsecondarySitePenalty_container").show(100);
-	else $("#GsecondarySitePenalty_container").hide(0);
 
 
 	if (elongation_model_temp["allowmRNAfolding"]) {
@@ -390,8 +383,6 @@ function updateModelDOM(elongation_model_temp){
 	$("#currentTranslocationModel").val(elongation_model_temp["currentTranslocationModel"]);
 	$("#currentRNABlockadeModel").val(elongation_model_temp["currentRNABlockadeModel"]);
 
-	//if (elongation_model_temp["id"] == "twoSiteBrownian") $("#allowGeometricCatalysis_container").hide(100);
-	//else $("#allowGeometricCatalysis_container").show(100);
 
 
 };
@@ -555,9 +546,8 @@ function viewModel(){
 		var disableds = [];
 		if (!ELONGATION_MODEL_TEMP["allowHypertranslocation"]) disableds.push("hypertranslocation");
 		if (!ELONGATION_MODEL_TEMP["allowBacktracking"]) disableds.push("backtracking");
-		if (!ELONGATION_MODEL_TEMP["allowInactivation"]) disableds.push("deactivation");
-		if (ELONGATION_MODEL_TEMP["allowBacktracking"] && ELONGATION_MODEL_TEMP["allowInactivation"] && !ELONGATION_MODEL_TEMP["allowBacktrackWithoutInactivation"]) disableds.push("'backtracking while activated'");
-
+		if (!ELONGATION_MODEL_TEMP["allowInactivation"]) disableds.push("inactivation");
+	      
 		var desc = "";
 		if (disableds.length > 0){
 			desc = "With ";
@@ -638,14 +628,14 @@ function getModelDiagramTemplate(){
 	
 	
 	return `
-		<div id='popup_model' style='background-color:#008cba; padding: 10 10; position:absolute; width: 1200px; left:380; top:20vh; z-index:5;'>
+		<div id='popup_model' style='background-color:#008cba; padding: 10 10; position:absolute; width: 1500px; left:380; top:20vh; z-index:5;'>
 			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
-				<span style='font-size: 30px'> Kinetic diagram </span>
+				<span style='font-size: 30px'> Kinetic pathway</span>
 				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeModelDiagramPopup()'>&times;</span>
 				<div style='padding:2; font-size:22px;'> XX_DESC_XX </div>
 
 				<div id="modelDiagramDiv">
-					<canvas id="modelDiagramCanvas" class="noselect" style="padding:10 10;" width=1000px height=600px></canvas>
+					<canvas id="modelDiagramCanvas" class="noselect" style="padding:10 10;" width=1220px height=400px></canvas>
 				</div>
 				
 
@@ -1110,8 +1100,10 @@ function drawModelDiagramCanvas_givenParams(canvasID, kineticStateDescriptionID,
 
 	spacingBetweenStates = 120;
 	arrowSpace = 20;
-	var xCoordOfMainState = 550; // Main state is state (m,+1)
-	var yCoordOfMainState = elongationModel["allowInactivation"] ? 250 : 350;
+	var xCoordOfMainState = elongationModel["allowInactivation"] && elongationModel["allowBacktracking"] ? 800 : 
+				elongationModel["allowInactivation"] || elongationModel["allowBacktracking"] ? 675 :
+													       550; // Main state is state (m,+1)
+	var yCoordOfMainState = 250;
 	var stateWidth = 100;
 	var stateHeight = 100;
 
@@ -1121,10 +1113,7 @@ function drawModelDiagramCanvas_givenParams(canvasID, kineticStateDescriptionID,
 	
 
 	var m = paramsResult["mRNALength"];
-	var pretranslocatedDesc = elongationModel["id"] == "twoSiteBrownian" ? 
-							"The polymerase is <b>pretranslocated</b> and ready to bind NTP in the secondary binding site. The nascent strand is " + m + "nt long.": 
-							"The polymerase is <b>pretranslocated</b>. The nascent strand is " + m + "nt long.";
-
+	var pretranslocatedDesc = "The polymerase is <b>pretranslocated</b>. The nascent strand is " + m + " nt long.";
 
 
 	// NTP = \u1D3A\u1D40\u1D3E
@@ -1134,35 +1123,36 @@ function drawModelDiagramCanvas_givenParams(canvasID, kineticStateDescriptionID,
 
 	var kU = paramsResult.kU == null ? parseFloat($("#kU").val()) : paramsResult.kU;
 	var kA = paramsResult.kA == null ? parseFloat($("#kA").val()) : paramsResult.kA;
+	var kCleave = paramsResult.kcleave == null ? parseFloat($("#RateCleave").val()) : paramsResult.kcleave;
 	var krelease = paramsResult.krelease == null ? parseFloat($("#RateUnbind").val()) : paramsResult.krelease;
 	var kcat = paramsResult.kcat == null ? parseFloat($("#kCat").val()) : paramsResult.kcat;
-	
+
 
 	///////////////
 	// m+1 state //
-	var isCurrentState = paramsResult["mRNAPosInActiveSite"] == 1 && paramsResult["activated"] && !paramsResult["NTPbound"];
-	plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",+1)", xCoordOfMainState, yCoordOfMainState, "The polymerase is <b>posttranslocated</b> and ready to bind the next NTP. The nascent strand is " + m + "nt long.", isCurrentState);
+	var isCurrentState = paramsResult["mRNAPosInActiveSite"] == 1 && !paramsResult["NTPbound"];
+	plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",+1)", xCoordOfMainState, yCoordOfMainState, "The polymerase is <b>posttranslocated</b> and ready to bind the next NTP. The nascent strand is " + m + " nt long.", isCurrentState);
 
 	var rateSum = paramsResult["kbind"] + paramsResult["k +1,0"] + (elongationModel["allowHypertranslocation"] ? paramsResult["k +1,+2"] : 0) + (elongationModel["allowInactivation"] ? kU : 0);
-	if (!elongationModel.assumeBindingEquilibrium) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + arrowSpace, yCoordOfMainState - arrowSpace, "up", "kbind", paramsResult["kbind"], rateSum, kineticStateDescriptionID, "k<sub>bind</sub>");
+	if (!elongationModel.assumeBindingEquilibrium) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + arrowSpace, yCoordOfMainState - arrowSpace, "up", "[NTP]kbind", paramsResult["kbind"], rateSum, kineticStateDescriptionID, "[NTP]k<sub>bind</sub>");
 	if (!elongationModel.assumeTranslocationEquilibrium) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState - arrowSpace, yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", paramsResult["k +1,0"], rateSum, kineticStateDescriptionID, "k<sub>bck</sub>");
 	if (elongationModel["allowHypertranslocation"]) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + stateWidth + arrowSpace, yCoordOfMainState + arrowSpace, "right", "kfwd", paramsResult["k +1,+2"], rateSum, kineticStateDescriptionID, "k<sub>fwd</sub>");
-	if (elongationModel["allowInactivation"]) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + stateWidth - arrowSpace, yCoordOfMainState + stateHeight + arrowSpace, "down", "kU", kU, rateSum, kineticStateDescriptionID, "k<sub>U</sub>");
 	///////////////
 
 
 
 	///////////////
 	// m0 state  //
-	isCurrentState = paramsResult["mRNAPosInActiveSite"] == 0 && paramsResult["activated"] && !paramsResult["NTPbound"];
-	var canBT = elongationModel["allowBacktracking"] && (!elongationModel["allowInactivation"] || (elongationModel["allowInactivation"] && elongationModel["allowBacktrackWithoutInactivation"]));
+	isCurrentState = paramsResult["mRNAPosInActiveSite"] == 0 && !paramsResult["NTPbound"];
+	var canBT = elongationModel["allowBacktracking"];
 	plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",0)", 		xCoordOfMainState - spacingBetweenStates - stateWidth,	yCoordOfMainState, pretranslocatedDesc, isCurrentState);
 
-	rateSum = paramsResult["k 0,+1"] + (canBT ? paramsResult["k 0,-1"] : 0) + (elongationModel["id"] == "twoSiteBrownian" ? paramsResult["k bind0"] : 0)  + (elongationModel["allowInactivation"] ? kU : 0);
+	var backRate = elongationModel["allowInactivation"] ? kU : canBT ? paramsResult["k 0,-1"] : 0;
+	rateSum = paramsResult["k 0,+1"] + backRate + (elongationModel["allowInactivation"] ? kU : 0);
 	if (!elongationModel.assumeTranslocationEquilibrium) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + arrowSpace - spacingBetweenStates, yCoordOfMainState + arrowSpace, "right", "kfwd", paramsResult["k 0,+1"], rateSum, kineticStateDescriptionID, "k<sub>fwd</sub>");
-	if (canBT) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + -1*spacingBetweenStates - stateWidth - arrowSpace,	yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", paramsResult["k 0,-1"], rateSum, kineticStateDescriptionID, "k<sub>bck</sub>");
-	if (elongationModel["id"] == "twoSiteBrownian") plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + arrowSpace - spacingBetweenStates - stateWidth, yCoordOfMainState - arrowSpace, "up", "kbind", paramsResult["k bind0"], rateSum, kineticStateDescriptionID, "k<sub>bind</sub>");
-	if (elongationModel["allowInactivation"]) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState  - arrowSpace  - spacingBetweenStates, yCoordOfMainState + stateHeight + arrowSpace, "down", "kU", kU, rateSum, kineticStateDescriptionID, "k<sub>U</sub>");
+	if (canBT || elongationModel["allowInactivation"] ) {
+		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + -1*spacingBetweenStates - stateWidth - arrowSpace,	yCoordOfMainState + stateHeight - arrowSpace, "left", (elongationModel["allowInactivation"] ? "kU" : "kbck"), backRate, rateSum, kineticStateDescriptionID, (elongationModel["allowInactivation"] ? "k<sub>U</sub>" : "k<sub>bck</sub>"));
+	}
 	///////////////
 
 
@@ -1175,13 +1165,12 @@ function drawModelDiagramCanvas_givenParams(canvasID, kineticStateDescriptionID,
 
 	/////////////////
 	// m+1 N state //
-	isCurrentState = paramsResult["mRNAPosInActiveSite"] == 1 && paramsResult["activated"] && paramsResult["NTPbound"];
-	plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",+1)\u1D3A", xCoordOfMainState,	yCoordOfMainState - spacingBetweenStates - stateHeight, "The polymerase is <b>posttranslocated</b> with NTP bound and ready for catalysis. The nascent strand is " + m + "nt long.", isCurrentState, "#328332");
+	isCurrentState = paramsResult["mRNAPosInActiveSite"] == 1 && paramsResult["NTPbound"];
+	plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",+1)\u1D3A", xCoordOfMainState,	yCoordOfMainState - spacingBetweenStates - stateHeight, "The polymerase is <b>posttranslocated</b> with NTP bound and ready for catalysis. The nascent strand is " + m + " nt long.", isCurrentState, "#328332");
 
-	rateSum = krelease + kcat + (elongationModel["id"] == "twoSiteBrownian" ? paramsResult["kN +1,0"] : 0);
+	rateSum = krelease + kcat;
 	if (!elongationModel.assumeBindingEquilibrium) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + stateWidth -  arrowSpace, yCoordOfMainState - spacingBetweenStates + arrowSpace, "down", "krelease", krelease, rateSum, kineticStateDescriptionID, "k<sub>release</sub>");
 	plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + arrowSpace + stateWidth,	yCoordOfMainState - spacingBetweenStates - stateHeight/2, "right", "kcat", kcat, rateSum, kineticStateDescriptionID, "k<sub>cat</sub>");
-	if (elongationModel["id"] == "twoSiteBrownian") plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState - arrowSpace, yCoordOfMainState - spacingBetweenStates - arrowSpace, "left", "kbck", paramsResult["kN +1,0"], rateSum, kineticStateDescriptionID, "k<sub>bck</sub>");
 	////////////////
 
 
@@ -1193,42 +1182,38 @@ function drawModelDiagramCanvas_givenParams(canvasID, kineticStateDescriptionID,
 
 	/////////////////
 	//  catalysed  //
-	plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + (m+1) + ",0)", 	xCoordOfMainState + spacingBetweenStates + stateWidth,	yCoordOfMainState - spacingBetweenStates - stateHeight, "Catalysis has occurred and the polymerase is <b>pretranslocated</b> again. The nascent strand is " + (m+1) + "nt long.");
+	plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + (m+1) + ",0)", 	xCoordOfMainState + spacingBetweenStates + stateWidth,	yCoordOfMainState - spacingBetweenStates - stateHeight, "Catalysis has occurred and the polymerase is <b>pretranslocated</b> again. The nascent strand is " + (m+1) + " nt long.");
 	////////////////
-
-
-	// 2nd binding site
-	if (elongationModel["id"] == "twoSiteBrownian"){
-
-		/////////////////
-		// m0 N state  //
-		isCurrentState = paramsResult["mRNAPosInActiveSite"] == 0 && paramsResult["activated"] && paramsResult["NTPbound"];
-		plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",0)\u1D3A", xCoordOfMainState - spacingBetweenStates - stateWidth, yCoordOfMainState - spacingBetweenStates - stateHeight, "The polymerase is <b>pretranslocated</b> with NTP bound in the secondary binding site. The nascent strand is " + m + "nt long.", isCurrentState, "#328332");
-		rateSum = paramsResult["k release0"] + paramsResult["kN 0,+1"];
-		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState  - arrowSpace  - spacingBetweenStates, yCoordOfMainState - spacingBetweenStates + arrowSpace, "down", "krelease", paramsResult["k release0"], rateSum, kineticStateDescriptionID, "k<sub>release</sub>");
-		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + arrowSpace - spacingBetweenStates, yCoordOfMainState - spacingBetweenStates - stateHeight + arrowSpace, "right", "kfwd", paramsResult["kN 0,+1"], rateSum, kineticStateDescriptionID, "k<sub>fwd</sub>");
-		/////////////////
-
-	}
 
 
 
 	// Backtrack state
 	if (elongationModel["allowBacktracking"]){
 
+		var dx = elongationModel["allowInactivation"] ? -220 : 0;
+
+
+
 		/////////////////
 		// m-1 state   //
-		isCurrentState = paramsResult["mRNAPosInActiveSite"] == -1 && paramsResult["activated"];
-		plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",-1)", xCoordOfMainState  + 2*(-spacingBetweenStates - stateWidth), yCoordOfMainState, "The polymerase is <b>backtracked</b> by 1 base. The nascent strand is " + m + "nt long.", isCurrentState);
+		isCurrentState = paramsResult["mRNAPosInActiveSite"] == -1;
+		plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",-1)", xCoordOfMainState  + 2*(-spacingBetweenStates - stateWidth) + dx, yCoordOfMainState, "The polymerase is <b>backtracked</b> by 1 base. The nascent strand is " + m + " nt long.", isCurrentState);
 		rateSum = paramsResult["k -1,-2"] + (canBT ? paramsResult["k -1,0"] : 0) + (elongationModel["allowInactivation"] ? kU : 0);
-		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + -2*spacingBetweenStates - 2*stateWidth - arrowSpace,	yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", paramsResult["k -1,-2"], rateSum, kineticStateDescriptionID, "k<sub>bck</sub>");
-		if (canBT) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + -2*spacingBetweenStates - stateWidth + arrowSpace,	yCoordOfMainState + arrowSpace, "right", "kfwd", paramsResult["k -1,0"], rateSum, kineticStateDescriptionID, "k<sub>fwd</sub>");
-		if (elongationModel["allowInactivation"]) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState  - arrowSpace  - 2*spacingBetweenStates -stateWidth, yCoordOfMainState + stateHeight + arrowSpace, "down", "kU", kU, rateSum, kineticStateDescriptionID, "k<sub>U</sub>");
+		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + -2*spacingBetweenStates - 2*stateWidth - arrowSpace + dx,	yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", paramsResult["k -1,-2"], rateSum, kineticStateDescriptionID, "k<sub>bck</sub>");
+		if (canBT) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + -2*spacingBetweenStates - stateWidth + arrowSpace + dx,	yCoordOfMainState + arrowSpace, "right", "kfwd", paramsResult["k -1,0"], rateSum, kineticStateDescriptionID, "k<sub>fwd</sub>");
 		/////////////////
 
 
 		// Dot dot dot arrows
-		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + -3*spacingBetweenStates - 2*stateWidth + arrowSpace,	yCoordOfMainState + arrowSpace, "right", "kfwd", paramsResult["k -2,-1"], 0, kineticStateDescriptionID, "k<sub>fwd</sub>");
+		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + -3*spacingBetweenStates - 2*stateWidth + arrowSpace + dx,	yCoordOfMainState + arrowSpace, "right", "kfwd", paramsResult["k -2,-1"], 0, kineticStateDescriptionID, "k<sub>fwd</sub>");
+
+
+
+		// Cleavage
+		//ctx.beginPath();
+		//ctx.moveTo(xCoordOfMainState + -2*spacingBetweenStates - 2*stateWidth + arrowSpace + dx, yCoordOfMainState + stateHeight + arrowSpace);
+		//ctx.quadraticCurveTo(xCoordOfMainState + -2*spacingBetweenStates - 2*stateWidth + arrowSpace + dx, yCoordOfMainState + stateHeight + arrowSpace + 20, 200, 20);
+		//ctx.stroke(); 
 
 
 	}
@@ -1240,12 +1225,11 @@ function drawModelDiagramCanvas_givenParams(canvasID, kineticStateDescriptionID,
 
 		/////////////////
 		// m+2 state   //
-		isCurrentState = paramsResult["mRNAPosInActiveSite"] == 2 && paramsResult["activated"];
-		plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",+2)", xCoordOfMainState + spacingBetweenStates + stateWidth, yCoordOfMainState, "The polymerase is <b>hypertranslocated</b> by 1 base. The nascent strand is " + m + "nt long.", isCurrentState);
+		isCurrentState = paramsResult["mRNAPosInActiveSite"] == 2;
+		plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",+2)", xCoordOfMainState + spacingBetweenStates + stateWidth, yCoordOfMainState, "The polymerase is <b>hypertranslocated</b> by 1 base. The nascent strand is " + m + " nt long.", isCurrentState);
 		rateSum = paramsResult["k +2,+3"] + paramsResult["k +2,+1"] + (elongationModel["allowInactivation"] ? kU : 0);
 		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + spacingBetweenStates + 2*stateWidth + arrowSpace, yCoordOfMainState + arrowSpace, "right", "kfwd", paramsResult["k +2,+3"], rateSum, kineticStateDescriptionID, "k<sub>fwd</sub>");
 		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + spacingBetweenStates + stateWidth - arrowSpace, yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", paramsResult["k +2,+1"], rateSum, kineticStateDescriptionID, "k<sub>bck</sub>");
-		if (elongationModel["allowInactivation"]) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState - arrowSpace + 1*spacingBetweenStates + 2*stateWidth, yCoordOfMainState + stateHeight + arrowSpace, "down", "kU", kU, rateSum, kineticStateDescriptionID, "k<sub>U</sub>");
 		/////////////////
 
 
@@ -1255,81 +1239,22 @@ function drawModelDiagramCanvas_givenParams(canvasID, kineticStateDescriptionID,
 	}
 
 
-	// Inactivated states
+	// Inactivated state
 	if (elongationModel["allowInactivation"]){
 
 		/////////////////
-		// m+1i state  //
-		isCurrentState = paramsResult["mRNAPosInActiveSite"] == 1 && !paramsResult["activated"];
-		plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",+1)\u2071", xCoordOfMainState, yCoordOfMainState + stateHeight + spacingBetweenStates, "The polymerase is <b>posttranslocated</b> and catalytically inactive. The nascent strand is " + m + "nt long.", isCurrentState, "#c0306d");
-		rateSum = kA + paramsResult["k +1,0"] + (elongationModel["allowHypertranslocation"] ? paramsResult["k +1,+2"] : 0);
-		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates - arrowSpace, "up", "kA", kA, rateSum, kineticStateDescriptionID, "k<sub>A</sub>");
-		if (!elongationModel.assumeTranslocationEquilibrium) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState - arrowSpace, yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", paramsResult["k +1,0"], rateSum, kineticStateDescriptionID, "k<sub>bck</sub>");
-		if (elongationModel["allowHypertranslocation"]) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + stateWidth + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right",  "kfwd", paramsResult["k +1,+2"], rateSum, kineticStateDescriptionID, "k<sub>fwd</sub>");
-		/////////////////
-
-
-
-		/////////////////
-		// m0 i state  //
+		// Inactivated state  //
 		isCurrentState = paramsResult["mRNAPosInActiveSite"] == 0 && !paramsResult["activated"];
-		plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",0)\u2071",  xCoordOfMainState - spacingBetweenStates - stateWidth, yCoordOfMainState + stateHeight + spacingBetweenStates, "The polymerase is <b>pretranslocated</b> and catalytically inactive. The nascent strand is " + m + "nt long.", isCurrentState, "#c0306d");
-		rateSum = kA + paramsResult["k 0,+1"] + (elongationModel["allowBacktracking"] ? paramsResult["k 0,-1"] : 0);
-		if (!elongationModel.assumeTranslocationEquilibrium) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState - spacingBetweenStates + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right", "kfwd", paramsResult["k 0,+1"], rateSum, kineticStateDescriptionID, "k<sub>fwd</sub>");
-		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + arrowSpace - spacingBetweenStates - stateWidth, yCoordOfMainState + stateHeight + spacingBetweenStates - arrowSpace, "up", "kA", kA, rateSum, kineticStateDescriptionID, "k<sub>A</sub>");
-		if (elongationModel["allowBacktracking"]) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + -1*spacingBetweenStates - stateWidth - arrowSpace,	yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", paramsResult["k 0,-1"], rateSum, kineticStateDescriptionID, "k<sub>bck</sub>");
+		plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "IS", xCoordOfMainState  + 2*(-spacingBetweenStates - stateWidth), yCoordOfMainState, "The polymerase is catalytically inactive and in the intermediate state (IS). The nascent strand is " + m + " nt long.", isCurrentState);
+		var rateBack = (elongationModel["allowBacktracking"] ? paramsResult["k 0,-1"] : 0);
+		rateSum = kA + rateBack;
+		
+		if (elongationModel["allowBacktracking"]) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + -2*spacingBetweenStates - 2*stateWidth - arrowSpace,	yCoordOfMainState + stateHeight - arrowSpace, "left", "kbck", rateBack, rateSum, kineticStateDescriptionID, "k<sub>bck</sub>");
+		plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + -2*spacingBetweenStates - stateWidth + arrowSpace,	yCoordOfMainState + arrowSpace, "right", "kA", kA, rateSum, kineticStateDescriptionID, "k<sub>A</sub>");
+		
 		/////////////////
+		
 
-
-
-		// Translocation equilibrium: add an equilibrium arrow between states 0 and 1
-		if (elongationModel.assumeTranslocationEquilibrium){
-			plotEquilibriumArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState - spacingBetweenStates + arrowSpace, yCoordOfMainState + 2 * arrowSpace + stateHeight + spacingBetweenStates, stateWidth, "horizontal", "Kt", "", paramsResult["Kt"], kineticStateDescriptionID, "K<sub>t</sub> = k<sub>bck</sub> / k<sub>fwd</sub>")
-		}
-
-
-
-
-		// Backtracked inactivated state
-		if (elongationModel["allowBacktracking"]){
-
-			/////////////////
-			// m-1 i state //
-			isCurrentState = paramsResult["mRNAPosInActiveSite"] == -1 && !paramsResult["activated"];
-			plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",-1)\u2071", xCoordOfMainState  + 2*(-spacingBetweenStates - stateWidth), yCoordOfMainState + stateHeight + spacingBetweenStates, "The polymerase is <b>backtracked</b> by 1 base and catalytically inactive. The nascent strand is " + m + "nt long.", isCurrentState, "#c0306d");
-			rateSum = paramsResult["k -1,0"] + kA + paramsResult["k -1,-2"];
-			plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + -2*spacingBetweenStates - stateWidth + arrowSpace,	yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right", "kfwd", paramsResult["k -1,0"], rateSum, kineticStateDescriptionID, "k<sub>fwd</sub>");
-			plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + arrowSpace  - 2*spacingBetweenStates - 2*stateWidth, yCoordOfMainState + stateHeight + spacingBetweenStates - arrowSpace, "up", "kA", kA, rateSum, kineticStateDescriptionID, "k<sub>A</sub>");
-			plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + -2*spacingBetweenStates - 2*stateWidth - arrowSpace,	yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", paramsResult["k -1,-2"], rateSum, kineticStateDescriptionID, "k<sub>bck</sub>");
-			/////////////////
-
-
-			// Dot dot dot arrows
-			plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + -3*spacingBetweenStates - 2*stateWidth + arrowSpace,	yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right", "kfwd", paramsResult["k -2,-1"], 0, kineticStateDescriptionID, "k<sub>fwd</sub>");
-
-
-
-		}
-
-
-		// Hypertranslocated inactivated state
-		if (elongationModel["allowHypertranslocation"]){
-
-			/////////////////
-			// m+2 i state //
-			isCurrentState = paramsResult["mRNAPosInActiveSite"] == 2 && !paramsResult["activated"];
-			plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",+2)\u2071", xCoordOfMainState + spacingBetweenStates + stateWidth, yCoordOfMainState + stateHeight + spacingBetweenStates, "The polymerase is <b>hypertranslocated</b> by 1 base and catalytically inactive. The nascent strand is " + m + "nt long.", isCurrentState, "#c0306d");
-			rateSum = paramsResult["k +2,+1"] + kA + paramsResult["k +2,+3"];
-			plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + spacingBetweenStates + stateWidth - arrowSpace, yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", paramsResult["k +2,+1"], rateSum, kineticStateDescriptionID, "k<sub>bck</sub>");
-			plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + spacingBetweenStates + 2*stateWidth + arrowSpace, yCoordOfMainState + stateHeight + spacingBetweenStates + arrowSpace, "right", "kfwd", paramsResult["k +2,+3"], rateSum, kineticStateDescriptionID, "k<sub>fwd</sub>");
-			plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + arrowSpace + 1*spacingBetweenStates + 1*stateWidth, yCoordOfMainState + stateHeight + spacingBetweenStates - arrowSpace, "up", "kA", kA, rateSum, kineticStateDescriptionID, "k<sub>A</sub>");
-			/////////////////
-
-			// Dot dot dot arrows
-			plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + 2*spacingBetweenStates + 2*stateWidth - arrowSpace, yCoordOfMainState + 2*stateHeight + spacingBetweenStates - arrowSpace, "left", "kbck", paramsResult["k +3,+2"], 0, kineticStateDescriptionID, "k<sub>bck</sub>");
-
-
-		}
 
 
 	}
@@ -1428,7 +1353,7 @@ function plotArrow_stateDiagram(ctx, stateHoverEvents, fromx, fromy, direction, 
 
 
     // Label
-    var labelWidthSpacer = arrowSize;
+    var labelWidthSpacer = 18;
     var labelLengthSpacer = 18;
 
     var xLabPos, yLabPos;
@@ -1446,13 +1371,13 @@ function plotArrow_stateDiagram(ctx, stateHoverEvents, fromx, fromy, direction, 
 	    	ctx.textBaseline="top"; 
 	        break;
 	    case "up":
-	    	xLabPos = fromx - labelWidthSpacer + 5;
+	    	xLabPos = fromx - labelWidthSpacer + 0;
 	    	yLabPos = fromy - labelLengthSpacer;
 	    	ctx.textAlign= "right";
 	    	ctx.textBaseline="top"; 
 	        break;
 	    case "down":
-	    	xLabPos = fromx + labelWidthSpacer - 5;
+	    	xLabPos = fromx + labelWidthSpacer;
 	    	yLabPos = fromy + labelLengthSpacer;
 	    	ctx.textAlign= "left";
 	    	ctx.textBaseline="bottom"; 
@@ -1494,9 +1419,10 @@ function plotArrow_stateDiagram(ctx, stateHoverEvents, fromx, fromy, direction, 
 		else mouseInArrow = mouseInArrow && fromy  <= mouseY && toy + headlen >= mouseY; 
 
 		if (mouseInArrow){
-			var fullDescription = "Rate constant " + (htmlLabel == "" ? label : htmlLabel) + " = " + roundToSF(rate) +  " s\u207B\u00B9.";
+			var sf = 3;
+			var fullDescription = "Rate constant " + (htmlLabel == "" ? label : htmlLabel) + " = " + roundToSF(rate, sf) +  " s\u207B\u00B9.";
 			if (rateSum != 0) {
-				var sf = 3;
+				
 				var prob = roundToSF(rate/rateSum, sf);
 				while(rate != rateSum && prob == 1) { 	// Make sure that the probability does not equal 1 exactly (unless its actually 1)
 					sf++;
@@ -1661,10 +1587,11 @@ function plotState(ctx, stateHoverEvents, kineticStateDescriptionID, label, xCoo
 		//var fillCol = "#008CBA";
 
 
-		//var borderCol = "#008CBA";
-		var fillCol = isCurrentState ? "#b3b3b3" : "white";
+		var borderCol = "black";
+		var fillCol = isCurrentState ? "#708090" : "white";
+        var fontCol = isCurrentState ? "white" : "black";
 
-		var borderWidth = 4;
+		var borderWidth = 2;
 
 
 		// Border
@@ -1680,7 +1607,7 @@ function plotState(ctx, stateHoverEvents, kineticStateDescriptionID, label, xCoo
 
 
 		// Label
-		ctx.fillStyle = "black";
+		ctx.fillStyle = fontCol;
 		ctx.textBaseline="bottom"; 
 		ctx.font = "18px Arial";
 		ctx.textAlign= "center";
@@ -1696,7 +1623,7 @@ function plotState(ctx, stateHoverEvents, kineticStateDescriptionID, label, xCoo
 			var mouseY = e.clientY - rect.top - 10;
 			var mouseInSquare = xCoord <= mouseX && xCoord + width >= mouseX && yCoord <= mouseY && yCoord + height >= mouseY;
 			if (mouseInSquare){
-				var fullDescription = (isCurrentState ? "<span style='background-color:#b3b3b3; padding: 2 2'>Current state:</span>" : "State:") + " " + label + " : " + desc;
+				var fullDescription = (isCurrentState ? "<span style='line-height: 1.5em; border-radius: 5px; color:white; background-color:#708090; padding: 5 5 5 5'>Current state</span>" : "State") + " " + label + ": " + desc;
 				$("#" + kineticStateDescriptionID).html(fullDescription);
 				return true;
 			}

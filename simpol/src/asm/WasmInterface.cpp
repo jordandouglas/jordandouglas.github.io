@@ -1553,7 +1553,6 @@ extern "C" {
 			if (setting == "allowBacktracking") currentModel->set_allowBacktracking(val == "true");
 			else if (setting == "allowHypertranslocation") currentModel->set_allowHypertranslocation(val == "true");
 			else if (setting == "allowInactivation") currentModel->set_allowInactivation(val == "true");
-			else if (setting == "allowBacktrackWithoutInactivation") currentModel->set_allowBacktrackWithoutInactivation(val == "true");
 			else if (setting == "allowGeometricCatalysis") currentModel->set_allowGeometricCatalysis(val == "true");
 			else if (setting == "subtractMeanBarrierHeight") currentModel->set_subtractMeanBarrierHeight(val == "true");
 			else if (setting == "allowDNAbending") currentModel->set_allowDNAbending(val == "true");
@@ -1620,12 +1619,13 @@ extern "C" {
 
 		// Calculate all rates for the state (from backtrack -2 to hypertranslocated +3) 
 		if (stateToCalculateFor->NTPbound()) stateToCalculateFor->releaseNTP();
-		stateToCalculateFor->deactivate(); // Set to deactivated so we can backtrack
+		
 
 
 
 		// Get the state into backtracked (m = -2)
 		for (int i = stateToCalculateFor->get_mRNAPosInActiveSite(); i > -2; i --){
+            stateToCalculateFor->deactivate(); // Inactivate so we can backtrack
 			stateToCalculateFor->backward();
 		}
 		for (int i = stateToCalculateFor->get_mRNAPosInActiveSite(); i < -2; i ++){
@@ -1637,13 +1637,16 @@ extern "C" {
 		stateDiagramJSON += "'k -2,-1':" + to_string(stateToCalculateFor->calculateForwardRate(true, false)) + ","; // From backtrack 2 to backtrack 1
 
 		// State m = -1
-		stateToCalculateFor->forward();
+		if (stateToCalculateFor->get_mRNAPosInActiveSite() == -2) stateToCalculateFor->forward();
 		stateDiagramJSON += "'k -1,-2':" + to_string(stateToCalculateFor->calculateBackwardRate(true, false)) + ","; // From backtrack 1 to backtrack 2
 		stateDiagramJSON += "'k -1,0':" + to_string(stateToCalculateFor->calculateForwardRate(true, false)) + ","; // From backtrack 1 to pretranslocated
 
 
 		// State m = 0
-		stateToCalculateFor->forward();
+        if (stateToCalculateFor->get_mRNAPosInActiveSite() == -1) {
+            stateToCalculateFor->forward();
+            stateToCalculateFor->activate(); // Reactivate
+        }
 		double k_01 = stateToCalculateFor->calculateForwardRate(true, true);
 		stateDiagramJSON += "'k 0,-1':" + to_string(stateToCalculateFor->calculateBackwardRate(true, false)) + ","; // From pretranslocated to backtrack 1
 		stateDiagramJSON += "'k 0,+1':" + to_string(currentModel->get_assumeTranslocationEquilibrium() ? 0 : stateToCalculateFor->calculateForwardRate(true, false)) + ","; // From pretranslocated to posttranslocated
@@ -1651,13 +1654,14 @@ extern "C" {
 
 
 		// State m = 1
-		stateToCalculateFor->forward();
+		if (stateToCalculateFor->get_mRNAPosInActiveSite() == 0) stateToCalculateFor->forward();
 		double k_10 = stateToCalculateFor->calculateBackwardRate(true, true);
 		stateDiagramJSON += "'k +1,0':" + to_string(currentModel->get_assumeTranslocationEquilibrium() ? 0 : stateToCalculateFor->calculateBackwardRate(true, false)) + ","; // From posttranslocated to pretranslocated
 		stateDiagramJSON += "'k +1,+2':" + to_string(stateToCalculateFor->calculateForwardRate(true, false)) + ","; // From posttranslocated to hypertranslocated 1
 		stateDiagramJSON += "'kbind':" + to_string(currentModel->get_assumeBindingEquilibrium() ? 0 : stateToCalculateFor->calculateBindNTPrate(true)) + ","; // Rate of binding NTP
 		stateDiagramJSON += "'krelease':" + to_string(currentModel->get_assumeBindingEquilibrium() ? 0 : stateToCalculateFor->calculateReleaseNTPRate(true)) + ","; // Rate of releasing NTP
 		stateDiagramJSON += "'kcat':" + to_string(stateToCalculateFor->calculateCatalysisRate(true)) + ","; // Rate of catalysis
+        stateDiagramJSON += "'kcleave':" + to_string(stateToCalculateFor->calculateCleavageRate(true)) + ","; // Rate of cleavage
 		stateDiagramJSON += "'KD':" + to_string(Kdiss->getVal(true)) + ","; // Dissociation constant
 		stateDiagramJSON += "'Kt':" + to_string(k_10 == 0 || k_01 == 0 ? 0 : k_10 / k_01) + ","; // Translocation constant
 		//cout << "k_10 " << k_10 << " k_01 " << k_01 << endl;
@@ -1665,13 +1669,13 @@ extern "C" {
 
 
 		// State m = 2
-		stateToCalculateFor->forward();
+		if (stateToCalculateFor->get_mRNAPosInActiveSite() == 1) stateToCalculateFor->forward();
 		stateDiagramJSON += "'k +2,+1':" + to_string(stateToCalculateFor->calculateBackwardRate(true, false)) + ","; // From hypertranslocated 1 to posttranslocated
 		stateDiagramJSON += "'k +2,+3':" + to_string(stateToCalculateFor->calculateForwardRate(true, false)) + ","; // From hypertranslocated 1 to hypertranslocated 2
 
 
 		// State m = 3
-		stateToCalculateFor->forward();
+		if (stateToCalculateFor->get_mRNAPosInActiveSite() == 2) stateToCalculateFor->forward();
 		stateDiagramJSON += "'k +3,+2':" + to_string(stateToCalculateFor->calculateBackwardRate(true, false)) + ","; // From hypertranslocated 2 to hypertranslocated 1
 
 
