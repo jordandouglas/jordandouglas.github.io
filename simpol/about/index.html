@@ -112,7 +112,7 @@ function drawModelDiagrams(){
 	var elongationModel = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: false, allowHypertranslocation: false, 
 						allowInactivation:false, allowBacktrackWithoutInactivation:false, deactivateUponMisincorporation: false, 
 						allowGeometricCatalysis: false, allowmRNAfolding:false, allowMisincorporation:false, useFourNTPconcentrations:false,
-						NTPbindingNParams: 2, assumeBindingEquilibrium: false, currentTranslocationModel: "HIBI_barriers",
+						NTPbindingNParams: 2, assumeBindingEquilibrium: false, currentTranslocationModel: "HIGI_barriers",
 						assumeTranslocationEquilibrium: false};
 										
 				
@@ -341,9 +341,12 @@ function addCitations(){
 						<div class="block-subtitle" style="font-size:45px"> An interactive graphical simulation of nucleic acid polymerases  </div> <br>
 					
 						<b>Disclaimer:</b> SimPol is currently in prerelease. It has not been peer-reviewed or published. <br><br>
+                            
+                            
+                        
 						SimPol is a free open-source web-based program aimed to help researchers, teachers and students visualise transcription at the level of a single molecule. 
-						<u>Transcription</u> is a critical biological process which occurs in all living organisms. It involves the copying of a template, typically DNA, 
-						into messenger RNA (mRNA). mRNA is used by cellular machinery to produce protein. This initial copying process is carried out by a protein called RNA polymerase. 
+						<u>Transcription</u> is an essential pathway for all living organisms. It involves the copying of a template, typically DNA, 
+						into messenger RNA (mRNA) which is used to produce protein. Trancription is carried out by an enzyme called RNA polymerase. 
 			
 						<br><br>
 						
@@ -373,11 +376,11 @@ function addCitations(){
 									<div id="sequenceSelection" class="block-subtitle"> Sequence selection </div> <br>
 									
 									
-									<img src="../../src/TutorialImages/sequenceParams.png" style="width:300px; padding: 10 30;" align=left></img>
+									<img src="../../src/TutorialImages/sequenceParams.png" style="width:350px; padding: 10 30;" align=left></img>
 									
 									<br><br><br>
 									
-									The first thing you may want to do is choose your nucleic acid sequence (or you can stick with the default sequence). Open up the &#9776; Parameters side-navigation menu, where you can enter your own sequence or 
+									The first thing you may want to do is choose your nucleic acid sequence. Or you can just stick with the default sequence. Open up the &#9776; Parameters side-navigation menu, where you can enter your own sequence (and then press Submit) or 
 									use one of the example sequences.
 									
 									
@@ -394,16 +397,15 @@ function addCitations(){
 								<div class="about-block-inner">
 									<div class="block-subtitle"> Polymerase structure </div> <br>
 								
-									Polymerases read the template strand (eg. the genome) in the 3&prime; &rarr; 5&prime; direction, and copy it to create the nascent strand (eg. mRNA) which grows in the 5&prime; &rarr; 3&prime; direction. You can control the polymerase using the Navigation panel
-									(described in the section below). Bases exist in the cell in the form of nucleoside triphosphate (NTP). RNA polymerases typically contain four channels: a template entry channel, a template exit channel, a nascent strand exit channel and an NTP entry pore. Within the RNA polymerase, 
-									the template and nascent strand basepair to form a hybrid. If the template is double-stranded then RNA polymerase needs to melt the template in order to access the strand which is being copied. 
-									This set of bases which are melted comprises the transcription bubble. In the example below, the transcription bubble contains 2 + 9 + 1 = 12bp.  <br><br>
+									Polymerases read the template strand (ie. the gene) in the 3&prime; &rarr; 5&prime; direction, and copy it to create the nascent strand (eg. mRNA) which grows in the 5&prime; &rarr; 3&prime; direction. 
+                                    The transcription bubble consists of a hybrid between the nascent strand and the template strand within the polymerase, and a set of unpaired 
+                                    template bases upstream and downstream of the polymerase. In the example below, the transcription bubble contains 2 + 9 + 1 = 12 bp.  <br><br>
 									
 									<img id="polStructure" src="../../src/TutorialImages/polStructure.png" style="height:200px; padding: 10 30;" align=left></img>
 									<img id="structureParams" src="../../src/TutorialImages/structureParams.png" style="height:200px; padding: 10 30;" align=right></img>
 									
 									 <br><br><br><br><br><br><br><br><br><br><br><br><br>
-									The number of template bases within the transcription bubble differs between polymerases.
+									The size of the transcription bubble differs between polymerases.
 									These three parameters may have an effect on the activity of the polymerase and can be changed from the &#9776; Parameters side-navigation menu. 
 							
 								</div>
@@ -420,71 +422,86 @@ function addCitations(){
 									applied by the simulator under the current model settings.
 								
 									
-									<br><br>
-									<div style="padding: 10 10; background-color:#ebe9e7" >
+									<br><br><br><br>
+									<div class="panelOuter">
+                                            <div class="panelInner" >
 										<span class="block-subsubtitle" > <b>1. Translocation:</b> </span>
 										
-										There are two translocation reactions: Backwards and Forwards. These operations move the polymerase one base-pair left and right respectively, with respect to the 
-									template and nascent strand. These operations involve reconfiguring the base-pairs within the hybrid, and within the chromosome if it is double-stranded. If the polymerase moves beyond the 3&prime; end of the nascent strand, 
-									then the nascent strand will be released (termination). 
+    										There are two translocation reactions: Backwards and Forwards. These operations move the polymerase one base-pair left and right respectively, with respect to the 
+    									template and nascent strand. These operations involve reconfiguring the base-pairs within the hybrid, and within the chromosome if it is double-stranded. If the polymerase moves beyond the 3&prime; end of the nascent strand, 
+    									then the nascent strand will be released (termination). 
 									</div> 
+                                    </div>  
 									
 									
 									<br><br>
-									<div style="padding: 10 10; background-color:#ebe9e7" >
+									<div class="panelOuter">
+                                            <div class="panelInner" >
 										<span class="block-subsubtitle" > <b>2. Nucleotide incorporation:</b> </span>
 										
-										If the active site is free and next to the 3&prime; end of the nascent strand, then the polymerase may bind NTP.
-										Once bound, the polymerase may catalyse the reaction, or it may release the NTP back into the cell. Reverse-catalysis is also possible in SimPol using 
-										the Decay reaction, although it is very improbable in nature. The canonical pathway of transcription 
-										elongation is a three step cycle: 1) forward translocation, 2) NTP binding, 3) catalysis. This may also be achieved with the Copy 
-										<img src="../../src/Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function. 
-									</div> 
+    										If the active site is free and next to the 3&prime; end of the nascent strand, then the polymerase may bind NTP.
+    										Once bound, the polymerase may catalyse the reaction, or it may release the NTP back into the cell. Reverse-catalysis is also possible in SimPol using 
+    										the Decay reaction, although it is infrequent in nature. The canonical pathway of transcription 
+    										elongation is a three step cycle: 1) forward translocation, 2) NTP binding, 3) catalysis. This may also be achieved with the Copy 
+    										<img src="../../src/Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function. 
+									    </div> 
+                                    </div> 
 									
 									
 									
 									
 									<br><br>
-									<div style="padding: 10 10; background-color:#ebe9e7" >
-										<span class="block-subsubtitle" > <b>3. Deactivation:</b> </span>
-										
-										RNA polymerases are believed to occassionally deactivate whereby they undergo 
-										conformational changes and enter a catalytically inactive state, sometimes known as the intermediate state. In this state the protein cannot polymerise but it may still translocate. Factors known to increase the 
-										rate of entering the inactive state are 1) weak basepairing in the hybrid, 2) interactions between the polymerase and upstream or downstream elements of the template, and 3) interactions between the polymerase and
-										a secondary structure in the nascent strand <cite val="artsimovitch2000pausing,depken2009origin,imashimizu2013intrinsic"></cite>. Inactivation causes the polymerase to pause indefinitely, 
-										and elongation can only resume following an activation event.
+									<div class="panelOuter">
+                                            <div class="panelInner" >
+        										<span class="block-subsubtitle" > <b>3. Inactivation:</b> </span>
+        										
+                                                
+                                                
+                                                
+        										RNA polymerases are believed to occassionally deactivate whereby they undergo 
+        										conformational changes and enter a catalytically inactive state, sometimes known as the intermediate state. In this state the protein cannot polymerise but it may still translocate. Factors known to increase the 
+        										rate of entering the inactive state are 1) weak basepairing in the hybrid, 2) interactions between the polymerase and upstream or downstream elements of the template, and 3) interactions between the polymerase and
+        										a secondary structure in the nascent strand <cite val="artsimovitch2000pausing,depken2009origin,imashimizu2013intrinsic"></cite>. Inactivation causes the polymerase to pause indefinitely, 
+        										and elongation can only resume following an activation event.
+                                           </div> 
 									</div> 
+                                        
 									<br><br>
-									<div style="padding: 10 10; background-color:#ebe9e7" >
+									<div class="panelOuter">
+                                            <div class="panelInner" >
 										<span class="block-subsubtitle" > <b>4. Nascent strand cleavage:</b> </span>
 										
-										When a nucleic acid polymerase backtracks for too long <i>in vivo</i> it can delay the production of its product and potentially cause roadblocks for other polymerases.
-										Many organisms have evolved elongation factors which serve to rescue the polymerase from this state. One mechanism these factors may act is by cleaving the 3<sup>&prime;</sup> 
-										end of the nascent strand when it pokes out the front of the polymerase during backtracking. This is carried out by GreA and GreB for prokaryotic
-										RNA polymerases and S-II for eukaryotic RNA polymerase II <cite val="toulme2000grea"></cite> and can be performed in SimPol using the cleavage reaction.
-									</div> 
+    										When a nucleic acid polymerase backtracks for too long <i>in vivo</i> it can delay the production of its product and potentially cause roadblocks for other polymerases.
+    										Many organisms have evolved elongation factors which serve to rescue the polymerase from this state. One mechanism these factors may act is by cleaving the 3<sup>&prime;</sup> 
+    										end of the nascent strand when it pokes out the front of the polymerase during backtracking. This is carried out by GreA and GreB for prokaryotic
+    										RNA polymerases and S-II for eukaryotic RNA polymerase II <cite val="toulme2000grea"></cite> and can be performed in SimPol using the cleavage reaction.
+									    </div> 
+                                    </div> 
 									
 				
 									
 									
 									
-										<br><br>
-									<div style="padding: 10 10; background-color:#ebe9e7" >
+									<br><br>
+									<div class="panelOuter">
+                                            <div class="panelInner" >
 										<span class="block-subsubtitle" > <b>5. Slippage:</b> </span>
 										
-										Sometimes the nascent and template strand temporarily melt and a bulge forms in one of the strands. This can be performed by the
-									Form Bulge reaction.
-									When this happens, a bulge (kink) forms within the duplex. This can occur within either the template or nascent strand (although in SimPol it can currently only occur within the nascent strand). When a bulge forms,
-									the active site may be opened up, allowing one of the template bases to be copied twice. This would lead to an insertion. The bulge may 
-									diffuse left or right along the
-									 hybrid. This process is favoured if the hybrid sequence is repetitive (eg. AAAAAAAAA/UUUUUUUUU). When positioned at either end of the hybrid, the bulge may be absorbed. This three step process (bulge formation, diffusion and absorption)
-									 was inspired by Neher et al.<cite val="neher2004dynamics,kuhner2007force"></cite> and is believed to be the mechanism behind transcriptional slippage. Iterative slippage and elongation can lead to large insertions. This is sometimes called stuttering and
-									can also be achieved with the Stutter <img src="../../src/Images/stutter.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function.
-							
-									</div> 
+    										Sometimes the nascent and template strand temporarily melt and a bulge forms in one of the strands. This can be performed by the
+    									Form Bulge reaction.
+    									When this happens, a bulge (kink) forms within the duplex. This can occur within either the template or nascent strand (although in SimPol it can currently only occur within the nascent strand). When a bulge forms,
+    									the active site may be opened up, allowing one of the template bases to be copied twice. This would lead to an insertion. The bulge may 
+    									diffuse left or right along the
+    									 hybrid. This process is favoured if the hybrid sequence is repetitive (eg. AAAAAAAAA/UUUUUUUUU). When positioned at either end of the hybrid, the bulge may be absorbed. This three step process (bulge formation, diffusion and absorption)
+    									 was inspired by Neher et al.<cite val="neher2004dynamics,kuhner2007force"></cite> and is believed to be the mechanism behind transcriptional slippage. Iterative slippage and elongation can lead to large insertions. This is sometimes called stuttering and
+    									can also be achieved with the Stutter <img src="../../src/Images/stutter.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function.
+    							
+									    </div> 
+                                    </div> 
 									
 								</div>
 							</div>
+                                        
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
@@ -553,7 +570,8 @@ function addCitations(){
 									</table>
 								
 									<div style="margin-left: 150px">
-										<i>The toolbar contains some essential functions which you should familiarise yourself with.</i> <br><br>
+										<i>The toolbar contains some essential functions you may want to familiarise yourself with.</i> <br><br>
+                                            
 										<b>Reinitiate</b> <img  src="../../src/Images/reset.png" style="padding:0 0; width:20px; height:20px"> will reset the polymerase to its initial position. This will
 										not affect plots or any other outputs. If you have added a background distribution behind any parameters then they will be resampled. <br><br>
 										<b>Stop</b> <img src="../../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> will immediately halt any polymerase acitivies taking place.
@@ -596,7 +614,43 @@ function addCitations(){
 							</div>
 					</div>
 				</div>
-				<br><br><br><br>
+				
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                                
+                <br><br><br><br>
+                <div class="main-block">
+                    <div class="main-block-inner">
+                        <div class="block-title"> 
+                        
+                        
+                            <span id='statespaceSectionBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
+                                State Space 
+                            </div> 
+                            <div id="statespaceSection" style="display:none">          
+                                <br><br>
+                                <div class="about-block" style="width:90%; margin:auto">
+                                    <div class="about-block-inner">
+                                                
+                                                
+                                                
+                                    </div>
+                                </div>
+                            </div>
+                
+                
+                        </div>
+                    </div>
+                </div>
+                                
+                    
+                <br><br><br><br>
 				<div class="main-block" >
 					<div class="main-block-inner">
 						<div class="block-title"> <span id='displayingPlotsBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span> Plots </div> 
@@ -752,7 +806,7 @@ function addCitations(){
 				<br><br><br><br>
 				<div class="main-block" >
 					<div class="main-block-inner">
-						<div class="block-title"><span id='parametersBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span> Parameters </div> 
+						<div class="block-title"><span id='parametersBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span> Parameters &amp; Settings </div> 
 						<div id="parameters"  style="display:none">
 				
 		
@@ -808,7 +862,7 @@ function addCitations(){
 														<div class="paramHelp" id="FAssist_ParamHelp">
 															<b style="font-size:20px">$F_{assist}$</b> - the size of the force being applied to the polymerase during a single-molecule experiment. Positive forces are assisting loads and increase
 																	the rate of transcription. Negative forces are hindering loads and decrease the rate of transcription. In a natural cellular environment this external force
-																	does not exist. Default: 0pN
+																	is not applicable. Default: 0 pN
 														</div><br>	
 									
 												</div>
@@ -819,18 +873,62 @@ function addCitations(){
 													<div class="parameter-title" style="font-size:18px">Basepairing configuration within the transcription bubble and polymerase.</div>  <br> 
 													
 														<div class="paramHelp" id="hybridLen_ParamHelp">
-															<b>Hybrid length (h)</b> - number of basepairs in the template/primer hybrid within the polymerase. As translocation rates are determined from sequence composition, this value may affect
-																			   the predicted location of pause sites. In eukaryotes and prokaryotes, RNA polymerase contains a hybrid of 8 or 9bp
-																			   <cite val="komissarova1997transcriptional,gnatt2001structural,nudler1997rna"></cite>. Default: 9bp 
+															<b>Hybrid length (h)</b> - number of basepairs in the template/nascent hybrid within the polymerase. As translocation rates are determined from sequence composition, this value may affect
+																			   the predicted location of pause sites. Default: 11 bp 
 														</div><br>				   
 														<div class="paramHelp" id="bubbleLeft_ParamHelp">			   
-															<b>Bubble size 3&prime; (&beta;<sub>1</sub>)</b> - number of unpaired template bases 3&prime; (left hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 2bp<cite val="maoileidigh2011unified"></cite>
+															<b>Bubble size 3&prime; (&beta;<sub>1</sub>)</b> - number of unpaired template bases 3&prime; (left hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 1 bp
 														</div><br>	
 														<div class="paramHelp" id="bubbleRight_ParamHelp">
-															<b>Bubble size 5&prime; (&beta;<sub>2</sub>)</b> - number of unpaired template bases 5&prime; (right hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 1bp<cite val="maoileidigh2011unified"></cite>
+															<b>Bubble size 5&prime; (&beta;<sub>2</sub>)</b> - number of unpaired template bases 5&prime; (right hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 0 bp
 														</div><br>	
 									
 												</div>
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        <br><br>
+                                                <div class="parameter-bg" style="font-size:18px">
+                                                    
+                                                    <div class="parameter-title" style="font-size:30px">NTP Incorporation Parameters </div>  
+                                                    <div class="parameter-title" style="font-size:18px">Kinetics of binding/releasing NTP, and catalysing polymerisation.</div>  <br> 
+                                                        
+                                                        <div class="paramHelp" id="Kdissociate_ParamHelp">
+                                                            <b style="font-size:20px">$K_D$</b> - equilibrium constant of NTP dissociation. $K_D$ is used in conjunction with $k_{bind}$ to calculate the rate of releasing
+                                                            bound NTP: $k_\text{release} = K_D$. Default: 1.8 &mu;M
+                                                        </div><br>
+                                                        <div class="paramHelp" id="kCat_ParamHelp"> 
+                                                            <b style="font-size:20px">$k_{cat}$</b> - rate constant of catalysing bound NTP, thus extending the nascent chain by one base. When translocation is fast,
+                                                                    catalysis is the rate limiting step in transcription. Default: 25 s<sup>-1</sup>
+                                                        </div><br>
+                                                        
+                                                        <div class="paramHelp" id="RateBind_ParamHelp">
+                                                            <b style="font-size:20px">$k_{bind}$</b> - used to calculate rate constant of binding the complementary NTP, which is calculated as [NTP] k<sub>bind</sub>. 
+                                                                    This parameter is constant across all NTPs. Default: 0.5448 &mu;M<sup>-1</sup>.s<sup>-1</sup>  
+                                                        </div><br>
+                                                        <!--
+                                                        <div class="paramHelp" id="RateMisbind_ParamHelp">
+                                                            <b style="font-size:20px">$k_{misbind}$</b> - used to calculate rate constant of binding a non-complementary NTP, which is calculated as [NTP] k<sub>misbind</sub>. 
+                                                                        If the bound NTP is added onto the end of the chain without correction then there is a misincorporation event. This parameter is only applicable when "Enable misincorporations" is enabled. The overall rate of uncorrected misincorpations during transcription is
+                                                                        around 1 in 10<sup>4</sup> - 10<sup>5</sup> bases<cite val="imashimizu2013direct,rosenberger1981estimate,shaw2002use"></cite>. Default: 0.25s<sup>-1</sup> 
+                                                        </div><br>
+                                                        -->
+                                                        <!--
+                                                        <div class="paramHelp" stule="display:none">
+                                                            <b style="font-size:20px">$k_{transition} / k_{transversion}$</b> - the ratio between transition and transversion rates. This parameter is only applicable when "Allow inactivation" is enabled. Default: 2 
+                                                        </div><br>
+                                                        -->
+                                                        
+                                                                               
+                                    
+                                                </div>
+                                        
+                                        
+                                        
+                                        
 												<br><br>
 												<div class="parameter-bg" style="font-size:18px">
 													
@@ -839,106 +937,90 @@ function addCitations(){
 														<div class="paramHelp" id="GDagSlide_ParamHelp">
 															<b style="font-size:20px">$\Delta G^\dagger_{\tau}$</b> - free energy barrier height of translocation. To translocate forwards or backwards, several
 																	basepairs may need to be broken. The energy barrier which must be overcome in order to translocate is estimated as the energy needed to break these basepairs
-																	plus the value of this parameter. Increasing this value will make translocation slower. Default: 9.079 k<sub>B</sub>T
+																	plus the value of this parameter. Increasing this value will make translocation slower. Default: 9.079 k<sub>B</sub>T <cite val="douglas2018bayesian"></cite>
 														</div><br>	
 														
 														<div class="paramHelp" id="DGPost_ParamHelp">
 															<b style="font-size:20px">$\Delta G_{\tau 1}$</b> - free energy term added to that of the posttranslocated state. When this value is low,
-															RNA polymerase spends more time in the posttranslocated state (compared with the pretranslocated state). Default: -2.007 k<sub>B</sub>T
-														</div><br>	
+															RNA polymerase spends more time in the posttranslocated state (compared with the pretranslocated state). Default: -2.007 k<sub>B</sub>T <cite val="douglas2018bayesian"></cite>
+														</div> <br>	
 														
 														<div class="paramHelp" id="barrierPos_ParamHelp">
 															<b style="font-size:20px">$\delta_1$</b> - position of the translocation intermediate state, with respect to the two connected ground states. 
 															This parameter lies between 0 and the width of a single basepair in DNA (3.4 &#x212b;<cite val="watson1953molecular"></cite>). This term only applies
-															when translocation is kinetic and when an assisting force $F_{assist}$ is applied. Default: 2.838 &#x212b;
+															when translocation is kinetic and when an assisting force $F_{assist}$ is applied. Default: 2.838 &#x212b; <cite val="douglas2018bayesian"></cite>
 														</div><br>	
 														
 																	
 																			   
 									
 												</div>
+												
 												<br><br>
 												<div class="parameter-bg" style="font-size:18px">
 													
-													<div class="parameter-title" style="font-size:30px">NTP Binding Parameters </div>  
-													<div class="parameter-title" style="font-size:18px">Kinetics of binding/releasing NTP, and catalysing polymerisation.</div>  <br> 
-														
-														<div class="paramHelp" id="Kdissociate_ParamHelp">
-															<b style="font-size:20px">$K_D$</b> - equilibrium constant of NTP dissociation. $K_D$ is used in conjunction with $k_{bind}$ to calculate the rate of releasing
-															bound NTP: $k_\text{release} = K_D \; k_\text{bind}$. $K_D$ is by default shared by all 4 NTPs but you can make it NTP specific instead (ie. 1 term for each of ATP, CTP, GTP, UTP).
-															Defaults: $K_D = 1.8, K_D^{ATP} = 50, K_D^{CTP} = 33, K_D^{GTP} = 36, K_D^{UTP} = 18\;$ <cite val="bai2007mechanochemical"></cite>
-														</div><br>
-														<div class="paramHelp" id="kCat_ParamHelp"> 
-															<b style="font-size:20px">$k_{cat}$</b> - rate constant of catalysing bound NTP, thus extending the nascent chain by one base. When translocation is fast,
-																	catalysis is the rate limiting step in transcription. $k_{cat}$ is by default shared by all 4 NTPs but you can make it NTP specific instead (ie. 1 term for each of ATP, CTP, GTP, UTP).
-																	Defaults: $k_{cat} = 25.56, k_{cat}^{ATP} = 38, k_{cat}^{CTP} = 7, k_{cat}^{GTP} = 62, k_{cat}^{UTP} = 24\;$ <cite val="bai2007mechanochemical"></cite>
-														</div><br>
-														
-														<div class="paramHelp" id="RateBind_ParamHelp">
-															<b style="font-size:20px">$k_{bind}$</b> - used to calculate rate constant of binding the complementary NTP, which is calculated as [NTP] k<sub>bind</sub>. 
-																	This parameter is constant across all NTPs. Default: 0.5448 &mu;M<sup>-1</sup>.s<sup>-1</sup>  
-														</div><br>
-														<!--
-														<div class="paramHelp" id="RateMisbind_ParamHelp">
-															<b style="font-size:20px">$k_{misbind}$</b> - used to calculate rate constant of binding a non-complementary NTP, which is calculated as [NTP] k<sub>misbind</sub>. 
-																		If the bound NTP is added onto the end of the chain without correction then there is a misincorporation event. This parameter is only applicable when "Enable misincorporations" is enabled. The overall rate of uncorrected misincorpations during transcription is
-																		around 1 in 10<sup>4</sup> - 10<sup>5</sup> bases<cite val="imashimizu2013direct,rosenberger1981estimate,shaw2002use"></cite>. Default: 0.25s<sup>-1</sup> 
-														</div><br>
-														-->
-														<!--
-														<div class="paramHelp" stule="display:none">
-															<b style="font-size:20px">$k_{transition} / k_{transversion}$</b> - the ratio between transition and transversion rates. This parameter is only applicable when "Allow inactivation" is enabled. Default: 2 
-														</div><br>
-														-->
-														
-																			   
-									
-												</div>
-												<br><br>
-												<div class="parameter-bg" style="font-size:18px">
-													
-													<div class="parameter-title" style="font-size:30px">Unactivated State Parameters </div>  
+													<div class="parameter-title" style="font-size:30px">Pause Parameters </div>  
 													<div class="parameter-title" style="font-size:18px">Kinetics of entering/exiting a catalytically inactive state.</div>  <br> 
 														<div class="paramHelp" id="kU_ParamHelp">
-															<b style="font-size:20px">$k_{U}$</b> - rate constant of polymerase entering the unactive state. When in the unactive state, the polymerase may
-																	translocate but it may not bind NTP or catalyse. Elongation may only continue when the polymerase reactivates. Default: 0.1s<sup>-1</sup>
+															<b style="font-size:20px">$k_{U}$</b> - rate constant of polymerase entering the inactive state / intermediate state. This state acts as an intermediate
+                                                            between the backtracked states and the pretranslocated state. Elongation may only continue when the polymerase reactivates. Default: 0.1s<sup>-1</sup>
 														</div><br>
 														<div class="paramHelp" id="kA_ParamHelp">
-															<b style="font-size:20px">$k_{A}$</b> - rate constant of polymerase entering the active state. Default: 4s<sup>-1</sup>
+															<b style="font-size:20px">$k_{A}$</b> - rate constant of polymerase entering the pretranslocated state from the intermediate state. Default: 4s<sup>-1</sup>
 														</div><br>
-														<div class="paramHelp" id="RateCleave_ParamHelp">
-															<b style="font-size:20px">$k_{cleave}$</b> - rate constant of cleaving the 3<sup>&prime;</sup> end of the nascent strand when the polymerase is backtracked. 
-															<i>In vivo</i> this reaction may be carried out by elongation factors, for example, GreA. Default: 0s<sup>-1</sup>
-														</div><br>
+														
 												</div>
+                                        
+                                                 <br><br>
+                                                <div class="parameter-bg" style="font-size:18px">
+                                                        
+                                                        <div class="parameter-title" style="font-size:30px">RNA Folding Settings  </div>  
+                                                        <div class="parameter-title" style="font-size:18px">Settings behind folding the nascent RNA strand.</div>  <br> 
+                                                        
+                                                            <div class="paramHelp">
+                                                                <b>Enable mRNA folding </b> - whether or not the nascent RNA strand will fold automatically during the simulation. The predicted energy barrier 
+                                                                        of unfolding secondary structures in the mRNA may need to be overcome when the polymerase translocates backwards. When the nascent strand
+                                                                        is DNA or dsRNA this feature is not applicable. Note that enabling this feature will slow down the first trial of the simulation as we compute
+                                                                        the predicted (MFE<cite val="zuker1981optimal"></val></cite>) secondary structure of the RNA. You can view the RNA secondary structure with the Fold 
+                                                                        <img src="../../src/Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"></img> button. Default: FALSE <br><br>
+                                                            </div><br>
+                                                           
+                                                    </div>
+                                               
+                                        
+                                        
+                                        
+                                                <br><br>
+                                                <div class="parameter-bg" style="font-size:18px">
+                                                    
+                                                    <div class="parameter-title" style="font-size:30px">Cleavage Parameters </div>  
+                                                    <div class="parameter-title" style="font-size:18px">Model for cleaving the nascent strand while backtracked.</div>  <br> 
+                                                       <div class="paramHelp" id="RateCleave_ParamHelp">
+                                                            <b style="font-size:20px">$k_{cleave}$</b> - rate constant of cleaving the 3<sup>&prime;</sup> end of the nascent strand when the polymerase is backtracked. 
+                                                            <i>In vivo</i> this reaction may be carried out by elongation factors, for example, GreA. Default: 0s<sup>-1</sup>
+                                                        </div><br>
+                                            
+                                            
+                                                     <div class="paramHelp" id="RateCleave_ParamHelp">
+                                                            <b style="font-size:20px">$\lambda_{cleave}$</b> - the maximum number of backtracked nucleotides which can be cleaved. 
+                                                            Set to 0 to have no upper limit. Default: 10 nt <cite val="lisica2016mechanisms"></cite>
+                                                        </div><br>
+                                                </div>
+                                        
+                                        
 												<br><br>
-												<div class="parameter-bg" style="font-size:18px">
-													
-													<div class="parameter-title" style="font-size:30px">RNA Folding Parameters  </div>  
-													<div class="parameter-title" style="font-size:18px">Settings behind folding the nascent RNA strand.</div>  <br> 
-													
-														<div class="paramHelp">
-															<b>Enable mRNA folding </b> - whether or not the nascent RNA strand will fold automatically during the simulation. The predicted energy barrier 
-																	of unfolding secondary structures in the mRNA may need to be overcome when the polymerase translocates backwards. When the nascent strand
-																	is DNA or dsRNA this feature is not applicable. Note that enabling this feature will slow down the first trial of the simulation as we compute
-																	the predicted (MFE<cite val="zuker1981optimal"></val></cite>) secondary structure of the RNA. You can view the RNA secondary structure with the Fold 
-																	<img src="../../src/Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"></img> button. Default: FALSE <br><br>
-														</div><br>
-														<div class="paramHelp" id="nbpToFold_ParamHelp">
-															<b>Number of bases to fold </b> - the number of most recently added bases in the nascent strand to fold (if "Allow mRNA folding" is enabled). The timescale
-																of transcription is probably not long enough to allow the whole mRNA chain to fold<cite val="maoileidigh2011unified"></cite>, especially in vivo, and folding the entire chain is
-																computationally expensive. For these two reasons we do not fold the entire mRNA but only the most recently added bases. Default: 150nt<cite val="maoileidigh2011unified"></cite> <br><br>
-														</div><br>
-												</div>
-											<br><br>
 												<div class="parameter-bg" style="font-size:18px">
 													
 													<div class="parameter-title" style="font-size:30px">Advanced Model Settings</div>  
 													<div class="parameter-title" style="font-size:18px">Other parameters relating to the algorithm and model.</div>  <br> 
-													<div class="paramHelp" id="arrestTime_ParamHelp">
+													
+                                            
+                                                    <div class="paramHelp" id="arrestTime_ParamHelp">
 														<b>Arrest time </b> - the amount of time the polymerase may take to copy a base before the simulation trial is aborted. When the timeout is
 																reached, copying will prematurely terminate and the next trial will begin. Default: 600s 
 													</div><br>		
+                                            
+                                                
 													
 												</div>
 												<br><br>
@@ -993,7 +1075,7 @@ function addCitations(){
 				<br><br><br><br>
 				<div class="main-block" >
 					<div class="main-block-inner">
-						<div class="block-title"><span id='kineticsBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>  Kinetics and Thermodynamics </div> 
+						<div class="block-title"><span id='kineticsBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>  Simulating </div> 
 						<div id="kinetics"  style="display:none">
 						
 						
@@ -2422,34 +2504,9 @@ function addCitations(){
 						</div>
 					</div>
 				</div>
+
+	
 	<!--
-	<br><br><br><br>
-	<div class="main-block">
-		<div class="main-block-inner">
-			<div class="block-title"> 
-			
-			
-				<span id='examplesBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
-				Examples 
-				</div> 
-					<div id="examples"  style="display:none">
-						<br><br>
-							<div class="about-block">
-								<div class="about-block-inner">
-									<div class="block-subtitle" > Example 1: effect of hybrid size on pause sites </div> <br>
-									Open up the session <a href="../?test.xml">test.xml</a>. 
-								</div>
-							</div>
-					</div>
-				</div>
-	
-	
-			</div>
-		</div>
-	</div>
-	-->
-	
-	
 	<br><br><br><br>
 	<div class="main-block">
 		<div class="main-block-inner">
@@ -2797,8 +2854,37 @@ function addCitations(){
 			</div>
 		</div>
 	</div>
+	-->
 	
-	
+                    
+                    
+    <br><br><br><br>
+    <div class="main-block">
+        <div class="main-block-inner">
+            <div class="block-title"> 
+            
+            
+                <span id='simpolLiteratureSectionBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
+                    SimPol in the Literature 
+                </div> 
+                <div id="simpolLiteratureSection" style="display:none">          
+                    <br><br>
+                    <div class="about-block" style="width:90%; margin:auto">
+                        <div class="about-block-inner">
+                                    
+                               Hey     
+                                    
+                        </div>
+                    </div>
+                </div>
+    
+    
+            </div>
+        </div>
+    </div>
+                    
+                    
+                    
 	
 	<br><br><br><br>
 	<div class="main-block">
@@ -2835,7 +2921,7 @@ function addCitations(){
 	
 	
 		<div class="header">
-			SimPol | Centre for Computational Evolution & School of Biological Sciences, University of Auckland | 2018
+			SimPol | Centre for Computational Evolution & School of Biological Sciences, University of Auckland | 2019
 		</div>
 	
 		</div>

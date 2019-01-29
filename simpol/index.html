@@ -47,8 +47,8 @@
 
 
 
-<!--<script language='JavaScript' type='text/JavaScript' src='src/Resources/d3.v4.min.js'></script> -->
-<script src="https://d3js.org/d3.v5.min.js"></script>
+<script language='JavaScript' type='text/JavaScript' src='../src/Resources/d3.v5.min.js'></script> 
+<!--<script src="https://d3js.org/d3.v5.min.js"></script>-->
 <!--<script language='JavaScript' type='text/JavaScript' src='http://d3js.org/d3.v4.min.js'></script> -->
 <!-- <script language='JavaScript' type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.bundle.min.js"></script> -->
 <script language='JavaScript' type="text/javascript" src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.js"></script>
@@ -147,7 +147,7 @@ function init(){
 		running_ABC = false;
 		$("#nbasesToSimulate").val(30);
 		$("#translocationSummaryContainer").hide(100);
-		$("#currentTranslocationModel").val("HIBU_barriers");
+		$("#currentTranslocationModel").val("HIGU_barriers");
 		maxHeight = 10000;
 		nTimes20SequencesToDisplay = 1;
 
@@ -2286,10 +2286,10 @@ function closeNav() {
 				 			    <option value="absoluteBarriers">Absolute barriers</option>
 				 				<option value="midpointBarriers">Midpoint barriers</option>
 				 				<optgroup label="Hybrid/bubble melting:">
-					 				<option value="HIBI_barriers">hIbI model</option>
-					 				<option value="HIBU_barriers">hIbU model</option>
-					 				<option value="HUBI_barriers">hUbI model</option>
-					 				<option value="HUBU_barriers">hUbU model</option>
+					 				<option value="HIGI_barriers">HIGI model</option>
+					 				<option value="HIGU_barriers">HIGU model</option>
+					 				<option value="HUGI_barriers">HUGI model</option>
+					 				<option value="HUGU_barriers">HUGU model</option>
 				 				</optgroup>
 
 							</select>
@@ -4068,7 +4068,7 @@ function closeNav() {
 
 
 				<div class="header">
-					SimPol | Centre for Computational Evolution & School of Biological Sciences, University of Auckland | 2018
+					SimPol | Centre for Computational Evolution & School of Biological Sciences, University of Auckland | 2019
 				</div>
 
 

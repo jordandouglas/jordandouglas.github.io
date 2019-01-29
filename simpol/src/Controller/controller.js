@@ -647,7 +647,6 @@ function renderObjects(override = false, resolve = function(){}){
 		var toCall = () => new Promise((resolve) => get_unrenderedObjects_controller(resolve));
 		toCall().then((unrenderedObjects_controller) => {
 
-			//console.log("unrenderedObjects_controller", unrenderedObjects_controller);
 
 
 			//renderingObjects = true;
