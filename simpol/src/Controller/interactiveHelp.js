@@ -62,9 +62,9 @@ function begin_biophys1(){
         "Example 1: simulating transcription elongation.",
         `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
         
-        To begin the simulation, press the <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
+        To begin the simulation, press the glowing <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
         button on the far left. See the plots further down this page to visualise the simulation results.`,
-        "This example was loaded from: <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=1'>www.polymerase.nz/simpol/?biophys=1</a>");
+        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=1'>www.polymerase.nz/simpol/?biophys=1</a>");
     
        
         // Add a glow around the simulate button
@@ -72,7 +72,7 @@ function begin_biophys1(){
 
         var intervalID = window.setInterval(function() {  
             btn.toggleClass('glowing');
-        }, 1000);
+        }, 750);
         
         
        
