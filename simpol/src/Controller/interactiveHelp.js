@@ -44,12 +44,28 @@ function begin_tutorial(tut_id = null){
         case "biophys2":
             begin_biophys2();
             break;  
+            
+            
+        case "biophys3":
+            begin_biophys3();
+            break; 
+            
+            
+        case "biophys4":
+            begin_biophys4();
+            break; 
+            
+            
+        case "biophys5":
+            begin_biophys5();
+            break; 
     
     }
 
 
 
 }
+
 
 // Perform 30 transcription elongation simulations of the first 80 nt of the E. coli lacZ gene.
 function begin_biophys1(){
@@ -110,7 +126,7 @@ function begin_biophys2(){
         `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
         
         To begin the demonstration, press the glowing <img id='startTrials' src='../src/Images/folding.png' style='vertical-align: middle; width:20px; height:20px;'>
-        button to toggle RNA folding.
+        button on the far left to toggle RNA folding.
         
         Then, use <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
         to begin the stochastic simulation`,
@@ -146,6 +162,156 @@ function begin_biophys2(){
                 fold_btn.unbind('click');
             });
             
+        
+        }, 50);
+        
+        
+    };
+    
+
+    loadSessionFromURL(sessionFileLocation, toDoAfterLoadSession);
+
+}
+
+
+
+
+
+
+
+
+// Add insertions into a poly(T) tract of the Buchnera aphidicola murC1 gene
+function begin_biophys3(){
+    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys3.xml";
+    var toDoAfterLoadSession = function() {
+        
+        
+        
+        addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
+        "Example 3: visualising transcriptional slippage.",
+        `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
+        
+        To add a 10A insert into the mRNA, press the glowing <img id='startTrials' src='../src/Images/stutter.png' style='vertical-align: middle; width:20px; height:20px;'>
+        button on the far left. This repetitive slippage is known as stuttering. During transcription, upto 4 inserts may be added into this region of the murC2 gene.`,
+        `This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=3'>www.polymerase.nz/simpol/?biophys=3</a> <br> <br>
+        Tamas, Ivica, et al. "Endosymbiont gene functions impaired and rescued by polymerase infidelity at poly (A) tracts." Proceedings of the National Academy of Sciences 105.39 (2008): 14934-14939.<br> <br>`);
+    
+       
+        // Add a glow around the stutter button
+        var btn = $("#stutterBtn");
+
+        var intervalID = window.setInterval(function() {  
+            btn.toggleClass('glowing');
+        }, 750);
+        
+        
+       
+        
+        window.setTimeout(function(){
+        
+            btn.click(function(){
+                window.clearInterval(intervalID);
+                btn.removeClass("glowing");
+                btn.unbind('click');
+            });
+        
+        }, 50);
+        
+        
+    };
+    
+
+    loadSessionFromURL(sessionFileLocation, toDoAfterLoadSession);
+
+}
+
+
+
+
+
+// Rxplore the third-order relationship between catalysis rate kcat , NTP binding rate kbind , and elongation velocity.
+function begin_biophys4(){
+    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys4.xml";
+    var toDoAfterLoadSession = function() {
+        
+        
+        
+        addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
+        "Example 1: simulating transcription elongation.",
+        `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
+        
+        To begin the stochastic simulation, press the glowing <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
+        button on the far left. See the plots further down this page to visualise the simulation results.`,
+        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=4'>www.polymerase.nz/simpol/?biophys=4</a>");
+    
+       
+        // Add a glow around the simulate button
+        var btn = $("#simulateBtn");
+
+        var intervalID = window.setInterval(function() {  
+            btn.toggleClass('glowing');
+        }, 750);
+        
+        
+       
+        
+        window.setTimeout(function(){
+        
+            btn.click(function(){
+                window.clearInterval(intervalID);
+                btn.removeClass("glowing");
+                btn.unbind('click');
+            });
+        
+        }, 50);
+        
+        
+    };
+    
+
+    loadSessionFromURL(sessionFileLocation, toDoAfterLoadSession);
+
+}
+
+
+
+
+
+
+
+// Fit parameters kcat and kbind to a toy [NTP]-velocity dataset using R-ABC.
+function begin_biophys5(){
+    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys5.xml";
+    var toDoAfterLoadSession = function() {
+        
+        
+        
+        addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
+        "Example 1: simulating transcription elongation.",
+        `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
+        
+        To begin the stochastic simulation, press the glowing <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
+        button on the far left. See the plots further down this page to visualise the simulation results.`,
+        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=5'>www.polymerase.nz/simpol/?biophys=5</a>");
+    
+       
+        // Add a glow around the simulate button
+        var btn = $("#simulateBtn");
+
+        var intervalID = window.setInterval(function() {  
+            btn.toggleClass('glowing');
+        }, 750);
+        
+        
+       
+        
+        window.setTimeout(function(){
+        
+            btn.click(function(){
+                window.clearInterval(intervalID);
+                btn.removeClass("glowing");
+                btn.unbind('click');
+            });
         
         }, 50);
         
