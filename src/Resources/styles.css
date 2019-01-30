@@ -549,6 +549,7 @@ div.vertical{
 	font-size: 18px;
 	text-decoration: none;
 	text-align: center;
+    %display:inline-block;
 	
 }
 
