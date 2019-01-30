@@ -2,7 +2,7 @@
 <session datetime="2019_1_31-10.53.45" N="30" speed="slow" polymerase="RNAP">
 	<sequence seqID="$user" TemplateType="dsDNA" PrimerType="ssRNA" seq="TACTTTCGACCGATGTCCTTCCGGTCTGCGCTTAATAAAAACTACCGCAATTGAGCCGCAAAGTAGACACCACGTTGCCC" />
 	<elongation-model>
-		<allowBacktracking val="true" />
+		<allowBacktracking val="false" />
 		<allowHypertranslocation val="false" />
 		<allowInactivation val="true" />
 		<deactivateUponMisincorporation val="false" />
