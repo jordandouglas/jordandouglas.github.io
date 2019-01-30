@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <session datetime="2019_1_31-11.39.39" N="10" speed="slow" polymerase="RNAP">
-	<sequence seqID="Buchnera aphidicola murC1 EU274658" TemplateType="dsDNA" PrimerType="ssRNA" seq="GGAAGACTATTAGGTCTTTAATATCGTCGATTTTTTTTTTGTAAGGATATGATAATTCTCGACTTTA" />
+	<sequence seqID="$user" TemplateType="dsDNA" PrimerType="ssRNA" seq="TACGCTAAAATATTCGTTAAAGTGTAATTAATCTTTTTTTTTTAATTTATTGGATTTTTAATG" />
 	<elongation-model>
 		<allowBacktracking val="false" />
 		<allowHypertranslocation val="false" />
@@ -39,7 +39,7 @@
 		<CleavageLimit val="10" distribution="Fixed" fixedDistnVal="10">Cleavage limit (nt)</CleavageLimit>
 		<upstreamWindow val="12" distribution="Fixed" fixedDistnVal="12">3′ DNA curvature window</upstreamWindow>
 		<downstreamWindow val="12" distribution="Fixed" fixedDistnVal="12">5′ DNA curvature window</downstreamWindow>
-		<haltPosition val="40" distribution="Fixed" fixedDistnVal="40">Halt position (nt)</haltPosition>
+		<haltPosition val="43" distribution="Fixed" fixedDistnVal="43">Halt position (nt)</haltPosition>
 		<proposalWidth val="1" distribution="Fixed" fixedDistnVal="1">Proposal width</proposalWidth>
 	</parameters>
 	<ABC inferenceMethod="ABC" ntrials="undefined" testsPerData="undefined" showRejectedParameters="false" />
