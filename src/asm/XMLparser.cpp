@@ -139,7 +139,6 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 					if (modelSettingName == "allowBacktracking") currentModel->set_allowBacktracking(value == "true");
 					else if (modelSettingName == "allowHypertranslocation") currentModel->set_allowHypertranslocation(value == "true");
 					else if (modelSettingName == "allowInactivation") currentModel->set_allowInactivation(value == "true");
-					else if (modelSettingName == "allowBacktrackWithoutInactivation") currentModel->set_allowBacktrackWithoutInactivation(value == "true");
 					else if (modelSettingName == "allowGeometricCatalysis") currentModel->set_allowGeometricCatalysis(value == "true");
 					else if (modelSettingName == "subtractMeanBarrierHeight") currentModel->set_subtractMeanBarrierHeight(value == "true");
 					else if (modelSettingName == "allowmRNAfolding") currentModel->set_allowmRNAfolding(value == "true");
@@ -587,7 +586,6 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 						if (attrName == "allowBacktracking") model->set_allowBacktracking(value == "true");
 						else if (attrName == "allowHypertranslocation") model->set_allowHypertranslocation(value == "true");
 						else if (attrName == "allowInactivation") model->set_allowInactivation(value == "true");
-						else if (attrName == "allowBacktrackWithoutInactivation") model->set_allowBacktrackWithoutInactivation(value == "true");
 						else if (attrName == "allowGeometricCatalysis") model->set_allowGeometricCatalysis(value == "true");
 						else if (attrName == "subtractMeanBarrierHeight") model->set_subtractMeanBarrierHeight(value == "true");
 						else if (attrName == "allowmRNAfolding") model->set_allowmRNAfolding(value == "true");

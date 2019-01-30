@@ -38,7 +38,6 @@ Model::Model(){
 	allowBacktracking = false;
 	allowHypertranslocation = false;
 	allowInactivation = false;
-	allowBacktrackWithoutInactivation = false;
 	deactivateUponMisincorporation = false;
 	allowGeometricCatalysis = true;
 	subtractMeanBarrierHeight = false;
@@ -73,7 +72,6 @@ Model* Model::clone(){
 	clonedModel->allowBacktracking = this->allowBacktracking;
 	clonedModel->allowHypertranslocation = this->allowHypertranslocation;
 	clonedModel->allowInactivation = this->allowInactivation;
-	clonedModel->allowBacktrackWithoutInactivation = this->allowBacktrackWithoutInactivation;
 	clonedModel->deactivateUponMisincorporation = this->deactivateUponMisincorporation;
 	clonedModel->allowGeometricCatalysis = this->allowGeometricCatalysis;
 	clonedModel->subtractMeanBarrierHeight = this->subtractMeanBarrierHeight;
@@ -171,7 +169,6 @@ string Model::toJSON(){
 	JSON += "'allowBacktracking':" + string(this->allowBacktracking ? "true" : "false") + ",";
 	JSON += "'allowHypertranslocation':" + string(this->allowHypertranslocation ? "true" : "false") + ",";
 	JSON += "'allowInactivation':" + string(this->allowInactivation ? "true" : "false") + ",";
-	JSON += "'allowBacktrackWithoutInactivation':" + string(this->allowBacktrackWithoutInactivation ? "true" : "false") + ",";
 	JSON += "'deactivateUponMisincorporation':" + string(this->deactivateUponMisincorporation ? "true" : "false") + ",";
 	JSON += "'allowGeometricCatalysis':" + string(this->allowGeometricCatalysis ? "true" : "false") + ",";
 	JSON += "'subtractMeanBarrierHeight':" + string(this->subtractMeanBarrierHeight ? "true" : "false") + ",";
@@ -219,7 +216,6 @@ string Model::toJSON_compact(){
 	JSON += "'allowBacktracking':" + string(this->allowBacktracking ? "true" : "false") + ",";
 	JSON += "'allowHypertranslocation':" + string(this->allowHypertranslocation ? "true" : "false") + ",";
 	JSON += "'allowInactivation':" + string(this->allowInactivation ? "true" : "false") + ",";
-	JSON += "'allowBacktrackWithoutInactivation':" + string(this->allowBacktrackWithoutInactivation ? "true" : "false") + ",";
 	JSON += "'allowGeometricCatalysis':" + string(this->allowGeometricCatalysis ? "true" : "false") + ",";
 	JSON += "'subtractMeanBarrierHeight':" + string(this->subtractMeanBarrierHeight ? "true" : "false") + ",";
 	JSON += "'allowmRNAfolding':" + string(this->allowmRNAfolding ? "true" : "false") + ",";
@@ -256,7 +252,6 @@ void Model::print(){
 	cout << "allowBacktracking = " << this->allowBacktracking << endl;
 	cout << "allowHypertranslocation = " << this->allowHypertranslocation << endl;
 	cout << "allowInactivation = " << this->allowInactivation << endl;
-	cout << "allowBacktrackWithoutInactivation = " << this->allowBacktrackWithoutInactivation << endl;
 	cout << "deactivateUponMisincorporation = " << this->deactivateUponMisincorporation << endl;
 	cout << "allowGeometricCatalysis = " << this->allowGeometricCatalysis << endl;
 	cout << "subtractMeanBarrierHeight = " << this->subtractMeanBarrierHeight << endl;
@@ -354,13 +349,6 @@ bool Model::get_allowInactivation(){
 }
 
 
-Model* Model::set_allowBacktrackWithoutInactivation(bool val){
-	this->allowBacktrackWithoutInactivation = val;
-	return this;
-}
-bool Model::get_allowBacktrackWithoutInactivation(){
-	return this->allowBacktrackWithoutInactivation;
-}
 
 
 Model* Model::set_deactivateUponMisincorporation(bool val){

@@ -1083,7 +1083,6 @@ void Settings::parseModel(string modelID, double modelWeight, string modelDescri
 		if (setting == "allowBacktracking") newModel->set_allowBacktracking(val == "true");
 		else if (setting == "allowHypertranslocation") newModel->set_allowHypertranslocation(val == "true");
 		else if (setting == "allowInactivation") newModel->set_allowInactivation(val == "true");
-		else if (setting == "allowBacktrackWithoutInactivation") newModel->set_allowBacktrackWithoutInactivation(val == "true");
 		else if (setting == "allowGeometricCatalysis") newModel->set_allowGeometricCatalysis(val == "true");
 		else if (setting == "subtractMeanBarrierHeight") newModel->set_subtractMeanBarrierHeight(val == "true");
 		else if (setting == "allowDNAbending") newModel->set_allowDNAbending(val == "true");

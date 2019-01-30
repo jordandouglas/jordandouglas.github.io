@@ -41,7 +41,6 @@ class Model{
 	bool allowBacktracking;
 	bool allowHypertranslocation;
 	bool allowInactivation;
-	bool allowBacktrackWithoutInactivation;
 	bool deactivateUponMisincorporation;
 	bool allowGeometricCatalysis;
 	bool subtractMeanBarrierHeight;
@@ -95,8 +94,6 @@ class Model{
 		bool get_allowHypertranslocation();
 		Model* set_allowInactivation(bool val);
 		bool get_allowInactivation();
-		Model* set_allowBacktrackWithoutInactivation(bool val);
-		bool get_allowBacktrackWithoutInactivation();
 		Model* set_deactivateUponMisincorporation(bool val);
 		bool get_deactivateUponMisincorporation();
 		Model* set_allowGeometricCatalysis(bool val);
