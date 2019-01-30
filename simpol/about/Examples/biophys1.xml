@@ -3,8 +3,8 @@
 	<sequence seqID="$user" TemplateType="dsDNA" PrimerType="ssRNA" seq="TACTTTCGACCGATGTCCTTCCGGTCTGCGCTTAATAAAAACTACCGCAATTGAGCCGCA" />
 	<plots hidden="false">
 		<plot1 name="distanceVsTime" plotFunction="plotTimeChart" xRange="automaticX" yRange="automaticY" />
-		<plot2 name="pauseHistogram" plotFunction="plot_pause_distribution" xRange="automaticX" perTime="perCatalysis" />
-		<plot3 name="velocityHistogram" plotFunction="plot_velocity_distribution" xRange="automaticX" windowSize="1" />
+		<plot2 name="pauseHistogram" plotFunction="plot_pause_distribution"  perTime="perCatalysis" xRange="automaticX" />
+		<plot3 name="velocityHistogram" plotFunction="plot_velocity_distribution"  windowSize="1" xRange="automaticX" />
 		<plot4 name="pauseSite" plotFunction="plot_time_vs_site" yAxis="timeSeconds" pauseSiteYVariable="timePerTranscriptLength" />
 	</plots>
 	<elongation-model>
