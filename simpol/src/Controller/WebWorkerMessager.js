@@ -2865,6 +2865,11 @@ function loadSession_controller(XMLData, resolve = function() { }){
 				$("#downloadPlot" + plt).show(0);
 				$("#helpPlot" + plt).show(0);
 				$("#helpPlot" + plt).attr("href", "about/#" + pltName + "_PlotHelp");
+                
+                
+                if (plt == 4) {
+                    $("#plot4Buttons").show(true);
+                }
 				
 				
 				//if (result["whichPlotInWhichCanvas"][plt]["name"] != "none" && result["whichPlotInWhichCanvas"][plt]["name"] != "custom" && result["whichPlotInWhichCanvas"][plt]["name"] != "parameterHeatmap") eval(result["whichPlotInWhichCanvas"][plt]["plotFunction"])();

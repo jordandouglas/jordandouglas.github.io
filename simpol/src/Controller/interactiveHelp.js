@@ -51,7 +51,7 @@ function begin_tutorial(tut_id = null){
 
 }
 
-// Perform 30 transcription elongation simulations of the first 50 nt of the E. coli lacZ gene.
+// Perform 30 transcription elongation simulations of the first 80 nt of the E. coli lacZ gene.
 function begin_biophys1(){
     var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys1.xml";
     var toDoAfterLoadSession = function() {
@@ -62,7 +62,7 @@ function begin_biophys1(){
         "Example 1: simulating transcription elongation.",
         `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
         
-        To begin the simulation, press the glowing <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
+        To begin the stochastic simulation, press the glowing <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
         button on the far left. See the plots further down this page to visualise the simulation results.`,
         "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=1'>www.polymerase.nz/simpol/?biophys=1</a>");
     
@@ -101,6 +101,59 @@ function begin_biophys1(){
 // Visualise the simulated change in RNA structure during transcription elongation.
 function begin_biophys2(){
 
+    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys2.xml";    
+    var toDoAfterLoadSession = function() {
+        
+        
+        addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
+        "Example 2: visualising cotranscriptional folding.",
+        `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
+        
+        To begin the demonstration, press the glowing <img id='startTrials' src='../src/Images/folding.png' style='vertical-align: middle; width:20px; height:20px;'>
+        button to toggle RNA folding.
+        
+        Then, use <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
+        to begin the stochastic simulation`,
+        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=2'>www.polymerase.nz/simpol/?biophys=2</a>");
+    
+       
+        // Add a glow around the simulate and folding buttons
+        var sim_btn = $("#simulateBtn");
+        var fold_btn = $("#foldBtnDiv");
+        
+        var sim_intervalID = window.setInterval(function() {  
+            sim_btn.toggleClass('glowing');
+        }, 750);
+        
+        
+        var fold_intervalID = window.setInterval(function() {  
+            fold_btn.toggleClass('glowing');
+        }, 750);
+        
+       
+        
+        window.setTimeout(function(){
+        
+            sim_btn.click(function(){
+                window.clearInterval(sim_intervalID);
+                sim_btn.removeClass("glowing");
+                sim_btn.unbind('click');
+            });
+            
+            fold_btn.click(function(){
+                window.clearInterval(fold_intervalID);
+                fold_btn.removeClass("glowing");
+                fold_btn.unbind('click');
+            });
+            
+        
+        }, 50);
+        
+        
+    };
+    
+
+    loadSessionFromURL(sessionFileLocation, toDoAfterLoadSession);
 
 }
 
