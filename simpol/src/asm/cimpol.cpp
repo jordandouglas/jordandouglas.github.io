@@ -170,7 +170,7 @@ int main(int argc, char** argv) {
 	if (_inputXMLfilename != ""){
 		char* filename = new char[_inputXMLfilename.length() + 1];
 		strcpy(filename, _inputXMLfilename.c_str());
-		bool succ = XMLparser::parseXMLFromFilename(filename);
+		bool succ = XMLparser::parseXMLFromFilename(filename, nullptr);
 		delete [] filename;
 		if (!succ) exit(1);
 

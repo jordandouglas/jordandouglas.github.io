@@ -15,4 +15,3 @@ emcc -s WASM=1 -o simpol_asm.html  -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 
 
 
 
-# -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=2

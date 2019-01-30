@@ -641,7 +641,7 @@ extern "C" {
 		//currentModel = new Model();
 		modelsToEstimate.clear();
 		
-		XMLparser::parseXMLFromString(XMLdata);
+		XMLparser::parseXMLFromString(XMLdata, _GUI_PLOTS);
 
 		Settings::sampleAll();
 		//Settings::initSequences();

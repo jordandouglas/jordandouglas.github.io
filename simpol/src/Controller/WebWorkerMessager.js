@@ -2850,14 +2850,15 @@ function loadSession_controller(XMLData, resolve = function() { }){
 		var openPlots = function(){
 
 
-         console.log("openPlots");
+         console.log("openPlots", result);
 			// Open up the appropriate plots
 			//PLOT_DATA = {};
 			//PLOT_DATA["whichPlotInWhichCanvas"] = result["whichPlotInWhichCanvas"];
-			
-			for (var plt in result["whichPlotInWhichCanvas"]){
+            
+			var plotSettings = result.plots.whichPlotInWhichCanvas;
+			for (var plt in plotSettings){
 				
-				var pltName = result["whichPlotInWhichCanvas"][plt]["name"];
+				var pltName = plotSettings[plt]["name"];
 				$("#selectPlot" + plt).val(pltName);
 				$("#plotDIV" + plt).show(0);
 				$("#plotOptions" + plt).show(0);
@@ -2877,7 +2878,7 @@ function loadSession_controller(XMLData, resolve = function() { }){
 			
 		}
 		
-		if (result["showPlots"] != null) showPlots(result["showPlots"]);
+		if (result.plots.plotsAreHidden != null) showPlots(!result.plots.plotsAreHidden);
 
 
 		
@@ -3079,7 +3080,7 @@ function loadSession_controller(XMLData, resolve = function() { }){
 	
 	if (WEB_WORKER == null) {
 		var toCall = () => new Promise((resolve) => XML_JS.loadSession_WW(XMLData, resolve));
-		toCall().then((whichPlotInWhichCanvas) => updateDom(whichPlotInWhichCanvas));
+		toCall().then((result) => updateDom(result));
 	}
 
 	else if (WEB_WORKER_WASM == null){
@@ -3087,7 +3088,7 @@ function loadSession_controller(XMLData, resolve = function() { }){
 		var fnStr = res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((whichPlotInWhichCanvas) => updateDom(whichPlotInWhichCanvas));
+		toCall().then((result) => updateDom(result));
 
 	}
 
@@ -3099,7 +3100,7 @@ function loadSession_controller(XMLData, resolve = function() { }){
 		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((whichPlotInWhichCanvas) => updateDom(whichPlotInWhichCanvas));
+		toCall().then((result) => updateDom(result));
 
 
 	}
