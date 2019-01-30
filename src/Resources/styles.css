@@ -838,10 +838,11 @@ input:checked + .slider:before {
 
 
 .glowing {
-    background-color:#708090;
-    border-color: white;
-    opacity: 1;
-    -webkit-box-shadow: 0 0 5px white;
-       -moz-box-shadow: 0 0 5px white;
-            box-shadow: 0 0 5px white;
+    background-color:#f0c36d;
+    border-color: #FFFFB2;
+    -webkit-box-shadow: 0 0 10px #FFFFB2;
+       -moz-box-shadow: 0 0 10px #FFFFB2;
+            box-shadow: 0 0 10px #FFFFB2;
 }
+
+
