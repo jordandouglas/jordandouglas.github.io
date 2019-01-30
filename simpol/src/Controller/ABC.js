@@ -32,6 +32,7 @@ function initABCpanel(){
 	gelFabricCanvases = {};
 
 
+
 	$(".beginABC_btn").css("cursor", "auto");
 	$(".beginABC_btn").css("background-color", "#858280");
 	$(".beginABC_btn").attr("disabled", "disabled");
@@ -5377,7 +5378,7 @@ function addNewABCRows(lines){
 function renderABCoutput(){
 
 
-
+    $("#ABCoutput").show(300);
 
 	// Print ALL lines or just accepted lines?
 	var linesToUse = $("#ABC_showRejectedParameters").prop("checked") ? ABClines : ABClinesAcceptedOnly;

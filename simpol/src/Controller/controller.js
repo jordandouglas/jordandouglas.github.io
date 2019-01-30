@@ -1593,6 +1593,7 @@ function clearCache(){
 
 
 				if (ABC_cleardata) {
+                     $("#ABCoutput").hide(300);
 					$("#ABCoutput").html("");
 					$("#downloadABC").hide(50);
 					$("#uploadABC").show(50);

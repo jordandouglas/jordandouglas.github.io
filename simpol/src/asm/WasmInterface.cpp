@@ -1510,7 +1510,7 @@ extern "C" {
 
 		string posteriorsJSON = "{";
 
-		if (_GUI_posterior.size() > 0) posteriorsJSON += "'0':'SimPol MCMC-ABC',";
+		if (_GUI_posterior.size() > 0) posteriorsJSON += "'0':'SimPol ABC',";
 		for (std::map<int, list<PosteriorDistributionSample*>>::iterator iter = _gelPosteriorDistributions.begin(); iter != _gelPosteriorDistributions.end(); ++iter){
 			int id = iter->first;
 			posteriorsJSON += "'" + to_string(id) + "':'Gel calibration " + to_string(id) + "',";

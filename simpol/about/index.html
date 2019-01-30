@@ -162,28 +162,39 @@ function drawModelDiagrams(){
 function printContents(){
 
     // Find all elements with section or subsection classes
-    var sects = $(".section, .subsection");
+    var sects = $(".section, .subsection, .subsubsection");
     var sectNum = 0;
     var subsectNum = 0;
+    var subsubsectNum = 0;
     for (var i = 0; i < sects.length; i ++){
             
         var ele = $(sects[i]);
+        var isSect = ele.hasClass("section");
+        var isSubsect = ele.hasClass("subsection");
+            
             
         // Give it an id
-        var HTML = $(ele).html().trim()
+        var HTML = (isSect || isSubsect) ? ele.html().trim() : ele.attr("sect").trim();
         var id = HTML.split(" ").join("_");
         ele.attr("id", id);
-        var isSect = ele.hasClass("section");
+        
+            
         var a_tag = "<a href='#" + id + "' style='text-decoration:none; color:" + (isSect ? "#008cba" : "black") + "'>" + HTML + "</a>";
           
         // Add the html to the contents section
         if (isSect){
             sectNum++;
             $("#contents").append("<div style='font-size:18px; color:#008cba'>" + sectNum + " " + a_tag + "</div>");
-            subsectNum = 1;
-        }else{
-            $("#contents").append("<div style='font-size:16px'>&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + " " + a_tag + "</div>");
+            subsectNum = 0;
+            subsubsectNum = 0;
+        }else if (isSubsect){
             subsectNum++;
+            $("#contents").append("<div style='font-size:17px'>&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + " " + a_tag + "</div>");
+            subsubsectNum = 0;
+        }
+        else {
+            subsubsectNum++;
+            $("#contents").append("<div style='font-size:16px'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + "." + subsubsectNum + " " + a_tag + "</div>");
         }
         
         
@@ -483,7 +494,7 @@ function addCitations(){
 									<br><br><br><br>
 									<div class="panelOuter">
                                             <div class="panelInner" >
-										<span class="block-subsubtitle" > 1. Translocation: </span>
+										<span class="subsubsection block-subsubtitle" sect="Translocation" > Translocation: </span>
 										
     										There are two translocation reactions: Backwards and Forwards. These operations move the polymerase one base-pair left and right respectively, with respect to the 
     									template and nascent strand. These operations involve reconfiguring the base-pairs within the hybrid, and within the chromosome if it is double-stranded. If the polymerase moves beyond the 3&prime; end of the nascent strand, 
@@ -495,7 +506,7 @@ function addCitations(){
 									<br><br>
 									<div class="panelOuter">
                                             <div class="panelInner" >
-										<span class="block-subsubtitle" > 2. Nucleotide incorporation: </span>
+										<span class="subsubsection block-subsubtitle" sect="Nucleotide incorporation" > Nucleotide incorporation: </span>
 										
     										If the active site is free and next to the 3&prime; end of the nascent strand, then the polymerase may bind NTP.
     										Once bound, the polymerase may catalyse the reaction, or it may release the NTP back into the cell. Reverse-catalysis is also possible in SimPol using 
@@ -511,7 +522,7 @@ function addCitations(){
 									<br><br>
 									<div class="panelOuter">
                                             <div class="panelInner" >
-        										<span class="block-subsubtitle" > 3. Inactivation: </span>
+        										<span class="subsubsection block-subsubtitle" sect="Inactivation" > Inactivation: </span>
         										
                                                 
                                                 
@@ -527,7 +538,7 @@ function addCitations(){
 									<br><br>
 									<div class="panelOuter">
                                             <div class="panelInner" >
-										<span class="block-subsubtitle" > 4. Nascent strand cleavage: </span>
+										<span class="subsubsection block-subsubtitle" sect="Nascent strand cleavage"> Nascent strand cleavage: </span>
 										
     										When a nucleic acid polymerase backtracks for too long <i>in vivo</i> it can delay the production of its product and potentially cause roadblocks for other polymerases.
     										Many organisms have evolved elongation factors which serve to rescue the polymerase from this state. One mechanism these factors may act is by cleaving the 3<sup>&prime;</sup> 
@@ -543,7 +554,7 @@ function addCitations(){
 									<br><br>
 									<div class="panelOuter">
                                             <div class="panelInner" >
-										<span class="block-subsubtitle" > 5. Slippage: </span>
+										<span class="subsubsection block-subsubtitle"  sect="Slippage"> Slippage: </span>
 										
     										Sometimes the nascent and template strand temporarily melt and a bulge forms in one of the strands. This can be performed by the
     									Form Bulge reaction.
@@ -885,7 +896,7 @@ function addCitations(){
 													
 													<div class="subsection parameter-title" style="font-size:30px">Experimental Conditions </div>  
 													<div class="parameter-title" style="font-size:18px">The concentrations of NTP (or dNTP if the nascent strand is DNA), and the size of the assisting force applied to the system</div>  <br> 
-														<div class="paramHelp" id="useFourNTPconcentrations_paramHelp">
+														<div class="paramHelp"  id="useFourNTPconcentrations_paramHelp">
 															<table style="">
 															<tr title="Do you want one concentration for all 4 NTPs or one concentration for each one?">
 																<td style="text-align:right; width:150px">
@@ -906,23 +917,23 @@ function addCitations(){
 														
 															</table>
 														</div><br>
-														<div class="paramHelp" id="NTPconc_ParamHelp">
+														<div class="subsubsection paramHelp" sect="[NTP]" id="NTPconc_ParamHelp">
 															<b>[NTP]</b> - concentration of all four NTPs (or dNTPs). Default: 1000&mu;M (or 20&mu;M) 
 														</div><br>
-														<div class="paramHelp" id="ATPconc_ParamHelp">
+														<div class="subsubsection paramHelp" sect="[ATP]" id="ATPconc_ParamHelp">
 															<b>[ATP]</b> - concentration of ATP (or dATP). Default: 3152&mu;M (or 24&mu;M)<cite val="traut1994physiological"></cite>
 														</div><br>
-														<div class="paramHelp" id="CTPconc_ParamHelp">
+														<div class="subsubsection paramHelp" sect="[CTP]" id="CTPconc_ParamHelp">
 															<b>[CTP]</b> - concentration of CTP (or dCTP). Default: 278&mu;M (or 29&mu;M)<cite val="traut1994physiological"></cite>
 														</div><br>
-														<div class="paramHelp" id="GTPconc_ParamHelp">
+														<div class="subsubsection paramHelp" sect="[GTP]" id="GTPconc_ParamHelp">
 															<b>[GTP]</b> - concentration of GTP (or dGTP). Default: 468&mu;M (or 5.2&mu;M)<cite val="traut1994physiological"></cite>
 														</div><br>
-														<div class="paramHelp" id="UTPconc_ParamHelp">
+														<div class="subsubsection paramHelp" sect="[UTP]" id="UTPconc_ParamHelp">
 															<b>[UTP]</b> - concentration of UTP (or dTTP). Default: 567&mu;M (or 37&mu;M)<cite val="traut1994physiological"></cite>
 														</div><br>
 																			   
-														<div class="paramHelp" id="FAssist_ParamHelp">
+														<div class="subsubsection paramHelp" sect="Force" id="FAssist_ParamHelp">
 															<b style="font-size:20px">$F_{assist}$</b> - the size of the force being applied to the polymerase during a single-molecule experiment. Positive forces are assisting loads and increase
 																	the rate of transcription. Negative forces are hindering loads and decrease the rate of transcription. In a natural cellular environment this external force
 																	is not applicable. Default: 0 pN
@@ -935,14 +946,14 @@ function addCitations(){
 													<div class="subsection parameter-title" style="font-size:30px">Structural Parameters </div>  
 													<div class="parameter-title" style="font-size:18px">Basepairing configuration within the transcription bubble and polymerase.</div>  <br> 
 													
-														<div class="paramHelp" id="hybridLen_ParamHelp">
+														<div class="subsubsection paramHelp" sect="Hybrid length" id="hybridLen_ParamHelp">
 															<b>Hybrid length (h)</b> - number of basepairs in the template/nascent hybrid within the polymerase. As translocation rates are determined from sequence composition, this value may affect
 																			   the predicted location of pause sites. Default: 11 bp 
 														</div><br>				   
-														<div class="paramHelp" id="bubbleLeft_ParamHelp">			   
+														<div class="subsubsection paramHelp" sect="Bubble left" id="bubbleLeft_ParamHelp">			   
 															<b>Bubble size 3&prime; (&beta;<sub>1</sub>)</b> - number of unpaired template bases 3&prime; (left hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 1 bp
 														</div><br>	
-														<div class="paramHelp" id="bubbleRight_ParamHelp">
+														<div class="subsubsection paramHelp" sect="Bubble right" id="bubbleRight_ParamHelp">
 															<b>Bubble size 5&prime; (&beta;<sub>2</sub>)</b> - number of unpaired template bases 5&prime; (right hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 0 bp
 														</div><br>	
 									
@@ -959,31 +970,20 @@ function addCitations(){
                                                     <div class="subsection parameter-title" style="font-size:30px">NTP Incorporation Parameters </div>  
                                                     <div class="parameter-title" style="font-size:18px">Kinetics of binding/releasing NTP, and catalysing polymerisation.</div>  <br> 
                                                         
-                                                        <div class="paramHelp" id="Kdissociate_ParamHelp">
+                                                        <div class="subsubsection paramHelp" sect="NTP dissociation constant" id="Kdissociate_ParamHelp">
                                                             <b style="font-size:20px">$K_D$</b> - equilibrium constant of NTP dissociation. $K_D$ is used in conjunction with $k_{bind}$ to calculate the rate of releasing
-                                                            bound NTP: $k_\text{release} = K_D$. Default: 1.8 &mu;M
+                                                            bound NTP: $k_{release} = K_D k_{bind}$. Default: 1.8 &mu;M
                                                         </div><br>
-                                                        <div class="paramHelp" id="kCat_ParamHelp"> 
+                                                        <div class="subsubsection paramHelp" sect="Rate of catalysis" id="kCat_ParamHelp"> 
                                                             <b style="font-size:20px">$k_{cat}$</b> - rate constant of catalysing bound NTP, thus extending the nascent chain by one base. When translocation is fast,
                                                                     catalysis is the rate limiting step in transcription. Default: 25 s<sup>-1</sup>
                                                         </div><br>
                                                         
-                                                        <div class="paramHelp" id="RateBind_ParamHelp">
+                                                        <div class="subsubsection paramHelp" sect="Rate of NTP binding" id="RateBind_ParamHelp">
                                                             <b style="font-size:20px">$k_{bind}$</b> - used to calculate rate constant of binding the complementary NTP, which is calculated as [NTP] k<sub>bind</sub>. 
                                                                     This parameter is constant across all NTPs. Default: 0.5448 &mu;M<sup>-1</sup>.s<sup>-1</sup>  
                                                         </div><br>
-                                                        <!--
-                                                        <div class="paramHelp" id="RateMisbind_ParamHelp">
-                                                            <b style="font-size:20px">$k_{misbind}$</b> - used to calculate rate constant of binding a non-complementary NTP, which is calculated as [NTP] k<sub>misbind</sub>. 
-                                                                        If the bound NTP is added onto the end of the chain without correction then there is a misincorporation event. This parameter is only applicable when "Enable misincorporations" is enabled. The overall rate of uncorrected misincorpations during transcription is
-                                                                        around 1 in 10<sup>4</sup> - 10<sup>5</sup> bases<cite val="imashimizu2013direct,rosenberger1981estimate,shaw2002use"></cite>. Default: 0.25s<sup>-1</sup> 
-                                                        </div><br>
-                                                        -->
-                                                        <!--
-                                                        <div class="paramHelp" stule="display:none">
-                                                            <b style="font-size:20px">$k_{transition} / k_{transversion}$</b> - the ratio between transition and transversion rates. This parameter is only applicable when "Allow inactivation" is enabled. Default: 2 
-                                                        </div><br>
-                                                        -->
+                                                        
                                                         
                                                                                
                                     
@@ -997,18 +997,18 @@ function addCitations(){
 													
 													<div class="subsection parameter-title" style="font-size:30px">Translocation Parameters </div>  
 													<div class="parameter-title" style="font-size:18px">Energetics of translocation reactions and forces.</div>  <br> 
-														<div class="paramHelp" id="GDagSlide_ParamHelp">
+														<div class="subsubsection paramHelp" sect="Translocation Gibbs barrier" id="GDagSlide_ParamHelp">
 															<b style="font-size:20px">$\Delta G^\dagger_{\tau}$</b> - free energy barrier height of translocation. To translocate forwards or backwards, several
 																	basepairs may need to be broken. The energy barrier which must be overcome in order to translocate is estimated as the energy needed to break these basepairs
 																	plus the value of this parameter. Increasing this value will make translocation slower. Default: 9.079 k<sub>B</sub>T <cite val="douglas2018bayesian"></cite>
 														</div><br>	
 														
-														<div class="paramHelp" id="DGPost_ParamHelp">
+														<div class="subsubsection paramHelp" sect="Posttranslocated Gibbs energy" id="DGPost_ParamHelp">
 															<b style="font-size:20px">$\Delta G_{\tau 1}$</b> - free energy term added to that of the posttranslocated state. When this value is low,
 															RNA polymerase spends more time in the posttranslocated state (compared with the pretranslocated state). Default: -2.007 k<sub>B</sub>T <cite val="douglas2018bayesian"></cite>
 														</div> <br>	
 														
-														<div class="paramHelp" id="barrierPos_ParamHelp">
+														<div class="subsubsection paramHelp" sect="Translocation displacement distance" id="barrierPos_ParamHelp">
 															<b style="font-size:20px">$\delta_1$</b> - position of the translocation intermediate state, with respect to the two connected ground states. 
 															This parameter lies between 0 and the width of a single basepair in DNA (3.4 &#x212b;<cite val="watson1953molecular"></cite>). This term only applies
 															when translocation is kinetic and when an assisting force $F_{assist}$ is applied. Default: 2.838 &#x212b; <cite val="douglas2018bayesian"></cite>
@@ -1024,11 +1024,11 @@ function addCitations(){
 													
 													<div class="subsection parameter-title" style="font-size:30px">Pause Parameters </div>  
 													<div class="parameter-title" style="font-size:18px">Kinetics of entering/exiting a catalytically inactive state.</div>  <br> 
-														<div class="paramHelp" id="kU_ParamHelp">
+														<div class="subsubsection paramHelp" sect="Rate of inactivation" id="kU_ParamHelp">
 															<b style="font-size:20px">$k_{U}$</b> - rate constant of polymerase entering the inactive state / intermediate state. This state acts as an intermediate
                                                             between the backtracked states and the pretranslocated state. Elongation may only continue when the polymerase reactivates. Default: 0.1s<sup>-1</sup>
 														</div><br>
-														<div class="paramHelp" id="kA_ParamHelp">
+														<div class="subsubsection paramHelp" sect="Rate of reactivation" id="kA_ParamHelp">
 															<b style="font-size:20px">$k_{A}$</b> - rate constant of polymerase entering the pretranslocated state from the intermediate state. Default: 4s<sup>-1</sup>
 														</div><br>
 														
@@ -1058,13 +1058,13 @@ function addCitations(){
                                                     
                                                     <div class="subsection parameter-title" style="font-size:30px">Cleavage Parameters </div>  
                                                     <div class="parameter-title" style="font-size:18px">Model for cleaving the nascent strand while backtracked.</div>  <br> 
-                                                       <div class="paramHelp" id="RateCleave_ParamHelp">
+                                                       <div class="subsubsection paramHelp" sect="Rate of cleavage" id="RateCleave_ParamHelp">
                                                             <b style="font-size:20px">$k_{cleave}$</b> - rate constant of cleaving the 3<sup>&prime;</sup> end of the nascent strand when the polymerase is backtracked. 
                                                             <i>In vivo</i> this reaction may be carried out by elongation factors, for example, GreA. Default: 0s<sup>-1</sup>
                                                         </div><br>
                                             
                                             
-                                                     <div class="paramHelp" id="RateCleave_ParamHelp">
+                                                     <div class="subsubsection paramHelp" sect="Cleavage limit" id="RateCleave_ParamHelp">
                                                             <b style="font-size:20px">$\lambda_{cleave}$</b> - the maximum number of backtracked nucleotides which can be cleaved. 
                                                             Set to 0 to have no upper limit. Default: 10 nt <cite val="lisica2016mechanisms"></cite>
                                                         </div><br>
@@ -1078,7 +1078,7 @@ function addCitations(){
 													<div class="parameter-title" style="font-size:18px">Other parameters relating to the algorithm and model.</div>  <br> 
 													
                                             
-                                                    <div class="paramHelp" id="arrestTime_ParamHelp">
+                                                    <div class="subsubsection paramHelp" sect="Arrest timeout" id="arrestTime_ParamHelp">
 														<b>Arrest time </b> - the amount of time the polymerase may take to copy a base before the simulation trial is aborted. When the timeout is
 																reached, copying will prematurely terminate and the next trial will begin. Default: 600s 
 													</div><br>		

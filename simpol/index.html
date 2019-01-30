@@ -31,7 +31,7 @@
 <link rel="icon" href="../src/Images/transcribe.png">
 <meta name="viewport" content="width=device-width, initial-scale=0.41, maximum-scale=1" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<meta name="Simpol" content="An interactive graphical simulator of nucleic acid polymerases. Contains JavaScript implementations of kinetic models of transcription elongation.">
+<meta name="SimPol" content="An interactive graphical simulator of nucleic acid polymerases. Contains JavaScript implementations of kinetic models of transcription elongation.">
 <link rel="stylesheet" type="text/css" href="../src/Resources/styles.css">
 
 <script language='JavaScript' type='text/JavaScript' src="../src/Resources/mersenne-twister.js"></script>
@@ -43,7 +43,16 @@
 
 
 <script language='JavaScript' type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/2.3.3/fabric.min.js"></script>
-
+        
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
 
 
@@ -294,7 +303,14 @@ function init(){
 
 
 				barchart(true);
+                
+                // Initialise ABC
+                $("#ABC_useMCMC").val(1);
+                $("#ABC_display").show();
+                $("#MCMC_display").hide();
 				initABCpanel();
+            
+            
 				initModelComparisonpanel();
 				callWebWorkerFunction(stringifyFunction("WW_JS.refresh_WW", []));
 			});
@@ -2280,7 +2296,7 @@ function closeNav() {
 
 						<td colspan = 3 style="text-align:center">
 
-				 			Barrier height model:
+				 			Transition state, $\mathbb{TS}$:
 				 			<select class="dropdown modelSetting" style="width:150px;"  id = "currentTranslocationModel" title="Select which model to use for estimating translocation free energy barrier heights" OnChange="userInputModel_controller()">
 
 				 			    <option value="absoluteBarriers">Absolute barriers</option>
@@ -2405,7 +2421,7 @@ function closeNav() {
 					 	 		<span class="slider round"></span>
 
 							</label> 
-							<span style="font-size:15px; vertical-align:middle" >Enable inactivation</span>
+							<span style="font-size:15px; vertical-align:middle" >Enable inactivation, $\mathbb{IS}$</span>
 
 				 		</td>
 
@@ -2527,7 +2543,7 @@ function closeNav() {
 						 	 <span class="slider round"></span>
 
 							</label> 
-							<span style="font-size:15px; vertical-align:middle" > Enable backtracking </span>
+							<span style="font-size:15px; vertical-align:middle" > Enable backtracking, $\mathbb{BT}$ </span>
 
 				 		</td>
 
@@ -2567,7 +2583,7 @@ function closeNav() {
 
 						<td colspan = 3 style="text-align:center">
 
-							Backstep model:
+							Backstep model, $\mathbb{GT}$:
 							<select class="dropdown modelSetting" style="" id="currentBacksteppingModel" title="Select which model to use for backtracking" OnChange="userInputModel_controller()">
 
 								<option value="backstep0">0 &rightarrow; -1 barrier </option>
@@ -2597,7 +2613,7 @@ function closeNav() {
 						 	 <span class="slider round"></span>
 
 							</label> 
-							<span style="font-size:15px; vertical-align:middle"> Enable hypertranslocation</span>
+							<span style="font-size:15px; vertical-align:middle"> Enable hypertranslocation, $\mathbb{HT}$</span>
 
 				 		</td>
 
@@ -2857,7 +2873,7 @@ function closeNav() {
 							 	 <span class="slider round"></span>
 
 								</label> 
-								<span style="font-size:15px; vertical-align:middle">Enable mRNA folding</span>
+								<span style="font-size:15px; vertical-align:middle">Enable mRNA folding, $\mathbb{RB}$</span>
 
 					 		</td>
 
@@ -3749,26 +3765,27 @@ function closeNav() {
 						<br><br>
 
 
-						<table padding=5 cellpadding=10 style="vertical-align:top">
+						<table  padding=5 cellpadding=10 style="vertical-align:top; margin-left:10px; border: 1px solid black; border-collapse: collapse;">
 
 							<tr>
 								
 
-								<td style="display:none">
+								<td style="vertical-align:top; border: 1px solid black; min-width:300px; background-color:#d3d3d3;">
+                                    <b style="text-align:center">Inference Method:</b><br><br>
 									<div style="position:relative; vertical-align:top;">
 										
-										<b>Inference Method:</b><br>
-										<input type="range" min="1" max="2" value="2" class="rangeslider noselect" style="width:100px" OnChange="toggleMCMC()" id="ABC_useMCMC" title="Use the R-ABC or MCMC-ABC algorithm to fit the data">
+										
+										<input type="range" min="1" max="2" value="1" class="rangeslider noselect" style="width:100px" OnChange="toggleMCMC()" id="ABC_useMCMC" title="Use the R-ABC or MCMC-ABC algorithm to fit the data">
 										<table style="margin-left: 30px; height: 100px; margin-top: -26px;">
 											<tr>
 												<td>
-													Rejection ABC
+													Rejection <br>(R-ABC)
 												</td>
 											</tr>
 											
 											<tr>
 												<td>
-													Markov-chain-Monte-Carlo ABC
+													Markov chain Monte Carlo <br>(MCMC-ABC)
 												</td>
 											</tr>
 
@@ -3780,15 +3797,15 @@ function closeNav() {
 								</td>
 							
 
-								<td style="vertical-align:top; text-align:right">
+								<td style="vertical-align:top; text-align:left; border: 1px solid black; ">
 
-									<b style="text-align:right">Length settings</b><br>
+									<b style="text-align:right">Length settings:</b><br><br>
 									<table style="text-align:right;  float:right">
 										
 										<tr>
 											<td>
-												Number of MCMC iterations:
-												<input type="number" id="MCMCntrials" min=0 value=10000 title="Number of iterations to run the MCMC chain for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008cba">
+												N iterations:
+												<input type="number" id="MCMCntrials" min=0 value=10000 title="Number of samples to generate (for R-ABC) or chain length (for MCMC-ABC)" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 
@@ -3796,10 +3813,24 @@ function closeNav() {
 
 										<tr>
 											<td>
-												Number of trials per data point:
-												<input type="number" id="MCMC_ntestsperdata" min=1 value=5 title="Number of tests to perform at each force/NTP setting. The mean velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008cba">
+												N trials per data point:
+												<input type="number" id="MCMC_ntestsperdata" min=1 value=5 title="Number of tests to perform at each force/NTP setting. The average velocity will be taken" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
+                                                    
+                                                    
+                                     <tr class="ABC_display">
+                                            <td>
+                                                <span style="vertical-align:middle" >Show all samples</span>
+                                                <label class="switch">
+                                                    <input class="modelSetting" type="checkbox" id="ABCshowAll" OnChange="RABC_toggle_display()">
+                                                    <span class="slider round"></span>
+                                                </label> 
+                                                
+                                            </td>
+                                        </tr>
+                                                    
+                                                    
 									
 									
 									</table>
@@ -3808,30 +3839,49 @@ function closeNav() {
 
 
 
-								<td style="vertical-align:top; text-align:right">
+								<td style="vertical-align:top; text-align:left; border: 1px solid black; min-width:200px">
 
-									<b style="text-align:right">Threshold settings</b><br>
+									<b style="text-align:right">Threshold settings:</b><br><br>
 									<table style="text-align:right; float:right">
-										<tr>
+										<tr class="MCMC_display">
 											<td>
 												&isin;<sub>min</sub> =
 												<input type="number" id="MCMC_chiSqthreshold_min" min=0 value=3 title="Chi-squared threshold which must be met to accept a point into the posterior" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 										
-										<tr>
+										<tr class="MCMC_display">
 											<td>
 												&isin;<sub>0</sub> =
 												<input type="number" id="MCMC_chiSqthreshold_0" min=0 value=100 title="Initial chi-squared threshold. This will be decreased every iteration until reaching the minimum threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 										
-										<tr>
+										<tr class="MCMC_display">
 											<td>
 												&gamma; =
 												<input type="number" id="MCMC_chiSqthreshold_gamma" min=0 max=1 step="0.0001" value=0.999 title="Exponential decrease in chi-squared threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
+                                                    
+                                        <tr class="ABC_display">
+                                            <td>
+                                                &epsilon; =
+                                                <input type="number" onChange="change_ABC_epsilon()" id="ABC_epsilon" min=0 step="0.001" value=1 title="Threshold for accepting a sample into the posterior distribution.  This input is linked with P(X &lt; &epsilon;)" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+                                            </td>
+                                        </tr>
+                                                    
+                                                    
+                                                    
+                                        <tr class="ABC_display">
+                                            <td>
+                                                P(X &lt; &epsilon;) =
+                                                <input type="number" onChange="change_ABC_quantile()" id="ABC_quantile" min=0 max=1 step="0.001" value=0 title="The proportion of samples to accept into the posterior distribution. This input is linked with &epsilon;" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+                                            </td>
+                                        </tr>
+                                                    
+                                       
+                                                    
 
 									
 									</table>
@@ -3840,21 +3890,21 @@ function closeNav() {
 
 
 
-								<td style="vertical-align:top; text-align:right">
+								<td  class="MCMC_display" style="vertical-align:top; text-align:left; border: 1px solid black; min-width:200px">
 
-									<b style="text-align:right">Chain settings</b><br>
+									<b style="text-align:right">Chain settings:</b><br><br>
 									<table style="text-align:right; float:right">
 										<tr>
 											<td>
 												Burn-in (%):
-												<input type="number" id="MCMC_burnin" onChange="update_burnin_controller();" min=0 max=100 value=-1 title="Percentage of points to throw away before reaching the posterior distribution. Set to -1 to allow Simpol to select burn-in automatically" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+												<input type="number" id="MCMC_burnin" onChange="update_burnin_controller();" min=0 max=100 value=-1 title="Percentage of points to throw away before reaching the posterior distribution. Set to -1 to allow SimPol to select burn-in automatically" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 										
 										<tr>
 											<td>
 												Log every (states):
-												<input type="number" id="MCMC_logevery" min=1 value=100 title="How often do you want to log the current position" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+												<input type="number" id="MCMC_logevery" min=1 value=100 title="How often do you want to log the current state" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
 											</td>
 										</tr>
 										
@@ -3866,18 +3916,27 @@ function closeNav() {
 
 
 
-								<td style="vertical-align:middle; text-align:right">
+								<td  style="vertical-align:top; text-align:left; border: 1px solid black; background-color:#d3d3d3;">
 
-									
+									<b style="text-align:right">Actions:</b><br><br>
 									<table style="text-align:center">
 										<tr>
 
 
 											<td>
-												<input type=button id="posteriorSummary_btn" onClick="posteriorSummary()" value='Posterior Summary' title="Extract values from the posterior distribution" class="operation" style="background-color:#008cba; width: 200px"> 
+												<input type=button id="posteriorSummary_btn" onClick="posteriorSummary()" value='Posterior Summary' title="Extract values from the posterior distribution" class="operation" style="background-color:#008cba; width: 170px"> 
 												<br><br>
-												<input type=button id="beginMCMC_btn" onClick="beginABC()" value='Begin MCMC-ABC' title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="operation beginABC_btn" style="background-color:#008cba; width: 180px"> 
-
+												<input type=button id="beginABC_btn" onClick="beginABC()" value='Begin R-ABC' title="Begin the approximate Bayesian computation via rejection with the current settings" class="ABC_display operation beginABC_btn" style="background-color:#008cba; width: 170px"> 
+                                                <input type=button id="beginMCMC_btn" onClick="beginABC()" value='Begin MCMC-ABC' title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="MCMC_display operation beginABC_btn" style="background-color:#008cba; width: 170px"> 
+                                                <br><br>
+                                                            
+                                                            
+                                                <div  style="text-align:left">
+                                                    <input type=image id="uploadABC" class="rotate180" title="Upload an ABC output in .log format" onClick="uploadABC();" src="../src/Images/download.png" style="cursor: pointer; vertical-align: middle; height:20px; ">  
+                                                    <input style="display:none" type="file" id="uploadABCinput" accept=".log"> 
+                                                    <input type=image id="downloadABC" title="Download the ABC output (displayed below) in .log format" onClick=downloadABC() src="../src/Images/download.png" style="cursor: pointer; display:none; vertical-align: middle; height:20px; ">  
+                                                 </div>
+                                                            
 											</td>
 
 										</tr>
@@ -3896,21 +3955,13 @@ function closeNav() {
 						<div style="padding: 5 10">
 
 
-
-
-
 							<span id="selectLoggedPosteriorDistnDIV" style="display:none">
 								<legend><b>Posterior distribution:</b></legend>
 								<select class="dropdown" title="Which posterior distribution do you want to display?" id="selectLoggedPosteriorDistn" onChange="setCurrentLoggedPosteriorDistributionID_controller()" style="vertical-align: middle; text-align:right; min-width: 150px">
 								</select>
 							</span>
 
-							&nbsp;&nbsp;
-							<span>
-								<input type=image id="uploadABC" class="rotate180" title="Upload an ABC output in .log format" onClick="uploadABC();" src="../src/Images/download.png" style="cursor: pointer; vertical-align: middle; height:20px; ">  
-									<input style="display:none" type="file" id="uploadABCinput" accept=".log"> 
-								<input type=image id="downloadABC" title="Download the ABC output (displayed below) in .log format" onClick=downloadABC() src="../src/Images/download.png" style="cursor: pointer; display:none; vertical-align: middle; height:20px; ">  
-							</span>
+							
 
 							&nbsp;&nbsp;
 							<span id="nRowsToDisplayABC" style="margin-left:10px;">
@@ -3937,7 +3988,7 @@ function closeNav() {
 
 							<br><br>
 
-							<div id="ABCoutput" style="width:95%; font-family:'Courier New'; background-color:white; color: black; font-size: 14px; padding: 10 20; height: 600px; overflow-y:scroll; overflow-x:scroll">
+							<div id="ABCoutput" style="display:none; width:95%; font-family:'Courier New'; background-color:white; color: black; font-size: 14px; padding: 10 20; height: 600px; overflow-y:scroll; overflow-x:scroll">
 
 							</div>
 			
