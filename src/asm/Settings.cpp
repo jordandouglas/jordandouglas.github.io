@@ -597,6 +597,9 @@ string Settings::toJSON(){
 	parametersJSON += "'model':{" + currentModel->toJSON() + "},";
 	parametersJSON += "'N':" + to_string(ntrials_sim) + ",";
 	parametersJSON += "'speed':'" + _animationSpeed + "',";
+    
+    
+    if (_GUI_PLOTS) parametersJSON += "'plots':" + _GUI_PLOTS->getPlotDataAsJSON() + ",";
 
 
 	parametersJSON += "'polymerases':{";

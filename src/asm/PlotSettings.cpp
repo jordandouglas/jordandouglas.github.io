@@ -310,15 +310,16 @@ string PlotSettings::toJSON(){
 
 	// Time histogram
 	else if (this->name == "pauseHistogram"){
+        settingsJSON += "'perTime':'" + this->perTime + "',";
 		settingsJSON += "'xRange':'" + this->xRange + "',";
-		settingsJSON += "'perTime':'" + this->perTime + "',";
 	}
 
 
 	// Velocity histogram
 	else if (this->name == "velocityHistogram"){
+        settingsJSON += "'windowSize':" + to_string(this->windowSize) + ",";
 		settingsJSON += "'xRange':'" + this->xRange + "',";
-		settingsJSON += "'windowSize':" + to_string(this->windowSize) + ",";
+		
 	}
 
 
@@ -333,22 +334,25 @@ string PlotSettings::toJSON(){
 
 	// Parameter heatmap
 	else if (this->name == "parameterHeatmap"){
-		settingsJSON += "'xRange':'" + this->xRange + "',";
-		settingsJSON += "'yRange':'" + this->yRange + "',";
-		settingsJSON += "'zRange':'" + this->zRange + "',";
-		settingsJSON += "'customParamX':'" + this->customParamX + "',";
-		settingsJSON += "'customParamY':'" + this->customParamY + "',";
-		settingsJSON += "'metricZ':'" + this->metricZ + "',";
-		settingsJSON += "'zColouring':'" + this->zColouring + "',";
-		settingsJSON += "'priorUnderlay':" + string(this->priorUnderlay ? "true" : "false") + ",";
+        settingsJSON += "'customParamX':'" + this->customParamX + "',"; //0
+        settingsJSON += "'customParamY':'" + this->customParamY + "',"; // 1
+        settingsJSON += "'metricZ':'" + this->metricZ + "',"; // 2
+		settingsJSON += "'xRange':'" + this->xRange + "',"; // 3
+		settingsJSON += "'yRange':'" + this->yRange + "',"; // 4
+		settingsJSON += "'zRange':'" + this->zRange + "',"; // 5
+		settingsJSON += "'zColouring':'" + this->zColouring + "',"; // 6
+        settingsJSON += "'selectedPosteriorID':" + to_string(this->selectedPosteriorID) + ","; // 7
+        settingsJSON += "'sitesToRecordX':'" + this->sitesToRecordX + "',"; // 8
+        settingsJSON += "'sitesToRecordY':'" + this->sitesToRecordY + "',"; // 9
+        settingsJSON += "'sitesToRecordZ':'" + this->sitesToRecordZ + "',"; // 10
+		settingsJSON += "'priorUnderlay':" + string(this->priorUnderlay ? "true" : "false") + ","; // 11
+        
 		settingsJSON += "'xData':" + this->xData + ",";
 		settingsJSON += "'yData':" + this->yData + ",";
 		settingsJSON += "'zData':" + this->zData + ",";
-		settingsJSON += "'sitesToRecordX':'" + this->sitesToRecordX + "',";
-		settingsJSON += "'sitesToRecordY':'" + this->sitesToRecordY + "',";
-		settingsJSON += "'sitesToRecordZ':'" + this->sitesToRecordZ + "',";
+		
 		if (this->selectedPosteriorID == 0) settingsJSON += "'burnin':" + to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
-		settingsJSON += "'selectedPosteriorID':" + to_string(this->selectedPosteriorID) + ",";
+		
 
 	}
 
@@ -651,7 +655,7 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 		}
 
 
-		cout << "values.at(11) " << values.at(11) << endl;
+		//cout << "values.at(11) " << values.at(11) << endl;
 		this->priorUnderlay = values.at(11) == "true";
 
 

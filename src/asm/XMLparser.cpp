@@ -41,7 +41,7 @@
 
 using namespace std;
 
-bool XMLparser::parseXMLFromFilename(char* fileName){
+bool XMLparser::parseXMLFromFilename(char* fileName, Plots* plotsObj){
 
 
 	cout << "Parsing " << fileName << endl;
@@ -53,13 +53,13 @@ bool XMLparser::parseXMLFromFilename(char* fileName){
 		return false;
 	}
 
-	XMLparser::parseXMLFromDocument(doc);
+	XMLparser::parseXMLFromDocument(doc, plotsObj);
 	return true;
 
 }
 
 
-bool XMLparser::parseXMLFromString(char* XMLdata){
+bool XMLparser::parseXMLFromString(char* XMLdata, Plots* plotsObj){
 
 
 	TiXmlDocument* doc = new TiXmlDocument();
@@ -69,7 +69,7 @@ bool XMLparser::parseXMLFromString(char* XMLdata){
 		//cout << "Cannot read XML string: \n" << string(XMLdata) << endl;
 		//return false;
 	//}
-	XMLparser::parseXMLFromDocument(*doc);
+	XMLparser::parseXMLFromDocument(*doc, plotsObj);
 	delete doc;
 
 	return true;
@@ -79,7 +79,7 @@ bool XMLparser::parseXMLFromString(char* XMLdata){
 
 // Parse all information from the XML file
 // If MCMC is in already progress (ie. MCMC::isInitialised() is set to true) then there are certain variables which we do not want to change eg. the experiments used by MCMC
-void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
+void XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 
 
 
@@ -88,7 +88,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 	TiXmlElement *sessionEle = doc.FirstChildElement("session");
 	if (sessionEle){
 
-
+        _animationSpeed = sessionEle->Attribute("speed") ? sessionEle->Attribute("speed") : _animationSpeed;
 		ntrials_sim = sessionEle->Attribute("N") ? atoi(sessionEle->Attribute("N")) : ntrials_sim;
 		if (sessionEle->Attribute("polymerase")){
 			string pol = sessionEle->Attribute("polymerase");
@@ -118,11 +118,65 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 				Settings::setSequence(_seqID);
 
 			}
-
+            
+             // delete sequenceEle;
 
 
 		}
-
+        
+        
+        
+        // Parse plots
+        TiXmlElement *plotsEle = sessionEle->FirstChildElement("plots");
+        if (plotsEle){
+        
+            if (plotsObj != nullptr){
+            
+                
+                // Hide the plots?
+                string hidePlots = plotsEle->Attribute("hidden") ? plotsEle->Attribute("hidden") : "true";
+                cout << "Hiding plots: " << hidePlots << endl;
+                plotsObj->hideAllPlots(hidePlots == "true");
+                
+                
+                for (int i = 1; i <= 4; i ++){
+                
+                    TiXmlElement *plotsSubEle = plotsEle->FirstChildElement(("plot" + to_string(i)).c_str());
+                    if (plotsSubEle){
+                    
+                        // Get the name of the plot and create it
+                        string plotName = plotsSubEle->Attribute("name") ? plotsSubEle->Attribute("name") : "";
+                        if (plotName == "") continue;
+                        plotsObj->userSelectPlot(i, plotName, false);
+                        
+                        
+                        // Change the settings of the plot
+                        string settings = "";
+                        for(const TiXmlAttribute* attr = plotsSubEle->FirstAttribute(); attr; attr=attr->Next()) {
+                            string attrName = attr->Name();
+                            string val = attr->Value();
+                            if (attrName != "name" && attrName != "plotFunction"){
+                                settings = settings + val + "|";
+                            }
+                        }  
+                                              
+                        plotsObj->savePlotSettings(i, settings);
+                    
+                    }
+                
+                }
+            
+            
+            
+            
+            }
+        
+        
+            // delete plotsEle;
+        
+        }
+        
+        
 
 		// Parse model settings
 		TiXmlElement *modelEle = sessionEle->FirstChildElement("elongation-model");
@@ -250,7 +304,8 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 			}
 
 
-
+            // delete parametersEle;
+            
 		}
 
 
@@ -543,7 +598,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 
 			}
 
-
+            // delete abcEle;
 		}
 
 
@@ -650,9 +705,13 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc){
 			// Sample a model and its parameters randomly
 			Settings::sampleModel();
 			_sampleModels = true;
-
+            
+            // delete estimateModelsEle;
+            
 		} else modelsToEstimate.push_back(currentModel);
-
+        
+        
+        // delete sessionEle;
 
 	}
 

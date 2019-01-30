@@ -24,6 +24,7 @@
 #ifndef XMLPARSER_H
 #define XMLPARSER_H
 
+#include "Plots.h"
 #include "tinyxml/tinyxml.h"
 
 #include <string>
@@ -31,11 +32,11 @@ using namespace std;
 
 class XMLparser{
 
-	static void parseXMLFromDocument(TiXmlDocument doc);
+	static void parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj);
 
 	public:
-		static bool parseXMLFromFilename(char* fileName);
-		static bool parseXMLFromString(char* XMLdata);
+		static bool parseXMLFromFilename(char* fileName, Plots* plotsObj);
+		static bool parseXMLFromString(char* XMLdata, Plots* plotsObj);
 
 };
 

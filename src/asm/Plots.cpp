@@ -556,8 +556,11 @@ void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, doubl
 string Plots::getPlotDataAsJSON(){
 
 
-	if (_USING_GUI && this->plotsAreHidden && this->sitewisePlotHidden && !this->sendCopiedSequences) return "{'moreData':false}";
-	if (!this->plotsInit)  return "{'moreData':false}";
+    
+    string defaultJSON = "{'plotsAreHidden':" + string(this->plotsAreHidden ? "true" : "false") + ",moreData':false}";
+
+	if (_USING_GUI && this->plotsAreHidden && this->sitewisePlotHidden && !this->sendCopiedSequences) return defaultJSON;
+	if (!this->plotsInit)  return defaultJSON;
 	//cout << "getPlotDataAsJSON" << endl;
 
 
@@ -591,7 +594,7 @@ string Plots::getPlotDataAsJSON(){
 	this->plotDataJSON += ",'velocity':" + to_string(this->velocity);
 	this->plotDataJSON += ",'templateSeq':'" + currentSequence->get_templateSequence() + "'";
 	this->plotDataJSON += ",'nbases':" + to_string(currentSequence->get_templateSequence().length());
-
+    this->plotDataJSON += ",'plotsAreHidden':" + string(this->plotsAreHidden ? "true" : "false");
 
 
 
