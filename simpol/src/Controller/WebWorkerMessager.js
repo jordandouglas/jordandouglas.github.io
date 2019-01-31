@@ -3672,10 +3672,16 @@ function deletePlots_controller(distanceVsTime_cleardata, timeHistogram_cleardat
 
 
 // Uploads the string in tsv format to the posterior distribution
-function uploadABC_controller(TSVstring){
+function uploadABC_controller(TSVstring, resolve = function() { }){
 
 
 	//console.log("TSVstring", TSVstring);
+    if (TSVstring.length > 10000000){
+        alert("That posterior distribution is too large (" + roundToSF(TSVstring.length/1000000) + "MB). Please upload a file less than 10MB.")
+        resolve();
+        return;
+    }
+    
 
 	updateABCExperimentalData_controller();
 	var updateDOM = function(result){
@@ -3705,6 +3711,8 @@ function uploadABC_controller(TSVstring){
 				$("#ABCacceptanceVal").html(roundToSF(result.acceptanceRate));
 				$("#burninStatusVal").html(result.status);
 				$("#currentEpsilonVal").html(roundToSF(result.epsilon), 6);
+                
+                resolve();
 				
 			});
 
@@ -3744,6 +3752,9 @@ function uploadABC_controller(TSVstring){
 			var msgID = res[1];
 			var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
 			toCall().then((lines) => updateDOM(lines));
+            
+            // Clear memory asap because the string can be big
+            TSVstring = "";
 
 
 		});

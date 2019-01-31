@@ -1152,16 +1152,31 @@ extern "C" {
 
 
 	}
-
+    
+    
+    // Upload the ABC posterior distribution in chunks
+    void EMSCRIPTEN_KEEPALIVE uploadABC_chunk(char* tsvInput){
+        //cout << "Received chunk" << endl; 
+        ABC_posterior_chunks = ABC_posterior_chunks + string(tsvInput);
+    }
+    
+    
 
 	// Upload the ABC file
-	void EMSCRIPTEN_KEEPALIVE uploadABC(char* tsvInput, int msgID){
+	void EMSCRIPTEN_KEEPALIVE uploadABC(int msgID){
 
-
-		cout << "uploadABC" << endl;
+    
+        if (ABC_posterior_chunks == ""){
+            cout << "Please upload ABC in chunks first" << endl;
+            messageFromWasmToJS("", msgID);
+            return;
+        }
+    
+		cout << "wasm uploadABC ";
+        cout << string(ABC_posterior_chunks).size() << endl;
 		MCMC::initMCMC(true);
 		
-		vector<string> lines = Settings::split(string(tsvInput), '!');
+		vector<string> lines = Settings::split(ABC_posterior_chunks, '!');
 		bool success = false;
 		vector<string> headerLineSplit;
 		vector<string> lineSplit;
@@ -1231,7 +1246,9 @@ extern "C" {
 		// Clear the output string
 		_ABCoutputToPrint.str("");
 		_ABCoutputToPrint.clear();
-
+        ABC_posterior_chunks = "";
+        
+        
 		messageFromWasmToJS(toReturnJSON, msgID);
 
 

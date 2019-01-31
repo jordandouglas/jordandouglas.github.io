@@ -245,7 +245,8 @@ function begin_biophys4(){
         between these three variables is complex. <br><br>
         
         To begin the stochastic simulation, press the glowing <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
-        button on the far left. See the plots further down this page to visualise the simulation results. Each coloured dot is one simulation. 5,000 simulations will be performed on the 0.5 kb lacZ gene.`,
+        button on the far left. 5,000 simulations will be performed on the 0.5 kb lacZ gene.
+         See the plots further down this page to visualise the simulation results. Each coloured dot is one simulation.`,
         "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=4'>www.polymerase.nz/simpol/?biophys=4</a>");
     
        

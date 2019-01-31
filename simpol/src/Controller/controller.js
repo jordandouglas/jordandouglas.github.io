@@ -1319,12 +1319,12 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 
 
 
-function getLoaderTemplate(id, msg = ""){
+function getLoaderTemplate(id, msg = "", small = false){
 	return `
 		<table  id="` + id + `" title="Loading...">
 			<tr>
 				<td>
-					<div class="loader"></div> 
+					<div class="` + (small ? "loader_small" : "loader") + `"></div> 
 				</td>
 				<td>
 					` + msg + `
@@ -1378,18 +1378,24 @@ function XMLToString(oXML) {
 function loadSession(fileLocation = null){
 	
 	document.getElementById('uploadSessionFile').addEventListener('change', loadSessionFile, false);
-	if(fileLocation == null) $("#uploadSessionFile").click();
+	if(fileLocation == null) {
+        $("#uploadSessionFile").click();
+    }
 	 
 	 function loadSessionFile(evt) {
-
+     
+     
+        $("#loadSessionID").after(getLoaderTemplate("uploadingXMLloader", "", true));    
+        $("#loadSessionID").hide();
+        $("#loadSessionID_div").addClass("bluegrey");
+     
 		var files = evt.target.files; // FileList object
-			
-		// Loop through the FileList
-		for (var i = 0, f; f = files[i]; i++) {
-		
-			loadSessionFromFileName(f);
-
-		}
+        
+        if (files.length > 0) loadSessionFromFileName(files[0], function() { 
+            $("#uploadingXMLloader").remove();
+            $("#loadSessionID").show();
+            $("#loadSessionID_div").removeClass("bluegrey");
+        });
 
 		$("#uploadSessionFile").val("");
 
@@ -1401,7 +1407,7 @@ function loadSession(fileLocation = null){
 
 
 
-function loadSessionFromFileName(fileName){
+function loadSessionFromFileName(fileName, resolve = function() { }){
 	
 	var reader = new FileReader();
 	
@@ -1412,7 +1418,7 @@ function loadSessionFromFileName(fileName){
 
 			if (e == null || e.target.result == "") return;
 			var XMLstring = e.target.result.replace(/(\r\n|\n|\r)/gm,"");
-			loadSessionFromString(XMLstring);
+			loadSessionFromString(XMLstring, resolve);
 
 		};
 

@@ -5036,7 +5036,7 @@ function uploadABCFromURL(url){
 			var TSVstring = xhttp.responseText.replace(/(\r\n|\n|\r)/gm,"!");
 			TSVstring = TSVstring.replace(/(\t)/gm, "&");
 			
-		   uploadABC_controller(TSVstring);
+		    uploadABC_controller(TSVstring);
 		   
 		}
 	};
@@ -5051,6 +5051,8 @@ function uploadABC(){
 	
 	
 	document.getElementById('uploadABCinput').addEventListener('change', loadSessionFile, false);
+    $("#uploadABC").after(getLoaderTemplate("uploadingABCloader", "", true));
+    $("#uploadABC").hide();
 	$("#uploadABCinput").click();
 
 	function loadSessionFile(evt) {
@@ -5073,7 +5075,9 @@ function uploadABC(){
 
 					//console.log("Sending TSVstring", TSVstring);
 
-					uploadABC_controller(TSVstring);
+					uploadABC_controller(TSVstring, function(){
+                        $("#uploadingABCloader").remove();
+                    });
 
 				};
 			})(fileName);

@@ -509,7 +509,22 @@ getPosteriorDistributionNames = function(msgID = null){
 // Upload the ABC file
 uploadABC = function(TSVfile, msgID = null){
     
-
+    
+    console.log("WW received TSVfile", TSVfile.length);
+    
+    // Break the string into chunks
+    var chunkSize = 100000;
+    for (var i = 0; i < Math.ceil(TSVfile.length / chunkSize); i ++){
+        
+        var start = i * chunkSize;
+        var stop = start + chunkSize;
+        var TSV_substr = TSVfile.substring(start, stop);
+        Module.ccall("uploadABC_chunk", null, ["string"],  [TSV_substr]); 
+        
+    }
+    
+    
+    
     // Create the callback function
     var toDoAfterCall = function(resultStr){
         console.log("uploadABC", resultStr);
@@ -518,7 +533,7 @@ uploadABC = function(TSVfile, msgID = null){
     WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 
     // Clear all ABC data first
-    Module.ccall("uploadABC", null, ["string", "number"],  [TSVfile, msgID]); 
+    Module.ccall("uploadABC", null, ["number"],  [msgID]); 
 
 
 }
