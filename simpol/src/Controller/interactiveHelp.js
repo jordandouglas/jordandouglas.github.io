@@ -192,7 +192,7 @@ function begin_biophys3(){
         `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
         
         To add a 10A insert into the mRNA, press the glowing <img id='startTrials' src='../src/Images/stutter.png' style='vertical-align: middle; width:20px; height:20px;'>
-        button on the far left. This repetitive slippage is known as stuttering. During transcription, upto 4 inserts may be added into this region of the murC2 gene.`,
+        button on the far left. This iterative slippage is known as stuttering. During transcription, anywhere up to 4 inserts could be added into this region of the murC2 gene.`,
         `This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=3'>www.polymerase.nz/simpol/?biophys=3</a> <br> <br>
         Tamas, Ivica, et al. "Endosymbiont gene functions impaired and rescued by polymerase infidelity at poly (A) tracts." Proceedings of the National Academy of Sciences 105.39 (2008): 14934-14939.<br> <br>`);
     
@@ -229,7 +229,7 @@ function begin_biophys3(){
 
 
 
-// Rxplore the third-order relationship between catalysis rate kcat , NTP binding rate kbind , and elongation velocity.
+// Explore the third-order relationship between catalysis rate kcat , NTP binding rate kbind , and elongation velocity.
 function begin_biophys4(){
     var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys4.xml";
     var toDoAfterLoadSession = function() {
@@ -237,11 +237,15 @@ function begin_biophys4(){
         
         
         addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
-        "Example 1: simulating transcription elongation.",
+        "Example 5: simulating transcription elongation.",
         `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
         
+        Two of the parameters: the rate of catalysis k<sub>cat</sub> and the rate of NTP binding k<sub>bind</sub>, will be randomly sampled
+        at the beginning of each simulation. These two parameters each increase the average velocity of the RNA polymerase, however the relationship 
+        between these three variables is complex. <br><br>
+        
         To begin the stochastic simulation, press the glowing <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
-        button on the far left. See the plots further down this page to visualise the simulation results.`,
+        button on the far left. See the plots further down this page to visualise the simulation results. Each coloured dot is one simulation. 5,000 simulations will be performed on the 4 kb rpoB gene.`,
         "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=4'>www.polymerase.nz/simpol/?biophys=4</a>");
     
        

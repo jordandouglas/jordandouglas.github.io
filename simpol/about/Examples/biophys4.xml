@@ -43,7 +43,7 @@
 		<CleavageLimit val="10" distribution="Fixed" fixedDistnVal="10">Cleavage limit (nt)</CleavageLimit>
 		<upstreamWindow val="12" distribution="Fixed" fixedDistnVal="12">3′ DNA curvature window</upstreamWindow>
 		<downstreamWindow val="12" distribution="Fixed" fixedDistnVal="12">5′ DNA curvature window</downstreamWindow>
-		<haltPosition val="43" distribution="Fixed" fixedDistnVal="43">Halt position (nt)</haltPosition>
+		<haltPosition val="12" distribution="Fixed" fixedDistnVal="12">Halt position (nt)</haltPosition>
 		<proposalWidth val="1" distribution="Fixed" fixedDistnVal="1">Proposal width</proposalWidth>
 	</parameters>
 	<ABC inferenceMethod="ABC" ntrials="undefined" testsPerData="undefined" showRejectedParameters="false" />
