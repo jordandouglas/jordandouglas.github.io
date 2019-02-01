@@ -5036,6 +5036,7 @@ function uploadABCFromURL(url, resolve = function() {}){
 			var TSVstring = xhttp.responseText.replace(/(\r\n|\n|\r)/gm,"!");
 			TSVstring = TSVstring.replace(/(\t)/gm, "&");
 			
+            if (!$("#ABCPanelTableDIV").is(":visible")) showABCPanelFn();
 		    uploadABC_controller(TSVstring, resolve);
 		   
 		}
