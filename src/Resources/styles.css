@@ -593,6 +593,14 @@ div.vertical{
 
 }
 
+.greenTick {
+    background-color:#A5CF19; 
+    color:#0B522D; 
+    padding: 5 5; 
+    font-size: 20px;
+    border-radius: 30px;
+ }
+
 .loader {
     border: 12px solid #ebe9e7; 
     border-top: 12px solid #008cba; 
