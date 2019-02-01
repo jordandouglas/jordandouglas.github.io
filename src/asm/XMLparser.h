@@ -36,7 +36,7 @@ class XMLparser{
 
 	public:
 		static bool parseXMLFromFilename(char* fileName, Plots* plotsObj);
-		static bool parseXMLFromString(char* XMLdata, Plots* plotsObj);
+		static bool parseXMLFromString(const char* XMLdata, Plots* plotsObj);
 
 };
 

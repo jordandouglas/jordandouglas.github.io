@@ -114,6 +114,10 @@ extern int N_THREADS;
 extern bool _RUNNING_ABC;
 
 
+// Chunking
+extern string chunk_string;
+
+
 // Experimental data
 extern list<ExperimentalData*> experiments;
 extern int _numExperimentalObservations;

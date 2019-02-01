@@ -106,6 +106,10 @@ int N_THREADS = 1;
 bool _RUNNING_ABC = false;
 
 
+// Chunking
+string chunk_string = "";
+
+
 // Experimental data
 list<ExperimentalData*> experiments;
 int _numExperimentalObservations = 0;

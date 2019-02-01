@@ -59,7 +59,7 @@ bool XMLparser::parseXMLFromFilename(char* fileName, Plots* plotsObj){
 }
 
 
-bool XMLparser::parseXMLFromString(char* XMLdata, Plots* plotsObj){
+bool XMLparser::parseXMLFromString(const char* XMLdata, Plots* plotsObj){
 
 
 	TiXmlDocument* doc = new TiXmlDocument();
@@ -248,7 +248,8 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 				else if (paramID == "RateCleave") param = RateCleave; 
 				else if (paramID == "CleavageLimit") param = CleavageLimit; 
 				else if (paramID == "DGHyperDag") param = DGHyperDag; 
-
+                else if (paramID == "haltPosition") param = haltPosition; 
+                else if (paramID == "proposalWidth") param = proposalWidth; 
 
 				else continue;
 
