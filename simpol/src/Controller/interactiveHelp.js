@@ -37,6 +37,42 @@ function begin_tutorial(tut_id = null){
     
     switch(tut_id){
     
+    
+        // Plos computational biology elongation
+        // Bayesian inference and comparison of stochastic transcription elongation models
+        case "ploscompbio1":
+            begin_ploscompbio_RNAP(true);
+            break;
+            
+            
+        case "ploscompbio2":
+            begin_ploscompbio_RNAP(false);
+            break;
+            
+            
+        case "ploscompbio3":
+            begin_ploscompbio_polII(true);
+            break;
+            
+            
+        case "ploscompbio4":
+            begin_ploscompbio_polII(false);
+            break;
+            
+            
+        case "ploscompbio5":
+            begin_ploscompbio_T7pol(true);
+            break;
+            
+            
+        case "ploscompbio6":
+            begin_ploscompbio_T7pol(false);
+            break;
+    
+    
+    
+    
+        // Biophysical journal examples
         case "biophys1":
             begin_biophys1();
             break;
@@ -67,41 +103,146 @@ function begin_tutorial(tut_id = null){
 }
 
 
+
+function loadSessionAndPosterior(sessionFileName, posteriorFileName, resolve = function() {} ){
+
+    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/" + sessionFileName;
+    var toDoAfterLoadSession = function() {
+            
+        var posteriorFileLocation = "http://www.polymerase.nz/simpol/about/" + posteriorFileName;
+        uploadABCFromURL(posteriorFileLocation, resolve);
+        
+    };
+
+
+    loadSessionFromURL(sessionFileLocation, toDoAfterLoadSession);
+}
+
+
+
+// Load the E.coli RNAP posterior distribution
+function begin_ploscompbio_RNAP(subsample = true){
+
+
+    var urlNum =  subsample ? 1 : 2;
+
+    addTutorialTemplate("Bayesian inference and comparison of stochastic transcription elongation models", 
+        "<i>E. coli</i> RNAP posterior distribution" + (subsample ? " (sample)" : "") + ".",
+        `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
+        
+        The posterior distribution may take several seconds to load. Scroll down to 'Approximate Bayesian Computation' and 'Plots panel' 
+        to view the results when they have loaded.` + getLoaderTemplate("posteriorLoader", "Loading files...", false),
+        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?ploscompbio=" + urlNum + "'>www.polymerase.nz/simpol/?ploscompbio=" + urlNum + "</a>");
+    
+
+
+    var posteriorFileName = "ElongationPosteriorData/Ecoli_RNAP_posterior" + (subsample ? "_small" : "") + ".log";
+    var sessionFileName = "ElongationPosteriorData/Ecoli_RNAP_session.xml";
+    
+    loadSessionAndPosterior(sessionFileName, posteriorFileName, function(){
+         $("#posteriorLoader").html(`Loaded &#10004;`);
+    });
+
+
+}
+
+
+// Load the Yeast pol IIposterior distribution
+function begin_ploscompbio_polII(subsample = true){
+
+
+    var urlNum =  subsample ? 3 : 4;
+
+    addTutorialTemplate("Bayesian inference and comparison of stochastic transcription elongation models", 
+        "<i>S. cerevisiae</i> pol II posterior distribution" + (subsample ? " (sample)" : "") + ".",
+        `Welcome to SimPol. This series of examples is complementary to the above article. <br><br>
+        The posterior distribution may take several seconds to load. Scroll down to 'Approximate Bayesian Computation' and 'Plots panel' 
+        to view the results when they have loaded.<br><br>` + getLoaderTemplate("posteriorLoader", "Loading files...", false),
+        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?ploscompbio=" + urlNum + "'>www.polymerase.nz/simpol/?ploscompbio=" + urlNum + "</a>");
+    
+
+
+    var posteriorFileName = "ElongationPosteriorData/Yeast_polII_posterior" + (subsample ? "_small" : "") + ".log";
+    var sessionFileName = "ElongationPosteriorData/Yeast_polII_session.xml";
+    
+    loadSessionAndPosterior(sessionFileName, posteriorFileName, function(){
+        $("#posteriorLoader").html(`Loaded &#10004;`);
+    });
+
+
+
+
+}
+
+
+
+// Load the Bacteriophage T7 pol posterior distribution
+function begin_ploscompbio_T7pol(subsample = true){
+
+
+    var urlNum =  subsample ? 5 : 6;
+
+    addTutorialTemplate("Bayesian inference and comparison of stochastic transcription elongation models", 
+        "Bacteriophage T7 pol posterior distribution" + (subsample ? " (sample)" : "") + ".",
+        `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
+        
+        The posterior distribution may take several seconds to load. Scroll down to 'Approximate Bayesian Computation' and 'Plots panel' 
+        to view the results when they have loaded.` + getLoaderTemplate("posteriorLoader", "Loading files...", false),
+        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?ploscompbio=" + urlNum + "'>www.polymerase.nz/simpol/?ploscompbio=" + urlNum + "</a>");
+    
+
+
+    var posteriorFileName = "ElongationPosteriorData/T7_pol_posterior" + (subsample ? "_small" : "") + ".log";
+    var sessionFileName = "ElongationPosteriorData/T7_pol_session.xml";
+    
+    loadSessionAndPosterior(sessionFileName, posteriorFileName, function(){
+        $("#posteriorLoader").html(`Loaded &#10004;`);
+    });
+
+
+
+
+}
+
+
+
 // Perform 30 transcription elongation simulations of the first 80 nt of the E. coli lacZ gene.
 function begin_biophys1(){
+
+
+    
+    addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
+    "Example 1: simulating transcription elongation.",
+    `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
+    
+    To begin the stochastic simulation, press the glowing <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
+    button on the far left. See the plots further down this page to visualise the simulation results.`,
+    "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=1'>www.polymerase.nz/simpol/?biophys=1</a>");
+
+   
+    // Add a glow around the simulate button
+    var btn = $("#simulateBtn");
+
+    var intervalID = window.setInterval(function() {  
+        btn.toggleClass('glowing');
+    }, 750);
+   
+    
+    window.setTimeout(function(){
+    
+        btn.click(function(){
+            window.clearInterval(intervalID);
+            btn.removeClass("glowing");
+            btn.unbind('click');
+        });
+    
+    }, 50);
+
+
     var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys1.xml";
     var toDoAfterLoadSession = function() {
         
         
-        
-        addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
-        "Example 1: simulating transcription elongation.",
-        `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
-        
-        To begin the stochastic simulation, press the glowing <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
-        button on the far left. See the plots further down this page to visualise the simulation results.`,
-        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=1'>www.polymerase.nz/simpol/?biophys=1</a>");
-    
-       
-        // Add a glow around the simulate button
-        var btn = $("#simulateBtn");
-
-        var intervalID = window.setInterval(function() {  
-            btn.toggleClass('glowing');
-        }, 750);
-        
-        
-       
-        
-        window.setTimeout(function(){
-        
-            btn.click(function(){
-                window.clearInterval(intervalID);
-                btn.removeClass("glowing");
-                btn.unbind('click');
-            });
-        
-        }, 50);
         
         
     };
@@ -117,53 +258,60 @@ function begin_biophys1(){
 // Visualise the simulated change in RNA structure during transcription elongation.
 function begin_biophys2(){
 
+
+
+
+    addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
+    "Example 2: visualising cotranscriptional folding.",
+    `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
+    
+    To begin the demonstration, press the glowing <img id='startTrials' src='../src/Images/folding.png' style='vertical-align: middle; width:20px; height:20px;'>
+    button on the far left to toggle RNA folding.
+    
+    Then, use <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
+    to begin the stochastic simulation`,
+    "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=2'>www.polymerase.nz/simpol/?biophys=2</a>");
+
+   
+    // Add a glow around the simulate and folding buttons
+    var sim_btn = $("#simulateBtn");
+    var fold_btn = $("#foldBtnDiv");
+    
+    var sim_intervalID = window.setInterval(function() {  
+        sim_btn.toggleClass('glowing');
+    }, 750);
+    
+    
+    var fold_intervalID = window.setInterval(function() {  
+        fold_btn.toggleClass('glowing');
+    }, 750);
+    
+   
+    
+    window.setTimeout(function(){
+    
+        sim_btn.click(function(){
+            window.clearInterval(sim_intervalID);
+            sim_btn.removeClass("glowing");
+            sim_btn.unbind('click');
+        });
+        
+        fold_btn.click(function(){
+            window.clearInterval(fold_intervalID);
+            fold_btn.removeClass("glowing");
+            fold_btn.unbind('click');
+        });
+        
+    
+    }, 50);
+    
+
+
+
+
     var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys2.xml";    
     var toDoAfterLoadSession = function() {
         
-        
-        addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
-        "Example 2: visualising cotranscriptional folding.",
-        `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
-        
-        To begin the demonstration, press the glowing <img id='startTrials' src='../src/Images/folding.png' style='vertical-align: middle; width:20px; height:20px;'>
-        button on the far left to toggle RNA folding.
-        
-        Then, use <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
-        to begin the stochastic simulation`,
-        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=2'>www.polymerase.nz/simpol/?biophys=2</a>");
-    
-       
-        // Add a glow around the simulate and folding buttons
-        var sim_btn = $("#simulateBtn");
-        var fold_btn = $("#foldBtnDiv");
-        
-        var sim_intervalID = window.setInterval(function() {  
-            sim_btn.toggleClass('glowing');
-        }, 750);
-        
-        
-        var fold_intervalID = window.setInterval(function() {  
-            fold_btn.toggleClass('glowing');
-        }, 750);
-        
-       
-        
-        window.setTimeout(function(){
-        
-            sim_btn.click(function(){
-                window.clearInterval(sim_intervalID);
-                sim_btn.removeClass("glowing");
-                sim_btn.unbind('click');
-            });
-            
-            fold_btn.click(function(){
-                window.clearInterval(fold_intervalID);
-                fold_btn.removeClass("glowing");
-                fold_btn.unbind('click');
-            });
-            
-        
-        }, 50);
         
         
     };
@@ -182,40 +330,43 @@ function begin_biophys2(){
 
 // Add insertions into a poly(T) tract of the Buchnera aphidicola murC1 gene
 function begin_biophys3(){
+
+    
+    addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
+    "Example 3: visualising transcriptional slippage.",
+    `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
+    
+    To add a 10A insert into the mRNA, press the glowing <img id='startTrials' src='../src/Images/stutter.png' style='vertical-align: middle; width:20px; height:20px;'>
+    button on the far left. This iterative slippage is known as stuttering. During transcription, anywhere up to 4 inserts could be added into this region of the murC2 gene <sup>1</sup>.`,
+    `This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=3'>www.polymerase.nz/simpol/?biophys=3</a> <br> <br>
+    <sup>1</sup> Tamas, Ivica, et al. "Endosymbiont gene functions impaired and rescued by polymerase infidelity at poly (A) tracts." Proceedings of the National Academy of Sciences 105.39 (2008): 14934-14939.<br> <br>`);
+
+   
+    // Add a glow around the stutter button
+    var btn = $("#stutterBtn");
+
+    var intervalID = window.setInterval(function() {  
+        btn.toggleClass('glowing');
+    }, 750);
+    
+    
+   
+    
+    window.setTimeout(function(){
+    
+        btn.click(function(){
+            window.clearInterval(intervalID);
+            btn.removeClass("glowing");
+            btn.unbind('click');
+        });
+    
+    }, 50);
+    
+
+
     var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys3.xml";
     var toDoAfterLoadSession = function() {
         
-        
-        
-        addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
-        "Example 3: visualising transcriptional slippage.",
-        `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
-        
-        To add a 10A insert into the mRNA, press the glowing <img id='startTrials' src='../src/Images/stutter.png' style='vertical-align: middle; width:20px; height:20px;'>
-        button on the far left. This iterative slippage is known as stuttering. During transcription, anywhere up to 4 inserts could be added into this region of the murC2 gene <sup>1</sup>.`,
-        `This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=3'>www.polymerase.nz/simpol/?biophys=3</a> <br> <br>
-        <sup>1</sup> Tamas, Ivica, et al. "Endosymbiont gene functions impaired and rescued by polymerase infidelity at poly (A) tracts." Proceedings of the National Academy of Sciences 105.39 (2008): 14934-14939.<br> <br>`);
-    
-       
-        // Add a glow around the stutter button
-        var btn = $("#stutterBtn");
-
-        var intervalID = window.setInterval(function() {  
-            btn.toggleClass('glowing');
-        }, 750);
-        
-        
-       
-        
-        window.setTimeout(function(){
-        
-            btn.click(function(){
-                window.clearInterval(intervalID);
-                btn.removeClass("glowing");
-                btn.unbind('click');
-            });
-        
-        }, 50);
         
         
     };
@@ -231,45 +382,50 @@ function begin_biophys3(){
 
 // Explore the third-order relationship between catalysis rate kcat , NTP binding rate kbind , and elongation velocity.
 function begin_biophys4(){
+
+
+
+    
+    addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
+    "Example 5: exploring the relationships between parameters.",
+    `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
+    
+    Two of the parameters: the rate of catalysis k<sub>cat</sub> and the rate of NTP binding k<sub>bind</sub>, will be randomly sampled
+    at the beginning of each simulation. These two parameters each increase the average velocity of the RNA polymerase, however the relationship 
+    between these three variables is complex. <br><br>
+    
+    To begin the stochastic simulation, press the glowing <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
+    button on the far left. 5,000 simulations will be performed on the 0.5 kb lacZ gene.
+     See the plots further down this page to visualise the simulation results. Each coloured dot is one simulation.`,
+    "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=4'>www.polymerase.nz/simpol/?biophys=4</a>");
+
+   
+    // Add a glow around the simulate button
+    var btn = $("#simulateBtn");
+
+    var intervalID = window.setInterval(function() {  
+        btn.toggleClass('glowing');
+    }, 750);
+    
+    
+   
+    
+    window.setTimeout(function(){
+    
+        btn.click(function(){
+            window.clearInterval(intervalID);
+            btn.removeClass("glowing");
+            btn.unbind('click');
+        });
+    
+    }, 50);
+    
+
+
     var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys4.xml";
     var toDoAfterLoadSession = function() {
         
-        
-        
-        addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
-        "Example 5: exploring the relationships between parameters.",
-        `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
-        
-        Two of the parameters: the rate of catalysis k<sub>cat</sub> and the rate of NTP binding k<sub>bind</sub>, will be randomly sampled
-        at the beginning of each simulation. These two parameters each increase the average velocity of the RNA polymerase, however the relationship 
-        between these three variables is complex. <br><br>
-        
-        To begin the stochastic simulation, press the glowing <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
-        button on the far left. 5,000 simulations will be performed on the 0.5 kb lacZ gene.
-         See the plots further down this page to visualise the simulation results. Each coloured dot is one simulation.`,
-        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=4'>www.polymerase.nz/simpol/?biophys=4</a>");
     
-       
-        // Add a glow around the simulate button
-        var btn = $("#simulateBtn");
-
-        var intervalID = window.setInterval(function() {  
-            btn.toggleClass('glowing');
-        }, 750);
-        
-        
-       
-        
-        window.setTimeout(function(){
-        
-            btn.click(function(){
-                window.clearInterval(intervalID);
-                btn.removeClass("glowing");
-                btn.unbind('click');
-            });
-        
-        }, 50);
-        
         
     };
     

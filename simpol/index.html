@@ -225,6 +225,11 @@ function init(){
                     if (JSONurl.nthreads != null) setNThreads_contoller(JSONurl.nthreads);
             
                         
+                    if (JSONurl.ploscompbio != null) {
+                        begin_tutorial("ploscompbio" + JSONurl.ploscompbio);
+                    }
+            
+            
                     if (JSONurl.biophys != null) {
                         begin_tutorial("biophys" + JSONurl.biophys);
                     }
@@ -250,7 +255,8 @@ function init(){
 
 					
 				}else{
-                    //begin_tutorial("biophys" + 4);
+                    //begin_tutorial("biophys" + 1);
+                    //begin_tutorial("ploscompbio" + 3);
 					userChangeSequence();
 				}
 

@@ -629,20 +629,34 @@ extern "C" {
 	}
 
 
+    
+    
+    
+    // Parse XML settings as chunks
+    void EMSCRIPTEN_KEEPALIVE loadSessionFromXML_chunk(char* XMLdata){
+        //cout << "Received chunk" << endl; 
+        chunk_string = chunk_string + string(XMLdata);
+    }
+    
 
+	// Parse XML settings from all the previously parsed chunks
+	void EMSCRIPTEN_KEEPALIVE loadSessionFromXML(int msgID){
 
-	// Parse XML settings in string form
-	void EMSCRIPTEN_KEEPALIVE loadSessionFromXML(char* XMLdata, int msgID){
-
-		// Settings::init();
+		if (chunk_string == ""){
+            cout << "Please upload XML in chunks first" << endl;
+            messageFromWasmToJS("", msgID);
+            return;
+        }
 	
 		// Reinitialise the modeltimer_start
 		//delete currentModel;
 		//currentModel = new Model();
 		modelsToEstimate.clear();
 		
-		XMLparser::parseXMLFromString(XMLdata, _GUI_PLOTS);
-
+        
+        // Parse XML
+		XMLparser::parseXMLFromString(chunk_string.c_str(), _GUI_PLOTS);
+        
 		Settings::sampleAll();
 		//Settings::initSequences();
 
@@ -651,6 +665,7 @@ extern "C" {
 		string parametersJSON = "{" + Settings::toJSON() + "}";
 
 		cout << "Finished parsing XML" << endl;
+        chunk_string = "";
 
 		messageFromWasmToJS(parametersJSON, msgID);
 
@@ -1157,7 +1172,7 @@ extern "C" {
     // Upload the ABC posterior distribution in chunks
     void EMSCRIPTEN_KEEPALIVE uploadABC_chunk(char* tsvInput){
         //cout << "Received chunk" << endl; 
-        ABC_posterior_chunks = ABC_posterior_chunks + string(tsvInput);
+        chunk_string = chunk_string + string(tsvInput);
     }
     
     
@@ -1166,17 +1181,17 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE uploadABC(int msgID){
 
     
-        if (ABC_posterior_chunks == ""){
+        if (chunk_string == ""){
             cout << "Please upload ABC in chunks first" << endl;
             messageFromWasmToJS("", msgID);
             return;
         }
     
 		cout << "wasm uploadABC ";
-        cout << string(ABC_posterior_chunks).size() << endl;
+        cout << string(chunk_string).size() << endl;
 		MCMC::initMCMC(true);
 		
-		vector<string> lines = Settings::split(ABC_posterior_chunks, '!');
+		vector<string> lines = Settings::split(chunk_string, '!');
 		bool success = false;
 		vector<string> headerLineSplit;
 		vector<string> lineSplit;
@@ -1246,7 +1261,7 @@ extern "C" {
 		// Clear the output string
 		_ABCoutputToPrint.str("");
 		_ABCoutputToPrint.clear();
-        ABC_posterior_chunks = "";
+        chunk_string = "";
         
         
 		messageFromWasmToJS(toReturnJSON, msgID);

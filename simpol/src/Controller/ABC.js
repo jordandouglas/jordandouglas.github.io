@@ -5023,7 +5023,7 @@ function drawTimeGelDensityCanvas(fitID, laneData = null){
 
 
 // Loads a session from the XML file stored at url
-function uploadABCFromURL(url){
+function uploadABCFromURL(url, resolve = function() {}){
 	
 	console.log("Trying to open", url);
 	var xhttp = new XMLHttpRequest();
@@ -5036,7 +5036,7 @@ function uploadABCFromURL(url){
 			var TSVstring = xhttp.responseText.replace(/(\r\n|\n|\r)/gm,"!");
 			TSVstring = TSVstring.replace(/(\t)/gm, "&");
 			
-		    uploadABC_controller(TSVstring);
+		    uploadABC_controller(TSVstring, resolve);
 		   
 		}
 	};

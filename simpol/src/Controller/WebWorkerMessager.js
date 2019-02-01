@@ -2898,7 +2898,7 @@ function loadSession_controller(XMLData, resolve = function() { }){
 
 		if (seqObject["seqID"] == "$user") {
 			$("#UserSequence").val(seqObject["seq"]);
-			$('input[name="inputSeqType"][value="inputTemplateSeq"]').click()
+			$('input[name="inputSeqType"][value="inputTemplateSeq"]').select()
 			submitCustomSequence(openPlots);
 		}
 

@@ -171,6 +171,19 @@ getUnrenderedobjects = function(msgID = null){
 // Loads a session from an XML string
 loadSessionFromXML = function(xmlData, msgID = null){
 
+
+    // Break the string into chunks
+    var chunkSize = 100000;
+    for (var i = 0; i < Math.ceil(xmlData.length / chunkSize); i ++){
+        
+        var start = i * chunkSize;
+        var stop = start + chunkSize;
+        var XML_substr = xmlData.substring(start, stop);
+        Module.ccall("loadSessionFromXML_chunk", null, ["string"],  [XML_substr]); 
+        
+    }   
+
+
     // Create the callback function
     var toDoAfterCall = function(resultStr){
         if (msgID != null) postMessage(msgID + "~X~" + resultStr);
@@ -178,7 +191,7 @@ loadSessionFromXML = function(xmlData, msgID = null){
     WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 
     
-    Module.ccall("loadSessionFromXML", null, ["string", "number"], [xmlData, msgID]);
+    Module.ccall("loadSessionFromXML", null, ["number"], [msgID]);
 }
 
 
