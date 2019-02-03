@@ -196,7 +196,7 @@ function drawPlotsFromData(plotData, resolve = function() { }){
 
 function update_PLOT_DATA(plotData){
 
-	//console.log("update_PLOT_DATA");
+	console.log("update_PLOT_DATA", plotData);
 
 	PLOT_DATA = plotData;
 
@@ -1836,7 +1836,7 @@ function maximumFromList(list){
 
 
 // Assumes that values are sorted
-function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = "", ylab = "Probability density", hoverLabels = false, canvasSizeMultiplier = 1, logSpace = false, underlayFn = null, col = "#008CBA"){
+function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = "", ylab = "Probability density", hoverLabels = false, canvasSizeMultiplier = 1, logSpace = false, underlayFn = null, isInteger = false, col = "#008CBA"){
 
 	if (canvasDivID != null && $("#" + canvasDivID).is( ":hidden" )) return;
 	
@@ -1888,20 +1888,20 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 
 
 		// Ensure that bin sizes increment by a nice number (eg. 1K, 2K, 2.5K, 5K for K = 10^N)
-		var nbins = Math.min(Math.ceil(Math.sqrt(values.length)), maxNumBins);
+		var nbins = isInteger ? Math.ceil(maxVal - minVal) : Math.min(Math.ceil(Math.sqrt(values.length)), maxNumBins);
 		if (minVal == maxVal) nbins = 1;
 
 		var niceBinSizes = [1, 2, 2.5, 5];
 		var niceBinSizeID = niceBinSizes.length - 1;
 		var basePower = Math.floor(log(maxVal, base = 10));
 		
-		var binSize = niceBinSizes[niceBinSizeID] * Math.pow(10, basePower);
+		var binSize = isInteger ? 1 : niceBinSizes[niceBinSizeID] * Math.pow(10, basePower);
 		
 		//console.log("BinSize1", binSize, "maxVal", maxVal, "basePower", basePower);
 		
 		if (minVal != maxVal) {
 			while(true){
-				if ((maxVal - minVal) / binSize - nbins > 0) break;
+				if ((maxVal - minVal) / binSize - nbins >= 0 && (!isInteger || (isInteger && binSize % 1 == 0))) break;
 				niceBinSizeID --;
 				if (niceBinSizeID < 0) {
 					niceBinSizeID = niceBinSizes.length - 1;
@@ -1914,6 +1914,8 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 			nbins = 1;
 			binSize = 1;
 		}
+        
+        console.log("binSize", binSize, nbins);
 		
 		
 		
@@ -1964,7 +1966,7 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 		
 
 		// Prior distribution underlay (if applicable)
-		drawHistogramPriorUnderlay(canvas, ctx, underlayFn, binSize, nbins, minVal, axisGap, binGap, heightScale);
+		drawHistogramPriorUnderlay(canvas, ctx, underlayFn, binSize, nbins, minVal, axisGap, binGap, heightScale, widthScale);
 
 
 
@@ -1995,7 +1997,7 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 
 
 		canvas.onmouseleave = function(e){
-			histogram(values, canvasID, canvasDivID, xRange, xlab, ylab, hoverLabels, canvasSizeMultiplier, logSpace, underlayFn, col);
+			histogram(values, canvasID, canvasDivID, xRange, xlab, ylab, hoverLabels, canvasSizeMultiplier, logSpace, underlayFn, isInteger, col);
 		};
 	
 
@@ -2035,16 +2037,16 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 }
 
 
-function drawHistogramPriorUnderlay(canvas, ctx, underlayFn, binSize, nbins, minVal, axisGap, binGap, heightScale){
+function drawHistogramPriorUnderlay(canvas, ctx, underlayFn, binSize, nbins, minVal, axisGap, binGap, heightScale, widthScale){
 
 	// Plot the prior distribution underlay if there is one
 	if (underlayFn != null){
 
-		var maxX = binSize * (nbins+1) + minVal;
-		var underlayScale = (maxX - minVal) / (canvas.width - axisGap);
+		var maxX = binSize * (nbins) + minVal;
+		var underlayScale = (maxX - minVal) / (canvas.width - axisGap - binGap);
 
-		ctx.globalAlpha = 0.6;
-		ctx.fillStyle = "#228B22";
+		ctx.globalAlpha = 0.8;
+		ctx.fillStyle = "#d3d3d3"; // "#228B22";
 		ctx.beginPath();
 		ctx.moveTo(axisGap, canvas.height - axisGap);
 
@@ -2052,17 +2054,17 @@ function drawHistogramPriorUnderlay(canvas, ctx, underlayFn, binSize, nbins, min
 		var maxY_prior = 0;
 		for (var xPix = axisGap; xPix < canvas.width; xPix++){
 			var x = underlayScale * (xPix-axisGap-binGap) + minVal;
-			var y = underlayFn(x);
+			var y = underlayFn(x, binSize);
 			maxY_prior = Math.max(maxY_prior, y);
 		}
 
-
+        // 
 		// Plot the prior curve
-		//console.log("underlayFn maxX", minVal, maxX);
+		// console.log("underlayFn maxX", minVal, maxX);
 		for (var xPix = axisGap; xPix < canvas.width; xPix++){
-
-			var x = underlayScale * (xPix-axisGap-binGap) + minVal;
-			var y = underlayFn(x) / maxY_prior;
+        
+			var x = underlayScale * (xPix-axisGap- binGap) + minVal;
+			var y = underlayFn(x, binSize) / maxY_prior;
 
 			var yPix = canvas.height - axisGap - y * heightScale; // -axisGap;
 			ctx.lineTo(xPix, yPix);
@@ -2091,7 +2093,7 @@ function histogram_mouse_over(x, y, canvas, ctx, binID, nbins, heightScale, widt
 
 
 	// Prior distribution underlay (if applicable)
-	drawHistogramPriorUnderlay(canvas, ctx, underlayFn, binSize, nbins, minVal, axisGap, binGap, heightScale);
+	drawHistogramPriorUnderlay(canvas, ctx, underlayFn, binSize, nbins, minVal, axisGap, binGap, heightScale, widthScale);
 
 	
 	for(var binID = 0; binID < nbins; binID ++){
@@ -3261,25 +3263,155 @@ function plot_parameter_heatmap(plotNumCustom = null){
 
 		// If y is probability make a histogram 
 		if (xvals != null && PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParamY"] == "probability"){
+        
+            get_PHYSICAL_PARAMETERS_controller(function(params){
+            
+                var paramID = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParamX"];
+                var isInteger = params[paramID].integer;
 
-
-			// Prior underlay?
-			var underlayFn = null;
-			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom].priorUnderlay){
-				console.log("Adding a prior underlay");
-				var sd = 1;
-				var meanVal = 8;
-				underlayFn = function(x){
-					return 1 / (Math.sqrt(2 * Math.PI * sd * sd)) * Math.exp(-(x-meanVal) * (x-meanVal) / (2 * sd * sd));
-				}
-			}
-
-
-
-			histogram(xvals, "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"], xLab, "Probability density", false, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], false, underlayFn);
-			return;
+    			// Prior underlay?
+    			var underlayFn = null;
+    			if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom].priorUnderlay){
+               
+    				console.log("Adding a prior underlay");
+                    
+                
+                    var xRange = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"];
+                    
+                    
+                    // Get the prior probability density (and xmax / xmin if automaticX)
+                    switch(params[paramID].distribution) {
+                    
+                    
+                        // Uniform prior
+                        case "Uniform":
+                            var lower = params[paramID].uniformDistnLowerVal;
+                            var upper = params[paramID].uniformDistnUpperVal;
+                            if (xRange == "automaticX"){
+                                var xmin = params[paramID]["zeroTruncated"] ? Math.max(0, lower - 0.25*(Math.abs(lower+upper+1))) : lower - 0.25*(Math.abs(lower+upper+1));
+                                xRange = [xmin, upper + 0.25*(Math.abs(lower+upper+1))];
+                            }
+                           
+                            var underlayFn = function(x, binsize = 1) {
+                                if (x >= lower && x <= upper) return 1 / (upper - lower);
+                                return 0;
+                            };
+                            
+                            break;
+                    
+                    
+                    
+                        // Exponential prior
+                        case "Exponential":
+                            var rate =  params[paramID].exponentialDistnVal;
+                            if (xRange == "automaticX"){
+                                xRange = [0, 5/rate];
+                            }
+                           
+                            var underlayFn = function(x, binsize = 1) {
+                                if (x < 0) return 0;
+                                return rate * Math.exp(-rate * x);
+                            };
+                            
+                            break;
+                    
+                    
+                        
+                        // Normal prior
+                        case "Normal":
+                            var sd = params[paramID].normalSdVal;
+                            var meanVal = params[paramID].normalMeanVal;
+                            console.log("Normal(", meanVal, ",", sd, ")");
+                            if (xRange == "automaticX"){
+                                var xmin = params[paramID]["zeroTruncated"] ? Math.max(meanVal - sd * 4, 0) : meanVal - sd * 4;
+                                xRange = [xmin, meanVal + sd * 4];
+                            }
+                           
+                            var underlayFn = function(x, binsize = 1) {
+                                if (params[paramID]["zeroTruncated"] && x <= 0) return 0;
+                                return 1 / (Math.sqrt(2 * Math.PI * sd * sd)) * Math.exp(-(x-meanVal) * (x-meanVal) / (2 * sd * sd));
+                            };
+                            
+                            break;
+                        
+                        
+                        
+                        // Lognormal prior
+                        case "Lognormal":
+                            var sd = params[paramID].lognormalSdVal
+                            var meanVal = params[paramID].lognormalMeanVal;
+                            console.log("Lognormal(", meanVal, ",", sd, ")");
+                            if (xRange == "automaticX"){
+                                var sd4 = Math.sqrt((Math.exp(Math.pow(sd, 2) - 1)) * Math.exp(2*meanVal + Math.pow(sd, 2))) * 4; // 4 standard deviations
+                                var empMean = Math.exp(meanVal + sd*sd/2);
+                                xRange = [Math.max(empMean - sd4, 0), empMean + sd4];
+                            }
+                            var underlayFn = function(x, binsize = 1) {
+                                if (x <= 0) return 0;
+                                return 1 / (x * sd * Math.sqrt(2 * Math.PI)) * Math.exp(-(Math.log(x)-meanVal) * (Math.log(x)-meanVal) / (2 * sd * sd));
+                            };
+                            
+                            break;
+                            
+                            
+                            
+                        // Gamma prior
+                        case "Gamma":
+                            var shape = params[paramID].gammaShapeVal
+                            var rateVal = params[paramID].gammaRateVal;
+                            var scale = 1/rateVal;
+                            console.log("Gamma(", shape, ",", rateVal, ")");
+                            console.log("XXX", jStat.gamma.pdf(10, shape, scale));
+                            if (xRange == "automaticX"){
+                                var sd4 = Math.sqrt(shape * scale * scale) * 4; // 4 standard deviations
+                                var empMean = shape * scale;
+                                xRange = [Math.max(empMean - sd4, 0), empMean + sd4];
+                            }
+                            var underlayFn = function(x, binsize = 1) {
+                                if (x <= 0) return 0;
+                                return jStat.gamma.pdf(x, shape, scale);
+                            };
+                            
+                            break;
+                            
+                            
+                        
+                        // Discrete uniform prior
+                        case "DiscreteUniform":
+                            var lower = params[paramID].uniformDistnLowerVal;
+                            var upper = params[paramID].uniformDistnUpperVal;
+                            console.log("DiscreteUniform(", lower, ",", upper, ")");
+                            if (xRange == "automaticX"){
+                                var xmin = params[paramID]["zeroTruncated"] ? Math.max(0, lower - 1) : lower - 1;
+                                xRange = [xmin, upper + 1];
+                            }
+                           
+                            var underlayFn = function(x, binsize = 1) {
+                                var upperTemp = upper + 1;
+                                var lowerTemp = lower;
+                                if (x >= lowerTemp && x <= upperTemp) return 1 / (upper - lower);
+                                return 0;
+                            };
+                            
+                            break;
+                        
+                        }
+                    
+                    
+                        histogram(xvals, "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, xRange, xLab, "Probability density", false, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], false, underlayFn, isInteger);
+                    
+                    
+    			} else {
+                    histogram(xvals, "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"], xLab, "Probability density", false, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], false, null, isInteger);
+                }
+                    
+    			return;
+                    
+            });
+            
+            return;
+            
 		}
-
 
 
 		var xValsGood = [];
@@ -4762,7 +4894,7 @@ function pauseSiteYVariableTemplate(){
 function priorDistributionUnderlayTemplate(){
 
 	return `
-		<div style="display:none">
+		<div">
 			<div id="priorDistributionUnderlayDIV" style="display:none">
 				<label style="cursor:pointer; line-height:22px"  title = "Plot the prior density of this parameter under the histogram."> 
 					<input class="variable"  type="checkbox" onChange="userChangeModelSampling_controller()" id="priorUnderlayChk"></input> 
@@ -5176,16 +5308,20 @@ function plotOptions(plotNum){
 			// If sampling from posterior then only have parameters which are being estimated in the dropdown
 			$("#settingCell8").html(getPosteriorCheckboxTemplate());
 			$("#selectPosteriorDistn").attr("onChange", "populateHeatmapSettingsParameterDropdowns(" + plotNum + ")");
+            
+            
+            // Add some loaders
+            $("#settingCell1").html(getLoaderTemplate("settingsLoader", "Loading parameters...", false));
 
 
 			getPosteriorDistributionNames(function(posteriorNames){
 
 				for (var p in posteriorNames){
-					$("#selectPosteriorDistn").append(`<option value="` + p + `" > ` + posteriorNames[p] + `</option>`);
-				}
-				$("#selectPosteriorDistn").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum].selectedPosteriorID);
+                    $("#selectPosteriorDistn").append(`<option value="` + p + `" > ` + posteriorNames[p] + `</option>`);
+                }
+                
 
-				console.log("selectedPosteriorID", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]);
+                console.log("selectedPosteriorID", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]);
 
 				populateHeatmapSettingsParameterDropdowns(plotNum, true);
 			});
@@ -5302,19 +5438,30 @@ function changePosteriorDistribution(){
 function populateHeatmapSettingsParameterDropdowns(plotNum, posteriorFromModel = false){
 
 
-	// X-axis parameter
-	$("#settingCell1").html(customPlotSelectParameterTemplate());
-	$("#settingCell3").html(customPlotSelectPropertyTemplate());
-	$("#settingCell5").html(parameterHeatmapZAxisTemplate());
 
 
 
 	var posteriorID = posteriorFromModel ? PLOT_DATA["whichPlotInWhichCanvas"][plotNum].selectedPosteriorID : $("#selectPosteriorDistn").val();
 
 	// var functionToGetParameters = usingPosterior ? function(resolve) { get_ParametersWithPriors_controller(resolve) } : function(resolve) { get_PHYSICAL_PARAMETERS_controller(resolve) };
-
+    
+    
 
 	getParametersInPosteriorDistribution(posteriorID, function(params){
+    
+        $("#selectPosteriorDistn").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum].selectedPosteriorID);
+    
+        // X-axis parameter
+        $("#settingCell1").html(customPlotSelectParameterTemplate());
+        $("#settingCell3").html(customPlotSelectPropertyTemplate());
+        $("#settingCell5").html(parameterHeatmapZAxisTemplate());
+        
+        
+        if (posteriorID != -1){
+            $('optgroup[label="Measurements"').remove();
+        }
+    
+    
 		console.log("params",params, params.length);
 		for (var paramID in params){
 			if (!params[paramID]["hidden"] && !params[paramID]["binary"] && params[paramID].name != null) {

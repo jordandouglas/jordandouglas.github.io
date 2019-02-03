@@ -950,8 +950,6 @@ function get_PHYSICAL_PARAMETERS_controller(resolve = function(dict) {}){
 		var msgID = res[1];
 		//console.log("Sending function: " + fnStr);
 		var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-
-
 		toCall(fnStr).then((dict) => resolve(dict));
 
 

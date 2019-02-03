@@ -1192,6 +1192,7 @@ extern "C" {
 		MCMC::initMCMC(true);
 		
 		vector<string> lines = Settings::split(chunk_string, '!');
+        _currentLoggedPosteriorDistributionID = 0;
 		bool success = false;
 		vector<string> headerLineSplit;
 		vector<string> lineSplit;
