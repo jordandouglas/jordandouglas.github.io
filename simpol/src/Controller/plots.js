@@ -2457,7 +2457,6 @@ function plot_time_vs_site(){
 		var ylab = PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["yAxis"] == "timePercentage" ? "Time (%)" : PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["yAxis"] == "timeSeconds" ? "Time (s)" : "log time(s)";
 
 	
-		//var pauseTimes = [0, 0.001, 0.01, 0.5, 10, 0.2, 3, 0.001, 0.01, 0.5, 10, 0.2, 3, 0.001, 0.01, 0.5, 10, 0.2, 3, 10, 0];
 		if ($("#plotDIV" + canvasesToPrintTo[canvasNum]).is( ":hidden" )) return;
 			sitewise_plot("plotCanvas" + canvasesToPrintTo[canvasNum], "plotCanvasContainer" + canvasesToPrintTo[canvasNum], "plotDIV" + canvasesToPrintTo[canvasNum], valuesToPlot, ylab, labelFn, PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["canvasSizeMultiplier"]);
 
@@ -2546,7 +2545,8 @@ function plot_catalysis_time_vs_site(){
 		}else valuesToPlot = PLOT_DATA["pauseTimePerSite"];
 
 		var ylab = PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["yAxis"] == "timePercentage" ? "Time (%)" : PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["yAxis"] == "timeSeconds" ? "Time (s)" : "log time(s)";
-
+        
+        
 	
 		//var pauseTimes = [0, 0.001, 0.01, 0.5, 10, 0.2, 3, 0.001, 0.01, 0.5, 10, 0.2, 3, 0.001, 0.01, 0.5, 10, 0.2, 3, 10, 0];
 		if ($("#plotDIV" + canvasesToPrintTo[canvasNum]).is( ":hidden" )) return;
@@ -2575,7 +2575,7 @@ function sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab = "
 	
 	var axisGap = 30 * canvasSizeMultiplier;
 	var startSite = (basesToDisplayTimes100-1) * 100 + 1;
-	var endSite = Math.min(startSite + 119, yvals.length-2);
+	var endSite = Math.min(startSite + 119, yvals.length-1);
 
 	$("#plots4").off("mouseleave"); // Remove the mouseleave event
 	
@@ -2585,7 +2585,7 @@ function sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab = "
 		if (scrollPos == null) scrollPos = $("#" + canvasDivID).scrollLeft();
 
 		$("#" + canvasID).remove();
-		var canvasWidth = axisGap + canvasSizeMultiplier * (Math.min((PLOT_DATA["nbases"]-1), 120-1)*25);  // Width should cover all nucleotides
+		var canvasWidth = axisGap + canvasSizeMultiplier * (Math.min((PLOT_DATA["nbases"]), 120-1)*25);  // Width should cover all nucleotides
 		
 		var canvasHeight = canvasSizeMultiplier * 150;
 		$("#" + canvasContainerID).html('<canvas id="' + canvasID + '" height=' + canvasHeight + ' width=' + canvasWidth + '></canvas>');
@@ -2619,7 +2619,7 @@ function sitewise_plot(canvasID, canvasContainerID, canvasDivID, yvals, ylab = "
 
 		// Set the label of the "Displaying XXX-YYY sites of ZZZ" label
 		$("#numSitesDisplayed").html(startSite + "-" + endSite);
-		$("#numSitesTotal").html(PLOT_DATA["nbases"]-1);
+		$("#numSitesTotal").html(PLOT_DATA["nbases"]);
 
 
 	}
@@ -2880,7 +2880,7 @@ function misincorporation_plot(canvasID, canvasDivID, yvals, ntrials, ylab = "",
 	var ctx = canvas.getContext('2d');
 	var axisGap = 30;
 	
-	ctx.canvas.width  = axisGap + $("#g" + (PLOT_DATA["nbases"]-1)).offset().left + $("#bases").scrollLeft() - $("#" + canvasDivID).offset().left; // Width should cover all nucleotides
+	ctx.canvas.width  = axisGap + $("#g" + (PLOT_DATA["nbases"])).offset().left + $("#bases").scrollLeft() - $("#" + canvasDivID).offset().left; // Width should cover all nucleotides
 	
 	
 	ctx.lineWidth = 0;
