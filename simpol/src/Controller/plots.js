@@ -2046,7 +2046,7 @@ function drawHistogramPriorUnderlay(canvas, ctx, underlayFn, binSize, nbins, min
 		var underlayScale = (maxX - minVal) / (canvas.width - axisGap - binGap);
 
 		ctx.globalAlpha = 0.8;
-		ctx.fillStyle = "#d3d3d3"; // "#228B22";
+		ctx.fillStyle = "#228B22"; //#d3d3d3
 		ctx.beginPath();
 		ctx.moveTo(axisGap, canvas.height - axisGap);
 
