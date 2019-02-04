@@ -196,7 +196,7 @@ function drawPlotsFromData(plotData, resolve = function() { }){
 
 function update_PLOT_DATA(plotData){
 
-	console.log("update_PLOT_DATA", plotData);
+	//console.log("update_PLOT_DATA", plotData);
 
 	PLOT_DATA = plotData;
 
@@ -1229,16 +1229,22 @@ function plot_MCMC_trace(){
 
 		// Epsilon decrease over time
 		var epsilon = null;
-		if (PLOT_DATA.ABC_EXPERIMENTAL_DATA !=null && yVar == "chiSq"){
-			var epsilon_min = -PLOT_DATA.ABC_EXPERIMENTAL_DATA.chiSqthreshold_min;
-			var epsilon_0 = -PLOT_DATA.ABC_EXPERIMENTAL_DATA.chiSqthreshold_0;
-			var epsilon_gamma = PLOT_DATA.ABC_EXPERIMENTAL_DATA.chiSqthreshold_gamma;
+		if (PLOT_DATA["whichPlotInWhichCanvas"][pltNum].exponentialDecay && yVar == "chiSq"){
+			var epsilon_min = parseFloat($("#MCMC_chiSqthreshold_min").val());
+			var epsilon_0 = parseFloat($("#MCMC_chiSqthreshold_0").val());
+			var epsilon_gamma =parseFloat($("#MCMC_chiSqthreshold_gamma").val());
+            
+            if (PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["yRange"] == "automaticY"){
+                ymin = 0;
+                ymax = epsilon_0;
+            }
 			epsilon = {emin: epsilon_min, e0: epsilon_0, gamma: epsilon_gamma};
 		}
 
 
 		var range = [xmin, xmax, ymin, ymax];
-
+        //console.log("ABC_EXPERIMENTAL_DATA", yVar, epsilon)
+        
 
 		// Print ESS
 		$("#plotLabelVariable" + pltNum).html(Math.round(PLOT_DATA["whichPlotInWhichCanvas"][pltNum].ESS * 100) / 100);
@@ -1305,7 +1311,8 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, burnin
 		
 	}
 
-
+    
+    
 	var heightScale = 1;
 	var ylabPos = [];
 	if (yVals != null && yVals.length > 0){
@@ -1315,7 +1322,6 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, burnin
 		heightScale = yResult["widthOrHeightScale"]
 		ylabPos = yResult["vals"]
 
-		//console.log("xResult", xResult);
 		
 	}
 	
@@ -1390,27 +1396,54 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, burnin
 
 		//var currentTimePixel = 0; 		// We do not want to plot every single value because it is wasteful (and crashes the program). 
 		//var currentDistancePixel = 0; 	// So only plot values which will occupy a new pixel
-
-		/*
+      
+      
+		
 		// Show the threshold epsilon decrease
 		if (epsilon != null){
-			var pixelY = epsilon.e0;
+            //console.log("epsilon", epsilon);
+            
+            
+            // Start the exponential decay curve
+            ctx.globalAlpha = 0.7;
+            ctx.strokeStyle = "black";
+            ctx.fillStyle = "#d3d3d3"; //#d3d3d3
+            ctx.beginPath();
+            ctx.moveTo(axisGap, canvas.height - axisGap);
+            
+            
+			var pixelY = 0;
 			var converged = false;
 			for (var pixelX = axisGap; pixelX <= canvas.width - outerMargin; pixelX++){
-				var trueX = range[0] + xVals[pixelX - axisGap]
+				var trueX = (pixelX - axisGap) / widthScale + range[0];
+                
 				if (!converged){
-					pixelY *= epsilon.gamma;
-					if (pixelY > epsilon.emin){
-						pixelY = epsilon.emin;
-						converged = true;
-					}
-				}
+					var trueY = Math.max(epsilon.e0 * Math.pow(epsilon.gamma, trueX), epsilon.emin);
+                    var pixelY = plotHeight - heightScale * (trueY - range[2]) + outerMargin;
+                    if (trueY <= epsilon.emin) converged = true;
+                    
+                    // Curved line
+                    ctx.lineTo(pixelX, pixelY);
+                    
+				}else{
+                    
+                    // Straight horizontal line the rest of the way
+                    var pixelY = canvas.height - heightScale * (epsilon.emin - range[2]) - axisGap;
+                    ctx.lineTo(canvas.width - outerMargin, pixelY);
+                    break;
+                }
 			}
+            
+            
+            ctx.lineTo(canvas.width - outerMargin, canvas.height - axisGap);
+            ctx.stroke();
+            //ctx.fill();
+            ctx.closePath();
+            
 		}
-		*/
+		
 
-
-
+       
 
 
 		// Burnin line in grey, main line in col
@@ -3216,7 +3249,7 @@ function getColourFromPalette(val, min, max, paletteName){
 function plot_parameter_heatmap(plotNumCustom = null){
 
 
-	//console.log("Drawing heatmap", plotNumCustom);
+	// console.log("Drawing heatmap", PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["zData"]);
 
 	if (plotNumCustom == null) plotNumCustom = 5;
 
@@ -3254,9 +3287,8 @@ function plot_parameter_heatmap(plotNumCustom = null){
 		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom].burnin != null) {
 			var burnin = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom].burnin;
 			xvals = xvals.slice(burnin, xvals.length)
-			zvals = yvals.slice(burnin, yvals.length)
-			zvals = yvals.slice(burnin, yvals.length)
-
+			yvals = yvals.slice(burnin, yvals.length)
+			zvals = zvals.slice(burnin, zvals.length)
 
 		}
 
@@ -3510,6 +3542,8 @@ function plot_parameter_heatmap(plotNumCustom = null){
 			for (var trialID = 0; trialID < zValsGood.length; trialID++){
 				cols.push(getColourFromPalette(zValsGood[trialID], zmin, zmax, colouringFn));
 			}
+            
+            //console.log("cols", xValsGood, zValsGood, cols);
 
 		}
 
@@ -5036,6 +5070,15 @@ function getTracePlotDropdownTemplate(){
 		<select class="dropdown" title="What do you want to show on the y-axis?" id = "traceVariableY" style="vertical-align: middle; text-align:right;">
 		</select><br>
 		Calculated per trial.
+        
+        <div>
+            <div id="exponentialDecayChkDIV">
+                <label style="cursor:pointer; line-height:22px"  title = "Plot the exponentially decaying value of &epsilon; behind X<sup>2</sup>."> 
+                    <input class="variable"  type="checkbox" onChange="userChangeModelSampling_controller()" id="exponentialDecayChk"></input> 
+                    Show &epsilon;
+                </label>
+            </div>
+        <div>
 	`;
 	
 }
@@ -5336,15 +5379,20 @@ function plotOptions(plotNum){
 
 			console.log("TP", PLOT_DATA["whichPlotInWhichCanvas"][plotNum]);
 
-
-			// Create a dropdown list which contains all the posterior distributions to choose from
-			$("#settingCell3").html(selectPosteriorDistributionTemplate());
-
-			// Create a dropdown list which contains all the parameters sampled in the prior
-			$("#settingCell4").html(getTracePlotDropdownTemplate().replace("Calculated per trial.", ""));
+            
+            $("#settingCell4").html(getLoaderTemplate("settingsLoader", "Loading...", false));
+            
+            
+			
+            
+            
 			
 			getPosteriorDistributionNames(function(posteriorNames){
-
+            
+                // Create a dropdown list which contains all the posterior distributions to choose from
+                $("#settingCell3").html(selectPosteriorDistributionTemplate());
+                
+                
 				for (var p in posteriorNames){
 					$("#selectPosteriorDistn").append(`<option value="` + p + `" > ` + posteriorNames[p] + `</option>`);
 				}
@@ -5375,7 +5423,9 @@ function plotOptions(plotNum){
 				$("#yMax_textbox").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["yRange"][1]);
 			}
 			
-
+            
+            
+           
 			break;
 
 
@@ -5414,6 +5464,7 @@ function changePosteriorDistribution(){
 
 	console.log("changePosteriorDistribution to", posteriorID, "for plot", plotNum);
 	
+    
 
 	if (posteriorID == null) return;
 
@@ -5421,13 +5472,21 @@ function changePosteriorDistribution(){
 	posteriorID = parseFloat(posteriorID);
 
 	getParametersInPosteriorDistribution(posteriorID, function(params){
+    
+    
+        // Create a dropdown list which contains all the parameters sampled in the prior
+        $("#settingCell4").html(getTracePlotDropdownTemplate().replace("Calculated per trial.", ""));
 
-		$("#traceVariableY").html("");
+		//$("#traceVariableY").html("");
 
 		for (var paramID in params){
 			$("#traceVariableY").append(`<option value="` + paramID + `" > ` + params[paramID].name + `</option>`);
 		}
 		$("#traceVariableY").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum].customParamY);
+        
+         // Exponential decay?
+        $("#exponentialDecayChk").prop('checked', (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["exponentialDecay"]));
+        
 
 	});
 
@@ -5464,7 +5523,7 @@ function populateHeatmapSettingsParameterDropdowns(plotNum, posteriorFromModel =
     
 		console.log("params",params, params.length);
 		for (var paramID in params){
-			if (!params[paramID]["hidden"] && !params[paramID]["binary"] && params[paramID].name != null) {
+			if ((posteriorID > -1 || !params[paramID]["hidden"]) && !params[paramID]["binary"] && params[paramID].name != null) {
 				$("#customParamX_params").append(`<option value="` + paramID + `" style="color:white"> ` + params[paramID]["name"] + `</option>`);
 				$("#customParamY_params").append(`<option value="` + paramID + `" style="color:white"> ` + params[paramID]["name"] + `</option>`);
 				$("#customParamZ_params").append(`<option value="` + paramID + `" style="color:white"> ` + params[paramID]["name"] + `</option>`);
@@ -5488,7 +5547,7 @@ function populateHeatmapSettingsParameterDropdowns(plotNum, posteriorFromModel =
 
 		// Prior underlay
 		$("#priorUnderlayChk").prop('checked', (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["priorUnderlay"]));
-
+        
 
 		// Y-axis attribute
 		$("#settingCell2").html(distanceVsTimeOptionsTemplate1().replace("Time range", "X-axis range").replace("XUNITS", "").replace("XUNITS", ""));

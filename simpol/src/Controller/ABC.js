@@ -1938,7 +1938,6 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 		//console.log("getPosteriorDistribution_controller", result);
 
-		
 		var abcDataObjectForModel = getAbcDataObject();
 
 
@@ -1948,25 +1947,72 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 			var plotWidth = canvas.width - axisGap - margin;
 			var plotHeight = canvas.height - axisGap - margin;
+            
+            // Ticks
+            var xlabPos = [];
+            var xResult = getNiceAxesNumbers(minimumFromList(forces), maximumFromList(forces), plotWidth);
+            var xmin = xResult["min"]
+            var xmax = xResult["max"]
+            var widthScale = xResult["widthOrHeightScale"]
+            xlabPos = xResult["vals"]
+           // console.log("xResult", xResult);
+
+            var ylabPos = [];
+            var yResult = getNiceAxesNumbers(0, maximumFromList(velocities), plotHeight, true);
+            var ymin = yResult["min"]
+            var ymax = yResult["max"]
+            var heightScale = yResult["widthOrHeightScale"]
+            ylabPos = yResult["vals"]
+            //console.log("yResult", yResult);
+  
+  
+  
+            // X min and max
+            var axisPointMargin = 5 * canvasSizeMultiplier;
+            ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+            ctx.textBaseline="top"; 
+            var tickLength = 10 * canvasSizeMultiplier;
+            ctx.lineWidth = 1 * canvasSizeMultiplier;
+
+            for (var labelID = 0; labelID < xlabPos.length; labelID++){
+            
+                var x0 = widthScale * (xlabPos[labelID] - xmin) + axisGap;
+                
+                ctx.textAlign = labelID == 0 ? "left" : "center";
+                ctx.fillText(xlabPos[labelID], x0, canvas.height - axisGap + axisPointMargin);
+                
+                // Draw a tick on the axis
+                ctx.beginPath();
+                ctx.moveTo(x0, canvas.height - axisGap - tickLength/2);
+                ctx.lineTo(x0, canvas.height - axisGap + tickLength/2);
+                ctx.stroke();
+
+            }
+            
+            
+            
+            
+            // Y min and max
+            ctx.textBaseline="bottom"; 
+
+            ctx.save()
+            ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
+            ctx.rotate(-Math.PI/2);
+            for (var labelID = 0; labelID < ylabPos.length; labelID++){
+                var y0 = heightScale * (ylabPos[labelID] - ymin);
+                ctx.fillText(ylabPos[labelID], y0, 0);
+
+                // Draw a tick on the axis
+                ctx.beginPath();
+                ctx.moveTo(y0, axisPointMargin - tickLength/2);
+                ctx.lineTo(y0, axisPointMargin + tickLength/2);
+                ctx.stroke();
 
 
-			var xmin = roundToSF(minimumFromList(forces), 2, "floor");
-			var xmax = roundToSF(maximumFromList(forces), 2, "ceil");
-			var ymin = 0;
-			var ymax = roundToSF(maximumFromList(velocities) * 1.3, 3, "ceil");
+            }
+            ctx.restore();
 
-			if (xmax == xmin){
-				xmax += 5;
-				xmin -= 5;
-			}
-
-			if (ymax == ymin){
-				ymax += 5;
-			}
-
-			var widthScale = plotWidth / (xmax - xmin);
-			var heightScale = plotHeight / (ymax - ymin);
-
+  
 
 
 			// Plot the posterior distribution of curves
@@ -2042,35 +2088,7 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 			}
 				
 
-			// X min and max
-			var axisPointMargin = 10 * canvasSizeMultiplier;
-			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
-			ctx.textBaseline="top"; 
-			ctx.textAlign="left"; 
-			ctx.fillText(xmin, axisGap, canvas.height - axisGap + axisPointMargin);
-			ctx.textAlign="right"; 
-			ctx.fillText(xmax, canvas.width - margin, canvas.height - axisGap + axisPointMargin);
-
-
-			// Y min and max
-			ctx.save()
-			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
-			ctx.textBaseline="bottom"; 
-			ctx.textAlign="right"; 
-			ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
-			ctx.rotate(-Math.PI/2);
-			ctx.fillText(0, 0, 0);
-			ctx.restore();
-			
-			ctx.save()
-			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
-			ctx.textAlign="right"; 
-			ctx.textBaseline="bottom"; 
-			ctx.translate(axisGap - axisPointMargin, margin);
-			ctx.rotate(-Math.PI/2);
-			ctx.fillText(ymax, 0, 0);
-			ctx.restore();
-			
+		
 
 		}
 
@@ -2101,7 +2119,7 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 		ctx.textAlign="center"; 
 		ctx.textBaseline="bottom"; 
 		ctx.save()
-		var ylabXPos = 2 * axisGap / 3;
+		var ylabXPos = 1 * axisGap / 2;
 		var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
 		ctx.translate(ylabXPos, ylabYPos);
 		ctx.rotate(-Math.PI/2);
@@ -2146,22 +2164,72 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 			var plotWidth = canvas.width - axisGap - margin;
 			var plotHeight = canvas.height - axisGap - margin;
 
+            
+            
+            
+            // Ticks
+            var xlabPos = [];
+            var xResult = getNiceAxesNumbers(0, maximumFromList(concentrations), plotWidth, true);
+            var xmin = xResult["min"]
+            var xmax = xResult["max"]
+            var widthScale = xResult["widthOrHeightScale"]
+            xlabPos = xResult["vals"]
+            //console.log("xResult", xResult);
 
-			var xmin = 0;
-			var xmax = roundToSF(maximumFromList(concentrations), 2, "ceil");
-			var ymin = 0;
-			var ymax = roundToSF(maximumFromList(velocities) * 1.3, 3, "ceil");
+            var ylabPos = [];
+            var yResult = getNiceAxesNumbers(0, maximumFromList(velocities), plotHeight, true);
+            var ymin = yResult["min"]
+            var ymax = yResult["max"]
+            var heightScale = yResult["widthOrHeightScale"]
+            ylabPos = yResult["vals"]
+            //console.log("yResult", yResult);
+  
+            
+             // X min and max
+            var axisPointMargin = 5 * canvasSizeMultiplier;
+            ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+            ctx.textBaseline="top"; 
+            var tickLength = 10 * canvasSizeMultiplier;
+            ctx.lineWidth = 1 * canvasSizeMultiplier;
 
-			if (xmax == xmin){
-				xmax += 10;
-			}
+            for (var labelID = 0; labelID < xlabPos.length; labelID++){
+            
+                var x0 = widthScale * (xlabPos[labelID] - xmin) + axisGap;
+                
+                ctx.textAlign = labelID == 0 ? "left" : "center";
+                ctx.fillText(xlabPos[labelID], x0, canvas.height - axisGap + axisPointMargin);
+                
+                // Draw a tick on the axis
+                ctx.beginPath();
+                ctx.moveTo(x0, canvas.height - axisGap - tickLength/2);
+                ctx.lineTo(x0, canvas.height - axisGap + tickLength/2);
+                ctx.stroke();
 
-			if (ymax == ymin){
-				ymax += 5;
-			}
+            }
+            
+            
+            
+            
+            // Y min and max
+            ctx.textBaseline="bottom"; 
 
-			var widthScale = plotWidth / (xmax - xmin);
-			var heightScale = plotHeight / (ymax - ymin);
+            ctx.save()
+            ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
+            ctx.rotate(-Math.PI/2);
+            for (var labelID = 0; labelID < ylabPos.length; labelID++){
+                var y0 = heightScale * (ylabPos[labelID] - ymin);
+                ctx.fillText(ylabPos[labelID], y0, 0);
+
+                // Draw a tick on the axis
+                ctx.beginPath();
+                ctx.moveTo(y0, axisPointMargin - tickLength/2);
+                ctx.lineTo(y0, axisPointMargin + tickLength/2);
+                ctx.stroke();
+
+
+            }
+            ctx.restore();
+            
 
 
 
@@ -2236,38 +2304,7 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 
 			}
 
-
-
-
-			
-			// X min and max
-			var axisPointMargin = 10 * canvasSizeMultiplier;
-			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
-			ctx.textBaseline="top"; 
-			ctx.textAlign="left"; 
-			ctx.fillText(xmin, axisGap, canvas.height - axisGap + axisPointMargin);
-			ctx.textAlign="right"; 
-			ctx.fillText(xmax, canvas.width - margin, canvas.height - axisGap + axisPointMargin);
-
-
-			// Y min and max
-			ctx.save()
-			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
-			ctx.textBaseline="bottom"; 
-			ctx.textAlign="right"; 
-			ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
-			ctx.rotate(-Math.PI/2);
-			ctx.fillText(0, 0, 0);
-			ctx.restore();
-			
-			ctx.save()
-			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
-			ctx.textAlign="right"; 
-			ctx.textBaseline="bottom"; 
-			ctx.translate(axisGap - axisPointMargin, margin);
-			ctx.rotate(-Math.PI/2);
-			ctx.fillText(ymax, 0, 0);
-			ctx.restore();
+		
 			
 
 		}
@@ -2303,7 +2340,7 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 		ctx.textAlign="center"; 
 		ctx.textBaseline="bottom"; 
 		ctx.save()
-		var ylabXPos = 2 * axisGap / 3;
+		var ylabXPos = 1 * axisGap / 2;
 		var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
 		ctx.translate(ylabXPos, ylabYPos);
 		ctx.rotate(-Math.PI/2);

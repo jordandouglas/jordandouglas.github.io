@@ -2575,6 +2575,8 @@ function saveSettings_controller(){
 				values.push([$("#yMin_textbox").val(), $("#yMax_textbox").val()]);
 			}
 			
+            values.push($("#exponentialDecayChk").prop("checked"));
+            
 
 			functionToCallAfterSaving  = function() { plot_MCMC_trace(); };
 			break;
@@ -2912,9 +2914,7 @@ function loadSession_controller(XMLData, resolve = function() { }){
 		// Update the ABC panel
 		if (experimentalData != null){
 
-
-
-			console.log("experimentalData", experimentalData);
+            if (experimentalData["fits"] != null && !$("#ABCPanelTableDIV").is(":visible")) showABCPanelFn();
 
 			// Reset the ABC DOM
 			initABCpanel();
