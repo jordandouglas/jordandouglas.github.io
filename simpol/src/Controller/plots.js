@@ -3267,11 +3267,11 @@ function plot_parameter_heatmap(plotNumCustom = null){
             get_PHYSICAL_PARAMETERS_controller(function(params){
             
                 var paramID = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParamX"];
-                var isInteger = paramID == null ? false : params[paramID].integer;
+                var isInteger = params[paramID] == null ? false : params[paramID].integer;
 
     			// Prior underlay?
     			var underlayFn = null;
-    			if (paramID != null && PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom].priorUnderlay){
+    			if (params[paramID] != null && PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom].priorUnderlay){
                
     				console.log("Adding a prior underlay");
                     
