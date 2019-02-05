@@ -19,6 +19,15 @@
     --------------------------------------------------------------------
 -*/
 
+.glowing {
+    background-color:#f0c36d; 
+    border-color: #FFFFB2; 
+    -webkit-box-shadow: 0 0 10px #FFFFB2; 
+       -moz-box-shadow: 0 0 10px #FFFFB2; 
+            box-shadow: 0 0 10px #FFFFB2; 
+}
+
+
 
 
 body { 
@@ -354,6 +363,16 @@ div.vertical{
 	width:110px;
 	cursor:pointer;
 	%box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+
+.operation.glowing {
+    background-color:#f0c36d; 
+    border-color: #FFFFB2; 
+    color:#f0c36d;
+    -webkit-box-shadow: 0 0 10px #FFFFB2; 
+       -moz-box-shadow: 0 0 10px #FFFFB2; 
+            box-shadow: 0 0 10px #FFFFB2; 
 }
 
 
@@ -857,15 +876,6 @@ input:checked + .slider:before {
     background: white; 
     cursor: pointer; /* Cursor on hover */
 	border-radius: 20px;
-}
-
-
-.glowing {
-    background-color:#f0c36d;
-    border-color: #FFFFB2;
-    -webkit-box-shadow: 0 0 10px #FFFFB2;
-       -moz-box-shadow: 0 0 10px #FFFFB2;
-            box-shadow: 0 0 10px #FFFFB2;
 }
 
 
