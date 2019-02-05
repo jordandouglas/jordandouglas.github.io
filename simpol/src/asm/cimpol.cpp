@@ -202,7 +202,7 @@ int main(int argc, char** argv) {
 	if (doMCMC){
 
         if (_outputFilename != "") cout << "Saving to " << _outputFilename << endl;
-		MCMC::initMCMC(false);
+		MCMC::initMCMC(false, true);
 		MCMC::beginMCMC();
 	}
 

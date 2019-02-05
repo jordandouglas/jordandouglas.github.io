@@ -140,7 +140,10 @@ function init(){
 
 
 	try{
-
+    
+            
+        $(".variable").focus(function() { $(this).select(); });
+            
 		
 		msgID_simulation = null;
 		simulationRenderingController = false;
@@ -315,7 +318,7 @@ function init(){
                 $("#ABC_useMCMC").val(1);
                 $("#ABC_display").show();
                 $("#MCMC_display").hide();
-				initABCpanel();
+				initABC();
             
             
 				initModelComparisonpanel();
@@ -3778,7 +3781,7 @@ function closeNav() {
 							<tr>
 								
 
-								<td style="vertical-align:top; border: 1px solid black; min-width:300px; background-color:#d3d3d3;">
+								<td style="vertical-align:top; border: 1px solid black; width:300px; background-color:#d3d3d3;">
                                     <b style="text-align:center">Inference Method:</b><br><br>
 									<div style="position:relative; vertical-align:top;">
 										
@@ -3800,6 +3803,11 @@ function closeNav() {
 										
 										
 										</table>
+                                                    
+                                                    
+                                        <div id="deleteABCmsg" style="display:none; font-size:12px; margin-top:5px;">
+                                            Delete the posterior distribution from the toolbar to unlock the ABC settings.
+                                        </div>
 										 
 									</div>
 								</td>
@@ -3831,7 +3839,7 @@ function closeNav() {
                                             <td>
                                                 <span style="vertical-align:middle" >Show all samples</span>
                                                 <label class="switch">
-                                                    <input class="modelSetting" type="checkbox" id="ABCshowAll" OnChange="RABC_toggle_display()">
+                                                    <input class="modelSetting" type="checkbox" id="ABCshowAll" OnChange="renderABCoutput()">
                                                     <span class="slider round"></span>
                                                 </label> 
                                                 
@@ -3875,7 +3883,7 @@ function closeNav() {
                                         <tr class="ABC_display">
                                             <td>
                                                 &epsilon; =
-                                                <input type="number" onChange="change_ABC_epsilon()" id="ABC_epsilon" min=0 step="0.001" value=1 title="Threshold for accepting a sample into the posterior distribution.  This input is linked with P(X &lt; &epsilon;)" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+                                                <input type="number" onChange="update_RABC_epsilon_controller(true)" id="ABC_epsilon" min=0 step="0.001" value=1 title="Threshold for accepting a sample into the posterior distribution.  This input is linked with P(X &lt; &epsilon;)" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#708090">
                                             </td>
                                         </tr>
                                                     
@@ -3884,7 +3892,7 @@ function closeNav() {
                                         <tr class="ABC_display">
                                             <td>
                                                 P(X &lt; &epsilon;) =
-                                                <input type="number" onChange="change_ABC_quantile()" id="ABC_quantile" min=0 max=1 step="0.001" value=0 title="The proportion of samples to accept into the posterior distribution. This input is linked with &epsilon;" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+                                                <input type="number" onChange="update_RABC_epsilon_controller(false)" id="ABC_quantile" min=0 max=1 step="0.001" value=0 title="The proportion of samples to accept into the posterior distribution. This input is linked with &epsilon;" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
                                             </td>
                                         </tr>
                                                     
@@ -3964,9 +3972,11 @@ function closeNav() {
 
 
 							<span id="selectLoggedPosteriorDistnDIV" style="display:none">
-								<legend><b>Posterior distribution:</b></legend>
-								<select class="dropdown" title="Which posterior distribution do you want to display?" id="selectLoggedPosteriorDistn" onChange="setCurrentLoggedPosteriorDistributionID_controller()" style="vertical-align: middle; text-align:right; min-width: 150px">
-								</select>
+                                <span style="display:none">
+    								<legend><b>Posterior distribution:</b></legend>
+    								<select class="dropdown" title="Which posterior distribution do you want to display?" id="selectLoggedPosteriorDistn" onChange="setCurrentLoggedPosteriorDistributionID_controller()" style="vertical-align: middle; text-align:right; min-width: 150px">
+    								</select>
+                                </span>
 							</span>
 
 							
@@ -3977,23 +3987,25 @@ function closeNav() {
 								&nbsp;Displaying lines <span id='numABCrowsDisplayed'>0</span> out of <span id='numABCrowsGenerated'>0</span>&nbsp;
 								<input type=button id='plusABCrows' class='minimise dropdown-disabled' style='width:40px'  value='30&rarr;' onClick=plusABCrows() title='See next 30 rows'>
 							</span>
+                            
+                                        
+                            <span id="showInMCMC" style="display:none">           
+    							&nbsp;&nbsp;
+    							<span id="ABCacceptanceDIV" title="Accumulative acceptance probability. This value is reset once burn-in has been achieved (if using MCMC).">
+    								Acceptance rate: <span id="ABCacceptanceVal"> </span>%
+    							</span>
 
-							&nbsp;&nbsp;
-							<span id="ABCacceptanceDIV" style="display:none" title="Accumulative acceptance probability. This value is reset once burn-in has been achieved (if using MCMC).">
-								Acceptance rate: <span id="ABCacceptanceVal"> </span>%
-							</span>
 
+    							&nbsp;&nbsp;
+    							<span id="currentEpsilonDIV" title="Current value of epsilon. Convergence can only be achieved after the current epsilon is equal to the minimum epsilon.">
+    								&epsilon; = <span id="currentEpsilonVal">  </span>
+    							</span>
 
-							&nbsp;&nbsp;
-							<span id="currentEpsilonDIV" style="display:none" title="Current value of epsilon. Convergence can only be achieved after the current epsilon is equal to the minimum epsilon.">
-								&epsilon; = <span id="currentEpsilonVal">  </span>
-							</span>
-
-							&nbsp;&nbsp;
-							<span id="burninStatusDIV" style="display:none">
-								Status: <span id="burninStatusVal" style="color:red">  </span>
-							</span>
-
+    							&nbsp;&nbsp;
+    							<span id="burninStatusDIV">
+    								Status: <span id="burninStatusVal" style="color:red">  </span>
+    							</span>
+                            </span>
 							<br><br>
 
 							<div id="ABCoutput" style="display:none; width:95%; font-family:'Courier New'; background-color:white; color: black; font-size: 14px; padding: 10 20; height: 600px; overflow-y:scroll; overflow-x:scroll">

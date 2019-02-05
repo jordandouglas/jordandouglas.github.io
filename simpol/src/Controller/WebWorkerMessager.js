@@ -2919,10 +2919,15 @@ function loadSession_controller(XMLData, resolve = function() { }){
 			// Reset the ABC DOM
 			initABCpanel();
 			initModelComparisonpanel();
-
+            
+            if (experimentalData["inferenceMethod"] != null){
+                if (experimentalData["inferenceMethod"] == "ABC") $("#ABC_useMCMC").val(1);
+                else $("#ABC_useMCMC").val(2);
+            
+            }
+            
 			if (experimentalData["ntrials"] != null) {
-				if (experimentalData["inferenceMethod"] == "ABC") $("#ABCntrials").val(experimentalData["ntrials"]);
-				else if (experimentalData["inferenceMethod"] == "MCMC") $("#MCMCntrials").val(experimentalData["ntrials"]);
+				$("#MCMCntrials").val(experimentalData["ntrials"]);
 			}
 			if (experimentalData["testsPerData"] != null) {
 				if (experimentalData["inferenceMethod"] == "ABC") $("#ABC_ntestsperdata").val(experimentalData["testsPerData"]);
@@ -2934,6 +2939,9 @@ function loadSession_controller(XMLData, resolve = function() { }){
 			if (experimentalData["chiSqthreshold_min"] != null) $("#MCMC_chiSqthreshold_min").val(experimentalData["chiSqthreshold_min"]);
 			if (experimentalData["chiSqthreshold_0"] != null) $("#MCMC_chiSqthreshold_0").val(experimentalData["chiSqthreshold_0"]);
 			if (experimentalData["chiSqthreshold_gamma"] != null) $("#MCMC_chiSqthreshold_gamma").val(experimentalData["chiSqthreshold_gamma"]);
+            
+            if (experimentalData["epsilon"] != null) $("#ABC_epsilon").val(experimentalData["epsilon"]);
+            if (experimentalData["quantile"] != null) $("#ABC_quantile").val(experimentalData["quantile"]);
 			
 
 			for (var fitID in experimentalData["fits"]){
@@ -3125,18 +3133,16 @@ function gelInference_controller(fitID, priors, resolve = function() { } ){
 
 
 		hideStopButtonAndShow("simulate");
+        //toggleMCMC();
+        
+        $("#MCMCntrials,#PreExp,#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("cursor", "");
+        $("#MCMCntrials,#PreExp,#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("background-color", "#008cba");
+        $("#MCMCntrials,#PreExp,#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").attr("disabled", false);
+        
 		$("#beginABC_btn").val("Resume ABC");
 		$("#beginMCMC_btn").val("Resume MCMC-ABC");
 		$(".beginABC_btn").attr("onclick", "beginABC()");
-		$("#ABCntrials").css("cursor", "");
-		$("#ABCntrials").css("background-color", "#008cba");
-		$("#ABCntrials").attr("disabled", false);
-		$("#MCMCntrials").css("cursor", "");
-		$("#MCMCntrials").css("background-color", "#008cba");
-		$("#MCMCntrials").attr("disabled", false);
-		$("#PreExp").attr("disabled", false);
-		$("#PreExp").css("cursor", "");
-		$("#PreExp").css("background-color", "#008CBA");
+		
 		running_ABC = false;
 		simulationRenderingController = false;
 
@@ -3204,14 +3210,7 @@ function gelInference_controller(fitID, priors, resolve = function() { } ){
 
 			$("#ABCacceptanceVal").html(roundToSF(result.acceptanceRate));
 
-			/*
-			// Update the counter
-			var nTrialsToGo = parseFloat(result["nTrialsToGo"]);
-			if (nTrialsToGo != parseFloat($("#ABCntrials").val()) && !isNaN(nTrialsToGo)) {
-				$("#ABCntrials").val(nTrialsToGo);
-				$("#MCMCntrials").val(nTrialsToGo);
-			}
-			*/
+			
 
 			if (result["lines"] != null) {
 				addNewABCRows(result["lines"].split("!"));
@@ -3778,18 +3777,14 @@ function beginABC_controller(abcDataObjectForModel){
 
 
 		hideStopButtonAndShow("simulate");
+        
+        $("#MCMCntrials,#PreExp").css("cursor", "");
+        $("#MCMCntrials,#PreExp").css("background-color", "#008cba");
+        $("#MCMCntrials,#PreExp").attr("disabled", false);
+        
 		$("#beginABC_btn").val("Resume ABC");
 		$("#beginMCMC_btn").val("Resume MCMC-ABC");
 		$(".beginABC_btn").attr("onclick", "beginABC()");
-		$("#ABCntrials").css("cursor", "");
-		$("#ABCntrials").css("background-color", "#008cba");
-		$("#ABCntrials").attr("disabled", false);
-		$("#MCMCntrials").css("cursor", "");
-		$("#MCMCntrials").css("background-color", "#008cba");
-		$("#MCMCntrials").attr("disabled", false);
-		$("#PreExp").attr("disabled", false);
-		$("#PreExp").css("cursor", "");
-		$("#PreExp").css("background-color", "#008CBA");
 		running_ABC = false;
 		simulationRenderingController = false;
 
@@ -3854,7 +3849,6 @@ function beginABC_controller(abcDataObjectForModel){
 						for (var p in posteriorNames){
 							if ($("#selectLoggedPosteriorDistn_" + p).length == 0) $("#selectLoggedPosteriorDistn").append(`<option id="selectLoggedPosteriorDistn_` + p + `" value="` + p + `" > ` + posteriorNames[p] + `</option>`);
 						}
-						console.log("result", result.selectedPosteriorID);
 
 
 						if ($("#selectLoggedPosteriorDistn").val() != null && $("#selectLoggedPosteriorDistn").val() != result.selectedPosteriorID){
@@ -3885,16 +3879,9 @@ function beginABC_controller(abcDataObjectForModel){
 					$("#currentEpsilonVal").html(roundToSF(result.epsilon), 6);
 
 
+                  
 
-					// Update the counter
-					var nTrialsToGo = parseFloat(result["nTrialsToGo"]);
-					if (nTrialsToGo != parseFloat($("#ABCntrials").val()) && !isNaN(nTrialsToGo)) {
-						$("#ABCntrials").val(nTrialsToGo);
-						$("#MCMCntrials").val(nTrialsToGo);
-					}
-
-
-					if (result["newLines"] != null) {
+					if (result["newLines"] != null && result["newLines"] != "") {
 
 
 
@@ -3914,7 +3901,10 @@ function beginABC_controller(abcDataObjectForModel){
 						*/
 
 						// Update the ABC output
+                        if (result.accepted) ABC_accepted_indices = result.accepted;
 						addNewABCRows(result["newLines"].split("!"));
+                        
+                        
 
 					}
 
@@ -3969,6 +3959,48 @@ function beginABC_controller(abcDataObjectForModel){
 }
 
 
+function update_RABC_epsilon_controller(userSelectEpsilon){
+    
+    
+    var value = userSelectEpsilon ? parseFloat($("#ABC_epsilon").val()) : parseFloat($("#ABC_quantile").val());
+    if (userSelectEpsilon) {
+        $("#ABC_epsilon").css("background-color", "#708090");
+        $("#ABC_quantile").css("background-color", "#008cba");
+    }else{
+        $("#ABC_quantile").css("background-color", "#708090");
+        $("#ABC_epsilon").css("background-color", "#008cba");
+    }
+    
+    
+    var updateDOM = function(result){
+    
+        
+        console.log("update_RABC_epsilon_controller", result);
+        $("#ABC_epsilon").val(roundToSF(result.epsilon));
+        $("#ABC_quantile").val(roundToSF(result.quantile));
+        ABC_accepted_indices = result.accepted;
+        renderABCoutput();
+        validateAllAbcDataInputs();
+        drawPlots();
+        
+    
+    }
+    
+    
+    if (WEB_WORKER_WASM != null) {
+        var res = stringifyFunction("update_RABC_epsilon", [value, userSelectEpsilon], true);
+        var fnStr = "wasm_" + res[0];
+        var msgID = res[1];
+        var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+        toCall().then((result) => updateDOM(result));
+
+
+    }
+    
+}
+
+
+
 
 
 function get_unrendered_ABCoutput_controller(resolve = function() { }){
@@ -3980,12 +4012,7 @@ function get_unrendered_ABCoutput_controller(resolve = function() { }){
 	// Update the ABC output 
 	var updateDOM = function(result){
 
-		// Update the counter
-		var nTrialsToGo = parseFloat(result["nTrialsToGo"]);
-		if (nTrialsToGo != parseFloat($("#ABCntrials").val()) && !isNaN(nTrialsToGo)) {
-			$("#ABCntrials").val(nTrialsToGo);
-			$("#MCMCntrials").val(nTrialsToGo);
-		}
+	
 
 
 

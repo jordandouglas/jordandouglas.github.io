@@ -24,6 +24,11 @@
 
 ABC_gel_images_to_load = [];
 
+function initABC(){
+    initABCpanel();
+    toggleMCMC();
+}
+
 
 
 function initABCpanel(){
@@ -36,18 +41,17 @@ function initABCpanel(){
 	$(".beginABC_btn").css("cursor", "auto");
 	$(".beginABC_btn").css("background-color", "#858280");
 	$(".beginABC_btn").attr("disabled", "disabled");
+    
 	$("#uploadABC").show(50);
 
 	// Acceptance
-	$("#ABCacceptanceDIV").hide(0);
+	$("#showInMCMC").hide(0);
 	$("#ABCacceptanceVal").html("0");
 
 	// Status
-	$("#burninStatusDIV").hide(0);
 	$("#burninStatusVal").html("");
 
 	// Epsilon
-	$("#currentEpsilonDIV").hide(0);
 	$("#currentEpsilonVal").html("");
 
 
@@ -57,7 +61,8 @@ function initABCpanel(){
 	nFits = 0;
 	ABCtableToUse = 1; // Alternate between the left (1) and right (2) tables
 	addNewCurveButtons();
-	toggleMCMC();
+    ABC_accepted_indices = [];
+	
 
 }
 
@@ -72,7 +77,7 @@ function beginABC(){
 
 
 	// Load the force-velocity values
-	var which = $("#ABC_useMCMC").val() == 1 ? "ABC" : $("#ABC_useMCMC").val() == 2 ? "MCMC" : "NS-ABC"
+	var which = $("#ABC_useMCMC").val() == 1 ? "ABC" : $("#ABC_useMCMC").val() == 2 ? "MCMC" : "NS-ABC";
 	var abcDataObjectForModel = getAbcDataObject(which);
 
 	console.log("Sending object", abcDataObjectForModel, $("#ABC_useMCMC").val());
@@ -83,6 +88,7 @@ function beginABC(){
 	$("#PreExp").attr("disabled", "disabled");
 	$("#PreExp").css("cursor", "auto");
 	$("#PreExp").css("background-color", "#858280");
+    $("#deleteABCmsg").show(50);
 	changeSpeed_controller();
 
 
@@ -94,14 +100,27 @@ function beginABC(){
 
 
 	// Disable the ntrials textboxes
-	$("#ABCntrials").css("cursor", "auto");
-	$("#ABCntrials").css("background-color", "#858280");
-	$("#ABCntrials").attr("disabled", "disabled");
-
-
 	$("#MCMCntrials").css("cursor", "auto");
 	$("#MCMCntrials").css("background-color", "#858280");
 	$("#MCMCntrials").attr("disabled", "disabled");
+    
+    
+    // Disable the inference method checkbox
+    $("#ABC_useMCMC").css("cursor", "auto");
+    $("#ABC_useMCMC").css("background-color", "#858280");
+    $("#ABC_useMCMC").attr("disabled", "disabled");
+    
+    
+    // Disable log every
+    $("#MCMC_logevery").css("cursor", "auto");
+    $("#MCMC_logevery").css("background-color", "#858280");
+    $("#MCMC_logevery").attr("disabled", "disabled");
+    
+    
+    // Disable epsilon settings for MCMC
+    $("#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("cursor", "auto");
+    $("#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("background-color", "#858280");
+    $("#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").attr("disabled", "disabled");
 
 
 	//$("#ABC_chiSq").css("cursor", "auto");
@@ -127,14 +146,10 @@ function onABCStart(){
 
 	$("#downloadABC").show(50);
 	$("#uploadABC").hide(50);
+    
+    
+    if ($("#ABC_useMCMC").val() == 2) $("#showInMCMC").show(50);
 
-	$("#ABCacceptanceDIV").show(50);
-
-	// Status
-	$("#burninStatusDIV").show(50);
-
-	// Epsilon
-	$("#currentEpsilonDIV").show(50);
 	
 	//$("#ABCacceptancePercentage_val").html("0");
 	$("#nRowsToDisplayABC").show(50);
@@ -193,17 +208,23 @@ function getAbcDataObject(which = "ABC"){
 	
 	var curveTables = $(".ABCcurveRow");
 	var abcDataObjectForModel = {};
+    
+    
 
+    
+    abcDataObjectForModel.ntrials = $("#MCMCntrials").val();
+    abcDataObjectForModel.testsPerData = $("#MCMC_ntestsperdata").val();
+    
+    
 	if (which == "ABC"){
 		abcDataObjectForModel.inferenceMethod = "ABC";
-		abcDataObjectForModel.ntrials = $("#ABCntrials").val();
-		abcDataObjectForModel.testsPerData = $("#ABC_ntestsperdata").val();
+		abcDataObjectForModel.epsilon = $("#ABC_epsilon").val();
+		abcDataObjectForModel.quantile = $("#ABC_quantile").val();
+        abcDataObjectForModel.ABCshowAll = $("#ABCshowAll").is(":checked");
 	}
 
 	else if (which == "MCMC"){
 		abcDataObjectForModel.inferenceMethod = "MCMC";
-		abcDataObjectForModel.ntrials = $("#MCMCntrials").val();
-		abcDataObjectForModel.testsPerData = $("#MCMC_ntestsperdata").val();
 		abcDataObjectForModel.burnin = $("#MCMC_burnin").val();
 		abcDataObjectForModel.logEvery = $("#MCMC_logevery").val();
 		abcDataObjectForModel.chiSqthreshold_min = $("#MCMC_chiSqthreshold_min").val();
@@ -5401,7 +5422,7 @@ function addNewABCRows(lines){
 
 			lineWithNBSPpadding += "<br></div>";
 			ABClines.push(lineWithNBSPpadding);
-			if (!rejected) ABClinesAcceptedOnly.push(lineWithNBSPpadding);
+			
 
 		}
 
@@ -5419,12 +5440,25 @@ function addNewABCRows(lines){
 
 function renderABCoutput(){
 
-
+    if (!ABClines.length) return
     $("#ABCoutput").show(300);
 
 	// Print ALL lines or just accepted lines?
-	var linesToUse = $("#ABC_showRejectedParameters").prop("checked") ? ABClines : ABClinesAcceptedOnly;
-
+	var linesToUse = [];
+    if ($("#ABC_useMCMC").val() == 1 && !$("#ABCshowAll").prop("checked")){
+        
+        //console.log("ABClines", ABClines);
+        linesToUse.push(ABClines[0]); // Header
+        for (var i = 0; i < ABC_accepted_indices.length; i ++){
+            var lineNumber = ABC_accepted_indices[i];
+            linesToUse.push(ABClines[lineNumber]);
+        }
+        
+        
+    }else linesToUse = ABClines;
+    
+    
+    if (linesToUse == null || linesToUse.length == 0) return;
 
 	var ABCoutputHTML = "";
 
@@ -5552,11 +5586,18 @@ function toggleAcceptedOrRejected(){
 function toggleMCMC(){
 
 
+    // Reactivate all the buttons
+    $("#MCMCntrials,#PreExp,#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("cursor", "");
+    $("#MCMCntrials,#PreExp,#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("background-color", "#008cba");
+    $("#MCMCntrials,#PreExp,#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").attr("disabled", false);
+     
+
 	// Rejection ABC
 	if ($("#ABC_useMCMC").val() == 1){
 
 		$(".ABC_display").show(50);
 		$(".MCMC_display").hide(0);
+        
 
 	}
 

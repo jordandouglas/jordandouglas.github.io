@@ -1115,6 +1115,11 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 			saveXML.writeAttributeString("inferenceMethod", abcDataObjectForModel["inferenceMethod"]);
 			saveXML.writeAttributeString("ntrials", abcDataObjectForModel["ntrials"]);
 			saveXML.writeAttributeString("testsPerData", abcDataObjectForModel["testsPerData"]);
+            if (abcDataObjectForModel["inferenceMethod"] == "ABC"){
+                saveXML.writeAttributeString("epsilon", abcDataObjectForModel["epsilon"]);
+                saveXML.writeAttributeString("quantile", abcDataObjectForModel["quantile"]);
+            }
+
 			if (abcDataObjectForModel["inferenceMethod"] == "MCMC"){
 				saveXML.writeAttributeString("chiSqthreshold_min", abcDataObjectForModel["chiSqthreshold_min"]);
 				saveXML.writeAttributeString("chiSqthreshold_0", abcDataObjectForModel["chiSqthreshold_0"]);
@@ -1608,17 +1613,15 @@ function clearCache(){
 					$(".MCMC_display").hide(50);
 
 					// Acceptance
-					$("#ABCacceptanceDIV").hide(50);
+					$("#showInMCMC").hide(50);
 					$("#ABCacceptanceVal").html("0");
 
 
 					// Status
-					$("#burninStatusDIV").hide(0);
 					$("#burninStatusVal").html("");
 
 
 					// Epsilon
-					$("#currentEpsilonDIV").hide(0);
 					$("#currentEpsilonVal").html("");
 					
 
@@ -1645,6 +1648,8 @@ function clearCache(){
 
 
 					if (ABC_cleardata) {
+                        $("#deleteABCmsg").hide(100);
+                        toggleMCMC();
 						ABClines = [];
 						ABClinesAcceptedOnly = [];
 						validateAllAbcDataInputs();

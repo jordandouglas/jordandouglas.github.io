@@ -41,32 +41,17 @@ function begin_tutorial(tut_id = null){
         // Plos computational biology elongation
         // Bayesian inference and comparison of stochastic transcription elongation models
         case "ploscompbio1":
-            begin_ploscompbio_RNAP(true);
+            begin_ploscompbio_RNAP();
             break;
             
             
         case "ploscompbio2":
-            begin_ploscompbio_RNAP(false);
+            begin_ploscompbio_polII();
             break;
             
             
         case "ploscompbio3":
-            begin_ploscompbio_polII(true);
-            break;
-            
-            
-        case "ploscompbio4":
-            begin_ploscompbio_polII(false);
-            break;
-            
-            
-        case "ploscompbio5":
-            begin_ploscompbio_T7pol(true);
-            break;
-            
-            
-        case "ploscompbio6":
-            begin_ploscompbio_T7pol(false);
+            begin_ploscompbio_T7pol();
             break;
     
     
@@ -121,10 +106,10 @@ function loadSessionAndPosterior(sessionFileName, posteriorFileName, resolve = f
 
 
 // Load the E.coli RNAP posterior distribution
-function begin_ploscompbio_RNAP(subsample = true){
+function begin_ploscompbio_RNAP(){
 
 
-    var urlNum =  subsample ? 1 : 2;
+    var urlNum = 1;
 
     addTutorialTemplate("Bayesian inference and comparison of stochastic transcription elongation models", 
         "<i>E. coli</i> RNAP posterior distribution" + (subsample ? " (sample)" : "") + ".",
@@ -148,10 +133,10 @@ function begin_ploscompbio_RNAP(subsample = true){
 
 
 // Load the Yeast pol IIposterior distribution
-function begin_ploscompbio_polII(subsample = true){
+function begin_ploscompbio_polII(){
 
 
-    var urlNum =  subsample ? 3 : 4;
+    var urlNum = 2;
 
     addTutorialTemplate("Bayesian inference and comparison of stochastic transcription elongation models", 
         "<i>S. cerevisiae</i> pol II posterior distribution" + (subsample ? " (sample)" : "") + ".",
@@ -177,10 +162,10 @@ function begin_ploscompbio_polII(subsample = true){
 
 
 // Load the Bacteriophage T7 pol posterior distribution
-function begin_ploscompbio_T7pol(subsample = true){
+function begin_ploscompbio_T7pol(){
 
 
-    var urlNum =  subsample ? 5 : 6;
+    var urlNum = 3;
 
     addTutorialTemplate("Bayesian inference and comparison of stochastic transcription elongation models", 
         "Bacteriophage T7 pol posterior distribution" + (subsample ? " (sample)" : "") + ".",

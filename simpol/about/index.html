@@ -161,6 +161,9 @@ function drawModelDiagrams(){
             
 function printContents(){
 
+            
+    $("#contentsLoader").remove();
+            
     // Find all elements with section or subsection classes
     var sects = $(".section, .subsection, .subsubsection");
     var sectNum = 0;
@@ -424,7 +427,22 @@ function addCitations(){
                     <div class="about-block-inner">
                         <div class="block-subtitle" style="font-size:45px">Contents</div> <br>
                     
-                            <div style="border-style:solid; padding: 10; display:inline-block; border-width: 1px; border-color:#008cba"  id="contents"></div>
+                            
+                            
+                            <div style="border-style:solid; padding: 10; display:inline-block; min-width:200px; border-width: 1px; border-color:#008cba"  id="contents">
+                                
+                                <table  id="contentsLoader" title="Loading...">
+                                <tr>
+                                    <td>
+                                        <div class="loader"></div> 
+                                    </td>
+                                    <td>
+                                        Loading...
+                                    </td>
+                                </tr>
+                            </table>
+                                
+                            </div>
                         
                 
                     </div>
@@ -2941,7 +2959,8 @@ function addCitations(){
                                     
                                     In this project (publication under review), we inferred kinetic parameters for three RNA polymerases: <i>E. coli</i> RNAP,  
                                     <i>S. cerevisiae</i> pol II, and Bacteriophage T7 pol. The posterior distributions for these three experiments are available below.
-                                    Use the subsampled datasets to reduce loading time in the web browser. Downloaded .log files can be viewed with Tracer<cite val="rambaut2015tracer"></cite>.  <br><br>
+                                    Subsampled posterior distributions may be viewed directly in the web browser, and the full posterior distributions are available to download.
+                                    Downloaded .log files can be viewed with Tracer<cite val="rambaut2015tracer"></cite>.  <br><br>
                                     
                                     <table style="padding: 10; text-align:center;" cellpadding="5">
                                         
@@ -2952,11 +2971,6 @@ function addCitations(){
                                             
                                             <th style="width:150px">
                                                 View sample
-                                            </th>
-                                            
-                                            
-                                            <th style="width:150px">
-                                                View full
                                             </th>
                                             
                                             <th style="width:150px">
@@ -2980,11 +2994,6 @@ function addCitations(){
                                             </td>
                                             
                                             <td>
-                                                <a href="../?ploscompbio=2">Open</a>
-                                            </td>
-                                            
-                                            
-                                            <td>
                                                 <a href="ElongationPosteriorData/Ecoli_RNAP_session.xml">Ecoli_RNAP_session.xml</a>
                                             </td>
                                             
@@ -3001,13 +3010,9 @@ function addCitations(){
                                             </td>
                                             
                                             <td>
-                                                <a href="../?ploscompbio=3">Open</a>
+                                                <a href="../?ploscompbio=2">Open</a>
                                             </td>
-                                            
-                                            <td>
-                                                <a href="../?ploscompbio=4">Open</a>
-                                            </td>
-                                            
+                                           
                                             
                                             <td>
                                                 <a href="ElongationPosteriorData/Yeast_polII_session.xml">Yeast_polII_session.xml</a>
@@ -3026,11 +3031,7 @@ function addCitations(){
                                             </td>
                                             
                                             <td>
-                                                <a href="../?ploscompbio=5">Open</a>
-                                            </td>
-                                            
-                                            <td>
-                                                <a href="../?ploscompbio=6">Open</a>
+                                                <a href="../?ploscompbio=3">Open</a>
                                             </td>
                                             
                                             

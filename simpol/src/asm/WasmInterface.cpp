@@ -979,10 +979,25 @@ extern "C" {
 
 		_GUI_PLOTS->prepareForABC();
 		//Settings::print();
-
-		// Initialise MCMC
-		MCMC::initMCMC(false);
-
+        
+        if (inferenceMethod == "ABC"){
+        
+            cout << "Initialising R-ABC" << endl;
+            MCMC::initMCMC(false, false);
+            
+        
+        }
+        
+        else {
+        
+        
+            cout << "Initialising MCMC-ABC" << endl;
+        
+    		// Initialise MCMC
+    		MCMC::initMCMC(false, true);
+        
+        }
+        
 		_currentLoggedPosteriorDistributionID = 0;
 
 
@@ -1019,11 +1034,12 @@ extern "C" {
 		_ABCoutputToPrint.clear();
 
 
-		// Ensure that the current MCMC state has been activated and has not been changed by the user
-		//MCMC::activatePreviousState();
 
 		// Stop when user presses stop button or when all trials completed
-		bool stop = MCMC::getPreviousStateNumber() > ntrials_abc || MCMC::get_hasFailedBurnin() || _GUI_STOP;
+		bool stop = false;
+        if (inferenceMethod == "ABC") stop = _GUI_posterior.size() >= ntrials_abc;
+        else stop = MCMC::getPreviousStateNumber() > ntrials_abc || MCMC::get_hasFailedBurnin() || _GUI_STOP;
+        int currentState = inferenceMethod == "ABC" ? _GUI_posterior.size() + 1 : MCMC::getPreviousStateNumber() + 1;
 		_RUNNING_ABC = !stop;
 
 		if (!stop){
@@ -1033,31 +1049,126 @@ extern "C" {
 			chrono::duration<double> elapsed_seconds = endTime - _interfaceSimulation_startTime;
 			double time = elapsed_seconds.count();
 
-			//cout << "Starting trial " << MCMC::getPreviousStateNumber() + 1 << endl;
+			//cout << "Starting trial " << inferenceMethod << ":" << currentState << endl;
 
 			while(time < 1 && !stop) {
 			
+            
+                
+            
+                    
+                if (inferenceMethod == "ABC"){
+                
+                
+                    currentState = _GUI_posterior.size() + 1;
+                
+                    Settings::sampleAll();
 
+                    // Cache the parameter values in posterior row object
+                    PosteriorDistributionSample* state = new PosteriorDistributionSample(currentState, _numExperimentalObservations, true);
+                    for (list<Parameter*>::iterator it = MCMC::get_parametersToEstimate()->begin(); it != MCMC::get_parametersToEstimate()->end(); ++it){
+                        //(*it)->print();
+                        state->addParameterEstimate((*it)->getID(), (*it)->getTrueVal());
+                    }
+                    if (modelsToEstimate.size() > 1) state->set_modelIndicator(currentModel->getID());
+                    state->set_logPriorProb(MCMC::calculateLogPriorProbability());
+                
+                    // Sample 1 R-ABC state
+                    BayesianCalculations::perform_1_rejectionABC_iteration(state);
+                    
+                    // Keep the posterior distribution sorted by X2
+                    Settings::sortedPush_posterior(_GUI_posterior, state);
+                    if (currentState == 1) state->printHeader(false);
+                    state->print(false);
+                    
 
-				// Start MCMC and return to the DOM every 1000 ms
-				MCMC::perform_1_iteration(MCMC::getPreviousStateNumber() + 1);
-
+                    
+                    stop = _GUI_posterior.size() >= ntrials_abc || _GUI_STOP;
+                    
+                }
+                
+                else {
+                
+                    // Perform 1 MCMC-ABC iteration
+                    currentState = MCMC::getPreviousStateNumber() + 1;
+                    MCMC::perform_1_iteration(currentState);
+                    
+                    stop = MCMC::getPreviousStateNumber() > ntrials_abc || MCMC::get_hasFailedBurnin() || _GUI_STOP;
+                    
+                }
+            
 
 				
 				endTime = chrono::system_clock::now();
 				elapsed_seconds = endTime - _interfaceSimulation_startTime;
 				time = elapsed_seconds.count();
 
-				stop = MCMC::getPreviousStateNumber() > ntrials_abc || MCMC::get_hasFailedBurnin() || _GUI_STOP;
+				
 
 
 			}
-
+            
 
 		}
+        
+        
+        // JSON string
+        string toReturnJSON = "{'stop':" + string(stop ?  "true" : "false") + ",";
+        
+        // Update _RABC_quantile here (if epsilon is being used)
+        if (inferenceMethod == "ABC"){
+        
+        
+            if (_RABC_useEpsilon) {
+        
+                int nStatesLessThanEpsilon = 0;
+                for (list<PosteriorDistributionSample*>::iterator it = _GUI_posterior.begin(); it != _GUI_posterior.end(); ++ it){
+                    double chiSq_list = (*it)->get_chiSquared();
+                    if (chiSq_list >= _RABC_epsilon){
+                        break;
+                    }else{
+                        nStatesLessThanEpsilon ++;
+                    }
+                    
+                }
+                
+                _RABC_quantile = 1.0 * nStatesLessThanEpsilon / _GUI_posterior.size();
+            
+            }
+            
+            
+            
+            // Return a list of accepted state numbers
+            list<int> acceptedStateNumbers;
+            if (_RABC_quantile > 0) {
+                int n = 0;
+                for (list<PosteriorDistributionSample*>::iterator it = _GUI_posterior.begin(); it != _GUI_posterior.end(); ++ it){
+                
+                    // Add the state to the list of accepted states
+                    int stateNum = (*it)->getStateNumber();
+                    acceptedStateNumbers.push_back(stateNum);
+                    
+                    // If have exceeded _RABC_quantile then break
+                    n++;
+                    if (n >= floor(_RABC_quantile * _GUI_posterior.size())) break;
+                
+                }
+            }
+            
+            
+            // List to string
+            string acceptedStateNumbers_str = "";
+            for (list<int>::iterator it = acceptedStateNumbers.begin(); it != acceptedStateNumbers.end(); ++ it){
+                acceptedStateNumbers_str += to_string(*it) + ",";
+            }
+            if (acceptedStateNumbers_str.length() > 0 && acceptedStateNumbers_str.substr(acceptedStateNumbers_str.length()-1, 1) == ",") acceptedStateNumbers_str = acceptedStateNumbers_str.substr(0, acceptedStateNumbers_str.length() - 1);
+            toReturnJSON += "'accepted':[" + acceptedStateNumbers_str + "],";
+            
+        
+        }
 
 
-		string toReturnJSON = "{'stop':" + string(stop ?  "true" : "false") + ",";
+		
 		toReturnJSON += "'acceptanceRate':" + to_string(MCMC::getAcceptanceRate() * 100) + ",";
 		toReturnJSON += "'status':'" + MCMC::getStatus() + "',";
 		toReturnJSON += "'epsilon':'" + to_string(MCMC::getEpsilon()) + "',";
@@ -1069,13 +1180,120 @@ extern "C" {
 
 
 	}
+    
+    
+    
+    // Change either the quantile or the value of epsilon of the R-ABC posterior distribution
+    // Returns a list of integers corresponding to which state numbers are now in the posterior distribution
+    // Assumes that the posterior distribution _GUI_posterior is sorted by X2
+    void EMSCRIPTEN_KEEPALIVE update_RABC_epsilon(double value, int valueIsEpsilon, int msgID){
+    
+    
+        string JSON = "{";
+        string acceptedStateNumbers_str = "";
+        list<int> acceptedStateNumbers;
+        double epsilon, quantile;
+        
+        
+        // Build a list of all states with X2 below epsilon='value'
+        if (valueIsEpsilon){
+            _RABC_useEpsilon = true;       
+            epsilon = value;
+            if (epsilon < 0) epsilon = 0;
+
+            
+            
+            int nStatesLessThanEpsilon = 0;
+            for (list<PosteriorDistributionSample*>::iterator it = _GUI_posterior.begin(); it != _GUI_posterior.end(); ++ it){
+                double chiSq_list = (*it)->get_chiSquared();
+                if (chiSq_list > epsilon){
+                    break;
+                }else{
+                    int stateNum = (*it)->getStateNumber();
+                    //Settings::sortedPush(acceptedStateNumbers, stateNum);
+                    acceptedStateNumbers.push_back(stateNum);
+                    nStatesLessThanEpsilon ++;
+                }
+                
+            }
+            
+            
+            // Calculate the quantile corresponding to epsilon
+            quantile = 1.0 * nStatesLessThanEpsilon / _GUI_posterior.size();
+        
+        
+        }
+        
+        
+        // Build a list of all states whose X2 is in the top 'value' quantile
+        else {
+            _RABC_useEpsilon = false;  
+            quantile = value;
+            if (quantile < 0) quantile = 0;
+            if (quantile > 1) quantile = 1;
+            
+            list<PosteriorDistributionSample*>::iterator it = _GUI_posterior.begin();
+            
+            if (quantile > 0) {
+                int n = 0;
+                for (it = it; it != _GUI_posterior.end(); ++ it){
+                    
+                    // If have exceeded quantile then break
+                    n++;
+                    if (n >= floor(quantile * _GUI_posterior.size())) break;
+                    
+                    
+                    // Add the state to the list of accepted states
+                    int stateNum = (*it)->getStateNumber();
+                    acceptedStateNumbers.push_back(stateNum);
+                    
+                
+                }
+            }
+            
+            
+            // Update epsilon
+            epsilon = (*it)->get_chiSquared();
+            
+        
+        }
+        
+        
+       //cout << "epsilon = " << epsilon << " quantile = " << quantile << endl;
+        
+        
+        // List to string
+        for (list<int>::iterator it = acceptedStateNumbers.begin(); it != acceptedStateNumbers.end(); ++ it){
+            acceptedStateNumbers_str += to_string(*it) + ",";
+        }
+        if (acceptedStateNumbers_str.length() > 0 && acceptedStateNumbers_str.substr(acceptedStateNumbers_str.length()-1, 1) == ",") acceptedStateNumbers_str = acceptedStateNumbers_str.substr(0, acceptedStateNumbers_str.length() - 1);
+        
+        _RABC_epsilon = epsilon;
+        _RABC_quantile = quantile;
+    
+        // Return JSON
+        JSON += "'epsilon':" + to_string(epsilon) + ",";
+        JSON += "'quantile':" + to_string(quantile) + ",";
+        JSON += "'accepted':[" + acceptedStateNumbers_str + "]";
+        JSON += "}";
+    
+        messageFromWasmToJS(JSON, msgID);
+    
+    }
 
 
 	// Get posterior distribution summary (geometric medians etc)
 	void EMSCRIPTEN_KEEPALIVE getPosteriorSummaryData(int msgID){
 
 		// Find the geometric median state
-		vector<PosteriorDistributionSample*> GUI_posterior_vec{ std::begin(_GUI_posterior), std::end(_GUI_posterior) };
+        int stopAt = inferenceMethod == "ABC" ? floor(_RABC_quantile * _GUI_posterior.size()) : _GUI_posterior.size();
+        if (stopAt == 0) {
+            messageFromWasmToJS("{}", msgID);
+            return;
+        }
+        list<PosteriorDistributionSample*>::iterator finalElementIterator = _GUI_posterior.begin();
+        std::advance(finalElementIterator, stopAt-1);
+		vector<PosteriorDistributionSample*> GUI_posterior_vec{ std::begin(_GUI_posterior), finalElementIterator };
 
 		// If no posterior distribution then return
 		if (GUI_posterior_vec.size() == 0) {
@@ -1097,7 +1315,7 @@ extern "C" {
 		toReturnJSON += "'paramNamesAndMedians':{";
 
 
-		// Iteratet through each parameter in the geometric median
+		// Iterate through each parameter in the geometric median
 		for (int i = 0; i < geometricMedian->getParameterNames().size(); i++){
 			string paramID = geometricMedian->getParameterNames().at(i);
 			cout << "param " << paramID << endl;
@@ -1126,14 +1344,22 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE getPosteriorDistribution(int msgID){
 
 		string toReturnJSON = "{";
-		toReturnJSON += "'burnin':" + to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
+        if (inferenceMethod == "ABC") toReturnJSON += "'burnin':0,";
+		if (inferenceMethod == "MCMC") toReturnJSON += "'burnin':" +  to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
 
 		// Velocities and band densities
 		toReturnJSON += "'posterior':[";
+        int n = 0;
+        int stopAt = inferenceMethod == "ABC" ? floor(_RABC_quantile * _GUI_posterior.size()) : _GUI_posterior.size();
 		for (list<PosteriorDistributionSample*>::iterator it = _GUI_posterior.begin(); it != _GUI_posterior.end(); ++ it){
+            n++;
+            if (n >= stopAt) break;
 			toReturnJSON += (*it)->toJSON() + ",";
 		}
-		if (toReturnJSON.substr(toReturnJSON.length()-1, 1) == ",") toReturnJSON = toReturnJSON.substr(0, toReturnJSON.length() - 1);
+        
+        //cout << "stop at " << stopAt << " _RABC_quantile " << _RABC_quantile << " n " << n << " toReturnJSON " << toReturnJSON << endl;
+        
+		if (toReturnJSON.length() && toReturnJSON.substr(toReturnJSON.length()-1, 1) == ",") toReturnJSON = toReturnJSON.substr(0, toReturnJSON.length() - 1);
 		toReturnJSON += "]";
 
 
@@ -1189,7 +1415,7 @@ extern "C" {
     
 		cout << "wasm uploadABC ";
         cout << string(chunk_string).size() << endl;
-		MCMC::initMCMC(true);
+		MCMC::initMCMC(true, inferenceMethod == "MCMC");
 		
 		vector<string> lines = Settings::split(chunk_string, '!');
         _currentLoggedPosteriorDistributionID = 0;

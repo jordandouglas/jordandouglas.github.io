@@ -440,6 +440,21 @@ resumeABC = function(msgID = null){
 }
 
 
+update_RABC_epsilon = function(value, valueIsEpsilon, msgID = null){
+
+
+     // Create the callback function
+    var toDoAfterCall = function(resultStr){
+        if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+    }
+    WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+    
+    Module.ccall("update_RABC_epsilon", null, ["number", "number", "number"],  [value, valueIsEpsilon, msgID]); 
+
+
+}
+
+
 // Get posterior distribution summary (geometric medians etc)
 getPosteriorSummaryData = function(msgID = null){
     
