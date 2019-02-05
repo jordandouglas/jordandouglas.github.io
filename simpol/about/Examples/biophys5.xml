@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<session datetime="2019_2_5-15.32.5" N="30" speed="hidden" polymerase="RNAP">
+	<sequence seqID="E.coli lacZ gene GU063697" TemplateType="dsDNA" PrimerType="ssRNA" seq="TACTTTCGACCGATGTCCTTCCGGTCTGCGCTTAATAAAAACTACCGCAATTGAGCCGCAAAGTAGACACCACGTTGCCCGCGACCCAGCCAATGCCGGTCCTGTCAGCAAACGGCAGACTTAAACTGGACTCGCGTAAAAATGCGCGGCCTCTTTTGGCGGAGCGCCACTACCACGACGCGACCTCACTGCCGTCAATAGACCTTCTAGTCCTATACACCGCCTACTCGCCGTAAAAGGCACTGCAGAGCAACGACGTATTTGGCTGATGTGTTTAGTCGCTAAAGGTACAACGGTGAGCGAAATTACTACTAAAGTCGGCGCGACATGACCTCCGACTTCAAGTCTACACGCCGCTCAACGCACTGATGGATGCCCATTGTCAAAGAAATACCGTCCCACTTTGCGTCCAGCGGTCGCCGTGGCGCGGAAAGCCGCCACTTTAATAGCTACTCGCACCACCAATACGGCTAGCGCAGTGTGATGCAGACTTGCAGCTTTTGGGCTTTGACACCTC" />
+	<plots hidden="false">
+		<plot1 name="parameterHeatmap" plotFunction="plot_parameter_heatmap" customParamX="RateBind" customParamY="probability" metricZ="none" xRange="automaticX" yRange="automaticY" zRange="automaticZ" zColouring="blue" selectedPosteriorID="0" sitesToRecordX="allSites" sitesToRecordY="allSites" sitesToRecordZ="allSites" priorUnderlay="true" burnin="292" />
+		<plot2 name="parameterHeatmap" plotFunction="plot_parameter_heatmap" customParamX="kCat" customParamY="RateBind" metricZ="none" xRange="automaticX" yRange="automaticY" zRange="automaticZ" zColouring="blue" selectedPosteriorID="0" sitesToRecordX="allSites" sitesToRecordY="allSites" sitesToRecordZ="allSites" priorUnderlay="true" burnin="292" />
+		<plot3 name="parameterHeatmap" plotFunction="plot_parameter_heatmap" customParamX="kCat" customParamY="probability" metricZ="none" xRange="automaticX" yRange="automaticY" zRange="automaticZ" zColouring="blue" selectedPosteriorID="0" sitesToRecordX="allSites" sitesToRecordY="allSites" sitesToRecordZ="allSites" priorUnderlay="true" burnin="292" />
+	</plots>
+	<elongation-model>
+		<allowBacktracking val="false" />
+		<allowHypertranslocation val="false" />
+		<allowInactivation val="false" />
+		<deactivateUponMisincorporation val="false" />
+		<allowGeometricCatalysis val="true" />
+		<subtractMeanBarrierHeight val="false" />
+		<allowmRNAfolding val="false" />
+		<allowMisincorporation val="false" />
+		<useFourNTPconcentrations val="true" />
+		<allowMultipleBulges val="true" />
+		<NTPbindingNParams val="2" />
+		<currentTranslocationModel val="HIGU_barriers" />
+		<currentRNABlockadeModel val="terminalBlockade" />
+		<currentInactivationModel val="sequenceIndependent" />
+		<currentBacksteppingModel val="backstep0" />
+		<assumeBindingEquilibrium val="false" />
+		<allowDNAbending val="false" />
+		<assumeTranslocationEquilibrium val="false" />
+	</elongation-model>
+	<parameters>
+		<ATPconc val="3152" distribution="Fixed" fixedDistnVal="3152"> [ATP] (μM)</ATPconc>
+		<CTPconc val="278" distribution="Fixed" fixedDistnVal="278"> [CTP] (μM)</CTPconc>
+		<GTPconc val="468" distribution="Fixed" fixedDistnVal="468"> [GTP] (μM)</GTPconc>
+		<UTPconc val="567" distribution="Fixed" fixedDistnVal="567"> [UTP] (μM)</UTPconc>
+		<FAssist val="0" distribution="Fixed" fixedDistnVal="0" uniformDistnLowerVal="-30" uniformDistnUpperVal="30">Force  (pN)</FAssist>
+		<hybridLen val="10" distribution="Fixed" fixedDistnVal="10">Hybrid length (bp)</hybridLen>
+		<bubbleLeft val="0" distribution="Fixed" fixedDistnVal="0">Bubble length left (bp)</bubbleLeft>
+		<bubbleRight val="0" distribution="Fixed" fixedDistnVal="0">Bubble length right (bp)</bubbleRight>
+		<GDagSlide val="8" distribution="Fixed" fixedDistnVal="8" uniformDistnLowerVal="9" uniformDistnUpperVal="15">ΔG†𝜏</GDagSlide>
+		<DGPost val="-2.007" distribution="Fixed" fixedDistnVal="-2.007">ΔG𝜏1</DGPost>
+		<barrierPos val="2.838" distribution="Fixed" fixedDistnVal="2.838">Transition state position  (Å)</barrierPos>
+		<arrestTime val="0" distribution="Fixed" fixedDistnVal="0">Arrest timeout  (s)</arrestTime>
+		<kCat val="218.138375" distribution="Lognormal" fixedDistnVal="25.56" lognormalMeanVal="4.454" lognormalSdVal="0.587">Rate of catalysis (s⁻¹)</kCat>
+		<Kdiss val="1.8" distribution="Fixed" fixedDistnVal="1.8">KD (μM)</Kdiss>
+		<RateBind val="4.346483" distribution="Lognormal" fixedDistnVal="0.5448" lognormalMeanVal="2" lognormalSdVal="0.5">Rate of binding  (μM⁻¹ s⁻¹)</RateBind>
+		<RateCleave val="0" distribution="Fixed" fixedDistnVal="0">Rate of cleavage (s⁻¹)</RateCleave>
+		<rnaFoldDistance val="8" distribution="Fixed" fixedDistnVal="8">Fold distance (nt)</rnaFoldDistance>
+		<CleavageLimit val="10" distribution="Fixed" fixedDistnVal="10">Cleavage limit (nt)</CleavageLimit>
+		<upstreamWindow val="12" distribution="Fixed" fixedDistnVal="12">3′ DNA curvature window</upstreamWindow>
+		<downstreamWindow val="12" distribution="Fixed" fixedDistnVal="12">5′ DNA curvature window</downstreamWindow>
+		<haltPosition val="14" distribution="Fixed" fixedDistnVal="14">Halt position (nt)</haltPosition>
+		<proposalWidth val="1" distribution="Fixed" fixedDistnVal="1">Proposal width</proposalWidth>
+	</parameters>
+	<ABC inferenceMethod="ABC" ntrials="10000" testsPerData="1" epsilon="4.77" quantile="0.15" showRejectedParameters="false">
+		<fit1 dataType="ntpVelocity" ATPconc="1" CTPconc="1" GTPconc="1" UTPconc="1" force="0" obs1="1,5" obs2="10,20" obs3="20,30" obs4="50,50" obs5="100,60" />
+	</ABC>
+</session>
