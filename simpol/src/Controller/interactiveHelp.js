@@ -433,16 +433,20 @@ function begin_biophys5(){
         
         
         addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
-        "Example 1: simulating transcription elongation.",
+        "Example 6: approximate Bayesian computation.",
         `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
         
-        To begin the stochastic simulation, press the glowing <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
-        button on the far left. See the plots further down this page to visualise the simulation results.`,
+        A toy [NTP]-velocity dataset has been uploaded into the 'Approximate Bayesian Computation' section below. Approximate Bayesian
+        computation will be used to fit two parameters - k<sub>cat</sub> and k<sub>bind</sub> - to the data. To begin the fitting process,
+        press the glowing 'Begin R-ABC' button down below.<br><br>
+        
+        In the histograms below, the yellow underlays show the prior distributions while the blue bars are the posterior distributions. If the
+        two distributions are different, then the data taught us something about the parameters.`,
         "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=5'>www.polymerase.nz/simpol/?biophys=5</a>");
     
        
         // Add a glow around the simulate button
-        var btn = $("#simulateBtn");
+        var btn = $("#beginABC_btn");
 
         var intervalID = window.setInterval(function() {  
             btn.toggleClass('glowing');

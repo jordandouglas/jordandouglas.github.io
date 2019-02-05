@@ -3281,7 +3281,7 @@ function plot_parameter_heatmap(plotNumCustom = null){
 		if (xvals == null) xvals = [];
 		if (yvals == null) yvals = [];
 		if (zvals == null) zvals = [];
-
+        
 
 		// Filter out burn-in values
 		if (PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom].burnin != null) {
@@ -3295,6 +3295,8 @@ function plot_parameter_heatmap(plotNumCustom = null){
 
 		// If y is probability make a histogram 
 		if (xvals != null && PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customParamY"] == "probability"){
+        
+            
         
             get_PHYSICAL_PARAMETERS_controller(function(params){
             
