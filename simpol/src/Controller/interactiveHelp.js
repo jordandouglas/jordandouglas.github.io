@@ -121,7 +121,7 @@ function begin_ploscompbio_RNAP(){
     
 
 
-    var posteriorFileName = "ElongationPosteriorData/Ecoli_RNAP_posterior" + (subsample ? "_small" : "") + ".log";
+    var posteriorFileName = "ElongationPosteriorData/Ecoli_RNAP_posterior_small.log";
     var sessionFileName = "ElongationPosteriorData/Ecoli_RNAP_session.xml";
     
     loadSessionAndPosterior(sessionFileName, posteriorFileName, function(){
@@ -147,7 +147,7 @@ function begin_ploscompbio_polII(){
     
 
 
-    var posteriorFileName = "ElongationPosteriorData/Yeast_polII_posterior" + (subsample ? "_small" : "") + ".log";
+    var posteriorFileName = "ElongationPosteriorData/Yeast_polII_posterior_small.log";
     var sessionFileName = "ElongationPosteriorData/Yeast_polII_session.xml";
     
     loadSessionAndPosterior(sessionFileName, posteriorFileName, function(){
@@ -177,7 +177,7 @@ function begin_ploscompbio_T7pol(){
     
 
 
-    var posteriorFileName = "ElongationPosteriorData/T7_pol_posterior" + (subsample ? "_small" : "") + ".log";
+    var posteriorFileName = "ElongationPosteriorData/T7_pol_posterior_small.log";
     var sessionFileName = "ElongationPosteriorData/T7_pol_session.xml";
     
     loadSessionAndPosterior(sessionFileName, posteriorFileName, function(){
