@@ -84,6 +84,7 @@ class PlotSettings{
 	// Trace plot
 	double ESS;
 	int selectedPosteriorID;
+    bool exponentialDecay;
 
 
 

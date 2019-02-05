@@ -104,6 +104,9 @@ double burnin = 10;
 int logEvery = 100;
 int N_THREADS = 1;
 bool _RUNNING_ABC = false;
+double _RABC_epsilon = 0;
+double _RABC_quantile = 0;
+bool _RABC_useEpsilon = true;
 
 
 // Chunking
@@ -1211,6 +1214,25 @@ void Settings::sortedPush(std::vector<int> &cont, int value) {
 void Settings::sortedPush(std::vector<double> &cont, double value) {
     std::vector<double> ::iterator it = std::lower_bound( cont.begin(), cont.end(), value, std::less<double>() ); // Increasing order
     cont.insert(it, value); // insert before iterator it
+}
+
+
+// Add a state into the posterior distribution, such that the list is sorted in increasing order of X2
+void Settings::sortedPush_posterior(std::list<PosteriorDistributionSample*> &cont, PosteriorDistributionSample* state) {
+
+
+    if (cont.size() > 0) for (list<PosteriorDistributionSample*>::iterator it = cont.begin(); it != cont.end(); ++ it){
+    
+        double chiSq_list = (*it)->get_chiSquared();
+        if (chiSq_list > state->get_chiSquared()){
+            cont.insert(it, state);
+            return;
+        }
+    
+    }
+    
+    cont.push_back(state);
+
 }
 
 

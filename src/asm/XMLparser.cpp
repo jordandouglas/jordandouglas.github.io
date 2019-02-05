@@ -326,6 +326,10 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 			_chiSqthreshold_min = abcEle->Attribute("chiSqthreshold_min") ? atof(abcEle->Attribute("chiSqthreshold_min")) : _chiSqthreshold_min;
 			_chiSqthreshold_0 = abcEle->Attribute("chiSqthreshold_0") ? atof(abcEle->Attribute("chiSqthreshold_0")) : _chiSqthreshold_0;
 			_chiSqthreshold_gamma = abcEle->Attribute("chiSqthreshold_gamma") ? atof(abcEle->Attribute("chiSqthreshold_gamma")) : _chiSqthreshold_gamma;
+            
+            _RABC_epsilon = abcEle->Attribute("epsilon") ? atof(abcEle->Attribute("epsilon")) : _RABC_epsilon;
+            _RABC_quantile = abcEle->Attribute("quantile") ? atof(abcEle->Attribute("quantile")) : _RABC_quantile;
+            
 			burnin = abcEle->Attribute("burnin") ? atoi(abcEle->Attribute("burnin")) : burnin;
 			if (!MCMC::isInitialised()) logEvery = abcEle->Attribute("logEvery") ? atoi(abcEle->Attribute("logEvery")) : logEvery;
 

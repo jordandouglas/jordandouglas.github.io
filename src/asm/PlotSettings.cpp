@@ -115,6 +115,7 @@ PlotSettings::PlotSettings(int plotNumber, string name){
 		this->yData = "{}"; // Custom Y variable
 		this->ESS = 0;
 		this->selectedPosteriorID = 0;
+        this->exponentialDecay = false;
 	}
 
 
@@ -366,6 +367,8 @@ string PlotSettings::toJSON(){
 		settingsJSON += "'burnin':" + to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
 		settingsJSON += "'ESS':" + to_string(this->ESS) + ",";
 		settingsJSON += "'selectedPosteriorID':" + to_string(this->selectedPosteriorID) + ",";
+        settingsJSON += "'exponentialDecay':" + string(this->exponentialDecay ? "true" : "false") + ",";
+        
 
 	}
 
@@ -721,7 +724,10 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
 			tuple.clear();
 
 		}
-
+        
+        
+        // Show the exponential decay?
+        this->exponentialDecay = values.at(3) == "true";
 
 
 	}

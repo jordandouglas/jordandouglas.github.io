@@ -44,7 +44,7 @@ class MCMC{
 
 	static void makeProposal();
 	static bool metropolisHastings(int sampleNum, PosteriorDistributionSample* thisMCMCState, PosteriorDistributionSample* prevMCMCState);
-	static double calculateLogPriorProbability();
+	
 	static void tryToEstimateParameter(Parameter* param);
 
 	static PosteriorDistributionSample* previousMCMCstate;
@@ -62,7 +62,7 @@ class MCMC{
 	public:
 
 
-		static void initMCMC(bool uploadingLogFile);
+		static void initMCMC(bool uploadingLogFile, bool performFirstSimulation);
 		static void beginMCMC();
 		static void perform_1_iteration(int n);
 		static int getPreviousStateNumber();
@@ -74,9 +74,10 @@ class MCMC{
 		static void setPreviousState(PosteriorDistributionSample* state);
 		static int get_nStatesUntilBurnin();
 		static string parametersToEstimate_toJSON();
+        static list<Parameter*>* get_parametersToEstimate();
 		static void activatePreviousState();
 		static bool isInitialised();
-
+        static double calculateLogPriorProbability();
 
 		// Experimental data
 		static bool resetExperiment();

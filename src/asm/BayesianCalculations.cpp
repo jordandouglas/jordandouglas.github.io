@@ -415,52 +415,72 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistributionSampl
 				state->addParameterEstimate(param->getID(), param->getTrueVal());
 			}
 			if (modelsToEstimate.size()) state->set_modelIndicator(currentModel->getID());
+            state->set_logPriorProb(MCMC::calculateLogPriorProbability());
 
 
 		}
+        
+        
+        if (n == 1) state->printHeader(_outputFilename != "");
+        
+        perform_1_rejectionABC_iteration(state);
+        
+        state->print(_outputFilename != "");
+        delete state;
+		
 
-		if (n == 1) state->printHeader(_outputFilename != "");
+  
+
+		
+
+	}
+
+}
 
 
 
-		if (!MCMC::resetExperiment()){
-			cout << "Could not initialise experiment" << endl;
-			exit(0);
-		}
-
-		// Run simulations under each experimental setting
-		int ntrialsPerDatapoint = MCMC::getNTrialsPostBurnin();
+// Samples a single state from posterior distribution using ABC. 
+// Provide a state populated with parameters, and it will be returned post-simulation
+void BayesianCalculations::perform_1_rejectionABC_iteration(PosteriorDistributionSample* state){
 
 
-		SimulatorResultSummary* simulationResults = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
-		state->addSimulatedAndObservedValue(simulationResults, MCMC::getCurrentExperiment());
+
+
+    if (!MCMC::resetExperiment()){
+        cout << "Could not initialise experiment" << endl;
+        exit(0);
+    }
+
+    // Run simulations under each experimental setting
+    int ntrialsPerDatapoint = MCMC::getNTrialsPostBurnin();
+
+
+    SimulatorResultSummary* simulationResults = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
+    state->addSimulatedAndObservedValue(simulationResults, MCMC::getCurrentExperiment());
+    
+    
+    simulationResults->clear();
+    delete simulationResults;
+
+    while (MCMC::nextExperiment()){
+
+        // Run simulations and stop if it exceeds threshold (unless this is the first trial)
+        ntrialsPerDatapoint = MCMC::getNTrialsPostBurnin();
+        simulationResults = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
+        state->addSimulatedAndObservedValue(simulationResults, MCMC::getCurrentExperiment());
         
         
         simulationResults->clear();
         delete simulationResults;
 
-		while (MCMC::nextExperiment()){
-
-			// Run simulations and stop if it exceeds threshold (unless this is the first trial)
-			ntrialsPerDatapoint = MCMC::getNTrialsPostBurnin();
-			simulationResults = SimulatorPthread::performNSimulations(ntrialsPerDatapoint, false);
-			state->addSimulatedAndObservedValue(simulationResults, MCMC::getCurrentExperiment());
-            
-            
-            simulationResults->clear();
-            delete simulationResults;
-
-		}
-        
-        
-        // Finished all experiments. Calculate the AUC of this state (if evaluating pause sites)
-        state->calculateAUC(ROCoutputfile);
+    }
+    
+    
+    // Finished all experiments. Calculate the AUC of this state (if evaluating pause sites)
+    state->calculateAUC("");
 
 
-		state->print(_outputFilename != "");
-		delete state;
 
-	}
 
 }
 
@@ -471,6 +491,29 @@ list<ParameterHeatmapData*> BayesianCalculations::getPosteriorDistributionAsHeat
 
 
 	list<PosteriorDistributionSample*> posteriorDistribution = Settings::getPosteriorDistributionByID(id);
+    
+    
+    // Subset the posterior distribution if using R-ABC
+    if (inferenceMethod == "ABC"){
+    
+        int n = 0;
+        int stopAt = floor(_RABC_quantile * posteriorDistribution.size());
+        
+        if (stopAt == 0) posteriorDistribution.clear();
+        else {
+            list<PosteriorDistributionSample*> temp;
+            for (list<PosteriorDistributionSample*>::iterator it = posteriorDistribution.begin(); it != posteriorDistribution.end(); ++ it){
+                n++;
+                if (n <= stopAt) temp.push_back(*it);
+                else break;
+            }
+            posteriorDistribution = temp;
+            
+        }
+        
+    
+    }
+    
 
 
 	// The posterior distribution is stored as rows, while the heatmap is stored as columns

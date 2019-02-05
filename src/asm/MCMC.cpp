@@ -57,7 +57,7 @@ PosteriorDistributionSample* MCMC::previousMCMCstate;
 PosteriorDistributionSample* MCMC::currentMCMCstate;
 
 
-void MCMC::initMCMC(bool uploadingLogFile){
+void MCMC::initMCMC(bool uploadingLogFile, bool performFirstSimulation){
 
 
 	if (MCMC::initialised) return;
@@ -103,7 +103,10 @@ void MCMC::initMCMC(bool uploadingLogFile){
 	// MCMC::currentMCMCstate = new PosteriorDistributionSample(0);
 
 
-
+    MCMC::initialised = true;
+    if (!performFirstSimulation) return;
+    
+    
 	// Load initial state from file
 	if (_resumeFromLogfile){
 		MCMC::previousMCMCstate->loadFromLogFile(_outputFilename);
@@ -148,7 +151,6 @@ void MCMC::initMCMC(bool uploadingLogFile){
 		MCMC::epsilon = max(_chiSqthreshold_0 * pow(_chiSqthreshold_gamma, MCMC::initialStateNum-1), _chiSqthreshold_min);
 	}
 
-	MCMC::initialised = true;
 
 
 }
@@ -640,6 +642,12 @@ string MCMC::parametersToEstimate_toJSON(){
 	if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
 	return JSON;
 
+}
+
+
+// Returns list of parameters to estimate
+list<Parameter*>* MCMC::get_parametersToEstimate(){
+    return &MCMC::parametersToEstimate;
 }
 
 

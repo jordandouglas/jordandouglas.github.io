@@ -112,6 +112,10 @@ extern double burnin; // Percentage
 extern int logEvery;
 extern int N_THREADS;
 extern bool _RUNNING_ABC;
+extern double _RABC_epsilon;
+extern double _RABC_quantile;
+extern bool _RABC_useEpsilon;
+
 
 
 // Chunking
@@ -253,6 +257,7 @@ class Settings{
 
     	static void sortedPush(std::vector<int> &cont, int value);
     	static void sortedPush(std::vector<double> &cont, double value);
+        static void sortedPush_posterior(std::list<PosteriorDistributionSample*> &cont, PosteriorDistributionSample* state);
     	static int indexOf(deque<int> arr, int val);
         static string trim(string str);
 
