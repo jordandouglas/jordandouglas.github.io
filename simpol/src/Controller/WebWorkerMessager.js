@@ -2943,6 +2943,7 @@ function loadSession_controller(XMLData, resolve = function() { }){
             if (experimentalData["epsilon"] != null) $("#ABC_epsilon").val(experimentalData["epsilon"]);
             if (experimentalData["quantile"] != null) $("#ABC_quantile").val(experimentalData["quantile"]);
 			
+            toggleMCMC();
 
 			for (var fitID in experimentalData["fits"]){
 
