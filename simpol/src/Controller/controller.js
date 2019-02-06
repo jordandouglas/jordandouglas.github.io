@@ -1374,7 +1374,7 @@ function loadSession(fileLocation = null){
 	 
 	 function loadSessionFile(evt) {
      
-        
+        $("#uploadingXMLloader").remove();
         $("#loadSessionID").after(getLoaderTemplate("uploadingXMLloader", "", true));    
         $("#loadSessionID").hide();
         $("#loadSessionID_div").addClass("bluegrey");
