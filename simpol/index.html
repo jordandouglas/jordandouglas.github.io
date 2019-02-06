@@ -143,7 +143,7 @@ function init(){
     
             
         $(".variable").focus(function() { $(this).select(); });
-            
+        $("#uploadingXMLloader").remove();
 		
 		msgID_simulation = null;
 		simulationRenderingController = false;
@@ -2226,10 +2226,10 @@ function closeNav() {
 		
 
 
-					<tr id="GDagSlide_container">
+					<tr id="DGtaudag_container">
 
 						<td style="text-align:left; font-size:10px; float:left; width:20px">
-				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#GDagSlide_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#DGtaudag_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
 						<td style="text-align:right; width:110px">
@@ -2237,22 +2237,22 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="GDagSlide" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
+							<input class="variable"  type="number" id="DGtaudag" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
 			 			</td>
 
 
 				 		<td>
-							<input type=image id='GDagSlide_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn"> 
+							<input type=image id='DGtaudag_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn"> 
 				 		</td>
 
 				 	</tr>
 
 
 
-				 	<tr id="DGPost_container">
+				 	<tr id="DGtau1_container">
 
 						<td style="text-align:left; font-size:10px; float:left; width:20px">
-				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#GDagSlide_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#DGtaudag_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
 						<td style="text-align:right; width:110px">
@@ -2260,12 +2260,12 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="DGPost" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
+							<input class="variable"  type="number" id="DGtau1" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
 			 			</td>
 
 
 				 		<td>
-							<input type=image id='DGPost_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn"> 
+							<input type=image id='DGtau1_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn"> 
 				 		</td>
 
 				 	</tr>
@@ -2333,7 +2333,7 @@ function closeNav() {
 
 
 						<td style="text-align:left; font-size:10px; float:left; width:20px">
-				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#GDagSlide_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none" href="about/#DGtaudag_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
 
@@ -2561,7 +2561,7 @@ function closeNav() {
 				 	</tr>
 
 
-					<tr style="display:none" id="deltaGDaggerBacktrack_container">
+					<tr style="display:none" id="DGtaudagM_container">
 
 						<td style="text-align:left; font-size:10px; float:left; width:20px">
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kU_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
@@ -2573,12 +2573,12 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="deltaGDaggerBacktrack"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T 
+							<input class="variable"  type="number" id="DGtaudagM"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T 
 				 		</td>
 
 
 				 		<td>
-							<input type=image id='deltaGDaggerBacktrack_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
+							<input type=image id='DGtaudagM_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
 				 		</td>
 
 				 	</tr>
@@ -2634,10 +2634,10 @@ function closeNav() {
 
 
 
-				 	<tr id="DGHyperDag_container">
+				 	<tr id="DGtaudagP_container">
 
 						<td style="text-align:left; font-size:10px; float:left; width:20px">
-				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#GDagSlide_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#DGtaudag_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
 						<td style="text-align:right; width:110px">
@@ -2645,12 +2645,12 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="DGHyperDag" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
+							<input class="variable"  type="number" id="DGtaudagP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
 			 			</td>
 
 
 				 		<td>
-							<input type=image id='DGHyperDag_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn"> 
+							<input type=image id='DGtaudagP_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn"> 
 				 		</td>
 
 				 	</tr>

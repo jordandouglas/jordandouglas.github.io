@@ -97,12 +97,23 @@ function beginABC(){
 	// Update the DOM so that we can see that ABC is running
 	$(".beginABC_btn").val("Stop ABC");
 	$(".beginABC_btn").attr("onclick", "stop_controller()");
+	
+    disableABCbuttons();
+
+	// Add the trace plots if MCMC
+	if (which == "MCMC") addTracePlots();
 
 
-	// Disable the ntrials textboxes
-	$("#MCMCntrials").css("cursor", "auto");
-	$("#MCMCntrials").css("background-color", "#858280");
-	$("#MCMCntrials").attr("disabled", "disabled");
+
+}
+
+
+function disableABCbuttons(){
+
+    // Disable the ntrials textboxes
+    $("#MCMCntrials").css("cursor", "auto");
+    $("#MCMCntrials").css("background-color", "#858280");
+    $("#MCMCntrials").attr("disabled", "disabled");
     
     
     // Disable the inference method checkbox
@@ -122,20 +133,32 @@ function beginABC(){
     $("#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("background-color", "#858280");
     $("#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").attr("disabled", "disabled");
 
-
-	//$("#ABC_chiSq").css("cursor", "auto");
-	//$("#ABC_chiSq").css("background-color", "#858280");
-	//$("#ABC_chiSq").attr("disabled", "disabled");
+}
 
 
 
+function enableABCbuttons_endABC(){
 
-	// Add the trace plots if MCMC
-	if (which == "MCMC") addTracePlots();
-
-
+    // Reactivate all the buttons
+    $("#MCMCntrials,#PreExp").css("cursor", "");
+    $("#MCMCntrials,#PreExp").css("background-color", "#008cba");
+    $("#MCMCntrials,#PreExp").attr("disabled", false);
+    
 
 }
+
+
+
+function enableSomeABCbuttons_deleteABC(){
+
+    // Reactivate all the buttons
+    $("#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("cursor", "");
+    $("#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("background-color", "#008cba");
+    $("#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").attr("disabled", false);
+    enableABCbuttons_endABC();
+
+}
+
 
 
 
@@ -1154,20 +1177,7 @@ function getPauseSitesTemplate(fitID){
 
 			</td>
 
-
-			<td class="` + fitID + `" style="width:300px; text-align:center; vertical-align:top">
-            
-				<div style="font-size:20px;">
-					Pause sites
-					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
-						
-				</div>
-
-					
-					<canvas id="pauseSitesCurve_` + fitID + `" width=300 height=300> </canvas>
-
-			</td>
-
+   
 
 
 			<td class="` + fitID + `" style="text-align:center; vertical-align:top">
@@ -1175,7 +1185,7 @@ function getPauseSitesTemplate(fitID){
 					<input type=button id='deleteExperiment_` + fitID + `' class='minimise' style='float:right'  value='&times;' onClick=deleteExperiment("` + fitID + `") title='Delete this experiment'>
 
 				
-					<table style="width:250px; margin:auto">
+					<table style="width:500px; margin:auto">
 
 
                  
@@ -1184,7 +1194,7 @@ function getPauseSitesTemplate(fitID){
 
                             <b>Sequence:</b>
 							<td style="text-align:right;" colspan=2>
-					 			<textarea id="pauseSitesSeq_` + fitID + `"  onChange="validateAllAbcDataInputs()" title="Please enter a sequence" style="max-width: 250px; width: 250px; height: 200px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input nascent sequence 5' to 3'..."></textarea> 
+					 			<textarea id="pauseSitesSeq_` + fitID + `"  onChange="validateAllAbcDataInputs()" title="Please enter the nascent sequence which contains the pause sites" style="max-width: 500px; width: 500px; height: 100px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input nascent sequence 5' to 3'..."></textarea> 
 							</td>
 					 	</tr>
 
@@ -1912,6 +1922,8 @@ function deleteExperiment(fitID){
 		$("#GTPconc_fit" + (fitNum-1)).val($("#GTPconc_fit" + (fitNum)).val());
 		$("#UTPconc_fit" + (fitNum-1)).val($("#UTPconc_fit" + (fitNum)).val());
 		$("#ABC_force_fit" + (fitNum-1)).val($("#ABC_force_fit" + (fitNum)).val());
+        $("#pauseSitesInputData_fit" + (fitNum-1)).val($("#pauseSitesInputData_fit" + (fitNum)).val());
+        $("#pauseSitesSeq_fit" + (fitNum-1)).val($("#pauseSitesSeq_fit" + (fitNum)).val());
 		
 		
 	}
@@ -5585,11 +5597,8 @@ function toggleAcceptedOrRejected(){
 
 function toggleMCMC(){
 
-
-    // Reactivate all the buttons
-    $("#MCMCntrials,#PreExp,#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("cursor", "");
-    $("#MCMCntrials,#PreExp,#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("background-color", "#008cba");
-    $("#MCMCntrials,#PreExp,#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").attr("disabled", false);
+    
+    enableABCbuttons_endABC();
      
 
 	// Rejection ABC

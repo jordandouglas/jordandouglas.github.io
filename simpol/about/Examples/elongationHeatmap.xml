@@ -4,7 +4,7 @@
 	<plots hidden="false">
 		<plot1 name="distanceVsTime" plotFunction="plotTimeChart" xRange="automaticX" yRange="automaticY" />
 		<plot2 name="velocityHistogram" plotFunction="plot_velocity_distribution" windowSize="1" xRange="automaticX" timeSpaceX="linearSpace" timeSpaceY="linearSpace" />
-		<plot3 name="parameterHeatmap" plotFunction="plot_parameter_heatmap" sitesToRecord="" customParamX="kCat" customParamY="GDagSlide" metricZ="velocity" xRange="automaticX" yRange="automaticY" zRange="automaticZ" zColouring="rainbow" plotFromPosterior="false" />
+		<plot3 name="parameterHeatmap" plotFunction="plot_parameter_heatmap" sitesToRecord="" customParamX="kCat" customParamY="DGtaudag" metricZ="velocity" xRange="automaticX" yRange="automaticY" zRange="automaticZ" zColouring="rainbow" plotFromPosterior="false" />
 	</plots>
 	<elongation-model id="simpleBrownian">
 		<allowBacktracking val="false" />
@@ -23,7 +23,7 @@
 		<hybridLen val="9" distribution="Fixed" fixedDistnVal="9">Hybrid length (bp)</hybridLen>
 		<bubbleLeft val="1" distribution="Fixed" fixedDistnVal="1">Bubble length left (bp)</bubbleLeft>
 		<bubbleRight val="2" distribution="Fixed" fixedDistnVal="2">Bubble length right (bp)</bubbleRight>
-		<GDagSlide val="6.02132226806134" distribution="Uniform" fixedDistnVal="5" uniformDistnLowerVal="2.5" uniformDistnUpperVal="7.5">ΔG†slide</GDagSlide>
+		<DGtaudag val="6.02132226806134" distribution="Uniform" fixedDistnVal="5" uniformDistnLowerVal="2.5" uniformDistnUpperVal="7.5">ΔG†slide</DGtaudag>
 		<FAssist val="2" distribution="Fixed" fixedDistnVal="0">Force (pN)</FAssist>
 		<arrestTime val="30" distribution="Fixed" fixedDistnVal="30">Arrest timeout (s)</arrestTime>
 		<kCat val="180.78693221323192" distribution="Uniform" fixedDistnVal="30" uniformDistnLowerVal="0" uniformDistnUpperVal="200" normalSdVal="5">Rate of catalysis (s⁻¹)</kCat>

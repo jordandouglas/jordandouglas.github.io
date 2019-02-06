@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <session datetime="2019_1_31-13.24.52" N="5000" speed="hidden" polymerase="RNAP">
 	<sequence seqID="E.coli lacZ gene GU063697" TemplateType="dsDNA" PrimerType="ssRNA" seq="TACTTTCGACCGATGTCCTTCCGGTCTGCGCTTAATAAAAACTACCGCAATTGAGCCGCAAAGTAGACACCACGTTGCCCGCGACCCAGCCAATGCCGGTCCTGTCAGCAAACGGCAGACTTAAACTGGACTCGCGTAAAAATGCGCGGCCTCTTTTGGCGGAGCGCCACTACCACGACGCGACCTCACTGCCGTCAATAGACCTTCTAGTCCTATACACCGCCTACTCGCCGTAAAAGGCACTGCAGAGCAACGACGTATTTGGCTGATGTGTTTAGTCGCTAAAGGTACAACGGTGAGCGAAATTACTACTAAAGTCGGCGCGACATGACCTCCGACTTCAAGTCTACACGCCGCTCAACGCACTGATGGATGCCCATTGTCAAAGAAATACCGTCCCACTTTGCGTCCAGCGGTCGCCGTGGCGCGGAAAGCCGCCACTTTAATAGCTACTCGCACCACCAATACGGCTAGCGCAGTGTGATGCAGACTTGCAGCTTTTGGGCTTTGACACCTC" />
 	<plots hidden="false">
@@ -32,8 +32,8 @@
 		<hybridLen val="10" distribution="Fixed" fixedDistnVal="10">Hybrid length (bp)</hybridLen>
 		<bubbleLeft val="1" distribution="Fixed" fixedDistnVal="1">Bubble length left (bp)</bubbleLeft>
 		<bubbleRight val="0" distribution="Fixed" fixedDistnVal="0">Bubble length right (bp)</bubbleRight>
-		<GDagSlide val="9.079" distribution="Fixed" fixedDistnVal="9.079" uniformDistnLowerVal="9" uniformDistnUpperVal="15">ΔG†𝜏</GDagSlide>
-		<DGPost val="-2.007" distribution="Fixed" fixedDistnVal="-2.007">ΔG𝜏1</DGPost>
+		<DGtaudag val="9.079" distribution="Fixed" fixedDistnVal="9.079" uniformDistnLowerVal="9" uniformDistnUpperVal="15">ΔG†𝜏</DGtaudag>
+		<DGtau1 val="-2.007" distribution="Fixed" fixedDistnVal="-2.007">ΔG𝜏1</DGtau1>
 		<arrestTime val="0" distribution="Fixed" fixedDistnVal="0">Arrest timeout  (s)</arrestTime>
 		<kCat val="68.069035" distribution="Uniform" fixedDistnVal="25.56" uniformDistnLowerVal="0" uniformDistnUpperVal="200" lognormalMeanVal="3.454" lognormalSdVal="0.587">Rate of catalysis (s⁻¹)</kCat>
 		<Kdiss val="1.8" distribution="Fixed" fixedDistnVal="1.8">KD (μM)</Kdiss>

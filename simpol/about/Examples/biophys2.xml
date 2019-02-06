@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <session datetime="2019_1_31-10.53.45" N="30" speed="slow" polymerase="RNAP">
 	<sequence seqID="$user" TemplateType="dsDNA" PrimerType="ssRNA" seq="TACTTTCGACCGATGTCCTTCCGGTCTGCGCTTAATAAAAACTACCGCAATTGAGCCGCAAAGTAGACACCACGTTGCCC" />
 	<elongation-model>
@@ -27,8 +27,8 @@
 		<hybridLen val="11" distribution="Fixed" fixedDistnVal="9">Hybrid length (bp)</hybridLen>
 		<bubbleLeft val="1" distribution="Fixed" fixedDistnVal="2">Bubble length left (bp)</bubbleLeft>
 		<bubbleRight val="3" distribution="Fixed" fixedDistnVal="1">Bubble length right (bp)</bubbleRight>
-		<GDagSlide val="9.079" distribution="Fixed" fixedDistnVal="9.079" uniformDistnLowerVal="9" uniformDistnUpperVal="15">ΔG†𝜏</GDagSlide>
-		<DGPost val="-2.007" distribution="Fixed" fixedDistnVal="-2.007">ΔG𝜏1</DGPost>
+		<DGtaudag val="9.079" distribution="Fixed" fixedDistnVal="9.079" uniformDistnLowerVal="9" uniformDistnUpperVal="15">ΔG†𝜏</DGtaudag>
+		<DGtau1 val="-2.007" distribution="Fixed" fixedDistnVal="-2.007">ΔG𝜏1</DGtau1>
 		<barrierPos val="2.838" distribution="Fixed" fixedDistnVal="2.838">Transition state position  (Å)</barrierPos>
 		<arrestTime val="360" distribution="Fixed" fixedDistnVal="360">Arrest timeout  (s)</arrestTime>
 		<kCat val="100" distribution="Fixed" fixedDistnVal="100" lognormalMeanVal="3.454" lognormalSdVal="0.587">Rate of catalysis (s⁻¹)</kCat>
@@ -37,7 +37,7 @@
 		<RateActivate val="5" distribution="Fixed" fixedDistnVal="5">Rate of activation (s⁻¹)</RateActivate>
 		<RateDeactivate val="0.5" distribution="Fixed" fixedDistnVal="0.5">Rate of inactivation (s⁻¹)</RateDeactivate>
 		<RateCleave val="0" distribution="Fixed" fixedDistnVal="0">Rate of cleavage (s⁻¹)</RateCleave>
-		<deltaGDaggerBacktrack val="3" distribution="Fixed" fixedDistnVal="3">ΔG†𝜏-</deltaGDaggerBacktrack>
+		<DGtaudagM val="3" distribution="Fixed" fixedDistnVal="3">ΔG†𝜏-</DGtaudagM>
 		<rnaFoldDistance val="8" distribution="Fixed" fixedDistnVal="8">Fold distance (nt)</rnaFoldDistance>
 		<CleavageLimit val="10" distribution="Fixed" fixedDistnVal="10">Cleavage limit (nt)</CleavageLimit>
 		<upstreamWindow val="12" distribution="Fixed" fixedDistnVal="12">3′ DNA curvature window</upstreamWindow>

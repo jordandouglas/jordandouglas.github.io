@@ -877,21 +877,6 @@ function renderObjects(override = false, resolve = function(){}){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function add_triphosphate(pos, x, y){
 
 	if (!ALLOW_ANIMATIONS) return;
@@ -1389,7 +1374,7 @@ function loadSession(fileLocation = null){
 	 
 	 function loadSessionFile(evt) {
      
-     
+        
         $("#loadSessionID").after(getLoaderTemplate("uploadingXMLloader", "", true));    
         $("#loadSessionID").hide();
         $("#loadSessionID_div").addClass("bluegrey");

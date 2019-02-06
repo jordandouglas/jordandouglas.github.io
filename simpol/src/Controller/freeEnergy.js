@@ -227,8 +227,8 @@ function updateModelDOM(elongation_model_temp){
 	//else $("#deactivateUponMisincorporation_container").hide(100);
 
 
-	if(elongation_model_temp["allowHypertranslocation"]) $("#DGHyperDag_container").show(300);
-	else  $("#DGHyperDag_container").hide(0);
+	if(elongation_model_temp["allowHypertranslocation"]) $("#DGtaudagP_container").show(300);
+	else  $("#DGtaudagP_container").hide(0);
 
 
 	
@@ -262,10 +262,10 @@ function updateModelDOM(elongation_model_temp){
 
 	// Backtracking model
 	if (elongation_model_temp["allowBacktracking"] || elongation_model_temp["currentBacksteppingModel"] == "backstep1"){
-		$("#deltaGDaggerBacktrack_container").show(100);
+		$("#DGtaudagM_container").show(100);
 	}
 	else{
-		$("#deltaGDaggerBacktrack_container").hide(0);
+		$("#DGtaudagM_container").hide(0);
 	}
 
 

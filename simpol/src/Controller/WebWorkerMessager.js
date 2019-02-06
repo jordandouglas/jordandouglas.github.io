@@ -3710,6 +3710,7 @@ function uploadABC_controller(TSVstring, resolve = function() { }){
 				$("#burninStatusVal").html(result.status);
 				$("#currentEpsilonVal").html(roundToSF(result.epsilon), 6);
                 
+                disableABCbuttons();
                 resolve();
 				
 			});
@@ -3790,6 +3791,7 @@ function beginABC_controller(abcDataObjectForModel){
 		simulationRenderingController = false;
 
 		get_unrendered_ABCoutput_controller();
+        enableSomeABCbuttons_deleteABC();
 
 
 	};
@@ -3870,7 +3872,7 @@ function beginABC_controller(abcDataObjectForModel){
 				// To do in between MCMC trials
 				var updateDOMbetweenTrials = function(result){
 
-					
+					disableABCbuttons();
 					drawPlots();
 
 					//console.log("updateDOMbetweenTrials", result);

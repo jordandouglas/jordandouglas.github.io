@@ -402,8 +402,6 @@ initABC = function(msgID = null){
 resumeABC = function(msgID = null){
 
 
-
-
     // Pause for a bit in case user requests to stop
     setTimeout(function(){
 

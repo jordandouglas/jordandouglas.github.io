@@ -278,7 +278,7 @@ function getContinuousVariableDistributionsTemplate(){
 		  	<option value="Normal">Normal Distribution</option>
 	      	<option value="Lognormal">Lognormal Distribution</option>
 	      	<option value="Exponential">Exponential Distribution</option>
-	      	<option value="Gamma">Gamma Distribution</option>
+	      	<!--<option value="Gamma">Gamma Distribution</option>-->
 		</select>
 	
 	`;

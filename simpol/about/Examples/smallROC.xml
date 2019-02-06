@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<session datetime="2018_10_24-11.38.23" N="100000" speed="medium" polymerase="polII">
+	<sequence seqID="Buchnera aphidicola murC1 EU274658" TemplateType="dsDNA" PrimerType="ssRNA" seq="GGAAGACTATTAGGTCTTTAATATCGTCGATTTTTTTTTTGTAAGGATATGATAATTCTCGACTTTA" />
+	<elongation-model>
+		<allowBacktracking val="true" />
+		<allowHypertranslocation val="false" />
+		<allowInactivation val="true" />
+		<allowBacktrackWithoutInactivation val="false" />
+		<deactivateUponMisincorporation val="false" />
+		<allowGeometricCatalysis val="true" />
+		<subtractMeanBarrierHeight val="true" />
+		<allowmRNAfolding val="true" />
+		<allowMisincorporation val="false" />
+		<useFourNTPconcentrations val="true" />
+		<allowMultipleBulges val="true" />
+		<NTPbindingNParams val="2" />
+		<currentTranslocationModel val="HUBU_barriers" />
+		<currentRNABlockadeModel val="terminalBlockade" />
+		<currentInactivationModel val="sequenceIndependent" />
+		<currentBacksteppingModel val="backstep1" />
+		<assumeBindingEquilibrium val="false" />
+		<allowDNAbending val="false" />
+		<assumeTranslocationEquilibrium val="false" />
+	</elongation-model>
+	<parameters>
+		<NTPconc val="1000" distribution="Fixed" fixedDistnVal="1000"> [NTP] (μM)</NTPconc>
+		<ATPconc val="1000" distribution="Fixed" fixedDistnVal="3152"> [ATP] (μM)</ATPconc>
+		<CTPconc val="1000" distribution="Fixed" fixedDistnVal="278"> [CTP] (μM)</CTPconc>
+		<GTPconc val="1000" distribution="Fixed" fixedDistnVal="468"> [GTP] (μM)</GTPconc>
+		<UTPconc val="1000" distribution="Fixed" fixedDistnVal="567"> [UTP] (μM)</UTPconc>
+		<FAssist val="0" distribution="Fixed" fixedDistnVal="0" uniformDistnLowerVal="-30" uniformDistnUpperVal="30">Force  (pN)</FAssist>
+		<hybridLen val="10" distribution="DiscreteUniform" fixedDistnVal="10" uniformDistnLowerVal="8" uniformDistnUpperVal="11">Hybrid length (bp)</hybridLen>
+		<bubbleLeft val="2" distribution="DiscreteUniform" fixedDistnVal="1" uniformDistnLowerVal="0" uniformDistnUpperVal="3">Bubble length left (bp)</bubbleLeft>
+		<bubbleRight val="2" distribution="DiscreteUniform" fixedDistnVal="1" uniformDistnLowerVal="0" uniformDistnUpperVal="3">Bubble length right (bp)</bubbleRight>
+		<DGtaudag val="13.48049" distribution="Normal" fixedDistnVal="21" uniformDistnLowerVal="9" uniformDistnUpperVal="15" normalMeanVal="22" normalSdVal="1">ΔG†𝜏</DGtaudag>
+		<DGtau1 val="-5.110798" distribution="Fixed" fixedDistnVal="-2" normalMeanVal="-2" normalSdVal="1">ΔG𝜏1</DGtau1>
+		<barrierPos val="2.889" distribution="Fixed" fixedDistnVal="2.889">Transition state position  (Å)</barrierPos>
+		<arrestTime val="1800" distribution="Fixed" fixedDistnVal="3600">Arrest timeout  (s)</arrestTime>
+		<kCat val="200" distribution="Fixed" fixedDistnVal="200" lognormalMeanVal="4" lognormalSdVal="0.5">Rate of catalysis (s⁻¹)</kCat>
+		<Kdiss val="3.5" distribution="Fixed" fixedDistnVal="50">KD (μM)</Kdiss>
+		<RateBind val="0.4" distribution="Fixed" fixedDistnVal="1">Rate of binding  (μM⁻¹ s⁻¹)</RateBind>
+		<RateActivate val="0.043468" distribution="Lognormal" fixedDistnVal="0.1" lognormalMeanVal="-1.93" lognormalSdVal="1.54">Rate of activation (s⁻¹)</RateActivate>
+		<RateDeactivate val="0.027912" distribution="Lognormal" fixedDistnVal="0.05" lognormalMeanVal="-1.93" lognormalSdVal="1.54">Rate of inactivation (s⁻¹)</RateDeactivate>
+		<RateCleave val="0.007874" distribution="Lognormal" fixedDistnVal="0.05" lognormalMeanVal="-1.93" lognormalSdVal="1.54">Rate of cleavage (s⁻¹)</RateCleave>
+		<DGtaudagM val="0.024298" distribution="Normal" fixedDistnVal="0" normalMeanVal="5" normalSdVal="2">ΔG†𝜏-</DGtaudagM>
+		<rnaFoldDistance val="8" distribution="Fixed" fixedDistnVal="8">Fold distance (nt)</rnaFoldDistance>
+		<CleavageLimit val="10" distribution="Fixed" fixedDistnVal="10">Cleavage limit (nt)</CleavageLimit>
+		<upstreamWindow val="12" distribution="Fixed" fixedDistnVal="12">3′ DNA curvature window</upstreamWindow>
+		<downstreamWindow val="12" distribution="Fixed" fixedDistnVal="12">5′ DNA curvature window</downstreamWindow>
+		<haltPosition val="14" distribution="Fixed" fixedDistnVal="14">Halt position (nt)</haltPosition>
+		<DGtaudagP val="3.33468" distribution="Normal" fixedDistnVal="3" normalMeanVal="5" normalSdVal="2">ΔG†𝜏+</DGtaudagP>
+		<proposalWidth val="0.05" distribution="Fixed" fixedDistnVal="0.05">Proposal width</proposalWidth>
+	</parameters>
+	<ABC inferenceMethod="ABC" ntrials="100000000" testsPerData="10" chiSqthreshold_min="0.26" chiSqthreshold_0="0.5" chiSqthreshold_gamma="0.99996" burnin="-1" logEvery="100" showRejectedParameters="false">
+		<fit1 dataType="pauseSites" name="yqiI" seq="GGTTATATCAATGACTTTGGTGGATTAAGTTTTTATGAAATAAACTGCCCTGTAGTAAATAACATTTGTAATATTTCTGTAGCCAACCGAGATCAATAATATGCGCTACTTGTTAATTGTTATTACTTTTTTTATGGGTTTTAGTTCATTACCTGCATGGGCAATGGACTGCTATGCTGAACATGAAGGTGGAAATACCGTTGTCATTGGTTACGTACCAAGAATCTCTATCCCCAGCGATGGTAAAAAAGGTGATAAAATCTGGCAAAGCAGTGAATATTTTATGAATGTTTTCTGTAATAATGCACTACCAGGCCCATCTCCAGGAGAAGAATACCCATCTGCATGGGCAAATATAATGATGTTGTTAGCATCAGGTCAAGACTTTTATAATCAAAACTCTTATACTTTCGGTGTAACTTATAATGGGGTTGATTATGATTCTACATCTCCACTACCTATTGCAGCACCTGTATGTATTGATATAAAGGGAGCCGGAACCTTCGGGAATGGCTACAAAAAGCCCGCAGTCTGTAGTGGCGGTCCTGAACCGCAATTATCAGTAACTTTTCCAGTACGAGTGCAGCTATATATTAAGCTAGCTAAAAATGCCAATAAAGTAAATAAAAAACTTGTATTACCTGACGAATATATAGCACTTGAATTTAAAGGTATGAGCGGAGCAGGTGCTATAGAAGTAGATAAAAATCTGACCTTCAGGATTCGCGGATTAAATAACATTCATGTCCTTGACTGCTTTGTTAATGTTGATCTGGAACCAGCTGATGGCGTTGTCGACTTTGGTAAAATAAATTCCCGAACAATTAAAAATACCAGCGTGAGTGAGACGTTTAGCGTAGTCATGACCAAAGATCCGGGTGCGGCCTGTACTGAGCAGTTTAATATTTTAGGGAGTTTTTTCACTACGGATATTTTGAGTGATTATAGCCATCTGGATATAGGTAATGGTCTGCTATTGAAGATATTTCATAACGATGGAACAGCAACGGAATTTAACCGCTTCTCACAATTTGCTTCTTTTTCATCGTCTAGTGCGCCTTCGGTCACCGCACCATTCAGGGCAGAACTGAGTGCGAACCCGGCAGAAACGGTTGTTGAGGGACCGTTTAGTAAAGACGTAATCCTGAAAATCACCTATAACTAGTATCTAATACAAACACTAAAACGGGCCATCAGGCCCGTTATATCAGTGCTCTAACTCCAGCTCTCTTGCCTGCATCATCTGTTGACAATACCAGGCATAA" indices="439,440,441,541,552,558" />
+		<fit2 dataType="pauseSites" name="ytfK" seq="GCCCGGATAGTCTATAGTCACTAAGCATTAAAATTTGCGCCTCATAATAGTTGGGCCGATTGTGGCACCGCACAGGCGTAATACTCAGCAGGAGATAACAATGAAAATTTTCCAACGGTACAACCCACTTCAGGTGGCGAAGTACGTAAAGATCCTGTTCCGTGGACGGTTATACATCAAGGACGTTGGCGCTTTTGAATTCGATAAGGGTAAGATTCTTATCCCAAAAGTGAAGGATAAGCTGCATTTGTCAGTGATGTCCGAAGTTAACCGTCAGGTTATGCGTCTGCAAACAGAGATGGCTTAACCAAAGTGCTATGCAGTAAAAAGTGCTATGCAGTAATAAGACGGCTCCTGATTCAGGAGCCGTTGATGTTTCTGGGGGTTACGCGACGCTTTCTTCTTTA" indices="127,152,158" />
+		<fit3 dataType="pauseSites" name="yjjJ" seq="TCTATTCATTTTTCTCTCCAGCTTGAATATTTTCGCTATACTTTTCAGTGAAATGTGTTAATAAATCTATTCAAGTATCTATTCACGAATCTATTCATTAATGAGCGAGCTGACTGATCTTTTACTGCAAGGGCCGCGTTCTGCCCCGGAATTGCGCCAGCGTCTGGCAATCAGTCAGGCGACGTTCTCACGCCTTGTTGCCAGAGAAGATCGGGTGATTCGCTTTGGTAAAGCACGGGCAACGCGATATGCACTGCTGCGTCCTTATCGCGGAATTGAGCGTATTCCCGTCTGGCGGGTGGACGATACCGGAAAGGCGCATAAATTCGCCGACATCCGGTTGTGCTGGCCGCAGGGAAGTTGTCTGGTAACAGGCGCAGATGGCGACGAACAGTGGTTTGATGGTTTGCCCTGGTATTTGACCGATCTCCGACCGCAGGGCTTTTTAGGGCGCGCGTGGGGCAGGAAGTTAGCCGCGCAACTGAATCTGACTGATGATATACGTCTCTGGCAGGAAGAAGATGTGCTCTACGCCCTGACCGTATTTAACGGTGAATATACTGGCGGTTGGTTGGTCGGGGAGGGGAATTATCAGCGATGGATTACTGCACAACACCCTGCGGAAATTCCTCTGGATCAAAAACTCACCCATTACGAACAGCTGGCAAGTGATGCACTGGCAGGAGAAATTGTGGGTTCTTCTGCGGGCGGCGAGCAGCCAAAATTTACCTACTATGCACAAACGCCGTCAGGCAATAAACATGTGTTGGTGAAATTCACCGTACCACAGCAAACCGCGGTCAGCCAACGTTGGGGTGACCTGCTAATTGCTGAATCTATTGCCGCGCAAATCCTGCGTGACGGTGGGATCCACGCCATCGAGTCAACGGTGCTTGTAACAAGTAACAGGCAGGTATTCCTCGAAGCGGAACGCTTTGACTGCAAAGGTAACGATGGTCGCTTGCCTATTGTGTCGCTGGAGGCGGTGCAGAGTGAGTTTATCTCTTCTCCGGGATCGTGGCCGCAGGCAATGCGCCGTTTGTGTGAGCAACAACTTGTCACTCACCAGAGCGTGGCGCAAACAGAAGTGATCTGGGCATTTGGGCGACTTATCGCCAACAGCGATATGCACGCAGGTAATTTATCGTTTTATTTATCTGAACCGCCATTTGCGCTGACGCCCGTCTACGACATGCTGCCGATGGTCTATGCACCAAACAGCGCTGGAATGCTGCGTGATGCTGCCATTGAGGTGAAGTTTGATCTTAACGTCAGTAAAAGCGCTTGGTTAACGGCGATCCCGCTGGCGCAGCAGTTCTGGCAAACGGTCGCCAGAGATCCGCGTATCAGCGAGGCGTTTCGCCACATTGCGCAAGAAATGCCGGAAAAAATCCGGCAAATCGAAGAGAAAGTTGCCCGCATGGGCGGGTAACTACCTTACAGCCCCCGCCATCCATGCCGATAACTCCCGTAGCTCTTTTTCCTGTTCCGGGAAGTCAACCAACAGCGCTTCGCACTCCTGTTGCAGCATA" indices="135,142,153,260,364,693,695,705,716,767,1094,1235,1341,1382" />
+		</ABC>
+	<estimated-models>
+		<model1 id="1" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model2 id="2" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model3 id="3" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model4 id="4" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model5 id="5" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model6 id="6" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model7 id="7" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model8 id="8" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+		<model9 id="9" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true"  currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model10 id="10" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model11 id="11" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model12 id="12" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model13 id="13" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model14 id="14" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model15 id="15" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model16 id="16" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+		
+		<model17 id="17" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model18 id="18" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model19 id="19" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model20 id="20" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model21 id="21" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model22 id="22" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model23 id="23" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model24 id="24" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+		<model25 id="25" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true"  currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model26 id="26" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model27 id="27" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model28 id="28" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model29 id="29" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model30 id="30" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model31 id="31" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model32 id="32" weight="1" allowInactivation="true" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+
+
+		<model33 id="33" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model34 id="34" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model35 id="35" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model36 id="36" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model37 id="37" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model38 id="38" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model39 id="39" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model40 id="40" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+		<model41 id="41" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true"  currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model42 id="42" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model43 id="43" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model44 id="44" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model45 id="45" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model46 id="46" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model47 id="47" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model48 id="48" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+		
+		<model50 id="49" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model51 id="50" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model52 id="51" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model53 id="52" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model54 id="53" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model55 id="54" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model56 id="55" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model57 id="56" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+		<model58 id="57" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true"  currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model59 id="58" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model60 id="59" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model61 id="60" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model62 id="61" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model63 id="62" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model63 id="63" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model64 id="64" weight="1"  allowInactivation="true" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+
+
+
+
+
+		<model65 id="65" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model66 id="66" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model67 id="67" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model68 id="68" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model69 id="69" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model70 id="70" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model71 id="71" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model72 id="72" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+		<model73 id="73" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true"  currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model74 id="74" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model75 id="75" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model76 id="76" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model77 id="77" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model78 id="78" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model79 id="79" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model80 id="80" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+		
+		<model81 id="81" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model82 id="82" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model83 id="83" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model84 id="84" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model85 id="85" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model86 id="86" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model87 id="87" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model88 id="88" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+		<model89 id="89" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true"  currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model90 id="90" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model91 id="91" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model92 id="92" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model93 id="93" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model94 id="94" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model95 id="95" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model96 id="96" weight="1" allowInactivation="false" allowmRNAfolding="false" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+
+
+		<model97 id="97" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model98 id="98" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model99 id="99" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model100 id="100" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model101 id="101" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model102 id="102" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model103 id="103" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model104 id="104" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+		<model105 id="105" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true"  currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model106 id="106" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model107 id="107" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model108 id="108" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model109 id="109" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model110 id="110" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model111 id="111" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model112 id="112" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="true" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+		
+		<model113 id="113" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model114 id="114" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model115 id="115" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model116 id="116" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model117 id="117" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model118 id="118" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model119 id="119" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model120 id="120" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="false" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+		<model121 id="121" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true"  currentBacksteppingModel="backstep0" currentTranslocationModel="HIBU_barriers"/>
+		<model122 id="122" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBU_barriers"/>
+		<model123 id="123" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HIBI_barriers"/>
+		<model124 id="124" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HIBI_barriers"/>
+		<model125 id="125" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBU_barriers"/>
+		<model126 id="126" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBU_barriers"/>
+		<model127 id="127" weight="1"  allowInactivation="false" allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep0" currentTranslocationModel="HUBI_barriers"/>
+		<model128 id="128" weight="1" allowInactivation="false"  allowmRNAfolding="true" allowBacktracking="false" allowHypertranslocation="true" currentBacksteppingModel="backstep1" currentTranslocationModel="HUBI_barriers"/>
+
+		
+	</estimated-models>
+</session>

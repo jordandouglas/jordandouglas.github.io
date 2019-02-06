@@ -1053,9 +1053,6 @@ extern "C" {
 
 			while(time < 1 && !stop) {
 			
-            
-                
-            
                     
                 if (inferenceMethod == "ABC"){
                 
@@ -1379,6 +1376,16 @@ extern "C" {
 
 
 		list<PosteriorDistributionSample*> posterior = Settings::getPosteriorDistributionByID(posteriorDistributionID);
+        
+        
+         
+        // If R-ABC then sort the posterior distribution by X2
+        if (inferenceMethod == "ABC"){
+            cout << "Sorting posterior " << endl;
+            Settings::sort_posterior(posterior);
+        }
+        
+        
 
 		posterior.front()->printHeader(false);
 		for (list<PosteriorDistributionSample*>::iterator it = posterior.begin(); it != posterior.end(); ++ it){
@@ -1490,6 +1497,7 @@ extern "C" {
 		_ABCoutputToPrint.clear();
         chunk_string = "";
         
+
         
 		messageFromWasmToJS(toReturnJSON, msgID);
 
@@ -2245,7 +2253,6 @@ extern "C" {
 			_GUI_simulating = false;
 			messageFromWasmToJS(toReturnJSON, msgID);
 			delete _interfaceSimulator;
-			//delete _interfaceSimulation_startTime;
 			return;
 		}
 
@@ -2378,13 +2385,16 @@ extern "C" {
 
 	// Delete the specified plot data (ie. clear the cache) 
 	void EMSCRIPTEN_KEEPALIVE deletePlots(bool distanceVsTime_cleardata, bool timeHistogram_cleardata, bool timePerSite_cleardata, bool customPlot_cleardata, bool ABC_cleardata, bool sequences_cleardata, int msgID){
-
+    
+    
+        cout << "deletePlot 1" << endl;
 		_GUI_PLOTS->deletePlotData(_currentStateGUI, distanceVsTime_cleardata, timeHistogram_cleardata, timePerSite_cleardata, customPlot_cleardata, ABC_cleardata, sequences_cleardata);
-
+        
+        cout << "deletePlot 2" << endl;
 		if (ABC_cleardata){
 			MCMC::cleanup();
 		}
-
+        cout << "deletePlot 3" << endl;
 		string plotsJSON = _GUI_PLOTS->getPlotDataAsJSON();
 		messageFromWasmToJS(plotsJSON, msgID);
 	}
@@ -2407,7 +2417,7 @@ extern "C" {
 
 
 		// Gibbs energy of transition state
-		double meanBarrierHeight = currentSequence->getMeanTranslocationBarrierHeight() + GDagSlide->getVal(true);
+		double meanBarrierHeight = currentSequence->getMeanTranslocationBarrierHeight() + DGtaudag->getVal(true);
 		parametersJSON += "'meanBarrierHeight':" + to_string(meanBarrierHeight);
 		parametersJSON += "}";
 		messageFromWasmToJS(parametersJSON, msgID);

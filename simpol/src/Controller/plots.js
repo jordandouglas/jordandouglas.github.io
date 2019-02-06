@@ -1892,7 +1892,7 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 	var ctx = canvas.getContext('2d');
 	var axisGap = 45 * canvasSizeMultiplier;
 	var binGap = 5 * canvasSizeMultiplier;
-	var maxNumBins = 16;
+	var maxNumBins = 24;
 	textbox = "";
 	
 	
@@ -1926,15 +1926,16 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 
 		var niceBinSizes = [1, 2, 2.5, 5];
 		var niceBinSizeID = niceBinSizes.length - 1;
-		var basePower = Math.floor(log(maxVal, base = 10));
+		var basePower = Math.floor(log(maxVal - minVal, base = 10));
 		
 		var binSize = isInteger ? 1 : niceBinSizes[niceBinSizeID] * Math.pow(10, basePower);
 		
-		//console.log("BinSize1", binSize, "maxVal", maxVal, "basePower", basePower);
 		
 		if (minVal != maxVal) {
 			while(true){
 				if ((maxVal - minVal) / binSize - nbins >= 0 && (!isInteger || (isInteger && binSize % 1 == 0))) break;
+                
+               
 				niceBinSizeID --;
 				if (niceBinSizeID < 0) {
 					niceBinSizeID = niceBinSizes.length - 1;
@@ -1948,7 +1949,7 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 			binSize = 1;
 		}
         
-        console.log("binSize", binSize, nbins);
+       
 		
 		
 		
@@ -1961,6 +1962,9 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 		nbins = Math.ceil((maxVal - minVal) / binSize);
 		//var binSize = (maxVal - minVal) / nbins;
 		widthScale = (plotWidth - (nbins+1)*binGap) / (nbins);
+        
+        
+        console.log("binSize", binSize, nbins, minVal, maxVal);
 		
 		// console.log("MinVal", minVal, "maxVal", maxVal, "binSize", binSize, "nbins", nbins);
 
@@ -1970,7 +1974,7 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 		var barHeights = [];
 		for(var binID = 0; binID < nbins; binID ++){
 		
-
+        
 			var y0 = 0;
 			var minBinVal = binSize * binID + minVal;
 			var maxBinVal = binSize * (binID+1) + minVal;
