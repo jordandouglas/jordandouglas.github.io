@@ -1926,7 +1926,7 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 
 		var niceBinSizes = [1, 2, 2.5, 5];
 		var niceBinSizeID = niceBinSizes.length - 1;
-		var basePower = Math.floor(log(maxVal - minVal, base = 10));
+		var basePower = Math.ceil(log(maxVal - minVal, base = 10));
 		
 		var binSize = isInteger ? 1 : niceBinSizes[niceBinSizeID] * Math.pow(10, basePower);
 		
@@ -1964,7 +1964,7 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 		widthScale = (plotWidth - (nbins+1)*binGap) / (nbins);
         
         
-        console.log("binSize", binSize, nbins, minVal, maxVal);
+        //console.log("binSize", binSize, nbins, minVal, maxVal);
 		
 		// console.log("MinVal", minVal, "maxVal", maxVal, "binSize", binSize, "nbins", nbins);
 
@@ -3311,7 +3311,7 @@ function plot_parameter_heatmap(plotNumCustom = null){
     			var underlayFn = null;
     			if (params[paramID] != null && PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom].priorUnderlay){
                
-    				console.log("Adding a prior underlay");
+    				//console.log("Adding a prior underlay");
                     
                 
                     var xRange = PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"];
@@ -3359,7 +3359,7 @@ function plot_parameter_heatmap(plotNumCustom = null){
                         case "Normal":
                             var sd = params[paramID].normalSdVal;
                             var meanVal = params[paramID].normalMeanVal;
-                            console.log("Normal(", meanVal, ",", sd, ")");
+                            //console.log("Normal(", meanVal, ",", sd, ")");
                             if (xRange == "automaticX"){
                                 var xmin = params[paramID]["zeroTruncated"] ? Math.max(meanVal - sd * 4, 0) : meanVal - sd * 4;
                                 xRange = [xmin, meanVal + sd * 4];
@@ -3378,7 +3378,7 @@ function plot_parameter_heatmap(plotNumCustom = null){
                         case "Lognormal":
                             var sd = params[paramID].lognormalSdVal
                             var meanVal = params[paramID].lognormalMeanVal;
-                            console.log("Lognormal(", meanVal, ",", sd, ")");
+                            //console.log("Lognormal(", meanVal, ",", sd, ")");
                             if (xRange == "automaticX"){
                                 var sd4 = Math.sqrt((Math.exp(Math.pow(sd, 2) - 1)) * Math.exp(2*meanVal + Math.pow(sd, 2))) * 4; // 4 standard deviations
                                 var empMean = Math.exp(meanVal + sd*sd/2);
@@ -3398,8 +3398,7 @@ function plot_parameter_heatmap(plotNumCustom = null){
                             var shape = params[paramID].gammaShapeVal
                             var rateVal = params[paramID].gammaRateVal;
                             var scale = 1/rateVal;
-                            console.log("Gamma(", shape, ",", rateVal, ")");
-                            console.log("XXX", jStat.gamma.pdf(10, shape, scale));
+                            //console.log("Gamma(", shape, ",", rateVal, ")");
                             if (xRange == "automaticX"){
                                 var sd4 = Math.sqrt(shape * scale * scale) * 4; // 4 standard deviations
                                 var empMean = shape * scale;
@@ -3418,7 +3417,7 @@ function plot_parameter_heatmap(plotNumCustom = null){
                         case "DiscreteUniform":
                             var lower = params[paramID].uniformDistnLowerVal;
                             var upper = params[paramID].uniformDistnUpperVal;
-                            console.log("DiscreteUniform(", lower, ",", upper, ")");
+                            //console.log("DiscreteUniform(", lower, ",", upper, ")");
                             if (xRange == "automaticX"){
                                 var xmin = params[paramID]["zeroTruncated"] ? Math.max(0, lower - 1) : lower - 1;
                                 xRange = [xmin, upper + 1];

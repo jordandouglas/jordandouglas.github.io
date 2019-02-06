@@ -3883,7 +3883,7 @@ function closeNav() {
                                         <tr class="ABC_display">
                                             <td>
                                                 &epsilon; =
-                                                <input type="number" onChange="update_RABC_epsilon_controller(true)" id="ABC_epsilon" min=0 step="0.001" value=1 title="Threshold for accepting a sample into the posterior distribution.  This input is linked with P(X &lt; &epsilon;)" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#708090">
+                                                <input type="number" onChange="update_RABC_epsilon_controller(true)" id="ABC_epsilon" min=0 step="0.001" value=1 title="Threshold for accepting a sample into the posterior distribution.  This input is linked with P(X &le; &epsilon;)" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#708090">
                                             </td>
                                         </tr>
                                                     
@@ -3891,7 +3891,7 @@ function closeNav() {
                                                     
                                         <tr class="ABC_display">
                                             <td>
-                                                P(X &lt; &epsilon;) =
+                                                P(X &le; &epsilon;) =
                                                 <input type="number" onChange="update_RABC_epsilon_controller(false)" id="ABC_quantile" min=0 max=1 step="0.001" value=0 title="The proportion of samples to accept into the posterior distribution. This input is linked with &epsilon;" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
                                             </td>
                                         </tr>
