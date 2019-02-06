@@ -144,8 +144,8 @@ Parameter* hybridLen = new Parameter("hybridLen", true, "exclusive", "Hybrid len
 Parameter* bubbleLeft = new Parameter("bubbleLeft", true, "inclusive", "Bubble length left (bp)", "Number of unpaired template bases 3\u2032 of the hybrid", "\u03B2_{1} (bp)");
 Parameter* bubbleRight = new Parameter("bubbleRight", true, "inclusive", "Bubble length right (bp)", "Number of unpaired template bases 5\u2032 of the hybrid", "\u03B2_{2} (bp)");
 
-Parameter* GDagSlide = new Parameter("GDagSlide", false, "false", "\u0394G\u2020\U0001D70F", "Gibbs energy barrier height of translocation", "\u0394G_{\U0001D70F}^{\u2020}  (k_{B}T)");
-Parameter* DGPost = new Parameter("DGPost", false, "false", "\u0394G\U0001D70F1", "Gibbs energy added on to posttranslocated ground state", "\u0394G_{\U0001D70F1}  (k_{B}T)");
+Parameter* DGtaudag = new Parameter("DGtaudag", false, "false", "\u0394G\u2020\U0001D70F", "Gibbs energy barrier height of translocation", "\u0394G_{\U0001D70F}^{\u2020}  (k_{B}T)");
+Parameter* DGtau1 = new Parameter("DGtau1", false, "false", "\u0394G\U0001D70F1", "Gibbs energy added on to posttranslocated ground state", "\u0394G_{\U0001D70F1}  (k_{B}T)");
 Parameter* barrierPos = new Parameter("barrierPos", false, "false", "Transition state position  (\u212B)", "Position of translocation transition state", "\u03B4_{1}");
 Parameter* arrestTime = new Parameter("arrestTime", false, "inclusive", "Arrest timeout  (s)", "Time from the start until transcription is arrested. Set to zero to prevent arrests.");
 Parameter* kCat = new Parameter("kCat", false, "inclusive", "Rate of catalysis (s\u207B\u00B9)", "Rate constant of catalysing bound NTP", "k_{cat}  (s^{\u22121\u2009})");
@@ -155,8 +155,8 @@ Parameter* RateBind = new Parameter("RateBind", false, "inclusive", "Rate of bin
 Parameter* RateActivate = new Parameter("RateActivate", false, "inclusive", "Rate of activation (s\u207B\u00B9)", "Rate constant of polymerase leaving the intermediate state", "k_[A]  (s^[\u22121\u2009])");
 Parameter* RateDeactivate = new Parameter("RateDeactivate", false, "inclusive", "Rate of inactivation (s\u207B\u00B9)", "Rate constant of polymerase entering the intermediate state", "k_[U]  (s^[\u22121\u2009])");
 Parameter* deltaGDaggerHybridDestabil = new Parameter("deltaGDaggerHybridDestabil", false, "false", "\u0394G\u2020\u03C0", "Gibbs energy barrier of hybrid destabilisation, which causes catalytic inactivation.");
-Parameter* deltaGDaggerBacktrack = new Parameter("deltaGDaggerBacktrack", false, "false", "\u0394G\u2020\U0001D70F-", "Additive Gibbs energy barrier height of backtracking. Added onto the value of \u0394G\u2020\U0001D70F.", "\u0394G_{\U0001D70F-}^{\u2020}  (k_{B}T)");
-Parameter* DGHyperDag = new Parameter("DGHyperDag", false, "false", "\u0394G\u2020\U0001D70F+", "Additive Gibbs energy barrier height of hypertranslocation. Added onto the value of \u0394G\u2020\U0001D70F.", "\u0394G_{\U0001D70F+}^{\u2020}  (k_{B}T)");
+Parameter* DGtaudagM = new Parameter("DGtaudagM", false, "false", "\u0394G\u2020\U0001D70F-", "Additive Gibbs energy barrier height of backtracking. Added onto the value of \u0394G\u2020\U0001D70F.", "\u0394G_{\U0001D70F-}^{\u2020}  (k_{B}T)");
+Parameter* DGtaudagP = new Parameter("DGtaudagP", false, "false", "\u0394G\u2020\U0001D70F+", "Additive Gibbs energy barrier height of hypertranslocation. Added onto the value of \u0394G\u2020\U0001D70F.", "\u0394G_{\U0001D70F+}^{\u2020}  (k_{B}T)");
 
 
 
@@ -230,8 +230,8 @@ void Settings::init(){
 	bubbleLeft->setDistributionParameter("fixedDistnVal", 2);
 	bubbleRight->setDistributionParameter("fixedDistnVal", 1);
 
-	GDagSlide->setDistributionParameter("fixedDistnVal", 9)->setDistributionParameter("uniformDistnLowerVal", 9)->setDistributionParameter("uniformDistnUpperVal", 15);
-	DGPost->setDistributionParameter("fixedDistnVal", 0);
+	DGtaudag->setDistributionParameter("fixedDistnVal", 9)->setDistributionParameter("uniformDistnLowerVal", 9)->setDistributionParameter("uniformDistnUpperVal", 15);
+	DGtau1->setDistributionParameter("fixedDistnVal", 0);
 	barrierPos->setDistributionParameter("fixedDistnVal", 1.7);
 	barrierPos->setDistributionParameter("upperVal", 3.4);
 
@@ -247,8 +247,8 @@ void Settings::init(){
 	RateActivate->setDistributionParameter("fixedDistnVal", 0.1);
 	RateDeactivate->setDistributionParameter("fixedDistnVal", 0.05);
 	deltaGDaggerHybridDestabil->setDistributionParameter("fixedDistnVal", -1);
-	deltaGDaggerBacktrack->setDistributionParameter("fixedDistnVal", 0);
-	DGHyperDag->setDistributionParameter("fixedDistnVal", 0);
+	DGtaudagM->setDistributionParameter("fixedDistnVal", 0);
+	DGtaudagP->setDistributionParameter("fixedDistnVal", 0);
 	RateCleave->setDistributionParameter("fixedDistnVal", 0);
 	CleavageLimit->setDistributionParameter("fixedDistnVal", 10);
 
@@ -281,8 +281,8 @@ void Settings::init(){
 	paramList.at(6) = hybridLen;
 	paramList.at(7) = bubbleLeft;
 	paramList.at(8) = bubbleRight;
-	paramList.at(9) = GDagSlide;
-	paramList.at(10) = DGPost;
+	paramList.at(9) = DGtaudag;
+	paramList.at(10) = DGtau1;
 	paramList.at(11) = barrierPos;
 	paramList.at(12) = arrestTime;
 	paramList.at(13) = kCat;
@@ -292,7 +292,7 @@ void Settings::init(){
 	paramList.at(17) = RateDeactivate;
 	paramList.at(18) = RateCleave;
 	paramList.at(19) = deltaGDaggerHybridDestabil;
-	paramList.at(20) = deltaGDaggerBacktrack;
+	paramList.at(20) = DGtaudagM;
 	paramList.at(21) = rnaFoldDistance;
 	paramList.at(22) = CleavageLimit;
 
@@ -302,7 +302,7 @@ void Settings::init(){
 	paramList.at(23) = upstreamWindow;
 	paramList.at(24) = downstreamWindow;
 	paramList.at(25) = haltPosition;
-	paramList.at(26) = DGHyperDag;
+	paramList.at(26) = DGtaudagP;
 
 	paramList.at(27) = proposalWidth;
 
@@ -332,8 +332,8 @@ void Settings::initPolymerases(){
 	T7pol->setParameters(Settings::getParamListClone());
 
 	// E. coli parameters
-	ecoliPol->setParameter(GDagSlide->clone()->setDistributionParameter("fixedDistnVal", 9.079));
-	ecoliPol->setParameter(DGPost->clone()->setDistributionParameter("fixedDistnVal", -2.007));
+	ecoliPol->setParameter(DGtaudag->clone()->setDistributionParameter("fixedDistnVal", 9.079));
+	ecoliPol->setParameter(DGtau1->clone()->setDistributionParameter("fixedDistnVal", -2.007));
 	ecoliPol->setParameter(barrierPos->clone()->setDistributionParameter("fixedDistnVal", 2.838));
 	ecoliPol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 25.56));
 	ecoliPol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 1.8));
@@ -343,8 +343,8 @@ void Settings::initPolymerases(){
 	ecoliPol->setParameter(bubbleRight->clone()->setDistributionParameter("fixedDistnVal", 1));
 
 	// S. cerevisiae parameters
-	yeastPol->setParameter(GDagSlide->clone()->setDistributionParameter("fixedDistnVal", 8.536));
-	yeastPol->setParameter(DGPost->clone()->setDistributionParameter("fixedDistnVal", -4.323));
+	yeastPol->setParameter(DGtaudag->clone()->setDistributionParameter("fixedDistnVal", 8.536));
+	yeastPol->setParameter(DGtau1->clone()->setDistributionParameter("fixedDistnVal", -4.323));
 	yeastPol->setParameter(barrierPos->clone()->setDistributionParameter("fixedDistnVal", 2.889));
 	yeastPol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 29.12));
 	yeastPol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 72));
@@ -353,7 +353,7 @@ void Settings::initPolymerases(){
 	yeastPol->setParameter(bubbleRight->clone()->setDistributionParameter("fixedDistnVal", 1));
 
 	// T7 parameters
-	T7pol->setParameter(DGPost->clone()->setDistributionParameter("fixedDistnVal", -4.709));
+	T7pol->setParameter(DGtau1->clone()->setDistributionParameter("fixedDistnVal", -4.709));
 	T7pol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 127.3));
 	T7pol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 105));
 	T7pol->setParameter(hybridLen->clone()->setDistributionParameter("fixedDistnVal", 8));
@@ -427,8 +427,8 @@ void Settings::setParameterList(vector<Parameter*> params){
 	hybridLen = paramList.at(6);
 	bubbleLeft = paramList.at(7);
 	bubbleRight = paramList.at(8);
-	GDagSlide = paramList.at(9);
-	DGPost = paramList.at(10);
+	DGtaudag = paramList.at(9);
+	DGtau1 = paramList.at(10);
 	barrierPos = paramList.at(11);
 	arrestTime = paramList.at(12);
 	kCat = paramList.at(13);
@@ -438,14 +438,14 @@ void Settings::setParameterList(vector<Parameter*> params){
 	RateDeactivate = paramList.at(17);
 	RateCleave = paramList.at(18);
 	deltaGDaggerHybridDestabil = paramList.at(19);
-	deltaGDaggerBacktrack = paramList.at(20);
+	DGtaudagM = paramList.at(20);
 	rnaFoldDistance = paramList.at(21);
 	CleavageLimit = paramList.at(22);
 	upstreamWindow = paramList.at(23);
 	downstreamWindow = paramList.at(24);
 
 	haltPosition = paramList.at(25);
-	DGHyperDag = paramList.at(26);
+	DGtaudagP = paramList.at(26);
 
 
 	proposalWidth = paramList.at(27);
@@ -622,7 +622,9 @@ string Settings::toJSON(){
 	parametersJSON += "'inferenceMethod':'" + inferenceMethod + "',";
 	parametersJSON += "'ntrials':" + to_string(ntrials_abc) + ",";
 	parametersJSON += "'testsPerData':" + to_string(testsPerData) + ",";
-
+    
+    parametersJSON += "'epsilon':" + to_string(_RABC_epsilon) + ",";
+    parametersJSON += "'quantile':" + to_string(_RABC_quantile) + ",";
 	parametersJSON += "'burnin':" + to_string(burnin) + ",";
 	parametersJSON += "'logEvery':" + to_string(logEvery) + ",";
 	parametersJSON += "'chiSqthreshold_min':" + to_string(_chiSqthreshold_min) + ",";
@@ -698,8 +700,8 @@ void Settings::print(){
 	hybridLen->print();
 	bubbleLeft->print();
 	bubbleRight->print();
-	GDagSlide->print();
-	DGPost->print();
+	DGtaudag->print();
+	DGtau1->print();
 	barrierPos->print();
 
 	arrestTime->print();
@@ -712,8 +714,8 @@ void Settings::print(){
 	RateCleave->print();
 	CleavageLimit->print();
 	deltaGDaggerHybridDestabil->print();
-	DGHyperDag->print();
-	deltaGDaggerBacktrack->print();
+	DGtaudagP->print();
+	DGtaudagM->print();
 
 	upstreamCurvatureCoeff->print();
 	downstreamCurvatureCoeff->print();
@@ -852,17 +854,17 @@ void Settings::updateParameterVisibilities(){
 
 	// Backtracking allowed?
 	if (currentModel->get_allowBacktracking() || currentModel->get_currentBacksteppingModel_int() == -1){
-		deltaGDaggerBacktrack->show();
+		DGtaudagM->show();
 	}else{
-		deltaGDaggerBacktrack->hide();
+		DGtaudagM->hide();
 	}
 
 
 	// Hypertranslocation
 		if (currentModel->get_allowHypertranslocation()){
-		DGHyperDag->show();
+		DGtaudagP->show();
 	}else{
-		DGHyperDag->hide();
+		DGtaudagP->hide();
 	}
 
 
@@ -945,8 +947,8 @@ Parameter* Settings::getParameterByName(string paramID){
 	if (paramID == "hybridLen") return hybridLen;
 	if (paramID == "bubbleLeft") return bubbleLeft;
 	if (paramID == "bubbleRight") return bubbleRight;
-	if (paramID == "GDagSlide") return GDagSlide;
-	if (paramID == "DGPost") return DGPost;
+	if (paramID == "DGtaudag") return DGtaudag;
+	if (paramID == "DGtau1") return DGtau1;
 	if (paramID == "barrierPos") return barrierPos;
 	if (paramID == "arrestTime") return arrestTime;
 	if (paramID == "proposalWidth") return proposalWidth;
@@ -958,8 +960,8 @@ Parameter* Settings::getParameterByName(string paramID){
 	if (paramID == "RateCleave") return RateCleave;
 	if (paramID == "CleavageLimit") return CleavageLimit;
 	if (paramID == "deltaGDaggerHybridDestabil") return deltaGDaggerHybridDestabil;
-	if (paramID == "deltaGDaggerBacktrack") return deltaGDaggerBacktrack;
-	if (paramID == "DGHyperDag") return DGHyperDag;
+	if (paramID == "DGtaudagM") return DGtaudagM;
+	if (paramID == "DGtaudagP") return DGtaudagP;
 	if (paramID == "upstreamCurvatureCoeff") return upstreamCurvatureCoeff;
 	if (paramID == "downstreamCurvatureCoeff") return downstreamCurvatureCoeff;
 	if (paramID == "upstreamWindow") return upstreamWindow;
@@ -1233,6 +1235,18 @@ void Settings::sortedPush_posterior(std::list<PosteriorDistributionSample*> &con
     
     cont.push_back(state);
 
+}
+
+
+
+bool compare_states (PosteriorDistributionSample* first, PosteriorDistributionSample* second) {
+    return first->get_chiSquared() < second->get_chiSquared();
+}
+
+
+// Sort a posterior distribution by X2
+void Settings::sort_posterior(std::list<PosteriorDistributionSample*> &cont){
+    cont.sort(compare_states);
 }
 
 

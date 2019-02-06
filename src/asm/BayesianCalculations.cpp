@@ -380,7 +380,10 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistributionSampl
         
     }
     
-    
+    if (!samplingFromPosterior) {
+        cout << "Initialising R-ABC" << endl;
+        MCMC::initMCMC(false, false);
+    }
     
     
 	// Perform N trials
@@ -404,19 +407,21 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistributionSampl
 
 		}
 
-		// Sample parameters from prior
+		// Sample parameters from prior. Only report the values of parameters which have prior distributions
 		else {
-
+        
+            
+        
 			Settings::sampleAll();
-
-			// Cache the parameter values in posterior row object
-			for (int i = 0; i < Settings::paramList.size(); i ++){
-				Parameter* param = Settings::paramList.at(i);
-				state->addParameterEstimate(param->getID(), param->getTrueVal());
-			}
-			if (modelsToEstimate.size()) state->set_modelIndicator(currentModel->getID());
+            
+            // Cache the estimated parameter value in posterior row object
+            for (list<Parameter*>::iterator it = MCMC::get_parametersToEstimate()->begin(); it != MCMC::get_parametersToEstimate()->end(); ++it){
+                //(*it)->print();
+                state->addParameterEstimate((*it)->getID(), (*it)->getTrueVal());
+            }
+            if (modelsToEstimate.size() > 1) state->set_modelIndicator(currentModel->getID());
             state->set_logPriorProb(MCMC::calculateLogPriorProbability());
-
+            
 
 		}
         

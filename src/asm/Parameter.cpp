@@ -127,7 +127,7 @@ double Parameter::getVal(bool normalise){
 	if (this->isMetaParameter) return this->instances.at(this->currentInstance)->getVal(normalise);
 
 
-	// if(this->id == "GDagSlide") cout << "ID" << this->id << "; val = " << this->val << "; norm " << this->normalisationAdditiveTerm << endl;
+	// if(this->id == "DGtaudag") cout << "ID" << this->id << "; val = " << this->val << "; norm " << this->normalisationAdditiveTerm << endl;
 
 	if (this->isHardcoded) return this->hardcodedVal + (normalise ? this->normalisationAdditiveTerm : 0);
 	return this->val + (normalise ? this->normalisationAdditiveTerm : 0);
@@ -184,7 +184,7 @@ void Parameter::recomputeNormalisationTerms(){
 
 
 	// If this parameter is the Gibbs energy barrier of translocation, normalise by subtracting from the mean
-	if (currentModel->get_subtractMeanBarrierHeight() && this->id == "GDagSlide") {
+	if (currentModel->get_subtractMeanBarrierHeight() && this->id == "DGtaudag") {
 		this->normalisationAdditiveTerm = currentModel->getTranslocationModelConstant();
 		//cout << " normalisationAdditiveTerm " << this->normalisationAdditiveTerm << endl;
 	}
@@ -357,7 +357,25 @@ double Parameter::calculateLogPrior(){
 		if (this->val < lower || this->val > upper) return -INFINITY;
 		return log(1 / (upper - lower + 1));
 	}
+    
+    
+    else if (this->distributionName == "Exponential"){
+        
 
+        if (this->val > this->distributionParameters["upperVal"]) return -INFINITY;
+        
+        // Convert this to log space to calculate prior
+        // See question 2 of http://www.math.nsysu.edu.tw/entrance/graduate/master-apply/100master-test-1.pdf
+        
+        
+        double rate = distributionParameters["exponentialDistnVal"];
+        double logval = log(this->val);
+        double prior = rate*exp(logval - rate*exp(logval));
+        return log(prior);
+        
+    }
+    
+    
 	else if (this->distributionName == "Normal"){
 		if (this->val < this->distributionParameters["lowerVal"] || this->val > this->distributionParameters["upperVal"]) return -INFINITY;
 		double mu = this->distributionParameters["normalMeanVal"];
@@ -449,7 +467,17 @@ void Parameter::makeProposal(){
 		else if (this->distributionName == "DiscreteUniform"){
 			this->sample();
 		}
-				
+			
+                
+        else if (this->distributionName == "Exponential"){
+            
+            // Convert this to log space, make jump, then transform back
+            stepSize = 1; // Variance in log space is ~1-2 regardless of rate
+            newVal = exp(log(this->val) + x * stepSize * proposalScale);
+            this->val = newVal;
+            
+        }            
+                        	
 				
 		else if (this->distributionName == "Normal"){
 

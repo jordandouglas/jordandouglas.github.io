@@ -217,7 +217,7 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
     cout << nTrialsTotalGUI << endl;
 
 	for (int n = 1; n <= nTrialsTotalGUI; n ++){
-		if (n == 1 || n % 100 == 0) cout << "Starting trial " << n << endl;
+		//if (n == 1 || n % 100 == 0) cout << "Starting trial " << n << endl;
 		//cout << "Starting trial " << n << endl;
 
 
@@ -790,7 +790,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 			//if (reactionToDo == -1){
 				//cout << nTrialsCompletedGUI << ", runifNum:" << runifNum << ", reactionToDo " << reactionToDo << ", bck:" << rates[0] << ", fwd:" << kFwd << ", rel:" << rates[2] << ", cat:" << rates[3] << endl;
-				//cout << "GDagSlide->getVal(true) " << GDagSlide->getVal(true) << " exp(-GDagSlide->getVal(true)) " << exp(-GDagSlide->getVal(true)) << " exp(-9.079) " << exp(-9.079) <<  endl;
+				//cout << "DGtaudag->getVal(true) " << DGtaudag->getVal(true) << " exp(-DGtaudag->getVal(true)) " << exp(-DGtaudag->getVal(true)) << " exp(-9.079) " << exp(-9.079) <<  endl;
 			//}
 
 
@@ -915,7 +915,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 	//cout << "timeElapsed = " << timeElapsed << endl;
 	//cout << "velocity = " << velocity << endl;
 	/*
-	cout << "kcat " << kCat->getVal(true) << " KD " << Kdiss->getVal(true) << "[ATP] = " << ATPconc->getVal(true) << "F = " << FAssist->getVal(true) << "DGslide = " << GDagSlide->getVal(true) << endl;
+	cout << "kcat " << kCat->getVal(true) << " KD " << Kdiss->getVal(true) << "[ATP] = " << ATPconc->getVal(true) << "F = " << FAssist->getVal(true) << "DGslide = " << DGtaudag->getVal(true) << endl;
 	cout << "Trans eq: " << currentModel->get_assumeTranslocationEquilibrium() << " Bind eq " << currentModel->get_assumeBindingEquilibrium() << endl;
 	*/
 	//cout << s->get_initialLength() << ";" "distanceTravelled = " << distanceTravelled << endl;

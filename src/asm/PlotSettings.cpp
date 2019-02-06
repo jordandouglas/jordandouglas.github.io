@@ -352,8 +352,10 @@ string PlotSettings::toJSON(){
 		settingsJSON += "'yData':" + this->yData + ",";
 		settingsJSON += "'zData':" + this->zData + ",";
 		
-		if (this->selectedPosteriorID == 0) settingsJSON += "'burnin':" + to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
-		
+		if (this->selectedPosteriorID == 0) {
+            if (inferenceMethod == "ABC") settingsJSON += "'burnin':0,";
+            if (inferenceMethod == "MCMC") settingsJSON += "'burnin':" + to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
+		}
 
 	}
 

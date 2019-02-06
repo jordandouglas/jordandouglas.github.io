@@ -102,10 +102,10 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		vector<double> rates = this->translocationRateTable.at(rowNum).at(colNum);
 
 		// Parameterised translocation barrier height
-		double backtrackBarrier = GDagSlide->getVal(true);
+		double backtrackBarrier = DGtaudag->getVal(true);
 
         
-        if (!fwd && state->get_mRNAPosInActiveSite() == -1) backtrackBarrier += deltaGDaggerBacktrack->getVal(true);
+        if (!fwd && state->get_mRNAPosInActiveSite() == -1) backtrackBarrier += DGtaudagM->getVal(true);
         
         
         // Can apply the backtrack penalty if backtracking or backstepping while backtracking is prohibited
@@ -113,11 +113,11 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
         
             
     		// If going from 0 to -1, apply the backtrack barrier penalty
-    		if (!fwd && state->get_mRNAPosInActiveSite() == 0 ) backtrackBarrier += deltaGDaggerBacktrack->getVal(true);
+    		if (!fwd && state->get_mRNAPosInActiveSite() == 0 ) backtrackBarrier += DGtaudagM->getVal(true);
 
 
     		// If going from -1 to 0, apply the backtrack barrier penalty
-    		if (fwd && state->get_mRNAPosInActiveSite() == -1 ) backtrackBarrier += deltaGDaggerBacktrack->getVal(true);
+    		if (fwd && state->get_mRNAPosInActiveSite() == -1 ) backtrackBarrier += DGtaudagM->getVal(true);
             
         }
 
@@ -130,10 +130,10 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		
 
 			// If in the 0 position and going backwards and the backtracking barrier is between 0 and -1, apply the backtrack penalty
-			if (state->get_mRNAPosInActiveSite() == 0 && !fwd && currentModel->get_currentBacksteppingModel_int() == 0) backtrackBarrier += deltaGDaggerBacktrack->getVal(true);
+			if (state->get_mRNAPosInActiveSite() == 0 && !fwd && currentModel->get_currentBacksteppingModel_int() == 0) backtrackBarrier += DGtaudagM->getVal(true);
 
 			// If in the -1 position and (going backwards and the backtracking barrier is between -1 and -2) OR (the backtracking barrier is between 0 and -1), apply the backtrack penalty
-			else if (state->get_mRNAPosInActiveSite() == -1 && ((!fwd && currentModel->get_currentBacksteppingModel_int() == -1) || currentModel->get_currentBacksteppingModel_int() == 0)) backtrackBarrier += deltaGDaggerBacktrack->getVal(true);
+			else if (state->get_mRNAPosInActiveSite() == -1 && ((!fwd && currentModel->get_currentBacksteppingModel_int() == -1) || currentModel->get_currentBacksteppingModel_int() == 0)) backtrackBarrier += DGtaudagM->getVal(true);
 
 			
 		} */
@@ -142,7 +142,7 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 
 		double forceGradientFwd = exp(( FAssist->getVal(true) * 1e-12 * (barrierPos->getVal(true)) * 1e-10) / (_kBT));
 		double forceGradientBck = exp((-FAssist->getVal(true) * 1e-12 * (3.4-barrierPos->getVal(true)) * 1e-10) / (_kBT));
-		double DGPostModifier = state->get_mRNAPosInActiveSite() == 1 ? exp(DGPost->getVal(true)) : 1;
+		double DGtau1Modifier = state->get_mRNAPosInActiveSite() == 1 ? exp(DGtau1->getVal(true)) : 1;
 		double RNAunfoldingBarrier = 1;
 		
 		
@@ -150,17 +150,17 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		//double hypertranslocationGradientForward = 1; // Modify the rate of hypertranslocating forwards
 		//double hypertranslocationGradientBackwards = 1; // Modify the rate of translocating backwards when in a hypertranslocated state
 		if (currentModel->get_allowHypertranslocation()){
-			//if (state->get_mRNAPosInActiveSite() > 0) hypertranslocationGradientForward = exp(-DGHyperDag->getVal() * 0.5);
-			//if (state->get_mRNAPosInActiveSite() > 1) hypertranslocationGradientBackwards = exp(DGHyperDag->getVal() * 0.5);
-			if ((fwd && state->get_mRNAPosInActiveSite() > 0) || (!fwd && state->get_mRNAPosInActiveSite() > 1)) hypertranslocationModifier =  exp(-DGHyperDag->getVal(false));
+			//if (state->get_mRNAPosInActiveSite() > 0) hypertranslocationGradientForward = exp(-DGtaudagP->getVal() * 0.5);
+			//if (state->get_mRNAPosInActiveSite() > 1) hypertranslocationGradientBackwards = exp(DGtaudagP->getVal() * 0.5);
+			if ((fwd && state->get_mRNAPosInActiveSite() > 0) || (!fwd && state->get_mRNAPosInActiveSite() > 1)) hypertranslocationModifier =  exp(-DGtaudagP->getVal(false));
 
 		}
 
 
 		//cout << "F = " << FAssist->getVal(true) << ", delta1 = " << barrierPos->getVal(true) << endl;
 		//cout << "kbck = " << rates[0] << ", kfwd = " << rates[1] << ", forceGradientFwd = " << forceGradientFwd << ", GDagRateModifier = " << GDagRateModifier  << endl;
-		//if (fwd) cout << rates[1] * DGPostModifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd << endl;
-		//else cout << rates[0] * DGPostModifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck << endl;
+		//if (fwd) cout << rates[1] * DGtau1Modifier * GDagRateModifier * hypertranslocationGradientForward * forceGradientFwd << endl;
+		//else cout << rates[0] * DGtau1Modifier * GDagRateModifier * hypertranslocationGradientBackwards * forceGradientBck << endl;
 
 
 
@@ -174,8 +174,8 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 
 			//if (rates[0] >= INF || rates[1] >= INF || forceGradientFwd >= INF || forceGradientBck >= INF || GDagRateModifier >= INF)
 				//cout << "rates[0]: " << rates[0] << ", rates[1]: " << rates[1] << ", forceGradientFwd: " << forceGradientFwd << " forceGradientBck: " << forceGradientBck << " GDagRateModifier: " << GDagRateModifier << endl;
-			if (fwd) return rates.at(1) * DGPostModifier * GDagRateModifier * hypertranslocationModifier * forceGradientFwd * RNAunfoldingBarrier;
-			else return rates.at(0) * DGPostModifier * GDagRateModifier * hypertranslocationModifier * forceGradientBck * RNAunfoldingBarrier;
+			if (fwd) return rates.at(1) * DGtau1Modifier * GDagRateModifier * hypertranslocationModifier * forceGradientFwd * RNAunfoldingBarrier;
+			else return rates.at(0) * DGtau1Modifier * GDagRateModifier * hypertranslocationModifier * forceGradientBck * RNAunfoldingBarrier;
 		}
 
 
@@ -200,8 +200,8 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 		//cout << "Calculated rates " << kfwd << "," << kbck << " for index " <<  rowNum << "," << colNum << endl;
 
 
-		if (fwd) return kfwd * DGPostModifier * GDagRateModifier * hypertranslocationModifier * forceGradientFwd * RNAunfoldingBarrier;
-		else return kbck * DGPostModifier * GDagRateModifier * hypertranslocationModifier * forceGradientBck * RNAunfoldingBarrier;
+		if (fwd) return kfwd * DGtau1Modifier * GDagRateModifier * hypertranslocationModifier * forceGradientFwd * RNAunfoldingBarrier;
+		else return kbck * DGtau1Modifier * GDagRateModifier * hypertranslocationModifier * forceGradientBck * RNAunfoldingBarrier;
 
 		
 		
@@ -224,7 +224,7 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 
 		vector<double> rates = this->backtrackRateTable.at(indexNum);
 
-		double backtrackBarrier = GDagSlide->getVal(true) + deltaGDaggerBacktrack->getVal(true);
+		double backtrackBarrier = DGtaudag->getVal(true) + DGtaudagM->getVal(true);
 		double GDagRateModifier = exp(-backtrackBarrier);
 		double forceGradientFwd = exp(( FAssist->getVal(true) * 1e-12 * (barrierPos->getVal(true)) * 1e-10) / (_kBT));
 		double forceGradientBck = exp((-FAssist->getVal(true) * 1e-12 * (3.4-barrierPos->getVal(true)) * 1e-10) / (_kBT));

@@ -175,8 +175,8 @@ extern Parameter *hybridLen;
 extern Parameter *bubbleLeft;
 extern Parameter *bubbleRight;
 
-extern Parameter *GDagSlide;
-extern Parameter *DGPost;
+extern Parameter *DGtaudag;
+extern Parameter *DGtau1;
 extern Parameter* barrierPos;
 
 extern Parameter *arrestTime;
@@ -187,8 +187,8 @@ extern Parameter *RateBind;
 extern Parameter *RateActivate;
 extern Parameter *RateDeactivate;
 extern Parameter *deltaGDaggerHybridDestabil;
-extern Parameter *deltaGDaggerBacktrack;
-extern Parameter *DGHyperDag;
+extern Parameter *DGtaudagM;
+extern Parameter *DGtaudagP;
 
 extern Parameter *RateCleave;
 extern Parameter *CleavageLimit;
@@ -258,6 +258,7 @@ class Settings{
     	static void sortedPush(std::vector<int> &cont, int value);
     	static void sortedPush(std::vector<double> &cont, double value);
         static void sortedPush_posterior(std::list<PosteriorDistributionSample*> &cont, PosteriorDistributionSample* state);
+        static void sort_posterior(std::list<PosteriorDistributionSample*> &cont);
     	static int indexOf(deque<int> arr, int val);
         static string trim(string str);
 

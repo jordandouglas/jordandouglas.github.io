@@ -372,7 +372,7 @@ bool Model::get_allowGeometricCatalysis(){
 
 Model* Model::set_subtractMeanBarrierHeight(bool val){
 	this->subtractMeanBarrierHeight = val;
-	GDagSlide->recomputeNormalisationTerms();
+	DGtaudag->recomputeNormalisationTerms();
 	return this;
 }
 bool Model::get_subtractMeanBarrierHeight(){

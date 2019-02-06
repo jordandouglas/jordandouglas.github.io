@@ -84,10 +84,10 @@ void MCMC::initMCMC(bool uploadingLogFile, bool performFirstSimulation){
 	MCMC::tryToEstimateParameter(hybridLen);
 	MCMC::tryToEstimateParameter(bubbleLeft);
 	MCMC::tryToEstimateParameter(bubbleRight);
-	MCMC::tryToEstimateParameter(GDagSlide);
-	MCMC::tryToEstimateParameter(DGPost);
-	MCMC::tryToEstimateParameter(deltaGDaggerBacktrack);
-	MCMC::tryToEstimateParameter(DGHyperDag);
+	MCMC::tryToEstimateParameter(DGtaudag);
+	MCMC::tryToEstimateParameter(DGtau1);
+	MCMC::tryToEstimateParameter(DGtaudagM);
+	MCMC::tryToEstimateParameter(DGtaudagP);
 	MCMC::tryToEstimateParameter(barrierPos);
 	MCMC::tryToEstimateParameter(kCat);
 	MCMC::tryToEstimateParameter(Kdiss);

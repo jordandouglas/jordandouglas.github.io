@@ -232,8 +232,8 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 				else if (paramID == "hybridLen") param = hybridLen; 
 				else if (paramID == "bubbleLeft") param = bubbleLeft; 
 				else if (paramID == "bubbleRight") param = bubbleRight; 
-				else if (paramID == "GDagSlide") param = GDagSlide; 
-				else if (paramID == "DGPost") param = DGPost; 
+				else if (paramID == "DGtaudag") param = DGtaudag; 
+				else if (paramID == "DGtau1") param = DGtau1; 
 				else if (paramID == "barrierPos") param = barrierPos; 
 				else if (paramID == "FAssist") param = FAssist; 
 				else if (paramID == "arrestTime") param = arrestTime; 
@@ -244,10 +244,10 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 				else if (paramID == "RateActivate") param = RateActivate; 
 				else if (paramID == "RateDeactivate") param = RateDeactivate; 
 				else if (paramID == "deltaGDaggerHybridDestabil") param = deltaGDaggerHybridDestabil; 
-				else if (paramID == "deltaGDaggerBacktrack") param = deltaGDaggerBacktrack; 
+				else if (paramID == "DGtaudagM") param = DGtaudagM; 
 				else if (paramID == "RateCleave") param = RateCleave; 
 				else if (paramID == "CleavageLimit") param = CleavageLimit; 
-				else if (paramID == "DGHyperDag") param = DGHyperDag; 
+				else if (paramID == "DGtaudagP") param = DGtaudagP; 
                 else if (paramID == "haltPosition") param = haltPosition; 
                 else if (paramID == "proposalWidth") param = proposalWidth; 
 
@@ -672,8 +672,8 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 						else if (attrName == "bubbleLeft") model->addParameterHardcoding("bubbleLeft", value); 
 						else if (attrName == "bubbleRight") model->addParameterHardcoding("bubbleRight", value); 
 
-						else if (attrName == "GDagSlide") model->addParameterHardcoding("GDagSlide", value); 
-						else if (attrName == "DGPost") model->addParameterHardcoding("DGPost", value); 
+						else if (attrName == "DGtaudag") model->addParameterHardcoding("DGtaudag", value); 
+						else if (attrName == "DGtau1") model->addParameterHardcoding("DGtau1", value); 
 						else if (attrName == "barrierPos") model->addParameterHardcoding("barrierPos", value); 
 
 						else if (attrName == "kCat") model->addParameterHardcoding("kCat", value); 
@@ -686,11 +686,11 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 
 						else if (attrName == "RateActivate") model->addParameterHardcoding("RateActivate", value); 
 						else if (attrName == "RateDeactivate") model->addParameterHardcoding("RateDeactivate", value); 
-						else if (attrName == "deltaGDaggerBacktrack") model->addParameterHardcoding("deltaGDaggerBacktrack", value); 
+						else if (attrName == "DGtaudagM") model->addParameterHardcoding("DGtaudagM", value); 
 						else if (attrName == "deltaGDaggerHybridDestabil") model->addParameterHardcoding("deltaGDaggerHybridDestabil", value); 
 						else if (attrName == "RateCleave") model->addParameterHardcoding("RateCleave", value); 
 						else if (attrName == "CleavageLimit") model->addParameterHardcoding("CleavageLimit", value); 
-						else if (attrName == "DGHyperDag") model->addParameterHardcoding("DGHyperDag", value); 
+						else if (attrName == "DGtaudagP") model->addParameterHardcoding("DGtaudagP", value); 
 
 					}
 

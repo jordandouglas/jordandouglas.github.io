@@ -549,7 +549,7 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 
 
 		double rate = _translocationRatesCache->getTranslocationRates(this, true);
-		if (rate >= INF) cout << "a kfwd = infinity" << this->mRNAPosInActiveSite << "," << this->get_nascentLength() << " rate: " << rate << endl;
+		//if (rate >= INF) cout << "a kfwd = infinity" << this->mRNAPosInActiveSite << "," << this->get_nascentLength() << " rate: " << rate << endl;
 		return rate;
 
 	}
@@ -567,7 +567,7 @@ double State::calculateForwardRate(bool lookupFirst, bool ignoreStateRestriction
 	//cout << "rate = " << groundEnergy << " - " << forwardHeight << " = " << _preExp * exp(-(forwardHeight - groundEnergy)) << endl;
 
 	double rate = _preExp * exp(-(forwardHeight - groundEnergy));
-	if (rate >= INF) cout << "b kfwd = infinity " << this->mRNAPosInActiveSite << "," << this->get_nascentLength()<< " rate: " << rate << endl;
+	//if (rate >= INF) cout << "b kfwd = infinity " << this->mRNAPosInActiveSite << "," << this->get_nascentLength()<< " rate: " << rate << endl;
 	return rate;
 	
 
@@ -739,7 +739,7 @@ double State::calculateBackwardRate(bool lookupFirst, bool ignoreStateRestrictio
 
 	// Calculate rate
 	double rate = _preExp * exp(-(backwardHeight - groundEnergy));
-	if (rate >= INF) cout << "kbck = infinity " << this->mRNAPosInActiveSite << "," << this->get_nascentLength() << " rate: " << rate << endl;
+	//if (rate >= INF) cout << "kbck = infinity " << this->mRNAPosInActiveSite << "," << this->get_nascentLength() << " rate: " << rate << endl;
 
 	
 	return rate;
@@ -997,7 +997,7 @@ double State::calculateDeactivateRate(bool ignoreStateRestrictions){
 			//cout << x.at(0) << "/" << x.at(1) << endl;
 
 			// If posttranslocated then account for the Gibbs energy bonus
-			if (this->mRNAPosInActiveSite == 1) relativeBarrierHeight = relativeBarrierHeight - DGPost->getVal(true);
+			if (this->mRNAPosInActiveSite == 1) relativeBarrierHeight = relativeBarrierHeight - DGtau1->getVal(true);
 			return _preExp * exp(-relativeBarrierHeight);
 		}
         */
@@ -2418,7 +2418,7 @@ int State::getLeftBulgeBoundary(){
 double State::calculateTranslocationFreeEnergy(bool ignoreParametersAndSettings){
 	//cout << "calculateTranslocationFreeEnergy" << endl;
 	double freeEnergy = FreeEnergy::getFreeEnergyOfHybrid(this) - FreeEnergy::getFreeEnergyOfTranscriptionBubble(this);
-	if (!ignoreParametersAndSettings && this->mRNAPosInActiveSite == 1) freeEnergy += DGPost->getVal(true);
+	if (!ignoreParametersAndSettings && this->mRNAPosInActiveSite == 1) freeEnergy += DGtau1->getVal(true);
 	return freeEnergy;	
 }
 
@@ -2454,7 +2454,7 @@ double State::calculateForwardTranslocationFreeEnergyBarrier(bool ignoreParamete
 
 
 	if (!ignoreParametersAndSettings) {
-		barrierHeight += GDagSlide->getVal(true);
+		barrierHeight += DGtaudag->getVal(true);
 	}
 
 	delete stateAfterForwardtranslocation;
@@ -2503,7 +2503,7 @@ double State::calculateBackwardTranslocationFreeEnergyBarrier(bool ignoreParamet
 
 
 	if (!ignoreParametersAndSettings) {
-		barrierHeight += GDagSlide->getVal(true);
+		barrierHeight += DGtaudag->getVal(true);
 	}
 
 

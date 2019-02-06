@@ -182,7 +182,7 @@ void PosteriorDistributionSample::calculateAUC(string printROCToFile){
     // In this case set AUC to 0
     if (this->meanDwellTimes_pauseSites.size() == 0 || this->meanDwellTimes_notpauseSites.size() == 0) {
         double AUC = 0;
-        cout << "1-AUC " << 1-AUC << endl;
+        //cout << "1-AUC " << 1-AUC << endl;
         this->chiSquared += 1-AUC;
         return;
     }
@@ -192,7 +192,7 @@ void PosteriorDistributionSample::calculateAUC(string printROCToFile){
     for (int i = 0; i < this->simulatedValues.size(); i ++){
         if (stof(this->simulatedValues.at(i)) == 0){
             double AUC = 0;
-            cout << "gene_" << i << ": 1-AUC " << 1-AUC << endl;
+            //cout << "gene_" << i << ": 1-AUC " << 1-AUC << endl;
             this->chiSquared += 1-AUC;
             return;
         }
@@ -210,7 +210,7 @@ void PosteriorDistributionSample::calculateAUC(string printROCToFile){
 
     if (isinf(maxDwellTime) || isinf(minDwellTime) || isnan(maxDwellTime) || isnan(minDwellTime)){
         double AUC = 0;
-        cout << "1-AUC " << 1-AUC << endl;
+        //cout << "1-AUC " << 1-AUC << endl;
         this->chiSquared += 1-AUC;
         return;
     }
@@ -305,7 +305,7 @@ void PosteriorDistributionSample::calculateAUC(string printROCToFile){
     }
 
 
-    cout << "1-AUC " << 1-AUC << endl;
+    //cout << "1-AUC " << 1-AUC << endl;
     
     
     // Print the TP and FP rates
