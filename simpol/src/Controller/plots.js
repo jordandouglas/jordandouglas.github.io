@@ -5508,12 +5508,12 @@ function populateHeatmapSettingsParameterDropdowns(plotNum, posteriorFromModel =
 	var posteriorID = posteriorFromModel ? PLOT_DATA["whichPlotInWhichCanvas"][plotNum].selectedPosteriorID : $("#selectPosteriorDistn").val();
 
 	// var functionToGetParameters = usingPosterior ? function(resolve) { get_ParametersWithPriors_controller(resolve) } : function(resolve) { get_PHYSICAL_PARAMETERS_controller(resolve) };
-    
+    console.log("posteriorID", posteriorID);
     
 
 	getParametersInPosteriorDistribution(posteriorID, function(params){
     
-        $("#selectPosteriorDistn").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum].selectedPosteriorID);
+        $("#selectPosteriorDistn").val(posteriorID); // PLOT_DATA["whichPlotInWhichCanvas"][plotNum].selectedPosteriorID);
     
         // X-axis parameter
         $("#settingCell1").html(customPlotSelectParameterTemplate());
