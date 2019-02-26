@@ -58,17 +58,15 @@ function init(){
 	// If the url is linked to a section then make sure the section is not collapsed
 	// Sections given id in this format: RateBind_ParamHelp. This means the linkable section is in the Parameters section
 	if(window.location.hash) {
-		//console.log(window.location.hash);
-
-		var hashBits = window.location.hash.split("_");
-		if (hashBits[1] == "ParamHelp") minimiseSection("#parametersBtn", true);
-		else if (hashBits[1] == "PlotHelp") minimiseSection("#displayingPlotsBtn", true); 
-		else if (hashBits[1] == "ModelHelp") minimiseSection("#kineticsBtn", true); 
-		else if (hashBits[1] == "ABCSectionHelp") minimiseSection("#ABCSectionBtn", true); 
-		else if (hashBits[1] == "performance") minimiseSection("#performanceBtn", true); 
-		else minimiseSection("#referencesSectionBtn", true); 
-		
-
+		console.log(window.location.hash);
+        
+        var id = window.location.hash.substring(1);
+            
+            
+        // Find the contents button for this element
+        var contents_atag = $("#" + id + "_con");  
+        contents_atag.click();
+        console.log("Clicking", contents_atag);  
 
 
 		$(window.location.hash).addClass("helpSelected");
@@ -169,6 +167,7 @@ function printContents(){
     var sectNum = 0;
     var subsectNum = 0;
     var subsubsectNum = 0;
+    var sectionID = "";
     for (var i = 0; i < sects.length; i ++){
             
         var ele = $(sects[i]);
@@ -179,15 +178,28 @@ function printContents(){
         // Give it an id
         var HTML = (isSect || isSubsect) ? ele.html().trim() : ele.attr("sect").trim();
         var id = HTML.split(" ").join("_");
+        var contents_ele_id = id + "_con";
         ele.attr("id", id);
-        
             
-        var a_tag = "<a href='#" + id + "' style='text-decoration:none; color:" + (isSect ? "#008cba" : "black") + "'>" + HTML + "</a>";
+        if (isSect) sectionName = id;
+
+        // OnClick
+        var onclick = "minimiseSection('#" + sectionName + "_Btn')"; // Click the button to hide/show the section
+        var onclick_show = "minimiseSection('#" + sectionName + "_Btn', true)"; // Click the contents entry to show the section
+            
+        var a_tag = `<a id="` + contents_ele_id + `" href='#` + id + `' onClick="` + onclick_show + `" style='text-decoration:none; color:` + (isSect ? "#008cba" : "black") + `'>` + HTML + `</a>`;
           
         // Add the html to the contents section
         if (isSect){
             sectNum++;
+            
+            
             $("#contents").append("<div style='font-size:18px; color:#008cba'>" + sectNum + " " + a_tag + "</div>");
+                        
+            
+            ele.before(`<span id='` + id + `_Btn' class='minimise' style="font-size:30px; padding: 5 5" disp="true"  onClick="` + onclick + `">&plus;</span>`);
+            ele.parent().next("div").attr("id", id + "_div");
+            
             subsectNum = 0;
             subsubsectNum = 0;
         }else if (isSubsect){
@@ -237,7 +249,8 @@ function minimiseSection(element, setTo = null){
 
 	var toHide = $(element).attr("id");
 	toHide = toHide.substring(0, toHide.length-3); // Remove 'Btn' from the end
-	console.log(toHide);
+    toHide = toHide + "div";
+    //console.log(toHide, $("#" + toHide));
 
 	
 	if(setTo == false || (setTo == null && $(element).attr("disp") == "false")){
@@ -256,7 +269,7 @@ function minimiseSection(element, setTo = null){
 function openReferences(){
 
 	
-	minimiseSection("#referencesSectionBtn", true);
+	minimiseSection("#References_Btn", true);
 
 }
 
@@ -450,13 +463,13 @@ function addCitations(){
 				
 
 
-<br><br><br>
+                <br><br><br>
 				<div class="main-block" >
 					<div class="main-block-inner">
-						<div class="block-title"> <span id='gettingStartedBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="false" onClick="minimiseSection(this)">&minus;</span> 
-                            <span class="section">Getting Started</span>
+						<div class="block-title"> 
+                             <span class="section">Getting Started</span>
                         </div> 
-						<div id="gettingStarted">
+						<div style="display:none">
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
@@ -715,12 +728,9 @@ function addCitations(){
                 <div class="main-block">
                     <div class="main-block-inner">
                         <div class="block-title"> 
-                        
-                        
-                            <span id='statespaceSectionBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
                                 <span class="section">State Space</span>
                             </div> 
-                            <div id="statespaceSection" style="display:none">          
+                            <div style="display:none">          
                                 <br><br>
                                 <div class="about-block" style="width:90%; margin:auto">
                                     <div class="about-block-inner">
@@ -740,11 +750,11 @@ function addCitations(){
                 <br><br><br><br>
 				<div class="main-block" >
 					<div class="main-block-inner">
-						<div class="block-title"> <span id='displayingPlotsBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span> 
+						<div class="block-title"> 
                         
                          <span class="section">Plots</span>
                         </div> 
-						<div id="displayingPlots"  style="display:none">
+						<div style="display:none">
 						
 						
 								<div class="about-block">
@@ -764,7 +774,7 @@ function addCitations(){
 							
 								<div  class="about-block">
 									<div class="about-block-inner"  style="vertical-align:middle;">
-										<div  id="distanceVsTime_PlotHelp" class="subsection block-subtitle"> Distance vs time </div> <br>
+										<div  id="Distance_vs_time" class="subsection block-subtitle"> Distance vs time </div> <br>
 										
 											<img src="../../src/TutorialImages/distanceVsTime.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
 											
@@ -780,7 +790,7 @@ function addCitations(){
 								<br><br><br>
 								<div class="about-block">
 									<div class="about-block-inner">
-										<div  id="pauseHistogram_PlotHelp"  class="subsection block-subtitle"> Time histogram </div> <br><br>
+										<div  id="Time_histogram"  class="subsection block-subtitle"> Time histogram </div> <br><br>
 										
 										
 											<img src="../../src/TutorialImages/pauseHistogram.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30; margin:auto; float:right"></img>
@@ -796,7 +806,7 @@ function addCitations(){
 								<br><br><br>
 								<div class="about-block">
 									<div class="about-block-inner" >
-										<div  id="velocityHistogram_PlotHelp" class="subsection block-subtitle"> Velocity histogram </div> <br>
+										<div  id="Velocity_histogram" class="subsection block-subtitle"> Velocity histogram </div> <br>
 											<br>
 										
 											<img src="../../src/TutorialImages/velocityHistogram1s.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
@@ -817,7 +827,7 @@ function addCitations(){
 								<br><br><br>
 								<div class="about-block">
 									<div class="about-block-inner">
-										<div id="parameterHeatmap_PlotHelp"  class="subsection block-subtitle"> Parameter plot </div> <br>
+										<div id="Parameter_plot"  class="subsection block-subtitle"> Parameter plot </div> <br>
 										
 										<img src="../../src/TutorialImages/customPlot2.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
 										<img src="../../src/TutorialImages/customPlot1.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
@@ -896,10 +906,10 @@ function addCitations(){
 				<br><br><br><br>
 				<div class="main-block" >
 					<div class="main-block-inner">
-						<div class="block-title"><span id='parametersBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span> 
+						<div class="block-title">
                             <span class="section">Parameters and Settings </span>
                         </div> 
-						<div id="parameters"  style="display:none">
+						<div style="display:none">
 				
 		
 								
@@ -914,7 +924,7 @@ function addCitations(){
 													
 													<div class="subsection parameter-title" style="font-size:30px">Experimental Conditions </div>  
 													<div class="parameter-title" style="font-size:18px">The concentrations of NTP (or dNTP if the nascent strand is DNA), and the size of the assisting force applied to the system</div>  <br> 
-														<div class="paramHelp"  id="useFourNTPconcentrations_paramHelp">
+														<div class="subsubsection paramHelp" sect="Number of NTPs">
 															<table style="">
 															<tr title="Do you want one concentration for all 4 NTPs or one concentration for each one?">
 																<td style="text-align:right; width:150px">
@@ -928,34 +938,41 @@ function addCitations(){
 																	<span style="font-size:15px; vertical-align:middle" >4 concentrations</span>
 														 		</td>
 													 			<td style="width:75%">
-																If this is set to <b>1 concentration</b> then all four NTPs will have the same concentration ([NTP]). If this is set to <b>4 concentrations</b>
-																then you can set the concentration of all four NTPs independently ([ATP], [CTP] [GTP], and [UTP]). Default: 1 concentration 
+																If this is set to <b>1 concentration</b> then all four NTPs have the same concentration [NTP]. If this is set to <b>4 concentrations</b>
+																then the four NTP concentrations are set independently: [ATP], [CTP], [GTP], and [UTP]. Default: 1 concentration 
 																</td>
 															</tr>
 														
 															</table>
 														</div><br>
-														<div class="subsubsection paramHelp" sect="[NTP]" id="NTPconc_ParamHelp">
-															<b>[NTP]</b> - concentration of all four NTPs (or dNTPs). Default: 1000&mu;M (or 20&mu;M) 
+														<div class="subsubsection paramHelp" sect="[NTP]">
+															<b>[NTP]</b> - concentration of all four NTPs (or dNTPs). Default: 1000 &mu;M (or 20 &mu;M) 
 														</div><br>
-														<div class="subsubsection paramHelp" sect="[ATP]" id="ATPconc_ParamHelp">
-															<b>[ATP]</b> - concentration of ATP (or dATP). Default: 3152&mu;M (or 24&mu;M)<cite val="traut1994physiological"></cite>
+														<div class="subsubsection paramHelp" sect="[ATP]">
+															<b>[ATP]</b> - concentration of ATP (or dATP). Default: 3152 &mu;M (or 24 &mu;M)<cite val="traut1994physiological"></cite>
 														</div><br>
-														<div class="subsubsection paramHelp" sect="[CTP]" id="CTPconc_ParamHelp">
-															<b>[CTP]</b> - concentration of CTP (or dCTP). Default: 278&mu;M (or 29&mu;M)<cite val="traut1994physiological"></cite>
+														<div class="subsubsection paramHelp" sect="[CTP]">
+															<b>[CTP]</b> - concentration of CTP (or dCTP). Default: 278 &mu;M (or 29 &mu;M)<cite val="traut1994physiological"></cite>
 														</div><br>
-														<div class="subsubsection paramHelp" sect="[GTP]" id="GTPconc_ParamHelp">
-															<b>[GTP]</b> - concentration of GTP (or dGTP). Default: 468&mu;M (or 5.2&mu;M)<cite val="traut1994physiological"></cite>
+														<div class="subsubsection paramHelp" sect="[GTP]">
+															<b>[GTP]</b> - concentration of GTP (or dGTP). Default: 468 &mu;M (or 5.2 &mu;M)<cite val="traut1994physiological"></cite>
 														</div><br>
-														<div class="subsubsection paramHelp" sect="[UTP]" id="UTPconc_ParamHelp">
-															<b>[UTP]</b> - concentration of UTP (or dTTP). Default: 567&mu;M (or 37&mu;M)<cite val="traut1994physiological"></cite>
+														<div class="subsubsection paramHelp" sect="[UTP]">
+															<b>[UTP]</b> - concentration of UTP (or dTTP). Default: 567 &mu;M (or 37 &mu;M)<cite val="traut1994physiological"></cite>
 														</div><br>
 																			   
-														<div class="subsubsection paramHelp" sect="Force" id="FAssist_ParamHelp">
+														<div class="subsubsection paramHelp" sect="Force">
 															<b style="font-size:20px">$F_{assist}$</b> - the size of the force being applied to the polymerase during a single-molecule experiment. Positive forces are assisting loads and increase
-																	the rate of transcription. Negative forces are hindering loads and decrease the rate of transcription. In a natural cellular environment this external force
+																	the rate of transcription <cite val="abbondanzieri2005direct"></cite>. Negative forces are hindering loads and decrease the rate of transcription. In a natural cellular environment this external force
 																	is not applicable. Default: 0 pN
 														</div><br>	
+                                            
+                                            
+                                            
+                                                        <div class="subsubsection paramHelp" sect="Halt">
+                                                            <b style="font-size:20px">Halt</b> - the position where the polymerase is halted prior to the start of the experiment. Change this value to start transcription further downstream.
+                                                            Default: 14 nt
+                                                        </div><br>  
 									
 												</div>
 												<br><br>
@@ -964,14 +981,14 @@ function addCitations(){
 													<div class="subsection parameter-title" style="font-size:30px">Structural Parameters </div>  
 													<div class="parameter-title" style="font-size:18px">Basepairing configuration within the transcription bubble and polymerase.</div>  <br> 
 													
-														<div class="subsubsection paramHelp" sect="Hybrid length" id="hybridLen_ParamHelp">
+														<div class="subsubsection paramHelp" sect="Hybrid">
 															<b>Hybrid length (h)</b> - number of basepairs in the template/nascent hybrid within the polymerase. As translocation rates are determined from sequence composition, this value may affect
 																			   the predicted location of pause sites. Default: 11 bp 
 														</div><br>				   
-														<div class="subsubsection paramHelp" sect="Bubble left" id="bubbleLeft_ParamHelp">			   
+														<div class="subsubsection paramHelp" sect="Bubble left">			   
 															<b>Bubble size 3&prime; (&beta;<sub>1</sub>)</b> - number of unpaired template bases 3&prime; (left hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 1 bp
 														</div><br>	
-														<div class="subsubsection paramHelp" sect="Bubble right" id="bubbleRight_ParamHelp">
+														<div class="subsubsection paramHelp" sect="Bubble right">
 															<b>Bubble size 5&prime; (&beta;<sub>2</sub>)</b> - number of unpaired template bases 5&prime; (right hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 0 bp
 														</div><br>	
 									
@@ -988,18 +1005,43 @@ function addCitations(){
                                                     <div class="subsection parameter-title" style="font-size:30px">NTP Incorporation Parameters </div>  
                                                     <div class="parameter-title" style="font-size:18px">Kinetics of binding/releasing NTP, and catalysing polymerisation.</div>  <br> 
                                                         
-                                                        <div class="subsubsection paramHelp" sect="NTP dissociation constant" id="Kdissociate_ParamHelp">
-                                                            <b style="font-size:20px">$K_D$</b> - equilibrium constant of NTP dissociation. $K_D$ is used in conjunction with $k_{bind}$ to calculate the rate of releasing
+                                            
+                                            
+                                                        <div class="subsubsection paramHelp" sect="Binding equilibrium">
+                                                            <table style="">
+                                                            <tr title="Assume that NTP binding is an equilibrium process?">
+                                                                <td style="width:320px" >
+                                                                    <label class="switch">
+                                                                         <input type="checkbox"> </input>
+                                                                         <span class="slider round"></span>
+                                                                    </label> 
+                                                                    <span style="font-size:15px; vertical-align:middle" >Assume NTP binding equilibrium, $\mathbb{BE}$</span>
+                                                                </td>
+                                                                <td>
+                                                                    <div style="margin-left:50px">
+                                                                        
+                                                                        If enabled, NTP binding is assumed to occur on such a rapid timescale that the NTP binding partial equilibrium assumption is applied. This will change how $K_D$ and $k_{bind}$ are interpreted. Default: false.
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        
+                                                            </table>
+                                                        </div><br>
+                                            
+                                            
+                                                        <div class="subsubsection paramHelp" sect="NTP dissociation constant">
+                                                            <b style="font-size:20px">$K_D$</b> - equilibrium constant of NTP dissociation. If binding is assumed to be an equilibrium process, $K_D$ is the ratio between the rates of NTP binding and release $K_D = \frac{k_{release}}{k_{bind}}$. Whereas, in a kinetic binding model $K_D$ is used in conjunction with $k_{bind}$ to calculate the rate of releasing
                                                             bound NTP: $k_{release} = K_D k_{bind}$. Default: 1.8 &mu;M
                                                         </div><br>
-                                                        <div class="subsubsection paramHelp" sect="Rate of catalysis" id="kCat_ParamHelp"> 
-                                                            <b style="font-size:20px">$k_{cat}$</b> - rate constant of catalysing bound NTP, thus extending the nascent chain by one base. When translocation is fast,
+                                                        <div class="subsubsection paramHelp" sect="Rate of catalysis"> 
+                                                            <b style="font-size:20px">$k_{cat}$</b> - rate constant of incorporating bound NTP, thus extending the 3<sup>&prime;</sup> end of the nascent chain by one nucleotide. When translocation is fast,
                                                                     catalysis is the rate limiting step in transcription. Default: 25 s<sup>-1</sup>
                                                         </div><br>
                                                         
-                                                        <div class="subsubsection paramHelp" sect="Rate of NTP binding" id="RateBind_ParamHelp">
-                                                            <b style="font-size:20px">$k_{bind}$</b> - used to calculate rate constant of binding the complementary NTP, which is calculated as [NTP] k<sub>bind</sub>. 
-                                                                    This parameter is constant across all NTPs. Default: 0.5448 &mu;M<sup>-1</sup>.s<sup>-1</sup>  
+                                                        <div class="subsubsection paramHelp" sect="Rate of NTP binding">
+                                                            <b style="font-size:20px">$k_{bind}$</b> - second order rate constant used to calculate rate constant of binding the complementary NTP, which is calculated as [NTP] k<sub>bind</sub>. If binding is assumed to be
+                                                                    an equilibrium process, this parameter has no meaning and the textbox will disappear.
+                                                                     Default: 0.5448 &mu;M<sup>-1</sup>.s<sup>-1</sup>  
                                                         </div><br>
                                                         
                                                         
@@ -1013,27 +1055,49 @@ function addCitations(){
 												<br><br>
 												<div class="parameter-bg" style="font-size:18px">
 													
-													<div class="subsection parameter-title" style="font-size:30px">Translocation Parameters </div>  
-													<div class="parameter-title" style="font-size:18px">Energetics of translocation reactions and forces.</div>  <br> 
-														<div class="subsubsection paramHelp" sect="Translocation Gibbs barrier" id="DGtaudag_ParamHelp">
-															<b style="font-size:20px">$\Delta G^\dagger_{\tau}$</b> - free energy barrier height of translocation. To translocate forwards or backwards, several
-																	basepairs may need to be broken. The energy barrier which must be overcome in order to translocate is estimated as the energy needed to break these basepairs
-																	plus the value of this parameter. Increasing this value will make translocation slower. Default: 9.079 k<sub>B</sub>T <cite val="douglas2018bayesian"></cite>
+													<div class="subsection parameter-title" style="font-size:30px">Translocation Parameters </div>
+                                                    <div class="parameter-title" style="font-size:18px">Energetics of translocation reactions and force dependency.</div>  <br> 
+                                            
+                                                    <div class="subsubsection paramHelp" sect="Translocation equilibrium">
+                                                            <table style>
+                                                            <tr title="Assume that translocation between the pre and posttranslocated states is an equilibrium process?">
+                                                                <td style="width:320px" >
+                                                                    <label class="switch">
+                                                                         <input type="checkbox"> </input>
+                                                                         <span class="slider round"></span>
+                                                                    </label> 
+                                                                    <span style="font-size:15px; vertical-align:middle" >Assume translocation equilibrium, $\mathbb{TE}$</span>
+                                                                </td>
+                                                                <td>
+                                                                    <div style="margin-left:50px">
+                                                                        
+                                                                        If enabled, translocation between the pretranslocated and posttranslocated positions is assumed to be at equilibrium. Backtracking and hypertranslocation are not affected. This will change how $\Delta G^\dagger_\tau$ and $\delta_1$ are interpreted. Default: false.
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        
+                                                            </table>
+                                                        </div><br>
+                                            
+													
+														<div class="subsubsection paramHelp" sect="Translocation Gibbs barrier">
+															<b style="font-size:20px">$\Delta G^\dagger_{\tau}$</b> - Gibbs energy barrier of translocation. To translocate forwards or backwards, several
+															basepairs may need to be broken. The energy barrier which must be overcome in order to translocate is estimated as the energy needed to break these basepairs
+															plus the value of this parameter. Increasing this value will make translocation slower. When translocation is assumed to reach at equilibrium, this parameter only
+                                                            applies to backtracking and hypertranslocation. Default: 9.079 k<sub>B</sub>T <cite val="douglas2018bayesian"></cite>
 														</div><br>	
 														
-														<div class="subsubsection paramHelp" sect="Posttranslocated Gibbs energy" id="DGtau1_ParamHelp">
+														<div class="subsubsection paramHelp" sect="Posttranslocated Gibbs energy">
 															<b style="font-size:20px">$\Delta G_{\tau 1}$</b> - free energy term added to that of the posttranslocated state. When this value is low,
 															RNA polymerase spends more time in the posttranslocated state (compared with the pretranslocated state). Default: -2.007 k<sub>B</sub>T <cite val="douglas2018bayesian"></cite>
 														</div> <br>	
 														
-														<div class="subsubsection paramHelp" sect="Translocation displacement distance" id="barrierPos_ParamHelp">
-															<b style="font-size:20px">$\delta_1$</b> - position of the translocation intermediate state, with respect to the two connected ground states. 
+														<div class="subsubsection paramHelp" sect="Translocation force dependency">
+															<b style="font-size:20px">$\delta_1$</b> - position of the translocation transition state, compared with the two adjacent translocation positions. 
 															This parameter lies between 0 and the width of a single basepair in DNA (3.4 &#x212b;<cite val="watson1953molecular"></cite>). This term only applies
 															when translocation is kinetic and when an assisting force $F_{assist}$ is applied. Default: 2.838 &#x212b; <cite val="douglas2018bayesian"></cite>
 														</div><br>	
 														
-																	
-																			   
 									
 												</div>
 												
@@ -1041,14 +1105,103 @@ function addCitations(){
 												<div class="parameter-bg" style="font-size:18px">
 													
 													<div class="subsection parameter-title" style="font-size:30px">Pause Parameters </div>  
-													<div class="parameter-title" style="font-size:18px">Kinetics of entering/exiting a catalytically inactive state.</div>  <br> 
-														<div class="subsubsection paramHelp" sect="Rate of inactivation" id="kU_ParamHelp">
-															<b style="font-size:20px">$k_{U}$</b> - rate constant of polymerase entering the inactive state / intermediate state. This state acts as an intermediate
-                                                            between the backtracked states and the pretranslocated state. Elongation may only continue when the polymerase reactivates. Default: 0.1s<sup>-1</sup>
+													<div class="parameter-title" style="font-size:18px">Kinetics of off-pathway translocation events.</div>  <br> 
+                                            
+                                            
+                                            
+                                                        <div class="subsubsection paramHelp" sect="Enable inactivation">
+                                                            <table >
+                                                            <tr title="Enable the polymerase to enter the intermediate state?">
+                                                                <td style="width:320px" >
+                                                                    <label class="switch">
+                                                                         <input type="checkbox"> </input>
+                                                                         <span class="slider round"></span>
+                                                                    </label> 
+                                                                    <span style="font-size:15px; vertical-align:middle" >Enable inactivation, $\mathbb{IS}$</span>
+                                                                </td>
+                                                                <td>
+                                                                    <div style="margin-left:50px">
+                                                                        
+                                                                        If enabled, the intermediate state (IS) may be entered from the pretranslocated state. When enabled, this reaction is a necessary step for backtracking. Default: false.
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        
+                                                            </table>
+                                                        </div><br>
+                                            
+														<div class="subsubsection paramHelp" sect="Rate of inactivation">
+															<b style="font-size:20px">$k_{U}$</b> - rate constant of polymerase entering the intermediate state. This state acts as a precursor for backtracking from the
+                                                            pretranslocated state. Default: 0.1s<sup>-1</sup>
 														</div><br>
-														<div class="subsubsection paramHelp" sect="Rate of reactivation" id="kA_ParamHelp">
+														<div class="subsubsection paramHelp" sect="Rate of reactivation">
 															<b style="font-size:20px">$k_{A}$</b> - rate constant of polymerase entering the pretranslocated state from the intermediate state. Default: 4s<sup>-1</sup>
 														</div><br>
+                                            
+                                            
+                                            
+                                            
+                                                        <div class="subsubsection paramHelp" sect="Enable backtracking">
+                                                            <table >
+                                                            <tr title="Enable the polymerase to backtrack during the simulation?">
+                                                                <td style="width:320px" >
+                                                                    <label class="switch">
+                                                                         <input type="checkbox"> </input>
+                                                                         <span class="slider round"></span>
+                                                                    </label> 
+                                                                    <span style="font-size:15px; vertical-align:middle" >Enable backtracking, $\mathbb{BT}$</span>
+                                                                </td>
+                                                                <td>
+                                                                    <div style="margin-left:50px">
+                                                                        
+                                                                        If enabled, the polymerase may backtrack. If $\mathbb{IS}$ is also enabled, then entry into the intermediate state is necessary to begin backtracking. Default: false.
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        
+                                                            </table>
+                                                        </div><br>
+                                            
+                                            
+                                            
+                                                        <div class="subsubsection paramHelp" sect="Gibbs barrier of backtracking">
+                                                            <b style="font-size:20px">$\Delta G^\dagger_{\tau -}$</b> - Gibbs energy barrier of backtracking. To translocate forwards or backwards, several
+                                                            basepairs may need to be broken. The energy barrier which must be overcome in order to backtrack is estimated as the energy needed to break these basepairs
+                                                            plus $\Delta G_\tau^\dagger$ plus the value of this parameter. Increasing this value will make backtracking slower. Default: 0 k<sub>B</sub>T 
+                                                        </div><br>  
+                                            
+                                            
+                                            
+                                                        <div class="subsubsection paramHelp" sect="Enable hypertranslocation">
+                                                            <table >
+                                                            <tr title="Enable the polymerase to hypertranslocate during the simulation?">
+                                                                <td style="width:320px" >
+                                                                    <label class="switch">
+                                                                         <input type="checkbox"> </input>
+                                                                         <span class="slider round"></span>
+                                                                    </label> 
+                                                                    <span style="font-size:15px; vertical-align:middle" >Enable hypertranslocation, $\mathbb{HT}$</span>
+                                                                </td>
+                                                                <td>
+                                                                    <div style="margin-left:50px">
+                                                                        
+                                                                        If enabled, the polymerase may hypertranslocate. This can lead to premature termination. Default: false.
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        
+                                                            </table>
+                                                        </div><br>
+                                            
+                                            
+                                            
+                                                         <div class="subsubsection paramHelp" sect="Gibbs barrier of hypertranslocation">
+                                                            <b style="font-size:20px">$\Delta G^\dagger_{\tau +}$</b> - Gibbs energy barrier of hypertranslocation. To translocate forwards or backwards, several
+                                                            basepairs may need to be broken. The energy barrier which must be overcome in order to hypertranslocate is estimated as the energy needed to break these basepairs
+                                                            plus $\Delta G_\tau^\dagger$ plus the value of this parameter. Increasing this value will make hypertranslocation slower. Default: 0 k<sub>B</sub>T 
+                                                        </div><br>  
+                                            
+                                            
 														
 												</div>
                                         
@@ -1058,13 +1211,39 @@ function addCitations(){
                                                         <div class="subsection parameter-title" style="font-size:30px">RNA Folding Settings  </div>  
                                                         <div class="parameter-title" style="font-size:18px">Settings behind folding the nascent RNA strand.</div>  <br> 
                                                         
-                                                            <div class="paramHelp">
-                                                                <b>Enable mRNA folding </b> - whether or not the nascent RNA strand will fold automatically during the simulation. The predicted energy barrier 
+                                            
+                                                            <div class="subsubsection paramHelp" sect="Fold distance">
+                                                                <b style="font-size:20px">Fold distance</b> - the number of RNA nucleotides upstream and downstream from the polymerase which are sterically
+                                                                prohibited from folding. Default: 8 nt <cite val="palangat1998transcriptional"></cite>
+                                                            </div><br>  
+                                            
+                                            
+                                            
+                                                            <div class="subsubsection paramHelp" sect="Enable RNA folding">
+                                                                <table >
+                                                                <tr title="Enable the polymerase to hypertranslocate during the simulation?">
+                                                                    <td style="width:320px" >
+                                                                        <label class="switch">
+                                                                             <input type="checkbox"> </input>
+                                                                             <span class="slider round"></span>
+                                                                        </label> 
+                                                                        <span style="font-size:15px; vertical-align:middle" >Enable mRNA folding, $\mathbb{RB}$</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div style="margin-left:50px">
+                                                                            
+                                                                        If enabled, the nascent RNA strand will fold automatically during the simulation. The predicted energy barrier 
                                                                         of unfolding secondary structures in the mRNA may need to be overcome when the polymerase translocates backwards. When the nascent strand
-                                                                        is DNA or dsRNA this feature is not applicable. Note that enabling this feature will slow down the first trial of the simulation as we compute
-                                                                        the predicted (MFE<cite val="zuker1981optimal"></val></cite>) secondary structure of the RNA. You can view the RNA secondary structure with the Fold 
-                                                                        <img src="../../src/Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"></img> button. Default: FALSE <br><br>
+                                                                        is not ssRNA, this feature is not applicable. Note that enabling this option will slow down the first trial of the simulation as the
+                                                                        secondary structure of the RNA is computed (MFE algorithm <cite val="zuker1981optimal"></val></cite>) using the ViennaRNA suite <cite val="lorenz2011viennarna"></cite>. You can view the RNA secondary structure with the Fold 
+                                                                        <img src="../../src/Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"></img> button. Default: false <br><br>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            
+                                                                </table>
                                                             </div><br>
+                      
                                                            
                                                     </div>
                                                
@@ -1078,7 +1257,7 @@ function addCitations(){
                                                     <div class="parameter-title" style="font-size:18px">Model for cleaving the nascent strand while backtracked.</div>  <br> 
                                                        <div class="subsubsection paramHelp" sect="Rate of cleavage" id="RateCleave_ParamHelp">
                                                             <b style="font-size:20px">$k_{cleave}$</b> - rate constant of cleaving the 3<sup>&prime;</sup> end of the nascent strand when the polymerase is backtracked. 
-                                                            <i>In vivo</i> this reaction may be carried out by elongation factors, for example, GreA. Default: 0s<sup>-1</sup>
+                                                            <i>In vivo</i> this reaction may be carried out by elongation factors, for example, GreA. Default: 0s <sup>-1</sup>
                                                         </div><br>
                                             
                                             
@@ -1096,10 +1275,16 @@ function addCitations(){
 													<div class="parameter-title" style="font-size:18px">Other parameters relating to the algorithm and model.</div>  <br> 
 													
                                             
-                                                    <div class="subsubsection paramHelp" sect="Arrest timeout" id="arrestTime_ParamHelp">
-														<b>Arrest time </b> - the amount of time the polymerase may take to copy a base before the simulation trial is aborted. When the timeout is
-																reached, copying will prematurely terminate and the next trial will begin. Default: 600s 
+                                                    <div class="subsubsection paramHelp" sect="Arrest timeout">
+														<b>Arrest time </b> - the amount of time the polymerase may take to terminate before the simulation trial is aborted. When the timeout is
+																reached, copying will prematurely terminate and the next trial will begin. Default: 0 s 
 													</div><br>		
+                                            
+                                            
+                                            
+                                                    <div class="subsubsection paramHelp" sect="Proposal width">
+                                                        <b>Proposal width </b> - scale width of operators during MCMC-ABC search. Higher values result in larger steps and smaller values give smaller steps.  Default: 1 
+                                                    </div><br>      
                                             
                                                 
 													
@@ -1126,23 +1311,17 @@ function addCitations(){
 											
 											<br>
 											If you are uncertain about the value of a parameter you can give it a background distribution <img src="../../src/Images/distn.png" style="vertical-align:middle; width:38px; height:12px;"></img> 
-											to capture your uncertainty. The probability distributions supported are uniform, normal, lognormal, exponential, and gamma. The parameter is resampled at the beginning of each simulation. 
+											to capture your uncertainty. The probability distributions supported are uniform, normal, lognormal, and exponential. The parameter is resampled at the beginning of each simulation. 
 											All parameters are sampled independently of each other.
 											<br><br>
 											
-											
+											<!--
 											<b>Example 1:</b> [ATP] is defaulted to Traut 1994’s<cite val="traut1994physiological"></cite> estimate of the mean ATP concentration (3152&mu;M) but one may wish to refine this value to reflect their own 
 											experimental settings. Or one may recognise that cellular NTP concentrations are not constant, and they fluctuate throughout the cell cycle. In this case, it may be more accurate to 
 											add a prior distribution behind [ATP]. Yaginuma et al. 2014 <cite val="yaginuma2014diversity"></cite> describe heterogeneity in [ATP] across E.coli cells with [ATP] following a positive-skewed modal distribution 
 											(mean: 1540&mu;M, SD: 1220&mu;M). Using SimPol and some algebra, one could model [ATP] approximately with a lognormal distribution (where &mu; = 7.10, &sigma; = 0.698). Then the ATP 
 											concentration would be resampled from this distribution at the beginning of each trial. <br><br>
-											
-											<!--
-											<b>Example 2:</b> There can be a great deal of heterogeneity between different RNA polymerase units. The standard deviation of transcription velocity 
-											across different RNA polymerase units in E.coli is quite high: around 4-6bp/s<cite val="adelman2002single,tolic2004diversity"></cite>. Compare this to the mean velocity of 
-											14-20bp/s. One of many methods to account for polymerase heterogeneity is to add a normal prior distribution behind $k_{cat}$ with a standard deviation of, for example, 5.<cite val="maoileidigh2011unified"></cite>
 											-->
-											
 											
 									</div>
 								</div>
@@ -1156,10 +1335,10 @@ function addCitations(){
 				<br><br><br><br>
 				<div class="main-block" >
 					<div class="main-block-inner">
-						<div class="block-title"><span id='kineticsBtn' class='minimise' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>  
+						<div class="block-title">
                             <span class="section">Simulating</span>
                         </div> 
-						<div id="kinetics"  style="display:none">
+						<div style="display:none">
 						
 						
 							<br><br>
@@ -1543,7 +1722,6 @@ function addCitations(){
 						<div class="block-title"> 
 						
 						
-							<span id='modelsBtn' class='minimise' value='&plus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
 							Models of Polymerisation
 							</div> 
 								<div id="models"  style="display:none">
@@ -1770,7 +1948,6 @@ function addCitations(){
 						<div class="block-title"> 
 						
 						
-							<span id='ABCSectionBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
 							Parameter Inference
 						</div> 
 						<div id="ABCSection"  style="display:none">
@@ -2088,10 +2265,9 @@ function addCitations(){
 						<div class="block-title"> 
 						
 						
-							<span id='performanceBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
 							<span class="section">Software Information</span> 
 						</div> 
-						<div id="performance"  style="display:none">
+						<div style="display:none">
 				
 				
 							<br><br>
@@ -2596,7 +2772,6 @@ function addCitations(){
 			<div class="block-title"> 
 			
 			
-				<span id='dataBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
 				Kinetic Data 
 				</div> 
 					<div id="data"  style="display:none">
@@ -2947,10 +3122,9 @@ function addCitations(){
             <div class="block-title"> 
             
             
-                <span id='simpolLiteratureSectionBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
                     <span class="section">SimPol in the Literature </span>
                 </div> 
-                <div id="simpolLiteratureSection" style="display:none">          
+                <div style="display:none">          
                     <br><br>
                     <div class="about-block" style="width:90%; margin:auto">
                         <div class="about-block-inner">
@@ -3077,10 +3251,9 @@ function addCitations(){
 			<div class="block-title"> 
 			
 			
-				<span id='referencesSectionBtn' class='minimise' value='&minus;' style="font-size:30px; padding: 5 5" disp="true" onClick="minimiseSection(this)">&plus;</span>
 				    <span class="section">References</span>
 				</div> 
-					<div id="referencesSection" style="display:none">
+					<div style="display:none">
 						<br><br>
 						<div class="about-block" style="width:90%; margin:auto">
 							<div class="about-block-inner"  id="references">

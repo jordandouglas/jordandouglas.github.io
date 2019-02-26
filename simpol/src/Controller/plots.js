@@ -291,11 +291,6 @@ function selectPlot(plotNum, deleteData = null){
 			$("#plotLabel" + plotNum).html("Mean velocity: <span id='plotLabelVariable" + plotNum + "'>" + 0 + "</span> bp/s");
 		}
 	
-		else if (value == "custom") {
-			$("#plotLabel" + plotNum).html("<br>");
-		}
-
-
 		else if (value == "parameterHeatmap") {
 			$("#plotLabel" + plotNum).html("<br>");
 		}
@@ -327,7 +322,19 @@ function selectPlot(plotNum, deleteData = null){
 				$("#plotOptions" + plotNum).show(true);
 				$("#downloadPlot" + plotNum).show(true);
 				$("#helpPlot" + plotNum).show(true);
-				$("#helpPlot" + plotNum).attr("href", "about/#" + value + "_PlotHelp");
+                
+                
+                var helpSection = "";
+                if (value == "distanceVsTime") helpSection = "Distance_vs_time";
+                else if (value == "pauseHistogram") helpSection = "Time_histogram";
+                else if (value == "velocityHistogram") helpSection = "Velocity_histogram";
+                else if (value == "parameterHeatmap") helpSection = "Parameter_plot";
+                else if (value == "tracePlot") helpSection = "MCMC_trace";
+                else helpSection = "Dwell_time_per_site";
+                
+                
+                
+				$("#helpPlot" + plotNum).attr("href", "about/#" + helpSection);
 			}
 
 
