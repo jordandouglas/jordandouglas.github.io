@@ -419,7 +419,7 @@ mfe_matrices_alloc_default( vrna_mx_mfe_t *vars,
 
 PRIVATE void
 mfe_matrices_free_default(vrna_mx_mfe_t *self){
-
+  free(self->evaluated);
   free(self->f5);
   free(self->f3);
   free(self->fc);

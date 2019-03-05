@@ -56,6 +56,7 @@ struct vrna_mx_mfe_s {
                 @code vrna_mx_mfe_t.type == VRNA_MX_DEFAULT @endcode
         @{
        */
+      int 	  *evaluated; /**<  @brief Jordan Douglas July 2018: whether or not this entry has been evaluated */
       int     *c;   /**<  @brief  Energy array, given that i-j pair */
       int     *f5;  /**<  @brief  Energy of 5' end */
       int     *f3;  /**<  @brief  Energy of 3' end */
