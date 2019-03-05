@@ -116,6 +116,12 @@ BIBLIOGRAPHY["haas2017bringing"] = {name: `Haas, Andreas, et al. "Bringing the w
 
 BIBLIOGRAPHY["douglas2018bayesian"] = {name: `Douglas, Jordan, Richard Kingston, and Alexei Drummond. "Bayesian inference and comparison of stochastic transcription elongation models." bioRxiv (2018): 499277.`, DOI: "10.1101/499277 "};
 BIBLIOGRAPHY["lisica2016mechanisms"] = {name: `Lisica, Ana, et al. "Mechanisms of backtrack recovery by RNA polymerases I and II." Proceedings of the National Academy of Sciences (2016): 201517011.`, DOI: "10.1073/pnas.1517011113"};
+BIBLIOGRAPHY["palangat1998transcriptional"] = {name: `Palangat, Murali, et al. "Transcriptional pausing at+ 62 of the HIV-1 nascent RNA modulates formation of the TAR RNA structure." Molecular cell 1.7 (1998): 1033-1042.`, DOI: "10.1016/S1097-2765(00)80103-3"};
+BIBLIOGRAPHY["cheung2011structural"] = {name: `Cheung, Alan CM, and Patrick Cramer. "Structural basis of RNA polymerase II backtracking, arrest and reactivation." Nature 471.7337 (2011): 249.`, DOI: "10.1038/nature09785"};
+BIBLIOGRAPHY["saba2019elemental"] = {name: `Saba, Jason, et al. "The elemental mechanism of transcriptional pausing." eLife 8 (2019): e40981.`, DOI: ""};
+
+BIBLIOGRAPHY["yarnell1999mechanism"] = {name: `Yarnell, W. S., and J. W. Roberts. "Mechanism of intrinsic transcription termination and antitermination." Science 284.5414 (1999): 611-615.`, DOI: "10.1126/science.284.5414.611 "};
+BIBLIOGRAPHY["larson2008applied"] = {name: `Larson, Matthew H., et al. "Applied force reveals mechanistic and energetic details of transcription termination." Cell 132.6 (2008): 971-982.`, DOI: "10.1016/j.cell.2008.01.027"};
 
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 
@@ -125,7 +131,6 @@ BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 
 
 
