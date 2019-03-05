@@ -92,9 +92,8 @@ function init(){
 
 function drawModelDiagrams(){
 
-	var paramsResult = {};
-	paramsResult["currentState"] = { leftGBase: 6, rightGBase: 15, leftMBase: 6, rightMBase: 15, NTPtoAdd: "A",
-					 mRNAPosInActiveSite: -5, NTPbound: false, nbases: 0, mRNALength: 15, activated:true, rateOfBindingNextBase:0,
+	var paramsResult = { leftGBase: 6, rightGBase: 15, leftMBase: 6, rightMBase: 15, NTPtoAdd: "A",
+					 mRNAPosInActiveSite: -5, NTPbound: false, nbases: 0, mRNALength: "L", activated:true, rateOfBindingNextBase:0,
 					 bulgePos: [0], bulgedBase: [-1], bulgeSize: [0], partOfBulgeID: [0], nextBaseToCopy: 16, terminated: false };
 					 
 	paramsResult["k -2,-1"] = 0;
@@ -114,46 +113,17 @@ function drawModelDiagrams(){
 
 
 	stateHoverEvents = [];
-	var elongationModel = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: false, allowHypertranslocation: false, 
-						allowInactivation:false, deactivateUponMisincorporation: false, 
+	var elongationModel = {id: "simpleBrownian", name: "Simple Brownian ratchet model", allowBacktracking: true, allowHypertranslocation: true, 
+						allowInactivation:true, deactivateUponMisincorporation: false, 
 						allowGeometricCatalysis: false, allowmRNAfolding:false, allowMisincorporation:false, useFourNTPconcentrations:false,
 						NTPbindingNParams: 2, assumeBindingEquilibrium: false, currentTranslocationModel: "HIGI_barriers",
 						assumeTranslocationEquilibrium: false};
 										
 				
 	// Simple kinetic model
-	drawModelDiagramCanvas_givenParams("modelDiagramCanvas_1", "kineticStateDescription_1", paramsResult, elongationModel);
+	drawModelDiagramCanvas_givenParams("modelDiagramCanvas", "kineticStateDescription", paramsResult, elongationModel);
 	
-	
-	// Hypertranslocation enabled
-	elongationModel.allowHypertranslocation = true;
-	elongationModel.allowBacktracking = false;
-	elongationModel.allowInactivation = false;
-	drawModelDiagramCanvas_givenParams("modelDiagramCanvas_2", "kineticStateDescription_2", paramsResult, elongationModel);
-	
-	
-	// Backtracking enabled
-	elongationModel.allowHypertranslocation = false;
-	elongationModel.allowBacktracking = true;
-	elongationModel.allowInactivation = false;
-	drawModelDiagramCanvas_givenParams("modelDiagramCanvas_3", "kineticStateDescription_3", paramsResult, elongationModel);
-	
-	
-	// Inactivation enabled
-	elongationModel.allowHypertranslocation = false;
-	elongationModel.allowBacktracking = true;
-	elongationModel.allowInactivation = true;
-	drawModelDiagramCanvas_givenParams("modelDiagramCanvas_4", "kineticStateDescription_4", paramsResult, elongationModel);
-	
-	
-	
-	// Full model
-	elongationModel.allowHypertranslocation = true;
-	elongationModel.allowBacktracking = true;
-	elongationModel.allowInactivation = true;
-	drawModelDiagramCanvas_givenParams("modelDiagramCanvas_5", "kineticStateDescription_5", paramsResult, elongationModel);
-
-
+   
 }
 
             
@@ -416,15 +386,10 @@ function addCitations(){
                         
 						SimPol is a free open-source web-based program aimed to help researchers, teachers and students visualise transcription at the level of a single molecule. 
 						<u>Transcription</u> is an essential pathway for all living organisms. It involves the copying of a template, typically DNA, 
-						into messenger RNA (mRNA) which is used to produce protein. Trancription is carried out by an enzyme called RNA polymerase. 
+						into messenger RNA (mRNA) which is used to produce protein. Transcription is carried out by an enzyme called RNA polymerase. 
+                        This webpage contains tutorials about SimPol and is hopefully friendly to all users.   <br><br>
 			
-						<br><br>
-						
-						This program is designed to be used by a wide range of users. Students, teachers, and others interested in learning biology may find SimPol helpful to understand transcription.
-						Molecular biologists may be interested in exploring how RNA polymerase interacts with certain genes. 
-						Researchers who are interested in RNA polymerase single-molecule experiments, and the mathematical models associated with them, may find use in the parameter inference feature of this software.
-						This webpage contains tutorials on how to use SimPol and is hopefully friendly to all users.   <br><br>
-						
+
 						
 				
 					</div>
@@ -480,7 +445,7 @@ function addCitations(){
                                     <div id="sequenceSelection" class="subsection block-subtitle">Information icons</div> <br>
                                     
                                     
-                                        Help icons <img src="../../src/Images/help.png" style="vertical-align:middle; width:25px; height:25px;"> are scattered throughout the interface of SimPol. Pressing one of these buttons will redirect you to
+                                        Help icons <img title="Help" src="../../src/Images/help.png" style="vertical-align:middle; width:25px; height:25px;"> are scattered throughout the interface of SimPol. Pressing one of these buttons will redirect you to
                                         the relevant section on this page. 
                                     
                                     
@@ -497,12 +462,13 @@ function addCitations(){
 									
 									<img src="../../src/TutorialImages/sequenceParams.png" style="width:350px; padding: 10 30;" align=left></img>
 									
-									<br><br><br>
+									<br><br><br><br><br>
 									
-									The first thing you may want to do is choose your nucleic acid sequence. Or you can just stick with the default sequence. Open up the &#9776; Parameters side-navigation menu, where you can enter your own sequence (and then press Submit) or 
-									use one of the example sequences.
-									
-									
+                                        
+                                    To enter a nucleic acid sequence, open up the &#9776; Parameters side-navigation menu, under "Select sequence" choose "Input sequence", enter a sequence and then press Submit.
+                                    A range of example sequences have also been provided.
+                                        
+                   
 									
 									SimPol is designed primarily for transcription with DNA-dependent RNA-polymerases. Your choice of template-type (DNA or RNA) and nascent-type (DNA or RNA) will dictate
 									which thermodynamic parameters are used - Turner's RNA/RNA parameters<cite val="xia1998thermodynamic"></cite>, Sugimoto's DNA/RNA parameters<cite val="wu2002temperature"></cite>, or SantaLucia's DNA/DNA parameters<cite val="santalucia1998unified"></cite>. <br><br>
@@ -529,98 +495,9 @@ function addCitations(){
 							
 								</div>
 							</div>
-							<br><br>
-							<div class="about-block">
-								<div  class="about-block-inner">
-									<div id="navigationPanelHelp" class="subsection block-subtitle" > Applying chemical reactions </div> <br>
-								
-									
-									You can control the polymerase directly using the Navigation panel at the top of the main page. You should play around with the different reactions to see how they work. You may wish to
-									Simulate <img src="../../src/Images/dice.png"  style="vertical-align:middle; width:25px; height:25px;"></img> reactions, whereby the reactions described below are selected randomly based off experimental parameters.
-									Use <input type=button value='View model diagram' title="View the kinetic diagram of this model" class="operation" style="width:160px; cursor:auto"> to see how these reactions can be 
-									applied by the simulator under the current model settings.
-								
-									
-									<br><br><br><br>
-									<div class="panelOuter">
-                                            <div class="panelInner" >
-										<span class="subsubsection block-subsubtitle" sect="Translocation" > Translocation: </span>
-										
-    										There are two translocation reactions: Backwards and Forwards. These operations move the polymerase one base-pair left and right respectively, with respect to the 
-    									template and nascent strand. These operations involve reconfiguring the base-pairs within the hybrid, and within the chromosome if it is double-stranded. If the polymerase moves beyond the 3&prime; end of the nascent strand, 
-    									then the nascent strand will be released (termination). 
-									</div> 
-                                    </div>  
-									
-									
-									<br><br>
-									<div class="panelOuter">
-                                            <div class="panelInner" >
-										<span class="subsubsection block-subsubtitle" sect="Nucleotide incorporation" > Nucleotide incorporation: </span>
-										
-    										If the active site is free and next to the 3&prime; end of the nascent strand, then the polymerase may bind NTP.
-    										Once bound, the polymerase may catalyse the reaction, or it may release the NTP back into the cell. Reverse-catalysis is also possible in SimPol using 
-    										the Decay reaction, although it is infrequent in nature. The canonical pathway of transcription 
-    										elongation is a three step cycle: 1) forward translocation, 2) NTP binding, 3) catalysis. This may also be achieved with the Copy 
-    										<img src="../../src/Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function. 
-									    </div> 
-                                    </div> 
-									
-									
-									
-									
-									<br><br>
-									<div class="panelOuter">
-                                            <div class="panelInner" >
-        										<span class="subsubsection block-subsubtitle" sect="Inactivation" > Inactivation: </span>
-        										
-                                                
-                                                
-                                                
-        										RNA polymerases are believed to occassionally deactivate whereby they undergo 
-        										conformational changes and enter a catalytically inactive state, sometimes known as the intermediate state. In this state the protein cannot polymerise but it may still translocate. Factors known to increase the 
-        										rate of entering the inactive state are 1) weak basepairing in the hybrid, 2) interactions between the polymerase and upstream or downstream elements of the template, and 3) interactions between the polymerase and
-        										a secondary structure in the nascent strand <cite val="artsimovitch2000pausing,depken2009origin,imashimizu2013intrinsic"></cite>. Inactivation causes the polymerase to pause indefinitely, 
-        										and elongation can only resume following an activation event.
-                                           </div> 
-									</div> 
-                                        
-									<br><br>
-									<div class="panelOuter">
-                                            <div class="panelInner" >
-										<span class="subsubsection block-subsubtitle" sect="Nascent strand cleavage"> Nascent strand cleavage: </span>
-										
-    										When a nucleic acid polymerase backtracks for too long <i>in vivo</i> it can delay the production of its product and potentially cause roadblocks for other polymerases.
-    										Many organisms have evolved elongation factors which serve to rescue the polymerase from this state. One mechanism these factors may act is by cleaving the 3<sup>&prime;</sup> 
-    										end of the nascent strand when it pokes out the front of the polymerase during backtracking. This is carried out by GreA and GreB for prokaryotic
-    										RNA polymerases and S-II for eukaryotic RNA polymerase II <cite val="toulme2000grea"></cite> and can be performed in SimPol using the cleavage reaction.
-									    </div> 
-                                    </div> 
-									
-				
-									
-									
-									
-									<br><br>
-									<div class="panelOuter">
-                                            <div class="panelInner" >
-										<span class="subsubsection block-subsubtitle"  sect="Slippage"> Slippage: </span>
-										
-    										Sometimes the nascent and template strand temporarily melt and a bulge forms in one of the strands. This can be performed by the
-    									Form Bulge reaction.
-    									When this happens, a bulge (kink) forms within the duplex. This can occur within either the template or nascent strand (although in SimPol it can currently only occur within the nascent strand). When a bulge forms,
-    									the active site may be opened up, allowing one of the template bases to be copied twice. This would lead to an insertion. The bulge may 
-    									diffuse left or right along the
-    									 hybrid. This process is favoured if the hybrid sequence is repetitive (eg. AAAAAAAAA/UUUUUUUUU). When positioned at either end of the hybrid, the bulge may be absorbed. This three step process (bulge formation, diffusion and absorption)
-    									 was inspired by Neher et al.<cite val="neher2004dynamics,kuhner2007force"></cite> and is believed to be the mechanism behind transcriptional slippage. Iterative slippage and elongation can lead to large insertions. This is sometimes called stuttering and
-    									can also be achieved with the Stutter <img src="../../src/Images/stutter.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function.
-    							
-									    </div> 
-                                    </div> 
-									
-								</div>
-							</div>
-                                        
+                                
+                                
+                                   
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
@@ -747,13 +624,160 @@ function addCitations(){
                 <div class="main-block">
                     <div class="main-block-inner">
                         <div class="block-title"> 
-                                <span class="section">State Space</span>
+                                <span class="section">States and Reactions</span>
                             </div> 
                             <div style="display:none">          
                                 <br><br>
                                 <div class="about-block" style="width:90%; margin:auto">
                                     <div class="about-block-inner">
                                                 
+                                                    
+                                        
+                                        
+                                        
+                                        
+                                       
+                                        <div class="about-block">
+                                            <div class="about-block-inner">
+                                                <div class="subsection block-subtitle">Kinetic model of transcription</div> <br><br>
+                                                    
+                                                
+                                                
+                                                    Let $S(L,\tau)$ denote the current state, where $L$ is the length of the mRNA and $\tau$ is the position of the RNA polymerase (RNAP)
+                                                    active site with respect to the $3^\prime$ mRNA. 
+                                                    Under the Brownian ratchet model, transcription elongation is a three step cycle <cite val="abbondanzieri2005direct,bai2004sequence,maoileidigh2011unified,erie1992single"></cite>. 
+                                                    First, RNAP translocates from the <b>pretranslocated</b> position $S(L,0)$ into the <b>posttranslocated</b> position $S(L,1)$. 
+                                                    Second, the incoming nucleoside triphosphate (NTP) binds to the active site of RNAP.
+                                                    Finally, the bound NTP is incorporated onto the $3^\prime$ mRNA, returning the RNAP into the pretranslocated position $S(L+1,0)$. <br><br>
+                                                
+                                                
+                                                    However, RNAP does not always conform to this pathway. Every once in a while RNAP <b>backtracks</b> $S(L,\tau), \tau$ &lt; 0 whereby RNAP slides upstream
+                                                    causing the $3^\prime$ mRNA to exit through the NTP entry channel <cite val="komissarova1997transcriptional,cheung2011structural"></cite>. This renders the enzyme catalytically inactive.
+                                                    It has been hypothesised that an intermediate state (IS) acts as a precursor for backtracking from the pretranslocated state <cite val="artsimovitch2000pausing,imashimizu2013intrinsic,saba2019elemental"></cite>.
+                                                    Alternatively, RNAP may <b>hypertranslocate</b> $S(L,\tau), \tau$ &gt; 1 whereby RNAP slides further downstream causing the shortening of the DNA/RNA hybrid <cite val="yarnell1999mechanism,larson2008applied"></cite>. 
+
+                                                    
+                                                    <br><br>
+                                                
+                                                    
+                                                        <div style='background-color:adadad; padding: 10 10;  width: 1400px; margin:auto'>
+                                                            <div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
+                                                                <span style='font-size: 30px'> Kinetic diagram </span>
+                                                                <div id="modelDiagramDiv" style="text-align:center">
+                                                                    <canvas id="modelDiagramCanvas" class="noselect" style="padding:10 10;" width=1220 height=400></canvas>
+                                                                </div>
+                                                                
+                                                                <div style="font-size:24; height:60px;">
+                                                                    <div id="kineticStateDescription" style="display:block; text-align:left">  </div>
+                                                                </div>
+                                                                <div style="font-size:15"> Hover over a state read its description. </div>
+                                                                
+                                                            </div>
+                                                        </div>
+                                                
+                                                    <br>
+                                                    In SimPol, backtracking, hypertranslocation, and the IS can each be enabled or disabled from the &#9776; Parameters side-navigation menu.  The kinetic diagram of the current model can be viewed using
+                                                <input type=button value='View model diagram' title="View the kinetic diagram of this model" class="operation" style="width:160px; cursor:auto">.
+                                                   
+                                                    
+                                                    
+                                                   
+                                                    
+            
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                        
+                                        
+                                        <br><br>
+                                        <div class="about-block">
+                                            <div  class="about-block-inner">
+                                                <div class="subsection block-subtitle" > Reactions </div>  <br><br>
+                                            
+                                                
+                                                The polymerase can be controlled manually using the Navigation panel at the top of the main page. 
+                                                
+                                                
+                                                <br><br>
+                                                <div class="panelOuter">
+                                                        <div class="panelInner" >
+                                                    <span class="block-subsubtitle" sect="Translocation" > Translocation: </span>
+                                                    
+                                                        There are two translocation reactions: Backwards and Forwards. These operations move the polymerase one position left and right respectively, with respect to the 
+                                                    template and nascent strand. These operations involve reconfiguring the base-pairs within the hybrid, and within the gene if it is double-stranded. If the polymerase moves beyond the 3&prime; end of the nascent strand, 
+                                                    then the nascent strand will be released (termination). 
+                                                </div> 
+                                                </div>  
+                                                
+                                                
+                                                <br><br>
+                                                <div class="panelOuter">
+                                                        <div class="panelInner" >
+                                                    <span class="block-subsubtitle" sect="Nucleotide incorporation" > Nucleotide incorporation: </span>
+                                                    
+                                                        If the active site is free and next to the 3&prime; end of the nascent strand, then the polymerase may bind NTP.
+                                                        Once bound, the polymerase may catalyse the reaction, or it may release the NTP back into the cell. Reverse-catalysis may also be performed 
+                                                        the Decay reaction, although this reaction is often considered to be irreversible. The canonical pathway of transcription 
+                                                        elongation is a three step cycle: 1) forward translocation, 2) NTP binding, 3) catalysis. This may also be achieved with the Copy 
+                                                        <img src="../../src/Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function. 
+                                                    </div> 
+                                                </div> 
+                                                
+                                                
+                                                
+                                                
+                                                <br><br>
+                                                <div class="panelOuter">
+                                                        <div class="panelInner" >
+                                                            <span class="block-subsubtitle" sect="Inactivation" > Inactivation: </span>
+                                                            
+                                                            
+                                                            It is hypothesised that the catalytically inactive intermediate state, IS, acts as a precursor for backtracking. The Deactivate reaction causes the
+                                                            polymerase to enter the IS from the pretranslocated state, thus enabling backtracking to occur. The Activate reaction is the reverse.
+                   
+                                                       </div> 
+                                                </div> 
+                                                    
+                                                <br><br>
+                                                <div class="panelOuter">
+                                                        <div class="panelInner" >
+                                                    <span class="block-subsubtitle" sect="Nascent strand cleavage"> Nascent strand cleavage: </span>
+                                                    
+                                                        When a nucleic acid polymerase backtracks for too long <i>in vivo</i> it can delay the production of its product and potentially cause roadblocks for other polymerases.
+                                                        Many organisms have evolved elongation factors which serve to rescue the polymerase from this state. One mechanism these factors may act is by cleaving the 3<sup>&prime;</sup> 
+                                                        end of the nascent strand when it pokes out the front of the polymerase during backtracking. This is carried out by GreA and GreB for prokaryotic
+                                                        RNA polymerases and S-II for eukaryotic RNA polymerase II <cite val="toulme2000grea"></cite> and can be performed in SimPol using the cleavage reaction.
+                                                    </div> 
+                                                </div> 
+                                                
+                            
+                                                
+                                                
+                                                
+                                                <br><br>
+                                                <div class="panelOuter">
+                                                        <div class="panelInner" >
+                                                    <span class="block-subsubtitle"  sect="Slippage"> Slippage: </span>
+                                                    
+                                                        Sometimes the nascent and template strand temporarily melt and a bulge forms in one of the strands. This can be performed by the
+                                                    Form Bulge reaction.
+                                                    When this happens, a bulge forms within the duplex. This can occur within either the template or nascent strand (although in SimPol it can currently only occur within the nascent strand). When a bulge forms,
+                                                    the active site may be opened up, allowing one of the template bases to be copied twice. This would lead to an insertion. The bulge may 
+                                                    diffuse left or right along the
+                                                     hybrid. This process is favoured if the hybrid sequence is repetitive (eg. AAAAAAAAA/UUUUUUUUU). When positioned at either end of the hybrid, the bulge may be absorbed. This three step process (bulge formation, diffusion and absorption)
+                                                     is based off the models proposed by Neher et al.<cite val="neher2004dynamics,kuhner2007force"></cite> and is believed to be the mechanism behind transcriptional slippage. Iterative slippage and elongation can lead to large insertions. This is sometimes called stuttering and
+                                                    can also be achieved with the Stutter <img src="../../src/Images/stutter.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function.
+                                            
+                                                    </div> 
+                                                </div> 
+                                                
+                                            </div>
+                                        </div>
+                                                 
+                                        
+                                        
+                                        
                                                 
                                                 
                                     </div>
@@ -2290,7 +2314,7 @@ function addCitations(){
 				
 				
 							<br><br>
-							<div class="about-block">
+							<div style="display:none" class="about-block">
 								<div class="about-block-inner">
 									<div class="subsection block-subtitle" > Web browser performance </div> <br>
 										

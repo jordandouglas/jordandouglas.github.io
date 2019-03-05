@@ -1083,6 +1083,8 @@ function drawModelDiagramCanvas(){
 
 function drawModelDiagramCanvas_givenParams(canvasID, kineticStateDescriptionID, paramsResult, elongationModel){
 	
+    
+    console.log("paramsResult", paramsResult);
 
 	var canvas = $("#" + canvasID)[0];
 
@@ -1182,7 +1184,8 @@ function drawModelDiagramCanvas_givenParams(canvasID, kineticStateDescriptionID,
 
 	/////////////////
 	//  catalysed  //
-	plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + (m+1) + ",0)", 	xCoordOfMainState + spacingBetweenStates + stateWidth,	yCoordOfMainState - spacingBetweenStates - stateHeight, "Catalysis has occurred and the polymerase is <b>pretranslocated</b> again. The nascent strand is " + (m+1) + " nt long.");
+    var plusOne = isNaN(parseFloat(m)) ? m + "+1" : m+1;
+	plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + plusOne + ",0)", 	xCoordOfMainState + spacingBetweenStates + stateWidth,	yCoordOfMainState - spacingBetweenStates - stateHeight, "Catalysis has occurred and the polymerase is <b>pretranslocated</b> again. The nascent strand is " + plusOne + " nt long.");
 	////////////////
 
 
@@ -1420,8 +1423,9 @@ function plotArrow_stateDiagram(ctx, stateHoverEvents, fromx, fromy, direction, 
 
 		if (mouseInArrow){
 			var sf = 3;
-			var fullDescription = "Rate constant " + (htmlLabel == "" ? label : htmlLabel) + " = " + roundToSF(rate, sf) +  " s\u207B\u00B9.";
-			if (rateSum != 0) {
+            if (rateSum != 0 && rateSum != null && !isNaN(rateSum)) {
+                console.log("rateSum", rateSum)
+		        var fullDescription = "Rate constant " + (htmlLabel == "" ? label : htmlLabel) + " = " + roundToSF(rate, sf) +  " s\u207B\u00B9.";
 				
 				var prob = roundToSF(rate/rateSum, sf);
 				while(rate != rateSum && prob == 1) { 	// Make sure that the probability does not equal 1 exactly (unless its actually 1)
@@ -1431,8 +1435,9 @@ function plotArrow_stateDiagram(ctx, stateHoverEvents, fromx, fromy, direction, 
 					if (sf > 20) break;
 				}
 				fullDescription += " This reaction will occur with probability " + prob + ".";
+                $("#" + kineticStateDescriptionID).html(fullDescription);
 			}
-			$("#" + kineticStateDescriptionID).html(fullDescription);
+			
 			return true;
 		}
 		return false;

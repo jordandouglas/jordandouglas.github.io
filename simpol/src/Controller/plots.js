@@ -332,8 +332,6 @@ function selectPlot(plotNum, deleteData = null){
                 else if (value == "tracePlot") helpSection = "MCMC_trace";
                 else helpSection = "Dwell_time_per_site";
                 
-                
-                
 				$("#helpPlot" + plotNum).attr("href", "about/#" + helpSection);
 			}
 
