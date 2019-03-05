@@ -28,6 +28,24 @@
 }
 
 
+a {
+
+    text-decoration:none;
+    
+}
+
+.xml_link {
+
+    padding: 5 5; 
+    background-color:#708090;
+    color:white;
+
+}
+
+.xml_link > a{
+    color:#d3d3d3;
+}
+
 
 
 body { 
