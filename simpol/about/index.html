@@ -446,8 +446,17 @@ function addCitations(){
                                     
                                     
                                         Help icons <img title="Help" src="../../src/Images/help.png" style="vertical-align:middle; width:25px; height:25px;"> are scattered throughout the interface of SimPol. Pressing one of these buttons will redirect you to
-                                        the relevant section on this page. 
+                                        the relevant section on this page.
+                                        <br><br>
+                                        
+                                         Conversely, there are direct links from this page to SimPol: &nbsp;&nbsp;&nbsp;
+                                        <span class="xml_link" style="text-align:center">
+                                               <b>Example session:</b> 
+                                               <a >Open</a> | 
+                                               <a >View XML</a>
+                                        </span> 
                                     
+                                        &nbsp;&nbsp;&nbsp; The XML files that specify the session parameters can be downloaded or the session can be directly opened.
                                     
                             
                                 </div>
@@ -679,7 +688,10 @@ function addCitations(){
                                                     <br>
                                                     In SimPol, backtracking, hypertranslocation, and the IS can each be enabled or disabled from the &#9776; Parameters side-navigation menu.  The kinetic diagram of the current model can be viewed using
                                                 <input type=button value='View model diagram' title="View the kinetic diagram of this model" class="operation" style="width:160px; cursor:auto">.
-                                                   
+                                                    Pressing the simulate button  <img src="../../src/Images/dice.png" style="vertical-align: middle; width:25px; height:25px;"> simulates the system according to the
+                                                    currently specified pathway. See 
+                                                <a id="Simulating_con" href="#Simulating" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">Simulating</a>.
+                                                    
                                                     
                                                     
                                                    
@@ -743,7 +755,7 @@ function addCitations(){
                                                 <br><br>
                                                 <div class="panelOuter">
                                                         <div class="panelInner" >
-                                                    <span class="block-subsubtitle" sect="Nascent strand cleavage"> Nascent strand cleavage: </span>
+                                                    <span class="block-subsubtitle" sect="Cleavage"> Cleavage: </span>
                                                     
                                                         When a nucleic acid polymerase backtracks for too long <i>in vivo</i> it can delay the production of its product and potentially cause roadblocks for other polymerases.
                                                         Many organisms have evolved elongation factors which serve to rescue the polymerase from this state. One mechanism these factors may act is by cleaving the 3<sup>&prime;</sup> 
@@ -805,7 +817,7 @@ function addCitations(){
 									<div class="about-block-inner">
 										
 										
-										The output of your simulation can be visualised using various graphs, which are updated in real-time during the simulation.
+										The output of the simulation can be visualised using various graphs, which are updated in real-time during the simulation.
 										These plots are displayed in the Plots panel and in the Sitewise panel. The display of each plot can be configured with its respective settings 
 									<img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>
 									button. The raw data (.tsv) or a high resolution image (.png) can be downloaded <img src="../../src/Images/download.png"  style="vertical-align:middle; height:20px;">. The different	
@@ -815,133 +827,234 @@ function addCitations(){
 								</div>
 							
 							
-							
-								<div  class="about-block">
-									<div class="about-block-inner"  style="vertical-align:middle;">
-										<div  id="Distance_vs_time" class="subsection block-subtitle"> Distance vs time </div> <br>
-										
-											<img src="../../src/TutorialImages/distanceVsTime.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
-											
-											<br>
-											This graph shows the progress made by the polymerase over time. The blue line represents the current simulation
-											and the grey lines represent previous simulations. The x- and y-axis ranges can be set manually in the settings <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
-											
-									</div>
-								</div>
+                            
+                            
+                                <table class="about-block" cellpadding="10">
+                                
+                                
+                                    <tr>
+                                        <td colspan="3">
+                                            <div class="subsection block-subtitle">Distance vs time </div> <br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1">
+                                            <img src="../../src/TutorialImages/distanceVsTime.png" style="vertical-align:middle; width:100%;">
+                                        </td>
+                                    
+                                    
+                                        <td colspan="2">
+                                            
+                                            This graph shows the progress made by the polymerase over time. The blue line represents the current simulation
+                                            and the grey lines represent previous simulations. The x- and y-axis ranges can be set manually in the settings <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
+                                        
+                                        </td>
+                                    
+                                    </tr>
+                                
+                                
+                                
+                                
+                                
+                                    <tr>
+                                        <td colspan="3">
+                                            <br> <div class="subsection block-subtitle">Time histogram </div> <br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1" style="width:33%">
+                                            Depending on the settings <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>, this will either show the total time taken to copy the template (one value per trial) or the time in
+                                            between successive catalysis events.
+                                        </td>
+                                    
+                                    
+                                        <td colspan="1" style="width:33%">
+                                            <img src="../../src/TutorialImages/pauseHistogram.png" style="vertical-align:middle; width:100%;">
+                                          
+                                        </td>
+                                    
+                                    
+                                         <td colspan="1" style="width:33%">
+                                            <img src="../../src/TutorialImages/pauseHistogram2.png" style="vertical-align:middle; width:100%;">
+                                          
+                                        </td>
+                                    
+                                    </tr>
+                                
+                                
+                                
+                                
+                                
+                                
+                                    <tr>
+                                        <td colspan="3">
+                                            <br> <div class="subsection block-subtitle">Velocity histogram </div> <br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1">
+                                            <img src="../../src/TutorialImages/velocityHistogram1s.png" style="vertical-align:middle; width:100%;">
+                                            <br> <span style="font-size:0.8em"> $w=1$ s </span>
+                                    
+                                        </td>
+                                    
+                                    
+                                        <td colspan="1">
+                                            <img src="../../src/TutorialImages/velocityHistogram20s.png" style="vertical-align:middle; width:100%;">
+                                            <br> <span style="font-size:0.8em"> $w=20$ s </span>
+                                        </td>
+                                    
+                                    
+                                         <td colspan="1">
+                                            These plots are histograms of the <i>instantaneous</i> velocities during elongation, as opposed to <i> mean </i> velocity. The instantaneous velocity at time $t$ is defined as the derivative of distance over time
+                                            $v(t) = \frac{dx}{dt}$. However since the distance versus time function is discontinuous, there is no derivative. Instead, the instantaneous velocities are calculated as the mean
+                                            velocities within non-overlapping fixed-sized windows. The window size parameter $w$ can be changed in the settings  <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
+                                            The plots on the left illustrate the effect this parameter can have. Larger window sizes tend to underrepresent negative velocities, which correspond to net backwards translocation within the time window.
+                                            
+                                          
+                                        </td>
+                                    
+                                    </tr>
+                                
+                                
+                                
+                                
+                                    <tr>
+                                        <td colspan="3">
+                                            <br> <div class="subsection block-subtitle">Parameter plot</div> <br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1">
+                                            Any parameter in the &#9776; Parameters menu can be plotted onto this graph through the settings menu <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
+                                            The parameter's value will remain constant unless changed either (1) manually, or (2) by adding a prior distribution
+                                            <img src="../../src/Images/distn.png" style="vertical-align:middle; width:38px; height:12px;"></img> 
+                                            (see <a id="Simulating_con" href="#Adding_a_prior_distribution_to_a_parameter" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">Adding a prior distribution to a parameter</a>).
+                                                     
+                                            Parameters are sampled from their prior distribution at the beginning of each simulation. 
+                                            Therefore one additional datapoint is made available to this plot at the end of each trial. 
+                                            Parameters can be compared with each other and with various measurements computed at the end of each simulation (mean velocity, mean catalysis time, mean total transcription time, and the final length of the
+                                            nascent strand). 
+                                        </td>
+                                    
+                                    
+                                        <td colspan="1">
+                                            <img src="../../src/TutorialImages/parameterHeatmap1.png" style="vertical-align:middle; width:100%;">
+                                          
+                                        </td>
+                                    
+                                    
+                                         <td colspan="1">
+                                            <img src="../../src/TutorialImages/parameterHeatmap2.png" style="vertical-align:middle; width:100%;">
+                                        </td>
+                                    
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1">
+                                            <img src="../../src/TutorialImages/parameterHeatmap3.png" style="vertical-align:middle; width:100%;">
+                                             <br><br>
+                                            <div class="xml_link" style="text-align:center">
+                                                <b>Elongation heatmap session:</b> 
+                                                <a href="../?s=elongationHeatmap.xml">Open</a> | 
+                                                <a href="Examples/elongationHeatmap.xml">View XML</a>
+                                            </div> 
+                                        </td>
+                                    
+                                    
+                                        <td colspan="1">
+                                            <img src="../../src/TutorialImages/parameterHeatmap4.png" style="vertical-align:middle; width:100%;">
+                                            <br><br>
+                                            <div class="xml_link" style="text-align:center">
+                                                <b>Incorporation heatmap session:</b> 
+                                                <a href="../?s=incorporationHeatmap.xml">Open</a> | 
+                                                <a href="Examples/incorporationHeatmap.xml">View XML</a>
+                                            </div> 
+                                        </td>
+                                    
+                                    
+                                         <td colspan="1">
+                                            Points can be coloured to represent a third variable, such as velocity. The third image
+                                            shows the relationship between two parameters - <a class="param_link" href="#Rate_of_catalysis">$k_{cat}$</a> and <a class="param_link" href="#Translocation_Gibbs_barrier">$\Delta G^\dagger_{\tau}$</a> -  required to achieve a velocity of 10-20 bp/s. As the rate of catalysis increases, 
+                                            the free energy barrier of translocation must increase with it in order to achieve the same velocity. 
+                                        
+                                            <br><br>
+                                            The forth images shows the relationship between <a class="param_link" href="#NTP_dissociation_constant">$K_D$</a> and <a class="param_link" href="#[NTP]">[NTP]</a>. As the dissociation constant of NTP binding increases, the concentration of NTP needed to achieve the same
+                                            velocity increases.
+                                        
+                                        </td>
+                                    
+                                    </tr>
+                                
+                                
+                                
+                                
+                                
+                                    <tr>
+                                        <td colspan="3">
+                                            <br> <div class="subsection block-subtitle">MCMC trace</div> <br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1">
+                                            The trace plot is used to view the trace of an Markov chain Monte Carlo (MCMC) simulation 
+                                            (see <a id="Simulating_con" href="#MCMC_ABC" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">MCMC ABC</a>).
+                                             
+                                            This is instrumental in interpreting chain convergence. The adjustable burn-in period
+                                            is denoted by the red line. The variable displayed on the y-axis as well as the x- and y- axis limits can
+                                            be adjusted in the settings <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;">.
+                                            This plot is only accessible after MCMC has been initiated. Alternatively, the 
+                                            posterior distribution may be downloaded a as a .log file and opening in 
+                                            <a href="http://www.beast2.org/tracer-2/">Tracer</a><cite val="rambaut2015tracer"></cite>.
+                                            
+                                        </td>
+                                    
+                                    
+                                        <td colspan="1">
+                                            <img src="../../src/TutorialImages/tracePlot.png" style="vertical-align:middle; width:100%;">
+                                          
+                                        </td>
+                                    
+                                    
+                                         <td colspan="1">
+                                            <img src="../../src/TutorialImages/tracePlot2.png" style="vertical-align:middle; width:100%;">
+                                        </td>
+                                    
+                                    </tr>
+                                
+                                
+                                
+                                
+                                
+                                    <tr>
+                                        <td colspan="3">
+                                            <br> <div class="subsection block-subtitle">Time per site</div> <br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">
+                                            <img src="../../src/TutorialImages/timePerSite.png" style="vertical-align:middle; width:100%;">
+                                            
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">
+                                            The time per site plots report the amount (or proportion) of time spent at each site in the template. Three options for the y-axis measure
+                                            are available in the settings <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;">.
+                                            First, the "Time to catalysis" of site $i$ is the mean time required to incorporate an NTP at site $i$, where the timer starts upon the incorporation of site $i-1$.
+                                            Second, the "Time spent at site" of site $i$ is the mean time that the RNAP active site is positioned on $i$. This can illuminate where the RNAP is spending its time during backtracking.
+                                            Third, the "Time per transcript length" of site $i$ is the mean time that the nascent strand has length $i$.
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                </table>
+                            
 								
-								
-								
-								<br><br><br>
-								<div class="about-block">
-									<div class="about-block-inner">
-										<div  id="Time_histogram"  class="subsection block-subtitle"> Time histogram </div> <br><br>
-										
-										
-											<img src="../../src/TutorialImages/pauseHistogram.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30; margin:auto; float:right"></img>
-											<img src="../../src/TutorialImages/pauseHistogram2.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30; margin:auto; float:right"></img>
-											
-											<br>
-											Depending on the settings <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>, this will either show the total time taken to copy the template (one value per trial) or the time in
-											between successive catalysis events. The x-axis of the latter plot can be restricted so that it only shows pause times (greater than 1s). 
-											
-									</div>
-								</div>
-								
-								<br><br><br>
-								<div class="about-block">
-									<div class="about-block-inner" >
-										<div  id="Velocity_histogram" class="subsection block-subtitle"> Velocity histogram </div> <br>
-											<br>
-										
-											<img src="../../src/TutorialImages/velocityHistogram1s.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
-											<img src="../../src/TutorialImages/velocityHistogram5s.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
-											
-											
-											
-											This is a histogram of the <i>instantaneous</i> velocities during elongation, not the <i> mean </i> velocities. The instantaneous velocity at time $t$ is defined as the derivative of distance over time
-											$v(t) = \frac{dx}{dt}$. However since the distance versus time function is discontinuous, there is no derivative. Instead, we calculate the instantaneous velocities as the mean
-											velocities within non-overlapping fixed-sized windows. The window size parameter, $w$, can be changed in the settings  <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
-											The plots on the left illustrate how important this parameter can be. Larger window sizes tend to underrepresent negative velocities, which correspond to net backwards translocation within the time window.
-											
-											
-											
-									</div>
-								</div>
-								
-								<br><br><br>
-								<div class="about-block">
-									<div class="about-block-inner">
-										<div id="Parameter_plot"  class="subsection block-subtitle"> Parameter plot </div> <br>
-										
-										<img src="../../src/TutorialImages/customPlot2.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
-										<img src="../../src/TutorialImages/customPlot1.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
-										
-										<br>
-										
-										Any parameter in the &#9776; Parameters menu can be plotted onto this graph through the settings menu <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
-										Note that this parameter will remain constant unless you decide to change it yourself, which you may either do (1) manually, or (2) by adding a prior distribution
-										<img src="../../src/Images/distn.png" style="vertical-align:middle; width:38px; height:12px;"></img>. Parameters are sampled
-										from their prior distribution once per trial. There will be one value added to this plot at the end of each trial. Parameters can be compared with each other
-										or with various metrics calculated from the simulation (mean velocity, mean catalysis time, mean total transcription time, and the final length of the
-										nascent strand). 
-										
-										
-										<br><br>
-										
-										
-										<img src="../../src/TutorialImages/parameterHeatmap1.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
-										<img src="../../src/TutorialImages/parameterHeatmap2.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=left></img>
-										
-										Points can be coloured to represent a third variable, such as velocity. The first image
-										shows the relationship between two parameters - $k_{cat}$ and $\Delta G^\dagger_{\tau}$ -  required to achieve a velocity of 20-30bp/s. As the rate of catalysis increases, 
-										the free energy barrier of translocation must increase with it in order to achieve the same velocity. 
-										
-										
-										<span style="padding: 2 5; background-color:#ebe9e7"> 
-											<b style="color:#008cba">Elongation heatmap session:</b> 
-											<a style="text-decoration:none" href="../?s=elongationHeatmap.xml">Open</a> | 
-											<a style="text-decoration:none" href="Examples/elongationHeatmap.xml">View XML</a>
-										</span>		<br><br>
-										
-										
-										The second images shows the relationship between $K_D$ and [NTP]. As the dissociation constant of NTP binding increases, the concentration of NTP needed to achieve the same
-										velocity increases. 
-									
-										
-										<span style="padding: 2 5; background-color:#ebe9e7"> 
-											<b style="color:#008cba">Incorporation heatmap session:</b> 
-											<a style="text-decoration:none" href="../?s=incorporationHeatmap.xml">Open</a> | 
-											<a style="text-decoration:none" href="Examples/incorporationHeatmap.xml">View XML</a>
-										</span>		
-										
-									</div>
-								</div>								
-								<br><br><br>
-								<div class="about-block">
-									<div class="about-block-inner" >
-										<div  id="tracePlot_PlotHelp" class="subsection block-subtitle"> MCMC trace </div> <br>
-											<br>
-											<img src="../../src/TutorialImages/tracePlot2.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
-											<img src="../../src/TutorialImages/tracePlot.png" style="vertical-align:middle; width:30%; display:block;padding: 10 30;" align=right></img>
-										
-											The trace plot is used to view the trace of an Markov chain Monte Carlo (MCMC) simulation. This is instrumental in interpreting
-											chain convergence. The adjustable burn-in period
-											is denoted by the red line. The variable displayed on the y-axis as well as the x- and y- axis limits can
-											be adjusted in the settings <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
-											This plot is only accessible after MCMC has been initiated. For a more advanced interrogation of MCMC traces, we recommend downloading the 
-											posterior distribution as a .log file and opening in 
-											<a href="http://www.beast2.org/tracer-2/">Tracer</a><cite val="rambaut2015tracer"></cite> 
-											or <a href="http://tgvaughan.github.io/icylog/">IcyLog</a>.     
-											
-											
-									</div>
-								</div>
-								<br><br><br>
-								<div class="about-block">
-									<div class="about-block-inner">
-										<div class="subsection block-subtitle"> Dwell time per site </div> <br>
-									</div>
-								</div>		
 																										
 						</div>
 					</div>		
