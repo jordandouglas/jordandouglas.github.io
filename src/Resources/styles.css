@@ -34,17 +34,6 @@ a {
     
 }
 
-.xml_link {
-
-    padding: 5 5; 
-    background-color:#708090;
-    color:white;
-
-}
-
-.xml_link > a{
-    color:#d3d3d3;
-}
 
 
 
@@ -897,3 +886,21 @@ input:checked + .slider:before {
 }
 
 
+.xml_link {
+
+    padding: 5 5; 
+    background-color:#708090;
+    color:white;
+
+}
+
+.xml_link > a{
+    color:#d3d3d3;
+}
+
+
+.param_link {
+    cursor:pointer;
+    color:#008cba;
+
+}
