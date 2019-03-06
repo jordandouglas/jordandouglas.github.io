@@ -52,40 +52,51 @@ function init(){
 	numReferences = 0;
 	referenceNumbers = {};
 	addCitations();
+           
             
             
-
-	// If the url is linked to a section then make sure the section is not collapsed
-	// Sections given id in this format: RateBind_ParamHelp. This means the linkable section is in the Parameters section
-	if(window.location.hash) {
-		console.log(window.location.hash);
-        
-        var id = window.location.hash.substring(1);
+    // Draw the model diagram canvases
+    drawModelDiagrams();
             
             
-        // Find the contents button for this element
-        var contents_atag = $("#" + id + "_con");  
-        contents_atag.click();
-        console.log("Clicking", contents_atag);  
-
-
-		$(window.location.hash).addClass("helpSelected");
-		
-		
-		// Add back the anchor to ensure that the page is in the right place. If the webpage takes too long to load and
-		// the anchored section is hidden, then the page won't anchor
-		var hash = window.location.hash;
-		window.location.hash = hash;
-		window.location.hash = window.location.hash;
-
-
-	}
-	
-	
- 
+    $('document').ready(function(){
             
-	// Draw the model diagram canvases
-	drawModelDiagrams();
+                
+    	// If the url is linked to a section then make sure the section is not collapsed
+    	// Sections given id in this format: RateBind_ParamHelp. This means the linkable section is in the Parameters section
+    	if(window.location.hash) {
+    		console.log(window.location.hash);
+            
+            var id = window.location.hash.substring(1);
+                
+                
+            // Find the contents button for this element
+            var contents_atag = $("#" + id + "_con");  
+            contents_atag.click();
+            console.log("Clicking", contents_atag);  
+
+
+    		$(window.location.hash).addClass("helpSelected");
+    		
+    		
+    		// Add back the anchor to ensure that the page is in the right place. If the webpage takes too long to load and
+    		// the anchored section is hidden, then the page won't anchor
+    		var hash = window.location.hash;
+    		window.location.hash = hash;
+    		window.location.hash = window.location.hash;
+
+
+    	}
+    	
+    	
+ });
+            
+
+            
+            
+            
+            
+            
 	
 }
 
