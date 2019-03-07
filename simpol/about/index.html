@@ -170,7 +170,7 @@ function populateParameterLinks(){
 
         DGtaudag:{anchor:"Translocation_Gibbs_barrier", latex:"$\\Delta G_{\\tau}^{\\dagger}$"},
         DGtau1:{anchor:"Posttranslocated_Gibbs_energy", latex:"$\\Delta G_{\\tau 1}$"},
-        barrierPos:{anchor:"Translocation_force_dependency", latex:"$\\delta_1"},
+        barrierPos:{anchor:"Translocation_force_dependency", latex:"$\\delta_1$"},
 
         arrestTime:{anchor:"Arrest_timeout", latex:"Arrest time"},
         kCat:{anchor:"Rate_of_catalysis", latex:"$k_{cat}$"},
@@ -189,7 +189,9 @@ function populateParameterLinks(){
         proposalWidth:{anchor:"Proposal_width", latex:"Proposal width"}, 
             
             
-        assumeBindingEquilibrium:{anchor:"Binding_equilibrium", latex:"$\\mathbb{BE}$"}
+        assumeBindingEquilibrium:{anchor:"Binding_equilibrium", latex:"$\\mathbb{BE}$"},
+        assumeTranslocationEquilibrium:{anchor:"Translocation_equilibrium", latex:"$\\mathbb{TE}$"} 
+            
             
     };
             
@@ -815,7 +817,6 @@ function addCitations(){
                                                 </div>  
                                                 
                                                 
-                                                <br><br>
                                                 <div class="panelOuter">
                                                         <div class="panelInner" >
                                                     <span class="block-subsubtitle" sect="Nucleotide incorporation" > Nucleotide incorporation: </span>
@@ -831,7 +832,6 @@ function addCitations(){
                                                 
                                                 
                                                 
-                                                <br><br>
                                                 <div class="panelOuter">
                                                         <div class="panelInner" >
                                                             <span class="block-subsubtitle" sect="Inactivation" > Inactivation: </span>
@@ -843,7 +843,6 @@ function addCitations(){
                                                        </div> 
                                                 </div> 
                                                     
-                                                <br><br>
                                                 <div class="panelOuter">
                                                         <div class="panelInner" >
                                                     <span class="block-subsubtitle" sect="Cleavage"> Cleavage: </span>
@@ -859,7 +858,6 @@ function addCitations(){
                                                 
                                                 
                                                 
-                                                <br><br>
                                                 <div class="panelOuter">
                                                         <div class="panelInner" >
                                                     <span class="block-subsubtitle"  sect="Slippage"> Slippage: </span>
@@ -1799,7 +1797,17 @@ function addCitations(){
                                         </h3>
                                     
                                         where $\Delta G_{S(L, \tau)}^{(bp)}$ is computed from themodynamic parameters of nucleotide basepairing<cite val="xia1998thermodynamic,wu2002temperature,santalucia1998unified"></cite>
-                                        and <param value="DGtau1"/> is the Gibbs energy added onto the posttranslocated position<cite val="douglas2018bayesian"></cite>.
+                                        and <param value="DGtau1"/> is the Gibbs energy added onto the posttranslocated position<cite val="douglas2018bayesian"></cite>. The basepairing energetic contribution
+                                        of a state is computed by summing the Gibbs energy of the gene to that of the hybrid:
+                                    
+                                    
+                                    
+                                         <h3>
+                                            $$
+                                               \Delta G_{total}^{(bp)} = \Delta G_{gene}^{(bp)} + \Delta G_{hybrid}^{(bp)}.
+                                            $$
+                                        </h3>
+                                    
                                     
                                     
 										Basepairs may need to be broken in order for the polymerase to translocate forwards (right) or backwards (left) from its current position. For example, consider the state below. 
@@ -1847,7 +1855,7 @@ function addCitations(){
                                     
                                          <h3>
                                             $$
-                                                \Delta G_{T(L, \tau)} = \Delta T_{S(L, \tau)}^{(bp)} + \Delta G_\tau^\dagger + \begin{cases}    \Delta G_{\tau -}^\dagger &\text{ if } \tau \leq -1 \text{ (backtracking) }\\ 
+                                                \Delta G_{T(L, \tau)} = \Delta G_{T(L, \tau)}^{(bp)} + \Delta G_\tau^\dagger + \begin{cases}    \Delta G_{\tau -}^\dagger &\text{ if } \tau \leq -1 \text{ (backtracking) }\\ 
                                                                                                                                                 0 & \text { if } \tau = 0  \text{ (elongation) } \\
                                                                                                                                                 \Delta G_{\tau +}^\dagger &\text { if } \tau \geq 1  \text{ (hypertranslocation) }
                                                                                                                                 \end{cases}
@@ -1855,10 +1863,10 @@ function addCitations(){
                                         </h3>
                                     
                                     
-                                        where $\Delta T_{S(L, \tau)}^{(bp)}$ is the Gibbs energy of basepairing in the transition state,
+                                        where $\Delta G_{T(L, \tau)}^{(bp)}$ is the Gibbs energy of basepairing in the transition state,
                                         <param value="DGtaudag"/> is the Gibbs energy barrier of translocation, 
                                         <param value="DGtaudagM"/> is the Gibbs energy barrier of backtracking, and
-                                        <param value="DGtaudagP"/> is the Gibbs energy barrier of hypertranslocation. Estimating $\Delta T_{S(L, \tau)}^{(bp)}$ can be achieved through
+                                        <param value="DGtaudagP"/> is the Gibbs energy barrier of hypertranslocation. Estimating $\Delta G_{T(L, \tau)}^{(bp)}$ can be achieved through
                                         several methods (discussed below). After the translocation energy barrier has been estimated, the rates of translocating between
                                         $S(L,\tau)$ and $S(L,\tau+1)$ can be calculated using the Arrhenius equation:
                                     
@@ -1870,100 +1878,119 @@ function addCitations(){
 											</h3>
 										
 										
-											using a pre-exponential constant of $A = 10^6$ s<sup>-1</sup>.	
-                                            SimPol has three models for estimating the $\Delta G^\dagger_{x,y}$ term. <br><br><br>
-										
-									<div style="padding: 10 10; background-color:#ebe9e7">		
-										<div id="translocation_ModelHelp" class="subsection block-subtitle" style="font-size:30px; text-align:left"> i. Midpoint model</div> 
-										
-										
-										
-										The Gibbs energy barrier height of transition from state x to y is calculated as 
-										
-										<h3>
-										$$
-											\Delta G^\dagger_{x,y} = \frac{\Delta G_x + \Delta G_y}{2} + \Delta G^\dagger_{\tau},
-										$$
-										</h3>
-									
-										
-										where the value of parameter $\Delta G^\dagger_{\tau}$ (units $k_B T$) can be manually tweaked. While this estimation is simplistic, it has the desirable property of
-										$\Delta G^\dagger_{\tau}$ being equal to the mean translocation barrier across the whole sequence.
-										The midpoint model was introduced by Tadigotla et al.<cite val="maoileidigh2011unified,tadigotla2006thermodynamic"></cite>
-										
-									</div>
-										
-										<br><br><br>
-										
-										
-									<div style="padding: 10 10; background-color:#ebe9e7">
-										<div id="translocation_ModelHelp" class="subsection block-subtitle" style="font-size:30px; text-align:left"> ii. Melting model</div> 
-										
-										
-										
-										This translocation model assumes that the intermediate translocation state is a nucleic acid complex which contains only the basepairs which exist in both $x$ and $y$ 
-										(ie. the intersection between the two sets of basepairs). The melting model describes a physical mechanism where the transcription bubble spontaneously melts on one side, and then 
-										closes up again on the other side, thus translocating the polymerase by one basepair. Let $\Delta G^\dagger_{x \cap y}$ be the Gibbs energy of basepairing of this intermediate state, 
-										which can easily be calculated from experimental parameters. Then, 
-										the total barrier height of translocation is.
-										
-										<h3>
-										$$
-											\Delta G^\dagger_{x,y} = \Delta G^\dagger_{x \cap y} + \Delta G^\dagger_{\tau},
-										$$
-										</h3>
-									
-										
-										again where the value of parameter $\Delta G^\dagger_{\tau}$ (units $k_B T$) can be manually tweaked. This parameter therefore has a different meaning across 
-										the three translocation models.
-									</div>
-									
-									<br><br><br>
-									
-									
-									
-									<div style="padding: 10 10; background-color:#ebe9e7">
-										<div id="translocation_ModelHelp" class="subsection block-subtitle" style="font-size:30px; text-align:left"> iii. Sealing model</div> 
-										
-										
-										
-										This model assumes that the intermediate translocation state is a nucleic acid complex which contains the basepairs which exist in either $x$ or $y$ 
-										(ie. the union between the two sets of basepairs). The sealing model describes a physical mechanism where two opposite bases on one side of the transcription bubble spontaneously form
-										thus sealing the transcription bubble and forcing the other side to melt. Thus the polymerase is thermally powered along by the width of one basepair. 
-										Let $\Delta G^\dagger_{x \cup y}$ be the Gibbs energy of basepairing of this intermediate state, 
-										which can easily be calculated from experimental parameters. Then, 
-										the total barrier height of translocation is.
-										
-										<h3>
-										$$
-											\Delta G^\dagger_{x,y} = \Delta G^\dagger_{x \cup y} + \Delta G^\dagger_{\tau},
-										$$
-										</h3>
-									
-										
-										again where the value of parameter $\Delta G^\dagger_{\tau}$ (units $k_B T$) can be manually tweaked. The sealing model is the default model in SimPol.
-									</div>
-									
-									
-									
-									
-									<div style="height:300px">
-										<img src="../../src/TutorialImages/Figure2a.png" style="vertical-align:middle; height:300px; display:block;padding: 10 30;" align=left></img>
-										<img src="../../src/TutorialImages/Figure2b.png" style="vertical-align:middle; height:300px; display:block;padding: 10 30;" align=right></img>
-									</div>
-									
-									<br><br><br>
+											using pre-exponential constant $A = 10^6$ s<sup>-1</sup>.	<br><br>
+                                            SimPol has several methods for estimating $\Delta G_{T(L, \tau)}^{(bp)}$ (denoted by $\mathbb{TS}$):
+                                    
+                                    
+                                    
+                                    <br><br>
+                                    <div class="panelOuter">
+                                        <div class="panelInner" >
+                                            <span class="block-subsubtitle" > i. Absolute model </span>
+                                        
+                                             Translocation rates are determined exclusively from the energies of the translocation states and not the transition states.
+                                            This is the most simple model, where
+                                            
+                                            <h3>
+                                            $$
+                                                \Delta G_{T(L, \tau)}^{(bp)} = 0. 
+                                            $$
+                                            </h3>
+                                            
+                                
+                                        </div> 
+                                    </div>  
+                                    
+                                    
+                                    
+                                    
+                                    <div class="panelOuter">
+                                        <div class="panelInner" >
+                                            <span class="block-subsubtitle" > ii. Midpoint model </span>
+                                        
+                                            The Gibbs energy of basepairing of the transition state between $S(L,\tau)$ and $S(L,\tau+1)$ is calculated as 
+                                        
+                                            <h3>
+                                            $$
+                                                \Delta G_{T(L, \tau)}^{(bp)} = \frac{\Delta G_{S(L,\tau)} + \Delta G_{S(L,\tau+1)}}{2}.
+                                            $$
+                                            </h3>
+                                        
+                                            
+                                            
+                                            This was initially described by Tadigotla et al.<cite val="maoileidigh2011unified,tadigotla2006thermodynamic"></cite>
+                                            
+                                            
+                                
+                                        </div> 
+                                    </div>  
+                                    
+                                    
+                                    
+                                    
+                                    <div class="panelOuter">
+                                        <div class="panelInner" >
+                                            <span class="block-subsubtitle" >  iii. Hybrid/bubble melting models </span>
+                                        
+                                             
+                                             Let $G$ be the set of basepairs within the gene of state $S(L, \tau)$,
+                                            and let $G^\prime$ be that of $S(L, \tau)$. Similarly, let $H$ and $H^\prime$ be the sets of basepairs within the hybrid of $S(L, \tau)$ and $S(L, \tau+1)$ respectively. 
+                                            Then, there are four ways of directly evaluating $\Delta G_{T(L, \tau)}^{(bp)}$ using thermodynamic parameters:
+                                            
+                                            
+                                            
+                                            <h3>
+                                            $$
+                                                \Delta G_{T(L, \tau)}^{(bp)} = \begin{cases} 
+                                                                                                \Delta G^{(bp)}(G \cap G^\prime, H \cap H^\prime) & \; \text{ if }  H_IG_I \text { model} \\
+                                                                                                \Delta G^{(bp)}(G \cap G^\prime, H \cup H^\prime) & \; \text{ if }  H_IG_U \text { model} \\
+                                                                                                \Delta G^{(bp)}(G \cup G^\prime, H \cap H^\prime) & \; \text{ if }  H_UG_I \text { model} \\ 
+                                                                                                \Delta G^{(bp)}(G \cup G^\prime, H \cup H^\prime) & \; \text{ if }  H_UG_U \text { model}.
+                                                                                \end{cases}
+                                            $$
+                                            </h3>
+                                        
+                                            
+                                            $\Delta G^{(bp)}(x,y)$ denotes the Gibbs energy of a state comprised of a gene containing basepairs in set $x$ and a hybrid containing basepairs in set $y$. 
+                                            These four models describe physical mechanisms of translocation, each describing the ordering of basepairing melting and forming required to translocate.
+ 
+                                
+                                        </div> 
+                                    </div>  
+                                    <br><br>
+                                    
+                                
+                                    
+                                    
+      
+                                    
 									
 									In optical trapping experiments, beads are tethered to single molecules of RNA polymerase and optical tweezers are used to exert a force (units pN) upon the elongation complex. 
-									Positive forces $F_{assist} = F > 0$ act in the same direction as transcription (an assisting load) while negative forces $F < 0$ act in the opposite direction 
+									Positive forces  <param value="FAssist"/> $= F > 0$ act in the same direction as transcription (an assisting load) while negative forces $F < 0$ act in the opposite direction 
 									(a hindering load). Increasing the assisting force serves to decrease the Gibbs energy barrier of forward translocation and increase the barrier of backwards translocation. This 
 									process is modelled by adding an additional term<cite val="depken2009origin"></cite> to the Arrhenius equation:
 										<h3>
-											$$ 	k_{x \rightarrow y} = \cases{10^6 e^{-(\Delta G_{x,y}^\dagger - \Delta G_x - F(\delta_1))} & \text{for forward translocation} \\ 
-																			10^6 e^{-(\Delta G_{x,y}^\dagger - \Delta G_x - F(\delta - \delta_1))} &  \text{for backward translocation}}$$
+											
+                                            
+                                            <h3>
+                                                $$
+                                                    k_{fwd}(S(L,\tau)) = A e^{-(\Delta G_{T(L, \tau)} - \Delta G_{S(L, \tau)} - F(\delta_1))} \\
+                                                    k_{bck}(S(L,\tau)) = A e^{-(\Delta G_{T(L, \tau-1)} - \Delta G_{S(L, \tau)} - F(\delta - \delta_1))}
+                                                $$
+                                            </h3>
+                                            
 										</h3>
-									where $\delta$ is the distance between consecutive basepairs ($\delta = 3.4$&#8491; in dsDNA<cite val="watson1953molecular"></cite>), and the intermediate state 
-									 is to be $\delta_1$ (&#8491;) between the two neighbouring positions.
+									where $\delta$ is the distance between consecutive basepairs ($\delta = 3.4$ &#8491; in dsDNA<cite val="watson1953molecular"></cite>), and 
+                                    0 &lt; <param value="barrierPos"/> &lt; $\delta$ is the position of the transition state between the two neighbouring states.
+                                        
+                                        
+                                        
+                                                                                   
+                                            
+                                    <br><br>
+                                    Translocation between the pretranslocated $\tau=0$ and posttranslocated $\tau=1$ positions can alternatively be modelled with an equilibrium approximation
+                                    <param value="assumeTranslocationEquilibrium"/>. This assumption asserts that <param value="DGtaudag"/> is so small that translocation
+                                    occurs on a timescale similar to NTP binding or incorporation. 
 							
 								</div>
 							</div>
