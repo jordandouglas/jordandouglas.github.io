@@ -59,7 +59,16 @@ function init(){
     drawModelDiagrams();
             
             
+    // Parameter links
+    populateParameterLinks(); 
+   
+            
+            
     $('document').ready(function(){
+            
+            
+        
+            
             
                 
     	// If the url is linked to a section then make sure the section is not collapsed
@@ -137,6 +146,73 @@ function drawModelDiagrams(){
    
 }
 
+            
+function populateParameterLinks(){
+            
+            
+            
+    var paramToAnchorTag = {
+        NTPconc:{anchor:"[NTP]", latex:"[NTP]"},
+        ATPconc:{anchor:"[ATP]", latex:"[ATP]"},
+        CTPconc:{anchor:"[CTP]", latex:"[CTP]"},
+        GTPconc:{anchor:"[GTP]", latex:"[GTP]"},
+        UTPconc:{anchor:"[UTP]", latex:"[UTP]"},
+        FAssist:{anchor:"Force", latex:"$F_{assist}$"},
+        haltPosition:{anchor:"Halt", latex:"Halt"},
+
+        hybridLen:{anchor:"Hybrid", latex:"$h$"},
+        bubbleLeft:{anchor:"Bubble_left", latex:"$\\beta_1$"},
+        bubbleRight:{anchor:"Bubble_right", latex:"$\\beta_2$"},
+
+        DGtaudag:{anchor:"Translocation_Gibbs_barrier", latex:"$\\Delta G_{\\tau}^{\\dagger}$"},
+        DGtau1:{anchor:"Posttranslocated_Gibbs_energy", latex:"$\\Delta G_{\\tau 1}$"},
+        barrierPos:{anchor:"Translocation_force_dependency", latex:"$\\delta_1"},
+
+        arrestTime:{anchor:"Arrest_timeout", latex:"Arrest time"},
+        kCat:{anchor:"Rate_of_catalysis", latex:"$k_{cat}$"},
+        Kdiss:{anchor:"NTP_dissociation_constant", latex:"$K_D$"},
+        RateBind:{anchor:"Rate_of_NTP_binding", latex:"$k_{bind}$"},
+
+        RateActivate:{anchor:"Rate_of_reactivation", latex:"k_A"},
+        RateDeactivate:{anchor:"Rate_of_inactivation", latex:"k_U"},
+        DGtaudagM:{anchor:"Gibbs_barrier_of_backtracking", latex:"$\\Delta G_{\\tau -}^\\dagger$"},
+        DGtaudagP:{anchor:"Gibbs_barrier_of_hypertranslocation", latex:"$\\Delta G_{\\tau +}^\\dagger$"},
+
+        RateCleave:{anchor:"Rate_of_cleavage", latex:"$k_{cleave}$"},
+        CleavageLimit:{anchor:"Cleavage_limit", latex:"$\\lambda_{cleave}$"},
+        rnaFoldDistance:{anchor:"Fold_distance", latex:"Fold distance"},
+
+        proposalWidth:{anchor:"Proposal_width", latex:"Proposal width"}, 
+            
+            
+        assumeBindingEquilibrium:{anchor:"Binding_equilibrium", latex:"$\\mathbb{BE}$"}
+            
+    };
+            
+            
+    
+    var paramsTags = $("param");
+            
+     
+    // Replace all <param value="paramID"/> tags with <a> tags that contain latex and a link to the appropriate parameter
+    for (var i = 0; i < paramsTags.length; i ++){
+            
+        var ele = $(paramsTags[i]);  
+        var paramID = ele.attr("value");
+        console.log("paramID", paramID);
+        var newTag = `<a onclick="minimiseSection('#Parameters_and_Settings_Btn', true)" class="param_link" href="#` + paramToAnchorTag[paramID].anchor + `">` + paramToAnchorTag[paramID].latex + `</a>`;
+            
+        ele.replaceWith(newTag);
+
+            
+    }
+            
+            
+            
+            
+            
+}            
+            
             
 function printContents(){
 
@@ -701,7 +777,7 @@ function addCitations(){
                                                 <input type=button value='View model diagram' title="View the kinetic diagram of this model" class="operation" style="width:160px; cursor:auto">.
                                                     Pressing the simulate button  <img src="../../src/Images/dice.png" style="vertical-align: middle; width:25px; height:25px;"> simulates the system according to the
                                                     currently specified pathway. See 
-                                                <a id="Simulating_con" href="#Simulating" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">Simulating</a>.
+                                                <a href="#Simulating" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">Simulating</a>.
                                                     
                                                     
                                                     
@@ -940,7 +1016,7 @@ function addCitations(){
                                             Any parameter in the &#9776; Parameters menu can be plotted onto this graph through the settings menu <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
                                             The parameter's value will remain constant unless changed either (1) manually, or (2) by adding a prior distribution
                                             <img src="../../src/Images/distn.png" style="vertical-align:middle; width:38px; height:12px;"></img> 
-                                            (see <a id="Simulating_con" href="#Adding_a_prior_distribution_to_a_parameter" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">Adding a prior distribution to a parameter</a>).
+                                            (see <a href="#Adding_a_prior_distribution_to_a_parameter" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">Adding a prior distribution to a parameter</a>).
                                                      
                                             Parameters are sampled from their prior distribution at the beginning of each simulation. 
                                             Therefore one additional datapoint is made available to this plot at the end of each trial. 
@@ -985,11 +1061,11 @@ function addCitations(){
                                     
                                          <td colspan="1">
                                             Points can be coloured to represent a third variable, such as velocity. The third image
-                                            shows the relationship between two parameters - <a class="param_link" href="#Rate_of_catalysis">$k_{cat}$</a> and <a class="param_link" href="#Translocation_Gibbs_barrier">$\Delta G^\dagger_{\tau}$</a> -  required to achieve a velocity of 10-20 bp/s. As the rate of catalysis increases, 
-                                            the free energy barrier of translocation must increase with it in order to achieve the same velocity. 
+                                            shows the relationship between two parameters - <param value="kCat"/> and <param value="DGtaudag"/> -  required to achieve a velocity of 10-20 bp/s. As the rate of catalysis increases, 
+                                            the Gibbs energy barrier of translocation must increase with it in order to achieve the same velocity. 
                                         
                                             <br><br>
-                                            The forth images shows the relationship between <a class="param_link" href="#NTP_dissociation_constant">$K_D$</a> and <a class="param_link" href="#[NTP]">[NTP]</a>. As the dissociation constant of NTP binding increases, the concentration of NTP needed to achieve the same
+                                            The forth images shows the relationship between <param value="Kdiss"/> and <param value="NTPconc"/>. As the dissociation constant of NTP binding increases, the concentration of NTP needed to achieve the same
                                             velocity increases.
                                         
                                         </td>
@@ -1008,7 +1084,7 @@ function addCitations(){
                                     <tr>
                                         <td colspan="1">
                                             The trace plot is used to view the trace of an Markov chain Monte Carlo (MCMC) simulation 
-                                            (see <a id="Simulating_con" href="#MCMC_ABC" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">MCMC ABC</a>).
+                                            (see <a href="#MCMC_ABC" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">MCMC ABC</a>).
                                              
                                             This is instrumental in interpreting chain convergence. The adjustable burn-in period
                                             is denoted by the red line. The variable displayed on the y-axis as well as the x- and y- axis limits can
@@ -1256,7 +1332,7 @@ function addCitations(){
 														</div><br>	
 														
 														<div class="subsubsection paramHelp" sect="Posttranslocated Gibbs energy">
-															<b style="font-size:20px">$\Delta G_{\tau 1}$</b> - free energy term added to that of the posttranslocated state. When this value is low,
+															<b style="font-size:20px">$\Delta G_{\tau 1}$</b> - Gibbs energy term added to that of the posttranslocated state. When this value is low,
 															RNA polymerase spends more time in the posttranslocated state (compared with the pretranslocated state). Default: -2.007 k<sub>B</sub>T <cite val="douglas2018bayesian"></cite>
 														</div> <br>	
 														
@@ -1522,8 +1598,8 @@ function addCitations(){
 										$$ p(s) \propto e^{-\frac{\Delta G_s}{k_B T}}, $$
 										</h3>
 										
-										where $\Delta G_s$ is the free energy of state $s$, $k_B$ is Boltzmann's constant ($1.3806 \times 10^{-23}$J.K$^{-1}$), and $T$ is the temperature in Kelvins. 
-										We express free energy in units of $k_B T$, by taking the experimental energy (in units of J) and dividing by $k_B T$.   <br><br>
+										where $\Delta G_s$ is the Gibbs energy of state $s$, $k_B$ is Boltzmann's constant ($1.3806 \times 10^{-23}$J.K$^{-1}$), and $T$ is the temperature in Kelvins. 
+										Energy is expressed in units of $k_B T$, by taking the experimental energy (in units of J) and dividing by $k_B T$.   <br><br>
 										
 										For example, suppose a single molecule is in equilibrium between two states, $A$ and $B$. These two states have free energies of $\Delta G_A = -3k_B T$ and $\Delta G_B = -6k_B T$,
 										respectively. We would therefore expect the molecule to be in state $A$ 4.7% of the time:
@@ -1539,8 +1615,11 @@ function addCitations(){
 			
 										
 										<br>
-										The Boltzmann distribution assumes that the system has been fluctuating for long enough to achieve equilibrium. However transcription occurs on too fast a timescale for equilibrium to be reached. 
-										Therefore we must model transcription as a kinetic process instead of an equilibrium one.
+										The Boltzmann distribution assumes that the system has been fluctuating for long enough to achieve equilibrium. 
+                                        However, since the competing processes of transcription 
+                                        (see <a style="text-decoration:none; color:#008cba" href="#Reactions" onclick="minimiseSection('#States_and_Reactions_Btn', true)" style="text-decoration:none; color:black">Reactions</a>)
+										occur on similar timescales, directly applying the Boltzmann distribution is not always a good assumption. 
+                                        
 							
 								</div>
 							</div>
@@ -1559,8 +1638,9 @@ function addCitations(){
 										
 										
 										Energy is required for a system to transit from one state to another. 
-										This free energy barrier is denoted by $\Delta G^\dagger$. The larger the barrier, the more time needed for random thermal collisions to provide
-										enough energy to allow the system to make the transition. Suppose a system is currently in state $s$, with free energy $\Delta G_s$. 
+										The standard Gibbs energy of activation for a reaction is denoted by $\Delta G^\dagger$. The larger this barrier, the more time needed for random thermal collisions to provide
+										enough energy to allow the system to make the transition. 
+                                        Suppose a system is currently in state $s$, with Gibbs energy $\Delta G_s$. 
 										The Arrhenius equation can estimate the rate constant of transiting from state $s$ to state $s^\prime$:
 										
 										
@@ -1568,7 +1648,7 @@ function addCitations(){
 											$$ k_{s \rightarrow s^\prime} = A e^{-\frac{\Delta G^\dagger - \Delta G_s}{k_B T}}, $$
 										</h3>
 										
-										where $A$ is a pre-exponential constant (units s$^{-1}$), and $\Delta G^\dagger$ is the absolute height of the free energy barrier between states $s$ and $s^\prime$. 
+										where $A$ is a pre-exponential constant (units s$^{-1}$), and $\Delta G^\dagger$ is the absolute height of the Gibbs energy barrier between states $s$ and $s^\prime$. 
 										Once the rate constants of all possible reactions are known, we can start the single-molecule simulation. 
 										
 										
@@ -1583,16 +1663,20 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div class="subsection block-subtitle"> Poisson processes: how a reaction is randomly sampled </div> <br>
+									<div class="subsection block-subtitle"> The Gillespie algorithm </div> <br>
 								
-									A critical assumption is that these reactions are Poisson processes; the amount of time until a reaction occurs is independent of all other reactions and independent of how long you have already waited. 
-									If you were to keep flipping a coin until it landed on tails, the probability of getting tails on the next flip is not affected by how many times you have already flipped, and is not affected by how 
-									many times your friend has flipped their coin. Similarly, whether you have been waiting 1 second or 1 hour for a chemical reaction to occur, the probability of it happening right now is always the same.
+                                    
+                                    Transcription is simulated <img src="../../src/Images/dice.png"  style="vertical-align:middle; width:25px; height:25px;"></img> using the Gillespie algorithm<cite val="gillespie1977exact,lecca2013stochastic"></cite>. 
+                                    
+									A critical assumption of this method is that these reactions are Poisson processes; the amount of time until a reaction occurs is independent of all other reactions 
+                                    and independent of the amount of time elapsed. 
+									For example, suppose we were to continue flipping a coin until it lands on tails. The probability of getting tails on the next flip is not affected by how many times we have already flipped, and is not affected by how 
+									many times someone else has flipped their coin. Similarly, whether a chemical reaction has been waiting 1 second or 1 hour for the reaction to occur, the probability of it happening right now is always the same.
 									The amount of time until reaction $s \rightarrow s^\prime$ occurs follows the exponential distribution with rate $k$. <br><br>
 									
 									<img id="exponential" src="../../src/TutorialImages/exponential.png" style="width:60%; padding: 10 30;" align=left></img>
 									
-									If there are multiple chemical reactions competing with each other, then the reaction with the shortest reaction time will be selected. For example, suppose that you have a test-tube containing 
+									If there are multiple chemical reactions competing with each other, then the reaction with the shortest reaction time will be selected. For example, suppose we have have a test-tube containing 
 									a single molecule of compound $A$, which can spontaneously undergo two reactions: $A \rightarrow B$ or $A \rightarrow C$, with rate constants 0.001s<sup>-1</sup> and 0.002s<sup>-1</sup> respectively. 
 									The test-tube will flash a different colour of light for each reaction. <br><br>
 									
@@ -1610,9 +1694,7 @@ function addCitations(){
 									
 									and the probability of sampling reaction $A \rightarrow C$ is $0.667$. 
 									
-									Reactions are sampled this way when you press the Simulate <img src="../../src/Images/dice.png"  style="vertical-align:middle; width:25px; height:25px;"></img> button.
-									
-									
+
 									
 									
 							
@@ -1626,7 +1708,10 @@ function addCitations(){
 								<div class="about-block-inner">
 									<div id="polymerisation_ModelHelp" class="subsection block-subtitle" > Kinetics of nucleotide incorporation</div> <br>
 										
-										Adding the next base onto the $3^\prime$ end of the nascent strand requires one translocation step (detailed in the next section) and at least three chemical steps<cite val="erie1992single"></cite>.
+										Adding the next base onto the $3^\prime$ end of the nascent strand requires one translocation step 
+                                        (see <a href="#Kinetics_of_translocation" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">Kinetics of translocation</a>) 
+                                    
+                                     and at least three chemical steps<cite val="erie1992single"></cite>: <br>
 										
 										
 										
@@ -1637,7 +1722,7 @@ function addCitations(){
 										
 										
 										<div style="padding: 10 10; background-color:#ebe9e7" >
-											<b>2. Phosphodisester bond formation.</b> The $5^\prime$ phosphate of the NMP is linked to the $3^\prime$-OH of the nascent strand.
+											<b>2. Phosphodisester bond formation.</b> The $5^\prime$ phosphate of thenucleoside monophosphate (NMP) is linked to the $3^\prime$-OH of the nascent strand.
 										</div><br>
 		
 										<div style="padding: 10 10; background-color:#ebe9e7" >
@@ -1646,30 +1731,31 @@ function addCitations(){
 										
 										Any of these steps could be reversible.
 										As there is not sufficent information to model all three steps, nucleotide incorporation has been compressed into a two step 
-										process.<cite val="bai2004sequence,abbondanzieri2005direct,maoileidigh2011unified"></cite>
+										process<cite val="bai2004sequence,abbondanzieri2005direct,maoileidigh2011unified"></cite>.
 										
 										
 										<div style="padding: 10 10; background-color:#ebe9e7" >
-											<b>1. NTP binding.</b> Step 1 from above. This is a reversible process. NTP binding/release is dictated by two parameters: $k_{bind}$ and $K_D$. 
+											<b>1. NTP binding.</b> Step 1 from above. This is a reversible process. NTP binding/release is dictated by two parameters: <param value="RateBind"/> and <param value="Kdiss"/>. 
 		
 										</div><br>
 										
 										
 										
 										<div style="padding: 10 10; background-color:#ebe9e7" >
-											<b>2. Catalysis.</b> Steps 2-3 from above. This is assumed to be an irreversible process. The rate of incorporating a bound nucleotide is $k_{cat}$.
+											<b>2. Catalysis.</b> Steps 2-3 from above. This is assumed to be an irreversible process. The rate of incorporating a bound nucleotide is <param value="kCat"/>.
 										</div><br><br>	
 										
 										
 										 
-											$k_{bind}$ (units s$^{-1}$&mu;M$^{-1}$) is the second order rate constant of binding NTP.
-											The rate of binding an NTP is equal to $k_{bind}$[NTP]. Once the NTP has been bound, it may be released back into solution.
-											The rate of release is calculated from the dissociation constant $K_D$ (units &mu;M). Rate of NTP release is equal to $K_D \times k_{bind}$. 
+											<param value="RateBind"/> (units s$^{-1}$&mu;M$^{-1}$) is the second order rate constant of binding NTP.
+											The rate of binding an NTP is equal to <param value="RateBind"/> $\times$ <param value="NTPconc"/>. Once the NTP has been bound, it may be released back into solution.
+											The rate of release is calculated from the dissociation constant <param value="Kdiss"/> (units &mu;M). Rate of NTP release is equal to <param value="Kdiss"/> $\times$ <param value="RateBind"/>. 
 											<br><br>
 											
 											
-											When the NTP concentration is high, or if $k_{bind}$ is large, then NTP binding becomes so rapid that equilibrium between these two states is achieved. Under these conditions,
-											the kinetics of NTP binding are no longer relevant. $K_D$ simply describes the proportion of time that NTP is bound. For example, if $K_D$ = 35&mu;M and [NTP] = 1000&mu;M,
+											When the NTP concentration is high, or if <param value="RateBind"/> is large, then NTP binding becomes so rapid that equilibrium between these two states is achieved. Under these conditions,
+											the kinetics of NTP binding are no longer relevant. <param value="Kdiss"/> simply the ratio between the rates of binding and release, and can be 
+                                            used to calculate the proportion of time that NTP is bound. For example, if <param value="Kdiss"/> = 35&mu;M and <param value="NTPconc"/> = 1000&mu;M,
 											then the proportion of time that NTP is bound (while in this two-state system) is around 97%:
 											
 										
@@ -1679,47 +1765,11 @@ function addCitations(){
 											</h3>
 										
 											<br>
-											$k_{cat}$ is the rate of incorporating a bound NTP. This reaction is one of the rate limiting steps of transcription. <br><br>
 											
+									
+                                             NTP binding/release can be approximated as an equilibrium process using <param value="assumeBindingEquilibrium"/>. 
+                                            This assumption is equivalent to setting <param value="RateBind"/> to a high value, and is much faster to simulate.
 											
-											<span style="line-height:28px;">
-												In SimPol, by default there is one concentration for all four NTPs, and one dissociation constant and rate of catalysis for all four bases. You can set the concentrations
-												and incorporation parameters for each of the four nucleotides independently by toggling 
-												
-												<span style="background-color:#ebe9e7; padding: 7 6;">
-													<span style="font-size:15px; vertical-align:middle; font-family:Arial" >1 concentration</span>
-													<label class="switch">
-														 <input type="checkbox"> </input>
-														 <span class="slider round notboolean"></span>
-													</label> 
-													<span style="font-size:15px; vertical-align:middle; font-family:Arial" >4 concentrations</span>
-												</span>
-												
-												&nbsp;and 
-												
-												<span style="background-color:#ebe9e7; padding: 7 6;">
-													<span style="font-size:15px; vertical-align:middle; font-family:Arial" >2 params</span>	
-													<label class="switch">
-														 <input type="checkbox"> </input>
-														 <span class="slider round notboolean"></span>
-													</label> 
-													<span style="font-size:15px; vertical-align:middle; font-family:Arial" >8 params</span>	
-												</span>											
-												
-												&nbsp;respectively. While $K_D$ and $k_{cat}$ can be set independently for each nucleotide, $k_{bind}$ is held constant for all four. If you do not wish to assume that NTP binding is in equilibrium you can toggle  
-												
-												
-													<span style="background-color:#ebe9e7; padding: 7 6;">
-														<label class="switch">
-															 <input type="checkbox" checked> </input>
-															 <span class="slider round"></span>
-														</label> 
-														<span style="font-size:15px; vertical-align:middle; font-family:Arial" >Assume NTP binding at equilibrium</span>	
-													</span> 
-													
-													&nbsp;which is defaulted to true. Note that making this assumption is equivalent to setting $k_{bind}$ to a high value, but is much faster to simulate.
-											
-											</span>
 											
 											
 								
@@ -1732,64 +1782,99 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div id="translocation_ModelHelp" class="subsection block-subtitle" > Calculating translocation rates</div> <br>
+									<div id="translocation_ModelHelp" class="subsection block-subtitle" >Kinetics of translocation</div> <br>
 								
+                                    
+                                        Let $\Delta G_{S(L, \tau)}$ be the Gibbs energy of state $S(L, \tau)$. This term is calculated using:
+                                    
+                                    
+                                        <h3>
+                                            $$
+                                                \Delta G_{S(L, \tau)} = \Delta G_{S(L, \tau)}^{(bp)} + \begin{cases} \Delta G_{\tau 1} &\text{ if } \tau = 1 \\ 0 &\text { if } \tau \neq 1 \end{cases}
+                                            $$
+                                        </h3>
+                                    
+                                        where $\Delta G_{S(L, \tau)}^{(bp)}$ is computed from themodynamic parameters of nucleotide basepairing<cite val="xia1998thermodynamic,wu2002temperature,santalucia1998unified"></cite>
+                                        and <param value="DGtau1"/> is the Gibbs energy added onto the posttranslocated position<cite val="douglas2018bayesian"></cite>.
+                                    
+                                    
 										Basepairs may need to be broken in order for the polymerase to translocate forwards (right) or backwards (left) from its current position. For example, consider the state below. 
 										<br><br>
-										<!--<img id="breakingPairs" src="../../src/TutorialImages/breakingPairs.png" style="width:90%; display:block;  margin: 0 auto;" border="1" ></img>-->
-										<img id="breakingPairs" src="../../src/TutorialImages/Figure1b.png" style="width:90%; display:block;  margin: 0 auto;" ></img>
+										<img id="breakingPairs" src="../../src/TutorialImages/basepairbreaking.png" style="width:90%; display:block;  margin: 0 auto;" ></img>
 										<br><br>
 										<div style="line-height:35px">
-											For the polymerase to move one step to the left, the 
+											For the polymerase to translocate one step backwards, the 
 										
 											<span style="position:absolute; width:33px; "> 
-												<img src="../../src/Images/Ag.png" style="width:15px; height:15px; position:absolute; left:0px"></img>
+												<img src="../../src/Images/Gg.png" style="width:15px; height:15px; position:absolute; left:0px"></img>
 												<img src="../../src/Images/Cg.png" style="width:15px; height:15px; position:absolute; left:18px"></img>
-												<img src="../../src/Images/Tm.png" style="width:15px; height:15px; top:18px; position:absolute; left:0px"></img>
+												<img src="../../src/Images/Cm.png" style="width:15px; height:15px; top:18px; position:absolute; left:0px"></img>
 												<img src="../../src/Images/Gm.png" style="width:15px; height:15px; top:18px; position:absolute; left:18px"></img>
 											</span> 
 											<span style="width:33;  display:inline-block;"></span> doublet on the left of the transcription bubble and the 
 											<span style="position:absolute; width:33px; "> 
-												<img src="../../src/Images/Tg.png" style="width:15px; height:15px; position:absolute; left:0px"></img>
+												<img src="../../src/Images/Cg.png" style="width:15px; height:15px; position:absolute; left:0px"></img>
 												<img src="../../src/Images/Gg.png" style="width:15px; height:15px; position:absolute; left:18px"></img>
-												<img src="../../src/Images/Am.png" style="width:15px; height:15px; top:18px; position:absolute; left:0px"></img>
+												<img src="../../src/Images/Gm.png" style="width:15px; height:15px; top:18px; position:absolute; left:0px"></img>
 												<img src="../../src/Images/Cm.png" style="width:15px; height:15px; top:18px; position:absolute; left:18px"></img>
 											</span> 
-											<span style="width:33;  display:inline-block;"></span> doublet on the right of the hybrid must both be broken. Additionally, the mRNA must be refolded into a different conformation. For the polymerase
-											to move one step to the right, the 
+											<span style="width:33;  display:inline-block;"></span> doublet on the right of the hybrid must both be broken. For the polymerase
+											to translocate one step forwards, the 
 											<span style="position:absolute; width:33px; "> 
 												<img src="../../src/Images/Tg.png" style="width:15px; height:15px; position:absolute; left:0px"></img>
-												<img src="../../src/Images/Ag.png" style="width:15px; height:15px; position:absolute; left:18px"></img>
+												<img src="../../src/Images/Tg.png" style="width:15px; height:15px; position:absolute; left:18px"></img>
 												<img src="../../src/Images/Am.png" style="width:15px; height:15px; top:18px; position:absolute; left:0px"></img>
-												<img src="../../src/Images/Tm.png" style="width:15px; height:15px; top:18px; position:absolute; left:18px"></img>
+												<img src="../../src/Images/Am.png" style="width:15px; height:15px; top:18px; position:absolute; left:18px"></img>
 											</span> 
 											<span style="width:33;  display:inline-block;"></span> doublet on the right of the transcription bubble and the 
 											<span style="position:absolute; width:33px; "> 
-												<img src="../../src/Images/Tg.png" style="width:15px; height:15px; position:absolute; left:0px"></img>
-												<img src="../../src/Images/Cg.png" style="width:15px; height:15px; position:absolute; left:18px"></img>
-												<img src="../../src/Images/Am.png" style="width:15px; height:15px; top:18px; position:absolute; left:0px"></img>
-												<img src="../../src/Images/Gm.png" style="width:15px; height:15px; top:18px; position:absolute; left:18px"></img>
+												<img src="../../src/Images/Ag.png" style="width:15px; height:15px; position:absolute; left:0px"></img>
+												<img src="../../src/Images/Tg.png" style="width:15px; height:15px; position:absolute; left:18px"></img>
+												<img src="../../src/Images/Um.png" style="width:15px; height:15px; top:18px; position:absolute; left:0px"></img>
+												<img src="../../src/Images/Am.png" style="width:15px; height:15px; top:18px; position:absolute; left:18px"></img>
 											</span> 
 											<span style="width:33;  display:inline-block;"></span> doublet on the left of the hybrid must both be broken. 
 										</div>
 										<br>
-										The estimated basepairing contribution to free energy for any given state can readily be calculated using RNA or DNA free energy parameters. 
-										 Let $\Delta G_x$ and $\Delta G_y$ be the basepairing free energies of neighbouring states x and y, respectively (units $k_B T$), where the free energy of the unknown intermediate state is $\Delta G_{x,y}^\dagger$. Once this free energy barrier height has been estimated, the sequence-specific rate constant of translocation can be calculated using the Arrhenius equation:
+										
+                                        Let $S(L,\tau)$ and $S(L,\tau+1)$ be two neighbouring states and let $T(L,\tau)$ be the translocation transition state between the two.
+                                        The Gibbs energy of this transition state is calculated as:
+                                    
+                                    
+                                         <h3>
+                                            $$
+                                                \Delta G_{T(L, \tau)} = \Delta T_{S(L, \tau)}^{(bp)} + \Delta G_\tau^\dagger + \begin{cases}    \Delta G_{\tau -}^\dagger &\text{ if } \tau \leq -1 \text{ (backtracking) }\\ 
+                                                                                                                                                0 & \text { if } \tau = 0  \text{ (elongation) } \\
+                                                                                                                                                \Delta G_{\tau +}^\dagger &\text { if } \tau \geq 1  \text{ (hypertranslocation) }
+                                                                                                                                \end{cases}
+                                            $$
+                                        </h3>
+                                    
+                                    
+                                        where $\Delta T_{S(L, \tau)}^{(bp)}$ is the Gibbs energy of basepairing in the transition state,
+                                        <param value="DGtaudag"/> is the Gibbs energy barrier of translocation, 
+                                        <param value="DGtaudagM"/> is the Gibbs energy barrier of backtracking, and
+                                        <param value="DGtaudagP"/> is the Gibbs energy barrier of hypertranslocation. Estimating $\Delta T_{S(L, \tau)}^{(bp)}$ can be achieved through
+                                        several methods (discussed below). After the translocation energy barrier has been estimated, the rates of translocating between
+                                        $S(L,\tau)$ and $S(L,\tau+1)$ can be calculated using the Arrhenius equation:
+                                    
 											<h3>
 											$$
-												k_{x \rightarrow y} = 10^6 e^{-(\Delta G_{x,y}^\dagger - \Delta G_x)}.
+												k_{S(L,\tau) \rightarrow S(L,\tau+1)} = k_{fwd}(S(L,\tau)) = A e^{-(\Delta G_{T(L, \tau)} - \Delta G_{S(L, \tau)})} \\
+                                                k_{S(L,\tau+1) \rightarrow S(L,\tau)} = k_{bck}(S(L,\tau+1)) = A e^{-(\Delta G_{T(L, \tau)} - \Delta G_{S(L, \tau+1)})}
 											$$
 											</h3>
 										
 										
-											We use a pre-exponential constant of $A = 10^6$ s<sup>-1</sup>.	SimPol has three models for estimating the $\Delta G^\dagger_{x,y}$ term. <br><br><br>
+											using a pre-exponential constant of $A = 10^6$ s<sup>-1</sup>.	
+                                            SimPol has three models for estimating the $\Delta G^\dagger_{x,y}$ term. <br><br><br>
 										
 									<div style="padding: 10 10; background-color:#ebe9e7">		
 										<div id="translocation_ModelHelp" class="subsection block-subtitle" style="font-size:30px; text-align:left"> i. Midpoint model</div> 
 										
 										
 										
-										The free energy barrier height of transition from state x to y is calculated as 
+										The Gibbs energy barrier height of transition from state x to y is calculated as 
 										
 										<h3>
 										$$
@@ -1814,7 +1899,7 @@ function addCitations(){
 										
 										This translocation model assumes that the intermediate translocation state is a nucleic acid complex which contains only the basepairs which exist in both $x$ and $y$ 
 										(ie. the intersection between the two sets of basepairs). The melting model describes a physical mechanism where the transcription bubble spontaneously melts on one side, and then 
-										closes up again on the other side, thus translocating the polymerase by one basepair. Let $\Delta G^\dagger_{x \cap y}$ be the free energy of basepairing of this intermediate state, 
+										closes up again on the other side, thus translocating the polymerase by one basepair. Let $\Delta G^\dagger_{x \cap y}$ be the Gibbs energy of basepairing of this intermediate state, 
 										which can easily be calculated from experimental parameters. Then, 
 										the total barrier height of translocation is.
 										
@@ -1841,7 +1926,7 @@ function addCitations(){
 										This model assumes that the intermediate translocation state is a nucleic acid complex which contains the basepairs which exist in either $x$ or $y$ 
 										(ie. the union between the two sets of basepairs). The sealing model describes a physical mechanism where two opposite bases on one side of the transcription bubble spontaneously form
 										thus sealing the transcription bubble and forcing the other side to melt. Thus the polymerase is thermally powered along by the width of one basepair. 
-										Let $\Delta G^\dagger_{x \cup y}$ be the free energy of basepairing of this intermediate state, 
+										Let $\Delta G^\dagger_{x \cup y}$ be the Gibbs energy of basepairing of this intermediate state, 
 										which can easily be calculated from experimental parameters. Then, 
 										the total barrier height of translocation is.
 										
@@ -1867,7 +1952,7 @@ function addCitations(){
 									
 									In optical trapping experiments, beads are tethered to single molecules of RNA polymerase and optical tweezers are used to exert a force (units pN) upon the elongation complex. 
 									Positive forces $F_{assist} = F > 0$ act in the same direction as transcription (an assisting load) while negative forces $F < 0$ act in the opposite direction 
-									(a hindering load). Increasing the assisting force serves to decrease the free energy barrier of forward translocation and increase the barrier of backwards translocation. This 
+									(a hindering load). Increasing the assisting force serves to decrease the Gibbs energy barrier of forward translocation and increase the barrier of backwards translocation. This 
 									process is modelled by adding an additional term<cite val="depken2009origin"></cite> to the Arrhenius equation:
 										<h3>
 											$$ 	k_{x \rightarrow y} = \cases{10^6 e^{-(\Delta G_{x,y}^\dagger - \Delta G_x - F(\delta_1))} & \text{for forward translocation} \\ 
