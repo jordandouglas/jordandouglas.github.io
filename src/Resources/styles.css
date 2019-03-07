@@ -904,3 +904,10 @@ input:checked + .slider:before {
     color:#008cba;
 
 }
+
+
+.subsection {
+
+    margin-bottom:0.5em;
+
+}

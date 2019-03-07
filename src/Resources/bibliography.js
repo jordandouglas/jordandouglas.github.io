@@ -123,14 +123,12 @@ BIBLIOGRAPHY["saba2019elemental"] = {name: `Saba, Jason, et al. "The elemental m
 BIBLIOGRAPHY["yarnell1999mechanism"] = {name: `Yarnell, W. S., and J. W. Roberts. "Mechanism of intrinsic transcription termination and antitermination." Science 284.5414 (1999): 611-615.`, DOI: "10.1126/science.284.5414.611 "};
 BIBLIOGRAPHY["larson2008applied"] = {name: `Larson, Matthew H., et al. "Applied force reveals mechanistic and energetic details of transcription termination." Cell 132.6 (2008): 971-982.`, DOI: "10.1016/j.cell.2008.01.027"};
 
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
+BIBLIOGRAPHY["gillespie1977exact"] = {name: `Gillespie, Daniel T. "Exact stochastic simulation of coupled chemical reactions." The journal of physical chemistry 81.25 (1977): 2340-2361.`, DOI: "10.1021/j100540a008"};
+BIBLIOGRAPHY["lecca2013stochastic"] = {name: `Lecca, Paola. "Stochastic chemical kinetics." Biophysical reviews 5.4 (2013): 323-345.`, DOI: "10.1007/s12551-013-0122-2"};
 
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
-
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
-
 
 
 
