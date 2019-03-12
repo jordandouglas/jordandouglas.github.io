@@ -190,7 +190,8 @@ function populateParameterLinks(){
             
             
         assumeBindingEquilibrium:{anchor:"Binding_equilibrium", latex:"$\\mathbb{BE}$"},
-        assumeTranslocationEquilibrium:{anchor:"Translocation_equilibrium", latex:"$\\mathbb{TE}$"} 
+        assumeTranslocationEquilibrium:{anchor:"Translocation_equilibrium", latex:"$\\mathbb{TE}$"},
+        allowmRNAfolding:{anchor:"Enable_RNA_folding", latex:"$\\mathbb{RB}$"}
             
             
     };
@@ -2041,7 +2042,7 @@ function addCitations(){
                                     If $\epsilon$ is sufficiently small, then $\hat{P}_\epsilon(\Theta_k|D)$ will be an accurate approximation of the true posterior distribution.
                                     However, if $\epsilon$ is too small, then adequately  sampling from $\hat{P}_\epsilon(\Theta_k|D)$ may not be attainable in any reasonable timeframe<cite val="bertorelle2010abc"></cite>. <br><br>
                                     
-                                    
+                                 
                                     In this section, first the various types of 
                                         <a href="#Experimental_Data" onclick="minimiseSection('#Approximate_Bayesian_computation_Btn', true)" style="text-decoration:none; color:#008cba">Experimental Data</a>
                                     $D$ supported by SimPol are described. Then, two ABC algorithms for
@@ -2184,7 +2185,7 @@ function addCitations(){
                         <br><br>
                         <div class="about-block">
                             <div class="about-block-inner">
-                            <div class="subsection block-subtitle">Motivating example</div> <br>
+                            <div class="subsection block-subtitle">Motivating example 1</div> <br>
                                 
                                 
                                 
@@ -2201,7 +2202,15 @@ function addCitations(){
                                                 We will consider a simple example of using ABC to infer parameters of transcription elongation using a toy [NTP]-velocity dataset.
                                                 The model assumes that NTP binding and translocation are at equilibrium and <param value="DGtau1"/> = 0.
                                                 <param value="kCat"/> and <param value="Kdiss"/> are to be estimated and they have been assigned lognormal prior distributions. We will revisit this example
-                                                using the R-ABC and MCMC-ABC algorithms.
+                                                using the R-ABC and MCMC-ABC algorithms.<br><br>
+                                                
+                                                
+                                                   
+                                                The posterior distribution can be summarised into a single state using
+                                                <input type="button" value="Posterior Summary" title="Extract values from the posterior distribution" class="operation" style="background-color:#008cba; cursor:auto; width: 170px">.
+                                                
+                                                
+                                                <br><br>
                                                 
                                                 
                                                        
@@ -2316,12 +2325,12 @@ function addCitations(){
                                     
                                     
                                 <br>
-                                To test this algorithm on the motivating example, follow the link below and then find and press 
+                                To test this algorithm on motivating example 1, follow the link below and then find and press 
                                     
                                     <input type="button" value="Begin ABC" title="Begin the approximate Bayesian computation via rejection with the current settings" style="width: 170px; cursor: auto; background-color: rgb(0, 140, 186);" class="ABC_display operation beginABC_btn">
                                  <br><br>  
                                 <span class="xml_link" style="text-align:center">
-                                    <b>R-ABC motivating example session:</b> 
+                                    <b>R-ABC motivating example 1 session:</b> 
                                     <a href="../?s=RABC.xml">Open</a> | 
                                     <a href="Examples/RABC.xml">View XML</a>
                                 </span> 
@@ -2494,14 +2503,14 @@ function addCitations(){
                                 </div>
                                     
                                     <br>
-                                    To test this algorithm on the motivating example, follow the link below and then find and press 
+                                    To test this algorithm on motivating example 2, follow the link below and then find and press 
                                         
                                         <input type="button" value="Begin MCMC-ABC" title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" style="width: 170px; cursor: auto; background-color: rgb(0, 140, 186);" class="MCMC_display operation beginABC_btn">.
                                     
                                     The chain is not guaranteed to converge and may tay a long time even if it does.
                                      <br><br>  
                                     <span class="xml_link" style="text-align:center">
-                                        <b>MCMC-ABC motivating example session:</b> 
+                                        <b>MCMC-ABC motivating example 2 session:</b> 
                                         <a href="../?s=MCMCABC.xml">Open</a> | 
                                         <a href="Examples/MCMCABC.xml">View XML</a>
                                     </span> 
@@ -2557,10 +2566,7 @@ function addCitations(){
                                     <img src="../../src/TutorialImages/modelComparison.png" style="width:100%; margin-top:20px; margin-bottom:20px">
                                     
                                     
-                                    
-                                    
-                                    
-                                    Refer to 
+                                     Refer to 
                                         <a href="#SimPol_in_the_Literature" onclick="minimiseSection('#SimPol_in_the_Literature_Btn', true)" style="text-decoration:none; color:#008cba">SimPol in the Literature</a>
                                     for real data examples of how model comparison has been used in inference.
                                     
@@ -2590,7 +2596,6 @@ function addCitations(){
 						<div style="display:none">
 				
 				
-							<br><br>
 							<div style="display:none" class="about-block">
 								<div class="about-block-inner">
 									<div class="subsection block-subtitle" > Web browser performance </div> <br>
@@ -3039,6 +3044,9 @@ function addCitations(){
 								<div class="about-block-inner">
 									<div id="fromCommandLine_performance" class="subsection block-subtitle"> Running SimPol from the command line </div> <br>
 	
+                                    
+                                        The following instructions will work for Linux/Mac. 
+                                    
 										<div style="padding: 10 10; background-color:#ebe9e7" >
 											<b> 1. Generate a SimPol session file.</b> Go to <a href="http://www.polymerase.nz">SimPol</a> in your web browser and configure the number of trials, parameters, model settings, ABC settings, etc.
 											When you are happy with all the settings, download the session as an XML file <img id='saveSessionID'  src="../../src/Images/downloadGreen.png" style="padding:5 0; vertical-align:middle; height:25px;">.
@@ -3049,31 +3057,58 @@ function addCitations(){
 											<b> 2. Download SimPol </b> from <a href="https://github.com/jordandouglas/jordandouglas.github.io">here</a> and unzip. Open up the command terminal and navigate to this folder.
 										</div> <br>
 										<div style="padding: 10 10; background-color:#ebe9e7" >
-											<b> 3. If running on Linux/Mac, compile SimPol with G++:</b> <br><br>
+											<b> 3. Compile the ViennaRNA suite module.</b> RNAfold<cite val="lorenz2011viennarna"></cite> is used when <param value="allowmRNAfolding"/> is enabled. <br><br>
 											
 											
 											<div style="margin-left: 100px;">
 													
-												<span class="code">cd src/asm</span><br>
-												<span class="code">bash build.sh</span><br>
+												<span class="code">cd src/asm/ViennaRNA</span><br>
+												<span class="code">bash build_vrna.sh </span><br>
 											</div>
 										</div> <br>
+                                    
+                                    
+                                    
+                                        <div style="padding: 10 10; background-color:#ebe9e7" >
+                                                <b> 4. Compile SimPol. </b> ViennaRNA must be successfully compiled first.<br><br>
+                                            
+                                            
+                                            <div style="margin-left: 100px;">
+                                                    
+                                                <span class="code">cd ../../../simpol/src/asm/</span><br>
+                                                <span class="code">bash build_vrna.sh </span><br>
+                                            </div>
+                                        </div> <br>
 										
 										<div style="padding: 10 10; background-color:#ebe9e7" >
-											<b> 4. Run SimPol.</b> On Linux/Mac this is done using <span class="code">SimpolC</span> generated in step 3. If running on Windows use <span class="code">SimpolCx32.exe</span> or <span class="code">SimpolCx64.exe</span> (for 32 or 64bit):  <br><br>
+											<b> 5. Run SimPol.</b> <br><br>
 												<div class="code" style="margin-left: 100px;">
 													
-													./SimpolC -i &lt;ipath/to/session.xml&gt; <span class="comment"># For Linux/Mac </span> <br>
-													SimpolCxNN.exe -i &lt;path\to\session.xml&gt; <span class="comment"># For Windows </span> <br>
+													bash simpol.sh -xml path/to/session.xml
 												</div> <br>
-												where <span class="code">session.xml</span> is the session you generated earlier. This will run the number of simulations
-												you specified and by default it will not save any kinetic data. Optional arguments:<br><br>
+												where <span class="code">session.xml</span> is the session generated earlier. This will run the number of simulations
+											     specified in the .xml file. Optional arguments:<br><br>
 												<div style="margin-left: 100px;">
 													
-													<span class="code">-MCMC</span>: Run MCMC analysis instead of just simulating. <br><br>
-													<span class="code">-o file.log </span>: Write the output into the specified file. <br><br>
-													
-													<span class="code">-nthreads N</span>: Parallelise the simulations over N threads. <br><br>
+											        <span class="code">-h</span>: View the command line argument specifications. <br><br>
+                                                   		
+                                            
+													<span class="code">-logO file.log</span>: Write the MCMC-ABC or R-ABC output into the specified file. <br><br>
+                                                   
+													<span class="code">-nthreads N</span>: Parallelise the simulations over N threads. Multithreading does not work in the web browser, only from the command line. Default: 1. <br><br>
+                                            
+                                                    <span class="code">-MCMC</span>: Run MCMC-ABC analysis instead of simulating. <br><br>
+                                                    <span class="code">-resume</span>: Resumes MCMC from the last state printed in the file specified by <span class="code">-logO</span> and appends to <span class="code">-logO</span>. Only applicable if <span class="code">-MCMC</span> is enabled. <br><br>
+                                                    
+                                            
+                                                    <span class="code">-logI file.log</span>: Read in the specified file. Only applicable if either -summary or -RABC are activated. <br><br>
+                                                    <span class="code">-summary</span>: prints a summary of the log file specified by <span class="code">-logI</span> into the terminal. <br><br>
+                                                    <span class="code">-RABC</span>: Run R-ABC analysis instead of simulating. All states will be printed regardless of the xml-specified value of epsilon. 
+                                                                                    If <span class="code">-logI</span> is specified then will sample from the posterior distribution, otherwise the prior.
+                                                                                    If <span class="code">-summary</span> is also specified then will sample from the geometric median instead of the whole posterior distribution. <br><br>
+                                                    
+                                                  
+                                            
 												</div>
 										</div>
 								</div>
