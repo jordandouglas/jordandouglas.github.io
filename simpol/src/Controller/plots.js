@@ -4729,24 +4729,7 @@ function distanceVsTimeOptionsTemplate1(){
 					<td></td>
 				</tr>
 				
-				
-				
-				<tr id="pauseXRow" style="cursor:pointer" onclick= " $('input[name=xRange][value=pauseX]').prop('checked', true); disableTextbox('#xMin_textbox'); disableTextbox('#xMax_textbox') ">
-					<td>
-						 <input type="radio" name="xRange" value="pauseX"> 
-					</td>
-					<td colspan=2>Pauses (&#x1D6D5; > 1s)</td>
-					
-				</tr>
-				
-				
-					<tr id="shortPauseXRow" style="cursor:pointer" onclick= " $('input[name=xRange][value=shortPauseX]').prop('checked', true); disableTextbox('#xMin_textbox'); disableTextbox('#xMax_textbox') ">
-						<td>
-							 <input type="radio" name="xRange" value="shortPauseX"> 
-						</td>
-						<td colspan=2>Short pauses (1s < &#x1D6D5; < 25s)</td>
-					</tr>
-				
+
 				
 				
 			<tr style="cursor:pointer" onclick= " $('input[name=xRange][value=specifyX]').prop('checked', true); enableTextbox('#xMin_textbox'); enableTextbox('#xMax_textbox') ">
@@ -5258,8 +5241,6 @@ function plotOptions(plotNum){
 			$("#settingCell1").html(distanceVsTimeOptionsTemplate1().replace("XUNITS", "s").replace("XUNITS", "s"));
 			$("#settingCell2").html(distanceVsTimeOptionsTemplate2().replace("YUNITS", "nt").replace("YUNITS", "nt").replace("YMINDEFAULT", 10).replace("YMAXDEFAULT", 100));
 
-			$("#pauseXRow").remove();
-			$("#shortPauseXRow").remove();
 
 			console.log('PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"]', PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["xRange"]);
 
@@ -5320,8 +5301,6 @@ function plotOptions(plotNum){
 			//$("#settingCell3").html(logSpaceTemplateX());
 			//$("#settingCell4").html(logSpaceTemplateY());
 			
-			$("#pauseXRow").remove();
-			$("#shortPauseXRow").remove();
 
 			// Window size
 			$("#windowSizeInput").val(roundToSF(PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["windowSize"] ));
@@ -5413,8 +5392,6 @@ function plotOptions(plotNum){
 		
 		
 			$("#settingCell1").html(distanceVsTimeOptionsTemplate1().replace("Time range", "Trace range").replace("XUNITS", "").replace("XUNITS", "").replace('value="1"', 'value="1000"'));
-			$("#pauseXRow").remove();
-			$("#shortPauseXRow").remove();
 			$("#settingCell2").html(distanceVsTimeOptionsTemplate2().replace("Distance range", "Y-axis range").replace("YUNITS", "").replace("YUNITS", "").replace("YMINDEFAULT", 0).replace("YMAXDEFAULT", 100));
 
 			// Set xmax and xmin
@@ -5562,8 +5539,6 @@ function populateHeatmapSettingsParameterDropdowns(plotNum, posteriorFromModel =
 		// Y-axis attribute
 		$("#settingCell2").html(distanceVsTimeOptionsTemplate1().replace("Time range", "X-axis range").replace("XUNITS", "").replace("XUNITS", ""));
 		$("#settingCell4").html(distanceVsTimeOptionsTemplate2().replace("Distance range", "Y-axis range").replace("YUNITS", "").replace("YUNITS", "").replace("YMINDEFAULT", 0).replace("YMAXDEFAULT", 1));
-		$("#pauseXRow").remove();
-		$("#shortPauseXRow").remove();
 
 
 		// Set xmax and xmin
@@ -5628,16 +5603,12 @@ function populateHeatmapSettingsParameterDropdowns(plotNum, posteriorFromModel =
 
 // If the perTemplate option is selected from the time histogram settings menu, then we hide the pause/short pause options
 function perTemplateSelected(){
-	$("#pauseXRow").hide(0);
-	$("#shortPauseXRow").hide(0);
-	if ($('input[name="xRange"][value="pauseX"]').prop("checked") || $('input[name="xRange"][value="shortPauseX"]').prop("checked")) $('input[name="xRange"][value="automaticX"]').click();
+	//if ($('input[name="xRange"][value="pauseX"]').prop("checked") || $('input[name="xRange"][value="shortPauseX"]').prop("checked")) $('input[name="xRange"][value="automaticX"]').click();
 }
 
 
 // If the perTemplate option is selected from the time histogram settings menu, then we hide the pause/short pause options
 function perTemplateDeselected(){
-	$("#pauseXRow").show(0);
-	$("#shortPauseXRow").show(0);
 }
 
 
