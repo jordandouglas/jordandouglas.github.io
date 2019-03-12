@@ -126,8 +126,17 @@ BIBLIOGRAPHY["larson2008applied"] = {name: `Larson, Matthew H., et al. "Applied 
 BIBLIOGRAPHY["gillespie1977exact"] = {name: `Gillespie, Daniel T. "Exact stochastic simulation of coupled chemical reactions." The journal of physical chemistry 81.25 (1977): 2340-2361.`, DOI: "10.1021/j100540a008"};
 BIBLIOGRAPHY["lecca2013stochastic"] = {name: `Lecca, Paola. "Stochastic chemical kinetics." Biophysical reviews 5.4 (2013): 323-345.`, DOI: "10.1007/s12551-013-0122-2"};
 
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
+BIBLIOGRAPHY["fawcett2006introduction"] = {name: `Fawcett, Tom. "An introduction to ROC analysis." Pattern recognition letters 27.8 (2006): 861-874.`, DOI: "10.1016/j.patrec.2005.10.010"};
+BIBLIOGRAPHY["ratmann2007using"] = {name: `Ratmann, Oliver, et al. "Using likelihood-free inference to compare evolutionary dynamics of the protein networks of H. pylori and P. falciparum." PLoS Computational Biology 3.11 (2007): e230.`, DOI: "10.1371/journal.pcbi.0030230"};
+BIBLIOGRAPHY["hastings1970monte"] = {name: `Hastings, W. Keith. "Monte Carlo sampling methods using Markov chains and their applications." (1970): 97-109.`, DOI: "10.1093/biomet/57.1.97"};
 
+
+
+BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
+BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
+BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
+BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
+BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 
 
