@@ -741,7 +741,7 @@ function addCitations(){
                                        
                                         <div class="about-block">
                                             <div class="about-block-inner">
-                                                <div class="subsection block-subtitle">Kinetic model of transcription</div> <br><br>
+                                                <div class="subsection block-subtitle">Kinetic model of transcription</div> 
                                                     
                                                 
                                                 
@@ -799,7 +799,7 @@ function addCitations(){
                                         <br><br>
                                         <div class="about-block">
                                             <div  class="about-block-inner">
-                                                <div class="subsection block-subtitle" > Reactions </div>  <br><br>
+                                                <div class="subsection block-subtitle" > Reactions </div>
                                             
                                                 
                                                 The polymerase can be controlled manually using the Navigation panel at the top of the main page. 
@@ -2000,548 +2000,452 @@ function addCitations(){
 					</div>
 				</div>
 				
-				<!--<br><br><br><br>
-				<div class="main-block">
-					<div class="main-block-inner">
-						<div class="block-title"> 
-						
-						
-							Models of Polymerisation
-							</div> 
-								<div id="models"  style="display:none">
-										<br><br>
-										<div class="about-block">
-											<div class="about-block-inner">
-												<div id="intro_modelsHelp" class="block-subtitle" >State notation</div> <br>
-													<img src="../../src/TutorialImages/backtracked.png" style="width:30%; padding: 2 10;" align=right></img>
-												Let $S(l, m)$ denote a polymerase state, where $l$ is the length of the nascent strand (units nt) and
-												$m \in \mathbb{Z}$ is the current position of the $3^\prime$ end of the nascent strand with respect to the active site of the polymerase.  
-												When $m = 1$, the polymerase is in the <i>posttranslocated</i> state - a prerequisite for NTP binding.   
-												The polymerase is <i> pretranslocated</i> when $m = 0$, <i>backtracked</i> when $m < 0$, and <i>hypertranslocated</i> when $m > 1$.
-												$S(l, m)^N$ denotes that NTP is bound and $S(l, m)^i$ denotes that the polymerase is catalytically inactive. 
-												For example, the state displayed is described by $S(14, -1)$ because the RNA is 14 nucleotides long and the polymerase
-												is backtracked 1 position. NTP is not bound and the polymerase is catalytically active.
-												   
-											
-												<br><br>
-												This section describes how the kinetic model of polymerisation can be altered. The currently selected model
-												can be viewed at any time by pressing 
-												<input type=button value='View model diagram' title="View the kinetic diagram of this model" class="operation" style="z-index: 100; width:160px; cursor:auto">
-												.
-											</div>
-										</div>
-										<br><br>
-										<div class="about-block">
-											<div class="about-block-inner">
-												<div id="simple_modelsHelp" class="block-subtitle" >Simple kinetic model</div> <br>
-													
-													The simplest model of polymerisation is the model with no off-pathway events (eg. hypertranslocation, backtracking, inactivation),
-													and is described by the Brownian ratchet mechanism. The polymerase is restricted to the main polymerisation pathway.
-													This model also does not make any explicit assumptions about equilibrium during NTP binding or translocation. Within each nascent
-													strand length $l$, there are 3 states: the polymerase can be pretranslocated $S(l, 0)$, posttranslocated $S(l, 1)$ or posttranslocated with
-													NTP bound $S(1, 1)^N$: <br><br>
-													
-													
-													
-													
-														<div style='background-color:adadad; padding: 10 10;  width: 50%; left: 25%; margin:auto'>
-															<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
-																<span style='font-size: 30px'> Kinetic diagram for Simple kinetic model </span>
-																<div id="modelDiagramDiv" style="text-align:center">
-																	<canvas id="modelDiagramCanvas_1" class="noselect" style="padding:10 10;" width=1000 height=500></canvas>
-																</div>
-																
-																<div style="font-size:24; height:60px;">
-																	<div id="kineticStateDescription_1" style="display:block; text-align:left">  </div>
-																</div>
-																<div style="font-size:15"> Hover over a state or arrow to read its description. </div>
-																
-															</div>
-														</div>
-													
-													
-													<br><br>
-													
-													
-													
-													
-													
-													
-													
-													The subsequent subsections will show the alterations which can be made to this model.
-											</div>
-										</div>
-										
-										
-										
-										
-										
-										
-										
-										<br><br>
-										<div class="about-block">
-											<div class="about-block-inner">
-												<div id="simple_modelsHelp" class="block-subtitle" >Hypertranslocation</div> <br>
-													
-													
-													
-													
-													
-													
-														<div style='background-color:adadad; padding: 10 10;  width: 50%; left: 25%; margin:auto'>
-															<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
-																<span style='font-size: 30px'> Kinetic diagram for Kinetic model with hypertranslocation </span>
-																<div id="modelDiagramDiv" style="text-align:center">
-																	<canvas id="modelDiagramCanvas_2" class="noselect" style="padding:10 10;" width=1000 height=500></canvas>
-																</div>
-																
-																<div style="font-size:24; height:60px;">
-																	<div id="kineticStateDescription_2" style="display:block; text-align:left">  </div>
-																</div>
-																<div style="font-size:15"> Hover over a state or arrow to read its description. </div>
-																
-															</div>
-														</div>
-													
-													
-													<br><br>
-													
-			
-											</div>
-										</div>
-										
-										
-										
-										
-										
-										<br><br>
-										<div class="about-block">
-											<div class="about-block-inner">
-												<div id="simple_modelsHelp" class="block-subtitle" >Backtracking</div> <br>
-													
-													
-													
-													
-													
-													
-														<div style='background-color:adadad; padding: 10 10;  width: 50%; left: 25%; margin:auto'>
-															<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
-																<span style='font-size: 30px'> Kinetic diagram for Kinetic model with backtracking </span>
-																<div id="modelDiagramDiv" style="text-align:center">
-																	<canvas id="modelDiagramCanvas_3" class="noselect" style="padding:10 10;" width=1000 height=500></canvas>
-																</div>
-																
-																<div style="font-size:24; height:60px;">
-																	<div id="kineticStateDescription_3" style="display:block; text-align:left">  </div>
-																</div>
-																<div style="font-size:15"> Hover over a state or arrow to read its description. </div>
-																
-															</div>
-														</div>
-													
-													
-													<br><br>
-													
-			
-											</div>
-										</div>
-										
-										
-										
-										
-										<br><br>
-										<div class="about-block">
-											<div class="about-block-inner">
-												<div id="simple_modelsHelp" class="block-subtitle" >Backtracking via inactivation</div> <br>
-													
-													
-													
-													
-													
-													
-														<div style='background-color:adadad; padding: 10 10;  width: 50%; left: 25%; margin:auto'>
-															<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
-																<span style='font-size: 30px'> Kinetic diagram for Kinetic model with inactivation pausing </span>
-																<div id="modelDiagramDiv" style="text-align:center">
-																	<canvas id="modelDiagramCanvas_4" class="noselect" style="padding:10 10;" width=1000 height=600></canvas>
-																</div>
-																
-																<div style="font-size:24; height:60px;">
-																	<div id="kineticStateDescription_4" style="display:block; text-align:left">  </div>
-																</div>
-																<div style="font-size:15"> Hover over a state or arrow to read its description. </div>
-																
-															</div>
-														</div>
-													
-													
-													<br><br>
-													
-			
-											</div>
-										</div>
-										
-										
-										
-										
-										<br><br>
-										<div class="about-block">
-											<div class="about-block-inner">
-												<div id="simple_modelsHelp" class="block-subtitle" >Backtracking via inactivation, hypertranslocation</div> <br>
-													
-													
-													
-													
-													
-													
-														<div style='background-color:adadad; padding: 10 10;  width: 50%; left: 25%; margin:auto'>
-															<div style='background-color: ebe9e7; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
-																<span style='font-size: 30px'> Kinetic diagram for Kinetic model with inactivation pausing and hypertranslocation </span>
-																<div id="modelDiagramDiv" style="text-align:center">
-																	<canvas id="modelDiagramCanvas_5" class="noselect" style="padding:10 10;" width=1000 height=600></canvas>
-																</div>
-																
-																<div style="font-size:24; height:60px;">
-																	<div id="kineticStateDescription_5" style="display:block; text-align:left">  </div>
-																</div>
-																<div style="font-size:15"> Hover over a state or arrow to read its description. </div>
-																
-															</div>
-														</div>
-													
-													
-													<br><br>
-													
-			
-											</div>
-										</div>
-										
-										
-										
-								</div>
-							</div>
-				
-				
-						</div>
-					</div>
-				</div>-->
-			<!--
 				<br><br><br><br>
 				<div class="main-block">
 					<div class="main-block-inner">
-						<div class="block-title"> 
-						
-						
-							Parameter Inference
-						</div> 
-						<div id="ABCSection"  style="display:none">
+                        <div class="block-title"> 
+                            <span class="section">Approximate Bayesian computation</span> 
+                        </div> 
+                        <div style="display:none">
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-								<div id="setupABC_ABCSectionHelp" class="block-subtitle" >Approximate Bayesian Computation</div> <br>
-									Approximate Bayesian Computation (ABC) is a statistical inference method used to fit parameters to experimental data<cite val="csillery2010approximate,beaumont2010approximate"></cite>. Let $\Theta$ be the set of
-									parameters to estimate. Parameter inference is the process of finding an estimate for $\Theta$ such that the model will accurately explain or predict empirical data $D$.
-									First, a prior distribution is specified for each parameter in $\Theta$. 
-									These probability distributions should reflect your pre-exisiting or <i>prior</i> belief about what values would be sensible for these parameters before observing experimental data $D$. 
-									Second, ABC is used to find a set of parameter values $\hat{\Theta}$ which adequately 
-									explain $D$.
+								<div class="subsection block-subtitle" >Bayesian inference</div> <br>
 									
-									The ABC algorithm is very simple: <br><br>
-									
-									
-									
-									<div style="padding: 2 10; background-color:#ebe9e7; font-size:18px" >
-									
-										<ol class="code">
-										
-											<li>
-												&Theta;<sup style='position: relative; left: -.65em;'>&Hat;</sup> &larr; {}
-														<span class="comment"> // The posterior distribution </span>
-											</li>
-											
-											<li>
-												for n = 1:N {
-											</li>
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &Theta;<sub>p</sub> ~ prior()
-															<span class="comment"> // Sample &Theta;<sub>p</sub> from prior distribution </span>
-											</li>
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; D<sup style='position: relative; left: -.65em;'>&Hat;</sup> &larr; run_model(&Theta;<sub>p</sub>) 
-														<span class="comment"> // Simulate data D<sup style='position: relative; left: -.65em;'>&Hat;</sup> using parameter values &Theta;<sub>p</sub> </span>
-											</li>
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; if (D<sup style='position: relative; left: -.65em;'>&Hat;</sup>&approx; D) &Theta;<sup style='position: relative; left: -.65em;'>&Hat;</sup>&larr; 
-													&Theta;<sup style='position: relative; left: -.65em;'>&Hat;</sup> &cup; &Theta;<sub>p</sub> 
-													<span class="comment"> // If D<sup style='position: relative; left: -.65em;'>&Hat;</sup> is close to D, add &Theta;<sub>p</sub> to the posterior distribution </span>
-											</li>
-											
-											
-											<li>
-												}
-											</li>
-											
-											
-										</ol>
-									
-									</div>
-								<br>
-								
-								The number of iterations $N$ should be large enough to produce a reasonable sized posterior distribution. A rejection algorithm $\hat{D} \approx D$ is required to determine whether
-								the predicted data is close enough to the true empirical data to be accepted into the posterior distribution. 
-								ABC has the advantage of being simple to set up
-								compared with a complex hillclimbing algorithm like Markov chain Monte Carlo, and is easy to parallelise. However, the nature of ABC means that the posterior 
-								distribution is not associated with true probabilities and has limited statistical meaning<cite val="templeton2009statistical"></cite>.
-								Furthermore, since each trial is sampled independently this means that when the number of parameters or the dataset becomes too large,
-								the amount of time required may become infeasible<cite val="bertorelle2010abc"></cite>. 
+                                    
+                                    
+                                    Let $D$ be some dataset and let $\Theta = ${$\theta_1, \theta_2, \dotso, \theta_b$} be a set of parameters for a model. The goal of statistical inference
+                                    is to find values for each parameter in $\Theta$ such that the model adequately describes the data $D$. <br><br>
+                                    
+                                    
+                                    In Bayesian statistics, parameters are estimated using the posterior distribution. The posterior probability of $\Theta = \Theta_k$ can be obtained using:
+                                    
+                                    
+                                    $$P(\Theta_k|D) = \frac{P(D|\Theta_k)P(\Theta_k)}{P(D)}$$
+                                    
+                                    where $P(D|\Theta_k)$ is the likelihood - the probability of observing data $D$ under the model assuming that the parameters in $\Theta_k$
+                                    are set to their true values - and $P(\Theta_k)$ is the prior probability of $\Theta_k$ being the true values before observing new data $D$. $P(D)$ is a 
+                                    normalisation constant and is intractable to evaluate directly. Subsequently, sampling methods are typically used to estimate the posterior distribution $P(\Theta|D)$.
+                                    In a Bayesian framework, parameters are estimated as probability distributions
+                                    - ie. the posterior distribution - instead of as point estimates. <br><br>
+                                    
+                                    
+                                    Unfortunately, in some circumstances calculating the likelihood $P(D|\Theta)$ is not tractable. Instead,
+                                    <a href="#Simulating" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">simulation</a>                           
+                                    can be used, and the posterior distribution can <i>approximated</i>. This framework is known as approximate Bayesian computation (ABC)<cite val="csillery2010approximate,beaumont2010approximate"></cite>.
+                                    Let $\rho(D,\hat{D}_k)$ be a function which evaluates the distance between the true data $D$ and the data $\hat{D}_k$ simulated under
+                                    the model with parameters $\Theta_k$. Then, $\Theta = \Theta_k$ is accepted into the posterior distribution if $\rho(D,\hat{D}_k) \leq \epsilon$
+                                    for some threshold $\epsilon \geq 0$. The posterior distribution approximated under $\epsilon$ is denoted by $\hat{P}_\epsilon(\Theta_k|D)$. <br><br>
+                                    
+                                    
+                                    If $\epsilon$ is sufficiently small, then $\hat{P}_\epsilon(\Theta_k|D)$ will be an accurate approximation of the true posterior distribution.
+                                    However, if $\epsilon$ is too small, then adequately  sampling from $\hat{P}_\epsilon(\Theta_k|D)$ may not be attainable in any reasonable timeframe<cite val="bertorelle2010abc"></cite>. <br><br>
+                                    
+                                    
+                                    In this section, first the various types of 
+                                        <a href="#Experimental_Data" onclick="minimiseSection('#Approximate_Bayesian_computation_Btn', true)" style="text-decoration:none; color:#008cba">Experimental Data</a>
+                                    $D$ supported by SimPol are described. Then, two ABC algorithms for
+                                    estimating $\hat{P}_\epsilon(\Theta_k|D)$ are explained:
+                                    
+                                        <a href="#R-ABC" onclick="minimiseSection('#Approximate_Bayesian_computation_Btn', true)" style="text-decoration:none; color:#008cba">R-ABC</a>
+                                     and
+                                        <a href="#MCMC-ABC" onclick="minimiseSection('#Approximate_Bayesian_computation_Btn', true)" style="text-decoration:none; color:#008cba">MCMC-ABC</a>.
+                                    For examples of ABC applied to real data, see 
+                                        <a href="#SimPol_in_the_Literature" onclick="minimiseSection('#SimPol_in_the_Literature_Btn', true)" style="text-decoration:none; color:#008cba">SimPol in the Literature</a>.
+                                    
+                                    
+                                    
 							</div>
 						</div>
+                            
+                            
+                            
+                             
+                            
+                            
+                            <div class="about-block">
+                                <div class="about-block-inner">
+                                <div class="subsection block-subtitle">Experimental Data</div> <br>
+                                    
+                                    
+                                    
+                                    <img src="../../src/TutorialImages/experimentalData.png" style="width:100%">
+                                    
+                                    
+                                    
+                                    SimPol supports three types of data, detailed below. The total experimental data is comprised of a series of $c$ experiments:
+                                    $D = (d_1, d_2, \dotso, d_c)$. In the image above, there are $c=2$ experiments.
+                                    Each datatype is associated with a distance function $\rho$. 
+                                   The values of $\rho$ are summed across each of the $c$ experiments to give the total distance.
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    <br><br>
+                                    <div class="panelOuter">
+                                        <div class="panelInner" >
+                                            <span class="block-subsubtitle subsubsection" sect="Force-velocity" > Force-velocity data </span><br><br>
+                                        
+                                            In optical trapping experiments, varying forces are applied to the RNA polymerase using optical  
+                                            tweezers<cite val="neuman2003ubiquitous,abbondanzieri2005direct,mejia2015trigger,dulin2015elongation"></cite>. As the assisting force increases, the rate of forward translocation
+                                            increases with it.  <br><br>
+                                            
+                                            
+                                            
+                                             Experimental dataset $d_i \in D$ consists of a set of experimental settings $x$ and observations $y$. 
+                                             
+                                            $$d_i = \begin{bmatrix}
+                                                        x_i^1 & y_i^1 \\
+                                                        x_i^2 & y_i^2 \\
+                                                        x_i^3 & y_i^3 \\
+                                                        \vdots & \vdots
+                                                    \end{bmatrix}$$
+                                            
+                                            
+                                            
+                                            
+                                            Vector $x$ describes the varying values of the applied
+                                                <a href="#Force" onclick="minimiseSection('#Parameters_and_Settings_Btn', true)" style="text-decoration:none; color:#008cba">Force</a>
+                                            used in the experiment. The NTP concentrations are held constant at specified values. 
+                                            The observations $y$ are the velocities of the polymerase, as measured under the applied force.   <br><br>
+                                            
+                                            
+                                            For force-velocity data, $\rho$ is the chi-squared statistic $X^2$:
+                                            
+                                            
+                                            $$
+                                                \rho(d_i, \hat{d_i}) = X^2 = \sum_j \frac{(y_i^j - \hat{y}_j^j)^2}{\hat{y}_j^j}
+                                            $$
+                                            
+                                            where $y_i$ are the true velocities for experiment $i$, and $\hat{y}_i$ are the simulated velocities.
+                                            
+
+                                    </div> 
+                                    </div>  
+                                    <br><br>
+                                    
+                                    
+                                    
+                                    
+                                    <div class="panelOuter">
+                                        <div class="panelInner" >
+                                            <span class="block-subsubtitle subsubsection" sect="[NTP]-velocity" > [NTP]-velocity data </span><br><br>
+                                        
+                                            
+                                            By increasing the concentrations of the four NTPs, the elongation velocity is expected to increase with it. <br><br>
+                                            
+                                            
+                                            Similar to force-velocity data, experimental dataset $d_i \in D$ is expressed as a matrix with experimental settings vector $x$ and measurements $y$.
+                                            
+                                            For this data type, $x$ describes the varying values of the
+                                                <a href="#[NTP]" onclick="minimiseSection('#Parameters_and_Settings_Btn', true)" style="text-decoration:none; color:#008cba">NTP concentrations</a>
+                                            used in the experiment. Each NTP is associated with a concentration multiplier [ATP]<sub>eq</sub>, [CTP]<sub>eq</sub>, [GTP]<sub>eq</sub>, and [UTP]<sub>eq</sub>.
+                                            The resulting concentrations for species _TP are computed as $x$[_TP]<sub>eq</sub>. The applied force is held constant at a specified value.
+                                            The observations $y$ are the velocities of the polymerase, as measured under the NTP concentrations. <br><br>
+                                            
+                                            For [NTP]-velocity data, $\rho$ is the chi-squared statistic $X^2$, calculated the same as for force-velocity data.
+                                            
+                                             
+                                    </div> 
+                                    </div>  
+                                    <br><br>
+                                    
+                                    
+                                    
+                                    <div class="panelOuter">
+                                        <div class="panelInner" >
+                                            <span class="block-subsubtitle subsubsection" sect="Pause sites" > Pause site data </span><br><br>
+                                        
+                                            At a pause site, the polymerase takes significantly longer than average to incorporate the next nucleotide and move on to the next position. <br><br>
+                                            
+                                            
+                                            When specifying pause site data, the indicies of all pause sites (defined as the length of the nascent strand when the pause occurs) must be indicated, and so must the full nascent sequence.
+                                            
+                                            
+                                            
+                                            <br><br>
+                                            Let $f_P(j)$ describe the median time that nascent strand has length $j$, averaged across multiple simulations of the specified gene.  
+                                            SimPol treats pause site prediction as a binary classification problem. Subsequently, $\rho$ is equal to 1 minus the area under the curve (AUC) of a ROC curve <cite val="fawcett2006introduction"></cite>,
+                                            computed by comparing the known locations of pause sites with continuous function $f_P$. A single AUC is computed across all pause site experimental datasets, not one per dataset.
+                                            
+                                             
+                                    </div> 
+                                    </div>  
+                                    
+                            </div>
+                        </div>
+                            
 							
 							
 							
 							
-							
-							
-							<br><br>
-							<div class="about-block">
-								<div class="about-block-inner">
-								<div class="block-subtitle">The ABC algorithm in SimPol</div> <br>
+						
+						
+						<br><br>
+						<div class="about-block">
+							<div class="about-block-inner">
+							<div class="subsection block-subtitle">R-ABC</div> <br>
+								
+								
+								The rejection-ABC (R-ABC) algorithm is simple and easy to parallelise<cite val="csillery2010approximate,beaumont2010approximate"></cite>. Each sample is generated independently. The following user-specified settings are involved: 
+								
+								    <ul>
+                                        <li><i>N iterations</i>, $N$: the total number of samples from posterior distribution $\hat{P}_\epsilon(\Theta|D)$ to generate. </li>
+                                        <li><i>N trials per data point</i>, $n$: the number of simulations per data point. The average measured value (mean velocity or median pause time) will be taken. </li>
+                                        <li>$\epsilon$: the threshold that $\rho(D,\hat{D}_k)$ must meet in order for $\Theta_k$ to be accepted into $\hat{P}_\epsilon(\Theta|D)$. This setting is linked with and can be used instead of $P(\rho \leq \epsilon)$.  </li>
+                                        <li>$P(\rho \leq \epsilon)$: the probability that a value sampled from $P(\Theta)$ will be accepted. This setting is linked with and can be used instead of $\epsilon$. </li>
+                                       
+                                    </ul>
+								
+                                    
+                                    
+								<div style="padding: 2 10; background-color:#ebe9e7; font-size:18x" >
+								
+									<ol class="code">
 									
 									
-									The following algorithm is used during ABC in SimPol:   <br><br>
+										<li>
+											function R_ABC($D$, $\Theta$, $N$, $\epsilon$) {
+										</li>
 									
-									
-									
-									<div style="padding: 2 10; background-color:#ebe9e7; font-size:18x" >
-									
-										<ol class="code">
+										<li>
+											&nbsp;&nbsp;&nbsp; $\hat{P}_\epsilon(\Theta|D) \leftarrow ${}
+													<span class="comment"> // Initialise empty posterior distribution </span>
+										</li>
+										
+										<li>
+											&nbsp;&nbsp;&nbsp; for k = 1:N {
+										</li>
+										
+										<li>
+											&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $\Theta_k \sim P(\Theta)$
+														<span class="comment"> // Sample $\Theta_k$ from prior distribution </span>
+										</li>
 										
 										
-											<li>
-												function SimPol_ABC(N, K, D) {
-											</li>
 										
-											<li>
-												&nbsp;&nbsp;&nbsp; &Theta;<sup style='position: relative; left: -.65em;'>&Hat;</sup> &larr; {}
-														<span class="comment"> // The posterior distribution </span>
-											</li>
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; for n = 1:N {
-											</li>
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &Theta;<sub>p</sub> ~ prior()
-															<span class="comment"> // Sample &Theta;<sub>p</sub> from prior distribution </span>
-											</li>
-											
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; for d<sub>i</sub> in D {
-														<span class="comment"> // Iterate through each experiment in the data D </span>
-											</li>
-											
-											
-											<li>
-												
-											</li>
-											
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="comment"> // d<sub>i</sub> consists of experimental settings s<sub>i</sub>, observed values o<sub>i</sub>, and rejection threshold &alpha;<sub>i</sub> </span>
-											</li>
-											
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; d<sub>i</sub> = (s<sub>i</sub>,o<sub>i</sub>,&alpha;<sub>i</sub>) 
-															
-											</li>
-											
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; RSS &larr; 0
-														<span class="comment"> // Residual sum of squares </span>
-															
-											</li>
-											
-											
-											<li>
-												
-											</li>
-											
-											
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; for s<sub>i</sub><sup>j</sup> in s<sub>i</sub> {
-														<span class="comment"> // Iterate through each experimental setting </span>
-											</li>
-											
-											<li>
-												
-											</li>
-											
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="comment"> // Simulate K times using parameters &Theta;<sub>p</sub> under experimental settings s<sub>i</sub><sup >j</sup> and take the median simulated value </span>
-											</li>
-											
-											
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; o<sub>i</sub><sup style='position: relative; left: -1.2em;'>&Hat;</sup><sup style='position: relative; left: -0.5em;'>j</sup>&larr; median(run_k_simulations(K, &Theta;<sub>p</sub>, s<sub>i</sub><sup >j</sup>))
-														
-											</li>
-											
-											
-												<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; RSS &larr; RSS + (o<sub>i</sub><sup style='position: relative; left: -1.2em;'>&Hat;</sup><sup style='position: relative; left: -0.5em;'>j</sup> - 
-																																			 o<sub>i</sub><sup>j</sup>)<sup>2</sup>
-														<span class="comment"> // Compare the observed value o<sub>i</sub><sup>j</sup> with the expected value o<sub>i</sub><sup style='position: relative; left: -1.2em;'>&Hat;</sup><sup style='position: relative; left: -0.5em;'>j</sup> </span>
-															
-											</li>
-											
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }
-											</li>
-											
-											
-											<li>
-												
-											</li>
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span class="comment"> // If the residual sum of squares is too high reject these parameters
-											</li>
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if (RSS > &alpha;<sub>i</sub>*|o<sub>i</sub>|) {
-															
-												
-											</li>
-											
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; n &larr; n + 1
-											</li>
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;  goto(4)
-											</li>
-											
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }
-											</li>
-											
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }
-											</li>
-											
-											
-											<li>
-												
-											</li>
-											
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &Theta;<sup style='position: relative; left: -.65em;'>&Hat;</sup>&larr; &Theta;<sup style='position: relative; left: -.65em;'>&Hat;</sup> &cup; &Theta;<sub>p</sub> 
-													<span class="comment"> // &Theta;<sub>p</sub> adequately fits all experiments in D, so add it to the posterior distribution </span>
-											</li>
-											<li>
-												&nbsp;&nbsp;&nbsp; }
-											</li>
-											
-											
-											<li>
-												&nbsp;&nbsp;&nbsp; return &Theta;<sup style='position: relative; left: -.65em;'>&Hat;</sup>
-											</li>
-											
-											
-											
-											<li>
-												}
-											</li>
-											
-											
-										</ol>
-									
-									</div>
-								<br>
-								SimPol's implementation of ABC requires three user arguments. First, the number of iterations $N$, which can be changed using 
+										
+										<li>
+											&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $\hat{D}_k \sim $ simulator($\Theta_k$)
+                                                        <span class="comment"> // Simulate data using the parameters specified in $\Theta_k$ </span>
+										</li>
+										
+										
+										<li>
+											&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if ($\rho(D, \hat{D}_k) \leq \epsilon$) {
+										</li>
+                                            
+                                            
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $\hat{P}_\epsilon(\Theta|D) \leftarrow \hat{P}_\epsilon(\Theta|D) \cup \Theta_k$
+                                                <span class="comment"> // Accept </span>
+                                        </li>
+                                            
+                                            
+                                            
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }
+                                        </li>
+                                            
+                                            
+                                            
+										<li>
+											&nbsp;&nbsp;&nbsp; }
+										</li>
+										
+										
+										<li>
+											&nbsp;&nbsp;&nbsp; return $\hat{P}_\epsilon(\Theta|D)$
+										</li>
+										
+										
+										
+										<li>
+											}
+										</li>
+										
+										
+									</ol>
 								
-								<span style="padding: 2 6; background-color:#ebe9e7">
-									Number of ABC iterations: <input type="number" value=1000 title="Number of iterations to run the ABC for" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
-								</span>.
-								
-								Second, the number of simulations $K$ to run per set of experimental data 
-								
-								<span style="padding: 2 6; background-color:#ebe9e7">
-									Number of tests per data point: <input type="number" value=20 title="Number of tests to perform at each force/NTP setting. The median velocity will be used" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#663399">
-								</span>.
-								
-								Third, the experimental data $D$. Various types of experimental data could be used for parameter inference. The experiments supported by SimPol are detailed in the next section. <br><br>
-								
-								
-								It is important to note that the algorithm will move on to the next prior sample if the current fit is bad. The ordering of the 
-								experimental datasets in $D$ therefore matters. To maximise efficiency you should place tests which are more likely to fail at the beginning of $D$ instead of the end.
-								If you are running ABC over a large $NK$, since ABC is <i>embarrassingly parallel</i> we recommend you download SimPol to utilise its multithreading potential. 
-								See <b><a style="text-decoration:none; color:#008cba" onclick="minimiseSection('#performanceBtn', true);" href="#fromCommandLine_performance">Running SimPol from the command line.</a></b>
-								
-		
 								</div>
+	
 							</div>
-							
-							
-							<br><br>
-							<div class="about-block">
-								<div class="about-block-inner">
-								<div  class="block-subtitle">Adding experimental data</div> <br>
-									Each experimental dataset $d_i \in D$ consists of a set of $l$ experimental settings $s_i = (s_i^1, s_i^2 , \dotso , s_i^l)$, 
-									a set of $l$ observed values $o_i = (o_i^1, o_i^2 , \dotso , o_i^l)$, and 
-									a user-specified rejection threshold $\alpha_i$. $s$ and $o$ have different meanings for different types of experimental data. But in all cases,
-									$\alpha_i$ is the mean residual sum of squares (mRSS) threshold for experiment $d_i$.  <br><br>							
-									
-					
-									<div style="padding: 10 10; background-color:#ebe9e7">
-										<div id="forceVelocity_ABCSectionHelp" class="block-subtitle" style="font-size:30px; text-align:left"> 1. Force-velocity curves</div> 
-										
-										In optical trapping experiments, varying forces (units pN) are applied to the RNA polymerase using optical  
-										tweezers<cite val="neuman2003ubiquitous,abbondanzieri2005direct,mejia2015trigger,dulin2015elongation"></cite>. As the assisting force increases, the rate of forward translocation
-										will increase with it.  <br><br>
-										
-										
-										Experimental setting $s_i^j \in s_i$ describes the applied forces and NTP concentrations used in the experiment. 
-										Observation $o_i^j \in o_i$ is the mean velocity measured in experiment $s_i$. Each force is associated with a single velocity, but
-										the NTP concentrations are shared by all $o_i^j \in o_i$.  <br><br>
-										
-										
-									</div>
-									
-									<br><br><br>
-									<div style="padding: 10 10; background-color:#ebe9e7">
-										<div id="ntpVelocity_ABCSectionHelp" class="block-subtitle" style="font-size:30px; text-align:left"> 2. [NTP]-velocity curves</div> 
-										
-										
-										
-									</div>
-									
-									<br><br><br>
-									
-								</div>
-							</div>
-							
-							
+						</div>
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                        <br><br>
+                        <div class="about-block">
+                            <div class="about-block-inner">
+                            <div class="subsection block-subtitle">MCMC-ABC</div> <br>
+                                
+    
+                                The Markov chain Monte Carlo ABC (MCMC-ABC) algorithm produces a random walk through parameter space<cite val="beaumont2010approximate"></cite>. Samples are no longer independent and therefore autocorrelation between successive states should be accounted for. 
+                                In contrast to R-ABC, $\epsilon$ is not fixed. To enable $\rho$ to converge, $\epsilon$ starts out high at $\epsilon_0$ and then decreases to $\epsilon_{min}$ following
+                                an exponential cooling scheme<cite val="ratmann2007using"></cite>: $\epsilon_i = \max(\epsilon_{min}, \gamma \epsilon_{i-1})$, where $0$ &lt; $\gamma$ &lt; $1$. 
+                                $\epsilon_i$ refers to the value of the threshold at iteration $i$ in the MCMC chain.
+                                If $\gamma$ is too small, the system may not converge, whereas if $\gamma$ is too large then it may take too long to converge.
+                                
+                                    
+                                    The following user-specified settings are involved: 
+                                    
+                                    <ul>
+                                        <li><i>N iterations</i>, $N$: the length of the chain of posterior distribution samples $\hat{P}_\epsilon(\Theta|D)$. </li>
+                                        <li><i>N trials per data point</i>, $n$: the number of simulations per data point. The average measured value (mean velocity or median pause time) will be taken. </li>
+                                        <li>$\epsilon_{min}$: the final value of $\epsilon$ after cooling.  </li>
+                                        <li>$\epsilon_{0}$: the initial value of $\epsilon$. </li>
+                                        <li>$\gamma$: the rate of $\epsilon$ cooling. </li>
+                                        <li><i>Burn-in (%)</i>: the percentage of samples to discard before reaching the posterior distribution. Set to -1 to allow automatic detection. </li>
+                                        <li><i>Log every (states)</i>, $L$: the frequency of storing posterior samples. Storing every sample is wasteful because of autocorrelation between successive sample. </li>
+                                       
+                                       
+                                    </ul>
+                                
+                                    
+                                    
+                                <div style="padding: 2 10; background-color:#ebe9e7; font-size:18x" >
+                                
+                                    <ol class="code">
+                                    
+                                    
+                                        <li>
+                                            function MCMC_ABC($D$, $\Theta$, $N$, $\epsilon_0$, $\epsilon_{min}$, $\gamma$, $L$) {
+                                        </li>
+                                    
+                                            
+                                            
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; $\Theta_0 \sim P(\Theta)$
+                                                    <span class="comment"> // Initial state sampled from prior distribution </span>
+                                        </li>
+                                            
+                                            
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; $\hat{P}_\epsilon(\Theta|D) \leftarrow ${$\Theta_0$}
+                                                    <span class="comment"> // Initialise posterior distribution </span>
+                                        </li>
+                                            
+                                            
+                                            
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; $\epsilon \leftarrow \epsilon_0$
+                                                    <span class="comment"> // Initialise the value of $\epsilon$ </span>
+                                        </li>
+                                            
+                                        
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; for k = 1:N {
+                                        </li>
+                                        
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $\Theta^\prime \sim $ proposal$(\Theta_{k-1})$
+                                                        <span class="comment"> // Sample proposal state using the proposal function. This randomly changes one parameter in $\Theta_{k-1}$. </span>
+                                        </li>
+                                        
+                                        
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $\hat{D}^\prime \sim $ simulator($\Theta^\prime$)
+                                                        <span class="comment"> // Simulate data using the parameters specified in $\Theta^\prime$ </span>
+                                        </li>
+                                            
+                                            
+                                            
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $\epsilon \leftarrow \max(\epsilon_{min}, \gamma \epsilon)$
+                                                        <span class="comment"> // Lower the threshold </span>
+                                        </li>
+                                            
+                                            
+                                         <li>
+                                            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $u \leftarrow$ random_uniform(0,1)
+                                                        <span class="comment"> // A random number uniformly sampled from the range (0,1)</span>
+                                        </li>
+                                        
+                                        
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if ($\rho(D, \hat{D}^\prime) \leq \epsilon$ and $u$ &gt; $\frac{P(\Theta^\prime)}{P(\Theta_{k-1})}$) {
+                                                        <span class="comment"> // Metropolis ratio<cite val="hastings1970monte"></cite> </span>
+                                        </li>        
+                                            
+                                            
+                                            
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $\Theta_k \leftarrow \Theta^\prime$
+                                                <span class="comment"> // Accept </span>
+                                        </li>
+                                            
+                                            
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; } else {
+                                                        
+                                        </li>   
+                                            
+                                            
+                                            
+                                       <li>
+                                            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $\Theta_k \leftarrow \Theta_{k-1}$
+                                                <span class="comment"> // Reject </span>
+                                        </li
+                                            
+                                            
+                                            
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; } 
+                                                        
+                                        </li>  
+                                            
+                                            
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if ($k$ % $L$ = 0) {
+                                        </li>
+                                            
+                                            
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $\hat{P}_\epsilon(\Theta|D) \leftarrow \hat{P}_\epsilon(\Theta|D) \cup \Theta_k$
+                                                <span class="comment"> // Log every $L$<sub>th</sub> state </span>
+                                        </li>
+                                        
+                                          <li>
+                                            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; } 
+                                        </li>  
+                                            
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; }
+                                        </li>
+                                        
+                                        
+                                        <li>
+                                            &nbsp;&nbsp;&nbsp; return $\hat{P}_\epsilon(\Theta|D)$
+                                        </li>
+                                        
+                                        
+                                        
+                                        <li>
+                                            }
+                                        </li>
+                                        
+                                        
+                                    </ol>
+                                
+                                </div>
+    
+                            </div>
+                        </div>
+                            
+                            
+                            
+             
 							
 							
 						</div>
 					</div>
 				</div>
-		-->
 				
 				<br><br><br><br>
 				<div class="main-block">
