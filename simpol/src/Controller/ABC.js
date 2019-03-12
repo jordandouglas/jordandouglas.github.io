@@ -1052,7 +1052,7 @@ function getABCntpVelocityCurveTemplate(fitID){
 
 				<div style="font-size:20px;">
 					[NTP]-velocity curve
-					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#[NTP]-velocity"><img class="helpIcon" src="../src/Images/help.png"></a>
 						
 				</div>
 
@@ -1183,7 +1183,15 @@ function getPauseSitesTemplate(fitID){
 			<td class="` + fitID + `" style="text-align:center; vertical-align:top">
 
 					<input type=button id='deleteExperiment_` + fitID + `' class='minimise' style='float:right'  value='&times;' onClick=deleteExperiment("` + fitID + `") title='Delete this experiment'>
+                    
+                    
+                    
+                    <div style="font-size:20px;">
+                    Pause site data
+                        <a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#Pause_sites"><img class="helpIcon" src="../src/Images/help.png"></a>
+                    </div>
 
+                    
 				
 					<table style="width:500px; margin:auto">
 
@@ -1299,7 +1307,7 @@ function getABCpauseSiteTemplate(fitID){
 
 				<div style="font-size:20px;">
 					Pause escape curve
-					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#[NTP]-velocity"><img class="helpIcon" src="../src/Images/help.png"></a>
 						
 				</div>
 
@@ -1470,7 +1478,7 @@ function getTimeGelTemplateRight(fitID){
 			<td colspan=3  style="width:100%; text-align:center; vertical-align:top">
 				<div style="font-size:20px;">
 					Gel electrophoresis of transcript lengths over time
-					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#[NTP]-velocity"><img class="helpIcon" src="../src/Images/help.png"></a>
 				</div>
 			</td>
 
