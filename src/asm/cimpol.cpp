@@ -17,21 +17,21 @@
 -*/
 
 
-#include "Parameter.h"
-#include "XMLparser.h"
-#include "Settings.h"
-#include "Model.h"
-#include "Simulator.h"
-#include "State.h"
-#include "Plots.h"
-#include "FreeEnergy.h"
-#include "TranslocationRatesCache.h"
-#include "MCMC.h"
-#include "SimulatorPthread.h"
-#include "BayesianCalculations.h"
-#include "PosteriorDistributionSample.h"
-#include "SimPol_vRNA_interface.h"
-#include "SimulatorResultSummary.h"
+#include "../../../src/asm/Parameter.h"
+#include "../../../src/asm/XMLparser.h"
+#include "../../../src/asm/Settings.h"
+#include "../../../src/asm/Model.h"
+#include "../../../src/asm/Simulator.h"
+#include "../../../src/asm/State.h"
+#include "../../../src/asm/Plots.h"
+#include "../../../src/asm/FreeEnergy.h"
+#include "../../../src/asm/TranslocationRatesCache.h"
+#include "../../../src/asm/MCMC.h"
+#include "../../../src/asm/SimulatorPthread.h"
+#include "../../../src/asm/BayesianCalculations.h"
+#include "../../../src/asm/PosteriorDistributionSample.h"
+#include "../../../src/asm/SimPol_vRNA_interface.h"
+#include "../../../src/asm/SimulatorResultSummary.h"
 
 
 #include <iostream>
@@ -161,7 +161,7 @@ int main(int argc, char** argv) {
 	if (!isWASM){
 		Settings::init();
 		currentModel = new Model();
-		Settings::activatePolymerase("polII");
+		Settings::activatePolymerase("RNAP");
 		Settings::sampleAll();
 		Settings::initSequences();
 	}
@@ -181,11 +181,9 @@ int main(int argc, char** argv) {
 	currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
 	currentSequence->initRNAunfoldingTable();
 	SimulatorPthread::init(); 
-	Plots::init();
+	_GUI_PLOTS->init();
 	if (PrimerType == "ssRNA") vRNA_init(complementSequence.c_str());
 
-
-    //complementSequence = Settings::complementSeq(templateSequence, TemplateType.substr(2) == "RNA");
 
 	
 	 // If no arguments then exit now
@@ -202,6 +200,8 @@ int main(int argc, char** argv) {
 
 	// Perform MCMC
 	if (doMCMC){
+
+        if (_outputFilename != "") cout << "Saving to " << _outputFilename << endl;
 		MCMC::initMCMC(false);
 		MCMC::beginMCMC();
 	}
