@@ -1,6 +1,6 @@
 ﻿<html>
 <head>
-<title>About PhyloPause</title>
+<title>About Pauser</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=0.41, maximum-scale=1" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -45,36 +45,51 @@ function init(){
 	numReferences = 0;
 	referenceNumbers = {};
 	addCitations();
-	
+	printContents();
 
 
-	// If the url is linked to a section then make sure the section is not collapsed
-	// Sections given id in this format: RateBind_ParamHelp. This means the linkable section is in the Parameters section
-	if(window.location.hash) {
-		//console.log(window.location.hash);
+	 
+    $('document').ready(function(){
+            
+            
 
-		var hashBits = window.location.hash.split("_");
-		if (hashBits[1] == "ParamHelp") minimiseSection("#parametersBtn", true);
-		else if (hashBits[1] == "PlotHelp") minimiseSection("#displayingPlotsBtn", true); 
-		else if (hashBits[1] == "ModelHelp") minimiseSection("#kineticsBtn", true); 
-		else if (hashBits[1] == "ABCSectionHelp") minimiseSection("#ABCSectionBtn", true); 
-		else if (hashBits[1] == "performance") minimiseSection("#performanceBtn", true); 
-		else minimiseSection("#referencesSectionBtn", true); 
-		
-
-
-
-		$(window.location.hash).addClass("helpSelected");
-		
-		
-		// Add back the anchor to ensure that the page is in the right place. If the webpage takes too long to load and
-		// the anchored section is hidden, then the page won't anchor
-		var hash = window.location.hash;
-		window.location.hash = hash;
-		window.location.hash = window.location.hash;
+            
+                
+                    
+            // If the url is linked to a section then make sure the section is not collapsed
+            // Sections given id in this format: RateBind_ParamHelp. This means the linkable section is in the Parameters section
+            if(window.location.hash) {
+                console.log(window.location.hash);
+                
+                var id = window.location.hash.substring(1);
+                    
+                    
+                // Find the contents button for this element
+                var contents_atag = $("#" + id + "_con");  
+                contents_atag.click();
+                console.log("Clicking", contents_atag);  
 
 
-	}
+                $(window.location.hash).addClass("helpSelected");
+                
+                
+                // Add back the anchor to ensure that the page is in the right place. If the webpage takes too long to load and
+                // the anchored section is hidden, then the page won't anchor
+                var hash = window.location.hash;
+                window.location.hash = hash;
+                window.location.hash = window.location.hash;
+
+
+            }
+                
+            
+            
+
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+        
+        
+ });
+            
 	
 	
 	
@@ -83,34 +98,105 @@ function init(){
 
 function minimiseSection(element, setTo = null){
 
-	var toHide = $(element).attr("id");
-	toHide = toHide.substring(0, toHide.length-3); // Remove 'Btn' from the end
-	console.log(toHide);
+    var toHide = $(element).attr("id");
+    toHide = toHide.substring(0, toHide.length-3); // Remove 'Btn' from the end
+    toHide = toHide + "div";
+    //console.log(toHide, $("#" + toHide));
 
-	
-	if(setTo == false || (setTo == null && $(element).attr("disp") == "false")){
-		$(element).html("&plus;")
-		$("#" + toHide).hide(setTo == null ? 300 : 0);
-		$(element).attr("disp", true);
-	}
-	else{
-		$(element).html("&minus;")
-		$("#" + toHide).show(setTo == null ? 300 : 0);
-		$(element).attr("disp", false);
-	}
+    
+    if(setTo == false || (setTo == null && $(element).attr("disp") == "false")){
+        $(element).html("&plus;")
+        $("#" + toHide).hide(setTo == null ? 300 : 0);
+        $(element).attr("disp", true);
+    }
+    else{
+        $(element).html("&minus;")
+        $("#" + toHide).show(setTo == null ? 300 : 0);
+        $(element).attr("disp", false);
+    }
 
 }
 
 function openReferences(){
 
-	
-	minimiseSection("#referencesSectionBtn", true);
+    
+    minimiseSection("#References_Btn", true);
 
 }
 
 $(window).on('hashchange', function() {
-  	$(window.location.hash).addClass("helpSelected");
+    $(window.location.hash).addClass("helpSelected");
 });
+    
+            
+            
+            
+            
+             
+function printContents(){
+
+            
+    $("#contentsLoader").remove();
+            
+    // Find all elements with section or subsection classes
+    var sects = $(".section, .subsection, .subsubsection");
+    var sectNum = 0;
+    var subsectNum = 0;
+    var subsubsectNum = 0;
+    var sectionID = "";
+    for (var i = 0; i < sects.length; i ++){
+            
+        var ele = $(sects[i]);
+        var isSect = ele.hasClass("section");
+        var isSubsect = ele.hasClass("subsection");
+            
+            
+        // Give it an id
+        var HTML = (isSect || isSubsect) ? ele.html().trim() : ele.attr("sect").trim();
+        var id = HTML.split(" ").join("_");
+        var contents_ele_id = id + "_con";
+        ele.attr("id", id);
+            
+        if (isSect) sectionName = id;
+
+        // OnClick
+        var onclick = "minimiseSection('#" + sectionName + "_Btn')"; // Click the button to hide/show the section
+        var onclick_show = "minimiseSection('#" + sectionName + "_Btn', true)"; // Click the contents entry to show the section
+            
+        var a_tag = `<a id="` + contents_ele_id + `" href='#` + id + `' onClick="` + onclick_show + `" style='text-decoration:none; color:` + (isSect ? "#A5CF19" : "black") + `'>` + HTML + `</a>`;
+          
+        // Add the html to the contents section
+        if (isSect){
+            sectNum++;
+            
+            
+            $("#contents").append("<div style='font-size:18px; color:#A5CF19'>" + sectNum + " " + a_tag + "</div>");
+                        
+            
+            ele.before(`<span id='` + id + `_Btn' class='minimise' style="font-size:30px; padding: 5 5" disp="true"  onClick="` + onclick + `">&plus;</span>`);
+            ele.parent().next("div").attr("id", id + "_div");
+            
+            subsectNum = 0;
+            subsubsectNum = 0;
+        }else if (isSubsect){
+            subsectNum++;
+            $("#contents").append("<div style='font-size:17px'>&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + " " + a_tag + "</div>");
+            subsubsectNum = 0;
+        }
+        else {
+            subsubsectNum++;
+            $("#contents").append("<div style='font-size:16px'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + "." + subsubsectNum + " " + a_tag + "</div>");
+        }
+        
+        
+            
+    }
+    
+
+
+
+}
+            
 
 
 function addCitations(){
@@ -119,8 +205,8 @@ function addCitations(){
 
 	var DOIspanTemplate = `
 		<span style="background-color:#ebe9e7; padding: 2 4" title="DOItitle">
-			<b style="color:#008cba">DOI:</b>
-			<a style="text-decoration:none; color:#008cba" href = "DOIhref">view</a>
+			<b style="color:#A5CF19">DOI:</b>
+			<a style="text-decoration:none; color:#A5CF19" href = "DOIhref">view</a>
 		</span>
 		
 	
@@ -203,10 +289,11 @@ function addCitations(){
                          <td  style="text-align:center; font-size: 20px; vertical-align:top; font-family: 'Palatino'; width: 40%;"> 
                                 <div style="width:100%; text-align:center;">
 
-                                        <a href="../"  style="text-decoration:none;  color:#414b4b" title="Launch PhyloPause">
-                                            <div style="font-size: 90px; margin-bottom: -22px "> PhyloPause </div>
-                                            <div style="font-size: 20px; "> Evolutionary &nbsp;&nbsp;&nbsp; Analysis of Transcriptional Pause Sites </div>
+                                         <a href="../" style="text-decoration:none;  color:#414b4b" title="Launch Pauser">
+                                            <div style="font-size: 108px; margin-bottom: -22px "> Pauser </div>
+                                            <div style="font-size: 18px; "> Predictor of Transcriptional Pause Sites </div>
                                         </a>
+                                        
                                     
                                     
                                 </div>
@@ -223,9 +310,9 @@ function addCitations(){
                                     <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#A5CF19; padding: 8 8;" title="Go back home">Home</span> 
                               </a>&nbsp;
                               <a href="../" style="text-decoration:none; color:white; ">
-                                <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#A5CF19; padding: 8 8; color:white" title="Launch PhyloPause">PhyloPause</span> 
+                                <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#A5CF19; padding: 8 8; color:white" title="Launch Pauser">Pauser</span> 
                                </a>&nbsp;
-                                    <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#0B522D; padding: 8 8;  color:white; " title="Introductory tutorials and other information about PhyloPause">About</span>
+                                    <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#0B522D; padding: 8 8;  color:white; " title="Introductory tutorials and other information about Pauser">About</span>
                          
                                     
                             </td>
@@ -245,13 +332,138 @@ function addCitations(){
 				<br>
 				<div class="about-block" style="width:70%; margin:auto">
 					<div class="about-block-inner">
-						<div class="block-subtitle" style="font-size:45px"> Prediction of transcriptional pause sites using phylogeny </div> <br>
+						<div class="block-subtitle" style="font-size:45px"> Prediction of transcriptional pause sites </div> <br>
 					
-						<b>Disclaimer:</b> PhyloPause is currently in prerelease. It has not been peer-reviewed or published. <br><br>
+						<b>Disclaimer:</b> Pauser is currently in prerelease. It has not been peer-reviewed or published. <br><br>
                          
 				
 					</div>
 				</div>
+                    
+                    
+                    
+                       
+                    
+                <br>
+                <div class="about-block" style="width:70%; margin:auto">
+                    <div class="about-block-inner">
+                        <div class="block-subtitle" style="font-size:45px">Contents</div> <br>
+                    
+                            
+                            
+                            <div style="border-style:solid; padding: 10; display:inline-block; min-width:200px; border-width: 1px; border-color:#A5CF19"  id="contents">
+                                
+                                <table  id="contentsLoader" title="Loading...">
+                                <tr>
+                                    <td>
+                                        <div class="loader"></div> 
+                                    </td>
+                                    <td>
+                                        Loading...
+                                    </td>
+                                </tr>
+                            </table>
+                                
+                            </div>
+                        
+                
+                    </div>
+                </div>
+                    
+                    
+                                
+                <br><br><br><br>
+                <div class="main-block">
+                    <div class="main-block-inner">
+                        <div class="block-title"> 
+                                <span class="section">Getting started</span>
+                            </div> 
+                            <div style="display:none">          
+                                <div class="about-block" style="width:90%; margin:auto">
+                                    <div class="about-block-inner">
+                                                
+                                                    
+                                                    
+                                        <div class="about-block">
+                                            <div class="about-block-inner">
+                                                <div id="sequenceSelection" class="subsection block-subtitle">Information icons</div> <br>
+                                                
+                                                
+                                                    Help icons <img title="Help" src="../../src/Images/help.png" style="vertical-align:middle; width:25px; height:25px;"> are scattered throughout the interface of Pauser. Pressing one of these buttons will redirect to
+                                                    the relevant section on this page.
+                                                
+                                        
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                        
+                                       
+                                        <div class="about-block">
+                                            <div class="about-block-inner">
+                                                <div class="subsection block-subtitle">Uploading nucleotide sequences</div>  <br>
+                                                    
+                                                
+                                                    One or more nucleotide sequences must be uploaded to begin Pauser, in .fasta format. Ensure that the sequences are positive sense and are specified $5^\prime \rightarrow 3^\prime$.
+                                                    Optionally, the known locations of pause sites within the sequence may be included, where a pause site is defined as the length of the mRNA when the pause occurs.
+                                                    This is done by appending the pause site indices onto the accession lines like so:
+                                                
+                                                
+                                                    <div style="font-family:'Courier new'; margin:30px; padding: 5">
+                                                    
+                                                    
+                                                        &gt;seq1|pausesites=(2,6,18-20)<br>
+                                                        AGCGTTAGGCGATTCGGGAAATGCGATTG<br>
+                                                        &gt;seq2<br>
+                                                        ATTCGGGATCATCGAT
+                                                    
+                                                    
+                                                    </div>
+                                                
+                                                
+                                                    Alternatively, a multiple sequence alignment of homologous sequences may be uploaded. If a gap <span class="code">-</span> is present in any sequence, 
+                                                    then it will be assumed that the sequences form an alignment. In this case, all sequences must be the same length.
+                                                    
+                                                   
+                                                    
+            
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                        
+                                        
+                                       
+                                        <div class="about-block">
+                                            <div class="about-block-inner">
+                                                <div class="subsection block-subtitle">Uploading a SimPol session</div>  <br>
+                                                    
+                                                
+                                                    Optionally, a session file may be generated using SimPol and uploaded to Pauser, in .xml format. This will determine the kinetic model to use for
+                                                    predicting pause sites. The session file specifies the parameters and model settings, including their prior distributions, and the number of simulations
+                                                    to perform per sequence. The default XML file can be viewed <a href="../pauser.xml" class="xml_link">here</a>.
+                                                    
+                                                    
+                                                   
+                                                    
+            
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                                
+                                    </div>
+                                </div>
+                            </div>
+                
+                
+                        </div>
+                    </div>
+                </div>
+                                
+                    
+                <br><br><br><br>
+                
 				
 				
 
@@ -268,7 +480,7 @@ function addCitations(){
 	
 	
 		<div class="header">
-			PhyloPause | Centre for Computational Evolution & School of Biological Sciences, University of Auckland | 2018
+			Pauser | Centre for Computational Evolution & School of Biological Sciences, University of Auckland | 2019
 		</div>
 	
 

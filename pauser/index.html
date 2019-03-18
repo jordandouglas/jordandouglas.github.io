@@ -1,4 +1,4 @@
-
+﻿
 <!--
     --------------------------------------------------------------------
     --------------------------------------------------------------------
@@ -25,7 +25,7 @@
 
 <html>
 <head>
-<title>PhyloPause</title>
+<title>Pauser</title>
 <!--<link rel="icon" href="../src/Images/transcribe.png">-->
 <meta name="viewport" content="width=device-width, initial-scale=0.41, maximum-scale=1" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -37,7 +37,6 @@
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/Alignment.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/PhyloPause.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/Session.js"></script>
-<script language='JavaScript' type='text/JavaScript' src="src/Controller/PhyloTree.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/WebWorkerMessager.js"></script>
 
 
@@ -83,7 +82,7 @@ function init(){
         console.log("WASM registered")
 
         // Upload the default session file
-        loadSessionFromURL("phylopause.xml");
+        loadSessionFromURL("pauser.xml");
 
 
 
@@ -97,14 +96,14 @@ function init(){
             // Load alignment first
             if (JSONurl.a != null){
 
-                var alignmentURL = "http://www.polymerase.nz/phylopause/about/Examples/" + JSONurl.a;
+                var alignmentURL = "http://www.polymerase.nz/pauser/about/Examples/" + JSONurl.a;
                 uploadAlignmentFromURL(alignmentURL, function() {
 
 
                     // Check if there is a tree
                     if (JSONurl.t != null){
 
-                        var treeURL = "http://www.polymerase.nz/phylopause/about/Examples/" + JSONurl.t;
+                        var treeURL = "http://www.polymerase.nz/pauser/about/Examples/" + JSONurl.t;
                         uploadTreeFromURL(treeURL, function() {
 
 
@@ -250,9 +249,9 @@ function getLoaderTemplate(id, msg = ""){
                          <td  style="text-align:center; font-size: 20px; vertical-align:top; font-family: 'Palatino'; width: 40%;"> 
                                 <div style="width:100%; text-align:center;">
 
-                                        <a href="" target="_blank" style="text-decoration:none;  color:#414b4b" title="Launch PhyloPause">
-                                            <div style="font-size: 90px; margin-bottom: -22px "> PhyloPause </div>
-                                            <div style="font-size: 20px; "> Evolutionary &nbsp;&nbsp;&nbsp; Analysis of Transcriptional Pause Sites </div>
+                                        <a href="" target="_blank" style="text-decoration:none;  color:#414b4b" title="Launch Pauser">
+                                            <div style="font-size: 108px; margin-bottom: -22px "> Pauser </div>
+                                            <div style="font-size: 18px; "> Predictor of Transcriptional Pause Sites </div>
                                         </a>
                                     
                                     
@@ -269,10 +268,10 @@ function getLoaderTemplate(id, msg = ""){
                               <a href="../../"  target="_blank" style="text-decoration:none; color:white; ">
                                     <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#A5CF19; padding: 8 8;" title="Go back home">Home</span> 
                               </a>&nbsp;
-                                <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#0B522D; padding: 8 8; color:white" title="Launch PhyloPause">PhyloPause</span> 
+                                <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#0B522D; padding: 8 8; color:white" title="Launch Pauser">Pauser</span> 
                               &nbsp;
                              <a href="about/"  target="_blank" style="text-decoration:none; color:white; ">
-                                    <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#A5CF19; padding: 8 8;  color:white; " title="Introductory tutorials and other information about PhyloPause">About</span>
+                                    <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#A5CF19; padding: 8 8;  color:white; " title="Introductory tutorials and other information about Pauser">About</span>
                                 </a>    
                          
                                     
@@ -309,54 +308,33 @@ function getLoaderTemplate(id, msg = ""){
 							<div  id="uploadAlignmentDIV"  style="background-color:white; padding: 20 10; border-style:solid; border-color:#0B522D">
 
 
-								<div style="font-size:20px; vertical-align:middle"> 1. Upload a nucleotide alignment 
-
+								<div style="font-size:20px; vertical-align:middle"> 1. Upload a nucleotide sequence(s) 
+                                        <a href="about/#Uploading_nucleotide_sequences" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
 									<span class="uploadAlignmentFirst greenTick" style="display:none" title="Successful upload"> &#10004; </span>
-
+                         
 									<input type=button id='uploadAlignmentBtn' onClick=uploadAlignment() value='Select file' title=".fasta" class="operation" style="z-index: 100; float:right; width:100px"> 
 									<input style="display:none" type="file" id="uploadAlignment" accept=".fasta"> 
 
 								<br><br></div>
 
 
-						 		<div style="display:none" class="uploadAlignmentFirst"> Alignment successfully uploaded. </div>
+						 		<div style="display:none" class="uploadAlignmentFirst"> Sequence(s) successfully uploaded. </div>
 
-						 		<div class="beforeUploadingAlignment"> Upload a nucleotide multiple sequence alignment in .fasta format. </div>
-
-
-							</div>
-
-							<br>
-							<div id="uploadTreeDIV" class="uploadAlignmentFirst" style="display:none; background-color:white; padding: 20 10; border-style:solid; border-color:#0B522D">
-
-								
-								<div style="font-size:20px"> 2. Upload a tree (optional) 
-
-									<span class="uploadTreeFirst greenTick" style="display:none" title="Successful upload"> &#10004; </span>
-									<input type=button id='uploadTreeBtn' onClick=uploadTree() value='Select file' title=".nexus, .nxs, .nex" class="operation" style="z-index: 100; float:right; width:100px"> 
-                                    <input style="display:none" type="file" id="uploadTree" accept=".nexus, .nex, .nxs"> 
-
-                                <br><br></div>
-
-                                        
-                                <div style="display:none" class="uploadTreeFirst"> Tree successfully uploaded. </div>
-
-                                        
-                                 <div class="beforeUploadingTree"> 
-                                    Upload a phylogenetic tree containing all the leaves in the above alignment in .nexus format.
-                                </div>
-								
+						 		<div class="beforeUploadingAlignment"> Upload one or more nucleotide sequences in .fasta format. Optionally include the locations of pause sites.
+                                          </div>
 
 
 							</div>
 
+							
 							<br>
 							<div id="uploadSessionDIV" class="uploadAlignmentFirst" style="display:none; background-color:white; padding: 20 10; border-style:solid; border-color:#0B522D">
 
 								
-								<div style="font-size:20px"> 3. Upload a SimPol session file (optional) 
+								<div style="font-size:20px"> 2. Upload a SimPol session file (optional) 
 									<span class="uploadSessionFirst greenTick" style="display:none" title="Successful upload"> &#10004; </span>
-
+                                         <a href="about/#Uploading_a_SimPol_session" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
+                                
                                     <input type=button id='uploadSessionBtn' onClick=uploadSession() value='Select file' title=".xml" class="operation" style="z-index: 100; float:right; width:100px"> 
                                     <input style="display:none" type="file" id="uploadSession" accept=".xml"> 
 
@@ -395,9 +373,9 @@ function getLoaderTemplate(id, msg = ""){
 
 					<span class="noselect"  style="font-size:18px; font-family:Bookman;">
 						<input type=button id='conservationSectionBtn' class='minimise' value='-' onClick="minimiseSection(this)">
-						<b style="color:#0B522D">Conservation of transcriptional pause sites </b>
+						<b style="color:#0B522D">Prediction of transcriptional pause sites </b>
 						&nbsp;&nbsp;&nbsp;
-                         <input class="uploadAlignmentFirst operation" type=button id='beginPhyloPause' onClick="beginPhyloPause(false);" value=" Begin PhyloPause" title="Use SimPol to predict the locations of pause sites in each sequence in the alignment." style="z-index: 100; float:right; width:160px; display:none"> 
+                         <input class="uploadAlignmentFirst operation" type=button id='beginPauser' onClick="beginPauser(false);" value=" Begin Pauser" title="Use SimPol to predict the locations of pause sites in each sequence in the alignment." style="z-index: 100; float:right; width:160px; display:none"> 
 
 
 						<div id="conservationSection" style="padding: 20 20">
@@ -409,7 +387,7 @@ function getLoaderTemplate(id, msg = ""){
 
 
 
-                                <div class="beginPhyloPauseFirst" style="display:none; color:#808D82"> 
+                                <div class="beginPauserFirst" style="display:none; color:#808D82"> 
 
 
                                     <table>
@@ -436,9 +414,50 @@ function getLoaderTemplate(id, msg = ""){
 
 
                                 <div class="beforeUploadingAlignment"> 
-                                    Upload a multiple sequence alignment to start the party 
+                                    Upload a nucleotide sequence(s) first.
                                 </div>
+                                
+                                    
+                                    
+                        
+                        <div class="uploadAlignmentFirst"  style="display:none">
+                                
+                                
+                             <div style="margin:20px">
+                                 
+                                <b style="color:#0B522D">Pause site classification summary</b> 
+                                <span style="cursor:pointer;" onclick="downloadClassifications();" title="Download the classifications in .tsv format"> <img src="../src/Images/downloadGreen.png" style="vertical-align:middle; padding:5 0; width:25px;"> </span>
+                                <table id="predictionSummaryTable" style="margin:10px; text-align:right" cellpadding=0 cellspacing=0> 
+                                
+                                    <tr style="color:#0B522D">
+                                        <td style="min-width:100px;">
+                                             Accession       
+                                        </td>
+                                                
+                                                
+                                        <td style="width:300px;" title="The predicted locations of pause sites, as classified by SimPol.">
+                                             SimPol    
+                                        </td>
+                                                
+                                                
+                                        <td style="width:300px;" title="The predicted locations of pause sites, as classified by the Naive Bayes classifier.">
+                                             NBC
+                                        </td>
+                                                
+                                            
+                                        <td style="width:300px;" title="The true locations of pause sites. These are optionally specified when uploading the .fasta file.">
+                                             True pause sites
+                                        </td>
+                                                
+                                    </tr>
 
+
+                                </table>
+                            </div>
+                                
+                                    
+                                    
+                                    
 
                                     
                             <div  id="conservationMSA_DIV"  class='scrollbar' style='scrollbar-x-position: top; overflow-x: scroll; position:relative; width:100%;'>
@@ -450,13 +469,19 @@ function getLoaderTemplate(id, msg = ""){
                                         
 
     							<div style="display:none" id="alignmentLoading"></div>
-
+                                
+                                            
+                                            
+                                            
+                                    
     							<table id="conservationMSA" style="font-size:20px; font-family: 'Courier New';" cellpadding=2 cellspacing=0> 
 
 
 
     							</table>
-
+                                            
+                                       
+                            </div>
 
                             </div>
 
@@ -473,48 +498,6 @@ function getLoaderTemplate(id, msg = ""){
 
 
 
-             
-            <br><br>
-
-            <div  class="panelOuter" style=" margin-left:50px; margin-right:50px">
-                <div class="panelInner">
-
-                    <span class="noselect"  style="font-size:18px; font-family:Bookman;">
-                        <input type=button id='treeSectionBtn' class='minimise' value='+' onClick="minimiseSection(this)">
-                        <b style="color:#0B522D">Phylogenetic tree </b>
-
-                        <div id="treeSection" style="display:none; padding: 20 20">
-
-
-
-                               <div class="beforeUploadingTree"> 
-                                    No tree available.
-                               </div>
-                                    
-
-                              <div style="display:none" id="svgCanvas" class="uploadTreeFirst"> 
-
-
-                              </div>
-
-                             
-
-
-                        </div>
-
-                    </span>
-                    
-
-                </div>
-            </div>
-
-
-   
-
-   
-
-			   
-				
 
 	
 	
@@ -538,7 +521,7 @@ function getLoaderTemplate(id, msg = ""){
 	
 	
 		<div class="header">
-			PhyloPause | Centre for Computational Evolution & School of Biological Sciences, University of Auckland | 2018
+			Pauser | Centre for Computational Evolution & School of Biological Sciences, University of Auckland | 2019
 		</div>
 	
 

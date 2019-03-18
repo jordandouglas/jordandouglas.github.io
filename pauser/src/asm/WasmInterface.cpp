@@ -1,4 +1,4 @@
-/* 
+﻿/* 
 	--------------------------------------------------------------------
 	--------------------------------------------------------------------
 	This file is part of SimPol.
@@ -77,6 +77,7 @@ extern "C" {
         _animationSpeed = "hidden";
         _PP_multipleSequenceAlignment = new MultipleSequenceAlignment();
         _PP_tree = new PhyloTree();
+        _GUI_PLOTS = new Plots();
 
 	}
 
@@ -93,7 +94,7 @@ extern "C" {
     void EMSCRIPTEN_KEEPALIVE loadSessionFromXML(char* XMLdata, int msgID){
 
         modelsToEstimate.clear();
-        XMLparser::parseXMLFromString(XMLdata);
+        XMLparser::parseXMLFromString(XMLdata, _GUI_PLOTS);
         Settings::sampleAll();
 
         _currentStateGUI = new State(true, true);
@@ -102,10 +103,10 @@ extern "C" {
         string parametersJSON = "{" + Settings::toJSON() + "}";
 
         // Ensure that the sitewise plot is always displayed and the other plots are hidden
-        Plots::init();
-        Plots::hideAllPlots(true);
-        Plots::hideSitewisePlot(false); 
-        Plots::set_sendCopiedSequences(false);
+        _GUI_PLOTS->init();
+        _GUI_PLOTS->hideAllPlots(true);
+        _GUI_PLOTS->hideSitewisePlot(false); 
+        _GUI_PLOTS->set_sendCopiedSequences(false);
         
 
         messageFromWasmToJS(parametersJSON, msgID);
@@ -155,25 +156,11 @@ extern "C" {
             _PP_tree->clear();
             messageFromWasmToJS("{'error':'" + errorMsg + "'}", msgID);
         }
-
-
-        // Recompute the sequence weights
-        _PP_multipleSequenceAlignment->calculateLeafWeights(_PP_tree);
-
+        
 
         messageFromWasmToJS("{'newick':'" + _PP_tree->getNewick() + "'}", msgID);
 
     }
-
-
-
-
-    // Get the weight of each sequence
-    void EMSCRIPTEN_KEEPALIVE getSequenceWeights(int msgID){
-        messageFromWasmToJS(_PP_multipleSequenceAlignment->toJSON(), msgID);
-    }
-
-
 
 
 
@@ -201,13 +188,13 @@ extern "C" {
 
 
     // Begin the PhyloPause simulations and return to js after a timeout (~1000ms) has been reached to check if user has requested to stop
-    void EMSCRIPTEN_KEEPALIVE startPhyloPause(int init, int msgID){
+    void EMSCRIPTEN_KEEPALIVE startPauser(int init, int msgID){
 
 
         if (init) {
             cout << "Intialising PhyloPause" << endl;
             if (_interfaceSimulator != nullptr) delete _interfaceSimulator;
-            _interfaceSimulator = new Simulator();
+            _interfaceSimulator = new Simulator(_GUI_PLOTS);
             _GUI_STOP = false;
         }
 
@@ -232,8 +219,8 @@ extern "C" {
         int result[3]; 
 
         // Perform simulations continuously and then send information back and pause once every 1000ms
-        _PP_multipleSequenceAlignment->PhyloPause_GUI(_interfaceSimulator, result);
-
+        _PP_multipleSequenceAlignment->Pauser_GUI(_interfaceSimulator, result);
+        
 
         // Create JSON string
         string toReturnJSON = "{";
@@ -261,7 +248,8 @@ extern "C" {
 
         toReturnJSON += "}";
 
-        // cout << "Plots data " << Plots::timeToCatalysisPerSite_toJSON() << endl;
+        //cout << "Plots data " << _GUI_PLOTS->timeToCatalysisPerSite_toJSON() << endl;
+        cout << toReturnJSON << endl;
 
         messageFromWasmToJS(toReturnJSON, msgID);
             

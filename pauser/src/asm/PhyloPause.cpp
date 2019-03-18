@@ -32,7 +32,7 @@
 #include "../../../src/asm/SimulatorResultSummary.h"
 #include "../../../src/asm/MultipleSequenceAlignment.h"
 #include "../../../src/asm/PhyloTree.h"
-#include "../../../src/asm/PauseSiteUtil.h"
+#include "../../../src/asm/EvolutionSimulator.h"
 
 
 
@@ -66,7 +66,11 @@ int main(int argc, char** argv) {
     
     cout << "Starting PhyloPause" << endl;
     _USING_PHYLOPAUSE = true;
+    _RECORD_PAUSE_TIMES = true;
+    bool neutral_evolution = false;
+    bool pause_site_search = false;
     auto startTime = std::chrono::system_clock::now();
+
 
     // Parse arguments
     bool doMCMC = false;
@@ -96,6 +100,16 @@ int main(int argc, char** argv) {
             i++;
             _outputFilename = string(argv[i]);
         }
+
+
+        else if(arg == "-neutral") {
+            neutral_evolution = true;
+        }
+
+
+        else if(arg == "-search") {
+            pause_site_search = true;
+        }
        
        /*
         else if(arg == "-nthreads" && i+1 < argc) {
@@ -117,30 +131,30 @@ int main(int argc, char** argv) {
 
     Settings::init();
     currentModel = new Model();
-    Settings::activatePolymerase("polII");
+    Settings::activatePolymerase("RNAP");
     Settings::sampleAll();
     Settings::initSequences();
 
 
 
-    if (_inputFastaFileName == ""){
+    if (!pause_site_search && _inputFastaFileName == ""){
         cout << "Input alignment file required. Please provide the location of a .fasta file with -fasta" << endl;
         exit(0);
     }
 
 
     if (_inputXMLfilename == ""){
-        //cout << "SimPol session .xml was not specified. Using ../phylopause.xml" << endl;
-        cout << "Input SimPol session required. Please provide the location of an .xml file with -xml. If you do not have one use phylopause.xml." << endl;
+        //cout << "SimPol session .xml was not specified. Using ../pauser.xml" << endl;
+        cout << "Input SimPol session required. Please provide the location of an .xml file with -xml. If you do not have one use pauser.xml." << endl;
         exit(0);
-        //_inputXMLfilename = "../phylopause.xml";
+        //_inputXMLfilename = "../pauser.xml";
     }
 
 
     if (_inputXMLfilename != ""){
         char* filename = new char[_inputXMLfilename.length() + 1];
         strcpy(filename, _inputXMLfilename.c_str());
-        bool succ = XMLparser::parseXMLFromFilename(filename);
+        bool succ = XMLparser::parseXMLFromFilename(filename, nullptr);
         delete [] filename;
         if (!succ) exit(1);
 
@@ -151,69 +165,91 @@ int main(int argc, char** argv) {
     currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
     currentSequence->initRNAunfoldingTable();
     SimulatorPthread::init(); 
-    Plots::init();
+    _GUI_PLOTS->init();
     if (PrimerType == "ssRNA") vRNA_init(complementSequence.c_str());
 
 
 
+     // Erase all contents of the output file so we can append to the end of it
+        if (_outputFilename != ""){
+            ofstream* outputFile = new ofstream(_outputFilename);
+            if (!outputFile->is_open()) {
+                cout << "Cannot open file " << _outputFilename << endl;
+                exit(0);
+            }
 
-    // Load in the alignment
-    _PP_multipleSequenceAlignment = new MultipleSequenceAlignment();
-    string errorMsg = _PP_multipleSequenceAlignment->parseFromFastaFile(_inputFastaFileName);
-
-    if (errorMsg != "") {
-        cout << errorMsg << endl;
-        exit(1);
-    }
-    cout << "Alignment successfully parsed." << endl;
-
-
-
-    // Load in the tree (if there is one)
-    _PP_tree = new PhyloTree();
-    if (_inputTreeFileName != ""){
-
-        // Parse the tree
-        string errorMsg = _PP_tree->parseFromNexusFile(_inputTreeFileName);
-        if (errorMsg != "") {
-            cout << errorMsg << endl;
-            exit(0);
-        }   
-
-
-        errorMsg = _PP_multipleSequenceAlignment->treeTipNamesAreConsistentWithMSA(_PP_tree);
-        if (errorMsg != "") {
-            cout << errorMsg << endl;
-            exit(0);
-        }  
-
-
-        // Recompute the sequence weights
-        _PP_multipleSequenceAlignment->calculateLeafWeights(_PP_tree);
-
-        cout << "Tree successfully parsed." << endl;
-
-    }
-
-    // Erase all contents of the output file so we can append to the end of it
-    if (_outputFilename != ""){
-        ofstream* outputFile = new ofstream(_outputFilename);
-        if (!outputFile->is_open()) {
-            cout << "Cannot open file " << _outputFilename << endl;
-            exit(0);
+            (*outputFile) << "";
+            outputFile->close();
         }
 
-        (*outputFile) << "";
-        outputFile->close();
+
+
+    // Search for pause sites and print to a file
+    if (pause_site_search) {
+
+        cout << "Searching for pause sites..." << endl;
+        EvolutionSimulator::generateSequencesWithPauseSite(5, 101, 51, 1000000, _outputFilename);
+    
+    } 
+
+    // Neutral evolution on sequences in the alignment
+    else if (neutral_evolution) {
+
+        //cout << "Simulating neutral evolution on input sequences..." << endl;
+
+
+
+        // Load in the alignment
+        _PP_multipleSequenceAlignment = new MultipleSequenceAlignment();
+        string errorMsg = _PP_multipleSequenceAlignment->parseFromFastaFile(_inputFastaFileName);
+
+        if (errorMsg != "") {
+            cout << errorMsg << endl;
+            exit(1);
+        }
+        cout << "Alignment successfully parsed." << endl;
+
+
+
+        for (int seqNum = 0; seqNum < _PP_multipleSequenceAlignment->get_nseqs(); seqNum++){
+
+            Sequence* seq = _PP_multipleSequenceAlignment->getSequenceAtIndex(seqNum);
+            cout << "Simulating neutral evolution on " << seq->getID() << endl;
+            EvolutionSimulator::simulateEvolution(seq, 51, 100, 10, 4, _outputFilename);
+
+        }
+
+
+
+
     }
 
 
+    // Compute pause statistics for the MSA
+    else {
 
-    // Begin PhyloPause
-    cout << "Beginning PhyloPause" << endl;
-    _PP_multipleSequenceAlignment->PhyloPause();
 
-    
+        // Load in the alignment
+        _PP_multipleSequenceAlignment = new MultipleSequenceAlignment();
+        string errorMsg = _PP_multipleSequenceAlignment->parseFromFastaFile(_inputFastaFileName);
+
+        if (errorMsg != "") {
+            cout << errorMsg << endl;
+            exit(1);
+        }
+        cout << "Alignment successfully parsed." << endl;
+
+        
+
+        // Begin PhyloPause
+        cout << "Beginning PhyloPause" << endl;
+        _PP_multipleSequenceAlignment->PhyloPause();
+
+        
+
+
+    }
+
     
     auto endTime = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = endTime-startTime;

@@ -106,7 +106,7 @@ function parseAlignment(align_str, resolve = function() { }){
     
 
     // Send the validated fasta through to the webassembly module
-    parseMSA_controller(align_str.replace(/(\r\n|\n|\r)/gm, "|"), function(parseResult){
+    parseMSA_controller(align_str.replace(/(\r\n|\n|\r)/gm, "`"), function(parseResult){
 
         //console.log("Parsed MSA", parseResult)
 
@@ -115,7 +115,8 @@ function parseAlignment(align_str, resolve = function() { }){
 
             $(".uploadAlignmentFirst").show(300);
             $(".beforeUploadingAlignment").hide(0);
-
+            
+            $(".deleteUponNewAlignment").remove();
 
             NUCLEOTIDE_ALIGNMENT = parseResult.alignment;
             NUCLEOTIDE_ALIGNMENT_NSITES = parseResult.nsites;
@@ -126,6 +127,7 @@ function parseAlignment(align_str, resolve = function() { }){
          
 
             renderAlignment(); 
+            renderPredictionSummary(); 
             resolve();
          
 
@@ -143,6 +145,30 @@ function parseAlignment(align_str, resolve = function() { }){
 
 
     });
+
+
+
+}
+
+
+// Construct a table which shows the locations of the pause site predictions in each sequence, and the locations of the true pause sites
+function renderPredictionSummary(){
+
+
+
+    console.log("renderPredictionSummary", NUCLEOTIDE_ALIGNMENT);
+
+    var odd = true;
+    for (var acc in NUCLEOTIDE_ALIGNMENT){
+
+        
+        var seq = NUCLEOTIDE_ALIGNMENT[acc];
+        //console.log(acc, seq);
+        
+        $("#predictionSummaryTable").append(getPredictionSummaryRowTemplate(acc.substr(1), odd, seq.true_pauseSites));
+        odd = !odd;
+
+    }
 
 
 
@@ -174,9 +200,8 @@ function renderAlignment(resolve = function() { }){
         
         var seq = NUCLEOTIDE_ALIGNMENT[acc];
         //console.log(acc, seq);
-        
 
-        $("#conservationMSA").append(getMSArowTemplate(acc.substr(1), seq.weight, seq.MSAsequence));
+        appendMSArowTemplate("#conservationMSA", acc.substr(1), seq.MSAsequence, seq.true_pauseSites);
 
 
     }
@@ -189,39 +214,6 @@ function renderAlignment(resolve = function() { }){
 }
 
 
-
-
-
-// Update the sequence weights with the appropriate values
-function renderSequenceWeights(resolve = function() { }){
-
-    getSequenceWeights_controller(function(result){
-
-        console.log("result", result);
-
-        NUCLEOTIDE_ALIGNMENT = result.alignment;
-        NUCLEOTIDE_ALIGNMENT_NSITES = result.nsites;
-        NUCLEOTIDE_ALIGNMENT_NSEQS = result.nseqs;
-
-        for (var acc in NUCLEOTIDE_ALIGNMENT){
-
-            // Change the weight html
-            var seq = NUCLEOTIDE_ALIGNMENT[acc];
-            var row = $(`[rowid="` + acc.substr(1) + `"]`);
-            var weight_element = row.children(`[colid="wgt"]`);
-
-
-            var weight = roundToSF(parseFloat(seq.weight), 2);
-            weight_element.html(weight);
-
-
-        }   
-
-        resolve();
-
-    });
-
-}
 
 
 // Add pause sites to the multiple sequence alignment on the DOM
@@ -286,83 +278,230 @@ renderPauseSitesOnAlignment = function(){
 function getMSAheaderTemplate(nsites){
 
 
-    var evidenceRow = `
-
-     <tr style="font-size:16px">
-            <td><td>
-            <td title="Strength of evidence of a pause site." style="text-align:right">Evidence:</td> 
-
-
-    `;
-
-	var row = `
-
-
-        
-
-		<tr style="font-size:16px">
-			<td title="The weight of the sequence, calculated from the phylogenetic tree." style="text-align:right;">Weight<td>
-			<td title="The name of the sequence." style="text-align:right">Sequence&nbsp;&nbsp;</td> 
-
-	`;
-
-
-	for (var i = 0; i < nsites; i ++){
+    // Add site numberings onto the top row. Every 20th site labelled.
+    var index_str = "";
+    var tooManySpaces = 0;
+    for (var i = 0; i < nsites; i ++){
     
-
-		row += `<td style="width: 20px;text-align:center; position:relative">`;
-
-		if ((i+1) % 10 == 1)  row += `<span style="position:absolute; top:0; left:2">` + (i+1) + `</span>`;
-
-		row += `</td>`;
-
-        evidenceRow += `<td id="e` + (i+1) + `"></td>`;
-
-
-	}
-
-
-	return evidenceRow + `</tr>` + row + `</tr>`;
-
-
-} 
-
-
-function getMSArowTemplate(name, weight, seq){
-
-
-	var row = `
-    
-		<tr rowid="` + name + `">
-			<td style="font-size:16px; text-align:center; color:#808D82;" colid="wgt">` + weight + `<td>
-			<td style="font-size:16px; text-align:right"> ` + name + `&nbsp;&nbsp;</td> 
-
-	`;
-
-    
-    var baseIndex = 1;
-	for (var i = 0; i < seq.length; i ++){
-
-		var col = NUCLEOTIDE_COLOURS[seq[i]];
-        
-
-		row += `<td colid="` + (i+1) + `" style="width: 20px;text-align:center; background-color:` + col + `;"`;
-
-        if (seq[i] != "-") {
-            row += `title="Site ` + baseIndex + `"`;
-            baseIndex ++;
+        if ((i+1) % 20 == 1)  {
+            tooManySpaces = ("" + (i+1)).length - 1;
+            index_str += (i+1)
         }
-        row += `>` + seq[i] + `</td>`;
+        else {
+            if (tooManySpaces > 0) tooManySpaces --
+            else index_str += "&nbsp";
+        }
 
+    }
 
-        
+	var row = `
 
-	}
+		<tr  class="deleteUponNewAlignment">
+			<td title="The accession id of the sequence." style="font-size:16px; text-align:right">Accession&nbsp;&nbsp;</td> 
+            <td style="text-align:left;">` + index_str + `</td>
+         </tr>
+	`;
+   
 
-
-	return row + `</tr>`;
+	return row;
 
 
 } 
+
+
+function getPredictionSummaryRowTemplate(name, odd, true_pauseSites){
+
+    var true_pauseSites_str = "";
+    if (true_pauseSites != null){
+        true_pauseSites_str = convertListToCommaString(true_pauseSites);
+    }
+    
+    
+    
+	var row = `
+    
+        <tr class="deleteUponNewAlignment" onclick="$(this).toggleClass('selected')">
+            <td>` + name + `</td>
+            <td></td> 
+            <td></td> 
+            <td>` + true_pauseSites_str + `</td> 
+        </tr>
+    `;
+    
+    return row;
+
+
+} 
+
+
+
+
+function appendMSArowTemplate(appendTo, name, seq, true_pauseSites = null, simpol_pauseSites = null, NBC_pauseSites = null){
+
+    
+    simpol_pauseSites = [22, 51, 55];
+    NBC_pauseSites = [15,16, 40, 22, 55]
+    
+    
+    var seq_list = seq.split("");
+    console.log("seq_list", seq_list);
+    
+    // Annotate the sites by true locations of pause sites
+    if (true_pauseSites != null){
+        for (var i = 0; i < true_pauseSites.length; i ++){
+            var pauseSite = true_pauseSites[i];
+            seq_list[pauseSite-1] = `<b title="According to the uploaded .fasta file, this site is a pause site." style="color:orange">` + seq_list[pauseSite-1] + `</b>`;
+        }
+    }
+    
+ 
+   
+    
+    var row = `
+    
+        <tr class="deleteUponNewAlignment" rowid="` + name + `">
+            <td style="font-size:16px; text-align:right"> ` + name + `&nbsp;&nbsp;</td> 
+            <td class="sequenceTD" style="position:relative; text-align:left;">` + seq_list.join("") + `</td>
+        </tr>
+        
+    `;
+    $(appendTo).append(row);
+    
+    // Add dots below the sequence showing whether SimPol and/or NBC classified it as a pause site
+    if (simpol_pauseSites != null){
+        var td_ele = $(`[rowid="` + name + `"]`).children(".sequenceTD");
+        for (var i = 0; i < simpol_pauseSites.length; i ++){
+            var pauseSite = simpol_pauseSites[i];
+            
+            
+            // If this is also an NBC pause site, then add both colours to the circle
+            var classes = "dot simpol_class_dot";
+            var title = "The above position was classified as a pause site by SimPol."
+            if (NBC_pauseSites != null){
+                for (var j = 0; j < NBC_pauseSites.length; j ++){
+                    var pauseSite_NBC = NBC_pauseSites[j];
+                    if (pauseSite_NBC == pauseSite){
+                        classes = classes + " NBC_class_dot";
+                        title = "The above position was classified as a pause site by both SimPol and NBC."
+                        break;
+                    }
+                }
+            }
+            
+            
+            var x = (pauseSite-1) - 0.75;
+            var dot = `<span title="` + title + `" class="` + classes + `" style="top:20px; left:` + x + `ch"></span>`
+            td_ele.append(dot);
+        }
+    }
+    
+    
+    // NBC pause sites (but not classified by SimPol too)
+    if (NBC_pauseSites != null){
+        var td_ele = $(`[rowid="` + name + `"]`).children(".sequenceTD");
+        for (var i = 0; i < NBC_pauseSites.length; i ++){
+            var pauseSite = NBC_pauseSites[i];
+            
+            
+            
+            // If this is also a SimPol pause site, then continue because it has already been plotted
+            if (simpol_pauseSites != null){
+                var isSimpolPause = false;
+                for (var j = 0; j < simpol_pauseSites.length; j ++){
+                    var pauseSite_SimPol = simpol_pauseSites[j];
+                    if (pauseSite_SimPol == pauseSite){
+                        isSimpolPause = true;
+                        break;
+                    }
+                }
+                if (isSimpolPause) continue;
+            }
+            
+            
+            var x = (pauseSite-1) - 0.75;
+            var dot = `<span title="The above position was classified as a pause site by NBC." class="dot NBC_class_dot" style="top:20px; left:` + x + `ch"></span>`
+            td_ele.append(dot);
+        }
+    }
+    
+    
+    
+} 
+
+
+
+// Assumes input list is sorted
+// Input: numeric array: [1,2,5,6,7,8,9,10]
+// Output: string: "1,2,5-10"
+function convertListToCommaString(list){
+
+    if (typeof list === "string") list = list = JSON.parse("[" + list + "]");
+    //console.log("Parsing list", list);
+    var string = "";
+    for (var i = 0; i < list.length; i ++){
+        var thisNum = list[i];
+        var nextNum = list[i+1];
+
+        // If the next number is not the following integer then move on 
+        if (nextNum == null || thisNum+1 != nextNum){
+            string += nextNum != null ? (thisNum + ", ") : thisNum;
+            continue;
+        }
+
+        // Otherwise we keep looping intil the next integer is not 1 greater than this one
+        var incrSize = 1;
+        while (i < list.length-1){
+            if (thisNum + incrSize + 1 != list[i+incrSize + 1]) break;
+            incrSize++;
+        }
+        nextNum = list[i+incrSize];
+        i += incrSize;
+        string += i < list.length-1 ? (thisNum + "-" + nextNum + ", ") : (thisNum + "-" + nextNum);
+
+    }
+    return string;
+
+
+}
+
+
+
+// Input: string: "1,2,5-10"
+// Output: numeric array: [1,2,5,6,7,8,9,10]
+function convertCommaStringToList(string){
+
+
+    var list = [];
+    var bits = string.split(",");
+    for (var i = 0; i < bits.length; i ++){
+        bit = bits[i].trim();
+        if (bit == "") continue;
+
+        if (bit.match("-")){
+            var lowerUpper = bit.split("-");
+            var lower = parseFloat(lowerUpper[0].trim());
+            var upper = parseFloat(lowerUpper[1].trim());
+            if (isNaN(lower) || isNaN(upper)) continue; // Don't add non-numbers
+            for (var j = lower; j <= upper; j ++){
+                if (list.indexOf(j) == -1) list.push(j); // Don't add duplicates
+            } 
+
+        }else {
+            var floatBit = parseFloat(bit);
+            if (!isNaN(floatBit) && list.indexOf(floatBit == -1)) list.push(floatBit); // Don't add non-numbers or duplicates
+        }
+
+    }
+
+    function sortNumber(a,b) {
+            return a - b;
+    }
+
+
+    // TODO: remove duplicates
+    return list.sort(sortNumber);
+
+
+}
 
 

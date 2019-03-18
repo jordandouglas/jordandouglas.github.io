@@ -366,30 +366,11 @@ function parseTree_controller(nexus, resolve = function(x) { }){
 }
 
 
-function getSequenceWeights_controller(resolve = function(){ }){
-
-
-    if (WEB_WORKER_WASM != null) {
-
-        var res = stringifyFunction("getSequenceWeights", [], true);
-        var fnStr = "wasm_" + res[0];
-        var msgID = res[1];
-        var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-        toCall().then((result) => resolve(result));
-
-
-    }
-
-
-}
-
-
-
-function startPhyloPause_controller(resume_simulation = false, resolve = function() { }){
+function startPauser_controller(resume_simulation = false, resolve = function() { }){
 
 
     $(".beforeBeginningPhyloPause").hide(0);
-    $(".beginPhyloPauseFirst").show(100);
+    $(".beginPauserFirst").show(100);
    
     PP_simulating = true;
 
@@ -419,7 +400,7 @@ function startPhyloPause_controller(resume_simulation = false, resolve = functio
 
 
 
-        var res = stringifyFunction("startPhyloPause", [resume_simulation], true);
+        var res = stringifyFunction("startPauser", [resume_simulation], true);
         var fnStr = "wasm_" + res[0];
         var msgID = res[1];
 

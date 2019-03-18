@@ -95,10 +95,6 @@ function parseTree(nexus_str, resolve = function() { }){
         
         if (parseResult.error == null || parseResult.error == ""){
 
-            $(".uploadTreeFirst").show(300);
-            $(".beforeUploadingTree").hide(0);
-         
-
             // Update the alignment sequence weights
             renderSequenceWeights(function(){
                 renderPauseSitesOnAlignment();

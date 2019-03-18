@@ -24,24 +24,24 @@
 
 
 
-function beginPhyloPause(resume_simulation = false){
+function beginPauser(resume_simulation = false){
 
     console.log("Beginning PhyloPause")
 
 
     // Change the description of the begin PhyloPause button
-    $("#beginPhyloPause").val("Stop PhyloPause");
-    $("#beginPhyloPause").attr("onclick", "stop_controller()");
+    $("#beginPauser").val("Stop PhyloPause");
+    $("#beginPauser").attr("onclick", "stop_controller()");
 
 
 
 
     // Initialise the simulation
-    startPhyloPause_controller(resume_simulation, function() {
+    startPauser_controller(resume_simulation, function() {
 
         // Change the description of the begin PhyloPause button
-        $("#beginPhyloPause").val("Resume PhyloPause");
-        $("#beginPhyloPause").attr("onclick", "beginPhyloPause(true)");
+        $("#beginPauser").val("Resume PhyloPause");
+        $("#beginPauser").attr("onclick", "beginPauser(true)");
 
     });
 

@@ -1,4 +1,4 @@
-/* 
+﻿/* 
     --------------------------------------------------------------------
     --------------------------------------------------------------------
     This file is part of SimPol.
@@ -200,23 +200,6 @@ parseMSA = function(fasta, msgID = null){
 }
 
 
-// Get the weight of each sequence
-getSequenceWeights = function(msgID = null){
-
-    // Create the callback function
-    var toDoAfterCall = function(resultStr){
-        if (msgID != null) postMessage(msgID + "~X~" + resultStr);
-    }
-    WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
-
-    
-    Module.ccall("getSequenceWeights", null, ["number"], [msgID]);
-
-}
-
-
-
-
 
 // Parse a tree in .nexus format
 parseTree = function(nexus, msgID = null){
@@ -236,7 +219,7 @@ parseTree = function(nexus, msgID = null){
 
 
 // Begin the PhyloPause simulations and return to js after a timeout (~1000ms) has been reached to check if user has requested to stop
-startPhyloPause = function(resume = false, msgID = null){
+startPauser = function(resume = false, msgID = null){
     
     // Create the callback function
     var toDoAfterCall = function(resultStr){
@@ -265,7 +248,7 @@ startPhyloPause = function(resume = false, msgID = null){
 
 
     WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall, remove: false};
-    Module.ccall("startPhyloPause", null, ["number", "number"], [(resume ? 0 : 1), msgID]);
+    Module.ccall("startPauser", null, ["number", "number"], [(resume ? 0 : 1), msgID]);
     
 }
 
@@ -300,7 +283,7 @@ resumePhyloPause = function(msgID = null){
         }
 
         WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall, remove: false};
-        Module.ccall("startPhyloPause", null, ["number", "number"], [0, msgID]);
+        Module.ccall("startPauser", null, ["number", "number"], [0, msgID]);
 
     }, 1);
 
