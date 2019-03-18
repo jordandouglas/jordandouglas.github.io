@@ -1,7 +1,7 @@
 /* 
-	--------------------------------------------------------------------
-	--------------------------------------------------------------------
-	This file is part of SimPol.
+    --------------------------------------------------------------------
+    --------------------------------------------------------------------
+    This file is part of SimPol.
 
     SimPol is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,94 +19,109 @@
     --------------------------------------------------------------------
 -*/
 
+.glowing {
+    background-color:#f0c36d; 
+    border-color: #FFFFB2; 
+    -webkit-box-shadow: 0 0 10px #FFFFB2; 
+       -moz-box-shadow: 0 0 10px #FFFFB2; 
+            box-shadow: 0 0 10px #FFFFB2; 
+}
+
+
+a {
+
+    text-decoration:none;
+    
+}
+
+
 
 
 body { 
-	font-family: Arial; 
-	%background-color:#ebe9e7;
+    font-family: Arial; 
+    %background-color:#ebe9e7;
 }
 
 optgroup {
-	color:black;
+    color:black;
 }
 
 .modelSelected{
-	background-color:#858280;
-	cursor:auto;
+    background-color:#858280;
+    cursor:auto;
     color: white;
     padding: 5px 0px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-	vertical-align: middle; 
-	width:110px;
+    vertical-align: middle; 
+    width:110px;
 }
 
 
 .modelSelectedTextarea{
-	background-color:#A5CF19;
+    background-color:#A5CF19;
     color: white;
 }
 
 
 
 canvas {
-	Vertical-align: middle;
+    Vertical-align: middle;
 }
 
 .comment {
-		color: #228b22;
-	}
+        color: #228b22;
+    }
 
 .code {
-	font-family:'Courier New';
-	%font-weight:bold;
+    font-family:'Courier New';
+    %font-weight:bold;
 }
 
 
 .code ol { 
-	    counter-reset: item;
-	}
-	
+        counter-reset: item;
+    }
+    
 
 .code ol li { 
-	display: block; 
+    display: block; 
 }
 
 
 .code ol li:before { 
-	content: counter(item) "  "; 
-	counter-increment: item;
-	color:#545454;
-	font-weight: bold;
-	text-align:right;
-	-webkit-touch-callout: none; /* iOS Safari */
-		-webkit-user-select: none; /* Safari */
-		 -khtml-user-select: none; /* Konqueror HTML */
-		   -moz-user-select: none; /* Firefox */
-			-ms-user-select: none; /* Internet Explorer/Edge */
-				user-select: none; /* Non-prefixed version, currently
-									  supported by Chrome and Opera */
+    content: counter(item) "  "; 
+    counter-increment: item;
+    color:#545454;
+    font-weight: bold;
+    text-align:right;
+    -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Safari */
+         -khtml-user-select: none; /* Konqueror HTML */
+           -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+                user-select: none; /* Non-prefixed version, currently
+                                      supported by Chrome and Opera */
 }
-	
+    
 
 
 .errorMsg{
-	background-color:#FFFFB2; 
-	padding: 5 2 5 2; width:95%; 
-	text-align:center; 
-	border-style: solid; 
-	border-width: 1px; 
-	border-color:#f0c36d;  
-	margin: auto; 
-	font-size: 14px;
-	border-radius: 5px;
+    background-color:#FFFFB2; 
+    padding: 5 2 5 2; width:95%; 
+    text-align:center; 
+    border-style: solid; 
+    border-width: 1px; 
+    border-color:#f0c36d;  
+    margin: auto; 
+    font-size: 14px;
+    border-radius: 5px;
 }
 
 
 @media screen and (orientation:portrait) {
-
 
 
 }
@@ -154,19 +169,19 @@ input[type=number] {
 }
 
 :focus {
-	outline: 0;
+    outline: 0;
 }
 
 .logo{
-	cursor:pointer;
+    cursor:pointer;
 
 }
 
 .ref{
 
-	padding:5;
-	width:100%;
-	line-height: 25px;
+    padding:5;
+    width:100%;
+    line-height: 25px;
 
 }
 
@@ -203,7 +218,7 @@ div.vertical{
     text-align: center;
     text-decoration: none;
     font-size: 18px;
-	width:450px;
+    width:450px;
 }
 
 
@@ -220,105 +235,110 @@ div.vertical{
 
 
 .scrollbar::-webkit-scrollbar {
-	width: 12px;
-	background-color: #ebe9e7;
+    width: 12px;
+    background-color: #ebe9e7;
 }
 
 .scrollbar::-webkit-scrollbar-thumb
 {
-	border-radius: 10px;
-	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-	background-color: #A5CF19;
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #A5CF19;
 }
 
 
 .main-block{
 
-	%border:1px solid black;
-	background-color: #858280;
-	width:80%;
-	font-family:Arial;
-	margin:auto;
-	padding: 5 5;
-	border-radius:10px;
+    %border:1px solid black;
+    background-color: #858280;
+    width:80%;
+    font-family:Arial;
+    margin:auto;
+    padding: 5 5;
+    border-radius:10px;
 
 }
 
 .main-block-inner{
-	background-color:white;
-	border-radius:10px;
+    background-color:white;
+    border-radius:10px;
 
 }
 
 .about-block{
-	
-	padding:20 20; 
-	font-family:Arial;
-	%background-color: #ebe9e7;
-	font-size: 18px;
-	display:block;
-	text-align: justify;
-	position: relative;
-	clear:both;
+    
+    padding:20 20; 
+    font-family:Arial;
+    %background-color: #ebe9e7;
+    font-size: 18px;
+    display:block;
+    text-align: justify;
+    position: relative;
+    clear:both;
 
 }
 
 .about-block-inner{
-	%border:1px solid black;
-	%background-color: white;
-	
+    %border:1px solid black;
+    %background-color: white;
+    
 
 }
 
 
 .block-title{
-	text-align:center; 
-	font-size:45px; 
-	font:bold; 
-	color:#A5CF19;
+    padding-top:10px;
+    padding-bottom:2px;
+    text-align:left; 
+    font-size:36px; 
+    font:bold; 
+    color:#A5CF19;
 }
 
 .block-title > .minimise{
-	width:30px; 
-	height:30px; 
-	font-size:20;
-	cursor:pointer;
-	
+    width:30px; 
+    height:30px; 
+    font-size:20;
+    cursor:pointer;
+    margin: 10px;
+    
 }
 
 
 
 
 .block-subtitle{
-	text-align:center; 
-	font-size:40px; 
-	font:bold; 
-	color:#A5CF19
+    text-align:left; 
+    font-size:32px; 
+    font:bold; 
+    color:#A5CF19;
+    display: inline-block;
+    padding-bottom:5px;
 }
 
 .block-subsubtitle{
-	text-align:center; 
-	font-size:20px; 
-	color:#A5CF19
+    text-align:left; 
+    font-size:20px; 
+    color:#A5CF19
 }
 
 
 #theToolbar{
-	%border-style: solid; 
-	%border-width: 2px; 
-	%border-color:#0B522D; 
-	
-	
+    %border-style: solid; 
+    %border-width: 2px; 
+    %border-color:#b20000; 
+    
+    
 }
 
 .toolbar {
-	background-color: #424f4f;
-	width:60px;
-	text-align:center;
-	-webkit-user-select: none;  
-	-moz-user-select: none;    
-	-ms-user-select: none;      
-	user-select: none;
+    background-color: #424f4f;
+    width:60px;
+    text-align:center;
+    -webkit-user-select: none;  
+    -moz-user-select: none;    
+    -ms-user-select: none;      
+    user-select: none;
 
 
 }
@@ -326,15 +346,15 @@ div.vertical{
 
 
 .toolbarIcon {
-	background-color: #ebe9e7;
-	padding: 5 5;
-	text-align:center;
+    background-color: #ebe9e7;
+    padding: 5 5;
+    text-align:center;
 }
 
 
 .toolbarIconDisabled {
-	background-color: #adadad;
-	cursor:auto;
+    background-color: #adadad;
+    cursor:auto;
 }
 
 .operation {
@@ -346,37 +366,47 @@ div.vertical{
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-	vertical-align: middle; 
-	width:110px;
-	cursor:pointer;
-	%box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    vertical-align: middle; 
+    width:110px;
+    cursor:pointer;
+    %box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+
+.operation.glowing {
+    background-color:#f0c36d; 
+    border-color: #FFFFB2; 
+    color:#f0c36d;
+    -webkit-box-shadow: 0 0 10px #FFFFB2; 
+       -moz-box-shadow: 0 0 10px #FFFFB2; 
+            box-shadow: 0 0 10px #FFFFB2; 
 }
 
 
 
 .ntp {
     background-color: #A5CF19;
-	color: white;
+    color: white;
     border: none;
     padding: 0px 0px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 12px;
-	vertical-align: middle; 
-	width:18px;
-	height:18px;
-	cursor:pointer;
+    vertical-align: middle; 
+    width:18px;
+    height:18px;
+    cursor:pointer;
 }
 
 .ntp-selected {
-    background-color: #0B522D;
-	cursor:auto;
+    background-color: #b20000;
+    cursor:auto;
 }
 
 .minimise {
     background-color: #A5CF19;
-	opacity: 1.0;
+    opacity: 1.0;
     border: none;
     color: white;
     padding: 0px 0px;
@@ -384,18 +414,17 @@ div.vertical{
     text-decoration: none;
     display: inline-block;
     font-size: 15px;
-	vertical-align: middle; 
-	width:20px;
-	height:20px;
-	cursor:pointer;
-	border-radius:5px;
+    vertical-align: middle; 
+    width:20px;
+    height:20px;
+    cursor:pointer;
+    border-radius:5px;
 }
 
 
-
 .spacer {
-	width:10px;
-	height:10px;	
+    width:10px;
+    height:10px;    
 }
 
 
@@ -408,21 +437,21 @@ div.vertical{
     top: 0;
     left: 0;
     %background-color: #A5CF19; /*baafab*/
-	background-color: #b3b3b3; /*baafab*/
+    background-color: #b3b3b3; /*baafab*/
     overflow-x: hidden;
     overflow-y:scroll;
     transition: 0.5s;
     padding-top: 50px;
-	text-align:left;
+    text-align:left;
 }
 
 .help{
-	vertical-align:middle;
+    vertical-align:middle;
 }
 
 .helpIcon {
-	width:15px;
-	cursor: pointer;
+    width:15px;
+    cursor: pointer;
 }
 
 .sidenav a {
@@ -454,29 +483,29 @@ div.vertical{
 
 .blueCloseBtn {
     font-size: 30px;
-	color:#A5CF19;
-	vertical-align:top;
-	cursor:pointer;
-	float:right;
-	position:absolute;
-	top: -5px;
-	right: 5px;
+    color:#A5CF19;
+    vertical-align:top;
+    cursor:pointer;
+    float:right;
+    position:absolute;
+    top: -5px;
+    right: 5px;
 }
 
 
 .blueDarkblueCloseBtn:hover{
-    color: #708090;
+    color: 2E8B57
 }
 
 .blueDarkblueCloseBtn {
     font-size: 30px;
-	color:#A5CF19;
-	vertical-align:top;
-	cursor:pointer;
-	float:right;
-	position:absolute;
-	top: -5px;
-	right: 5px;
+    color:#A5CF19;
+    vertical-align:top;
+    cursor:pointer;
+    float:right;
+    position:absolute;
+    top: -5px;
+    right: 5px;
 }
 
 #main {
@@ -495,75 +524,75 @@ div.vertical{
 
 .ABC_output_highlighted {
 
-	background-color:#663399;
-	color:white;
-	display:inline;
-	padding: 0 1;
+    background-color:#663399;
+    color:white;
+    display:inline;
+    padding: 0 1;
 
 }
 
 .parameter-bg {
-	%background-color: #ebe9e7;
-	background-color: white;
+    %background-color: #ebe9e7;
+    background-color: white;
     border: none;
     color: black;
     padding: 10px 10px;
     text-align: left;
     text-decoration: none;
     font-size: 14px;
-	transition: 0.5s;
-	
+    transition: 0.5s;
+    
 }
 
 .panelOuter{
 
-	%background-color: #008bca;
-	%background-color: black;
-	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    %background-color: #008bca;
+    %background-color: black;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     color: black;
     %padding: 5px 5px;
     text-align: left;
     text-decoration: none;
-    font-size: 14px;
-	transition: 0.5s;
+    font-size: 16px;
+    transition: 0.5s;
+    margin-bottom:20px;
 
 
 }
 
 
 .panelInner{
-	padding: 5px 5px;
-	background-color: white;
+    padding: 5px 5px;
+    background-color: white;
 
 }
-
-
 
 
 
 
 
 .parameter-title {
-	font-size: 18px;
-	text-decoration: none;
-	text-align: center;
-	
+    font-size: 18px;
+    text-decoration: none;
+    text-align: center;
+    %display:inline-block;
+    
 }
 
 .header {
-	background-color: white;
-	min-width:99%;
-	padding: 5px 5px;
-	text-align: center;
-	font-family: "Arial";
-	%box-shadow: 5px 4px 8px 0 #424f4f, 6px 6px 20px 0 rgba(0, 0, 0, 0.19);
+    background-color: white;
+    min-width:99%;
+    padding: 5px 5px;
+    text-align: center;
+    font-family: "Arial";
+    %box-shadow: 5px 4px 8px 0 #424f4f, 6px 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .plot-dropdown {
     position: relative; 
-	font-family: "Arial";
+    font-family: "Arial";
     padding: 5px;
-	font-size:18px;
+    font-size:18px;
     margin: 0 auto;
     background: #A5CF19;
     color: white;
@@ -573,9 +602,9 @@ div.vertical{
 
 .dropdown {
     position: relative; 
-	font-family: "Arial";
+    font-family: "Arial";
     padding: 5px;
-	font-size:14px;
+    font-size:14px;
     margin: 0 auto;
     background: #A5CF19;
     color: white;
@@ -584,6 +613,19 @@ div.vertical{
 
 }
 
+
+.bluegrey {
+    background-color:#2E8B57;
+
+}
+
+.greenTick {
+    background-color:#A5CF19; 
+    color:#0B522D; 
+    padding: 5 5; 
+    font-size: 20px;
+    border-radius: 30px;
+ }
 
 .loader {
     border: 12px solid #ebe9e7; 
@@ -594,93 +636,106 @@ div.vertical{
     animation: spin 2s linear infinite;
 }
 
+
+.loader_small {
+    border: 8px solid #ebe9e7; 
+    border-top: 8px solid #A5CF19; 
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    animation: spin 2s linear infinite;
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
 optgroup {
-	font-family: "Arial";
-	font-size:14px;
+    font-family: "Arial";
+    font-size:14px;
     color: white;
 }
 
 .dropdown-disabled {
     position: relative; 
-	font-family: "Arial";
+    font-family: "Arial";
     padding: 2px 3px;
-	font-size:14px;
+    font-size:14px;
     margin: 0 auto;
     background: #858280;
     color: white;
     outline: none;
     cursor: default;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	text-overflow: '';
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-overflow: '';
 }
 
 .variable{
-	color:white;
-	background-color: #A5CF19;
-	/* font-size:16px;
-	height:22px; */
+    color:white;
+    background-color: #A5CF19;
+    /* font-size:16px;
+    height:22px; */
 }
 
 .paramHelp {
-	padding:5 5;
-	background-color:#ebe9e7;
+    padding:5 5;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    #background-color:#ebe9e7;
 }
 
 
 .refLink{
-	text-decoration: none; 
-	color:#A5CF19;
+    text-decoration: none; 
+    color:#A5CF19;
 }
 
 
-.helpSelected  {
-	background-color:#708090;
-	color:white;
+.helpSelected {
+    background-color:#2E8B57;
+    border-radius: 8px;
+    padding: 5;
+    color:white;
 }
 
 
 .helpSelected * {
-	color:white;
+    color:white;
 }
 
 
 
 .parameter-disabled {
-	
+    
     margin: 0 auto;
     background: #858280;
     outline: none;
     cursor: default;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	text-overflow: '';
-	color: white;
-	-webkit-text-fill-color:white;
-	
-	
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-overflow: '';
+    color: white;
+    -webkit-text-fill-color:white;
+    
+    
 }
 
 
 :disabled {
-	cursor:auto;
-	
+    cursor:auto;
+    
 }
 
 input {
-	box-shadow: none;
+    box-shadow: none;
 }
 
 
 
 .textboxBlue{
-	color:white;
-	background-color: #A5CF19;
+    color:white;
+    background-color: #A5CF19;
 
 
 }
@@ -696,32 +751,32 @@ input {
 
 
 .variable-active{
-	background-color: #1e7d1e;
-	color:white;
-	cursor:pointer;
+    background-color: #1e7d1e;
+    color:white;
+    cursor:pointer;
 }
 
 .variable-cursor{
-	cursor: url("src/Images/cursorHover.png"), pointer;
+    cursor: url("src/Images/cursorHover.png"), pointer;
 }
 
 .distn{
-	padding: 3 3;
-	vertical-align: middle; 
-	width:38px; 
-	height:12px;
-	float:right;
-	cursor:pointer;
+    padding: 3 3;
+    vertical-align: middle; 
+    width:38px; 
+    height:12px;
+    float:right;
+    cursor:pointer;
 }
 
 
 .distn_inline{
-	padding: 3 3;
-	vertical-align: bottom; 
-	width:38px; 
-	height:12px;
-	text-align:right;
-	cursor:pointer;
+    padding: 3 3;
+    vertical-align: bottom; 
+    width:38px; 
+    height:12px;
+    text-align:right;
+    cursor:pointer;
 }
 
 
@@ -756,63 +811,45 @@ input {
 }
 
 .slider:before {
-	position: absolute;
-	content: "";
-	height: 20px;
-	width: 20px;
-	left: 6px;
-	bottom: 3px;
-	background-color: white;
-	-webkit-transition: .3s;
-	transition: .3s;
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 6px;
+    bottom: 3px;
+    background-color: white;
+    -webkit-transition: .3s;
+    transition: .3s;
 }
 
 .notboolean{
-	background-color: #A5CF19;	
+    background-color: #A5CF19;  
 }
 
 input:checked + .slider {
-	background-color: #A5CF19;		
+    background-color: #A5CF19;      
 }
 
 input:focus + .slider {
-	box-shadow: 0 0 1px #A5CF19;
+    box-shadow: 0 0 1px #A5CF19;
 }
 
 input:checked + .slider:before {
-	-webkit-transform: translateX(20px);
-	-ms-transform: translateX(20px);
-	transform: translateX(20px);
+    -webkit-transform: translateX(20px);
+    -ms-transform: translateX(20px);
+    transform: translateX(20px);
 }
-
-
-
-.nucleotideHighlighted {
-
-    color:white;
-    background-color:black;
-
-}
-
-
 
 /* Rounded sliders */
 .slider.round {
-	border-radius: 34px;
+    border-radius: 34px;
 }
 
 .slider.round:before {
-	border-radius: 50%;
-	
+    border-radius: 50%;
+    
 } 
 
-.greenTick {
-	background-color:#A5CF19; 
-	color:#0B522D; 
-	padding: 5 5; 
-    font-size: 20px;
-	border-radius: 30px;
- }
 
 .rangeslider {
     -webkit-appearance: none;  /* Override default CSS styles */
@@ -820,12 +857,12 @@ input:checked + .slider:before {
     height: 26px; /* Specified height */
     background: #A5CF19; 
     outline: none; /* Remove outline */
-	border-radius: 20px;
-	transform: rotate(90deg);
-	padding: 5 5;
-	transform-origin: left top 0;
-	margin-left: 26px;
-	
+    border-radius: 20px;
+    transform: rotate(90deg);
+    padding: 5 5;
+    transform-origin: left top 0;
+    margin-left: 26px;
+    
 }
 
 
@@ -837,7 +874,7 @@ input:checked + .slider:before {
     height: 20px; /* Slider handle height */
     background: white; 
     cursor: pointer; /* Cursor on hover */
-	border-radius: 20px;
+    border-radius: 20px;
 }
 
 .rangeslider::-moz-range-thumb {
@@ -845,6 +882,77 @@ input:checked + .slider:before {
     height: 20px; /* Slider handle height */
     background: white; 
     cursor: pointer; /* Cursor on hover */
-	border-radius: 20px;
+    border-radius: 20px;
 }
 
+
+.xml_link {
+
+    padding: 1 5; 
+    background-color:#2E8B57;
+    color:white;
+
+}
+
+.xml_link > a{
+    color:#d3d3d3;
+}
+
+
+.param_link {
+    cursor:pointer;
+    color:#A5CF19;
+
+}
+
+
+.subsection {
+
+    margin-bottom:0.5em;
+
+}
+
+#predictionSummaryTable td{
+    padding: 5px;
+    font-size:16px; 
+    text-align:right;
+
+}
+
+
+tr.selected{
+    color:white;
+    background-color:#0B522D;
+}
+
+
+.dot {
+    border-style: solid;
+    border-width: 2px;
+    height: 6px;
+    width: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    position: absolute;
+}
+
+.simpol_class_dot {
+    background-color: #008cba;
+    border-color: #008cba;
+}
+
+
+.NBC_class_dot {
+    background-color: #d3d3d3;
+    border-color: #d3d3d3;
+}
+
+.simpol_class_dot.NBC_class_dot {
+    background-color: #d3d3d3;
+    border-color: #008cba;
+}
+
+
+#conservationMSA td {
+    padding-bottom: 8px;
+}
