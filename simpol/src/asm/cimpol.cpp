@@ -158,7 +158,8 @@ int main(int argc, char** argv) {
         
         cout << "----------------------------------------" << endl;
     
-        exit(0);
+        if ( argc > 1) exit(0);
+        
     }
     
 
