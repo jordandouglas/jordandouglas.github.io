@@ -29,7 +29,6 @@
 #include "../../../src/asm/Plots.h"
 #include "../../../src/asm/MultipleSequenceAlignment.h"
 #include "../../../src/asm/PauseSiteUtil.h"
-#include "../../../src/asm/PhyloTree.h"
 
 
 #include <emscripten.h>
@@ -72,11 +71,10 @@ extern "C" {
 
 
 	void EMSCRIPTEN_KEEPALIVE initGUI(bool isMobile){
-        cout << "Initialising Simpol for PhyloPause" << endl;
+        cout << "Initialising Pauser" << endl;
 		_USING_GUI = true;
         _animationSpeed = "hidden";
         _PP_multipleSequenceAlignment = new MultipleSequenceAlignment();
-        _PP_tree = new PhyloTree();
         _GUI_PLOTS = new Plots();
 
 	}
@@ -123,7 +121,9 @@ extern "C" {
         cout << "STOPPING C++" << endl;
         messageFromWasmToJS("", msgID);
     }
-
+    
+    
+    
     // Parse an MSA from a JSON string
     void EMSCRIPTEN_KEEPALIVE parseMSA(char* fasta, int msgID){
 
@@ -138,53 +138,52 @@ extern "C" {
 
     }
 
-
-
-    // Parse a tree from a nexus string
-    void EMSCRIPTEN_KEEPALIVE parseTree(char* nexus, int msgID){
-
-
-        _PP_tree->clear();
-
-        // Parse the tree
-        string errorMsg = _PP_tree->parseFromNexus(string(nexus));
-        if (errorMsg != "") messageFromWasmToJS("{'error':'" + errorMsg + "'}", msgID);
-
-
-        errorMsg = _PP_multipleSequenceAlignment->treeTipNamesAreConsistentWithMSA(_PP_tree);
-        if (errorMsg != "") {
-            _PP_tree->clear();
-            messageFromWasmToJS("{'error':'" + errorMsg + "'}", msgID);
-        }
+    
+    // Returns the classifier threshold values
+    void EMSCRIPTEN_KEEPALIVE getThresholds(int msgID){
         
-
-        messageFromWasmToJS("{'newick':'" + _PP_tree->getNewick() + "'}", msgID);
-
+        string JSON = "{";
+        JSON += "'simpolThreshold':" + to_string(_simpol_evidence_threshold) + ",";
+        JSON += "'nbcThreshold':" + to_string(_nbc_evidence_threshold);
+        JSON += "}";
+        
+        
+        messageFromWasmToJS(JSON, msgID);
     }
+    
+    
+    
 
 
 
     // Return a JSON string of the cumulatively calculated pause sites
     void EMSCRIPTEN_KEEPALIVE getPauseSites(int msgID){
         
-        string JSON = "{'evidence':[";
-        vector<int> evidence = PauseSiteUtil::calculateEvidence(_PP_multipleSequenceAlignment);
-        for(int i = 0; i < evidence.size(); i ++){
-            JSON += to_string(evidence.at(i));
-            if (i < evidence.size() - 1) JSON += ",";
-        }
-
-
-        JSON += "],'pauseSites':";
+        string JSON = "{'simpol_pause_sites':";
         JSON += _PP_multipleSequenceAlignment->pauseSites_toJSON();
         JSON += "}";
 
-
-
         messageFromWasmToJS(JSON, msgID);
     }
-
-
+    
+    
+    // Update the threshold required for a site to be classified as a pause site by SimPol
+    void EMSCRIPTEN_KEEPALIVE updateThreshold(char* classifier, double threshold, int msgID){
+        
+        string classifier_str = string(classifier);
+        if (classifier_str == "simpol") _simpol_evidence_threshold = threshold;
+        else if (classifier_str == "nbc") _nbc_evidence_threshold = threshold;
+        
+        cout << msgID << ": " <<  classifier << " threshold set to " << threshold << endl;
+        
+        string JSON = "{";
+        JSON += "'simpolThreshold':" + to_string(_simpol_evidence_threshold) + ",";
+        JSON += "'nbcThreshold':" + to_string(_nbc_evidence_threshold);
+        JSON += "}";
+        
+        messageFromWasmToJS(JSON, msgID);
+        
+    }
 
 
     // Begin the PhyloPause simulations and return to js after a timeout (~1000ms) has been reached to check if user has requested to stop
@@ -192,9 +191,11 @@ extern "C" {
 
 
         if (init) {
-            cout << "Intialising PhyloPause" << endl;
+            cout << "Intialising Pauser" << endl;
             if (_interfaceSimulator != nullptr) delete _interfaceSimulator;
             _interfaceSimulator = new Simulator(_GUI_PLOTS);
+            _simpol_max_evidence = 0;
+            _nbc_max_evidence = 0;
             _GUI_STOP = false;
         }
 

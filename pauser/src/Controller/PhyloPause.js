@@ -26,7 +26,7 @@
 
 function beginPauser(resume_simulation = false){
 
-    console.log("Beginning PhyloPause")
+    console.log("Beginning Pauser")
 
 
     // Change the description of the begin PhyloPause button

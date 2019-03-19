@@ -220,47 +220,25 @@ function renderAlignment(resolve = function() { }){
 renderPauseSitesOnAlignment = function(){
 
 
-
     getPauseSites_controller(function(result){
 
 
-        console.log("result", result);
-        var pauseSites = result.pauseSites;
+        //console.log("renderPauseSitesOnAlignment", result);
+        $(".positive_class").remove();
+        var simpol_pause_sites = result.simpol_pause_sites;
 
         // Plot whether each cell is a pause site or not
-        for (var acc in pauseSites){
+        for (var acc in simpol_pause_sites){
 
             var row = $(`[rowid="` + acc.substr(1) + `"]`);
 
 
-            //console.log(acc, "row", row, row.children(`[colid]`));
-
-            for (var i = 0; i < pauseSites[acc].length; i++){
-
-                var siteNum = pauseSites[acc][i];
-                var site = row.children(`[colid="` + siteNum + `"]`);
-                //console.log(siteNum, "site", site);
-                site.css("background-color", "black");
-                site.addClass("nucleotideHighlighted");
-
-
-
+            for (var i = 0; i < simpol_pause_sites[acc].length; i++){
+            
+                var siteNum = simpol_pause_sites[acc][i];
+                addSimPolPauseSite(row.children(".sequenceTD"), siteNum);
                 
             }
-
-
-        }
-
-
-        // Pause site evidence
-        for (var i = 0; i < result.evidence.length; i ++){
-
-            var siteNum = i + 1;
-            if (result.evidence[i] == 1) $("#e" + siteNum).html("*");
-            else if (result.evidence[i] == 2) $("#e" + siteNum).html(`*<br style="line-height:10px">*`);
-            else $("#e" + siteNum).html("");
-
-
 
         }
 
@@ -270,9 +248,20 @@ renderPauseSitesOnAlignment = function(){
 
 }
 
+ // Add dots below the sequence showing that SimPol classified it as a pause site
+function addSimPolPauseSite(td_ele, pauseSite){
+
+    
+    // If this is also an NBC pause site, then add both colours to the circle
+    var classes = "positive_class dot simpol_class_dot";
+    var title = "The above position was classified as a pause site by SimPol."
+    
+    var x = pauseSite - 0.75;
+    var dot = `<span title="` + title + `" class="` + classes + `" style="top:20px; left:` + x + `ch"></span>`
+    td_ele.append(dot);
 
 
-
+}
 
 
 function getMSAheaderTemplate(nsites){
@@ -350,7 +339,7 @@ function appendMSArowTemplate(appendTo, name, seq, true_pauseSites = null, simpo
     if (true_pauseSites != null){
         for (var i = 0; i < true_pauseSites.length; i ++){
             var pauseSite = true_pauseSites[i];
-            seq_list[pauseSite-1] = `<b title="According to the uploaded .fasta file, this site is a pause site." style="color:orange">` + seq_list[pauseSite-1] + `</b>`;
+            seq_list[pauseSite-1] = `<b title="According to the uploaded .fasta file, this site is a pause site." style="color:red">` + seq_list[pauseSite-1] + `</b>`;
         }
     }
     
@@ -367,33 +356,9 @@ function appendMSArowTemplate(appendTo, name, seq, true_pauseSites = null, simpo
     `;
     $(appendTo).append(row);
     
-    // Add dots below the sequence showing whether SimPol and/or NBC classified it as a pause site
-    if (simpol_pauseSites != null){
-        var td_ele = $(`[rowid="` + name + `"]`).children(".sequenceTD");
-        for (var i = 0; i < simpol_pauseSites.length; i ++){
-            var pauseSite = simpol_pauseSites[i];
-            
-            
-            // If this is also an NBC pause site, then add both colours to the circle
-            var classes = "dot simpol_class_dot";
-            var title = "The above position was classified as a pause site by SimPol."
-            if (NBC_pauseSites != null){
-                for (var j = 0; j < NBC_pauseSites.length; j ++){
-                    var pauseSite_NBC = NBC_pauseSites[j];
-                    if (pauseSite_NBC == pauseSite){
-                        classes = classes + " NBC_class_dot";
-                        title = "The above position was classified as a pause site by both SimPol and NBC."
-                        break;
-                    }
-                }
-            }
-            
-            
-            var x = (pauseSite-1) - 0.75;
-            var dot = `<span title="` + title + `" class="` + classes + `" style="top:20px; left:` + x + `ch"></span>`
-            td_ele.append(dot);
-        }
-    }
+    
+    return;
+    
     
     
     // NBC pause sites (but not classified by SimPol too)

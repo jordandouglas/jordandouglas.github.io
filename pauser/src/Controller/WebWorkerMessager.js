@@ -312,6 +312,7 @@ function loadSession_controller(XMLData, resolve = function(x) { }){
 
 
 
+// Get the pause sites as classified under the current thresholds
 function getPauseSites_controller(resolve = function(x) { }){
 
 
@@ -330,8 +331,13 @@ function getPauseSites_controller(resolve = function(x) { }){
 }
 
 
-function parseMSA_controller(fasta, resolve = function(x) { }){
 
+
+
+
+
+
+function parseMSA_controller(fasta, resolve = function(x) { }){
 
     //console.log("fasta", fasta);
 
@@ -342,34 +348,69 @@ function parseMSA_controller(fasta, resolve = function(x) { }){
         var msgID = res[1];
         var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
         toCall().then((result) => resolve(result));
-
-
     }
     
 }
 
 
-function parseTree_controller(nexus, resolve = function(x) { }){
 
+
+// Gets the classifier threshold values from the model and updates the DOM
+function getThresholds_controller(fasta, resolve = function() { }){
+
+    //console.log("fasta", fasta);
+    var updateDOM = function(result){
+    
+        $("#simpol_threshold").val(result.simpolThreshold);
+        $("#nbc_threshold").val(result.nbcThreshold);
+        resolve();
+    
+    }
 
     if (WEB_WORKER_WASM != null) {
 
-        var res = stringifyFunction("parseTree", [nexus], true);
+        var res = stringifyFunction("getThresholds", [], true);
         var fnStr = "wasm_" + res[0];
         var msgID = res[1];
         var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-        toCall().then((result) => resolve(result));
-
-
+        toCall().then((result) => updateDOM(result));
     }
     
+}
+
+
+
+function updateThreshold_controller(classifier = "simpol"){
+
+    var updateDOM = function(result){
+        console.log("updateThreshold_controller", result);
+        
+        $("#simpol_threshold").val(result.simpolThreshold);
+        $("#nbc_threshold").val(result.nbcThreshold);
+        
+        renderPauseSitesOnAlignment();
+    }
+
+
+    var threshold = classifier == "simpol" ? $("#simpol_threshold").val() : $("#nbc_threshold").val();
+    if (WEB_WORKER_WASM != null) {
+
+        var res = stringifyFunction("updateThreshold", [classifier, threshold], true);
+        var fnStr = "wasm_" + res[0];
+        var msgID = res[1];
+        var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+        toCall().then((result) => updateDOM(result));
+
+    }
+
+
 }
 
 
 function startPauser_controller(resume_simulation = false, resolve = function() { }){
 
 
-    $(".beforeBeginningPhyloPause").hide(0);
+    $(".beforeBeginningPauser").hide(0);
     $(".beginPauserFirst").show(100);
    
     PP_simulating = true;

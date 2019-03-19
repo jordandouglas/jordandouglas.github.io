@@ -201,18 +201,6 @@ parseMSA = function(fasta, msgID = null){
 
 
 
-// Parse a tree in .nexus format
-parseTree = function(nexus, msgID = null){
-
-    // Create the callback function
-    var toDoAfterCall = function(resultStr){
-        if (msgID != null) postMessage(msgID + "~X~" + resultStr);
-    }
-    WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
-
-    
-    Module.ccall("parseTree", null, ["string", "number"], [nexus, msgID]);
-}
 
 
 
@@ -252,6 +240,35 @@ startPauser = function(resume = false, msgID = null){
     
 }
 
+// Returns the classifier threshold values
+getThresholds = function(msgID = null){
+
+    // Create the callback function
+    var toDoAfterCall = function(resultStr){
+        if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+    }
+    WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+    
+    Module.ccall("getThresholds", null, ["number"], [msgID]);
+
+
+}
+
+
+
+// Update the threshold required for a site to be classified as a pause site by SimPol
+updateThreshold = function(classifier, threshold, msgID = null){
+
+    // Create the callback function
+    var toDoAfterCall = function(resultStr){
+        if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+    }
+    WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+    
+    Module.ccall("updateThreshold", null, ["string", "number", "number"], [classifier, threshold, msgID]);
+
+
+}
 
 
 // Resume simulations from before continuing from the current state and time elapsed

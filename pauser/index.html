@@ -83,7 +83,10 @@ function init(){
 
         // Upload the default session file
         loadSessionFromURL("pauser.xml");
-
+        
+            
+        // Set the thresholds to their initial value
+        getThresholds_controller();
 
 
         if (location.href.indexOf("?") != -1){
@@ -422,6 +425,90 @@ function getLoaderTemplate(id, msg = ""){
                         
                         <div class="uploadAlignmentFirst"  style="display:none">
                                 
+                                        
+                                        
+                                        
+                                        
+                             <div style="margin:20px; margin-bottom:50px">
+                                 
+                                <b style="color:#0B522D">Classifiers</b> 
+                                <table id="classifiersTable" style="margin:10px; text-align:center" cellpadding=0 cellspacing=0> 
+                                
+                                    <tr style="color:#0B522D">
+                                        <td style="min-width:100px;"  title="The method used to classify pause sites.">
+                                             Classifier
+                                        </td>
+                                                    
+                                                              
+                                        <td style="width:100px;" title="The colour of a site which has been classified as a pause site by this method.">
+                                             Positive
+                                        </td>
+                                                
+                                                
+                                        <td style="width:300px;" title="Adjust the threshold to select which sites are classified as pause sites.">
+                                             Evidence threshold
+                                        </td>
+                                                    
+                                                    
+                                        <td style="width:300px">
+                                        </td>
+                                                    
+                                                    
+                                            
+                                    </tr>
+                                                
+                                                
+                                                
+                                     <tr>
+                                        <td style="color:#0B522D">
+                                             SimPol       
+                                        </td>
+                                              
+                                                    
+                                                            
+                                        <td style="position:relative">
+                                             <span class="dot simpol_class_dot" style="top:0.5em; left:45%"></span>
+                                        </td>
+                                                
+                                        <td style="position:relative">
+                                             <input type="range" min="0" max="1" step="0.01" value="0.8" style="width:100%" class="slider simpol_class" onchange="updateThreshold_controller('simpol')" id="simpol_threshold">
+                                        </td>
+                                                    
+                                                    
+                                        <td rowspan="2">
+                                              Higher thresholds result in fewer sites classified as pause sites. 
+                                        </td>
+                                                
+                                        
+                                            
+                                    </tr>
+                                                
+                                                
+                                                
+                                     <tr>
+                                        <td style="color:#0B522D">
+                                             Naive Bayes (NBC)       
+                                        </td>
+                                                    
+                                         <td style="position:relative">
+                                             <span class="dot NBC_class_dot" style="top:0.5em; left:45%"></span>
+                                        </td>
+                                                
+                                        <td style="position:relative">
+                                             <input type="range" min="0" max="1" step="0.01" value="0.2" style="width:100%" class="slider NBC_class" onchange="updateThreshold_controller('nbc')" id="nbc_threshold">
+                                        </td>
+                                                
+                                                
+                                            
+                                    </tr>
+
+
+                                </table>
+                            </div>
+                                        
+                                        
+                                        
+                                        
                                 
                              <div style="margin:20px">
                                  
