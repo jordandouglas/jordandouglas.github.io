@@ -202,10 +202,15 @@ map<int, list<PosteriorDistributionSample*>> _gelPosteriorDistributions; // All 
 Plots* _GUI_PLOTS;
 
 
-// PhyloPause
+// Pauser
 MultipleSequenceAlignment* _PP_multipleSequenceAlignment;
-PhyloTree* _PP_tree;
-bool _USING_PHYLOPAUSE = false;
+bool _USING_PAUSER = false;
+double _simpol_evidence_threshold = 0.5;
+double _simpol_max_evidence = 0;
+double _nbc_evidence_threshold = 0.5;
+double _nbc_max_evidence = 0;
+
+
 
 void Settings::init(){
 

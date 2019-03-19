@@ -29,7 +29,6 @@
 #include "Sequence.h"
 #include "Simulator.h"
 #include "Plots.h"
-#include "PhyloTree.h"
 
 
 #include <string>
@@ -42,10 +41,11 @@ class MultipleSequenceAlignment{
 
 
     vector<Sequence*> alignment;
-    vector<vector<bool>*> pauseSitesInAlignment;
-    int nsites;
+    vector<vector<double>> relativeTimePerLengths;
+    int nsites; // Is it an alignment or just a series of sequences?
     int currentSequenceForSimulation;
     bool initialisedSimulator;
+    bool isAlignment; // Is it an alignment or just a series of sequences?
     
 
     public:
@@ -56,14 +56,12 @@ class MultipleSequenceAlignment{
         string parseFromFastaFile(string filename);
         string toJSON();
         void clear();
-        void PhyloPause();
-        void PhyloPause_GUI(Simulator* simulator, int* result);
+        void Pauser();
+        void Pauser_GUI(Simulator* simulator, int* result);
         string getCurrentSequence();
         string pauseSites_toJSON();
-        vector<vector<bool>*> get_pauseSitesInAlignment();
+        vector<vector<double>> get_relativeTimePerLengths();
         Sequence* getSequenceAtIndex(int index);
-        void calculateLeafWeights(PhyloTree* tree);
-        string treeTipNamesAreConsistentWithMSA(PhyloTree* tree); // Check that the leaf sequence names are the same as those in the multiple sequence alignment
         
 
 

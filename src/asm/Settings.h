@@ -35,7 +35,6 @@
 #include "SlippageLandscapes.h"
 #include "PosteriorDistributionSample.h"
 #include "MultipleSequenceAlignment.h"
-#include "PhyloTree.h"
 
 
 #include <random>
@@ -157,10 +156,14 @@ extern list<PosteriorDistributionSample*> _GUI_posterior;
 extern map<int, list<PosteriorDistributionSample*>> _gelPosteriorDistributions; // All posterior distributions for gel calibrations
 extern Plots* _GUI_PLOTS;
 
-// PhyloPause
+// Pauser
 extern MultipleSequenceAlignment* _PP_multipleSequenceAlignment;
-extern PhyloTree* _PP_tree;
-extern bool _USING_PHYLOPAUSE;
+extern bool _USING_PAUSER;
+extern double _simpol_evidence_threshold;
+extern double _simpol_max_evidence;
+extern double _nbc_evidence_threshold;
+extern double _nbc_max_evidence;
+
 
 // Parameters
 extern Parameter *NTPconc;

@@ -46,7 +46,6 @@ Sequence::Sequence(string seqID, string TemplateType, string PrimerType, string 
 	this->translocationRatesCache = new TranslocationRatesCache();
 
     this->MSAsequence = "";
-    this->weight = 0;
     this->nsitesMSA = 0;
 }
 
@@ -69,7 +68,6 @@ Sequence::Sequence(string seqID, string MSAsequence){
     this->RNAunfoldingTableBuilt = false;
     this->translocationRatesCache = new TranslocationRatesCache();
 
-    this->weight = 1;
     this->nsitesMSA = this->MSAsequence.size();
 
 }
@@ -145,7 +143,19 @@ string Sequence::toJSON(){
 	string nascentType = string(this->nascent_SS ? "ss" : "ds") + string(this->nascent_RNA ? "RNA" : "DNA");
 	string templateType = string(this->template_SS ? "ss" : "ds") + string(this->template_RNA ? "RNA" : "DNA");
 	string parametersJSON = "'" + seqID  + "':{'seq':'" + this->templateSequence + "','template':'" + templateType + "','primer':'" + nascentType + "','MSAsequence':'" + this->MSAsequence + "'";
-    if (this->weight != 0) parametersJSON += ",'weight':" + to_string(this->weight);
+    
+    if (this->true_pauseSites.size() > 0){
+        
+        parametersJSON += ",'true_pauseSites':[";
+        for (int i = 0; i < this->true_pauseSites.size(); i ++){
+             parametersJSON += to_string(this->true_pauseSites.at(i));
+             if (i < this->true_pauseSites.size() - 1) parametersJSON += ",";
+        }
+        
+        parametersJSON += "]";
+    
+    }
+    
     parametersJSON += "}";
     return parametersJSON;
 }
@@ -214,14 +224,20 @@ string Sequence::get_MSAsequence(){
     return this->MSAsequence;
 }
 
-double Sequence::get_weight(){
-    return this->weight;
+
+
+
+// Set the true known locations of pause sites. Return an error if there are problems
+string Sequence::set_true_pauseSites(list<int> pauses){
+
+    vector<int> temp{ std::begin(pauses), std::end(pauses) };
+    this->true_pauseSites = temp;
+    sort(this->true_pauseSites.begin(), this->true_pauseSites.end()); 
+    for (int i = 0; i < this->true_pauseSites.size(); i ++ ){
+        int pauseSite = this->true_pauseSites.at(i);
+        if (pauseSite <= 0 || pauseSite > this->templateSequence.size()) return "ERROR: pause site " + to_string(pauseSite) + " is out of range for " + this->seqID;    
+    }
+    
+    return "";
+
 }
-
-void Sequence::set_weight(double wgt){
-    this->weight = wgt;
-}
-
-
-
-

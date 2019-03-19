@@ -58,7 +58,6 @@ Plots::Plots(){
 
     // Pause time per site
     this->npauseSimulations = 0;
-    this->phyloPauseTimePerSite.resize(0);
 
 
     // Copied sequences (only the ones that have not been sent to the controller)
@@ -117,21 +116,10 @@ void Plots::init(){
 
     if (_RECORD_PAUSE_TIMES){
 
-        if (_USING_PHYLOPAUSE) {
-            this->phyloPauseTimePerSite.resize(currentSequence->get_templateSequence().length()+1); // This object is indexed starting from 1
-            for (int baseNum = 0; baseNum < this->phyloPauseTimePerSite.size(); baseNum ++) {
-                this->phyloPauseTimePerSite.at(baseNum).clear();
-            }
+        for (list<vector<double>>::iterator it = this->proportionTimePerTranscriptLength.begin(); it != this->proportionTimePerTranscriptLength.end(); ++it){
+            it->clear();
         }
-        else {
-            for (list<vector<double>>::iterator it = this->proportionTimePerTranscriptLength.begin(); it != this->proportionTimePerTranscriptLength.end(); ++it){
-                it->clear();
-            }
-            this->proportionTimePerTranscriptLength.clear();
-            //vector<double> first_vec(currentSequence->get_templateSequence().length()+1);
-            //for (int i = 0; i < first_vec.size(); i ++) first_vec.at(i) = 0;
-            //this->proportionTimePerTranscriptLength.push_back(first_vec);
-        }
+        this->proportionTimePerTranscriptLength.clear();
 
     }
 
@@ -374,8 +362,7 @@ void Plots::resetTimeToCatalysis(){
 
 // Updates the timeWaitedUntilNextCatalysis or timeToCatalysisPerSite object at the current site. Only call this method when updatePlotData should not be called
 void Plots::update_timeWaitedUntilNextCatalysis(int baseNumber){
-    if (_USING_PHYLOPAUSE && baseNumber < this->phyloPauseTimePerSite.size()) this->phyloPauseTimePerSite.at(baseNumber).push_back(this->timeWaitedUntilNextCatalysis);
-    else if (baseNumber < this->timeToCatalysisPerSite.size()) {
+    if (baseNumber < this->timeToCatalysisPerSite.size()) {
         this->timeToCatalysisPerSite.at(baseNumber) += this->timeWaitedUntilNextCatalysis;
         this->recordSite(baseNumber, this->timeWaitedUntilNextCatalysis);
     }
@@ -401,30 +388,12 @@ void Plots::onTerminate(State* state, double totalTime, double arrestTimeVal){
 void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, double reactionTime) {
 
 
-    // Phylopause -> record time to catalysis at this site and add to list for this site
+    // Pauser -> record time to catalysis at this site and add to list for this site
     if (_RECORD_PAUSE_TIMES){
 
-
-        // Time per transcript length
-        //if (state->get_nascentLength() < this->timePerTranscriptLength.size()) this->timePerTranscriptLength.at(state->get_nascentLength()) += reactionTime;
-
-
-        if (_USING_PHYLOPAUSE){
-            this->timeWaitedUntilNextCatalysis += reactionTime;
-            bool thereWasACatalysis = lastAction == 3 && (state->NTPbound() || currentModel->get_assumeBindingEquilibrium());
-            if (thereWasACatalysis) {
-                this->phyloPauseTimePerSite.at(state->getRightTemplateBaseNumber()).push_back(this->timeWaitedUntilNextCatalysis);
-                this->timeWaitedUntilNextCatalysis = 0;
-            }
-        }
-
-        else{
-
-            this->proportionTimePerTranscriptLength.back().at(state->get_nascentLength()) = this->proportionTimePerTranscriptLength.back().at(state->get_nascentLength()) + reactionTime;
-
-        }
-
+        this->proportionTimePerTranscriptLength.back().at(state->get_nascentLength()) = this->proportionTimePerTranscriptLength.back().at(state->get_nascentLength()) + reactionTime;
         return;
+        
     }
 
 
@@ -557,7 +526,7 @@ string Plots::getPlotDataAsJSON(){
 
 
     
-    string defaultJSON = "{'plotsAreHidden':" + string(this->plotsAreHidden ? "true" : "false") + ",moreData':false}";
+    string defaultJSON = "{'plotsAreHidden':" + string(this->plotsAreHidden ? "true" : "false") + ",'moreData':false}";
 
 	if (_USING_GUI && this->plotsAreHidden && this->sitewisePlotHidden && !this->sendCopiedSequences) return defaultJSON;
 	if (!this->plotsInit)  return defaultJSON;
@@ -1330,65 +1299,5 @@ list<vector<double>> Plots::getProportionOfTimePerLength(){
 
     return this->proportionTimePerTranscriptLength;
 
-}
-
-
-
-// Returns a vector of tuples. Each tuple contains the mean and standard error of time to catalysis at that site
-vector<vector<double>> Plots::getTimeToCatalysisPerSite(){
-
-
-    vector<vector<double>> TTC(this->phyloPauseTimePerSite.size()-1);
-    for (int baseNum = 1; baseNum < this->phyloPauseTimePerSite.size(); baseNum ++){
-        TTC.at(baseNum-1).resize(4); // Mean, standard error of mean, median, standard error of median
-
-        if (this->phyloPauseTimePerSite.at(baseNum).size() == 0){
-            TTC.at(baseNum-1).at(0) = 0;
-            TTC.at(baseNum-1).at(1) = 0;
-            TTC.at(baseNum-1).at(2) = 0;
-            TTC.at(baseNum-1).at(3) = 0; 
-            continue;
-        }
-
-
-        // Calculate mean
-        double meanTTC = 0;
-        for (list<double>::iterator it = this->phyloPauseTimePerSite.at(baseNum).begin(); it != this->phyloPauseTimePerSite.at(baseNum).end(); ++it){
-            meanTTC += *it;
-        }
-        meanTTC = meanTTC / this->phyloPauseTimePerSite.at(baseNum).size();
-
-
-        // Calculate median
-        this->phyloPauseTimePerSite.at(baseNum).sort();
-        list<double>::iterator med = this->phyloPauseTimePerSite.at(baseNum).begin();
-        std::advance(med, floor(this->phyloPauseTimePerSite.at(baseNum).size() / 2));
-        double median = *med;
-
-
-        // Calculate variance
-        double variance = 0;
-        for (list<double>::iterator it = this->phyloPauseTimePerSite.at(baseNum).begin(); it != this->phyloPauseTimePerSite.at(baseNum).end(); ++it){
-            variance += pow(*it - meanTTC, 2);
-        }
-        variance = variance / this->phyloPauseTimePerSite.at(baseNum).size();
-
-
-        // Standard error of mean
-        double standardError = sqrt(variance / this->phyloPauseTimePerSite.at(baseNum).size());
-
-
-
-        TTC.at(baseNum-1).at(0) = meanTTC;
-        TTC.at(baseNum-1).at(1) = standardError;
-        TTC.at(baseNum-1).at(2) = median;
-        TTC.at(baseNum-1).at(3) = 1.253 * standardError; // Standard error of median is 1.253 * standard error of mean
-
-
-    }
-
-
-
-    return TTC;
 }
 

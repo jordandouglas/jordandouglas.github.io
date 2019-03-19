@@ -27,8 +27,6 @@
 #include "PauseSiteUtil.h"
 #include "MultipleSequenceAlignment.h"
 #include "Settings.h"
-#include "PhyloTreeNode.h"
-#include "Eigen/Dense"
 #include "SimulatorResultSummary.h"
 #include "SimulatorPthread.h"
 
@@ -40,13 +38,13 @@
 
 
 using namespace std;
-using Eigen::MatrixXd;
 
 MultipleSequenceAlignment::MultipleSequenceAlignment(){
 
     this->currentSequenceForSimulation = 0;
-    initialisedSimulator = false;
-    this->pauseSitesInAlignment.resize(0);
+    this->initialisedSimulator = false;
+    this->isAlignment = false;
+    this->relativeTimePerLengths.resize(0);
 
 }
 
@@ -55,7 +53,7 @@ int MultipleSequenceAlignment::get_nseqs(){
     return this->alignment.size();
 }
 
-// Get the number of sites in the alignment
+// Get the number of sites in the alignment. If not an alignment, return max number of sites
 int MultipleSequenceAlignment::get_nsites(){
     return this->nsites;
 }
@@ -71,12 +69,12 @@ string MultipleSequenceAlignment::parseFromFastaFile(string filename){
     fastaFile.open(filename);
 
     // Create a string which contains all the lines in the file, where each line is concatenated with a |
-    // The reason I am using | instead of \n is because of the difficulties in parsing \n from JavaScript to WebAssembly
+    // The reason I am using ` instead of \n is because of the difficulties in parsing \n from JavaScript to WebAssembly
     string fasta = "";
     if(fastaFile.is_open()) {
 
          while(getline(fastaFile, line)){
-            fasta += line + "|";
+            fasta += line + "`";
          }
 
     }
@@ -98,24 +96,33 @@ string MultipleSequenceAlignment::parseFromFastaFile(string filename){
 
 }
 
-// Parse the list of sequences in the alignment from a fasta string
+// Parse the list of sequences in the alignment from a fasta string. Optionally, sequences have pause sites specified
 // Returns an error message if there are any problems
+// Example:
+//      >seq1|pausesites=(2,6,18-20)
+//      AGCGTTAGGCGATTCGGGAAATGCGATTG
+//      >seq2
+//      ATTCGGGATCATCGAT 
 string MultipleSequenceAlignment::parseFromFasta(string fasta){
 
     this->clear();
-
+    this->isAlignment = false;
     //cout << "Parsing .fasta " << fasta << endl;
 
 
-    vector<string> fasta_split = Settings::split(fasta, '|'); // | used a line break
+    vector<string> fasta_split = Settings::split(fasta, '`'); // ` used as line break
 
 
     string currentAccession = "";
     string currentSequenceStr = "";
+    list<int> currentSeqPauseSites;
+    vector<string> accession_split;
 
     list<Sequence*> alignment_list;
-
-
+    
+    
+    std::regex nucleotide_pattern ("[ACGTU-]");
+    std::regex gap_pattern ("[-]");
 
     // Parse the fasta 
     for (int i = 0; i < fasta_split.size(); i++) {
@@ -133,11 +140,73 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
             if (currentSequenceStr != ""){
 
                 Sequence* currentSeq = new Sequence(currentAccession, currentSequenceStr);
+                if (currentSeqPauseSites.size()) {
+                    string err = currentSeq->set_true_pauseSites(currentSeqPauseSites);
+                    if (err != "") return err;
+                }
                 alignment_list.push_back(currentSeq);
                 currentSequenceStr = "";
             }
            
-           currentAccession = line;
+           
+           // Split the line into an accession and optionally a list of known pause sites
+           accession_split = Settings::split(line, '|'); 
+           currentSeqPauseSites.clear();
+           currentAccession = accession_split.at(0);
+           
+           if (accession_split.size() > 1){
+                
+                // Extract the numbers out of pattern eg. pausesites=(20, 40, 50-55)
+                string pauseSitesMatch = "pausesites=(";
+                string afterAccession = Settings::trim(accession_split.at(1)); 
+                
+                if (afterAccession.size() > pauseSitesMatch.size() + 1 && afterAccession.substr(0, pauseSitesMatch.size()) == pauseSitesMatch){
+                    
+                    // Contents inside the brackets. Split by ,
+                    string innerBrackets = afterAccession.substr(pauseSitesMatch.size());
+                    
+                    accession_split = Settings::split(innerBrackets, ')'); 
+                    innerBrackets = accession_split.at(0);
+                    
+                    // Split inner contents by , to get indices
+                    accession_split = Settings::split(innerBrackets, ','); 
+                    
+                    for (int pos = 0; pos < accession_split.size(); pos ++){
+                    
+                        string trimmedBit = Settings::trim(accession_split.at(pos)); 
+                        string seqNoDash = std::regex_replace (trimmedBit, gap_pattern, "");
+                        
+                        // An integer eg. 10
+                        if (seqNoDash.size() == trimmedBit.size()){
+                            
+                            
+                            
+                            int num = stoi(trimmedBit);
+                            
+                            
+                            if (num <= 0) return "ERROR: could not parse pause site: " + trimmedBit + " for " + currentAccession;
+                            currentSeqPauseSites.push_back(num);
+                        
+                        }
+                        
+                        // A range of integers eg. 50-52
+                        else {
+                            
+                            vector<string> range_split = Settings::split(trimmedBit, '-');
+                            if (range_split.size() != 2 || range_split.at(0) == "" || range_split.at(1) == "")  return "ERROR: could not parse pause sites: " + trimmedBit + " for " + currentAccession;
+                            int num1 = stoi(range_split.at(0));
+                            int num2 = stoi(range_split.at(1));
+                            if (num1 <= 0 || num2 <= 0 || num1 >= num2)  return "ERROR: could not parse pause sites: " + trimmedBit + " for " + currentAccession;
+                            for (int num = num1; num <= num2; num ++) {
+                                currentSeqPauseSites.push_back(num);
+                            }
+                            
+                        }
+                    
+                    }                
+                }
+           
+           }
         }
 
 
@@ -149,10 +218,9 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
                 // Check that sequence has A,C,G,T,U,- only
                 std::transform(line.begin(), line.end(), line.begin(), ::toupper);
 
-
-                string x = "ACGTUBBBBBCAU--";
-                std::regex pattern ("[ACGTU-]");
-                string seqNoACGTU = std::regex_replace (line, pattern, "");
+                
+                
+                string seqNoACGTU = std::regex_replace (line, nucleotide_pattern, "");
 
 
                 if (seqNoACGTU.size() != 0) {
@@ -160,6 +228,12 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
                 }
 
                 currentSequenceStr += line;
+                
+                
+                // Check if there are any gaps
+                string seqNoGaps = std::regex_replace (line, gap_pattern, "");
+                if (seqNoGaps.size() < line.size()) this->isAlignment = true;
+                
 
 
             } else {
@@ -177,6 +251,10 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
     if (currentSequenceStr != ""){
 
         Sequence* currentSeq = new Sequence(currentAccession, currentSequenceStr);
+        if (currentSeqPauseSites.size()) {
+            string err = currentSeq->set_true_pauseSites(currentSeqPauseSites);
+            if (err != "") return err;
+        }
         alignment_list.push_back(currentSeq);
         currentSequenceStr = "";
     }
@@ -192,47 +270,42 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
 
 
 
-    if (this->alignment.size() == 0) {
-        return "ERROR: the alignment needs at least one sequence";
+   if (this->alignment.size() == 0) {
+        return "ERROR: the alignment needs at least one sequence.";
     }
 
 
 
 
-    // Ensure that all sequences have same length
-    this->nsites = this->alignment.at(0)->get_nsitesMSA();
-    for (int i = 1; i < this->alignment.size(); i ++){
+    // Ensure that if this is an alignment (contains a "-") then all sequences have same length
+    
+    if (this->isAlignment){
+        this->nsites = this->alignment.at(0)->get_nsitesMSA();
+        for (int i = 1; i < this->alignment.size(); i ++){
 
-        
-        if (this->alignment.at(i)->get_nsitesMSA() != this->nsites)  {
-            return "ERROR: " + this->alignment.at(i)->getID() + " does not have a consistent length. " + to_string(this->alignment.at(i)->get_nsitesMSA()) + " != " + to_string(this->nsites) + ".";
+            
+            if (this->alignment.at(i)->get_nsitesMSA() != this->nsites)  {
+                return "Multiple sequence alignment ERROR: " + this->alignment.at(i)->getID() + " does not have the same length as the previous sequences in the alignment. " + to_string(this->alignment.at(i)->get_nsitesMSA()) + " != " + to_string(this->nsites) + ".";
+            }
+
         }
-
+    }else {
+    
+    
+        // Set nsites to the maximum number of sites across the sequences
+        this->nsites = 0;
+        for (int i = 0; i < this->alignment.size(); i ++){
+            int seq_len = this->alignment.at(i)->get_nsitesMSA();
+            if (seq_len > this->nsites) this->nsites = seq_len;
+        }
     }
 
     fasta_split.clear();
 
+    
 
-
-    // Set the default weight of each sequence to 1/nseqs
-    for (int i = 0; i < this->alignment.size(); i ++){
-        this->alignment.at(i)->set_weight(1.0 / this->alignment.size());
-    }
-
-
-
-    // Create the pause sites double vector
-    this->pauseSitesInAlignment.resize(this->alignment.size());
-    for (int i = 0; i < this->pauseSitesInAlignment.size(); i ++){
-
-        this->pauseSitesInAlignment.at(i) = new vector<bool>();
-        this->pauseSitesInAlignment.at(i)->resize(this->nsites);
-
-        for (int j = 0; j < this->nsites; j ++){
-            this->pauseSitesInAlignment.at(i)->at(j) = false;
-        }
-    }
-
+    // Create the vector of mean time per length in each sequence
+    this->relativeTimePerLengths.resize(this->alignment.size());
 
     return "";
 
@@ -253,6 +326,7 @@ string MultipleSequenceAlignment::toJSON(){
 
     JSON += "},";
     JSON += "'nseqs':" + to_string(this->alignment.size()) + ",";
+    JSON += "'isAlignment':" + string(isAlignment ? "true" : "false") + ",";
     JSON += "'nsites':" + to_string(this->nsites) + "}";
 
     return JSON;
@@ -261,6 +335,7 @@ string MultipleSequenceAlignment::toJSON(){
 
 
 // Returns a JSON string of double array of pause sites
+// Only return pause sites which meet the thresholds
 string MultipleSequenceAlignment::pauseSites_toJSON(){
 
     
@@ -270,23 +345,26 @@ string MultipleSequenceAlignment::pauseSites_toJSON(){
 
     string JSON = "{"; 
 
-    for (int i = 0; i < this->pauseSitesInAlignment.size(); i ++){
-
+    for (int i = 0; i < this->relativeTimePerLengths.size(); i ++){
+        
         string accession = this->alignment.at(i)->getID();
         string pauseSitesThisAccession_JSON = "";
-
-        for (int j = 0; j < this->nsites; j ++){
-
-            if (this->pauseSitesInAlignment.at(i)->at(j)){
-                pauseSitesThisAccession_JSON += to_string(j+1) + ",";
+        int seq_len = this->relativeTimePerLengths.at(i).size();
+        
+        //cout << accession << ": ";
+        for (int j = 1; j < seq_len; j ++){
+            //cout << this->relativeTimePerLengths.at(i).at(j) << ",";
+            if (this->relativeTimePerLengths.at(i).at(j) / _simpol_max_evidence >= _simpol_evidence_threshold) {
+                pauseSitesThisAccession_JSON += to_string(j) + ",";
             }
         }
+        //cout << endl;
 
-        // Pause sites exist -> ass to JSON string 
+        
         if (pauseSitesThisAccession_JSON.size() > 0) {
             if (pauseSitesThisAccession_JSON.substr(pauseSitesThisAccession_JSON.length()-1, 1) == ",") pauseSitesThisAccession_JSON = pauseSitesThisAccession_JSON.substr(0, pauseSitesThisAccession_JSON.length() - 1);
             JSON += "'" + accession + "':[" + pauseSitesThisAccession_JSON + "],"; 
-          }
+        }
 
     }
 
@@ -295,7 +373,7 @@ string MultipleSequenceAlignment::pauseSites_toJSON(){
     if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
     JSON += "}";
 
-    cout << "pauseSites_toJSON " << JSON << endl;
+    //cout << "pauseSites_toJSON " << JSON << endl;
 
     return JSON;
 
@@ -310,12 +388,11 @@ void MultipleSequenceAlignment::clear(){
     this->currentSequenceForSimulation = 0;
     this->initialisedSimulator = false;
 
-    for (int i = 0; i < this->pauseSitesInAlignment.size(); i ++){
-        this->pauseSitesInAlignment.at(i)->clear();
-        delete this->pauseSitesInAlignment.at(i);
+    for (int i = 0; i < this->relativeTimePerLengths.size(); i ++){
+        this->relativeTimePerLengths.at(i).clear();
     }
-    this->pauseSitesInAlignment.clear();
-    this->pauseSitesInAlignment.resize(0);
+    this->relativeTimePerLengths.clear();
+    this->relativeTimePerLengths.resize(0);
 
 }
 
@@ -334,7 +411,7 @@ string MultipleSequenceAlignment::getCurrentSequence(){
 
 
 // Perform simulations on each sequence in the alignment
-void MultipleSequenceAlignment::PhyloPause(){
+void MultipleSequenceAlignment::Pauser(){
 
    
 
@@ -363,12 +440,16 @@ void MultipleSequenceAlignment::PhyloPause(){
         // Perform multi-threaded simulation
         SimulatorResultSummary* simulationResults = SimulatorPthread::performNSimulations(ntrials_sim, false);
 
-
-           
-        vector<vector<double>> timeToCatalysisPerSite = _GUI_PLOTS->getTimeToCatalysisPerSite();
+        simulationResults->clear();
+        delete simulationResults;
+        
+        
+        
+        // TO COMPLETE:
+        //vector<vector<double>> timeToCatalysisPerSite = _GUI_PLOTS->getTimeToCatalysisPerSite();
       
-        vector<bool>* isPauseSite = PauseSiteUtil::identifyPauseSites(currentSeq, timeToCatalysisPerSite);
-        this->pauseSitesInAlignment.at(currentSequenceForSimulation) = isPauseSite;
+        //vector<bool>* isPauseSite = PauseSiteUtil::identifyPauseSites(currentSeq, timeToCatalysisPerSite);
+        //this->pauseSitesInAlignment.at(currentSequenceForSimulation) = isPauseSite;
 
         // Clear the rate table to liberate memory
         currentSeq->deconstructRateTable();
@@ -376,7 +457,7 @@ void MultipleSequenceAlignment::PhyloPause(){
 
         // Print to file?
         if (_outputFilename != ""){
-            PauseSiteUtil::writePauseSitesToFile(_outputFilename, currentSeq, timeToCatalysisPerSite);
+            //PauseSiteUtil::writePauseSitesToFile(_outputFilename, currentSeq, timeToCatalysisPerSite);
         }
 
         //this->initialisedSimulator = false;
@@ -393,16 +474,16 @@ void MultipleSequenceAlignment::PhyloPause(){
 
 
 // Perform simulations on each sequence in the alignment. GUI only
-void MultipleSequenceAlignment::PhyloPause_GUI(Simulator* simulator, int* result){
+void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, int* result){
 
-   
-
+    
     bool timeoutReached = false;
     double simulator_result[3];
     for (currentSequenceForSimulation; currentSequenceForSimulation < this->alignment.size(); currentSequenceForSimulation++){
 
 
         Sequence* currentSeq = this->alignment.at(currentSequenceForSimulation);
+        SimulatorResultSummary* sequence_summary = new SimulatorResultSummary(ntrials_sim);
 
         // Initialise the simulator
         if (!this->initialisedSimulator) {
@@ -410,7 +491,7 @@ void MultipleSequenceAlignment::PhyloPause_GUI(Simulator* simulator, int* result
             
             this->initialisedSimulator = true;
 
-            //cout << "Starting " << ntrials_sim << " for sequence " << currentSeq->getID() << endl;
+            cout << "Starting " << ntrials_sim << " for sequence " << currentSeq->getID() << endl;
             cout << "Starting sequence " << (currentSequenceForSimulation + 1) << " out of " << this->alignment.size() << endl;
 
             // Activate the sequence
@@ -425,14 +506,15 @@ void MultipleSequenceAlignment::PhyloPause_GUI(Simulator* simulator, int* result
                 delete _currentStateGUI;
                 _currentStateGUI = new State(true, true);
             }
-
-
+            
+            
             // Prepare for simulating
-            simulator->initialise_GUI_simulation(ntrials_sim, 1000);
-
+            simulator->initialise_GUI_simulation(sequence_summary, 1000);
+            
+            
             // Start the simulations for this sequence
             simulator->perform_N_Trials_and_stop_GUI(simulator_result);
-
+            
 
         }
 
@@ -449,6 +531,7 @@ void MultipleSequenceAlignment::PhyloPause_GUI(Simulator* simulator, int* result
 
         timeoutReached = simulator_result[2] == 0;
         if (timeoutReached) {
+        
 
             // 1st element = nseqs complete, 
             // 2nd element = ntrials complete in this sequence
@@ -460,12 +543,25 @@ void MultipleSequenceAlignment::PhyloPause_GUI(Simulator* simulator, int* result
         }   
 
 
-        // Sequence completed. Save the TTC information and move on to the next sequence
-        vector<bool>* isPauseSite = PauseSiteUtil::identifyPauseSites(currentSeq, _GUI_PLOTS->getTimeToCatalysisPerSite());
-        this->pauseSitesInAlignment.at(currentSequenceForSimulation) = isPauseSite;
+        // Sequence completed. Save the time per length information and move on to the next sequence
+        sequence_summary->add_proportionOfTimePerLength(simulator->getPlots()->getProportionOfTimePerLength());
+        sequence_summary->compute_meanRelativeTimePerLength();
+        
+        this->relativeTimePerLengths.at(currentSequenceForSimulation) = sequence_summary->get_meanRelativeTimePerLength();
+        
+        
+        // Recompute the maximum evidence, so we can normalise
+        for (int i = 1; i < this->relativeTimePerLengths.at(currentSequenceForSimulation).size(); i ++){
+            double relativeTime = this->relativeTimePerLengths.at(currentSequenceForSimulation).at(i);
+            if (relativeTime > _simpol_max_evidence) _simpol_max_evidence = relativeTime;
+        }
+        
+        
 
         // Clear the rate table to liberate memory
         currentSeq->deconstructRateTable();
+        sequence_summary->clear();
+        delete sequence_summary;
 
         this->initialisedSimulator = false;
     }
@@ -482,8 +578,8 @@ void MultipleSequenceAlignment::PhyloPause_GUI(Simulator* simulator, int* result
 
 
 
-vector<vector<bool>*> MultipleSequenceAlignment::get_pauseSitesInAlignment(){
-    return this->pauseSitesInAlignment;
+vector<vector<double>> MultipleSequenceAlignment::get_relativeTimePerLengths(){
+    return this->relativeTimePerLengths;
 }
 
 
@@ -492,143 +588,4 @@ Sequence* MultipleSequenceAlignment::getSequenceAtIndex(int index){
 }
 
 
-
-
-// Check that the leaf sequence names are the same as those in the multiple sequence alignment
-string MultipleSequenceAlignment::treeTipNamesAreConsistentWithMSA(PhyloTree* tree){
-
-    vector<PhyloTreeNode*> leaves = tree->getLeaves();
-
-    if (leaves.size() != this->get_nseqs()) return "ERROR: different number of tips in tree and multiple sequence alignment.";
-
-    for (int leafIndex = 0; leafIndex < leaves.size(); leafIndex ++){
-
-
-        //leaves.at(leafIndex)->print();
-
-        string accession = leaves.at(leafIndex)->getID();
-
-        // Check that this leaf is on the MSA
-        bool leafIsInAlignment = false;
-        for (int seqIndex = 0; seqIndex < this->get_nseqs(); seqIndex ++){
-
-            Sequence* seq = this->getSequenceAtIndex(seqIndex);
-            if (seq->getID().substr(1) == accession){
-                leaves.at(leafIndex)->setSequence(seq);
-                leafIsInAlignment = true;
-                break;
-            }
-
-        }
-
-        // Does not match a sequence -> return error
-        if (!leafIsInAlignment) return "ERROR: leaf " + accession + " is not in the multiple sequence alignment.";
-
-
-    }
-
-
-    return "";
-
-}
-       
-
-// Calculate the information weight of each sequence in the aligment, using a tree
-void MultipleSequenceAlignment::calculateLeafWeights(PhyloTree* tree){
-
-
-
-    vector<PhyloTreeNode*> leaves = tree->getLeaves();
-    vector<PhyloTreeNode*> leaves_ordered(leaves.size());
-
-
-    // Sort the leaves list into the same order as the rows of the MSA
-    for (int seqIndex = 0; seqIndex < this->get_nseqs(); seqIndex ++){
-
-        // Find the matching node
-        Sequence* seq = this->getSequenceAtIndex(seqIndex);
-        PhyloTreeNode* match = nullptr;
-        for (int leafIndex = 0; leafIndex < leaves.size(); leafIndex ++){
-
-            string accession = leaves.at(leafIndex)->getID();
-            if (seq->getID().substr(1) == accession){
-                match = leaves.at(leafIndex);
-                break;
-            }
-
-        }
-
-        if (match == nullptr) {
-            cout << "ERROR: cannot find " << seq->getID().substr(1) << " in the tree" << endl;
-            exit(0);
-        }
-
-
-        leaves_ordered.at(seqIndex) = match;
-
-
-    }
-
-
-
-    // Calculate distance between each leaf and the root
-    vector<double> distanceToRoot(this->get_nseqs());
-    for (int i = 0; i < distanceToRoot.size(); i ++){
-        distanceToRoot.at(i) = leaves_ordered.at(i)->getDistanceToRoot();
-        //cout << "Distance from " << this->getSequenceAtIndex(i)->getID() << " to root " << distanceToRoot.at(i) << endl;
-    }
-
-
-
-    // Build a pairwise correlation matrix
-    MatrixXd correlation(this->get_nseqs(), this->get_nseqs());
-    for (int i = 0; i < this->get_nseqs(); i ++){
-        for (int j = 0; j < this->get_nseqs(); j ++){
-            correlation(i,j) = 1;
-        }
-    }
-
-    //cout << correlation << endl;
-
-    // Calculate the distance between each pair of nodes' MRCA and the root
-    for (int i = 0; i < this->get_nseqs(); i ++){
-
-        for (int j = i+1; j < this->get_nseqs(); j ++){
-
-            // Find the MRCA of these two leaves
-            PhyloTreeNode* mrca = tree->getMRCA(leaves_ordered.at(i), leaves_ordered.at(j));
-
-
-            // Calculate distance between this node and the root
-            double distance_ij = mrca->getDistanceToRoot();
-
-
-            // Correlation = shared distance^2 / (distance1 * distance2)
-            correlation(i,j) = (distance_ij * distance_ij) / (distanceToRoot.at(i) * distanceToRoot.at(j));
-            correlation(j,i) = correlation(i,j);
-
-        }
-
-
-    }
-
-
-
-    // The weight of sequence i is the sum of all entries in row i of the inverse of the correlation matrix
-    MatrixXd correlation_inverse = correlation.inverse();
-    //cout << correlation_inverse << endl;
-
-    for (int i = 0; i < this->get_nseqs(); i ++){
-
-        double weight_i = 0;
-        for (int j = 0; j < this->get_nseqs(); j ++){
-            weight_i += correlation_inverse(i,j);
-        }
-
-
-        this->alignment.at(i)->set_weight(weight_i);
-
-    }
-
-
-} 
+ 

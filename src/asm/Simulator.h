@@ -61,6 +61,10 @@ class Simulator{
 	int niterationsUntilLastTimeoutCheck;
 	double simulateForSeconds;
 	double inSimulationTimeElapsedCurrentSimulation; // Time elapsed in the current simulation (for GUI)
+    
+    
+    // Simulation result summary for the GUI
+    SimulatorResultSummary* resultSummary_GUI;
 
 	// Random number generation
 	random_device rd; 
@@ -72,7 +76,7 @@ class Simulator{
     	int getNtrialsTotal_GUI();
     	int getNtrialsCompleted_GUI();
     	list<int> sample_action_GUI();
-    	void initialise_GUI_simulation(int N, double msUntilStop);
+    	void initialise_GUI_simulation(SimulatorResultSummary* resultSummary, double msUntilStop);
     	void perform_N_Trials_and_stop_GUI(double* toReturn);
     	void resume_trials_GUI(double* toReturn);
     	double rexp(double rate);

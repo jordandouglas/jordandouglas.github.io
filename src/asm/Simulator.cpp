@@ -50,6 +50,9 @@ Simulator::Simulator(Plots* plots){
 	simulateForSeconds = -1;
 	this->animatingGUI = false;
     this->simulator_plots = plots;
+    
+    
+    this->resultSummary_GUI = nullptr;
 
 }
 
@@ -152,12 +155,22 @@ void Simulator::perform_N_Trials(SimulatorResultSummary* summary, State* state, 
 
 
 // Initialises N trials to be performed in hidden or animation mode. Does not simulate
-void Simulator::initialise_GUI_simulation(int N, double msUntilStop){
+void Simulator::initialise_GUI_simulation(SimulatorResultSummary* summary, double msUntilStop){
 
+    int N = summary->get_ntrials();
 	this->nTrialsTotalGUI = N;
 	this->nTrialsCompletedGUI = 0;
 	this->simulateForSeconds = msUntilStop / 1000;
 	this->niterationsUntilLastTimeoutCheck = 0;
+    
+    
+    // Reset the simulator summary
+    if (this->resultSummary_GUI != nullptr){
+        this->resultSummary_GUI->clear();
+        delete this->resultSummary_GUI;
+    }
+    
+    this->resultSummary_GUI = summary;
 
 }
 
@@ -224,6 +237,9 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
 		result[0] = 0;
 		result[1] = 0;
 		result[2] = 0;
+        
+        
+
 
 		if (!_RUNNING_ABC || _RECORD_PAUSE_TIMES) this->simulator_plots->refreshPlotData(_currentStateGUI); // New simulation -> refresh plot data
 		currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
@@ -247,7 +263,10 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
 			nTrialsCompletedGUI++;
 			meanMeanVelocity += result[0];
 			meanMeanTime += result[1];
-
+            
+            
+            // Update the final transcript length of this simulation
+            this->resultSummary_GUI->add_transcriptLength(_currentStateGUI->get_nascentLength());
 
 			if (!_RUNNING_ABC) this->simulator_plots->updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
 			Settings::sampleAll(); // Resample the parameters
@@ -920,7 +939,14 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 	*/
 	//cout << s->get_initialLength() << ";" "distanceTravelled = " << distanceTravelled << endl;
 	toReturn[0] = velocity;
-	toReturn[2] = 1; // Success
+    
+    
+    
+    
+    chrono::duration<double> elapsed_seconds = chrono::system_clock::now() - _interfaceSimulation_startTime;
+    double time = elapsed_seconds.count();
+    if (time >= simulateForSeconds) toReturn[2] = 0; // Timeout
+	else toReturn[2] = 1; // Success
 
 
 

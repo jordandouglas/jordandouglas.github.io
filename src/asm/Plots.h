@@ -69,10 +69,6 @@ class Plots{
     list<vector<double>> proportionTimePerTranscriptLength;
 
 
-    // PhyloPause pause distribution per plot data
-    vector<list<double>> phyloPauseTimePerSite;
-
-
 	// Parameter heatmap data
 	list<ParameterHeatmapData*> parametersPlotData;
 
@@ -130,7 +126,6 @@ class Plots{
 		void prepareForABC();
 		void setTracePlotPosteriorByID(int id);
         string timeToCatalysisPerSite_toJSON();
-        vector<vector<double>> getTimeToCatalysisPerSite();
         list<vector<double>> getProportionOfTimePerLength();
 
 };

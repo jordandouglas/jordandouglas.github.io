@@ -47,10 +47,13 @@ class Sequence{
 	bool rateTableBuilt;
 	bool RNAunfoldingTableBuilt;
 
-    // PhyloPause
-    double weight; 
+    // Pauser
     int nsitesMSA;
     string MSAsequence;
+    vector<int> true_pauseSites;
+    vector<int> SimPol_pauseSites;
+    vector<int> NBC_pauseSites;
+    
 
 	public:
 		Sequence(string seqID, string TemplateType, string PrimerType, string templateSequence); // Normal sequence (ACGTU only)
@@ -80,9 +83,10 @@ class Sequence{
 		void print();
         string get_MSAsequence();
         void deconstructRateTable();
-        double get_weight();
-        void set_weight(double wgt);
         void clear();
+        
+        // Pauser
+        string set_true_pauseSites(list<int> pauses);
 
 
 };

@@ -53,13 +53,6 @@ class PauseSiteUtil {
         // Write this generations pause information to a file
         static void writePauseSiteToFile(string filename, int nmutsToNoSelectivePressure, double medianPauseSite, double standardError);
 
-        // Identify which sites in the selected sequences are pause sites, by comparing to a standard
-        static vector<bool>* identifyPauseSites(Sequence* seq, vector<vector<double>> timesToCatalysis);
-
-        // Evidence that each site is a pause site
-        static vector<int> calculateEvidence(MultipleSequenceAlignment* MSA);
-
-
 
 };
 
