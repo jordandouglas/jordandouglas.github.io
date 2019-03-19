@@ -921,7 +921,6 @@ input:checked + .slider:before {
     padding: 5px;
     padding-bottom:20px;
     font-size:16px; 
-
 }
 
 
@@ -929,7 +928,14 @@ input:checked + .slider:before {
     padding: 5px;
     font-size:16px; 
     text-align:right;
+}
 
+
+#classifierAdequacyTable td{
+    margin-top:40px;
+    padding: 5px;
+    font-size:16px; 
+    text-align:right;
 }
 
 
