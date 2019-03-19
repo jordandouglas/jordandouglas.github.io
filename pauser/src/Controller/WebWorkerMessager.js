@@ -313,13 +313,13 @@ function loadSession_controller(XMLData, resolve = function(x) { }){
 
 
 // Get the pause sites as classified under the current thresholds
-function getPauseSites_controller(resolve = function(x) { }){
+function getPauserResults_controller(resolve = function(x) { }){
 
 
 
     if (WEB_WORKER_WASM != null) {
 
-        var res = stringifyFunction("getPauseSites", [], true);
+        var res = stringifyFunction("getPauserResults", [], true);
         var fnStr = "wasm_" + res[0];
         var msgID = res[1];
         var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -335,8 +335,6 @@ function getPauseSites_controller(resolve = function(x) { }){
 
 
 
-
-
 function parseMSA_controller(fasta, resolve = function(x) { }){
 
     //console.log("fasta", fasta);
@@ -344,6 +342,24 @@ function parseMSA_controller(fasta, resolve = function(x) { }){
     if (WEB_WORKER_WASM != null) {
 
         var res = stringifyFunction("parseMSA", [fasta], true);
+        var fnStr = "wasm_" + res[0];
+        var msgID = res[1];
+        var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+        toCall().then((result) => resolve(result));
+    }
+    
+}
+
+
+
+
+function getMSA_controller(resolve = function(x) { }){
+
+    //console.log("fasta", fasta);
+
+    if (WEB_WORKER_WASM != null) {
+
+        var res = stringifyFunction("getMSA", [], true);
         var fnStr = "wasm_" + res[0];
         var msgID = res[1];
         var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
@@ -388,7 +404,7 @@ function updateThreshold_controller(classifier = "simpol"){
         $("#simpol_threshold").val(result.simpolThreshold);
         $("#nbc_threshold").val(result.nbcThreshold);
         
-        renderPauseSitesOnAlignment();
+        updatePauserResultDisplays();
     }
 
 
@@ -451,7 +467,7 @@ function startPauser_controller(resume_simulation = false, resolve = function() 
 
 
 
-            renderPauseSitesOnAlignment();
+            updatePauserResultDisplays();
             
 
             if (result.ntrials_complete != null) {

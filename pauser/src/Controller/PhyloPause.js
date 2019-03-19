@@ -29,8 +29,8 @@ function beginPauser(resume_simulation = false){
     console.log("Beginning Pauser")
 
 
-    // Change the description of the begin PhyloPause button
-    $("#beginPauser").val("Stop PhyloPause");
+    // Change the description of the begin Pauser button
+    $("#beginPauser").val("Stop Pauser");
     $("#beginPauser").attr("onclick", "stop_controller()");
 
 
@@ -39,8 +39,8 @@ function beginPauser(resume_simulation = false){
     // Initialise the simulation
     startPauser_controller(resume_simulation, function() {
 
-        // Change the description of the begin PhyloPause button
-        $("#beginPauser").val("Resume PhyloPause");
+        // Change the description of the begin Pauser button
+        $("#beginPauser").val("Resume Pauser");
         $("#beginPauser").attr("onclick", "beginPauser(true)");
 
     });

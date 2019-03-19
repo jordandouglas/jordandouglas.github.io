@@ -128,6 +128,7 @@ function parseAlignment(align_str, resolve = function() { }){
 
             renderAlignment(); 
             renderPredictionSummary(); 
+            renderAdequacyTable();
             resolve();
          
 
@@ -142,18 +143,15 @@ function parseAlignment(align_str, resolve = function() { }){
 
         }
 
-
-
     });
-
-
 
 }
 
 
+
+
 // Construct a table which shows the locations of the pause site predictions in each sequence, and the locations of the true pause sites
 function renderPredictionSummary(){
-
 
 
     console.log("renderPredictionSummary", NUCLEOTIDE_ALIGNMENT);
@@ -165,14 +163,53 @@ function renderPredictionSummary(){
         var seq = NUCLEOTIDE_ALIGNMENT[acc];
         //console.log(acc, seq);
         
-        $("#predictionSummaryTable").append(getPredictionSummaryRowTemplate(acc.substr(1), odd, seq.true_pauseSites));
+        $("#predictionSummaryTable").append(getPredictionSummaryRowTemplate(acc.substr(1), odd, seq.known_pauseSites));
         odd = !odd;
 
     }
 
+}
+
+
+// Draw the classification adequacy table. Cells will not be populated.
+function renderAdequacyTable(){
+
+
+    // Check if any uploaded sequences actually contain known pause site information
+    var thereAreTruePauseSites = false;
+    for (var acc in NUCLEOTIDE_ALIGNMENT){
+        var seq = NUCLEOTIDE_ALIGNMENT[acc];
+        if (seq.known_pauseSites != null) {
+            thereAreTruePauseSites = true;
+            break;
+        }
+
+    }
+    if (!thereAreTruePauseSites) {
+        $("#classifierAdequacy_nodata").show(100);
+        $("#classifierAdequacyTable").hide(0);
+        return;
+    }
+    
+    
+    
+    // Create the table
+    $("#classifierAdequacyTable").show(100);
+    $("#classifierAdequacy_nodata").hide(0);
+    
+    
+    for (var acc in NUCLEOTIDE_ALIGNMENT){
+        var seq = NUCLEOTIDE_ALIGNMENT[acc];
+        if (seq.known_pauseSites == null) continue;
+        $("#classifierAdequacyTable").append(getClassifierAdequacyRowTemplate(acc.substr(1)));
+    }
+
+
+
 
 
 }
+
 
 
 
@@ -201,7 +238,7 @@ function renderAlignment(resolve = function() { }){
         var seq = NUCLEOTIDE_ALIGNMENT[acc];
         //console.log(acc, seq);
 
-        appendMSArowTemplate("#conservationMSA", acc.substr(1), seq.MSAsequence, seq.true_pauseSites);
+        appendMSArowTemplate("#conservationMSA", acc.substr(1), seq.MSAsequence, seq.known_pauseSites);
 
 
     }
@@ -216,22 +253,64 @@ function renderAlignment(resolve = function() { }){
 
 
 
+
 // Add pause sites to the multiple sequence alignment on the DOM
-renderPauseSitesOnAlignment = function(){
+updatePauserResultDisplays = function(){
 
 
-    getPauseSites_controller(function(result){
-
-
-        //console.log("renderPauseSitesOnAlignment", result);
+    
+    getPauserResults_controller(function(result){
+    
+        NUCLEOTIDE_ALIGNMENT = result.sequences.alignment;
+        
+        
         $(".positive_class").remove();
         var simpol_pause_sites = result.simpol_pause_sites;
+        
+        console.log("simpol_pause_sites", simpol_pause_sites);
+        
+        
+        
+        // Update classifier tables
+        for (var acc in NUCLEOTIDE_ALIGNMENT){
+        
+            var seq = NUCLEOTIDE_ALIGNMENT[acc];
+            
+        
+            // Update the summary table
+            $("#simpol_summary_" + acc.substr(1)).html(seq.simpol_pauseSites == null ? "" : convertListToCommaString(seq.simpol_pauseSites));
+            
+            
+            // Update the adequacy table
+            if (seq.known_pauseSites != null) {
+                
+                var adequacy_row = $(`[rowid="ad_` + acc.substr(1) + `"]`);
+                if (seq.simpol_pauseSites != null) {
+                    adequacy_row.children(".simpol_recall").html(roundToSF(seq.simpol_recall));
+                    adequacy_row.children(".simpol_precision").html(roundToSF(seq.simpol_precision));
+                    adequacy_row.children(".simpol_accuracy").html(roundToSF(seq.simpol_accuracy));
+                }
+                
+                if (seq.nbc_pauseSites != null) {
+                    adequacy_row.children(".nbc_recall").html(roundToSF(seq.nbc_recall));
+                    adequacy_row.children(".nbc_precision").html(roundToSF(seq.nbc_precision));
+                    adequacy_row.children(".nbc_accuracy").html(roundToSF(seq.nbc_accuracy));
+                }
+                
+                
+            }
 
+        }
+        
+        
+        
+        
+        
         // Plot whether each cell is a pause site or not
         for (var acc in simpol_pause_sites){
 
             var row = $(`[rowid="` + acc.substr(1) + `"]`);
-
+            
 
             for (var i = 0; i < simpol_pause_sites[acc].length; i++){
             
@@ -298,11 +377,39 @@ function getMSAheaderTemplate(nsites){
 } 
 
 
-function getPredictionSummaryRowTemplate(name, odd, true_pauseSites){
 
-    var true_pauseSites_str = "";
-    if (true_pauseSites != null){
-        true_pauseSites_str = convertListToCommaString(true_pauseSites);
+function getClassifierAdequacyRowTemplate(name){
+    
+    var row = `
+        <tr rowid="ad_` + name + `" class="deleteUponNewAlignment" onclick="$('[rowid=ad_` + name + `]').toggleClass('selected')">
+            <td rowspan="2">` + name + `</td>
+            
+            <td  style="padding-top:10px">SimPol</td>
+            <td class="simpol_recall"></td> 
+            <td class="simpol_precision"></td> 
+            <td class="simpol_accuracy"></td> 
+            
+        </tr>
+        <tr rowid="ad_` + name + `" onclick="$('[rowid=ad_` + name + `]').toggleClass('selected')">
+            
+            <td  style="padding-bottom:10px">NBC</td>
+            <td class="nbc_recall"></td> 
+            <td class="nbc_precision"></td> 
+            <td class="nbc_accuracy"></td> 
+            
+        </tr>
+    `;
+    
+    return row;
+
+}
+
+
+function getPredictionSummaryRowTemplate(name, odd, known_pauseSites){
+
+    var known_pauseSites_str = "";
+    if (known_pauseSites != null){
+        known_pauseSites_str = convertListToCommaString(known_pauseSites);
     }
     
     
@@ -311,9 +418,9 @@ function getPredictionSummaryRowTemplate(name, odd, true_pauseSites){
     
         <tr class="deleteUponNewAlignment" onclick="$(this).toggleClass('selected')">
             <td>` + name + `</td>
-            <td></td> 
-            <td></td> 
-            <td>` + true_pauseSites_str + `</td> 
+            <td id="simpol_summary_` + name + `"></td> 
+            <td id="nbc_summary_` + name + `"></td> 
+            <td>` + known_pauseSites_str + `</td> 
         </tr>
     `;
     
@@ -325,7 +432,7 @@ function getPredictionSummaryRowTemplate(name, odd, true_pauseSites){
 
 
 
-function appendMSArowTemplate(appendTo, name, seq, true_pauseSites = null, simpol_pauseSites = null, NBC_pauseSites = null){
+function appendMSArowTemplate(appendTo, name, seq, known_pauseSites = null, simpol_pauseSites = null, NBC_pauseSites = null){
 
     
     simpol_pauseSites = [22, 51, 55];
@@ -333,12 +440,11 @@ function appendMSArowTemplate(appendTo, name, seq, true_pauseSites = null, simpo
     
     
     var seq_list = seq.split("");
-    console.log("seq_list", seq_list);
     
     // Annotate the sites by true locations of pause sites
-    if (true_pauseSites != null){
-        for (var i = 0; i < true_pauseSites.length; i ++){
-            var pauseSite = true_pauseSites[i];
+    if (known_pauseSites != null){
+        for (var i = 0; i < known_pauseSites.length; i ++){
+            var pauseSite = known_pauseSites[i];
             seq_list[pauseSite-1] = `<b title="According to the uploaded .fasta file, this site is a pause site." style="color:red">` + seq_list[pauseSite-1] + `</b>`;
         }
     }

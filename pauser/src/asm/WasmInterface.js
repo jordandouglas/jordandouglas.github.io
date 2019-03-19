@@ -171,7 +171,7 @@ loadSessionFromXML = function(xmlData, msgID = null){
 
 
 // Return a JSON string of the cumulatively calculated pause sites
-getPauseSites = function(msgID = null){
+getPauserResults = function(msgID = null){
 
     // Create the callback function
     var toDoAfterCall = function(resultStr){
@@ -180,8 +180,9 @@ getPauseSites = function(msgID = null){
     WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
 
     
-    Module.ccall("getPauseSites", null, ["number"], [msgID]);
+    Module.ccall("getPauserResults", null, ["number"], [msgID]);
 }
+
 
 
 
@@ -200,7 +201,17 @@ parseMSA = function(fasta, msgID = null){
 }
 
 
+// Get the MSA and all of its predicted pause site locations
+getMSA = function(msgID = null){
 
+    // Create the callback function
+    var toDoAfterCall = function(resultStr){
+        if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+    }
+    WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+    Module.ccall("getMSA", null, ["number"], [msgID]);
+    
+}
 
 
 

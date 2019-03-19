@@ -404,7 +404,7 @@ function getLoaderTemplate(id, msg = ""){
 
                                                 <td>
                                                        <br><br>
-                                                    <span id="nTrialsComplete">0</span> out of <span id="nTrialsTotal">0</span> simulation trials have completed for <span id="currentSequenceProgress">the current sequence</span>. <br>
+                                                    <span id="nTrialsComplete">0</span> out of <span id="nTrialsTotal">0</span> SimPol simulations have been completed for <span id="currentSequenceProgress">the current sequence</span>. <br>
                                                     <span id="nSequencesComplete">0</span> out of <span id="nSequencesTotal">0</span> sequences are complete. <br>
                                                 </td>
                                   
@@ -425,7 +425,6 @@ function getLoaderTemplate(id, msg = ""){
                         
                         <div class="uploadAlignmentFirst"  style="display:none">
                                 
-                                        
                                         
                                         
                                         
@@ -532,8 +531,8 @@ function getLoaderTemplate(id, msg = ""){
                                         </td>
                                                 
                                             
-                                        <td style="width:300px;" title="The true locations of pause sites. These are optionally specified when uploading the .fasta file.">
-                                             True pause sites
+                                        <td style="width:300px;" title="The known locations of pause sites. These are optionally specified when uploading the .fasta file.">
+                                             Known pause sites
                                         </td>
                                                 
                                     </tr>
@@ -569,6 +568,60 @@ function getLoaderTemplate(id, msg = ""){
                                             
                                        
                             </div>
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                             <div style="margin:20px; margin-bottom:50px">
+                                 
+                                <b style="color:#0B522D">Classifier adequacy</b> 
+                                            
+                                            
+                                <div id="classifierAdequacy_nodata" style="display:none">
+                                     Specify the locations of pause sites in one or more sequences in the .fasta file to assess the classifier adequacies.      
+                                                
+                                </div>
+                                            
+                                <table id="classifierAdequacyTable" style="margin:10px; text-align:center; display:none" cellpadding=0 cellspacing=0> 
+                                
+                                    <tr style="color:#0B522D">
+                                        <td style="min-width:100px;" title="The accession of any sequences whose pause sites are known.">
+                                             Accession
+                                        </td>
+                                                
+                                                    
+                                        <td style="min-width:100px;" title="The method used to generate classifications.">
+                                             Classifier
+                                        </td>
+                                                    
+                                                              
+                                        <td style="width:100px;" title="Recall / sensitivity / true positive rate. The probability of a known pause site being classified as one under the current threshold.">
+                                             Recall
+                                        </td>
+                                                
+                                                
+                                        <td style="width:100px;" title="The probability of a site classified as a pause site actually being one under the current threshold.">
+                                             Precision
+                                        </td>
+                                                    
+                                                    
+                                        <td style="width:100px" title="The overall percentage of correct classifications under the current threshold.">
+                                             Accuracy
+                                        </td>
+                                                    
+                                            
+                                    </tr>
+
+
+                                </table>
+                            </div>
+                                        
+                                        
+                                        
+                                        
 
                             </div>
 

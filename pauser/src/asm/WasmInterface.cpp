@@ -124,6 +124,12 @@ extern "C" {
     
     
     
+    // Get the MSA and all of its predicted pause site locations
+    void EMSCRIPTEN_KEEPALIVE getMSA(int msgID){
+        messageFromWasmToJS(_PP_multipleSequenceAlignment->toJSON(), msgID);
+    }
+    
+    
     // Parse an MSA from a JSON string
     void EMSCRIPTEN_KEEPALIVE parseMSA(char* fasta, int msgID){
 
@@ -157,10 +163,11 @@ extern "C" {
 
 
     // Return a JSON string of the cumulatively calculated pause sites
-    void EMSCRIPTEN_KEEPALIVE getPauseSites(int msgID){
+    void EMSCRIPTEN_KEEPALIVE getPauserResults(int msgID){
         
-        string JSON = "{'simpol_pause_sites':";
-        JSON += _PP_multipleSequenceAlignment->pauseSites_toJSON();
+        string JSON = "{";
+        JSON += "'simpol_pause_sites':" + _PP_multipleSequenceAlignment->pauseSites_toJSON() + ",";
+        JSON += "'sequences':" + _PP_multipleSequenceAlignment->toJSON();
         JSON += "}";
 
         messageFromWasmToJS(JSON, msgID);
@@ -258,11 +265,6 @@ extern "C" {
     }
     
 
+    
 }
-
-
-
-
-
-
 
