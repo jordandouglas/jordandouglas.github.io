@@ -805,9 +805,12 @@ input {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  height:10px;
+  background-color: #d3d3d3;
+  background-image:  linear-gradient(to right, white , black);
   -webkit-transition: .3s;
   transition: .3s;
+  
 }
 
 .slider:before {
@@ -886,6 +889,8 @@ input:checked + .slider:before {
 }
 
 
+
+
 .xml_link {
 
     padding: 1 5; 
@@ -911,6 +916,14 @@ input:checked + .slider:before {
     margin-bottom:0.5em;
 
 }
+
+#classifiersTable td{
+    padding: 5px;
+    padding-bottom:20px;
+    font-size:16px; 
+
+}
+
 
 #predictionSummaryTable td{
     padding: 5px;
@@ -943,14 +956,50 @@ tr.selected{
 
 
 .NBC_class_dot {
-    background-color: #d3d3d3;
-    border-color: #d3d3d3;
+    background-color: #FFA500;
+    border-color: #FFA500;
 }
 
 .simpol_class_dot.NBC_class_dot {
-    background-color: #d3d3d3;
+    background-color: #FFA500;
     border-color: #008cba;
 }
+
+
+
+.slider.simpol_class::-webkit-slider-thumb {
+    background: #008cba;
+}
+
+.slider.simpol_class::-moz-range-thumb {
+  background: #008cba;
+}
+
+.slider.NBC_class::-webkit-slider-thumb {
+    background: #FFA500;
+}
+
+.slider.NBC_class::-moz-range-thumb {
+  background: #FFA500;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.slider::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+
 
 
 #conservationMSA td {
