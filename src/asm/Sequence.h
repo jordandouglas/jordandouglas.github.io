@@ -50,9 +50,9 @@ class Sequence{
     // Pauser
     int nsitesMSA;
     string MSAsequence;
-    vector<int> true_pauseSites;
-    vector<int> SimPol_pauseSites;
-    vector<int> NBC_pauseSites;
+    vector<int> known_pauseSites;
+    vector<int> simpol_pauseSites;
+    vector<int> nbc_pauseSites;
     
 
 	public:
@@ -85,9 +85,13 @@ class Sequence{
         void deconstructRateTable();
         void clear();
         
+        
+        
         // Pauser
-        string set_true_pauseSites(list<int> pauses);
-
+        string set_known_pauseSites(list<int> pauses);
+        void set_simpol_pauseSites(list<int> pauses);
+        void set_nbc_pauseSites(list<int> pauses);
+       
 
 };
 

@@ -141,7 +141,7 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
 
                 Sequence* currentSeq = new Sequence(currentAccession, currentSequenceStr);
                 if (currentSeqPauseSites.size()) {
-                    string err = currentSeq->set_true_pauseSites(currentSeqPauseSites);
+                    string err = currentSeq->set_known_pauseSites(currentSeqPauseSites);
                     if (err != "") return err;
                 }
                 alignment_list.push_back(currentSeq);
@@ -252,7 +252,7 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
 
         Sequence* currentSeq = new Sequence(currentAccession, currentSequenceStr);
         if (currentSeqPauseSites.size()) {
-            string err = currentSeq->set_true_pauseSites(currentSeqPauseSites);
+            string err = currentSeq->set_known_pauseSites(currentSeqPauseSites);
             if (err != "") return err;
         }
         alignment_list.push_back(currentSeq);
@@ -351,14 +351,14 @@ string MultipleSequenceAlignment::pauseSites_toJSON(){
         string pauseSitesThisAccession_JSON = "";
         int seq_len = this->relativeTimePerLengths.at(i).size();
         
-        //cout << accession << ": ";
+        list<int> simpol_pauseSites_list;
         for (int j = 1; j < seq_len; j ++){
-            //cout << this->relativeTimePerLengths.at(i).at(j) << ",";
             if (this->relativeTimePerLengths.at(i).at(j) / _simpol_max_evidence >= _simpol_evidence_threshold) {
                 pauseSitesThisAccession_JSON += to_string(j) + ",";
+                simpol_pauseSites_list.push_back(j);
             }
         }
-        //cout << endl;
+        this->alignment.at(i)->set_simpol_pauseSites(simpol_pauseSites_list);
 
         
         if (pauseSitesThisAccession_JSON.size() > 0) {

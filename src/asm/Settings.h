@@ -266,7 +266,10 @@ class Settings{
         static string trim(string str);
 
     	static void renormaliseParameters();
-
+        static double calculate_classifier_recall(vector<int> true_pauses, vector<int> classified_pauses);
+        static double calculate_classifier_precision(vector<int> true_pauses, vector<int> classified_pauses);
+        static double calculate_classifier_accuracy(int numSites, vector<int> true_pauses, vector<int> classified_pauses);
+        
 };
 
 

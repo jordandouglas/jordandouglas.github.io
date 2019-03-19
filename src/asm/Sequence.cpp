@@ -144,17 +144,69 @@ string Sequence::toJSON(){
 	string templateType = string(this->template_SS ? "ss" : "ds") + string(this->template_RNA ? "RNA" : "DNA");
 	string parametersJSON = "'" + seqID  + "':{'seq':'" + this->templateSequence + "','template':'" + templateType + "','primer':'" + nascentType + "','MSAsequence':'" + this->MSAsequence + "'";
     
-    if (this->true_pauseSites.size() > 0){
-        
-        parametersJSON += ",'true_pauseSites':[";
-        for (int i = 0; i < this->true_pauseSites.size(); i ++){
-             parametersJSON += to_string(this->true_pauseSites.at(i));
-             if (i < this->true_pauseSites.size() - 1) parametersJSON += ",";
+    
+    if (_USING_PAUSER) {
+    
+    
+        // Locations of known pause sites
+        if (this->known_pauseSites.size() > 0){
+            parametersJSON += ",'known_pauseSites':[";
+            for (int i = 0; i < this->known_pauseSites.size(); i ++){
+                 parametersJSON += to_string(this->known_pauseSites.at(i));
+                 if (i < this->known_pauseSites.size() - 1) parametersJSON += ",";
+            }
+            parametersJSON += "]";
         }
         
-        parametersJSON += "]";
+        
+        
+        // Locations of SimPol pause sites
+        if (this->simpol_pauseSites.size() > 0){
+            parametersJSON += ",'simpol_pauseSites':[";
+            for (int i = 0; i < this->simpol_pauseSites.size(); i ++){
+                 parametersJSON += to_string(this->simpol_pauseSites.at(i));
+                 if (i < this->simpol_pauseSites.size() - 1) parametersJSON += ",";
+            }
+            parametersJSON += "]";
+            
+            
+            
+            // Precision/recall etc. for SimPol
+            if (this->known_pauseSites.size() > 0){
+                parametersJSON += ",'simpol_recall':" + to_string(Settings::calculate_classifier_recall(this->known_pauseSites, this->simpol_pauseSites));
+                parametersJSON += ",'simpol_precision':" + to_string(Settings::calculate_classifier_precision(this->known_pauseSites, this->simpol_pauseSites));
+                parametersJSON += ",'simpol_accuracy':" + to_string(Settings::calculate_classifier_accuracy(this->get_nsitesMSA(), this->known_pauseSites, this->simpol_pauseSites));
+            }
+            
+            
+        }
+        
+        
+        // Locations of NBC pause sites
+        if (this->nbc_pauseSites.size() > 0){
+            parametersJSON += ",'nbc_pauseSites':[";
+            for (int i = 0; i < this->nbc_pauseSites.size(); i ++){
+                 parametersJSON += to_string(this->nbc_pauseSites.at(i));
+                 if (i < this->nbc_pauseSites.size() - 1) parametersJSON += ",";
+            }
+            parametersJSON += "]";
+            
+            
+            // Precision/recall etc. for NBC
+            if (this->known_pauseSites.size() > 0){
+                parametersJSON += ",'nbc_recall':" + to_string(Settings::calculate_classifier_recall(this->known_pauseSites, this->nbc_pauseSites));
+                parametersJSON += ",'nbc_precision':" + to_string(Settings::calculate_classifier_precision(this->known_pauseSites, this->nbc_pauseSites));
+                parametersJSON += ",'nbc_accuracy':" + to_string(Settings::calculate_classifier_accuracy(this->get_nsitesMSA(), this->known_pauseSites, this->nbc_pauseSites));
+            }
+            
+        }
+    
     
     }
+    
+    
+    
+    
     
     parametersJSON += "}";
     return parametersJSON;
@@ -228,16 +280,34 @@ string Sequence::get_MSAsequence(){
 
 
 // Set the true known locations of pause sites. Return an error if there are problems
-string Sequence::set_true_pauseSites(list<int> pauses){
+string Sequence::set_known_pauseSites(list<int> pauses){
 
     vector<int> temp{ std::begin(pauses), std::end(pauses) };
-    this->true_pauseSites = temp;
-    sort(this->true_pauseSites.begin(), this->true_pauseSites.end()); 
-    for (int i = 0; i < this->true_pauseSites.size(); i ++ ){
-        int pauseSite = this->true_pauseSites.at(i);
+    this->known_pauseSites = temp;
+    sort(this->known_pauseSites.begin(), this->known_pauseSites.end()); 
+    for (int i = 0; i < this->known_pauseSites.size(); i ++ ){
+        int pauseSite = this->known_pauseSites.at(i);
         if (pauseSite <= 0 || pauseSite > this->templateSequence.size()) return "ERROR: pause site " + to_string(pauseSite) + " is out of range for " + this->seqID;    
     }
     
     return "";
 
 }
+
+
+
+// Set the locations of pause sites, according to the SimPol classifier
+void Sequence::set_simpol_pauseSites(list<int> pauses){
+    vector<int> temp{ std::begin(pauses), std::end(pauses) };
+    this->simpol_pauseSites = temp;
+}
+
+
+
+// Set the locations of pause sites, according to the NBC classifier
+void Sequence::set_nbc_pauseSites(list<int> pauses){
+    vector<int> temp{ std::begin(pauses), std::end(pauses) };
+    this->nbc_pauseSites = temp;
+}
+
+

@@ -1261,3 +1261,67 @@ int Settings::indexOf(deque<int> arr, int val){
 	}
 	return -1;
 }
+
+
+// Calculate the recall (probability of a true pause site being classified as one)
+double Settings::calculate_classifier_recall(vector<int> true_pauses, vector<int> classified_pauses){
+
+    double recall = 0;
+    for (int i = 0; i < true_pauses.size(); i ++){
+        int true_site = true_pauses.at(i);
+    
+        // Check if this true pause was also classified as one
+        for (int j = 0; j < classified_pauses.size(); j ++){
+            int classified_site = classified_pauses.at(j);
+            
+            if (true_site == classified_site) {
+                recall += 1.0 / true_pauses.size();
+                break;
+            }
+        
+        }
+    }
+    
+    return recall;
+
+}
+
+// Calculate the precision (probability of a classified pause site actually being one)
+double Settings::calculate_classifier_precision(vector<int> true_pauses, vector<int> classified_pauses){
+    return Settings::calculate_classifier_recall(classified_pauses, true_pauses);
+}
+
+// Number of correctly classified sites / total number of sites
+double Settings::calculate_classifier_accuracy(int numSites, vector<int> true_pauses, vector<int> classified_pauses){
+
+    double accuracy = 0;
+    for (int site = 1; site <= numSites; site ++){
+    
+    
+        // Is is a true pause site?
+        bool isTruePause = false;
+        for (int i = 0; i < true_pauses.size(); i ++){
+            if (true_pauses.at(i) == site){
+                isTruePause = true;
+                break;
+            }
+        }
+        
+        
+        // Was it classified as a pause site?
+        bool isClassifiedPause = false;
+        for (int i = 0; i < classified_pauses.size(); i ++){
+            if (classified_pauses.at(i) == site){
+                isClassifiedPause = true;
+                break;
+            }
+        }
+        
+        
+        // Is it correctly classified?
+        if (isTruePause == isClassifiedPause) accuracy += 1.0/numSites;
+    
+    }
+    return accuracy;
+
+}
