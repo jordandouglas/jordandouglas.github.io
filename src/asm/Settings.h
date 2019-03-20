@@ -35,6 +35,7 @@
 #include "SlippageLandscapes.h"
 #include "PosteriorDistributionSample.h"
 #include "MultipleSequenceAlignment.h"
+#include "BayesClassifier.h"
 
 
 #include <random>
@@ -162,7 +163,9 @@ extern bool _USING_PAUSER;
 extern double _simpol_evidence_threshold;
 extern double _simpol_max_evidence;
 extern double _nbc_evidence_threshold;
+extern double _nbc_min_evidence;
 extern double _nbc_max_evidence;
+extern BayesClassifier* _NBC_classifier;
 
 
 // Parameters

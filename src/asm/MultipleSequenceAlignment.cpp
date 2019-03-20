@@ -45,6 +45,7 @@ MultipleSequenceAlignment::MultipleSequenceAlignment(){
     this->initialisedSimulator = false;
     this->isAlignment = false;
     this->relativeTimePerLengths.resize(0);
+    this->NBC_evidence_per_site.resize(0);
 
 }
 
@@ -306,6 +307,8 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
 
     // Create the vector of mean time per length in each sequence
     this->relativeTimePerLengths.resize(this->alignment.size());
+    this->NBC_evidence_per_site.resize(this->alignment.size());
+    
 
     return "";
 
@@ -316,7 +319,7 @@ string MultipleSequenceAlignment::toJSON(){
 
     string JSON = "{'alignment':{"; 
 
-     for (int i = 0; i < this->alignment.size(); i ++){
+    for (int i = 0; i < this->alignment.size(); i ++){
 
         Sequence* seq = this->alignment.at(i);
         JSON += seq->toJSON();
@@ -334,48 +337,45 @@ string MultipleSequenceAlignment::toJSON(){
 }
 
 
-// Returns a JSON string of double array of pause sites
-// Only return pause sites which meet the thresholds
-string MultipleSequenceAlignment::pauseSites_toJSON(){
-
+// Updates the sequences in the alignment by adding pause sites to them
+void MultipleSequenceAlignment::classify(){
     
-
-    // Return an object of lists  acc:[site1, site2, ...]
-    // Where each element refers to the pause sites in that sequence
-
-    string JSON = "{"; 
-
+    cout << "Classifying" << endl;
     for (int i = 0; i < this->relativeTimePerLengths.size(); i ++){
         
         string accession = this->alignment.at(i)->getID();
-        string pauseSitesThisAccession_JSON = "";
         int seq_len = this->relativeTimePerLengths.at(i).size();
         
+        
+        // SimPol and NBC 
         list<int> simpol_pauseSites_list;
+        list<int> nbc_pauseSites_list;
         for (int j = 1; j < seq_len; j ++){
+        
+        
+            //cout << "SIMPOL " << i << "," << j << ": " << this->relativeTimePerLengths.at(i).at(j) << endl;
+        
+            // Simpol
             if (this->relativeTimePerLengths.at(i).at(j) / _simpol_max_evidence >= _simpol_evidence_threshold) {
-                pauseSitesThisAccession_JSON += to_string(j) + ",";
                 simpol_pauseSites_list.push_back(j);
             }
+            
+            //cout << "NBC " << i << "," << j << ": " << this->NBC_evidence_per_site.at(i).at(j) << endl;
+            
+            
+            // NBC. Evidence has been pre-normalised into [0,1]
+            if (this->NBC_evidence_per_site.at(i).at(j) >= _nbc_evidence_threshold) {
+                nbc_pauseSites_list.push_back(j);
+            }
+            
+            
         }
-        this->alignment.at(i)->set_simpol_pauseSites(simpol_pauseSites_list);
-
         
-        if (pauseSitesThisAccession_JSON.size() > 0) {
-            if (pauseSitesThisAccession_JSON.substr(pauseSitesThisAccession_JSON.length()-1, 1) == ",") pauseSitesThisAccession_JSON = pauseSitesThisAccession_JSON.substr(0, pauseSitesThisAccession_JSON.length() - 1);
-            JSON += "'" + accession + "':[" + pauseSitesThisAccession_JSON + "],"; 
-        }
+        this->alignment.at(i)->set_simpol_pauseSites(simpol_pauseSites_list);
+        this->alignment.at(i)->set_nbc_pauseSites(nbc_pauseSites_list);
 
     }
 
-
-    // Remove trailing comma
-    if (JSON.substr(JSON.length()-1, 1) == ",") JSON = JSON.substr(0, JSON.length() - 1);
-    JSON += "}";
-
-    //cout << "pauseSites_toJSON " << JSON << endl;
-
-    return JSON;
 
 }
 
@@ -387,12 +387,24 @@ void MultipleSequenceAlignment::clear(){
     this->alignment.clear();
     this->currentSequenceForSimulation = 0;
     this->initialisedSimulator = false;
-
+    
+    
+    // Clear SimPol simulation evidence
     for (int i = 0; i < this->relativeTimePerLengths.size(); i ++){
         this->relativeTimePerLengths.at(i).clear();
     }
     this->relativeTimePerLengths.clear();
     this->relativeTimePerLengths.resize(0);
+    
+    
+    // Clear NBC evidence
+    for (int i = 0; i < this->NBC_evidence_per_site.size(); i ++){
+        this->NBC_evidence_per_site.at(i).clear();
+    }
+    this->NBC_evidence_per_site.clear();
+    this->NBC_evidence_per_site.resize(0);    
+    
+    
 
 }
 
@@ -474,7 +486,7 @@ void MultipleSequenceAlignment::Pauser(){
 
 
 // Perform simulations on each sequence in the alignment. GUI only
-void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, int* result){
+void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, BayesClassifier* bayes_classifier, int* result){
 
     
     bool timeoutReached = false;
@@ -487,6 +499,13 @@ void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, int* result){
 
         // Initialise the simulator
         if (!this->initialisedSimulator) {
+            
+            
+            
+            // Naive Bayes classifier for sequence first
+            vector<double> NBC_seq = bayes_classifier->get_evidence_per_site(currentSeq, _nbc_min_evidence, _nbc_max_evidence);
+            this->NBC_evidence_per_site.at(currentSequenceForSimulation) = NBC_seq;
+        
             
             
             this->initialisedSimulator = true;

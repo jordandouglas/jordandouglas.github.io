@@ -161,45 +161,41 @@ string Sequence::toJSON(){
         
         
         // Locations of SimPol pause sites
-        if (this->simpol_pauseSites.size() > 0){
-            parametersJSON += ",'simpol_pauseSites':[";
-            for (int i = 0; i < this->simpol_pauseSites.size(); i ++){
-                 parametersJSON += to_string(this->simpol_pauseSites.at(i));
-                 if (i < this->simpol_pauseSites.size() - 1) parametersJSON += ",";
-            }
-            parametersJSON += "]";
-            
-            
-            
-            // Precision/recall etc. for SimPol
-            if (this->known_pauseSites.size() > 0){
-                parametersJSON += ",'simpol_recall':" + to_string(Settings::calculate_classifier_recall(this->known_pauseSites, this->simpol_pauseSites));
-                parametersJSON += ",'simpol_precision':" + to_string(Settings::calculate_classifier_precision(this->known_pauseSites, this->simpol_pauseSites));
-                parametersJSON += ",'simpol_accuracy':" + to_string(Settings::calculate_classifier_accuracy(this->get_nsitesMSA(), this->known_pauseSites, this->simpol_pauseSites));
-            }
-            
-            
+        parametersJSON += ",'simpol_pauseSites':[";
+        for (int i = 0; i < this->simpol_pauseSites.size(); i ++){
+             parametersJSON += to_string(this->simpol_pauseSites.at(i));
+             if (i < this->simpol_pauseSites.size() - 1) parametersJSON += ",";
         }
+        parametersJSON += "]";
+        
+        
+        
+        // Precision/recall etc. for SimPol
+        if (this->known_pauseSites.size() > 0){
+            parametersJSON += ",'simpol_recall':" + to_string(Settings::calculate_classifier_recall(this->known_pauseSites, this->simpol_pauseSites));
+            parametersJSON += ",'simpol_precision':" + to_string(Settings::calculate_classifier_precision(this->known_pauseSites, this->simpol_pauseSites));
+            parametersJSON += ",'simpol_accuracy':" + to_string(Settings::calculate_classifier_accuracy(this->get_nsitesMSA(), this->known_pauseSites, this->simpol_pauseSites));
+        }
+            
+            
         
         
         // Locations of NBC pause sites
-        if (this->nbc_pauseSites.size() > 0){
-            parametersJSON += ",'nbc_pauseSites':[";
-            for (int i = 0; i < this->nbc_pauseSites.size(); i ++){
-                 parametersJSON += to_string(this->nbc_pauseSites.at(i));
-                 if (i < this->nbc_pauseSites.size() - 1) parametersJSON += ",";
-            }
-            parametersJSON += "]";
-            
-            
-            // Precision/recall etc. for NBC
-            if (this->known_pauseSites.size() > 0){
-                parametersJSON += ",'nbc_recall':" + to_string(Settings::calculate_classifier_recall(this->known_pauseSites, this->nbc_pauseSites));
-                parametersJSON += ",'nbc_precision':" + to_string(Settings::calculate_classifier_precision(this->known_pauseSites, this->nbc_pauseSites));
-                parametersJSON += ",'nbc_accuracy':" + to_string(Settings::calculate_classifier_accuracy(this->get_nsitesMSA(), this->known_pauseSites, this->nbc_pauseSites));
-            }
-            
+        parametersJSON += ",'nbc_pauseSites':[";
+        for (int i = 0; i < this->nbc_pauseSites.size(); i ++){
+             parametersJSON += to_string(this->nbc_pauseSites.at(i));
+             if (i < this->nbc_pauseSites.size() - 1) parametersJSON += ",";
         }
+        parametersJSON += "]";
+        
+        
+        // Precision/recall etc. for NBC
+        if (this->known_pauseSites.size() > 0){
+            parametersJSON += ",'nbc_recall':" + to_string(Settings::calculate_classifier_recall(this->known_pauseSites, this->nbc_pauseSites));
+            parametersJSON += ",'nbc_precision':" + to_string(Settings::calculate_classifier_precision(this->known_pauseSites, this->nbc_pauseSites));
+            parametersJSON += ",'nbc_accuracy':" + to_string(Settings::calculate_classifier_accuracy(this->get_nsitesMSA(), this->known_pauseSites, this->nbc_pauseSites));
+        }
+            
     
     
     }

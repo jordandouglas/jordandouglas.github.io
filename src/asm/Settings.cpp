@@ -208,8 +208,9 @@ bool _USING_PAUSER = false;
 double _simpol_evidence_threshold = 0.5;
 double _simpol_max_evidence = 0;
 double _nbc_evidence_threshold = 0.5;
+double _nbc_min_evidence = 0;
 double _nbc_max_evidence = 0;
-
+BayesClassifier* _NBC_classifier;
 
 
 void Settings::init(){
@@ -1266,6 +1267,9 @@ int Settings::indexOf(deque<int> arr, int val){
 // Calculate the recall (probability of a true pause site being classified as one)
 double Settings::calculate_classifier_recall(vector<int> true_pauses, vector<int> classified_pauses){
 
+
+    if (classified_pauses.size() == 0) return 0;
+
     double recall = 0;
     for (int i = 0; i < true_pauses.size(); i ++){
         int true_site = true_pauses.at(i);
@@ -1288,12 +1292,14 @@ double Settings::calculate_classifier_recall(vector<int> true_pauses, vector<int
 
 // Calculate the precision (probability of a classified pause site actually being one)
 double Settings::calculate_classifier_precision(vector<int> true_pauses, vector<int> classified_pauses){
+    if (classified_pauses.size() == 0) return 0;
     return Settings::calculate_classifier_recall(classified_pauses, true_pauses);
 }
 
 // Number of correctly classified sites / total number of sites
 double Settings::calculate_classifier_accuracy(int numSites, vector<int> true_pauses, vector<int> classified_pauses){
 
+    if (classified_pauses.size() == 0) return 0;
     double accuracy = 0;
     for (int site = 1; site <= numSites; site ++){
     

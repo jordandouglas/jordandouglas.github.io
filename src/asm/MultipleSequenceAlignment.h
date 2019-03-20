@@ -28,6 +28,7 @@
 
 #include "Sequence.h"
 #include "Simulator.h"
+#include "BayesClassifier.h"
 #include "Plots.h"
 
 
@@ -42,6 +43,7 @@ class MultipleSequenceAlignment{
 
     vector<Sequence*> alignment;
     vector<vector<double>> relativeTimePerLengths;
+    vector<vector<double>> NBC_evidence_per_site;
     int nsites; // Is it an alignment or just a series of sequences?
     int currentSequenceForSimulation;
     bool initialisedSimulator;
@@ -57,9 +59,9 @@ class MultipleSequenceAlignment{
         string toJSON();
         void clear();
         void Pauser();
-        void Pauser_GUI(Simulator* simulator, int* result);
+        void Pauser_GUI(Simulator* simulator, BayesClassifier* bayes_classifier, int* result);
         string getCurrentSequence();
-        string pauseSites_toJSON();
+        void classify();
         vector<vector<double>> get_relativeTimePerLengths();
         Sequence* getSequenceAtIndex(int index);
         
