@@ -29,6 +29,7 @@
 #include "../../../src/asm/Plots.h"
 #include "../../../src/asm/MultipleSequenceAlignment.h"
 #include "../../../src/asm/PauseSiteUtil.h"
+#include "../../../src/asm/BayesClassifier.h"
 
 
 #include <emscripten.h>
@@ -76,6 +77,7 @@ extern "C" {
         _animationSpeed = "hidden";
         _PP_multipleSequenceAlignment = new MultipleSequenceAlignment();
         _GUI_PLOTS = new Plots();
+        _NBC_classifier = new BayesClassifier();
 
 	}
 
@@ -130,6 +132,22 @@ extern "C" {
     }
     
     
+    
+    // Parse NBC probabilities from a string (csv format)
+    void EMSCRIPTEN_KEEPALIVE parseNBC(char* nbc, int msgID){
+
+        // Parse each sequence in the multiple sequence alignment
+        _NBC_classifier->loadFromString(string(nbc));
+        vector<double> min_max = _NBC_classifier->get_min_max_evidence();
+        _nbc_min_evidence = min_max.at(0);
+        _nbc_max_evidence = min_max.at(1);
+        _nbc_evidence_threshold = (_NBC_classifier->get_threshold() - _nbc_min_evidence) / (_nbc_max_evidence - _nbc_min_evidence);
+        messageFromWasmToJS("{'_nbc_evidence_threshold':" + to_string(_nbc_evidence_threshold) +"}", msgID);
+
+    }
+
+    
+    
     // Parse an MSA from a JSON string
     void EMSCRIPTEN_KEEPALIVE parseMSA(char* fasta, int msgID){
 
@@ -165,13 +183,16 @@ extern "C" {
     // Return a JSON string of the cumulatively calculated pause sites
     void EMSCRIPTEN_KEEPALIVE getPauserResults(int msgID){
         
+        _PP_multipleSequenceAlignment->classify();
+        
         string JSON = "{";
-        JSON += "'simpol_pause_sites':" + _PP_multipleSequenceAlignment->pauseSites_toJSON() + ",";
         JSON += "'sequences':" + _PP_multipleSequenceAlignment->toJSON();
         JSON += "}";
 
         messageFromWasmToJS(JSON, msgID);
     }
+    
+    
     
     
     // Update the threshold required for a site to be classified as a pause site by SimPol
@@ -227,10 +248,10 @@ extern "C" {
         int result[3]; 
 
         // Perform simulations continuously and then send information back and pause once every 1000ms
-        _PP_multipleSequenceAlignment->Pauser_GUI(_interfaceSimulator, result);
+        _PP_multipleSequenceAlignment->Pauser_GUI(_interfaceSimulator, _NBC_classifier, result);
         
 
-        // Create JSON string
+        // C _NBC_classifier,
         string toReturnJSON = "{";
         int nseqs_complete = result[0];
         int ntrials_complete = result[1];

@@ -331,7 +331,20 @@ function getPauserResults_controller(resolve = function(x) { }){
 }
 
 
+// Parse NBC probabilities from a string
+function parseNBC_controller(nbc_str, resolve = function(x) { }){
 
+
+    if (WEB_WORKER_WASM != null) {
+
+        var res = stringifyFunction("parseNBC", [nbc_str], true);
+        var fnStr = "wasm_" + res[0];
+        var msgID = res[1];
+        var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+        toCall().then((result) => resolve(result));
+    }
+    
+}
 
 
 
@@ -460,18 +473,20 @@ function startPauser_controller(resume_simulation = false, resolve = function() 
         var res = stringifyFunction("startPauser", [resume_simulation], true);
         var fnStr = "wasm_" + res[0];
         var msgID = res[1];
+        var nseqs_complete_prev = 0;
 
         var afterInit = function(result){
 
             console.log("afterInit", result);
 
 
-
-            updatePauserResultDisplays();
-            
-
             if (result.ntrials_complete != null) {
                 
+                
+                // Only render the results if a sequence has finished
+                console.log("nseqs_complete_prev", nseqs_complete_prev, result.nseqs_complete);
+                if (nseqs_complete_prev < result.nseqs_complete) updatePauserResultDisplays();
+                nseqs_complete_prev = result.nseqs_complete;
                 
                 // Update the simulation progress metrics
                 $("#simulationProgressDIV").show(100);
@@ -498,6 +513,7 @@ function startPauser_controller(resume_simulation = false, resolve = function() 
 
 
             if (result.stop) {
+                updatePauserResultDisplays();
                 updateDOM(result);
                 MESSAGE_LISTENER[msgID] = null;
             }

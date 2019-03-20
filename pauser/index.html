@@ -37,6 +37,7 @@
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/Alignment.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/PhyloPause.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/Session.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/NBC.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/WebWorkerMessager.js"></script>
 
 
@@ -87,8 +88,15 @@ function init(){
             
         // Set the thresholds to their initial value
         getThresholds_controller();
-
-
+        
+            
+            
+        // Load NBC file from default specifications
+        var nbcURL = "http://www.polymerase.nz/pauser/NBC_pauser.csv";
+        uploadNBCFromURL(nbcURL);
+        
+        
+        
         if (location.href.indexOf("?") != -1){
             
             var search = location.search.substring(1);
@@ -116,6 +124,7 @@ function init(){
 
                 });
             }
+            
 
             
         }
@@ -509,41 +518,6 @@ function getLoaderTemplate(id, msg = ""){
                                         
                                         
                                 
-                             <div style="margin:20px">
-                                 
-                                <b style="color:#0B522D">Pause site classification summary</b> 
-                                <span style="cursor:pointer;" onclick="downloadClassifications();" title="Download the classifications in .tsv format"> <img src="../src/Images/downloadGreen.png" style="vertical-align:middle; padding:5 0; width:25px;"> </span>
-                                <table id="predictionSummaryTable" style="margin:10px; text-align:right" cellpadding=0 cellspacing=0> 
-                                
-                                    <tr style="color:#0B522D">
-                                        <td style="min-width:100px;">
-                                             Accession       
-                                        </td>
-                                                
-                                                
-                                        <td style="width:300px;" title="The predicted locations of pause sites, as classified by SimPol.">
-                                             SimPol    
-                                        </td>
-                                                
-                                                
-                                        <td style="width:300px;" title="The predicted locations of pause sites, as classified by the Naive Bayes classifier.">
-                                             NBC
-                                        </td>
-                                                
-                                            
-                                        <td style="width:300px;" title="The known locations of pause sites. These are optionally specified when uploading the .fasta file.">
-                                             Known pause sites
-                                        </td>
-                                                
-                                    </tr>
-
-
-                                </table>
-                            </div>
-                                
-                                    
-                                    
-                                    
 
                                     
                             <div  id="conservationMSA_DIV"  class='scrollbar' style='scrollbar-x-position: top; overflow-x: scroll; position:relative; width:100%;'>
@@ -621,6 +595,41 @@ function getLoaderTemplate(id, msg = ""){
                                         
                                         
                                         
+                             <div style="margin:20px">
+                                 
+                                <b style="color:#0B522D">Pause site classification summary</b> 
+                                <span style="cursor:pointer;" onclick="downloadClassifications();" title="Download the classifications in .tsv format"> <img src="../src/Images/downloadGreen.png" style="vertical-align:middle; padding:5 0; width:25px;"> </span>
+                                <table id="predictionSummaryTable" style="margin:10px; text-align:right" cellpadding=0 cellspacing=0> 
+                                
+                                    <tr style="color:#0B522D">
+                                        <td style="min-width:100px;">
+                                             Accession       
+                                        </td>
+                                                
+                                                
+                                        <td style="width:300px;" title="The predicted locations of pause sites, as classified by SimPol.">
+                                             SimPol    
+                                        </td>
+                                                
+                                                
+                                        <td style="width:300px;" title="The predicted locations of pause sites, as classified by the Naive Bayes classifier.">
+                                             NBC
+                                        </td>
+                                                
+                                            
+                                        <td style="width:300px;" title="The known locations of pause sites. These are optionally specified when uploading the .fasta file.">
+                                             Known pause sites
+                                        </td>
+                                                
+                                    </tr>
+
+
+                                </table>
+                            </div>
+                                
+                                    
+                                    
+                                    
                                         
 
                             </div>
@@ -650,12 +659,6 @@ function getLoaderTemplate(id, msg = ""){
 	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
 
 
-	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
-	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
-
-
-	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
-	<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> 
 
 
 	

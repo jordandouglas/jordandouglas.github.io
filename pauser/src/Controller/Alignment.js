@@ -265,13 +265,12 @@ updatePauserResultDisplays = function(){
         
         
         $(".positive_class").remove();
-        var simpol_pause_sites = result.simpol_pause_sites;
         
-        console.log("simpol_pause_sites", simpol_pause_sites);
-        
+        console.log("updatePauserResultDisplays", result);
         
         
-        // Update classifier tables
+        
+        // Update classifier tables and alignment 
         for (var acc in NUCLEOTIDE_ALIGNMENT){
         
             var seq = NUCLEOTIDE_ALIGNMENT[acc];
@@ -279,6 +278,7 @@ updatePauserResultDisplays = function(){
         
             // Update the summary table
             $("#simpol_summary_" + acc.substr(1)).html(seq.simpol_pauseSites == null ? "" : convertListToCommaString(seq.simpol_pauseSites));
+            $("#nbc_summary_" + acc.substr(1)).html(seq.nbc_pauseSites == null ? "" : convertListToCommaString(seq.nbc_pauseSites));
             
             
             // Update the adequacy table
@@ -299,27 +299,52 @@ updatePauserResultDisplays = function(){
                 
                 
             }
-
-        }
-        
-        
-        
-        
-        
-        // Plot whether each cell is a pause site or not
-        for (var acc in simpol_pause_sites){
-
-            var row = $(`[rowid="` + acc.substr(1) + `"]`);
             
-
-            for (var i = 0; i < simpol_pause_sites[acc].length; i++){
             
-                var siteNum = simpol_pause_sites[acc][i];
-                addSimPolPauseSite(row.children(".sequenceTD"), siteNum);
+            
+            
+            // Plot whether each cell is a pause site or not
+            var aln_row = $(`[rowid="` + acc.substr(1) + `"]`);
+            
+            
+            // A SimPol pause site
+            for (var i = 0; i < seq.simpol_pauseSites.length; i++){
+                var siteNum = seq.simpol_pauseSites[i];
                 
+                // Check if it is also an NBC pause site
+                var isNBC = false;
+                for (var j = 0; j < seq.nbc_pauseSites.length; j++){
+                    if (siteNum == seq.nbc_pauseSites[j]){
+                        isNBC = true;
+                        break;
+                    }
+                }
+                
+                if (isNBC) showPauseSiteClassification(aln_row.children(".sequenceTD"), siteNum, "simpol_class_dot NBC_class_dot", "The above position was classified as a pause site by both SimPol and NBC.");
+                else showPauseSiteClassification(aln_row.children(".sequenceTD"), siteNum, "simpol_class_dot", "The above position was classified as a pause site by SimPol.");
             }
+            
+            
+            
+            // An NBC pause site
+            for (var i = 0; i < seq.nbc_pauseSites.length; i++){
+                var siteNum = seq.nbc_pauseSites[i];
+                
+                // Check if it is also a SimPol pause site
+                var isSimPol = false;
+                for (var j = 0; j < seq.simpol_pauseSites.length; j++){
+                    if (siteNum == seq.simpol_pauseSites[j]){
+                        isSimPol = true;
+                        break;
+                    }
+                }
+                
+                if (!isSimPol) showPauseSiteClassification(aln_row.children(".sequenceTD"), siteNum, "NBC_class_dot", "The above position was classified as a pause site by NBC.");
+            }
+            
 
         }
+   
 
     });
 
@@ -327,18 +352,15 @@ updatePauserResultDisplays = function(){
 
 }
 
- // Add dots below the sequence showing that SimPol classified it as a pause site
-function addSimPolPauseSite(td_ele, pauseSite){
 
-    
+// Add dots below the sequence showing that a classifier classified it as a pause site
+function showPauseSiteClassification(td_ele, pauseSite, classes, title){
+
     // If this is also an NBC pause site, then add both colours to the circle
-    var classes = "positive_class dot simpol_class_dot";
-    var title = "The above position was classified as a pause site by SimPol."
-    
+    var classes = "positive_class dot " + classes; 
     var x = pauseSite - 0.75;
     var dot = `<span title="` + title + `" class="` + classes + `" style="top:20px; left:` + x + `ch"></span>`
     td_ele.append(dot);
-
 
 }
 
@@ -461,39 +483,6 @@ function appendMSArowTemplate(appendTo, name, seq, known_pauseSites = null, simp
         
     `;
     $(appendTo).append(row);
-    
-    
-    return;
-    
-    
-    
-    // NBC pause sites (but not classified by SimPol too)
-    if (NBC_pauseSites != null){
-        var td_ele = $(`[rowid="` + name + `"]`).children(".sequenceTD");
-        for (var i = 0; i < NBC_pauseSites.length; i ++){
-            var pauseSite = NBC_pauseSites[i];
-            
-            
-            
-            // If this is also a SimPol pause site, then continue because it has already been plotted
-            if (simpol_pauseSites != null){
-                var isSimpolPause = false;
-                for (var j = 0; j < simpol_pauseSites.length; j ++){
-                    var pauseSite_SimPol = simpol_pauseSites[j];
-                    if (pauseSite_SimPol == pauseSite){
-                        isSimpolPause = true;
-                        break;
-                    }
-                }
-                if (isSimpolPause) continue;
-            }
-            
-            
-            var x = (pauseSite-1) - 0.75;
-            var dot = `<span title="The above position was classified as a pause site by NBC." class="dot NBC_class_dot" style="top:20px; left:` + x + `ch"></span>`
-            td_ele.append(dot);
-        }
-    }
     
     
     

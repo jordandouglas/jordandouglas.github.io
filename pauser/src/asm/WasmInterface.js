@@ -184,6 +184,18 @@ getPauserResults = function(msgID = null){
 }
 
 
+// Parse NBC probabilities from a string (csv format)
+parseNBC = function(nbc_str, msgID = null){
+
+    // Create the callback function
+    var toDoAfterCall = function(resultStr){
+        if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+    }
+    WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+    
+    Module.ccall("parseNBC", null, ["string", "number"], [nbc_str, msgID]);
+}
 
 
 
