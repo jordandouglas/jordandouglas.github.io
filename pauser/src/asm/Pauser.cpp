@@ -50,12 +50,13 @@ using namespace std;
 
 
 
-/* Optional arguments: 
-                
-                -fasta <filename>: load in a .fasta alignment file
-                -tree <filename>: load in a .nexus tree file (optional)
+/* Arguments: 
+                -h: help
+                -o <filename>: file to print the results to (REQUIRED)
+                -fasta <filename>: load in a .fasta alignment file (REQUIRED)
                 -xml <filename>: load in an .xml SimPol session file (optional)
-                -o <filename>: file to plot the mean time-to-catalysis matrix into
+                -nbc <filename>: load in an NBC parameters file (optional)
+               
 
 */
 
@@ -70,6 +71,8 @@ int main(int argc, char** argv) {
 
     // Parse arguments
     bool doMCMC = false;
+    string nbcInputFileName = "";
+    bool printHelp = false;
     for (int i = 1; i < argc; i ++){
 
         string arg = string(argv[i]);
@@ -80,15 +83,13 @@ int main(int argc, char** argv) {
         }
         
         
+        if(arg == "-h") {
+            printHelp = true;
+        }
+        
         else if(arg == "-fasta" && i+1 < argc) {
             i++;
            _inputFastaFileName = string(argv[i]);
-        }
-
-
-        else if(arg == "-tree" && i+1 < argc) {
-            i++;
-            _inputTreeFileName = string(argv[i]);
         }
 
 
@@ -96,8 +97,13 @@ int main(int argc, char** argv) {
             i++;
             _outputFilename = string(argv[i]);
         }
+        
+        
+        else if(arg == "-nbc" && i+1 < argc) {
+            i++;
+            nbcInputFileName = string(argv[i]);
+        }
 
-      
        
        /*
         else if(arg == "-nthreads" && i+1 < argc) {
@@ -108,10 +114,35 @@ int main(int argc, char** argv) {
 
         else {
             cout << "Invalid command line arguments" << endl;
-            exit(0);
+            printHelp = true;
         }
         
     }
+    
+    
+    
+    if (printHelp){
+    
+        
+        string tabs = "\t\t";
+        cout << "----------------------------------------" << endl;
+        cout << "USAGE: bash pauser.sh -fasta path/to/sequences.fasta -o path/to/output.csv" << endl;
+        cout << tabs << "where sequences.fasta is the file containing sequences, and output.csv the file to save the results to." << endl;
+        cout << "Optional arguments:" << endl;
+        cout << tabs << "-h: Help." << endl;
+        cout << tabs << "-xml session.xml: Load the specified SimPol session in .xml format. If unspecified, will load the default session at pauser/pauser.xml. " << endl;
+        cout << tabs << "-nbc params.txt: Load the specified naive Bayes classifier parameters. If unspecified, will load the default session at pauser/NBC_pauser.txt." << endl;
+        
+        cout << "For more information see http://www.polymerase.nz/pauser/about/" << endl;
+        
+        cout << "----------------------------------------" << endl;
+    
+        if ( argc > 1) exit(0);
+        
+    }
+    
+    
+    
 
     // Initialise the thermodynamic parameter table
     FreeEnergy::init_BP_parameters();
@@ -124,11 +155,18 @@ int main(int argc, char** argv) {
     Settings::initSequences();
 
 
-    if (_inputXMLfilename == ""){
-        //cout << "SimPol session .xml was not specified. Using ../pauser.xml" << endl;
-        cout << "Input SimPol session required. Please provide the location of an .xml file with -xml. If you do not have one use pauser.xml." << endl;
+    if (_inputFastaFileName == ""){
+        cout << "Sequence .fasta file was not specified. Please specify the file to begin." << endl;
+        cout << "Use -h for help" << endl;
         exit(0);
-        //_inputXMLfilename = "../pauser.xml";
+    }
+    
+    
+    
+    if (_outputFilename == ""){
+        cout << "Output .csv file was not specified. Please specify the file to begin." << endl;
+        cout << "Use -h for help" << endl;
+        exit(0);
     }
 
 

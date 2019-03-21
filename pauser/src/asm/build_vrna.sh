@@ -1,8 +1,13 @@
 #!/bin/bash -e
 
-echo "Building Pauser..."
+echo "Building Pauser with the ViennaRNA library..."
 
-g++ -std=c++11 -O3 -fpermissive -pthread -o Pauser Pauser.cpp ../../../src/asm/MultipleSequenceAlignment.cpp \
+vrna_library_loc="`pwd`/../../../src/asm/ViennaRNA"
+vrna_wd_option="-L$vrna_library_loc"
+vrna_wd_option=$vrna_wd_option"/"
+echo "The vRNA library should be saved at $vrna_library_loc/libViennaRNA.so"
+
+g++ $vrna_wd_option -std=c++11 -O3 -fpermissive -pthread Pauser.cpp ../../../src/asm/MultipleSequenceAlignment.cpp \
 ../../../src/asm/PauseSiteUtil.cpp  ../../../src/asm/Plots.cpp \
 ../../../src/asm/Sequence.cpp ../../../src/asm/Parameter.cpp ../../../src/asm/HTMLobject.cpp ../../../src/asm/Coordinates.cpp \
 ../../../src/asm/MCMC.cpp ../../../src/asm/ExperimentalData.cpp ../../../src/asm/Polymerase.cpp ../../../src/asm/PosteriorDistributionSample.cpp \
@@ -12,6 +17,6 @@ g++ -std=c++11 -O3 -fpermissive -pthread -o Pauser Pauser.cpp ../../../src/asm/M
 ../../../src/asm/randomc/mersenne.cpp ../../../src/asm/tinyxml/tinystr.cpp ../../../src/asm/tinyxml/tinyxml.cpp \
 ../../../src/asm/tinyxml/tinyxmlerror.cpp ../../../src/asm/tinyxml/tinyxmlparser.cpp ../../../src/asm/SimulatorPthread.cpp \
 ../../../src/asm/SimulatorResultSummary.cpp ../../../src/asm/BayesianCalculations.cpp ../../../src/asm/GelLaneData.cpp \
-../../../src/asm/WasmMessengerNull.cpp ../../../src/asm/SimPol_vRNA_interfaceNull.cpp  ../../../src/asm/BayesClassifier.cpp
+../../../src/asm/WasmMessengerNull.cpp  ../../../src/asm/BayesClassifier.cpp  -o Pauser -lViennaRNA
 
 echo "Done! Saved to Pauser"

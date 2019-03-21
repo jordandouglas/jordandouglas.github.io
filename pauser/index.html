@@ -387,7 +387,9 @@ function getLoaderTemplate(id, msg = ""){
 						<input type=button id='conservationSectionBtn' class='minimise' value='-' onClick="minimiseSection(this)">
 						<b style="color:#0B522D">Prediction of transcriptional pause sites </b>
 						&nbsp;&nbsp;&nbsp;
-                         <input class="uploadAlignmentFirst operation" type=button id='beginPauser' onClick="beginPauser(false);" value=" Begin Pauser" title="Use SimPol to predict the locations of pause sites in each sequence in the alignment." style="z-index: 100; float:right; width:160px; display:none"> 
+                         <span class="finishPauserFirst" style="display:none; cursor:pointer;" onclick="downloadClassifications();" title="Download the full pause site prediction results."> <img src="../src/Images/downloadGreen.png" style="vertical-align:middle; padding:5 0; width:30px;"> </span>
+                                
+                         <input class="uploadAlignmentFirst operation" type=button id='beginPauser' onClick="beginPauser(false);" value=" Begin Pauser" title="Predict the locations of pause sites in each sequence." style="z-index: 100; float:right; width:160px; display:none"> 
 
 
 						<div id="conservationSection" style="padding: 20 20">
@@ -440,6 +442,8 @@ function getLoaderTemplate(id, msg = ""){
                              <div style="margin:20px; margin-bottom:50px">
                                  
                                 <b style="color:#0B522D">Classifiers</b> 
+                                <a href="about/#Classifiers" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
+                                
                                 <table id="classifiersTable" style="margin:10px; text-align:center" cellpadding=0 cellspacing=0> 
                                 
                                     <tr style="color:#0B522D">
@@ -552,7 +556,8 @@ function getLoaderTemplate(id, msg = ""){
                              <div style="margin:20px; margin-bottom:50px">
                                  
                                 <b style="color:#0B522D">Classifier adequacy</b> 
-                                            
+                                <a href="about/#Evaluating_classifier_adequacy" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
+                                       
                                             
                                 <div id="classifierAdequacy_nodata" style="display:none">
                                      Specify the locations of pause sites in one or more sequences in the .fasta file to assess the classifier adequacies.      
@@ -598,7 +603,8 @@ function getLoaderTemplate(id, msg = ""){
                              <div style="margin:20px">
                                  
                                 <b style="color:#0B522D">Pause site classification summary</b> 
-                                <span style="cursor:pointer;" onclick="downloadClassifications();" title="Download the classifications in .tsv format"> <img src="../src/Images/downloadGreen.png" style="vertical-align:middle; padding:5 0; width:25px;"> </span>
+                                 <a href="about/#Viewing_predictions" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
+                                  
                                 <table id="predictionSummaryTable" style="margin:10px; text-align:right" cellpadding=0 cellspacing=0> 
                                 
                                     <tr style="color:#0B522D">
@@ -607,17 +613,17 @@ function getLoaderTemplate(id, msg = ""){
                                         </td>
                                                 
                                                 
-                                        <td style="width:300px;" title="The predicted locations of pause sites, as classified by SimPol.">
+                                        <td style="max-width:300px; width:300px;" title="The predicted locations of pause sites, as classified by SimPol.">
                                              SimPol    
                                         </td>
                                                 
                                                 
-                                        <td style="width:300px;" title="The predicted locations of pause sites, as classified by the Naive Bayes classifier.">
+                                        <td style="max-width:300px; width:300px;" title="The predicted locations of pause sites, as classified by the Naive Bayes classifier.">
                                              NBC
                                         </td>
                                                 
                                             
-                                        <td style="width:300px;" title="The known locations of pause sites. These are optionally specified when uploading the .fasta file.">
+                                        <td style="max-width:300px; width:300px;" title="The known locations of pause sites. These are optionally specified when uploading the .fasta file.">
                                              Known pause sites
                                         </td>
                                                 

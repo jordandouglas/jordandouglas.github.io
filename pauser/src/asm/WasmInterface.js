@@ -263,6 +263,28 @@ startPauser = function(resume = false, msgID = null){
     
 }
 
+
+
+
+
+
+// Get the results of Pauser as a string to download into a .psr file
+getResultsFileString = function(msgID = null){
+
+    // Create the callback function
+    var toDoAfterCall = function(resultStr){
+        if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+    }
+    WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+    
+    Module.ccall("getResultsFileString", null, ["number"], [msgID]);
+
+
+}
+
+
+
+
 // Returns the classifier threshold values
 getThresholds = function(msgID = null){
 

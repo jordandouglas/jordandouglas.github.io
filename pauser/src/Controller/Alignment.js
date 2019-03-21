@@ -117,6 +117,10 @@ function parseAlignment(align_str, resolve = function() { }){
             $(".beforeUploadingAlignment").hide(0);
             
             $(".deleteUponNewAlignment").remove();
+            
+            
+            resetResults();
+            
 
             NUCLEOTIDE_ALIGNMENT = parseResult.alignment;
             NUCLEOTIDE_ALIGNMENT_NSITES = parseResult.nsites;
@@ -412,7 +416,7 @@ function getClassifierAdequacyRowTemplate(name){
             <td class="simpol_accuracy"></td> 
             
         </tr>
-        <tr rowid="ad_` + name + `" onclick="$('[rowid=ad_` + name + `]').toggleClass('selected')">
+        <tr rowid="ad_` + name + `" class="deleteUponNewAlignment"  onclick="$('[rowid=ad_` + name + `]').toggleClass('selected')">
             
             <td  style="padding-bottom:10px">NBC</td>
             <td class="nbc_recall"></td> 

@@ -348,6 +348,8 @@ function parseNBC_controller(nbc_str, resolve = function(x) { }){
 
 
 
+
+
 function parseMSA_controller(fasta, resolve = function(x) { }){
 
     //console.log("fasta", fasta);
@@ -489,7 +491,6 @@ function startPauser_controller(resume_simulation = false, resolve = function() 
                 nseqs_complete_prev = result.nseqs_complete;
                 
                 // Update the simulation progress metrics
-                $("#simulationProgressDIV").show(100);
                 $("#nTrialsComplete").html(result.ntrials_complete);
                 $("#nSequencesComplete").html(result.nseqs_complete);
                 $("#currentSequenceProgress").html(result.currentSequenceProgress.substr(1));
@@ -516,6 +517,20 @@ function startPauser_controller(resume_simulation = false, resolve = function() 
                 updatePauserResultDisplays();
                 updateDOM(result);
                 MESSAGE_LISTENER[msgID] = null;
+                
+                
+                // Change the description of the begin Pauser button
+                if (result.nseqs_complete == NUCLEOTIDE_ALIGNMENT_NSEQS){
+                     $("#beginPauser").val("Finished");
+                     $("#beginPauser").attr("onclick", "");
+                     $("#beginPauser").css("cursor", "auto");
+                     $("#beginPauser").css("background-color", "#696969");
+                     $(".finishPauserFirst").show(300);
+                }
+               
+
+                
+                
             }
 
 
@@ -533,7 +548,25 @@ function startPauser_controller(resume_simulation = false, resolve = function() 
 }
 
 
+// Get the results of Pauser as a string to download into a .psr file
+function getResultsFileString_controller(resolve = function(x) { }){
 
+
+    if (WEB_WORKER_WASM != null){
+
+        
+        var res = stringifyFunction("getResultsFileString", [], true);
+        var fnStr = "wasm_" + res[0];
+        var msgID = res[1];
+        
+        var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+        toCall(fnStr).then((result) => resolve(result));
+        
+    }
+
+
+
+}
 
 
 

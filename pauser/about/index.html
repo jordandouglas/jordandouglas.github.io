@@ -163,14 +163,14 @@ function printContents(){
         var onclick = "minimiseSection('#" + sectionName + "_Btn')"; // Click the button to hide/show the section
         var onclick_show = "minimiseSection('#" + sectionName + "_Btn', true)"; // Click the contents entry to show the section
             
-        var a_tag = `<a id="` + contents_ele_id + `" href='#` + id + `' onClick="` + onclick_show + `" style='text-decoration:none; color:` + (isSect ? "#A5CF19" : "black") + `'>` + HTML + `</a>`;
+        var a_tag = `<a id="` + contents_ele_id + `" href='#` + id + `' onClick="` + onclick_show + `" style='text-decoration:none; color:` + (isSect ? "#0B522D" : "black") + `'>` + HTML + `</a>`;
           
         // Add the html to the contents section
         if (isSect){
             sectNum++;
             
             
-            $("#contents").append("<div style='font-size:18px; color:#A5CF19'>" + sectNum + " " + a_tag + "</div>");
+            $("#contents").append("<div style='font-size:18px; color:#0B522D'>" + sectNum + " " + a_tag + "</div>");
                         
             
             ele.before(`<span id='` + id + `_Btn' class='minimise' style="font-size:30px; padding: 5 5" disp="true"  onClick="` + onclick + `">&plus;</span>`);
@@ -460,6 +460,190 @@ function addCitations(){
                         </div>
                     </div>
                 </div>
+                
+                
+                
+                
+                
+                   
+                <br><br><br><br>
+                <div class="main-block">
+                    <div class="main-block-inner">
+                        <div class="block-title"> 
+                                <span class="section">Prediction of transcriptional pause sites</span>
+                            </div> 
+                            <div style="display:none">          
+                                <div class="about-block" style="width:90%; margin:auto">
+                                    <div class="about-block-inner">
+                                                
+                                                    
+                                                    
+                                        <div class="about-block">
+                                            <div class="about-block-inner">
+                                                <div id="sequenceSelection" class="subsection block-subtitle">Classifiers</div> <br>
+                                                
+                                                
+                                                
+                                        
+                                            </div>
+                                        </div>
+                                    
+                                    
+                                    
+                                        <div class="about-block">
+                                            <div class="about-block-inner">
+                                                <div id="sequenceSelection" class="subsection block-subtitle">Viewing predictions</div> <br>
+                                                
+                                                
+                                                
+                                        
+                                            </div>
+                                        </div>
+                                    
+                                    
+                                    
+                                    
+                                    
+                                        <div class="about-block">
+                                            <div class="about-block-inner">
+                                                <div id="sequenceSelection" class="subsection block-subtitle">Evaluating classifier adequacy</div> <br>
+                                                
+                                                
+                                                
+                                        
+                                            </div>
+                                        </div>
+                                       
+                                        
+                                                
+                                    </div>
+                                </div>
+                            </div>
+                
+                
+                        </div>
+                    </div>
+                </div>
+                
+                
+            
+            
+                      
+                <br><br><br><br>
+                <div class="main-block">
+                    <div class="main-block-inner">
+                        <div class="block-title"> 
+                                <span class="section">Software information</span>
+                            </div> 
+                            <div style="display:none">          
+                                <div class="about-block" style="width:90%; margin:auto">
+                                    <div class="about-block-inner">
+                                                
+                                                    
+                                                    
+                                        <div class="about-block">
+                                            <div class="about-block-inner">
+                                                <div id="sequenceSelection" class="subsection block-subtitle">Running Pauser from the command line</div> <br>
+                                                
+                                                
+                                                    
+                                        The following instructions will work for Linux/Mac. 
+                                    
+                                       
+                                        
+                                        <div style="padding: 10 10; background-color:#ebe9e7" >
+                                            <b> 1. Download Pauser </b> from <a href="https://github.com/jordandouglas/jordandouglas.github.io">here</a> and unzip. Open up the command terminal and navigate to this folder.
+                                        </div> <br>
+                                        
+                                        <div style="padding: 10 10; background-color:#ebe9e7" >
+                                            <b> 2. Compile the ViennaRNA suite module.</b> RNAfold<cite val="lorenz2011viennarna"></cite> is used when enabled in the SimPol .xml file. <br><br>
+                                            
+                                            
+                                            <div style="margin-left: 100px;">
+                                                    
+                                                <span class="code">cd src/asm/ViennaRNA</span><br>
+                                                <span class="code">bash build_vrna.sh </span><br>
+                                            </div>
+                                        </div> <br>
+                                    
+                                    
+                                    
+                                        <div style="padding: 10 10; background-color:#ebe9e7" >
+                                                <b> 3. Compile Pauser. </b> ViennaRNA must be successfully compiled first.<br><br>
+                                            
+                                            
+                                            <div style="margin-left: 100px;">
+                                                    
+                                                <span class="code">cd ../../../pauser/src/asm/</span><br>
+                                                <span class="code">bash build_vrna.sh </span><br>
+                                            </div>
+                                        </div> <br>
+                                        
+                                        <div style="padding: 10 10; background-color:#ebe9e7" >
+                                            <b> 4. Run Pauser.</b> <br><br>
+                                                <div class="code" style="margin-left: 100px;">
+                                                    
+                                                    bash pauser.sh -fasta path/to/sequences.fasta -o path/to/output.csv
+                                                </div> <br>
+                                                where <span class="code">sequences.fasta</span> is the file containing sequences, and <span class="code">output.csv</span> the file to save the results to. Optional arguments:<br><br>
+                                                <div style="margin-left: 100px;">
+                                                    
+                                                    <span class="code">-h</span>: View the command line argument specifications. <br><br>
+                                                        
+                                            
+                                                    <span class="code">-xml session.xml</span>: Load the specified SimPol session in .xml format. If unspecified, will load the default session at pauser/pauser.xml. <br><br>
+                                                   
+                                                    <span class="code">-nbc params.txt</span>: Load the specified naive Bayes classifier parameters. If unspecified, will load the default session at pauser/NBC_pauser.txt. <br><br>
+                                                   
+                                                 <!--
+                                                    <span class="code">-nthreads N</span>: Parallelise the simulations over N threads. Multithreading does not work in the web browser, only from the command line. Default: 1. <br><br>
+                                                 -->
+                                            
+                                                </div>
+                                        </div>
+                                                
+                                        
+                                            </div>
+                                        </div>
+                                        
+                                                
+                                    </div>
+                                </div>
+                            </div>
+                
+                
+                        </div>
+                    </div>
+                </div>
+                
+                
+                             
+    
+                <br><br><br><br>
+                <div class="main-block">
+                    <div class="main-block-inner">
+                        <div class="block-title"> 
+                        
+                        
+                                <span class="section">References</span>
+                            </div> 
+                                <div style="display:none">
+                                    <br><br>
+                                    <div class="about-block" style="width:90%; margin:auto">
+                                        <div class="about-block-inner"  id="references">
+                                                
+                                                
+                                                
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                
+                        </div>
+                    </div>
+                </div>
+            
                                 
                     
                 <br><br><br><br>

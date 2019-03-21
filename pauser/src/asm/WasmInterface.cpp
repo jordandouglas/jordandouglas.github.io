@@ -171,14 +171,23 @@ extern "C" {
         JSON += "'nbcThreshold':" + to_string(_nbc_evidence_threshold);
         JSON += "}";
         
-        
         messageFromWasmToJS(JSON, msgID);
     }
     
     
     
-
-
+    // Get the results of Pauser as a string to download into a .psr file
+    void EMSCRIPTEN_KEEPALIVE getResultsFileString(int msgID){
+        
+        string JSON = "{";
+        JSON += "'output':'" + _PP_multipleSequenceAlignment->getPauserAsString() + "'";
+        JSON += "}";
+        
+        messageFromWasmToJS(JSON, msgID);
+        
+    }
+    
+    
 
     // Return a JSON string of the cumulatively calculated pause sites
     void EMSCRIPTEN_KEEPALIVE getPauserResults(int msgID){

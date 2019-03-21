@@ -88,6 +88,7 @@ function uploadSession(){
 
 
                     console.log("Successfully uploaded session", fileName);
+                    resetResults();
 
                     $(".uploadSessionFirst").show(300);
                     $(".beforeUploadingSession").hide(0);
