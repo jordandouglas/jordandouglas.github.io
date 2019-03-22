@@ -31,7 +31,7 @@
 #include "../../../src/asm/SimPol_vRNA_interface.h"
 #include "../../../src/asm/SimulatorResultSummary.h"
 #include "../../../src/asm/MultipleSequenceAlignment.h"
-
+#include "../../../src/asm/BayesClassifier.h"
 
 
 #include <iostream>
@@ -56,9 +56,8 @@ using namespace std;
                 -fasta <filename>: load in a .fasta alignment file (REQUIRED)
                 -xml <filename>: load in an .xml SimPol session file (optional)
                 -nbc <filename>: load in an NBC parameters file (optional)
-               
-
 */
+
 
 int main(int argc, char** argv) { 
 
@@ -67,14 +66,14 @@ int main(int argc, char** argv) {
     _USING_PAUSER = true;
     _RECORD_PAUSE_TIMES = true;
     auto startTime = std::chrono::system_clock::now();
-
+    _animationSpeed = "hidden";
 
     // Parse arguments
     bool doMCMC = false;
     string nbcInputFileName = "";
     bool printHelp = false;
     for (int i = 1; i < argc; i ++){
-
+    
         string arg = string(argv[i]);
 
         if(arg == "-xml" && i+1 < argc) {
@@ -83,7 +82,7 @@ int main(int argc, char** argv) {
         }
         
         
-        if(arg == "-h") {
+        else if(arg == "-h") {
             printHelp = true;
         }
         
@@ -113,12 +112,11 @@ int main(int argc, char** argv) {
         */
 
         else {
-            cout << "Invalid command line arguments" << endl;
+            cout << "Invalid command line argument: " << arg << endl;
             printHelp = true;
         }
         
     }
-    
     
     
     if (printHelp){
@@ -142,7 +140,6 @@ int main(int argc, char** argv) {
     }
     
     
-    
 
     // Initialise the thermodynamic parameter table
     FreeEnergy::init_BP_parameters();
@@ -153,10 +150,19 @@ int main(int argc, char** argv) {
     Settings::activatePolymerase("RNAP");
     Settings::sampleAll();
     Settings::initSequences();
-
+    
+    
 
     if (_inputFastaFileName == ""){
         cout << "Sequence .fasta file was not specified. Please specify the file to begin." << endl;
+        cout << "Use -h for help" << endl;
+        exit(0);
+    }
+    
+    
+    
+    if (nbcInputFileName == ""){
+        cout << "Naive Bayes .csv file was not specified. Please specify the file to begin." << endl;
         cout << "Use -h for help" << endl;
         exit(0);
     }
@@ -168,7 +174,8 @@ int main(int argc, char** argv) {
         cout << "Use -h for help" << endl;
         exit(0);
     }
-
+    
+    
 
     if (_inputXMLfilename != ""){
         char* filename = new char[_inputXMLfilename.length() + 1];
@@ -178,58 +185,63 @@ int main(int argc, char** argv) {
         if (!succ) exit(1);
 
     }
-
-
+    
+    
+    
     Settings::sampleAll();
     currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
     currentSequence->initRNAunfoldingTable();
-    SimulatorPthread::init(); 
-    _GUI_PLOTS->init();
+    SimulatorPthread::init();
+    //_GUI_PLOTS->init();
     if (PrimerType == "ssRNA") vRNA_init(complementSequence.c_str());
+    
+    
 
 
-
-     // Erase all contents of the output file so we can append to the end of it
-        if (_outputFilename != ""){
-            ofstream* outputFile = new ofstream(_outputFilename);
-            if (!outputFile->is_open()) {
-                cout << "Cannot open file " << _outputFilename << endl;
-                exit(0);
-            }
-
-            (*outputFile) << "";
-            outputFile->close();
+    // Erase all contents of the output file so we can append to the end of it
+    if (_outputFilename != ""){
+        ofstream* outputFile = new ofstream(_outputFilename);
+        if (!outputFile->is_open()) {
+            cout << "Cannot open file " << _outputFilename << endl;
+            exit(0);
         }
 
-
-
-
-    // Compute pause statistics for the MSA
-    else {
-
-
-        // Load in the alignment
-        _PP_multipleSequenceAlignment = new MultipleSequenceAlignment();
-        string errorMsg = _PP_multipleSequenceAlignment->parseFromFastaFile(_inputFastaFileName);
-
-        if (errorMsg != "") {
-            cout << errorMsg << endl;
-            exit(1);
-        }
-        cout << "Alignment successfully parsed." << endl;
-
-        
-
-        // Begin Pauser
-        cout << "Beginning Pauser" << endl;
-        _PP_multipleSequenceAlignment->Pauser();
-
-        
-
-
+        (*outputFile) << "";
+        outputFile->close();
     }
 
+
+
+    // Load in the alignment
+    _PP_multipleSequenceAlignment = new MultipleSequenceAlignment();
+    string errorMsg = _PP_multipleSequenceAlignment->parseFromFastaFile(_inputFastaFileName);
+
+    if (errorMsg != "") {
+        cout << errorMsg << endl;
+        exit(1);
+    }
+    cout << "Alignment successfully parsed." << endl;
     
+    
+    
+    // Load in the NBC parameters
+    BayesClassifier* bayes_classifier = new BayesClassifier();
+    bayes_classifier->loadFromFile(nbcInputFileName);
+    vector<double> min_max = bayes_classifier->get_min_max_evidence();
+    _nbc_min_evidence = min_max.at(0);
+    _nbc_max_evidence = min_max.at(1);
+    
+
+    // Begin Pauser
+    cout << "Beginning Pauser" << endl;
+    _PP_multipleSequenceAlignment->Pauser(bayes_classifier);
+
+    
+    
+    // Print to file
+    _PP_multipleSequenceAlignment->printPauserToFile(_outputFilename);
+
+
     auto endTime = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = endTime-startTime;
     cout << "Done! Time elapsed: " << elapsed_seconds.count() << "s" << endl;

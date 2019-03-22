@@ -255,9 +255,11 @@ extern "C" {
         // 2nd element = ntrials complete in this sequence
         // 3rd element = 1 if finished, 0 if not
         int result[3]; 
-
+        
+        
         // Perform simulations continuously and then send information back and pause once every 1000ms
         _PP_multipleSequenceAlignment->Pauser_GUI(_interfaceSimulator, _NBC_classifier, result);
+        
         
 
         // C _NBC_classifier,
@@ -281,12 +283,9 @@ extern "C" {
         toReturnJSON += "'Ntot':" + to_string(ntrials_sim) + ",";
         toReturnJSON += "'nseqs_complete':" + to_string(nseqs_complete) + ",";
         toReturnJSON += "'currentSequenceProgress':'" + currentSequenceProgress + "',";
-
         toReturnJSON += "'ntrials_complete':" + to_string(ntrials_complete);
-
         toReturnJSON += "}";
 
-        //cout << "Plots data " << _GUI_PLOTS->timeToCatalysisPerSite_toJSON() << endl;
         cout << toReturnJSON << endl;
 
         messageFromWasmToJS(toReturnJSON, msgID);

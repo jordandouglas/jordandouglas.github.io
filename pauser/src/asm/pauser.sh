@@ -9,7 +9,7 @@ echo "The vRNA library should be saved at $vrna_library_loc/libViennaRNA.so"
 
 export LD_LIBRARY_PATH=$vrna_library_loc:$LD_LIBRARY_PATH./
 
-$(dirname $0)/./Pauser "$@"
+$(dirname $0)/./Pauser -xml $(dirname $0)/../../pauser.xml -nbc $(dirname $0)/../../NBC_pauser.csv "$@"
 
 
 
