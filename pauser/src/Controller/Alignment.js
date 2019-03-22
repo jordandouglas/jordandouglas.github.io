@@ -201,14 +201,18 @@ function renderAdequacyTable(){
     $("#classifierAdequacyTable").show(100);
     $("#classifierAdequacy_nodata").hide(0);
     
+  
     
     for (var acc in NUCLEOTIDE_ALIGNMENT){
         var seq = NUCLEOTIDE_ALIGNMENT[acc];
         if (seq.known_pauseSites == null) continue;
         $("#classifierAdequacyTable").append(getClassifierAdequacyRowTemplate(acc.substr(1)));
     }
-
-
+    
+   
+     
+    // Total row
+    //$("#classifierAdequacyTable").append(getClassifierAdequacyRowTemplate("Average", true));
 
 
 
@@ -274,7 +278,18 @@ updatePauserResultDisplays = function(){
         
         
         
+        // Average precision, recall, and accuracy
+        var average_simpol_precision = 0;
+        var average_simpol_recall = 0;
+        var average_simpol_accuracy = 0;
+        var average_nbc_precision = 0;
+        var average_nbc_recall = 0;
+        var average_nbc_accuracy = 0;
+        
+        
         // Update classifier tables and alignment 
+        var n_nucleotides = 0;
+        var nseq_predicted = 0;
         for (var acc in NUCLEOTIDE_ALIGNMENT){
         
             var seq = NUCLEOTIDE_ALIGNMENT[acc];
@@ -284,9 +299,11 @@ updatePauserResultDisplays = function(){
             $("#simpol_summary_" + acc.substr(1)).html(seq.simpol_pauseSites == null ? "" : convertListToCommaString(seq.simpol_pauseSites));
             $("#nbc_summary_" + acc.substr(1)).html(seq.nbc_pauseSites == null ? "" : convertListToCommaString(seq.nbc_pauseSites));
             
-            
             // Update the adequacy table
             if (seq.known_pauseSites != null) {
+            
+                nseq_predicted ++;
+                n_nucleotides += seq.seq.length;
                 
                 var adequacy_row = $(`[rowid="ad_` + acc.substr(1) + `"]`);
                 if (seq.simpol_pauseSites != null) {
@@ -299,6 +316,23 @@ updatePauserResultDisplays = function(){
                     adequacy_row.children(".nbc_recall").html(roundToSF(seq.nbc_recall));
                     adequacy_row.children(".nbc_precision").html(roundToSF(seq.nbc_precision));
                     adequacy_row.children(".nbc_accuracy").html(roundToSF(seq.nbc_accuracy));
+                }
+                
+                
+                            
+                // Average precision, recall, and accuracy
+                if (seq.simpol_pauseSites != null) {
+                    average_simpol_precision += seq.simpol_recall * seq.simpol_pauseSites.length / seq.known_pauseSites.length;
+                    average_simpol_recall += seq.simpol_precision * seq.known_pauseSites.length / seq.simpol_pauseSites.length;
+                    average_simpol_accuracy += seq.simpol_accuracy * seq.seq.length;
+                }
+                
+                
+                // Average precision, recall, and accuracy
+                if (seq.nbc_pauseSites != null) {
+                    average_nbc_precision += seq.nbc_recall * seq.nbc_pauseSites.length / seq.known_pauseSites.length;
+                    average_nbc_recall += seq.nbc_precision * seq.known_pauseSites.length / seq.nbc_pauseSites.length;
+                    average_nbc_accuracy += seq.nbc_accuracy * seq.seq.length;
                 }
                 
                 
@@ -346,10 +380,26 @@ updatePauserResultDisplays = function(){
                 if (!isSimPol) showPauseSiteClassification(aln_row.children(".sequenceTD"), siteNum, "NBC_class_dot", "The above position was classified as a pause site by NBC.");
             }
             
+            
+
+            
 
         }
-   
-
+        
+        
+        /*
+        console.log("average_simpol_precision", average_simpol_precision, average_nbc_precision);
+        var average_row = $(`[rowid="ad_Average"]`);
+        average_row.children(".simpol_precision").html(roundToSF(average_simpol_precision));
+        average_row.children(".simpol_recall").html(roundToSF(average_simpol_recall));
+        average_row.children(".simpol_accuracy").html(roundToSF(average_simpol_accuracy / (n_nucleotides * nseq_predicted)));
+        
+        average_row.children(".nbc_precision").html(roundToSF(average_nbc_precision));
+        average_row.children(".nbc_recall").html(roundToSF(average_nbc_recall));
+        average_row.children(".nbc_accuracy").html(roundToSF(average_nbc_accuracy / (n_nucleotides * nseq_predicted)));
+        */
+        
+        
     });
 
 
@@ -404,11 +454,14 @@ function getMSAheaderTemplate(nsites){
 
 
 
-function getClassifierAdequacyRowTemplate(name){
+function getClassifierAdequacyRowTemplate(name, average = false){
+    
+    
+    var name_html = average ? "<b>" + name + "</b>" : name;
     
     var row = `
         <tr rowid="ad_` + name + `" class="deleteUponNewAlignment" onclick="$('[rowid=ad_` + name + `]').toggleClass('selected')">
-            <td rowspan="2">` + name + `</td>
+            <td rowspan="2">` + name_html + `</td>
             
             <td  style="padding-top:10px">SimPol</td>
             <td class="simpol_recall"></td> 
