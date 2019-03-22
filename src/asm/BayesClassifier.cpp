@@ -38,14 +38,14 @@ void BayesClassifier::loadFromFile(string inputProbabilitiesFile){
     
     
     // Parse the parameters file
-    ifstream likelihood_file;
+    ifstream NBC_file;
     string line = "";
-    likelihood_file.open(inputProbabilitiesFile);
+    NBC_file.open(inputProbabilitiesFile);
     vector<string> split_line;
     string inputProbabilitiesString = "";
-    if(likelihood_file.is_open()) {
-        while(getline(likelihood_file, line)) inputProbabilitiesString += line + "|";
-        likelihood_file.close();
+    if(NBC_file.is_open()) {
+        while(getline(NBC_file, line)) inputProbabilitiesString += line + "|";
+        NBC_file.close();
     }
 
     else {
@@ -56,7 +56,7 @@ void BayesClassifier::loadFromFile(string inputProbabilitiesFile){
     
     this->loadFromString(inputProbabilitiesString);
 
-    cout << "Successfully parsed" << endl;
+    cout << "NBC parameters successfully parsed." << endl;
 
 
 }
@@ -89,7 +89,7 @@ void BayesClassifier::loadFromString(string inputProbabilities){
     }
 
 
-    cout << "Prior = " << this->prior << ", window_before = " << this->window_before << ", window_after = " << this->window_after << " threshold  = " << this->threshold << endl;
+    //cout << "Prior = " << this->prior << ", window_before = " << this->window_before << ", window_after = " << this->window_after << " threshold  = " << this->threshold << endl;
     this->likelihoods_positive.resize(this->window_before + 1 + this->window_after);
     for (int i = 0; i < this->likelihoods_positive.size(); i ++){
         this->likelihoods_positive.at(i).resize(4); // A, C, G, T
@@ -272,9 +272,8 @@ vector<double> BayesClassifier::get_min_max_evidence() {
     vector<double> min_max(2);
     min_max.at(0) = min_score_positive - min_score_negative;
     min_max.at(1) = max_score_positive - max_score_negative;
-    
-    cout << "The minimum evidence is " << min_max.at(0) << endl;
-    cout << "The maximum evidence is " << min_max.at(1) << endl;
+    //cout << "The minimum evidence is " << min_max.at(0) << endl;
+    //cout << "The maximum evidence is " << min_max.at(1) << endl;
     
     return min_max;
 

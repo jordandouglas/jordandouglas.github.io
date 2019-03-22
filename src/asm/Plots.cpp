@@ -103,6 +103,9 @@ void Plots::clear(){
     this->parametersPlotData.clear();
     this->catalysisTimes.clear();
     this->catalysisTimesUnsent.clear();
+    for (list<vector<double>>::iterator it = this->proportionTimePerTranscriptLength.begin(); it != this->proportionTimePerTranscriptLength.end(); ++it){
+            it->clear();
+    }
     this->proportionTimePerTranscriptLength.clear();
 
 
@@ -228,9 +231,6 @@ void Plots::refreshPlotData(State* state){
     this->npauseSimulations ++;
 
 
-
-
-
     if (_RECORD_PAUSE_TIMES){
         vector<double> next_vec(currentSequence->get_templateSequence().length()+1);
         for (int i = 0; i < next_vec.size(); i ++) next_vec.at(i) = 0;
@@ -238,10 +238,7 @@ void Plots::refreshPlotData(State* state){
     }
 
 
-
-
-
-	if (state == nullptr || !_USING_GUI || !this->plotsInit) return;
+	if (_USING_PAUSER || state == nullptr || !_USING_GUI || !this->plotsInit) return;
 
 
 	//cout << "Refreshing plot data: " << this->currentSimNumber << endl;
@@ -300,7 +297,7 @@ void Plots::refreshPlotData(State* state){
 void Plots::updateParameterPlotData(State* state){
 
 
-	if (state == nullptr || !_USING_GUI || !this->plotsInit) return;
+	if (_USING_PAUSER || state == nullptr || !_USING_GUI || !this->plotsInit) return;
 
 	if (this->catalysisTimesThisTrial.size() == 0) return; 
 	if (this->totaltimeElapsedThisTrial == 0) return;
@@ -362,11 +359,12 @@ void Plots::resetTimeToCatalysis(){
 
 // Updates the timeWaitedUntilNextCatalysis or timeToCatalysisPerSite object at the current site. Only call this method when updatePlotData should not be called
 void Plots::update_timeWaitedUntilNextCatalysis(int baseNumber){
+
+    if (_USING_PAUSER) return;
     if (baseNumber < this->timeToCatalysisPerSite.size()) {
         this->timeToCatalysisPerSite.at(baseNumber) += this->timeWaitedUntilNextCatalysis;
         this->recordSite(baseNumber, this->timeWaitedUntilNextCatalysis);
     }
-
 
     this->timeWaitedUntilNextCatalysis = 0;
 }
@@ -389,11 +387,9 @@ void Plots::updatePlotData(State* state, int lastAction, int* actionsToDo, doubl
 
 
     // Pauser -> record time to catalysis at this site and add to list for this site
-    if (_RECORD_PAUSE_TIMES){
-
+    if (_USING_PAUSER || _RECORD_PAUSE_TIMES){
         this->proportionTimePerTranscriptLength.back().at(state->get_nascentLength()) = this->proportionTimePerTranscriptLength.back().at(state->get_nascentLength()) + reactionTime;
         return;
-        
     }
 
 
@@ -1296,7 +1292,7 @@ string Plots::timeToCatalysisPerSite_toJSON(){
 
 // Returns a vector of the mean proportion of time spent at each length across the simulations
 list<vector<double>> Plots::getProportionOfTimePerLength(){
-
+    
     return this->proportionTimePerTranscriptLength;
 
 }

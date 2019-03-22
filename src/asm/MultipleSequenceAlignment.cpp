@@ -27,7 +27,6 @@
 #include "PauseSiteUtil.h"
 #include "MultipleSequenceAlignment.h"
 #include "Settings.h"
-#include "SimulatorResultSummary.h"
 #include "SimulatorPthread.h"
 
 #include <regex>
@@ -46,6 +45,7 @@ MultipleSequenceAlignment::MultipleSequenceAlignment(){
     this->isAlignment = false;
     this->relativeTimePerLengths.resize(0);
     this->NBC_evidence_per_site.resize(0);
+    this->finishedPauser = false;
 
 }
 
@@ -64,7 +64,6 @@ int MultipleSequenceAlignment::get_nsites(){
 // Parse the .fasta 
 string MultipleSequenceAlignment::parseFromFastaFile(string filename){
 
-    
     ifstream fastaFile;
     string line = "";
     fastaFile.open(filename);
@@ -106,6 +105,7 @@ string MultipleSequenceAlignment::parseFromFastaFile(string filename){
 //      ATTCGGGATCATCGAT 
 string MultipleSequenceAlignment::parseFromFasta(string fasta){
 
+    this->finishedPauser = false;
     this->clear();
     this->isAlignment = false;
     //cout << "Parsing .fasta " << fasta << endl;
@@ -145,6 +145,15 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
                     string err = currentSeq->set_known_pauseSites(currentSeqPauseSites);
                     if (err != "") return err;
                 }
+                
+                // Check that sequence id is unique
+                for (list<Sequence*>::iterator it = alignment_list.begin(); it != alignment_list.end(); ++ it){
+                    if (currentSeq->getID() == (*it)->getID()){
+                        return "ERROR: ensure that all sequences have unique identifiers. " + currentSeq->getID() + " = " + (*it)->getID();
+                    }
+                }
+                
+                
                 alignment_list.push_back(currentSeq);
                 currentSequenceStr = "";
             }
@@ -256,6 +265,16 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
             string err = currentSeq->set_known_pauseSites(currentSeqPauseSites);
             if (err != "") return err;
         }
+        
+        
+        // Check that sequence id is unique
+        for (list<Sequence*>::iterator it = alignment_list.begin(); it != alignment_list.end(); ++ it){
+            if (currentSeq->getID() == (*it)->getID()){
+                return "ERROR: ensure that all sequences have unique identifiers. " + currentSeq->getID() + " = " + (*it)->getID();
+            }
+        }
+        
+        
         alignment_list.push_back(currentSeq);
         currentSequenceStr = "";
     }
@@ -423,59 +442,70 @@ string MultipleSequenceAlignment::getCurrentSequence(){
 
 
 // Perform simulations on each sequence in the alignment
-void MultipleSequenceAlignment::Pauser(){
+void MultipleSequenceAlignment::Pauser(BayesClassifier* bayes_classifier){
 
-   
-
-    bool timeoutReached = false;
-    for (currentSequenceForSimulation = 0; currentSequenceForSimulation < this->alignment.size(); currentSequenceForSimulation++){
+    // Initialise simulator
+    Plots* simulator_plots = new Plots();
+    Simulator* simulator = new Simulator(simulator_plots);
+    State* initialState;
+    
+    
+    // Iterate through sequences
+    for (; currentSequenceForSimulation < this->alignment.size(); currentSequenceForSimulation++){
 
 
         Sequence* currentSeq = this->alignment.at(currentSequenceForSimulation);
+        SimulatorResultSummary* sequence_summary = new SimulatorResultSummary(ntrials_sim);
 
-        // Initialise the simulator
-            
         
-        this->initialisedSimulator = true;
+        // Naive Bayes classifier for sequence first
+        vector<double> NBC_seq = bayes_classifier->get_evidence_per_site(currentSeq, _nbc_min_evidence, _nbc_max_evidence);
+        this->NBC_evidence_per_site.at(currentSequenceForSimulation) = NBC_seq;
+        
+        
 
+        cout << "Starting " << ntrials_sim << " for sequence " << currentSeq->getID() << endl;
         cout << "Starting sequence " << (currentSequenceForSimulation + 1) << " out of " << this->alignment.size() << endl;
 
         // Activate the sequence
-        _GUI_PLOTS->deletePlotData(_currentStateGUI, true, true, true, true, true, true);
+        simulator_plots->clear();
         Settings::setSequence(currentSeq);
 
 
         // Reinitialise plot data every time sequence changes
-        _GUI_PLOTS->init(); 
-
-
-        // Perform multi-threaded simulation
-        SimulatorResultSummary* simulationResults = SimulatorPthread::performNSimulations(ntrials_sim, false);
-
-        simulationResults->clear();
-        delete simulationResults;
+        simulator_plots->init();
         
         
+        // Simulate
+        initialState = new State(true);
+        simulator->perform_N_Trials(sequence_summary, initialState, false);
         
-        // TO COMPLETE:
-        //vector<vector<double>> timeToCatalysisPerSite = _GUI_PLOTS->getTimeToCatalysisPerSite();
-      
-        //vector<bool>* isPauseSite = PauseSiteUtil::identifyPauseSites(currentSeq, timeToCatalysisPerSite);
-        //this->pauseSitesInAlignment.at(currentSequenceForSimulation) = isPauseSite;
+
+        // Simualtion completed. Save the time per length information and move on to the next sequence
+        sequence_summary->add_proportionOfTimePerLength(simulator_plots->getProportionOfTimePerLength());
+        sequence_summary->compute_meanRelativeTimePerLength();
+        this->relativeTimePerLengths.at(currentSequenceForSimulation) = sequence_summary->get_meanRelativeTimePerLength();
+        
+        
+        // Recompute the maximum evidence, so we can normalise
+        for (int i = 1; i < this->relativeTimePerLengths.at(currentSequenceForSimulation).size(); i ++){
+            double relativeTime = this->relativeTimePerLengths.at(currentSequenceForSimulation).at(i);
+            if (relativeTime > _simpol_max_evidence) _simpol_max_evidence = relativeTime;
+        }
+        
 
         // Clear the rate table to liberate memory
         currentSeq->deconstructRateTable();
+        sequence_summary->clear();
+        delete sequence_summary;
 
-
-        // Print to file?
-        if (_outputFilename != ""){
-            //PauseSiteUtil::writePauseSitesToFile(_outputFilename, currentSeq, timeToCatalysisPerSite);
-        }
-
-        //this->initialisedSimulator = false;
     }
-
-
+    
+    delete initialState;
+    simulator_plots->clear();
+    delete simulator_plots;
+    delete simulator;
+    this->finishedPauser = true;
 
 }
 
@@ -491,16 +521,15 @@ void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, BayesClassifier
     
     bool timeoutReached = false;
     double simulator_result[3];
-    for (currentSequenceForSimulation; currentSequenceForSimulation < this->alignment.size(); currentSequenceForSimulation++){
-
-
+    for (; currentSequenceForSimulation < this->alignment.size(); currentSequenceForSimulation++){
+    
+    
         Sequence* currentSeq = this->alignment.at(currentSequenceForSimulation);
-        SimulatorResultSummary* sequence_summary = new SimulatorResultSummary(ntrials_sim);
-
+        
         // Initialise the simulator
         if (!this->initialisedSimulator) {
-            
-            
+        
+        
             
             // Naive Bayes classifier for sequence first
             vector<double> NBC_seq = bayes_classifier->get_evidence_per_site(currentSeq, _nbc_min_evidence, _nbc_max_evidence);
@@ -510,25 +539,25 @@ void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, BayesClassifier
             
             this->initialisedSimulator = true;
 
-            cout << "Starting " << ntrials_sim << " for sequence " << currentSeq->getID() << endl;
+            cout << "Beginning " << ntrials_sim << " simulations for " << currentSeq->getID().substr(0) << endl;
             cout << "Starting sequence " << (currentSequenceForSimulation + 1) << " out of " << this->alignment.size() << endl;
 
             // Activate the sequence
-            _GUI_PLOTS->deletePlotData(_currentStateGUI, true, true, true, true, true, true);
+            simulator->getPlots()->clear();
             Settings::setSequence(currentSeq);
 
-        
-            _GUI_PLOTS->init(); // Reinitialise plot data every time sequence changes
 
-
-            if (_USING_GUI){
-                delete _currentStateGUI;
-                _currentStateGUI = new State(true, true);
-            }
+            //if (_USING_GUI){
+                //delete _currentStateGUI;
+                //_currentStateGUI = new State(true, false);
+           // }
+            
+            simulator->getPlots()->init(); // Reinitialise plot data every time sequence changes
             
             
             // Prepare for simulating
-            simulator->initialise_GUI_simulation(sequence_summary, 1000);
+            this->current_sequence_summary = new SimulatorResultSummary(ntrials_sim);
+            simulator->initialise_GUI_simulation(this->current_sequence_summary, 1000);
             
             
             // Start the simulations for this sequence
@@ -551,7 +580,6 @@ void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, BayesClassifier
         timeoutReached = simulator_result[2] == 0;
         if (timeoutReached) {
         
-
             // 1st element = nseqs complete, 
             // 2nd element = ntrials complete in this sequence
             // 3rd element = 1 if finished, 0 if not
@@ -560,13 +588,14 @@ void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, BayesClassifier
             result[2] = 0;
             return;
         }   
-
+        
+        
 
         // Sequence completed. Save the time per length information and move on to the next sequence
-        sequence_summary->add_proportionOfTimePerLength(simulator->getPlots()->getProportionOfTimePerLength());
-        sequence_summary->compute_meanRelativeTimePerLength();
+        this->current_sequence_summary->add_proportionOfTimePerLength(simulator->getPlots()->getProportionOfTimePerLength());
+        this->current_sequence_summary->compute_meanRelativeTimePerLength();
         
-        this->relativeTimePerLengths.at(currentSequenceForSimulation) = sequence_summary->get_meanRelativeTimePerLength();
+        this->relativeTimePerLengths.at(currentSequenceForSimulation) = this->current_sequence_summary->get_meanRelativeTimePerLength();
         
         
         // Recompute the maximum evidence, so we can normalise
@@ -579,8 +608,7 @@ void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, BayesClassifier
 
         // Clear the rate table to liberate memory
         currentSeq->deconstructRateTable();
-        sequence_summary->clear();
-        delete sequence_summary;
+        this->current_sequence_summary->clear();
 
         this->initialisedSimulator = false;
     }
@@ -591,6 +619,7 @@ void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, BayesClassifier
     result[0] = currentSequenceForSimulation;
     result[1] = simulator->getNtrialsCompleted_GUI();
     result[2] = 1; // Done
+    this->finishedPauser = true;
 
 
 }
@@ -607,4 +636,78 @@ Sequence* MultipleSequenceAlignment::getSequenceAtIndex(int index){
 }
 
 
- 
+// Print the Pauser results to a file
+void MultipleSequenceAlignment::printPauserToFile(string file){
+
+    // Get the output string and replace | with \n
+    string str_pipes = this->getPauserAsString();
+    vector<string> lines = Settings::split(this->getPauserAsString(), '|');
+    string str_linebreaks = "";
+    for (int i = 0; i < lines.size(); i ++) str_linebreaks += lines.at(i) + "\n";
+    
+    
+    cout << "Writing to file " << file << endl;
+    //cout << str_pipes << endl;
+    
+    // Write to file
+    ofstream myfile;
+    myfile.open(file);
+    if (myfile.is_open()) {
+        myfile << str_linebreaks << endl;
+        myfile.close();
+    }
+    else {
+        cout << "Error opening file " << file << endl;
+        exit(0);
+    }
+
+}
+
+
+// Return the results as a string. To allow parsing in JSON, uses '|' as a line break.
+string MultipleSequenceAlignment::getPauserAsString(){
+
+
+    if (!this->finishedPauser) return "";
+    
+    
+    string output = "";
+    
+    
+    // Report the evidence per site per sequence for each classifier
+    output += "Sequence,Classifier,EvidencePerSite|";
+    for (int i = 0; i < this->alignment.size(); i ++){
+    
+        Sequence* seq = this->alignment.at(i);
+        int seq_len = this->relativeTimePerLengths.at(i).size();
+        
+        
+        //cout << "i " << i << 
+        
+        // SimPol classifier
+        output += seq->getID().substr(1) + ",simpol,";
+        for (int j = 1; j < seq_len; j ++){
+            output += to_string(this->relativeTimePerLengths.at(i).at(j));
+            if (j < seq_len - 1) output += ",";
+            
+        }
+        output += "|";
+    
+    
+        // NB classifier
+        output += seq->getID().substr(1) + ",nbc, ";
+        for (int j = 1; j < seq_len; j ++){
+            output += to_string(this->NBC_evidence_per_site.at(i).at(j));
+            if (j < seq_len - 1) output += ",";
+        }
+        output += "|";
+    
+    }
+    
+    
+    //cout << "output " << output << endl;
+    return output;
+
+
+
+}

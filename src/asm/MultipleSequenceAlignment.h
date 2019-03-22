@@ -30,7 +30,7 @@
 #include "Simulator.h"
 #include "BayesClassifier.h"
 #include "Plots.h"
-
+#include "SimulatorResultSummary.h"
 
 #include <string>
 #include <list>
@@ -48,7 +48,8 @@ class MultipleSequenceAlignment{
     int currentSequenceForSimulation;
     bool initialisedSimulator;
     bool isAlignment; // Is it an alignment or just a series of sequences?
-    
+    bool finishedPauser;
+    SimulatorResultSummary* current_sequence_summary;
 
     public:
         MultipleSequenceAlignment();
@@ -58,12 +59,16 @@ class MultipleSequenceAlignment{
         string parseFromFastaFile(string filename);
         string toJSON();
         void clear();
-        void Pauser();
+        void Pauser(BayesClassifier* bayes_classifier);
         void Pauser_GUI(Simulator* simulator, BayesClassifier* bayes_classifier, int* result);
         string getCurrentSequence();
         void classify();
         vector<vector<double>> get_relativeTimePerLengths();
         Sequence* getSequenceAtIndex(int index);
+        
+        
+        void printPauserToFile(string file);
+        string getPauserAsString();
         
 
 

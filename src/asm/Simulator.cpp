@@ -271,7 +271,7 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
 			if (!_RUNNING_ABC) this->simulator_plots->updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
 			Settings::sampleAll(); // Resample the parameters
 			delete _currentStateGUI;
-			_currentStateGUI = new State(true, true);
+			_currentStateGUI = new State(true, !_USING_PAUSER);
 		}
 
 	}
@@ -307,9 +307,8 @@ void Simulator::resume_trials_GUI(double* toReturn){
 	for (int n = nTrialsCompletedGUI+1; n <= nTrialsTotalGUI; n ++){
 		//if (n == 1 || n % 100 == 0) cout << "Starting trial " << n << endl;
 		//cout << "Starting trial " << n << endl;
-
+        
 		performSimulation(_currentStateGUI, result);
-
 
 		// If 3rd element is 0, then the current simulation was interrupted by a timeout
 		if (result[2] == 0){
@@ -333,7 +332,7 @@ void Simulator::resume_trials_GUI(double* toReturn){
 		if (!_RUNNING_ABC) this->simulator_plots->updateParameterPlotData(_currentStateGUI); // Update parameter plot before starting next trial
 		Settings::sampleAll(); // Resample the parameters
 		delete _currentStateGUI;
-		_currentStateGUI = new State(true, true);
+		_currentStateGUI = new State(true, !_USING_PAUSER);
 		result[0] = 0;
 		result[1] = 0;
 		result[2] = 0;
@@ -398,7 +397,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 	int checkTimeoutEveryNIterations = 10000;
 	
 	while(!s->isTerminated()){
-
+        
 
 
 		// Check if GUI timeout has been reached (if there is a timeout)
@@ -436,7 +435,7 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 			//cout << "In-simulation timeout reached " << timeElapsed << endl;
 
 
-            // Label the next nucleotide as having been transcribed (so that an arrests do not underinflate pause times)
+            // Label the next nucleotide as having been transcribed (so that arrests do not underinflate pause times)
             this->simulator_plots->update_timeWaitedUntilNextCatalysis(s->get_nascentLength() + 1);
 
 
