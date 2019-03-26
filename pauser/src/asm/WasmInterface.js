@@ -151,7 +151,19 @@ getNtrials = function(msgID = null){
 
 
 
+// Perform a ROC analysis to get AUC and points to plot on a ROC curve
+getROCanalysis = function(msgID = null){
 
+    // Create the callback function
+    var toDoAfterCall = function(resultStr){
+        if (msgID != null) postMessage(msgID + "~X~" + resultStr);
+    }
+    WASM_MESSAGE_LISTENER[msgID] = {resolve: toDoAfterCall};
+
+    
+    Module.ccall("getROCanalysis", null, ["number"], [msgID]);
+
+}
 
 
 

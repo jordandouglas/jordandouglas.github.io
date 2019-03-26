@@ -551,53 +551,73 @@ function getLoaderTemplate(id, msg = ""){
                                         
                                         
                                         
-                                        
-                                        
-                             <div style="margin:20px; margin-bottom:50px">
-                                 
-                                <b style="color:#0B522D">Classifier adequacy</b> 
-                                <a href="about/#Evaluating_classifier_adequacy" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
-                                       
+                             <table style="width:100%"> 
+                                 <tr>
+                                    <td style="vertical-align:top">
+                                         <div style="margin:20px; margin-bottom:50px">
+                                                        
+                                             
+                                            <b style="color:#0B522D">Classifier adequacy</b> 
+                                            <a href="about/#Evaluating_classifier_adequacy" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
+                                                   
+                                                        
+                                            <div id="classifierAdequacy_nodata" style="display:none">
+                                                 Specify the locations of pause sites in one or more sequences in the .fasta file to assess the classifier adequacies.      
+                                                            
+                                            </div>
+                                                        
+                                            <table id="classifierAdequacyTable" style="margin:10px; text-align:center; display:none" cellpadding=0 cellspacing=0> 
                                             
-                                <div id="classifierAdequacy_nodata" style="display:none">
-                                     Specify the locations of pause sites in one or more sequences in the .fasta file to assess the classifier adequacies.      
-                                                
-                                </div>
-                                            
-                                <table id="classifierAdequacyTable" style="margin:10px; text-align:center; display:none" cellpadding=0 cellspacing=0> 
-                                
-                                    <tr style="color:#0B522D">
-                                        <td style="min-width:100px;" title="The accession of any sequences whose pause sites are known.">
-                                             Accession
-                                        </td>
-                                                
-                                                    
-                                        <td style="min-width:100px;" title="The method used to generate classifications.">
-                                             Classifier
-                                        </td>
-                                                    
-                                                              
-                                        <td style="width:100px;" title="Recall / sensitivity / true positive rate. The probability of a known pause site being classified as one under the current threshold.">
-                                             Recall
-                                        </td>
-                                                
-                                                
-                                        <td style="width:100px;" title="The probability of a site classified as a pause site actually being one under the current threshold.">
-                                             Precision
-                                        </td>
-                                                    
-                                                    
-                                        <td style="width:100px" title="The overall percentage of correct classifications under the current threshold.">
-                                             Accuracy
-                                        </td>
-                                                    
-                                            
-                                    </tr>
+                                                <tr style="color:#0B522D">
+                                                    <td style="min-width:100px;" title="The accession of any sequences whose pause sites are known.">
+                                                         Accession
+                                                    </td>
+                                                            
+                                                                
+                                                    <td style="min-width:100px;" title="The method used to generate classifications.">
+                                                         Classifier
+                                                    </td>
+                                                                
+                                                                          
+                                                    <td style="width:100px;" title="Recall / sensitivity / true positive rate. The probability of a known pause site being classified as one under the current threshold.">
+                                                         Recall
+                                                    </td>
+                                                            
+                                                            
+                                                    <td style="width:100px;" title="The probability of a site classified as a pause site actually being one under the current threshold.">
+                                                         Precision
+                                                    </td>
+                                                                
+                                                                
+                                                    <td style="width:100px" title="The overall percentage of correct classifications under the current threshold.">
+                                                         Accuracy
+                                                    </td>
+                                                                
+                                                        
+                                                </tr>
 
 
-                                </table>
-                            </div>
-                                        
+                                            </table>
+                                        </div>
+                                    </td>
+                                                
+                                    <td style="vertical-align:top">
+                                         
+                                          <div style="margin:20px; margin-bottom:50px; text-align:center">
+                                                        
+                                                        
+                                                 <b style="color:#0B522D">ROC curve</b> 
+                                                 <a href="about/#ROC_curve" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
+                                                    <br><br>
+                                                        
+                                                 <canvas id="ROC_curve_canvas" width="0" height="0"></canvas>      
+                                                        
+                                          </div>
+                                                    
+                                    </td>
+                                                
+                                 </tr>
+                             </table>
                                         
                                         
                              <div style="margin:20px">

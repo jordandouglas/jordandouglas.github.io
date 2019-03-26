@@ -133,6 +133,7 @@ function parseAlignment(align_str, resolve = function() { }){
             renderAlignment(); 
             renderPredictionSummary(); 
             renderAdequacyTable();
+            plotROC();
             resolve();
          
 
@@ -212,7 +213,7 @@ function renderAdequacyTable(){
    
      
     // Total row
-    //$("#classifierAdequacyTable").append(getClassifierAdequacyRowTemplate("Average", true));
+    $("#classifierAdequacyTable").append(getClassifierAdequacyRowTemplate("Average", true));
 
 
 
@@ -274,7 +275,7 @@ updatePauserResultDisplays = function(){
         
         $(".positive_class").remove();
         
-        console.log("updatePauserResultDisplays", result);
+       // console.log("updatePauserResultDisplays", result);
         
         
         
@@ -288,8 +289,10 @@ updatePauserResultDisplays = function(){
         
         
         // Update classifier tables and alignment 
-        var n_nucleotides = 0;
-        var nseq_predicted = 0;
+        var nTruePauseSites = 0;
+        var nSimPolPauseSites = 0;
+        var nNBCPauseSites = 0;
+        var nNucleotides = 0;
         for (var acc in NUCLEOTIDE_ALIGNMENT){
         
             var seq = NUCLEOTIDE_ALIGNMENT[acc];
@@ -302,39 +305,46 @@ updatePauserResultDisplays = function(){
             // Update the adequacy table
             if (seq.known_pauseSites != null) {
             
-                nseq_predicted ++;
-                n_nucleotides += seq.seq.length;
+                
                 
                 var adequacy_row = $(`[rowid="ad_` + acc.substr(1) + `"]`);
-                if (seq.simpol_pauseSites != null) {
+                if (seq.pauser_finished) {
+                
+                
+                    
+                    // Update DOM for SimPol accuracy, recall, precision
                     adequacy_row.children(".simpol_recall").html(roundToSF(seq.simpol_recall));
                     adequacy_row.children(".simpol_precision").html(roundToSF(seq.simpol_precision));
                     adequacy_row.children(".simpol_accuracy").html(roundToSF(seq.simpol_accuracy));
-                }
-                
-                if (seq.nbc_pauseSites != null) {
+                    
+                    
+                    // Update DOM for NBC accuracy, recall, precision
                     adequacy_row.children(".nbc_recall").html(roundToSF(seq.nbc_recall));
                     adequacy_row.children(".nbc_precision").html(roundToSF(seq.nbc_precision));
                     adequacy_row.children(".nbc_accuracy").html(roundToSF(seq.nbc_accuracy));
-                }
-                
-                
-                            
-                // Average precision, recall, and accuracy
-                if (seq.simpol_pauseSites != null) {
-                    average_simpol_precision += seq.simpol_recall * seq.simpol_pauseSites.length / seq.known_pauseSites.length;
-                    average_simpol_recall += seq.simpol_precision * seq.known_pauseSites.length / seq.simpol_pauseSites.length;
+                    
+                    
+                    // For computing mean accuracy, recall, precision
+                    nTruePauseSites += seq.known_pauseSites.length;
+                    nSimPolPauseSites += seq.simpol_pauseSites.length;
+                    nNBCPauseSites += seq.nbc_pauseSites.length;
+                    nNucleotides += seq.seq.length;
+                    
+                    
+                    // SimPol average precision, recall, and accuracy
+                    average_simpol_recall += seq.simpol_recall * seq.known_pauseSites.length;
+                    average_simpol_precision += seq.simpol_precision * seq.simpol_pauseSites.length;
                     average_simpol_accuracy += seq.simpol_accuracy * seq.seq.length;
-                }
-                
-                
-                // Average precision, recall, and accuracy
-                if (seq.nbc_pauseSites != null) {
-                    average_nbc_precision += seq.nbc_recall * seq.nbc_pauseSites.length / seq.known_pauseSites.length;
-                    average_nbc_recall += seq.nbc_precision * seq.known_pauseSites.length / seq.nbc_pauseSites.length;
+                    
+                    
+                    // NBC average precision, recall, and accuracy
+                    average_nbc_recall += seq.nbc_recall * seq.known_pauseSites.length;
+                    average_nbc_precision += seq.nbc_precision * seq.nbc_pauseSites.length;
                     average_nbc_accuracy += seq.nbc_accuracy * seq.seq.length;
+                    
+                    
                 }
-                
+                 
                 
             }
             
@@ -387,18 +397,28 @@ updatePauserResultDisplays = function(){
         }
         
         
-        /*
-        console.log("average_simpol_precision", average_simpol_precision, average_nbc_precision);
+        
+        
+        // Finalise average precision, recall, and accuracy calculations
+        average_simpol_precision /= nSimPolPauseSites;
+        average_simpol_recall /= nTruePauseSites;
+        average_simpol_accuracy /= nNucleotides;
+        average_nbc_precision /= nNBCPauseSites;
+        average_nbc_recall /= nTruePauseSites;
+        average_nbc_accuracy /= nNucleotides;
+        
+        
         var average_row = $(`[rowid="ad_Average"]`);
         average_row.children(".simpol_precision").html(roundToSF(average_simpol_precision));
         average_row.children(".simpol_recall").html(roundToSF(average_simpol_recall));
-        average_row.children(".simpol_accuracy").html(roundToSF(average_simpol_accuracy / (n_nucleotides * nseq_predicted)));
+        average_row.children(".simpol_accuracy").html(roundToSF(average_simpol_accuracy));
         
         average_row.children(".nbc_precision").html(roundToSF(average_nbc_precision));
         average_row.children(".nbc_recall").html(roundToSF(average_nbc_recall));
-        average_row.children(".nbc_accuracy").html(roundToSF(average_nbc_accuracy / (n_nucleotides * nseq_predicted)));
-        */
+        average_row.children(".nbc_accuracy").html(roundToSF(average_nbc_accuracy));
         
+        
+        plotROC();
         
     });
 

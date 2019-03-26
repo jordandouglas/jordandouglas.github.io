@@ -479,14 +479,11 @@ function startPauser_controller(resume_simulation = false, resolve = function() 
 
         var afterInit = function(result){
 
-            console.log("afterInit", result);
-
 
             if (result.ntrials_complete != null) {
                 
                 
                 // Only render the results if a sequence has finished
-                console.log("nseqs_complete_prev", nseqs_complete_prev, result.nseqs_complete);
                 if (nseqs_complete_prev < result.nseqs_complete) updatePauserResultDisplays();
                 nseqs_complete_prev = result.nseqs_complete;
                 
@@ -567,6 +564,27 @@ function getResultsFileString_controller(resolve = function(x) { }){
 
 
 }
+
+
+
+// Perform a ROC analysis to get AUC and points to plot on a ROC curve
+function getROCanalysis_controller(  resolve = function() { } ){
+    if (WEB_WORKER_WASM != null){
+
+        
+        var res = stringifyFunction("getROCanalysis", [], true);
+        var fnStr = "wasm_" + res[0];
+        var msgID = res[1];
+        
+        var toCall = (fnStr) => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
+        toCall(fnStr).then((result) => resolve(result));
+        
+    }
+
+
+
+}
+
 
 
 

@@ -111,8 +111,7 @@ extern "C" {
 
         messageFromWasmToJS(parametersJSON, msgID);
 
-        // Clean up
-        free(XMLdata);
+
 
     }
 
@@ -188,6 +187,32 @@ extern "C" {
     }
     
     
+    // Perform a ROC analysis to get AUC and points to plot on a ROC curve
+    void EMSCRIPTEN_KEEPALIVE getROCanalysis(int msgID){
+    
+    
+        string JSON = "{";
+        if (_simpol_AUC_calculator != nullptr && _nbc_AUC_calculator != nullptr) {
+        
+            // SimPol
+            JSON += "'simpol_AUC':" + to_string(1 - _simpol_AUC_calculator->get_chiSquared()) + ",";
+            JSON += "'simpol_ROC':" + _simpol_AUC_calculator->get_ROC_curve_JSON() + ",";
+            
+            // NBC
+            JSON += "'nbc_AUC':" + to_string(1 - _nbc_AUC_calculator->get_chiSquared()) + ",";
+            JSON += "'nbc_ROC':" + _nbc_AUC_calculator->get_ROC_curve_JSON();
+            
+            
+        }
+        JSON += "}";
+        
+        messageFromWasmToJS(JSON, msgID);
+    
+    
+    }
+
+    
+    
 
     // Return a JSON string of the cumulatively calculated pause sites
     void EMSCRIPTEN_KEEPALIVE getPauserResults(int msgID){
@@ -235,8 +260,13 @@ extern "C" {
             _interfaceSimulator = new Simulator(_GUI_PLOTS);
             _simpol_max_evidence = 0;
             _nbc_max_evidence = 0;
+            if (_simpol_AUC_calculator != nullptr) delete _simpol_AUC_calculator;
+            if (_nbc_AUC_calculator != nullptr) delete _nbc_AUC_calculator;
+            _simpol_AUC_calculator = new PosteriorDistributionSample(0, 1, false);
+            _nbc_AUC_calculator = new PosteriorDistributionSample(0, 1, false);
             _GUI_STOP = false;
         }
+        
 
         // Check if told to stop
         if (_GUI_STOP){
@@ -260,7 +290,7 @@ extern "C" {
         
         
         // Perform simulations continuously and then send information back and pause once every 1000ms
-        _PP_multipleSequenceAlignment->Pauser_GUI(_interfaceSimulator, _NBC_classifier, result);
+        _PP_multipleSequenceAlignment->Pauser_GUI(_interfaceSimulator, _NBC_classifier, _simpol_AUC_calculator, _nbc_AUC_calculator, result);
         
         
 
@@ -288,7 +318,6 @@ extern "C" {
         toReturnJSON += "'ntrials_complete':" + to_string(ntrials_complete);
         toReturnJSON += "}";
 
-        cout << toReturnJSON << endl;
 
         messageFromWasmToJS(toReturnJSON, msgID);
             
