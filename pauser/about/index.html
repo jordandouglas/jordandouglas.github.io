@@ -456,7 +456,7 @@ function addCitations(){
                                                     Optionally, a session file may be generated using SimPol and uploaded to Pauser, in .xml format. This will determine the kinetic model to use for
                                                     predicting pause sites. The session file specifies the parameters and model settings, including their prior distributions, and the number of simulations
                                                     to perform per sequence. The default XML file can be viewed <a href="../pauser.xml" class="xml_link">here</a> and session files can be generated at 
-                                                    <a style="color:#A5CF19" href="www.polymerase.nz/simpol">www.polymerase.nz/simpol</a>.
+                                                    <a style="color:#A5CF19" href="http://www.polymerase.nz/simpol">www.polymerase.nz/simpol</a>.
                                                     
                                                     
                                                    
@@ -501,9 +501,9 @@ function addCitations(){
                                     
                                         <br><br>
                                         Upon beginning Pauser, each uploaded sequence is analysed by two classifiers - SimPol and a Naive Bayes classifier (NBC). 
-                                        Each classifier calculates the <b>evidence</b> of any given site being a pause site. Interpetation of evidence differs between classifiers.
+                                        Each classifier calculates the <b>evidence</b> of each site being a pause site. Interpretation of evidence differs between classifiers.
                                         The evidence threshold of each classifier can be adjusted independently. Low thresholds result in more sites classified as pause sites, and
-                                        a high threshold results in fewer sites classified as pause sites.
+                                        higher thresholds result in fewer pause classifications.
                                     
                                                     
                                         <div class="about-block">
@@ -581,11 +581,11 @@ function addCitations(){
                                                     are given. Let $T_i = \mathcal{P}$ if site $i$ is a known pause site, and let $T_i = \mathcal{N}$ if $i$ is known to not be a pause site.
                                             
                                                     <br><br>
-                                                    <b>Recall</b> is the probability of a true pause being classified as a pause: $P(C_i = \mathcal{P}|T_i  = \mathcal{P}) = \frac{P(C_i = \mathcal{P} \; \cap \; T_i  = \mathcal{P}}{T_i  = \mathcal{P}}$
+                                                    <b>Recall</b> is the probability of a true pause being classified as a pause: $P(C_i = \mathcal{P}|T_i  = \mathcal{P}) = \frac{P(C_i = \mathcal{P} \; \cap \; T_i  = \mathcal{P})}{P(T_i  = \mathcal{P})}$
                                             
                                                     
                                                     <br><br>
-                                                    <b>Precision</b> is the probability that a site classified as a pause is actually a pause: $P(T_i = \mathcal{P}|C_i  = \mathcal{P}) = \frac{P(C_i = \mathcal{P} \; \cap \; T_i  = \mathcal{P}}{C_i  = \mathcal{P}}$
+                                                    <b>Precision</b> is the probability that a site classified as a pause is actually a pause: $P(T_i = \mathcal{P}|C_i  = \mathcal{P}) = \frac{P(C_i = \mathcal{P} \; \cap \; T_i  = \mathcal{P})}{P(C_i  = \mathcal{P})}$
                                             
                                             
                                             
