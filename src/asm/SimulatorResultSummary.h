@@ -53,6 +53,7 @@ class SimulatorResultSummary{
 		void clear();
 
         void add_proportionOfTimePerLength(list<vector<double>> newProportionsOfTimePerLength);
+        void add_proportionOfTimePerLength(vector<double> newProportionsOfTimePerLength);
         list<vector<double>> get_proportionOfTimePerLength();
         void compute_meanRelativeTimePerLength();
         vector<double> get_meanRelativeTimePerLength();

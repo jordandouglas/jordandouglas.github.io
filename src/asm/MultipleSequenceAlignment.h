@@ -31,6 +31,7 @@
 #include "BayesClassifier.h"
 #include "Plots.h"
 #include "SimulatorResultSummary.h"
+#include "PosteriorDistributionSample.h"
 
 #include <string>
 #include <list>
@@ -60,7 +61,7 @@ class MultipleSequenceAlignment{
         string toJSON();
         void clear();
         void Pauser(BayesClassifier* bayes_classifier);
-        void Pauser_GUI(Simulator* simulator, BayesClassifier* bayes_classifier, int* result);
+        void Pauser_GUI(Simulator* simulator, BayesClassifier* bayes_classifier, PosteriorDistributionSample* simpol_AUC_calculator, PosteriorDistributionSample* nbc_AUC_calculator, int* result);
         string getCurrentSequence();
         void classify();
         vector<vector<double>> get_relativeTimePerLengths();

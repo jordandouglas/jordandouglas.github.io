@@ -211,7 +211,7 @@ vector<double> BayesClassifier::get_evidence_per_site(Sequence* seq, double minE
 
 		double score = log_posterior_positive - log_posterior_negative;
         double normalisedScore = (score - minEvidence) / (maxEvidence - minEvidence);
-		evidence.at(site + 1) = normalisedScore;
+		evidence.at(site) = normalisedScore;
 		
 	}
 

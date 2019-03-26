@@ -47,6 +47,7 @@ Sequence::Sequence(string seqID, string TemplateType, string PrimerType, string 
 
     this->MSAsequence = "";
     this->nsitesMSA = 0;
+    this->pauser_finished = false;
 }
 
 // MSA sequence (gaps allowed)
@@ -69,6 +70,7 @@ Sequence::Sequence(string seqID, string MSAsequence){
     this->translocationRatesCache = new TranslocationRatesCache();
 
     this->nsitesMSA = this->MSAsequence.size();
+    this->pauser_finished = false;
 
 }
 
@@ -147,6 +149,9 @@ string Sequence::toJSON(){
     
     if (_USING_PAUSER) {
     
+    
+        parametersJSON += ",'pauser_finished':" + string(this->pauser_finished ? "true" : "false");
+        
     
         // Locations of known pause sites
         if (this->known_pauseSites.size() > 0){
@@ -304,6 +309,27 @@ void Sequence::set_simpol_pauseSites(list<int> pauses){
 void Sequence::set_nbc_pauseSites(list<int> pauses){
     vector<int> temp{ std::begin(pauses), std::end(pauses) };
     this->nbc_pauseSites = temp;
+}
+
+// Get the true known locations of pause sites.
+vector<int> Sequence::get_known_pauseSites(){
+    return this->known_pauseSites;
+}
+
+// Get the locations of pause sites, according to the SimPol classifier
+vector<int> Sequence::get_simpol_pauseSites(){
+    return this->simpol_pauseSites;
+}
+
+// Get the locations of pause sites, according to the NBC classifier
+vector<int> Sequence::get_nbc_pauseSites(){
+    return this->nbc_pauseSites;
+}
+
+
+// Flag the sequence for Pauser having finished all predictions on this sequence
+void Sequence::flag_pauser_finished(bool setTo){
+    this->pauser_finished = setTo;
 }
 
 

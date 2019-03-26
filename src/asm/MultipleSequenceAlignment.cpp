@@ -28,6 +28,7 @@
 #include "MultipleSequenceAlignment.h"
 #include "Settings.h"
 #include "SimulatorPthread.h"
+#include "ExperimentalData.h"
 
 #include <regex>
 #include <algorithm>
@@ -359,7 +360,6 @@ string MultipleSequenceAlignment::toJSON(){
 // Updates the sequences in the alignment by adding pause sites to them
 void MultipleSequenceAlignment::classify(){
     
-    cout << "Classifying" << endl;
     for (int i = 0; i < this->relativeTimePerLengths.size(); i ++){
         
         string accession = this->alignment.at(i)->getID();
@@ -394,7 +394,7 @@ void MultipleSequenceAlignment::classify(){
         this->alignment.at(i)->set_nbc_pauseSites(nbc_pauseSites_list);
 
     }
-
+    
 
 }
 
@@ -496,6 +496,7 @@ void MultipleSequenceAlignment::Pauser(BayesClassifier* bayes_classifier){
 
         // Clear the rate table to liberate memory
         currentSeq->deconstructRateTable();
+        currentSeq->flag_pauser_finished(true);
         sequence_summary->clear();
         delete sequence_summary;
 
@@ -516,7 +517,7 @@ void MultipleSequenceAlignment::Pauser(BayesClassifier* bayes_classifier){
 
 
 // Perform simulations on each sequence in the alignment. GUI only
-void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, BayesClassifier* bayes_classifier, int* result){
+void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, BayesClassifier* bayes_classifier, PosteriorDistributionSample* simpol_AUC_calculator, PosteriorDistributionSample* nbc_AUC_calculator, int* result){
 
     
     bool timeoutReached = false;
@@ -534,7 +535,24 @@ void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, BayesClassifier
             // Naive Bayes classifier for sequence first
             vector<double> NBC_seq = bayes_classifier->get_evidence_per_site(currentSeq, _nbc_min_evidence, _nbc_max_evidence);
             this->NBC_evidence_per_site.at(currentSequenceForSimulation) = NBC_seq;
-        
+            
+            
+            // Add the NBC predicted pause sites of this sequence to the AUC calculator
+            if (currentSeq->get_known_pauseSites().size() > 0){
+                ExperimentalData* pauseSiteData = new ExperimentalData(-1, "pauseSites", currentSeq->get_known_pauseSites().size());
+                pauseSiteData->set_pauseSiteIndices(currentSeq->get_known_pauseSites());
+                SimulatorResultSummary* temp = new SimulatorResultSummary(ntrials_sim);
+                temp->add_proportionOfTimePerLength(NBC_seq);
+                temp->compute_meanRelativeTimePerLength();
+                nbc_AUC_calculator->addSimulatedAndObservedValue(temp, pauseSiteData);
+                nbc_AUC_calculator->calculateAUC(true, true);
+                
+                // Clean-up
+                pauseSiteData->clear();
+                delete pauseSiteData;
+                temp->clear();
+                delete temp;
+            }
             
             
             this->initialisedSimulator = true;
@@ -605,9 +623,20 @@ void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, BayesClassifier
         }
         
         
+        // Add the predicted pause sites of this sequence to the AUC calculator
+        if (currentSeq->get_known_pauseSites().size() > 0){
+            ExperimentalData* pauseSiteData = new ExperimentalData(-1, "pauseSites", currentSeq->get_known_pauseSites().size());
+            pauseSiteData->set_pauseSiteIndices(currentSeq->get_known_pauseSites());
+            simpol_AUC_calculator->addSimulatedAndObservedValue(this->current_sequence_summary, pauseSiteData);
+            simpol_AUC_calculator->calculateAUC(true, true);
+            pauseSiteData->clear();
+            delete pauseSiteData;
+        }
+        
 
         // Clear the rate table to liberate memory
         currentSeq->deconstructRateTable();
+        currentSeq->flag_pauser_finished(true);
         this->current_sequence_summary->clear();
 
         this->initialisedSimulator = false;

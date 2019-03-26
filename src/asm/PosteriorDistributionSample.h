@@ -55,6 +55,7 @@ class PosteriorDistributionSample {
     list<double> meanDwellTimes_pauseSites;
     list<double> meanDwellTimes_notpauseSites;
     bool haveCalculatedAUC;
+    string ROC_curve_JSON;
 
 
     public:
@@ -76,7 +77,7 @@ class PosteriorDistributionSample {
     	vector<string> getParameterNames();
     	//void addSimulatedAndObservedValue(double simVal, double obsVal);
     	void addSimulatedAndObservedValue(SimulatorResultSummary* simulated, ExperimentalData* observed);
-        void calculateAUC(string printROCToFile);
+        void calculateAUC(bool saveString, bool calculateAgain);
     	void parseFromLogFileLine(vector<string> splitLine, vector<string> headerLineSplit);
     	bool isABC();
 		
@@ -85,6 +86,7 @@ class PosteriorDistributionSample {
     	string toJSON();
     	void loadFromLogFile(string filename);
     	void setParametersFromState();
+        string get_ROC_curve_JSON();
         //void clear();
 
 

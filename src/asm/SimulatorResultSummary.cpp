@@ -80,6 +80,11 @@ void SimulatorResultSummary::add_proportionOfTimePerLength(list<vector<double>> 
 }
 
 
+void SimulatorResultSummary::add_proportionOfTimePerLength(vector<double> newProportionsOfTimePerLength){
+    this->proportionOfTimePerLength.push_back(newProportionsOfTimePerLength);
+}
+
+
 // Return the mean time spent at each length
 vector<double> SimulatorResultSummary::get_meanRelativeTimePerLength(){
     return this->meanRelativeTimePerLength;

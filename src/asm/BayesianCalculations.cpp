@@ -482,7 +482,7 @@ void BayesianCalculations::perform_1_rejectionABC_iteration(PosteriorDistributio
     
     
     // Finished all experiments. Calculate the AUC of this state (if evaluating pause sites)
-    state->calculateAUC("");
+    state->calculateAUC(false, false);
 
 
 

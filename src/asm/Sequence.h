@@ -53,6 +53,7 @@ class Sequence{
     vector<int> known_pauseSites;
     vector<int> simpol_pauseSites;
     vector<int> nbc_pauseSites;
+    bool pauser_finished;
     
 
 	public:
@@ -91,7 +92,10 @@ class Sequence{
         string set_known_pauseSites(list<int> pauses);
         void set_simpol_pauseSites(list<int> pauses);
         void set_nbc_pauseSites(list<int> pauses);
-       
+        vector<int> get_known_pauseSites();
+        vector<int> get_simpol_pauseSites();
+        vector<int> get_nbc_pauseSites();
+        void flag_pauser_finished(bool setTo);
 
 };
 

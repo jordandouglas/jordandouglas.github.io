@@ -100,7 +100,6 @@ void MCMC::initMCMC(bool uploadingLogFile, bool performFirstSimulation){
 
 	// 2 states stored in memory
 	MCMC::previousMCMCstate = new PosteriorDistributionSample(0, _numExperimentalObservations, true);
-	// MCMC::currentMCMCstate = new PosteriorDistributionSample(0);
 
 
     MCMC::initialised = true;
@@ -439,7 +438,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistributionSample* this_M
 
 
     // Finished all experiments. Calculate the AUC of this state (if evaluating pause sites)
-    this_MCMCState->calculateAUC("");
+    this_MCMCState->calculateAUC(false, false);
 
 	// Exceeds threshold -> reject
 	if (this_MCMCState->get_chiSquared() > MCMC::epsilon && sampleNum > 0) return false;

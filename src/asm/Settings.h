@@ -157,6 +157,7 @@ extern list<PosteriorDistributionSample*> _GUI_posterior;
 extern map<int, list<PosteriorDistributionSample*>> _gelPosteriorDistributions; // All posterior distributions for gel calibrations
 extern Plots* _GUI_PLOTS;
 
+
 // Pauser
 extern MultipleSequenceAlignment* _PP_multipleSequenceAlignment;
 extern bool _USING_PAUSER;
@@ -166,7 +167,8 @@ extern double _nbc_evidence_threshold;
 extern double _nbc_min_evidence;
 extern double _nbc_max_evidence;
 extern BayesClassifier* _NBC_classifier;
-
+extern PosteriorDistributionSample* _simpol_AUC_calculator;
+extern PosteriorDistributionSample* _nbc_AUC_calculator;
 
 // Parameters
 extern Parameter *NTPconc;

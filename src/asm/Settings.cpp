@@ -205,12 +205,14 @@ Plots* _GUI_PLOTS;
 // Pauser
 MultipleSequenceAlignment* _PP_multipleSequenceAlignment;
 bool _USING_PAUSER = false;
-double _simpol_evidence_threshold = 0.5;
+double _simpol_evidence_threshold = 0.3;
 double _simpol_max_evidence = 0;
 double _nbc_evidence_threshold = 0.5;
 double _nbc_min_evidence = 0;
 double _nbc_max_evidence = 0;
 BayesClassifier* _NBC_classifier;
+PosteriorDistributionSample* _simpol_AUC_calculator;
+PosteriorDistributionSample* _nbc_AUC_calculator;
 
 
 void Settings::init(){

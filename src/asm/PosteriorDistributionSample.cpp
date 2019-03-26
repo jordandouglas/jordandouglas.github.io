@@ -43,6 +43,7 @@ PosteriorDistributionSample::PosteriorDistributionSample(int sampleNum, int numE
 	this->logPriorProb = 1;
 	this->modelIndicator = "";
     this->haveCalculatedAUC = false;
+    this->ROC_curve_JSON = "";
 
 	this->ABC = ABC;
 	if (!this->ABC){
@@ -62,7 +63,7 @@ PosteriorDistributionSample* PosteriorDistributionSample::clone(bool copySimulat
 	copy->logPriorProb = this->logPriorProb;
 	copy->logPosterior = this->logPosterior;
 	copy->logLikelihood = this->logLikelihood;
-
+    copy->ROC_curve_JSON = this->ROC_curve_JSON; 
 
 	// Copy parameters
 	for(std::map<string, double>::iterator iter = this->parameterEstimates.begin(); iter != this->parameterEstimates.end(); ++ iter){
@@ -169,10 +170,13 @@ vector<string> PosteriorDistributionSample::getParameterNames(){
 
 // Calculate the AUC of this state and add 1-AUC to the X2
 // Only applicable if pause sites are being fit to, and if the AUC has not already been calculated
-void PosteriorDistributionSample::calculateAUC(string printROCToFile){
+// Stores a string of values to plot if saveString is enabled
+void PosteriorDistributionSample::calculateAUC(bool saveString, bool calculateAgain){
 
+    cout << "calculateAUC" << endl;
 
-    if ((this->meanDwellTimes_pauseSites.size() == 0 && this->meanDwellTimes_notpauseSites.size() == 0) || this->haveCalculatedAUC) return;
+    if (this->meanDwellTimes_pauseSites.size() == 0 && this->meanDwellTimes_notpauseSites.size() == 0) return;
+    if (!calculateAgain && this->haveCalculatedAUC) return;
     this->haveCalculatedAUC = true;
 
 
@@ -189,7 +193,7 @@ void PosteriorDistributionSample::calculateAUC(string printROCToFile){
     
     
     // If any given gene has a zero ratio between pause-times and non-pause-times, set AUC to 0
-    for (int i = 0; i < this->simulatedValues.size(); i ++){
+    for (int i = 0; !_USING_PAUSER && i < this->simulatedValues.size(); i ++){
         if (stof(this->simulatedValues.at(i)) == 0){
             double AUC = 0;
             //cout << "gene_" << i << ": 1-AUC " << 1-AUC << endl;
@@ -308,48 +312,31 @@ void PosteriorDistributionSample::calculateAUC(string printROCToFile){
     //cout << "1-AUC " << 1-AUC << endl;
     
     
-    // Print the TP and FP rates
-    if (printROCToFile != ""){
+    // Save the TP and FP rates to a string
+    if (saveString){
     
         
-        ofstream rocFile;
-        rocFile.open(printROCToFile, ios_base::app);
-        if (!rocFile.is_open()) {
-            cout << "Cannot open file " << printROCToFile << endl;
-            exit(0);
-        }
-        rocFile.precision(10);
-        rocFile.setf(ios::fixed);
-        rocFile.setf(ios::showpoint); 
+        this->ROC_curve_JSON = "{";
         
-        
-        rocFile << "===NewSimulation===" << endl;
-        
-        
-        rocFile << "FP\tTP" << endl;
+        // X-axis (false positive rates)
+        this->ROC_curve_JSON += "'FP':[";
         for (int i = 0; i < ROC_curve.size(); i ++){
-            rocFile << ROC_curve.at(i).at(0) << "\t" << ROC_curve.at(i).at(1) << endl;
+            this->ROC_curve_JSON += to_string(ROC_curve.at(i).at(0));
+            if (i < ROC_curve.size() - 1) this->ROC_curve_JSON += ",";
         }
-        rocFile << endl;
+        this->ROC_curve_JSON += "],";
         
         
         
-        /*
-        for(list<double>::iterator it = this->meanDwellTimes_pauseSites.begin(); it != this->meanDwellTimes_pauseSites.end(); ++it){
-            rocFile << *it << ",";
+        // Y-axis (true positive rates)
+        this->ROC_curve_JSON += "'TP':[";
+        for (int i = 0; i < ROC_curve.size(); i ++){
+            this->ROC_curve_JSON += to_string(ROC_curve.at(i).at(1));
+            if (i < ROC_curve.size() - 1) this->ROC_curve_JSON += ",";
         }
-        rocFile << 0 << endl;
-        
-        
-        for(list<double>::iterator it = this->meanDwellTimes_notpauseSites.begin(); it != this->meanDwellTimes_notpauseSites.end(); ++it){
-            rocFile << *it << ",";
-        }
-        rocFile << 0 << endl;
-        */
-        
+        this->ROC_curve_JSON += "]";
+        this->ROC_curve_JSON += "}";
             
-        rocFile.close();
-        
     }
     
     
@@ -375,9 +362,12 @@ void PosteriorDistributionSample::calculateAUC(string printROCToFile){
     // Ensure AUC does not go over 1 due to numerical integration
     AUC = min(AUC, 1.0);
 
-
+    
+    cout << "AUC " << AUC << endl;
+    
     // Add 1-AUC to the X2
-    this->chiSquared += 1-AUC;
+    if (calculateAgain) this->chiSquared = 1-AUC;
+    else this->chiSquared += 1-AUC;
 
 
 }
@@ -386,11 +376,10 @@ void PosteriorDistributionSample::calculateAUC(string printROCToFile){
 // Cache the simulated value, and use the simulated and observed values to update the chi squared test statistic
 void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSummary* simulated, ExperimentalData* observed){
 
+    cout << "Adding data for " << observed->getDataType() << endl;
 
-
-	if (this->currentObsNum >= this->simulatedValues.size()) return;
+    if (this->currentObsNum >= this->simulatedValues.size() && observed->getDataType() != "pauseSites") return;
 	
-
 	// If time gel then compare distribution of lengths
 	if (observed->getDataType() == "timeGel"){
 		
@@ -584,7 +573,10 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 
 	// Compare the transcript lengths at this time with the known pause sites
 	else if (observed->getDataType() == "pauseSites"){
-
+    
+    
+        cout << "Adding pauseSites" << endl;
+    
         vector<double> relativeDwellTimes = simulated->get_meanRelativeTimePerLength();
 
         // Do not calculate X2 until the very end of all experiments. Cache the relative dwell times and come back to them later
@@ -625,7 +617,7 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
         meanNonPauseTime = meanNonPauseTime / nNonpauses;
         double ratio = meanPauseTime / meanNonPauseTime;
         if (isnan(ratio) || isinf(ratio)) ratio = 0;
-        this->simulatedValues.at(this->currentObsNum) = to_string(ratio);
+        if (!_USING_PAUSER) this->simulatedValues.at(this->currentObsNum) = to_string(ratio);
 	    this->chiSquared += 0;
 
 	}
@@ -1018,3 +1010,6 @@ void PosteriorDistributionSample::setParametersFromState(){
 }
 
 
+string PosteriorDistributionSample::get_ROC_curve_JSON(){
+    return this->ROC_curve_JSON;
+}
