@@ -11,7 +11,7 @@ An interactive graphical simulator of nucleic acid polymerases. SimPol is writte
 
 To run the program on a web browser go to http://www.polymerase.nz. 
 
-For instructions on running the SimPol C++ module from the command line see http://www.polymerase.nz/simpol/about/#fromCommandLine_performance
+For instructions on running the SimPol C++ module from the command line see http://www.polymerase.nz/simpol/about/#Running_SimPol_from_the_command_line
 
 
 
