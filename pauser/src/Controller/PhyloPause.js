@@ -136,7 +136,7 @@ function download(filename, text) {
 // Plot ROC curve and AUC
 function plotROC(){
 
-
+    if (!$("#ROC_curve_td").is(":visible")) return;
 
     getROCanalysis_controller(function(result) {
     

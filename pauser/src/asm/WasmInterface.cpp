@@ -195,12 +195,12 @@ extern "C" {
         if (_simpol_AUC_calculator != nullptr && _nbc_AUC_calculator != nullptr) {
         
             // SimPol
-            JSON += "'simpol_AUC':" + to_string(1 - _simpol_AUC_calculator->get_chiSquared()) + ",";
-            JSON += "'simpol_ROC':" + _simpol_AUC_calculator->get_ROC_curve_JSON() + ",";
+            JSON += "'simpol_AUC':" + to_string(1 - _simpol_AUC_calculator->get_chiSquared());
+            if (_simpol_AUC_calculator->get_ROC_curve_JSON() != "") JSON += ",'simpol_ROC':" + _simpol_AUC_calculator->get_ROC_curve_JSON() + ",";
             
             // NBC
-            JSON += "'nbc_AUC':" + to_string(1 - _nbc_AUC_calculator->get_chiSquared()) + ",";
-            JSON += "'nbc_ROC':" + _nbc_AUC_calculator->get_ROC_curve_JSON();
+            JSON += ",'nbc_AUC':" + to_string(1 - _nbc_AUC_calculator->get_chiSquared());
+            if (_nbc_AUC_calculator->get_ROC_curve_JSON() != "") JSON += ",'nbc_ROC':" + _nbc_AUC_calculator->get_ROC_curve_JSON();
             
             
         }
@@ -262,8 +262,8 @@ extern "C" {
             _nbc_max_evidence = 0;
             if (_simpol_AUC_calculator != nullptr) delete _simpol_AUC_calculator;
             if (_nbc_AUC_calculator != nullptr) delete _nbc_AUC_calculator;
-            _simpol_AUC_calculator = new PosteriorDistributionSample(0, 1, false);
-            _nbc_AUC_calculator = new PosteriorDistributionSample(0, 1, false);
+            _simpol_AUC_calculator = new PosteriorDistributionSample(0, 1, true);
+            _nbc_AUC_calculator = new PosteriorDistributionSample(0, 1, true);
             _GUI_STOP = false;
         }
         

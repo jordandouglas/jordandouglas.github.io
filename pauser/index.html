@@ -39,7 +39,7 @@
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/Session.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/NBC.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/WebWorkerMessager.js"></script>
-
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/interactiveHelp.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -100,31 +100,12 @@ function init(){
         if (location.href.indexOf("?") != -1){
             
             var search = location.search.substring(1);
-            var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
-
-            console.log("JSONurl", JSONurl);
-
-            // Load alignment first
-            if (JSONurl.a != null){
-
-                var alignmentURL = "http://www.polymerase.nz/pauser/about/Examples/" + JSONurl.a;
-                uploadAlignmentFromURL(alignmentURL, function() {
-
-
-                    // Check if there is a tree
-                    if (JSONurl.t != null){
-
-                        var treeURL = "http://www.polymerase.nz/pauser/about/Examples/" + JSONurl.t;
-                        uploadTreeFromURL(treeURL, function() {
-
-
-                        });
-
-                    }
-
-                });
-            }
+            var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
             
+    
+            if (JSONurl.biophys != null) {
+                begin_tutorial("biophys" + JSONurl.biophys);
+            }
 
             
         }
@@ -601,7 +582,7 @@ function getLoaderTemplate(id, msg = ""){
                                         </div>
                                     </td>
                                                 
-                                    <td style="vertical-align:top">
+                                    <td id="ROC_curve_td" style="vertical-align:top">
                                          
                                           <div style="margin:20px; margin-bottom:50px; text-align:center">
                                                         
