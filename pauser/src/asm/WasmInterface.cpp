@@ -196,7 +196,7 @@ extern "C" {
         
             // SimPol
             JSON += "'simpol_AUC':" + to_string(1 - _simpol_AUC_calculator->get_chiSquared());
-            if (_simpol_AUC_calculator->get_ROC_curve_JSON() != "") JSON += ",'simpol_ROC':" + _simpol_AUC_calculator->get_ROC_curve_JSON() + ",";
+            if (_simpol_AUC_calculator->get_ROC_curve_JSON() != "") JSON += ",'simpol_ROC':" + _simpol_AUC_calculator->get_ROC_curve_JSON();
             
             // NBC
             JSON += ",'nbc_AUC':" + to_string(1 - _nbc_AUC_calculator->get_chiSquared());

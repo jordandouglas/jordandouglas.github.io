@@ -264,7 +264,7 @@ startPauser = function(resume = false, msgID = null){
 
             // Resume the trials and tell the messenger to not delete the message
             if (msgID != null) postMessage(msgID + "~X~" + resultStr);
-            resumePhyloPause(msgID);
+            (msgID);
         }
     }
 
@@ -329,7 +329,7 @@ updateThreshold = function(classifier, threshold, msgID = null){
 
 
 // Resume simulations from before continuing from the current state and time elapsed
-resumePhyloPause = function(msgID = null){
+resumePauser = function(msgID = null){
 
 
 
@@ -352,7 +352,7 @@ resumePhyloPause = function(msgID = null){
              
                 // Resume the trials and tell the messenger to not delete the message
                 if (msgID != null) postMessage(msgID + "~X~" + resultStr);
-                resumePhyloPause(msgID);
+                resumePauser(msgID);
             }
         }
 

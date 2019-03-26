@@ -265,11 +265,14 @@ function renderAlignment(resolve = function() { }){
 
 
 // Add pause sites to the multiple sequence alignment on the DOM
-updatePauserResultDisplays = function(){
+updatePauserResultDisplays = function(resolve = function() { }){
 
 
     
     getPauserResults_controller(function(result){
+    
+    
+        resolve();
     
         NUCLEOTIDE_ALIGNMENT = result.sequences.alignment;
         
