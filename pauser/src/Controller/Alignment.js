@@ -43,6 +43,7 @@ function uploadAlignmentFromURL(url, resolve = function() { }){
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
         
+        
           
             if (xhttp == null || xhttp.responseXML == "") return;
             
@@ -265,14 +266,11 @@ function renderAlignment(resolve = function() { }){
 
 
 // Add pause sites to the multiple sequence alignment on the DOM
-updatePauserResultDisplays = function(resolve = function() { }){
+updatePauserResultDisplays = function(){
 
 
     
     getPauserResults_controller(function(result){
-    
-    
-        resolve();
     
         NUCLEOTIDE_ALIGNMENT = result.sequences.alignment;
         

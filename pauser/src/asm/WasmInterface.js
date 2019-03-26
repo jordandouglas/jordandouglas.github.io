@@ -264,7 +264,7 @@ startPauser = function(resume = false, msgID = null){
 
             // Resume the trials and tell the messenger to not delete the message
             if (msgID != null) postMessage(msgID + "~X~" + resultStr);
-            (msgID);
+            resumePauser(msgID);
         }
     }
 

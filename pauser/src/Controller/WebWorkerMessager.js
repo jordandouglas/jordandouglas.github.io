@@ -479,7 +479,7 @@ function startPauser_controller(resume_simulation = false, resolve = function() 
 
         var afterInit = function(result){
 
-        
+
             if (result.ntrials_complete != null) {
                 
                 
