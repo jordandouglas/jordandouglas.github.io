@@ -129,16 +129,20 @@ BIBLIOGRAPHY["lecca2013stochastic"] = {name: `Lecca, Paola. "Stochastic chemical
 BIBLIOGRAPHY["fawcett2006introduction"] = {name: `Fawcett, Tom. "An introduction to ROC analysis." Pattern recognition letters 27.8 (2006): 861-874.`, DOI: "10.1016/j.patrec.2005.10.010"};
 BIBLIOGRAPHY["ratmann2007using"] = {name: `Ratmann, Oliver, et al. "Using likelihood-free inference to compare evolutionary dynamics of the protein networks of H. pylori and P. falciparum." PLoS Computational Biology 3.11 (2007): e230.`, DOI: "10.1371/journal.pcbi.0030230"};
 BIBLIOGRAPHY["hastings1970monte"] = {name: `Hastings, W. Keith. "Monte Carlo sampling methods using Markov chains and their applications." (1970): 97-109.`, DOI: "10.1093/biomet/57.1.97"};
+BIBLIOGRAPHY["herbert2006sequence"] = {name: `Herbert, Kristina M., et al. "Sequence-resolved detection of pausing by single RNA polymerase molecules." Cell 125.6 (2006): 1083-1094.`, DOI: "10.1016/j.cell.2006.04.032"};
+BIBLIOGRAPHY["larson2014pause"] = {name: `Larson, Matthew H., et al. "A pause sequence enriched at translation start sites drives transcription dynamics in vivo." Science 344.6187 (2014): 1042-1047.`, DOI: "10.1126/science.1251871"};
+BIBLIOGRAPHY["winkler2002mrna"] = {name: `Winkler, Wade C., Smadar Cohen-Chalamish, and Ronald R. Breaker. "An mRNA structure that controls gene expression by binding FMN." Proceedings of the National Academy of Sciences 99.25 (2002): 15908-15913.`, DOI: "10.1073/pnas.212628899"};
+BIBLIOGRAPHY["de2003slow"] = {name: `de la Mata, Manuel, et al. "A slow RNA polymerase II affects alternative splicing in vivo." Molecular cell 12.2 (2003): 525-532.`, DOI: "10.1016/j.molcel.2003.08.001"};
+BIBLIOGRAPHY["fawcett2006introduction"] = {name: `Fawcett, Tom. "An introduction to ROC analysis." Pattern recognition letters 27.8 (2006): 861-874.`, DOI: "10.1016/j.patrec.2005.10.010"};
 
 
-
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
-
+BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 
 
 
