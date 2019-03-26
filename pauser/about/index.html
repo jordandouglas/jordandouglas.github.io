@@ -335,7 +335,26 @@ function addCitations(){
 						<div class="block-subtitle" style="font-size:45px"> Prediction of transcriptional pause sites </div> <br>
 					
 						<b>Disclaimer:</b> Pauser is currently in prerelease. It has not been peer-reviewed or published. <br><br>
+                            
+                            
+                         Transcription elongation is carried out by RNA polymerase (RNAP). This involves RNAP translocating the DNA in the $3^\prime \rightarrow 5^\prime$ direction, while 
+                         the RNA grows sequentially in the $5^\prime \rightarrow 3^\prime$ direction.
+                         In prokaryotes and eukaryotes, this process occurs at a mean rate of 20-100 bp/s<cite val="ryals1982temperature,vogel1994rna,mason2005distinction"></cite>.
+                         However, individual RNAP molecules proceed erractically along their template. Approximately once every 100 bp there exists a pause site<cite val="herbert2006sequence,larson2014pause"></cite>, 
+                         at which RNAP can take seconds or minutes to transcribe. Transcriptional pausing plays a range of important biological roles in gene expression<cite val="winkler2002mrna,palangat1998transcriptional,de2003slow"></cite>.
                          
+                            
+                            <br><br>
+                            
+                        Pauser is a web-based program dedicated to predicting the locations of pause sites in gene sequences in a binary classification framework.
+                            
+                       
+                            
+                        The two predictors - <span style="color:#008cba">SimPol</span> and a <span style="color:#FFA500">Naive Bayes classifier</span> - were trained on the <i>E. coli</i> RNAP using published data<cite val="larson2014pause"></cite>.
+                        
+                            
+                            
+                            
 				
 					</div>
 				</div>
@@ -421,11 +440,6 @@ function addCitations(){
                                                     </div>
                                                 
                                                 
-                                                    Alternatively, a multiple sequence alignment of homologous sequences may be uploaded. If a gap <span class="code">-</span> is present in any sequence, 
-                                                    then it will be assumed that the sequences form an alignment. In this case, all sequences must be the same length.
-                                                    
-                                                   
-                                                    
             
                                             </div>
                                         </div>
@@ -441,7 +455,8 @@ function addCitations(){
                                                 
                                                     Optionally, a session file may be generated using SimPol and uploaded to Pauser, in .xml format. This will determine the kinetic model to use for
                                                     predicting pause sites. The session file specifies the parameters and model settings, including their prior distributions, and the number of simulations
-                                                    to perform per sequence. The default XML file can be viewed <a href="../pauser.xml" class="xml_link">here</a>.
+                                                    to perform per sequence. The default XML file can be viewed <a href="../pauser.xml" class="xml_link">here</a> and session files can be generated at 
+                                                    <a style="color:#A5CF19" href="www.polymerase.nz/simpol">www.polymerase.nz/simpol</a>.
                                                     
                                                     
                                                    
@@ -477,24 +492,75 @@ function addCitations(){
                                     <div class="about-block-inner">
                                                 
                                                     
+                                        Let $X = (x_1, x_2, \dotso , x_L)$ be a sequence with $L$ nucleotides. Each site within $X$ is classified as being a pause site $C_i = \mathcal{P}$ or as not
+                                        being a pause site $C_i = \mathcal{N}$.
+                                     
+                                        Site $i$ is defined as a <b>pause site</b> if the average time to transcribe $i+1$ is significantly long, as specified by an adjustable threshold.
+                                        
+                                    
+                                    
+                                        <br><br>
+                                        Upon beginning Pauser, each uploaded sequence is analysed by two classifiers - SimPol and a Naive Bayes classifier (NBC). 
+                                        Each classifier calculates the <b>evidence</b> of any given site being a pause site. Interpetation of evidence differs between classifiers.
+                                        The evidence threshold of each classifier can be adjusted independently. Low thresholds result in more sites classified as pause sites, and
+                                        a high threshold results in fewer sites classified as pause sites.
+                                    
                                                     
                                         <div class="about-block">
                                             <div class="about-block-inner">
                                                 <div id="sequenceSelection" class="subsection block-subtitle">Classifiers</div> <br>
                                                 
                                                 
-                                                
-                                        
-                                            </div>
-                                        </div>
-                                    
-                                    
-                                    
-                                        <div class="about-block">
-                                            <div class="about-block-inner">
-                                                <div id="sequenceSelection" class="subsection block-subtitle">Viewing predictions</div> <br>
-                                                
-                                                
+                                                   
+                                                    <div class="panelOuter">
+                                                        <div class="panelInner" >
+                                                            <span class="subsubsection block-subsubtitle" sect="SimPol">SimPol</span> <br><br>
+                                                    
+                                                                SimPol is a framework for developing kinetic models of transcription elongation. These models are physically
+                                                                informed by the thermodynamics of nucleic acids<cite val="wu2002temperature,xia1998thermodynamic,santalucia1998unified"></cite>.
+                                                                While these models lack predictive power when it comes to transcriptional pausing, they are explanatory models and can guide the 
+                                                                development of testable hypotheses. To change the default model, see  
+                                                                    <a href="#Uploading_a_SimPol_session" onclick="minimiseSection('#Getting_started_Btn', true)" style="text-decoration:none; color:#A5CF19">Uploading a SimPol session</a>.
+                                                                
+                                                                <br><br>
+                                                                <b>Evidence:</b> the evidence that site $i$ is a pause site is equal to the median time that the mRNA has length $i$, averaged across 
+                                                                all simulations of the sequence.
+                                                    
+                                                    
+                                                        </div> 
+                                                    </div> 
+                                            
+                                            
+                                            
+                                            
+                                                <div class="panelOuter">
+                                                        <div class="panelInner" >
+                                                            <span class="subsubsection block-subsubtitle" sect="Naive Bayes">Naive Bayes</span><br><br>
+                                                    
+                                                                            
+                                                                A Naive Bayes classifier (NBC) is a simple statistical technique and is a sequence-based model. All nucleotides within a window of size $w_1 + w_2$ around
+                                                                site $i$ are examined by the model, and this is used to classify $i$ into one of the two classes. The NBC assumes independence between sites. While NBC 
+                                                                has significantly stronger predictive power than SimPol, it lacks explanatory power.
+                                                    
+                                                    
+                                                              
+                                                    
+                                                    
+                                                                <br><br>
+                                                                <b>Evidence:</b> the evidence that site $i$ is a pause site is equal to the log posterior ratio:
+                                                    
+                                                                $$
+                                                                    \log \frac{P(C_i = \mathcal{P}|X)}{P(C_i = \mathcal{N}|X)} = \log \frac
+                                                                                                       {P(\mathcal{P}) \sum\limits_{j=i-w_1}^{i+w_2} P(x_j| C_i = \mathcal{P}) } 
+                                                                                                       {P(\mathcal{N}) \sum\limits_{j=i-w_1}^{i+w_2} P(x_j| C_i = \mathcal{N})  }
+                                                                $$
+                                                                
+                                                                where $P(\mathcal{P})$ and $P(\mathcal{N})$ are the prior probabilities of a site being a pause site / not a pause site (equal to 0.007 and 0.993 respectively).
+                                                    
+                                                    
+                                                        </div> 
+                                                    </div> 
+                                            
                                                 
                                         
                                             </div>
@@ -508,7 +574,24 @@ function addCitations(){
                                             <div class="about-block-inner">
                                                 <div id="sequenceSelection" class="subsection block-subtitle">Evaluating classifier adequacy</div> <br>
                                                 
-                                                
+                                                    If the locations of pause sites are already known (see
+                                                        <a href="#Uploading_nucleotide_sequences" onclick="minimiseSection('#Getting_started_Btn', true)" style="text-decoration:none; color:#A5CF19">Uploading nucleotide sequences</a>
+                                            
+                                                    ), then the adequacy of the classifiers can be quantified. The recall, precision, and accuracy of each sequence, and the average across all sequences
+                                                    are given. Let $T_i = \mathcal{P}$ if site $i$ is a known pause site, and let $T_i = \mathcal{N}$ if $i$ is known to not be a pause site.
+                                            
+                                                    <br><br>
+                                                    <b>Recall</b> is the probability of a true pause being classified as a pause: $P(C_i = \mathcal{P}|T_i  = \mathcal{P}) = \frac{P(C_i = \mathcal{P} \; \cap \; T_i  = \mathcal{P}}{T_i  = \mathcal{P}}$
+                                            
+                                                    
+                                                    <br><br>
+                                                    <b>Precision</b> is the probability that a site classified as a pause is actually a pause: $P(T_i = \mathcal{P}|C_i  = \mathcal{P}) = \frac{P(C_i = \mathcal{P} \; \cap \; T_i  = \mathcal{P}}{C_i  = \mathcal{P}}$
+                                            
+                                            
+                                            
+                                                    <br><br>
+                                                    <b>Accuracy</b> is the overall proportion of correct classifications: $P(T_i = \mathcal{P} \; \cap \; C_i  = \mathcal{P}) + P(T_i = \mathcal{N} \; \cap \; C_i  = \mathcal{N})$
+                                            
                                                 
                                         
                                             </div>
@@ -523,7 +606,10 @@ function addCitations(){
                                             <div class="about-block-inner">
                                                 <div id="sequenceSelection" class="subsection block-subtitle">ROC curve</div> <br>
                                                 
-                                                
+                                                    If the locations of pause sites are already known, then a ROC curve will be constructed. A ROC analysis accounts for all possible evidence thresholds
+                                                    of a classifier and explores true and false positive rates simultaneously. The total adequacy of a classifier can be summarised by integrating the area
+                                                    under the curve (AUC) of a ROC plot. The AUC lies in the range [0,1]. A perfect classifier will have an AUC of 1, while a classifier with an AUC of 0.5
+                                                    or less is no better than a coin toss. See review by Fawcett<cite val="fawcett2006introduction"></cite> for an introduction to ROC analyses.
                                                 
                                         
                                             </div>
