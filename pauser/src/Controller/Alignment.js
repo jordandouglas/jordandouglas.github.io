@@ -42,6 +42,7 @@ function uploadAlignmentFromURL(url, resolve = function() { }){
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
+        
           
             if (xhttp == null || xhttp.responseXML == "") return;
             
@@ -100,7 +101,6 @@ function uploadAlignment(fileLocation = null){
 function parseAlignment(align_str, resolve = function() { }){
 
 
-
 	NUCLEOTIDE_ALIGNMENT = {};
 	NUCLEOTIDE_ALIGNMENT_NSITES = 0;
     
@@ -108,7 +108,7 @@ function parseAlignment(align_str, resolve = function() { }){
     // Send the validated fasta through to the webassembly module
     parseMSA_controller(align_str.replace(/(\r\n|\n|\r)/gm, "`"), function(parseResult){
 
-        //console.log("Parsed MSA", parseResult)
+        console.log("Parsed MSA", parseResult)
 
         
         if (parseResult.error == null){

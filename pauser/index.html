@@ -34,12 +34,13 @@
 <script language='JavaScript' type='text/JavaScript' src="../src/Resources/jsPhyloSVG/raphael-min.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="../src/Resources/jsPhyloSVG/jsphylosvg-min.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="../src/Resources/jquery-3.1.1.min.js"></script>
+<script language='JavaScript' type='text/JavaScript' src="src/Controller/interactiveHelp.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/Alignment.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/PhyloPause.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/Session.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/NBC.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/WebWorkerMessager.js"></script>
-<script language='JavaScript' type='text/JavaScript' src="src/Controller/interactiveHelp.js"></script>
+
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -93,23 +94,28 @@ function init(){
             
         // Load NBC file from default specifications
         var nbcURL = "http://www.polymerase.nz/pauser/NBC_pauser.csv";
-        uploadNBCFromURL(nbcURL);
-        
-        
-        
-        if (location.href.indexOf("?") != -1){
+        uploadNBCFromURL(nbcURL, function(){
             
-            var search = location.search.substring(1);
-            var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
-            
-    
-            if (JSONurl.biophys != null) {
-                begin_tutorial("biophys" + JSONurl.biophys);
+              
+            begin_tutorial("biophys" + 4);
+            if (location.href.indexOf("?") != -1){
+                
+                var search = location.search.substring(1);
+                var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
+                
+        
+                if (JSONurl.biophys != null) {
+                    begin_tutorial("biophys" + JSONurl.biophys);
+                }
+
+                
             }
 
             
-        }
-
+            
+        });
+        
+      
             
             
     }
