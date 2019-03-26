@@ -376,7 +376,7 @@ div.vertical{
 .operation.glowing {
     background-color:#f0c36d; 
     border-color: #FFFFB2; 
-    color:#f0c36d;
+    color:black;
     -webkit-box-shadow: 0 0 10px #FFFFB2; 
        -moz-box-shadow: 0 0 10px #FFFFB2; 
             box-shadow: 0 0 10px #FFFFB2; 
