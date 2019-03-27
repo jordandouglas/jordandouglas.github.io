@@ -34,11 +34,36 @@ function begin_tutorial(tut_id = null){
     
     switch(tut_id){
     
-    
+            
         // Biophysical journal examples
+        case "biophys1":
+            window.location.replace("../simpol/?biophys=1");
+            break;
+    
+        case "biophys2":
+            window.location.replace("../simpol/?biophys=2");
+            break;  
+            
+            
+        case "biophys3":
+            window.location.replace("../simpol/?biophys=3");
+            break; 
+            
+            
         case "biophys4":
             begin_biophys4();
-            break;
+            break; 
+            
+            
+        case "biophys5":
+            window.location.replace("../simpol/?biophys=5");
+            break; 
+            
+            
+        case "biophys6":
+            window.location.replace("../simpol/?biophys=6");
+            break; 
+            
     
     }
 
