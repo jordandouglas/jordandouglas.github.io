@@ -73,12 +73,17 @@ function begin_tutorial(tut_id = null){
             
             
         case "biophys4":
-            begin_biophys4();
+            window.location.replace("../pauser/?biophys=4");
             break; 
             
             
         case "biophys5":
             begin_biophys5();
+            break; 
+            
+            
+        case "biophys6":
+            begin_biophys6();
             break; 
     
     }
@@ -366,7 +371,7 @@ function begin_biophys3(){
 
 
 // Explore the third-order relationship between catalysis rate kcat , NTP binding rate kbind , and elongation velocity.
-function begin_biophys4(){
+function begin_biophys5(){
 
 
 
@@ -382,7 +387,7 @@ function begin_biophys4(){
     To begin the stochastic simulation, press the glowing <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
     button on the far left. 5,000 simulations will be performed on the 0.5 kb lacZ gene.
      See the plots further down this page to visualise the simulation results. Each coloured dot is one simulation.`,
-    "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=4'>www.polymerase.nz/simpol/?biophys=4</a>");
+    "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=5'>www.polymerase.nz/simpol/?biophys=4</a>");
 
    
     // Add a glow around the simulate button
@@ -407,7 +412,7 @@ function begin_biophys4(){
     
 
 
-    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys4.xml";
+    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys5.xml";
     var toDoAfterLoadSession = function() {
         
     
@@ -426,8 +431,8 @@ function begin_biophys4(){
 
 
 // Fit parameters kcat and kbind to a toy [NTP]-velocity dataset using R-ABC.
-function begin_biophys5(){
-    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys5.xml";
+function begin_biophys6(){
+    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys6.xml";
     var toDoAfterLoadSession = function() {
         
         
@@ -442,7 +447,7 @@ function begin_biophys5(){
         
         In the histograms below, the yellow underlays show the prior distributions while the blue bars are the posterior distributions. If the
         two distributions are different, then the data taught us something about the parameters.`,
-        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=5'>www.polymerase.nz/simpol/?biophys=5</a>");
+        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=6'>www.polymerase.nz/simpol/?biophys=5</a>");
     
        
         // Add a glow around the simulate button

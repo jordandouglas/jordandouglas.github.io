@@ -49,7 +49,7 @@ using namespace std;
 
 
 
-/* Optional arguments: 
+/* Arguments: 
 				
                 -h: prints arguments
 				-xml <filename>: load in an xml file
@@ -137,7 +137,7 @@ int main(int argc, char** argv) {
 	}
     
     
-    if (printHelp || argc <= 1){
+    if (printHelp){
     
         
         string tabs = "\t\t";
@@ -166,22 +166,26 @@ int main(int argc, char** argv) {
 
 	if (_printSummary && _inputLogFileName == ""){
 		cout << "You have enabled summary mode. Please specify a log file with -logI" << endl;
+        cout << "Use -h for help" << endl;
 		exit(0);
 	}
 
 	if (_printSummary && _inputXMLfilename == ""){
 		cout << "You have enabled summary mode. Please specify an input xml file with -xml" << endl;
+        cout << "Use -h for help" << endl;
 		exit(0);
 	}
 
 
 	if (_sampleFromLikelihood && _printSummary && _inputXMLfilename == ""){
 		cout << "You have enabled posterior sampling mode using the geometric median. Please specify an input log file with -logI" << endl;
+        cout << "Use -h for help" << endl;
 		exit(0);
 	}
 
 	if (_sampleFromLikelihood && _inputXMLfilename == ""){
 		cout << "You have enabled posterior sampling mode. Please specify an input xml file with -xml" << endl;
+        cout << "Use -h for help" << endl;
 		exit(0);
 	}
 	
@@ -221,7 +225,8 @@ int main(int argc, char** argv) {
     if (argc == 1) {
     	
     	cout << "Please enter command line arguments to start Simpol" << endl;
-    	exit(1);
+        cout << "Use -h for help" << endl;
+    	exit(0);
     }
 
 

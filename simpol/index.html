@@ -222,7 +222,6 @@ function init(){
 					
 					var search = location.search.substring(1);
 					var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
-
                     
             
                     if (JSONurl.nthreads != null) setNThreads_contoller(JSONurl.nthreads);

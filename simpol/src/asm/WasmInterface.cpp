@@ -2163,7 +2163,9 @@ extern "C" {
 		
 		// Prepare for simulating
 		_interfaceSimulator = new Simulator(_GUI_PLOTS);
-		_interfaceSimulator->initialise_GUI_simulation(N, 1000);
+        
+        SimulatorResultSummary* gui_summary = new SimulatorResultSummary(N);
+		_interfaceSimulator->initialise_GUI_simulation(gui_summary, 1000);
 
 
 		// Create JSON string
