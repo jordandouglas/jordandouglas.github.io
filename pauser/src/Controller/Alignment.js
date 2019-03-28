@@ -486,17 +486,17 @@ function getClassifierAdequacyRowTemplate(name, average = false){
             <td rowspan="2">` + name_html + `</td>
             
             <td  style="padding-top:10px">SimPol</td>
-            <td class="simpol_recall"></td> 
-            <td class="simpol_precision"></td> 
-            <td class="simpol_accuracy"></td> 
+            <td title="The probability of a known pause site being classified as one by SimPol, under the current threshold." class="simpol_recall"></td> 
+            <td title="The probability of a site classified as a pause site by SimPol actually being one, under the current threshold." class="simpol_precision"></td> 
+            <td title="The overall proportion of correct classifications under the current threshold." class="simpol_accuracy"></td> 
             
         </tr>
         <tr rowid="ad_` + name + `" class="deleteUponNewAlignment"  onclick="$('[rowid=ad_` + name + `]').toggleClass('selected')">
             
             <td  style="padding-bottom:10px">NBC</td>
-            <td class="nbc_recall"></td> 
-            <td class="nbc_precision"></td> 
-            <td class="nbc_accuracy"></td> 
+            <td title="The probability of a known pause site being classified as one by NBC under the current threshold." class="nbc_recall"></td> 
+            <td title="The probability of a site classified as a pause site by NBC actually being one, under the current threshold." class="nbc_precision"></td> 
+            <td title="The overall proportion of correct classifications under the current threshold." class="nbc_accuracy"></td> 
             
         </tr>
     `;
