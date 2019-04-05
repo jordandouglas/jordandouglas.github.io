@@ -4,7 +4,7 @@
 	<elongation-model>
 		<allowBacktracking val="false" />
 		<allowHypertranslocation val="true" />
-		<allowInactivation val="true" />
+		<allowInactivation val="false" />
 		<allowBacktrackWithoutInactivation val="false" />
 		<deactivateUponMisincorporation val="false" />
 		<allowGeometricCatalysis val="true" />
@@ -14,10 +14,10 @@
 		<useFourNTPconcentrations val="true" />
 		<allowMultipleBulges val="true" />
 		<NTPbindingNParams val="2" />
-		<currentTranslocationModel val="HIGU_barriers" />
+		<currentTranslocationModel val="HIGI_barriers" />
 		<currentRNABlockadeModel val="terminalBlockade" />
 		<currentInactivationModel val="sequenceIndependent" />
-		<currentBacksteppingModel val="backstep1" />
+		<currentBacksteppingModel val="backstep0" />
 		<assumeBindingEquilibrium val="false" />
 		<allowDNAbending val="false" />
 		<assumeTranslocationEquilibrium val="false" />
