@@ -40,6 +40,8 @@
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/Session.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/NBC.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/WebWorkerMessager.js"></script>
+<script language='JavaScript' type="text/javascript" src ="https://rawgit.com/eligrey/canvas-toBlob.js/master/canvas-toBlob.js"></script>
+<script language='JavaScript' type="text/javascript" src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.js"></script>
 
 
 <script type="text/x-mathjax-config">
@@ -377,12 +379,12 @@ function getLoaderTemplate(id, msg = ""){
                                 
                          <input class="uploadAlignmentFirst operation" type=button id='beginPauser' onClick="beginPauser(false);" value=" Begin Pauser" title="Predict the locations of pause sites in each sequence." style="z-index: 100; float:right; width:160px; display:none"> 
 
-
+                         <br><br>
 						<div id="conservationSection" style="padding: 20 20">
 
 
                                 <div style="display:none" class="uploadAlignmentFirst"> 
-                                    When you are ready to start the transcription simulations press Begin. This will be executed clientside (ie. using your CPU) and may take a while to finish.
+                                    When you are ready to start the transcription simulations press Begin. This will be executed client-side (ie. using your CPU) and may take a while to finish.
                                 </div>
 
 
@@ -594,7 +596,8 @@ function getLoaderTemplate(id, msg = ""){
                                                         
                                                  <b style="color:#0B522D">ROC curve</b> 
                                                  <a href="about/#ROC_curve" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
-                                                    <br><br>
+                                                 <span style="cursor:pointer;" onclick="downloadROC();" title="Download the plot (.png)."> <img src="../src/Images/downloadGreen.png" style="vertical-align:middle; padding:5 0; width:30px;"> </span>
+                                                 <br><br>
                                                         
                                                  <canvas id="ROC_curve_canvas" width="0" height="0"></canvas>      
                                                         

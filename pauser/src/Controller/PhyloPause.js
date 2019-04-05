@@ -133,8 +133,49 @@ function download(filename, text) {
 
 
 
+function downloadROC(){
+
+
+    // Remove the temporary canvas if it already exists
+    $("#ROCcanvasTempDIV").remove();
+    
+    // Create an invisible canvas with a large size
+    console.log("making a canvas png");
+    
+    var canvasHTML = `
+                    <div class="scrollbar" id="ROCcanvasTempDIV"  style="display:none; height:170px; display:block; overflow-x:scroll; overflow-y:auto;  position:relative"> 
+                        <div id="plotCanvasContainer5"> 
+                            <canvas id="ROCcanvasTemp" width="1" height="1"></canvas> 
+                        </div>
+                    </div>`;
+    $("#main").after(canvasHTML);
+    
+    
+    plotROC("ROCcanvasTemp", 4, function() {
+    
+    
+        // Save the temporary canvas to a file
+        var tempCanvas = document.getElementById("ROCcanvasTemp");
+    
+    
+        tempCanvas.toBlob(function(blob) {
+            saveAs(blob, "ROCplot.png");
+        }, "image/png");
+        
+        
+        // Delete the temporary canvas
+        $("#ROCcanvasTempDIV").remove();
+    
+    
+    }); 
+   
+    
+
+}
+
+
 // Plot ROC curve and AUC
-function plotROC(){
+function plotROC(canvasID = "ROC_curve_canvas", canvasSizeMultiplier = 1, resolve = function() { }){
 
     if (!$("#ROC_curve_td").is(":visible")) return;
 
@@ -147,12 +188,12 @@ function plotROC(){
         if (result.nbc_ROC != null) values["NBC"] = {x: result.nbc_ROC.FP, y: result.nbc_ROC.TP, col: "#FFA500", AUC: result.nbc_AUC};
         
         // Plot the ROC curve
-        ROC_plot(values, [0,1,0,1], "ROC_curve_canvas", 1, "False positive rate", "True positive rate");
+        ROC_plot(values, [0,1,0,1], canvasID, canvasSizeMultiplier, "False positive rate", "True positive rate");
        
         
         // Annotations
         //$("#ROC_curve_annotation").html("AUC = " + roundToSF(result.simpol_AUC));
-
+        resolve();
         
     
     });
@@ -163,11 +204,10 @@ function plotROC(){
 
 
 // Plot the values of x and y onto a ROC plot
-function ROC_plot(values, range, id, canvasSizeMultiplier, xlab = "Variable 1", ylab = "Variable 2") {
+function ROC_plot(values, range, id, canvasSizeMultiplier = 1, xlab = "Variable 1", ylab = "Variable 2") {
     
 
-
-    if (canvasSizeMultiplier == null) canvasSizeMultiplier = 1;
+    
 
 
     var axisGap = 45 * canvasSizeMultiplier;
@@ -178,8 +218,10 @@ function ROC_plot(values, range, id, canvasSizeMultiplier, xlab = "Variable 1", 
     if (canvas == null) return;
     
 
-    canvas.width = 400;
-    canvas.height = 400;
+    canvas.width = 400 * canvasSizeMultiplier;
+    canvas.height = 400 * canvasSizeMultiplier;
+    
+    
 
     var ctx = canvas.getContext('2d');
     ctx.globalAlpha = 1;
@@ -195,7 +237,7 @@ function ROC_plot(values, range, id, canvasSizeMultiplier, xlab = "Variable 1", 
     
     
     // Draw diagonal line with AUC=0.5
-    ctx.setLineDash([5,15])
+    ctx.setLineDash([5  * canvasSizeMultiplier, 15  * canvasSizeMultiplier])
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2 * canvasSizeMultiplier;
     ctx.beginPath();
