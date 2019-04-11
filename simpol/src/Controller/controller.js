@@ -82,6 +82,17 @@ function translocationCalculationSummary(){
 		$("#meanForwardRate").html(roundToSF(toReturn.meanForwardRate, 3));
 		$("#meanBackwardsRate").html(roundToSF(toReturn.meanBackwardsRate, 3));
 		$("#meanBarrierHeight").html(roundToSF(toReturn.meanBarrierHeight, 3));
+        
+        if (toReturn.allowHypertranslocation) {
+            $("#meanForwardHyperRate_div").show(100);
+            $("#meanBackwardsHyperRate_div").show(100);
+            $("#meanForwardHyperRate").html(roundToSF(toReturn.meanForwardHyperRate, 3));
+            $("#meanBackwardsHyperRate").html(roundToSF(toReturn.meanBackwardsHyperRate, 3));
+        }else{
+            $("#meanForwardHyperRate_div").hide(0);
+            $("#meanBackwardsHyperRate_div").hide(0);
+        }
+        
 		$("#translocationSummaryContainer").show(100);
 
 		

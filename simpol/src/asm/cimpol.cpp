@@ -66,6 +66,8 @@ using namespace std;
 							Otherwise will sample from the distributions specified in -xml xmlfile
 							This will be printed into terminal, or -logO file if specified
 				-marginal: if -summary is enabled then will print a marginal-model geometric median summary. Models 
+                -sitesummary <fastaInFile> <outFile>: samples from posterior / prior and prints a sitewise summary to file. Applies to all sequences in <fastaInFile>
+                            Summary includes probability of hypertranslocation-induced arrest and probability of RNA-ratchet per site 
 */
 
 int main(int argc, char** argv) { 
@@ -76,6 +78,8 @@ int main(int argc, char** argv) {
 
 	// Parse arguments
 	bool doMCMC = false;
+    string siteSummaryFile = "";
+    string fastaInFile = "";
     bool printHelp = false;
 	for (int i = 1; i < argc; i ++){
 
@@ -83,7 +87,7 @@ int main(int argc, char** argv) {
 
 		if (arg == "-MCMC") doMCMC = true;
         
-        if (arg == "-h") printHelp = true;
+         else if (arg == "-h") printHelp = true;
 		
 		else if (arg == "-sim") doMCMC = false;
 		
@@ -110,6 +114,15 @@ int main(int argc, char** argv) {
 			i++;
 			_outputFilename = string(argv[i]);
 		}
+        
+        
+        else if(arg == "-sitesummary" && i+2 < argc) {
+            i++;
+            fastaInFile = string(argv[i]);
+            i++;
+            siteSummaryFile = string(argv[i]);
+        }
+
 
 
 		else if(arg == "-logI" && i+1 < argc) {
@@ -153,6 +166,7 @@ int main(int argc, char** argv) {
         cout << tabs << "-logI file.log: Read in the specified file. Only applicable if either -summary or -RABC are activated. " << endl;
         cout << tabs << "-summary: prints a summary of the log file specified by -logI into the terminal. " << endl;
         cout << tabs << "-RABC: Run R-ABC analysis instead of simulating. All states will be printed regardless of the xml-specified value of epsilon. If -logI is specified then will sample from the posterior distribution, otherwise the prior. If -summary is also specified then will sample from the geometric median instead of the whole posterior distribution." << endl;
+        cout << tabs << "-sitesummary <fastaInFile> <outFile>: Performs a sitewise summary on all sequences in <fastaInFile> and prints to <outFile>. Summary includes probability of RNA-blockade-induced hypertranslocation arrest and probability of RNA-ratchet per site. If -logI is specified then will sample from the posterior distribution, otherwise the prior." << endl;
         
         cout << "For more information see http://www.polymerase.nz/simpol/about/" << endl;
         
@@ -175,6 +189,13 @@ int main(int argc, char** argv) {
         cout << "Use -h for help" << endl;
 		exit(0);
 	}
+    
+    
+    if (_printSummary && _inputXMLfilename == ""){
+        cout << "You have enabled summary mode. Please specify an input xml file with -xml" << endl;
+        cout << "Use -h for help" << endl;
+        exit(0);
+    }
 
 
 	if (_sampleFromLikelihood && _printSummary && _inputXMLfilename == ""){
@@ -183,8 +204,8 @@ int main(int argc, char** argv) {
 		exit(0);
 	}
 
-	if (_sampleFromLikelihood && _inputXMLfilename == ""){
-		cout << "You have enabled posterior sampling mode. Please specify an input xml file with -xml" << endl;
+	if (siteSummaryFile != "" && _inputXMLfilename == ""){
+		cout << "You have enabled sitewise summary mode. Please specify an input xml file with -xml" << endl;
         cout << "Use -h for help" << endl;
 		exit(0);
 	}
@@ -210,7 +231,6 @@ int main(int argc, char** argv) {
 		if (!succ) exit(1);
 
 	}
-
 
 	Settings::sampleAll();
 	currentSequence->initRateTable(); // Ensure that the current sequence's translocation rate cache is up to date
@@ -253,8 +273,8 @@ int main(int argc, char** argv) {
 			statesPostBurnin.at(0) = BayesianCalculations::getGeometricMedian(statesPostBurnin, true, true);
 			cout << "Sampling new data using geometric median parameters" << endl;
 		}
-		else if (!_printSummary && statesPostBurnin.size() > 0) cout << "Sampling new data using parameters in posterior distribution " << _inputLogFileName << endl;
-		else cout << "Sampling new data using parameters specified by " << _inputXMLfilename << endl;
+		else if (!_printSummary && statesPostBurnin.size() > 0) cout << "Sampling new data using posterior distribution " << _inputLogFileName << endl;
+		else cout << "Sampling new data using session specified in " << _inputXMLfilename << endl;
 		BayesianCalculations::sampleFromPosterior(statesPostBurnin);
 	}
 
@@ -267,6 +287,23 @@ int main(int argc, char** argv) {
 		if (_marginalModel) BayesianCalculations::printMarginalGeometricMedians(statesPostBurnin);
 		else BayesianCalculations::getGeometricMedian(statesPostBurnin, true, true);
 	}
+    
+    
+    // Sitewise summaries
+    else if (fastaInFile != "" && siteSummaryFile != ""){
+    
+    
+        // Posterior distribution (.log) or prior distribution (.xml)
+        vector<PosteriorDistributionSample*> posteriorDistribution(0);
+        if (_inputLogFileName != "") posteriorDistribution = BayesianCalculations::loadLogFile(_inputLogFileName, _chiSqthreshold_min);
+        if (posteriorDistribution.size() > 0) cout << "Performing sitewise summary using posterior distribution " << _inputLogFileName << endl;
+        else cout << "Performing sitewise summary using session specified in " << _inputXMLfilename << endl;
+    
+    
+        // Perform the sitewise summary
+        BayesianCalculations::performSitewiseSummary(posteriorDistribution, fastaInFile, siteSummaryFile);
+    
+    }
 
 
 	// Just simulate

@@ -18,7 +18,8 @@ g++ $vrna_wd_option -std=c++11 -O3 -fpermissive -pthread   cimpol.cpp  \
   ../../../src/asm/Sequence.cpp ../../../src/asm/SimulatorResultSummary.cpp ../../../src/asm/Settings.cpp ../../../src/asm/FreeEnergy.cpp \
   ../../../src/asm/TranslocationRatesCache.cpp ../../../src/asm/Polymerase.cpp ../../../src/asm/randomc/mersenne.cpp \
   ../../../src/asm/tinyxml/tinystr.cpp ../../../src/asm/tinyxml/tinyxml.cpp ../../../src/asm/tinyxml/tinyxmlerror.cpp \
-  ../../../src/asm/tinyxml/tinyxmlparser.cpp ../../../src/asm/GelLaneData.cpp  -o SimpolC -lViennaRNA
+  ../../../src/asm/tinyxml/tinyxmlparser.cpp ../../../src/asm/GelLaneData.cpp ../../../src/asm/SitewiseSummary.cpp \
+   ../../../src/asm/MultipleSequenceAlignment.cpp ../../../src/asm/BayesClassifier.cpp  -o SimpolC -lViennaRNA
 
 
 #g++ $vrna_wd_option -Wall -std=c++11 -O3 -fpermissive -pthread main.cpp -o SimpolC -lViennaRNA 

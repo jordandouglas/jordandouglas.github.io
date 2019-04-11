@@ -2407,7 +2407,7 @@ extern "C" {
 	// Calculates the mean translocation equilibrium constant, and mean rates of going forward and backwards, and Gibbs energy of transition state
 	void EMSCRIPTEN_KEEPALIVE calculateMeanTranslocationEquilibriumConstant(int msgID){
 
-		double results[4];
+		double results[6];
 		FreeEnergy::calculateMeanTranslocationEquilibriumConstant(results);
 
 		// Build JSON string
@@ -2416,6 +2416,9 @@ extern "C" {
 		parametersJSON += "'meanEquilibriumConstantFwdOverBck':" + to_string(results[1]) + ",";
 		parametersJSON += "'meanForwardRate':" + to_string(results[2]) + ",";
 		parametersJSON += "'meanBackwardsRate':" + to_string(results[3]) + ",";
+        parametersJSON += "'meanForwardHyperRate':" + to_string(results[4]) + ",";
+        parametersJSON += "'meanBackwardsHyperRate':" + to_string(results[5]) + ",";
+        parametersJSON += "'allowHypertranslocation':" + string(currentModel->get_allowHypertranslocation() ? "true" : "false") + ",";
 
 
 		// Gibbs energy of transition state
