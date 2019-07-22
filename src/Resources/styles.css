@@ -427,7 +427,7 @@ div.vertical{
 	opacity: 1.0;
     border: none;
     color: white;
-    padding: 0px 0px;
+    padding-bottom: 0px 0px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -645,6 +645,8 @@ input[type=checkbox] {
     color: white;
     outline: none;
     cursor: pointer;
+    margin-right:20px;
+    margin-left:20px;
 }
 
 .dropdown {

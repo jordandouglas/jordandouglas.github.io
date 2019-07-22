@@ -287,7 +287,7 @@ function init(){
 
 					 
 					 
-				SIDENAV_WIDTH = IS_MOBILE ? 500 : 380;
+				SIDENAV_WIDTH = IS_MOBILE ? 700 : 380;
 					 
 					 
 				// On desktop make the toolbar draggable
@@ -1717,14 +1717,14 @@ function closeNav() {
 			
 				<div id="SequenceSettings">
 					 <br> Select sequence: <select class="dropdown" style="width: 350px;" name="SelectSequence" id = "SelectSequence" title="Select a sequence" OnChange="stop_controller(function() { userChangeSequence(); }); ">
-					</select>
+					</select><br>
 						
 					Template: <select class="dropdown" name="SelectTemplateType" id="SelectTemplateType" OnChange="stop_controller(function() { submitCustomSequence(); });">
 							  <option value="ssRNA">ssRNA</option>
 							  <option value="ssDNA">ssDNA</option>
 							  <option value="dsRNA">dsRNA</option>
 							  <option value="dsDNA">dsDNA</option>
-						</select>
+						</select> &nbsp;&nbsp;
 						
 						&nbsp;Nascent type: <select class="dropdown" name="SelectPrimerType" id="SelectPrimerType" OnChange="stop_controller(function() { submitCustomSequence(); });">
 							  <option value="ssRNA">ssRNA</option>
