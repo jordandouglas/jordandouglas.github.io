@@ -133,15 +133,6 @@ canvas {
 }
 
 
-@media screen and (orientation:portrait) {
-
-
-}
-
-
-@media screen and (orientation:landscape) {
-
-}
 
 
 label {
@@ -345,6 +336,12 @@ div.vertical{
 
 }
 
+@media only screen and ( max-device-width: 1000px ) {
+	.toolbar{
+		margin-left:60px;
+	}
+}
+
 
 
 .toolbarIcon {
@@ -473,15 +470,15 @@ div.vertical{
 }
 
 .helpIcon {
-	width:1.5em;
+	width:15px;
 	cursor: pointer;
 	vertical-align:middle;
 }
 
-@media{
+@media only screen and ( max-device-width: 1000px ) {
 
 	.helpIcon{
-		width:2.5em;
+		width:30px;
 	}
 }
 
@@ -548,11 +545,6 @@ div.vertical{
 
 
 
-@media screen and (max-height: 450px) {
-  .sidenav {padding-top: 15px;}
-  .sidenav a {font-size: 18px;}
-}
-
 
 .ABC_output_highlighted {
 
@@ -593,10 +585,10 @@ div.vertical{
 }
 
 
-@media {
+@media only screen and ( max-device-width: 1000px ) {
 
 	.panelOuter{
-		margin-left:180px;
+		margin-left:250px;
 	
 	}
 	
@@ -825,13 +817,13 @@ input {
 .distn{
 	padding: 3 3;
 	vertical-align: middle; 
-	width:38px; 
-	height:12px;
+	width:50px; 
+	height:18px;
 	float:right;
 	cursor:pointer;
 }
 
-@media {
+@media only screen and ( max-device-width: 1000px ) {
 	.distn{
 		width:60px; 
 		height:20px;
