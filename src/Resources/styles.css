@@ -29,6 +29,13 @@ body {
 	%background-color:#ebe9e7;
 }
 
+
+
+.title{
+	text-size-adjust: 400%;
+}
+
+
 .glowing {
     background-color:#f0c36d; 
     border-color: #FFFFB2; 
@@ -326,6 +333,7 @@ div.vertical{
 }
 
 .toolbar {
+	border-radius: 10px;
 	background-color: #424f4f;
 	width:60px;
 	text-align:center;
@@ -333,7 +341,7 @@ div.vertical{
 	-moz-user-select: none;    
 	-ms-user-select: none;      
 	user-select: none;
-
+	margin-left:10px;
 
 }
 
@@ -382,14 +390,15 @@ div.vertical{
     background-color: #008CBA;
 	color: white;
     border: none;
-    padding: 0px 0px;
+    padding: 0;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
+    %display: inline-block;
     font-size: 12px;
+    width:2em;
+    height:2em;
+    line-height:1em;
 	vertical-align: middle; 
-	width:18px;
-	height:18px;
 	cursor:pointer;
 }
 
@@ -397,6 +406,9 @@ div.vertical{
     background-color: #b20000;
 	cursor:auto;
 }
+
+
+
 
 
 .block-title > .minimise{
@@ -563,7 +575,35 @@ div.vertical{
     font-size: 16px;
 	transition: 0.5s;
     margin-bottom:20px;
+    margin-left:130px;
 
+}
+
+
+@media {
+
+	.panelOuter{
+		margin-left:180px;
+	
+	}
+	
+	input[type=checkbox] {
+	  /* Double-sized Checkboxes */
+	  -ms-transform: scale(2); /* IE */
+	  -moz-transform: scale(2); /* FF */
+	  -webkit-transform: scale(2); /* Safari and Chrome */
+	  -o-transform: scale(2); /* Opera */
+	  transform: scale(2);
+	  padding: 10px;
+	  margin-right:15px;
+	  
+	}
+
+}
+
+
+input[type=checkbox] {
+	vertical-align:middle;
 
 }
 
@@ -572,7 +612,6 @@ div.vertical{
 	padding: 5px 5px;
 	background-color: white;
 }
-
 
 
 
@@ -949,7 +988,11 @@ input:checked + .slider:before {
 }
 
 
-
+.panel_title{
+	font-family:Raleway, Arial;
+	font-weight:bold;
+	font-size:16px;
+}
 
 .button{
 
@@ -958,8 +1001,17 @@ input:checked + .slider:before {
 	font-size: 18px; 
 	background-color:#008CBA; 
 	padding: 8 8;
-	line-height:25px;
+	line-height:1.5em;
+	color:white;
 }
 
+.button.extraline{
+	line-height:2.5em;
+}
+
+
+.button.selected{
+	background-color:#b20000;
+}
 
 

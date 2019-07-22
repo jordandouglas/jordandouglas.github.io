@@ -3037,7 +3037,7 @@ function closeNav() {
                                 <div style="width:100%; text-align:center;">
 
                                         <a href="" target="_blank" style="text-decoration:none;  color:#414b4b" title="Launch SimPol">
-                                            <div style="font-size: 107px; margin-bottom: -20px "> SimPol </div>
+                                            <div class="title" style="font-size: 107px; margin-bottom: -20px "> SimPol </div>
                                             <div style="font-size: 18px; "> Simulation of Nucleic Acid Polymerases </div>
                                         </a>
                                     
@@ -3048,17 +3048,17 @@ function closeNav() {
                             
                             
 
-                            <td style="height:30px; width: 30%; vertical-align:bottom; text-align:right;"> 
+                            <td style="width: 30%; vertical-align:bottom; text-align:right;"> 
 
 
 
                               <a href="../../"  target="_blank" style="text-decoration:none; color:white; ">
-                                    <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#008CBA; padding: 8 8;" title="Go back home">Home</span> 
-                              </a>&nbsp;
-                                <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#b20000; padding: 8 8; color:white" title="Launch SimPol">SimPol</span> 
-                              &nbsp;
+                                    <span class="button extraline" title="Go back home">Home</span> 
+                              </a>
+                               <span class="button selected extraline" title="Launch SimPol">SimPol</span> 
+                              
                              <a href="about/"  target="_blank" style="text-decoration:none; color:white; ">
-                                    <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#008cba; padding: 8 8;  color:white; " title="Introductory tutorials and other information about SimPol">About</span>
+                                    <span class="button extraline" title="Introductory tutorials and other information about SimPol">About</span>
                                 </a>    
                          
                                     
@@ -3095,7 +3095,7 @@ function closeNav() {
 
 			
 			<div id="theToolbar" class="noselect" style="position:fixed; top:320px; left:10px; z-index:5;">
-				<table class="toolbar" cellpadding=3 style="border-radius: 10px;">
+				<table class="toolbar" cellpadding=3>
 						
 
 					<tr style="height:20px">
@@ -3216,18 +3216,18 @@ function closeNav() {
 			<br><br>
 
 
-			<div id="navigationPanel"  class="panelOuter" style="margin-left:130px;">
+			<div id="navigationPanel"  class="panelOuter">
 				<div class="panelInner">
 
 					<span style="font-size:18px;">
 						<input type=button id='showNavigationPanel' class='minimise' value='-' onClick=showNavigationPanel()> 
-						<b>Navigation panel</b> 
+						<span class="panel_title">Navigation panel</span> 
 							<span style="font-size:12px;  vertical-align:middle"> - Press any of the arrows below to apply a reaction </span>
 	 						<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#Reactions"><img class="helpIcon" src="../src/Images/help.png"></a>
 							
 							</span>
 	 
-						<input type=button id='viewModelBtn' onClick=viewModel() value='View model diagram' title="View the kinetic diagram of this model" class="operation" style="z-index: 100; float:right; width:160px">
+						<span class="button" id='viewModelBtn' onClick=viewModel() title="View the kinetic diagram of this model" style="z-index: 100; float:right;">View model diagram</span>
 						<!--<input type=image id='viewModelBtn' title="View the kinetic diagram of this model" onClick="viewModel()" src="../src/Images/diagram.png" style="padding: 3 3; width:50px; height:25px; vertical-align: middle; ">-->
 					</span>
 
@@ -3267,10 +3267,10 @@ function closeNav() {
 
 
 											Base to add:
-											<input type=button id='ntpA' onClick=userChangeNTPType('A') value='A' title="Set the NTP to A" class="ntp ntp-selected">
-											<input type=button id='ntpC' onClick=userChangeNTPType('C') value='C' title="Set the NTP to C" class="ntp">
-											<input type=button id='ntpG' onClick=userChangeNTPType('G') value='G' title="Set the NTP to G" class="ntp">
-											<input type=button id='ntpT' onClick=userChangeNTPType('T') value='T' title="Set the NTP to T" class="ntp">
+											<input  type=button id='ntpA' onClick=userChangeNTPType('A') value='A' title="Set the NTP to A" class="ntp ntp-selected">
+											<input  type=button id='ntpC' onClick=userChangeNTPType('C') value='C' title="Set the NTP to C" class="ntp">
+											<input  type=button id='ntpG' onClick=userChangeNTPType('G') value='G' title="Set the NTP to G" class="ntp">
+											<input  type=button id='ntpT' onClick=userChangeNTPType('T') value='T' title="Set the NTP to T" class="ntp">
 										</div>
 
 									</td>
@@ -3364,12 +3364,12 @@ function closeNav() {
 
 
 
-			<div id="plots4"  class="panelOuter" style=" margin-left:130px;">
+			<div id="plots4"  class="panelOuter">
 				<div class="panelInner">
 
 					<span style="font-size:18px; ">
 						<input type=button id='showSitewisePlot' class='minimise' value='+' onClick="showSitewisePlot()">
-						<b>Sitewise panel</b>
+						<span class="panel_title">Sitewise panel</span>
 						&nbsp;&nbsp;&nbsp;
 						<select class="plot-dropdown" title="Select which plot to display" id = "selectPlot4" OnChange="selectPlot(4);" style="vertical-align: middle; text-align:right;">
 								  <option value="none">Display a sitewise plot...</option>
@@ -3407,12 +3407,12 @@ function closeNav() {
 				</div>
 
 			
-			<div id="plots123"  class="panelOuter" style="margin-left:130px;">
+			<div id="plots123"  class="panelOuter">
 				<div class="panelInner">
 
 					<span style="font-size:18px; ">
 						<input type=button id='showPlots' class='minimise' value='-' onClick="showPlots()">
-						<b>Plot panel</b>
+						<span class="panel_title">Plot panel</span>
 
 						<span style="font-size:12px;  vertical-align:middle"> 
 							- Visualise the simulation output in real-time
@@ -3542,12 +3542,12 @@ function closeNav() {
 
 
 			
-			<div id="ABCpanel"  class="panelOuter" style="margin-left:130px;">
+			<div id="ABCpanel"  class="panelOuter">
 				<div class="panelInner">
 
 				<span  style="font-size:18px; ">
 					<input type=button id='showABCPanel' class='minimise' value='+' onClick=showABCPanelFn()> 
-					<b>Approximate Bayesian Computation</b> 
+					<span class="panel_title">Approximate Bayesian Computation</span> 
 						<span style="font-size:12px;  vertical-align:middle"> 
 							- Fit the parameters to experimental data using approximate Bayesian computation (ABC)
 						</span>
@@ -3833,12 +3833,12 @@ function closeNav() {
 
 
 			
-			<div id="ModelBuildingPanel"  class="panelOuter" style="margin-left:130px;">
+			<div id="ModelBuildingPanel"  class="panelOuter">
 				<div class="panelInner">
 
 				<span  style="font-size:18px; ">
 					<input type=button id='showModelBuildingPanel' class='minimise' value='+' onClick=showModelBuildingPanelFn()> 
-					<b>Model comparison</b> 
+					<span class="panel_title">Model comparison</span> 
 						<span style="font-size:12px;  vertical-align:middle"> 
 							- Create and save different models. These models can be compared using ABC
 						</span>
@@ -3876,15 +3876,15 @@ function closeNav() {
 
 
 			
-			<div style="margin-left:130px;">
+			<div class="panelOuter">
 
-				<div id="sequences" class="panelOuter" style="position:relative; transition: 0s;">
+				<div id="sequences" style="position:relative; transition: 0s;">
 
 					<div class="panelInner">
 
 						<div style='font-size:16px; '>
 							<input type=button class='minimise' id='hideSequences'  value='+' title='Hide/show the sequence window' onClick=toggleSequences()>
-							<span style='font-size:18px; '><b>Copied sequences</b> &nbsp;&nbsp;&nbsp;</span>
+							<span class="panel_title">Copied sequences &nbsp;&nbsp;&nbsp;</span>
 							<span id="terminatedSequencesDescription" style="display:none">
 								<input type=button id='minus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='&larr;20' onClick=minusSequences() title='See previous 20 sequences'>
 								 &nbsp;Displaying seqs <span id='numSeqsDisplayed'>0</span> out of <span id='numSeqsSimulated'>0</span>&nbsp; 
