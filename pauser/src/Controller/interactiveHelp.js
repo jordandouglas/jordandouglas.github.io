@@ -166,7 +166,7 @@ function getTutorialDialogTemplate(){
 
     return `
         <div id='tutorialDialog' style='background-color:A5CF19; padding: 10 10; position:fixed; width: 36vw; left:32vw; top:10vh; z-index:5' plotNum="XX_plotNum_XX">
-            <div style='background-color: white; padding: 15 15; text-align:left; font-size:15; font-family:Arial; overflow-y:auto'>
+            <div style='background-color: white; padding: 15 15; text-align:left; font-size:15;  overflow-y:auto'>
                 <b style='font-size: 22px'> XX_tutname_XX </b>
                 <span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeTutorialDialog()'>&times;</span>
                 <div style='padding-top: 10px; font-size:18px;'> XX_tutorialSubtitle_XX </div>

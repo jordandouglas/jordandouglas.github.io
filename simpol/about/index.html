@@ -282,7 +282,7 @@ function printContents(){
             sectNum++;
             
             
-            $("#contents").append("<div style='font-size:18px; color:#008cba'>" + sectNum + " " + a_tag + "</div>");
+            $("#contents").append("<div class='contents_sect'>" + sectNum + " " + a_tag + "</div>");
                         
             
             ele.before(`<span id='` + id + `_Btn' class='minimise' style="font-size:30px; padding: 5 5" disp="true"  onClick="` + onclick + `">&plus;</span>`);
@@ -290,14 +290,16 @@ function printContents(){
             
             subsectNum = 0;
             subsubsectNum = 0;
+            
+            
         }else if (isSubsect){
             subsectNum++;
-            $("#contents").append("<div style='font-size:17px'>&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + " " + a_tag + "</div>");
+            $("#contents").append("<div class='contents_subsect'>&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + " " + a_tag + "</div>");
             subsubsectNum = 0;
         }
         else {
             subsubsectNum++;
-            $("#contents").append("<div style='font-size:16px'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + "." + subsubsectNum + " " + a_tag + "</div>");
+            $("#contents").append("<div class='contents_subsubsect'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + "." + subsubsectNum + " " + a_tag + "</div>");
         }
         
         
