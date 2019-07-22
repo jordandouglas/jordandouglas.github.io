@@ -1716,7 +1716,7 @@ function closeNav() {
 
 			
 				<div id="SequenceSettings">
-					 <br> Select sequence: <select class="dropdown" style="width: 350px;" name="SelectSequence" id = "SelectSequence" title="Select a sequence" OnChange="stop_controller(function() { userChangeSequence(); }); ">
+					 <br> Select sequence: <select class="dropdown" style="width: 100%" name="SelectSequence" id = "SelectSequence" title="Select a sequence" OnChange="stop_controller(function() { userChangeSequence(); }); ">
 					</select><br>
 						
 					Template: <select class="dropdown" name="SelectTemplateType" id="SelectTemplateType" OnChange="stop_controller(function() { submitCustomSequence(); });">
@@ -1834,7 +1834,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-				 			<input class="variable"   type="number" onChange="update_this_parameter_controller(this)" id="NTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
+				 			<input class="variable param_box"   type="number" onChange="update_this_parameter_controller(this)" id="NTPconc">&mu;M 
 						</td>
 
 
@@ -1857,7 +1857,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-				 			<input class="variable"   type="number" onChange="update_this_parameter_controller(this)" id="ATPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
+				 			<input class="variable param_box"   type="number" onChange="update_this_parameter_controller(this)" id="ATPconc">&mu;M 
 						</td>
 
 
@@ -1879,7 +1879,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-				 			<input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="CTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+				 			<input class="variable param_box"  type="number" onChange="update_this_parameter_controller(this)"  id="CTPconc">&mu;M
 						</td>
 
 
@@ -1903,7 +1903,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="GTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+							<input class="variable param_box"  type="number" onChange="update_this_parameter_controller(this)"  id="GTPconc">&mu;M
 						</td>
 
 
@@ -1927,7 +1927,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" onChange="update_this_parameter_controller(this)"  id="UTPconc" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
+							<input class="variable param_box"  type="number" onChange="update_this_parameter_controller(this)"  id="UTPconc">&mu;M	
 						</td>
 
 
@@ -1950,7 +1950,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input type="number" class="variable"  id="FAssist" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">pN
+							<input type="number" class="variable param_box"  id="FAssist"  OnChange="update_this_parameter_controller(this)">pN
 			 			</td>
 
 
@@ -1975,7 +1975,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input type="number" class="variable"  id="haltPosition" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">nt
+							<input type="number" class="variable param_box"  id="haltPosition"  OnChange="update_this_parameter_controller(this)">nt
 			 			</td>
 
 
@@ -2013,7 +2013,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-			    			<input class="variable"  type="number"  id="hybridLen" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
+			    			<input class="variable param_box"  type="number"  id="hybridLen" OnChange="update_this_parameter_controller(this)"> bp 
 						</td>
 
 
@@ -2036,7 +2036,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-				 			<input class="variable"  type="number"  id="bubbleLeft" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
+				 			<input class="variable param_box"  type="number"  id="bubbleLeft"  OnChange="update_this_parameter_controller(this)"> bp 
 		    			</td>
 
 
@@ -2059,7 +2059,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number"  id="bubbleRight" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
+							<input class="variable param_box"  type="number"  id="bubbleRight" OnChange="update_this_parameter_controller(this)"> bp 
 		    			</td>
 
 
@@ -2128,7 +2128,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="Kdiss"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  &mu;M
+							<input class="variable param_box"  type="number" id="Kdiss" OnChange="update_this_parameter_controller(this)">  &mu;M
 				 		</td>
 
 
@@ -2151,7 +2151,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="kCat"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+							<input class="variable param_box"  type="number" id="kCat"  OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
 				 		</td>
 
 
@@ -2176,7 +2176,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="RateBind"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+							<input class="variable param_box"  type="number" id="RateBind" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
 				 		</td>
 
 
@@ -2266,7 +2266,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="DGtaudag" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
+							<input class="variable param_box"  type="number" id="DGtaudag" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
 			 			</td>
 
 
@@ -2289,7 +2289,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="DGtau1" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
+							<input class="variable param_box"  type="number" id="DGtau1" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
 			 			</td>
 
 
@@ -2313,7 +2313,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input type="number" step="0.1" min="0" max = "3.4" class="variable"  id="barrierPos" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">&#x212b;
+							<input type="number" step="0.1" min="0" max = "3.4" class="variable param_box"  id="barrierPos" OnChange="update_this_parameter_controller(this)">&#x212b;
 			 			</td>
 
 
@@ -2484,7 +2484,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="RateDeactivate"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+							<input class="variable param_box"  type="number" id="RateDeactivate"  OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
 				 		</td>
 
 
@@ -2509,7 +2509,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="deltaGDaggerHybridDestabil"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T 
+							<input class="variable param_box"  type="number" id="deltaGDaggerHybridDestabil"  OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T 
 				 		</td>
 
 
@@ -2534,7 +2534,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="RateActivate" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+							<input class="variable param_box"  type="number" id="RateActivate"  OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
 				 		</td>
 
 
@@ -2581,7 +2581,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="DGtaudagM"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T 
+							<input class="variable param_box"  type="number" id="DGtaudagM"  OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T 
 				 		</td>
 
 
@@ -2653,7 +2653,7 @@ function closeNav() {
 				 		</td>
 
 				 		<td>
-							<input class="variable"  type="number" id="DGtaudagP" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
+							<input class="variable param_box"  type="number" id="DGtaudagP" OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T
 			 			</td>
 
 
@@ -2676,21 +2676,21 @@ function closeNav() {
 
 
 				
-				<span style="display:none"> <br> &Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>special</sub> = <input class="variable"  type="number" title="Free energy barrier height of sliding in or out of the edit site" name="GDaggerSpecial" id="GDaggerSpecial" value=0 style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T <br> </span>  
+				<span style="display:none"> <br> &Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>special</sub> = <input class="variable param_box"  type="number" title="Free energy barrier height of sliding in or out of the edit site" name="GDaggerSpecial" id="GDaggerSpecial" value=0  OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T <br> </span>  
 				
 				<!--
 				<div id="kUspecial_container">
-				 	<span style="">k<sup>`</sup><sub style='position: relative; left: -.20em;'>U</sub> = <input class="variable"  type="number"  id="kUspecial"  style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> </span> 
+				 	<span style="">k<sup>`</sup><sub style='position: relative; left: -.20em;'>U</sub> = <input class="variable param_box"  type="number"  id="kUspecial" OnChange="update_this_parameter_controller(this)"> </span> 
 					<input type=image id='kUspecial_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  		
 				</div>
 				
 				<div id="kAspecial_container">
-					<span style="">k<sup>`</sup><sub style='position: relative; left: -.20em;'>A</sub> = <input class="variable"  type="number" id="kAspecial" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> </span>  
+					<span style="">k<sup>`</sup><sub style='position: relative; left: -.20em;'>A</sub> = <input class="variable param_box"  type="number" id="kAspecial" OnChange="update_this_parameter_controller(this)"> </span>  
 					<input type=image id='kAspecial_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">   
 				</div>
 				-->
 				
-				<span style="display:none">Special site = <input class="variable"  type="number" name="specialSite" id="specialSite" value=33 style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"></span>
+				<span style="display:none">Special site = <input class="variable param_box"  type="number" name="specialSite" id="specialSite" value=33  OnChange="update_this_parameter_controller(this)"></span>
 				
 				<br>
 				
@@ -2725,7 +2725,7 @@ function closeNav() {
 					 		</td>
 
 					 		<td>
-				    			<input class="variable"  type="number"  id="rnaFoldDistance" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)"> bp 
+				    			<input class="variable param_box"  type="number"  id="rnaFoldDistance" OnChange="update_this_parameter_controller(this)"> bp 
 							</td>
 
 
@@ -2823,7 +2823,7 @@ function closeNav() {
 					 		</td>
 
 					 		<td>
-								<input class="variable"  type="number" id="RateCleave" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
+								<input class="variable param_box"  type="number" id="RateCleave" OnChange="update_this_parameter_controller(this)">  s<sup>-1</sup> 
 					 		</td>
 
 
@@ -2848,7 +2848,7 @@ function closeNav() {
 					 		</td>
 
 					 		<td>
-								<input class="variable"  type="number" id="CleavageLimit" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">  nt 
+								<input class="variable param_box"  type="number" id="CleavageLimit" OnChange="update_this_parameter_controller(this)">  nt 
 					 		</td>
 
 
@@ -2900,7 +2900,7 @@ function closeNav() {
 					 		</td>
 
 					 		<td>
-								<input type="number" class="variable" id="arrestTime" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">s
+								<input type="number" class="variable param_box" id="arrestTime" OnChange="update_this_parameter_controller(this)">s
 				 			</td>
 
 
@@ -2923,7 +2923,7 @@ function closeNav() {
 					 		</td>
 
 					 		<td>
-								<input type="number" min=0 step=0.1 class="variable" id="proposalWidth" style="vertical-align: middle; text-align:left; width: 70px" OnChange="update_this_parameter_controller(this)">
+								<input type="number" min=0 step=0.1 class="variable param_box" id="proposalWidth" OnChange="update_this_parameter_controller(this)">
 				 			</td>
 
 
@@ -2999,10 +2999,9 @@ function closeNav() {
 
             <div class="parameter-bg" style="display:none">
                 <div class="parameter-title">Template Slippage Parameters </div>
-                 <br>&Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>bulgeTemplate</sub> = <input class="variable"  type="number" title="Free energy barrier height of bulge formation and diffusion in the template sequence" name="GDaggerDiffuseT" id="GDaggerDiffuseT" value=14 style="vertical-align: middle; text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T
+                 <br>&Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>bulgeTemplate</sub> = <input class="variable param_box"  type="number" title="Free energy barrier height of bulge formation and diffusion in the template sequence" name="GDaggerDiffuseT" id="GDaggerDiffuseT" value=14 OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T
 
-                    <span style="display:none"><br>&Delta;G<sub>bulge</sub> = <input class="variable"  type="number" title="Free energy change of having a bulge in the primer" name="GBulge" id="GBulge" value=0 style="vertical-align: middle; 
-                    text-align:right; width: 70px" OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T</span>
+                    <span style="display:none"><br>&Delta;G<sub>bulge</sub> = <input class="variable param_box"  type="number" title="Free energy change of having a bulge in the primer" name="GBulge" id="GBulge" value=0  OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T</span>
                 
             </div>
 
@@ -3635,7 +3634,7 @@ function closeNav() {
 										<tr>
 											<td>
 												N iterations:
-												<input type="number" id="MCMCntrials" min=0 value=10000 title="Number of samples to generate (for R-ABC) or chain length (for MCMC-ABC)" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008cba">
+												<input type="number" id="MCMCntrials" min=0 value=10000 title="Number of samples to generate (for R-ABC) or chain length (for MCMC-ABC)" class="variable param_box" >
 											</td>
 										</tr>
 
@@ -3644,7 +3643,7 @@ function closeNav() {
 										<tr>
 											<td>
 												N trials per data point:
-												<input type="number" id="MCMC_ntestsperdata" min=1 value=5 title="Number of tests to perform at each force/NTP setting. The average velocity will be taken" class="variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008cba">
+												<input type="number" id="MCMC_ntestsperdata" min=1 value=5 title="Number of tests to perform at each force/NTP setting. The average velocity will be taken" class="variable param_box">
 											</td>
 										</tr>
                                                     
@@ -3676,28 +3675,28 @@ function closeNav() {
 										<tr class="MCMC_display">
 											<td>
 												&isin;<sub>min</sub> =
-												<input type="number" id="MCMC_chiSqthreshold_min" min=0 value=3 title="Chi-squared threshold which must be met to accept a point into the posterior" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+												<input type="number" id="MCMC_chiSqthreshold_min" min=0 value=3 title="Chi-squared threshold which must be met to accept a point into the posterior" class="variable param_box">
 											</td>
 										</tr>
 										
 										<tr class="MCMC_display">
 											<td>
 												&isin;<sub>0</sub> =
-												<input type="number" id="MCMC_chiSqthreshold_0" min=0 value=50 title="Initial chi-squared threshold. This will be decreased every iteration until reaching the minimum threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+												<input type="number" id="MCMC_chiSqthreshold_0" min=0 value=50 title="Initial chi-squared threshold. This will be decreased every iteration until reaching the minimum threshold" class="variable param_box">
 											</td>
 										</tr>
 										
 										<tr class="MCMC_display">
 											<td>
 												&gamma; =
-												<input type="number" id="MCMC_chiSqthreshold_gamma" min=0 max=1 step="0.0001" value=0.999 title="Exponential decrease in chi-squared threshold" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+												<input type="number" id="MCMC_chiSqthreshold_gamma" min=0 max=1 step="0.0001" value=0.999 title="Exponential decrease in chi-squared threshold" class="variable param_box">
 											</td>
 										</tr>
                                                     
                                         <tr class="ABC_display">
                                             <td>
                                                 &epsilon; =
-                                                <input type="number" onChange="update_RABC_epsilon_controller(true)" id="ABC_epsilon" min=0 step="0.001" value=1 title="Threshold for accepting a sample into the posterior distribution.  This input is linked with P(&rho; &le; &epsilon;)" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#708090">
+                                                <input type="number" onChange="update_RABC_epsilon_controller(true)" id="ABC_epsilon" min=0 step="0.001" value=1 title="Threshold for accepting a sample into the posterior distribution.  This input is linked with P(&rho; &le; &epsilon;)" class="variable param_box">
                                             </td>
                                         </tr>
                                                     
@@ -3706,7 +3705,7 @@ function closeNav() {
                                         <tr class="ABC_display">
                                             <td>
                                                 P(&rho; &le; &epsilon;) =
-                                                <input type="number" onChange="update_RABC_epsilon_controller(false)" id="ABC_quantile" min=0 max=1 step="0.001" value=0 title="The proportion of samples to accept into the posterior distribution. This input is linked with &epsilon;" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+                                                <input type="number" onChange="update_RABC_epsilon_controller(false)" id="ABC_quantile" min=0 max=1 step="0.001" value=0 title="The proportion of samples to accept into the posterior distribution. This input is linked with &epsilon;" class="variable param_box">
                                             </td>
                                         </tr>
                                                     
@@ -3727,14 +3726,14 @@ function closeNav() {
 										<tr>
 											<td>
 												Burn-in (%):
-												<input type="number" id="MCMC_burnin" onChange="update_burnin_controller();" min=0 max=100 value=-1 title="Percentage of points to throw away before reaching the posterior distribution. Set to -1 to allow SimPol to select burn-in automatically" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+												<input type="number" id="MCMC_burnin" onChange="update_burnin_controller();" min=0 max=100 value=-1 title="Percentage of points to throw away before reaching the posterior distribution. Set to -1 to allow SimPol to select burn-in automatically" class="variable param_box">
 											</td>
 										</tr>
 										
 										<tr>
 											<td>
 												Log every (states):
-												<input type="number" id="MCMC_logevery" min=1 value=100 title="How often do you want to log the current state" class="variable" style="vertical-align: middle; text-align:left; width: 60px;  font-size:14px; background-color:#008cba">
+												<input type="number" id="MCMC_logevery" min=1 value=100 title="How often do you want to log the current state" class="variable param_box">
 											</td>
 										</tr>
 										
@@ -3754,10 +3753,10 @@ function closeNav() {
 
 
 											<td>
-												<input type=button id="posteriorSummary_btn" onClick="posteriorSummary()" value='Posterior Summary' title="Extract values from the posterior distribution" class="operation" style="background-color:#008cba; width: 170px"> 
+												<span class=button id="posteriorSummary_btn" onClick="posteriorSummary()" title="Extract values from the posterior distribution" class="operation" style="background-color:#008cba; width: 170px">Posterior Summary</span>
 												<br><br>
-												<input type=button id="beginABC_btn" onClick="beginABC()" value='Begin R-ABC' title="Begin the approximate Bayesian computation via rejection with the current settings"  style="width: 170px" class="ABC_display operation beginABC_btn"> 
-                                                <input type=button id="beginMCMC_btn" onClick="beginABC()" value='Begin MCMC-ABC' title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" style="width: 170px" class="MCMC_display operation beginABC_btn" > 
+												<span class=button id="beginABC_btn" onClick="beginABC()"  title="Begin the approximate Bayesian computation via rejection with the current settings"  style="width: 170px" class="ABC_display operation beginABC_btn"> Begin R-ABC </span>
+                                                <span class=button id="beginMCMC_btn" onClick="beginABC()"  title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" style="width: 170px" class="MCMC_display operation beginABC_btn" > Begin MCMC-ABC </span>
                                                 <br><br>
                                                             
                                                             
@@ -3853,7 +3852,7 @@ function closeNav() {
                             
 
 						<label style="cursor:pointer; float:right; vertical-align:top"  title = "Check to sample the model from the list of models below. Each model will be sampled with probability proportional to its weight."> 
-							<input class="variable"  type="checkbox" onChange="userChangeModelSampling_controller()" style="cursor:pointer;" id="sampleModelsChk">Sample models</input> 
+							<input class="variable "  type="checkbox" onChange="userChangeModelSampling_controller()" style="cursor:pointer;" id="sampleModelsChk">Sample models</input> 
 						</label> <br>
  
 				</span>
