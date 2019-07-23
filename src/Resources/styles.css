@@ -440,14 +440,12 @@ div.vertical{
 
 
 
-.block-title > .minimise{
-	width:1.5em; 
-	height:1.5em; 
-	line-height:1.5em;
-	font-size:30px;
-	cursor:pointer;
-    margin: 10px;
-	
+.block-title > .minimise {
+    line-height: 1.2em;
+    font-size: 30px;
+    cursor: pointer;
+    padding: 0em 0.3em 0em 0.3em;
+    margin: 0.2em;
 }
 
 
@@ -999,14 +997,13 @@ input:checked + .slider:before {
 
 .section{
 	font-family:Raleway, Arial;
-
+	margin-bottom:0.5em;
+	
 }
 
 
 .subsection {
 	font-family:Raleway, Arial;
-    margin-bottom:0.5em;
-
 }
 
 
