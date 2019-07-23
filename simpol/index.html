@@ -3239,7 +3239,8 @@ function closeNav() {
 
 						
 							<div id="navigationPanelTable" class="scrollbar" style="overflow-x:scroll; width:100%; position:relative">
-							<span class="button" id='viewModelBtn' onClick=viewModel() title="View the kinetic diagram of this model" style="z-index: 100; float:right;">View model diagram</span>
+							<br>
+							<span class="button" id='viewModelBtn' onClick=viewModel() title="View the kinetic diagram of this model" style="z-index: 100; float:left;">View model diagram</span>
 							<table  cellspacing="0" style="width:100%;">
 
 
@@ -3897,7 +3898,7 @@ function closeNav() {
 								 &nbsp;Displaying seqs <span id='numSeqsDisplayed'>0</span> out of <span id='numSeqsSimulated'>0</span>&nbsp; 
 								<input type=button id='plus20Sequences' class='minimise dropdown-disabled' style='width:40px'  value='20&rarr;' onClick=plusSequences() title='See next 20 sequences'>
 								&nbsp;&nbsp;&nbsp;
-								<input type="image" style="vertical-align: middle; height:20px;  padding: 5 0; display:none; cursor: pointer" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="../src/Images/download.png"> </input>
+								<input type="image" class="icon" style="display:none; cursor: pointer" title="Download sequences in .fasta format" id="downloadSeqs" onClick="downloadSequences()" src="../src/Images/download.png"> </input>
 							</span>
 
 						</div>
