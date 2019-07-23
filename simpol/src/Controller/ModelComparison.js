@@ -179,7 +179,7 @@ function getModelComparisonRowTemplate(modelNum) {
 							Weight:
 						</td>
 						<td>
-							<input id="modelWeight_` + modelNum + `" type="number" min=0 class="variable param_box" style="width:50px; height: 20px" value=1 title="This model will be resampled at the beginning of each simulation with probability proportional to its weight."></input>
+							<input id="modelWeight_` + modelNum + `" type="number" min=0 class="variable param_box" value=1 title="This model will be resampled at the beginning of each simulation with probability proportional to its weight."></input>
 						</td>
 					</tr>
 
