@@ -28,8 +28,6 @@ ABC_gel_images_to_load = [];
 
 function initABCpanel(){
 
-	console.log("initABCpanel");
-
 
 	gelFabricCanvases = {};
 
@@ -751,9 +749,9 @@ function getNewCurveButtonsTemplate(){
 
 					Add experimental data <br><br>
 					<span onClick='addNewABCData("forceVelocity")' title="Add force-velocity experimental data" class="ABCbtn button">+ Force-velocity curve</span>
-					<br><br>
-					<span onClick='addNewABCData("ntpVelocity") title="Add [NTP]-velocity experimental data" class="ABCbtn button">+ [NTP]-velocity curve</span>
-					<br><br>
+					<br><br><br><br>
+					<span onClick='addNewABCData("ntpVelocity")' title="Add [NTP]-velocity experimental data" class="ABCbtn button">+ [NTP]-velocity curve</span>
+					<br><br><br><br>
 					<span onClick='addNewABCData("pauseSites")' title="Enumerate all abundant transcript lengths after a given period of time" class="ABCbtn button">+ Pause sites</span>
 					<br>
 					

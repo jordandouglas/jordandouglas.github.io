@@ -451,11 +451,9 @@ div.vertical{
     padding-bottom: 0px 0px;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
-    font-size: 25px;
+    font-size: 20px;
 	vertical-align: middle; 
-	width:1em;
-	height:1em;
+	height:1.2em;
 	line-height:1em;
 	cursor:pointer;
 	border-radius:5px;
