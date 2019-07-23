@@ -36,7 +36,11 @@ body {
 }
 
 .navArrow{
+	font-size:15px;
 	text-size-adjust: 100%;
+	position:absolute;
+	z-index:2;
+	
 }
 
 
