@@ -28,6 +28,8 @@ ABC_gel_images_to_load = [];
 
 function initABCpanel(){
 
+	console.log("initABCpanel");
+
 
 	gelFabricCanvases = {};
 
