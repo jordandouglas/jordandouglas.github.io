@@ -745,13 +745,13 @@ function getNewCurveButtonsTemplate(){
 
 			<td style="vertical-align:middle; font-size:20px; text-align:center;" colspan=3>
 				<br><br>
-				<div style="padding: 5 5; background-color:#b3b3b3; font-size:16px; width:300px; margin:auto;">
+				<div style="padding: 5 5; background-color:#b3b3b3; font-size:16px; width:500px; margin:auto;">
 
 					Add experimental data <br><br>
 					<span onClick='addNewABCData("forceVelocity")' title="Add force-velocity experimental data" class="ABCbtn button">+ Force-velocity curve</span>
-					<br><br><br><br>
+					<br><br>
 					<span onClick='addNewABCData("ntpVelocity")' title="Add [NTP]-velocity experimental data" class="ABCbtn button">+ [NTP]-velocity curve</span>
-					<br><br><br><br>
+					<br><br>
 					<span onClick='addNewABCData("pauseSites")' title="Enumerate all abundant transcript lengths after a given period of time" class="ABCbtn button">+ Pause sites</span>
 					<br>
 					
