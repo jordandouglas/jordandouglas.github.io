@@ -179,7 +179,7 @@ function getModelComparisonRowTemplate(modelNum) {
 							Weight:
 						</td>
 						<td>
-							<input id="modelWeight_` + modelNum + `" type="number" min=0 class="variable" style="width:50px; height: 20px" value=1 title="This model will be resampled at the beginning of each simulation with probability proportional to its weight."></input>
+							<input id="modelWeight_` + modelNum + `" type="number" min=0 class="variable param_box" style="width:50px; height: 20px" value=1 title="This model will be resampled at the beginning of each simulation with probability proportional to its weight."></input>
 						</td>
 					</tr>
 
@@ -189,16 +189,16 @@ function getModelComparisonRowTemplate(modelNum) {
 
 			<td style="padding:5 5; vertical-align:middle; width: 70%">
 
-				<textarea id="modelBuildingDescription_` + modelNum + `" title="Description of all the model settings and the values of all parameters which do not have a prior distribution. A parameter may only have one prior distribution." style="width:100%; max-width:100%; min-width:100%; height: 100px; min-height:100px font-size: 16px" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">Retrieving model JSON...</textarea>
+				<textarea id="modelBuildingDescription_` + modelNum + `" title="Description of all the model settings and the values of all parameters which do not have a prior distribution. A parameter may only have one prior distribution." style="width:100%; max-width:100%; min-width:100%; height: 6em; min-height:4em font-size: 16px" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">Retrieving model JSON...</textarea>
 
 			</td>
 
 			<td style="padding:5 5; text-alight:right">
 
 
-				<img onClick='deleteModel(` + modelNum + `)' src="../src/Images/close.png" style="float:right; padding:5 0; height:20px; cursor:pointer" title="Delete this model">
+				<img class="icon" onClick='deleteModel(` + modelNum + `)' src="../src/Images/close.png" style="cursor:pointer" title="Delete this model">
 
-				<input type=button id='activateModelBtn_` + modelNum + `' onClick='activateModel(` + modelNum + `)' value='Activate' title="Activate this model" class="operation">
+				<span id='activateModelBtn_` + modelNum + `' onClick='activateModel(` + modelNum + `)' title="Activate this model" class="operation button">Activate</span>
 			
 
 			</td>
