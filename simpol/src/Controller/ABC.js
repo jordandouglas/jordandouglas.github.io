@@ -24,11 +24,6 @@
 
 ABC_gel_images_to_load = [];
 
-function initABC(){
-    initABCpanel();
-    toggleMCMC();
-}
-
 
 
 function initABCpanel(){
@@ -37,21 +32,21 @@ function initABCpanel(){
 	gelFabricCanvases = {};
 
 
-
 	$(".beginABC_btn").css("cursor", "auto");
 	$(".beginABC_btn").css("background-color", "#858280");
 	$(".beginABC_btn").attr("disabled", "disabled");
-    
 	$("#uploadABC").show(50);
 
 	// Acceptance
-	$("#showInMCMC").hide(0);
+	$("#ABCacceptanceDIV").hide(0);
 	$("#ABCacceptanceVal").html("0");
 
 	// Status
+	$("#burninStatusDIV").hide(0);
 	$("#burninStatusVal").html("");
 
 	// Epsilon
+	$("#currentEpsilonDIV").hide(0);
 	$("#currentEpsilonVal").html("");
 
 
@@ -61,8 +56,7 @@ function initABCpanel(){
 	nFits = 0;
 	ABCtableToUse = 1; // Alternate between the left (1) and right (2) tables
 	addNewCurveButtons();
-    ABC_accepted_indices = [];
-	
+	toggleMCMC();
 
 }
 
@@ -77,7 +71,7 @@ function beginABC(){
 
 
 	// Load the force-velocity values
-	var which = $("#ABC_useMCMC").val() == 1 ? "ABC" : $("#ABC_useMCMC").val() == 2 ? "MCMC" : "NS-ABC";
+	var which = $("#ABC_useMCMC").val() == 1 ? "ABC" : $("#ABC_useMCMC").val() == 2 ? "MCMC" : "NS-ABC"
 	var abcDataObjectForModel = getAbcDataObject(which);
 
 	console.log("Sending object", abcDataObjectForModel, $("#ABC_useMCMC").val());
@@ -88,7 +82,6 @@ function beginABC(){
 	$("#PreExp").attr("disabled", "disabled");
 	$("#PreExp").css("cursor", "auto");
 	$("#PreExp").css("background-color", "#858280");
-    $("#deleteABCmsg").show(50);
 	changeSpeed_controller();
 
 
@@ -97,8 +90,25 @@ function beginABC(){
 	// Update the DOM so that we can see that ABC is running
 	$(".beginABC_btn").val("Stop ABC");
 	$(".beginABC_btn").attr("onclick", "stop_controller()");
-	
-    disableABCbuttons();
+
+
+	// Disable the ntrials textboxes
+	$("#ABCntrials").css("cursor", "auto");
+	$("#ABCntrials").css("background-color", "#858280");
+	$("#ABCntrials").attr("disabled", "disabled");
+
+
+	$("#MCMCntrials").css("cursor", "auto");
+	$("#MCMCntrials").css("background-color", "#858280");
+	$("#MCMCntrials").attr("disabled", "disabled");
+
+
+	//$("#ABC_chiSq").css("cursor", "auto");
+	//$("#ABC_chiSq").css("background-color", "#858280");
+	//$("#ABC_chiSq").attr("disabled", "disabled");
+
+
+
 
 	// Add the trace plots if MCMC
 	if (which == "MCMC") addTracePlots();
@@ -106,59 +116,6 @@ function beginABC(){
 
 
 }
-
-
-function disableABCbuttons(){
-
-    // Disable the ntrials textboxes
-    $("#MCMCntrials").css("cursor", "auto");
-    $("#MCMCntrials").css("background-color", "#858280");
-    $("#MCMCntrials").attr("disabled", "disabled");
-    
-    
-    // Disable the inference method checkbox
-    $("#ABC_useMCMC").css("cursor", "auto");
-    $("#ABC_useMCMC").css("background-color", "#858280");
-    $("#ABC_useMCMC").attr("disabled", "disabled");
-    
-    
-    // Disable log every
-    $("#MCMC_logevery").css("cursor", "auto");
-    $("#MCMC_logevery").css("background-color", "#858280");
-    $("#MCMC_logevery").attr("disabled", "disabled");
-    
-    
-    // Disable epsilon settings for MCMC
-    $("#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("cursor", "auto");
-    $("#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("background-color", "#858280");
-    $("#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").attr("disabled", "disabled");
-
-}
-
-
-
-function enableABCbuttons_endABC(){
-
-    // Reactivate all the buttons
-    $("#MCMCntrials,#PreExp").css("cursor", "");
-    $("#MCMCntrials,#PreExp").css("background-color", "#008cba");
-    $("#MCMCntrials,#PreExp").attr("disabled", false);
-    
-
-}
-
-
-
-function enableSomeABCbuttons_deleteABC(){
-
-    // Reactivate all the buttons
-    $("#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("cursor", "");
-    $("#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("background-color", "#008cba");
-    $("#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").attr("disabled", false);
-    enableABCbuttons_endABC();
-
-}
-
 
 
 
@@ -169,10 +126,14 @@ function onABCStart(){
 
 	$("#downloadABC").show(50);
 	$("#uploadABC").hide(50);
-    
-    
-    if ($("#ABC_useMCMC").val() == 2) $("#showInMCMC").show(50);
 
+	$("#ABCacceptanceDIV").show(50);
+
+	// Status
+	$("#burninStatusDIV").show(50);
+
+	// Epsilon
+	$("#currentEpsilonDIV").show(50);
 	
 	//$("#ABCacceptancePercentage_val").html("0");
 	$("#nRowsToDisplayABC").show(50);
@@ -231,23 +192,17 @@ function getAbcDataObject(which = "ABC"){
 	
 	var curveTables = $(".ABCcurveRow");
 	var abcDataObjectForModel = {};
-    
-    
 
-    
-    abcDataObjectForModel.ntrials = $("#MCMCntrials").val();
-    abcDataObjectForModel.testsPerData = $("#MCMC_ntestsperdata").val();
-    
-    
 	if (which == "ABC"){
 		abcDataObjectForModel.inferenceMethod = "ABC";
-		abcDataObjectForModel.epsilon = $("#ABC_epsilon").val();
-		abcDataObjectForModel.quantile = $("#ABC_quantile").val();
-        abcDataObjectForModel.ABCshowAll = $("#ABCshowAll").is(":checked");
+		abcDataObjectForModel.ntrials = $("#ABCntrials").val();
+		abcDataObjectForModel.testsPerData = $("#ABC_ntestsperdata").val();
 	}
 
 	else if (which == "MCMC"){
 		abcDataObjectForModel.inferenceMethod = "MCMC";
+		abcDataObjectForModel.ntrials = $("#MCMCntrials").val();
+		abcDataObjectForModel.testsPerData = $("#MCMC_ntestsperdata").val();
 		abcDataObjectForModel.burnin = $("#MCMC_burnin").val();
 		abcDataObjectForModel.logEvery = $("#MCMC_logevery").val();
 		abcDataObjectForModel.chiSqthreshold_min = $("#MCMC_chiSqthreshold_min").val();
@@ -791,20 +746,12 @@ function getNewCurveButtonsTemplate(){
 				<div style="padding: 5 5; background-color:#b3b3b3; font-size:16px; width:300px; margin:auto;">
 
 					Add experimental data <br><br>
-					<input type=button onClick='addNewABCData("forceVelocity")' value='+ Force-velocity curve' title="Add force-velocity experimental data" class="operation ABCbtn" style="background-color:#008CBA; width: 200px"> 
+					<span onClick='addNewABCData("forceVelocity")' title="Add force-velocity experimental data" class="ABCbtn button">+ Force-velocity curve</span>
 					<br><br>
-					<input type=button onClick='addNewABCData("ntpVelocity")' value='+ [NTP]-velocity curve' title="Add [NTP]-velocity experimental data" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
+					<span onClick='addNewABCData("ntpVelocity") title="Add [NTP]-velocity experimental data" class="ABCbtn button">+ [NTP]-velocity curve</span>
 					<br><br>
-
-					<!--<input type=button onClick='addNewABCData("timeGel")' value='+ Time gel' title="Upload a gel of transcript lengths over time" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
-					<br><br>-->
-
-					<!--<input type=button onClick='addNewABCData("pauseEscape")' value='+ Pause escape data' title="Add maximal pause probability and/or half life data about a pause site" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
-					<br><br>-->
-
-
-					<input type=button onClick='addNewABCData("pauseSites")' value='+ Pause sites' title="Enumerate all abundant transcript lengths after a given period of time" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
-					<br><br>
+					<span onClick='addNewABCData("pauseSites")' title="Enumerate all abundant transcript lengths after a given period of time" class="ABCbtn button">+ Pause sites</span>
+					<br>
 					
 				</div>
 
@@ -1052,7 +999,7 @@ function getABCntpVelocityCurveTemplate(fitID){
 
 				<div style="font-size:20px;">
 					[NTP]-velocity curve
-					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#[NTP]-velocity"><img class="helpIcon" src="../src/Images/help.png"></a>
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
 						
 				</div>
 
@@ -1177,23 +1124,28 @@ function getPauseSitesTemplate(fitID){
 
 			</td>
 
-   
+
+			<td class="` + fitID + `" style="width:300px; text-align:center; vertical-align:top">
+            
+				<div style="font-size:20px;">
+					Pause sites
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+						
+				</div>
+
+					
+					<canvas id="pauseSitesCurve_` + fitID + `" width=300 height=300> </canvas>
+
+			</td>
+
 
 
 			<td class="` + fitID + `" style="text-align:center; vertical-align:top">
 
 					<input type=button id='deleteExperiment_` + fitID + `' class='minimise' style='float:right'  value='&times;' onClick=deleteExperiment("` + fitID + `") title='Delete this experiment'>
-                    
-                    
-                    
-                    <div style="font-size:20px;">
-                    Pause site data
-                        <a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#Pause_sites"><img class="helpIcon" src="../src/Images/help.png"></a>
-                    </div>
 
-                    
 				
-					<table style="width:500px; margin:auto">
+					<table style="width:250px; margin:auto">
 
 
                  
@@ -1202,7 +1154,7 @@ function getPauseSitesTemplate(fitID){
 
                             <b>Sequence:</b>
 							<td style="text-align:right;" colspan=2>
-					 			<textarea id="pauseSitesSeq_` + fitID + `"  onChange="validateAllAbcDataInputs()" title="Please enter the nascent sequence which contains the pause sites" style="max-width: 500px; width: 500px; height: 100px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input nascent sequence 5' to 3'..."></textarea> 
+					 			<textarea id="pauseSitesSeq_` + fitID + `"  onChange="validateAllAbcDataInputs()" title="Please enter a sequence" style="max-width: 250px; width: 250px; height: 200px; vertical-align: top; font-size: 14px; font-family: 'Courier New'" placeholder="Input nascent sequence 5' to 3'..."></textarea> 
 							</td>
 					 	</tr>
 
@@ -1307,7 +1259,7 @@ function getABCpauseSiteTemplate(fitID){
 
 				<div style="font-size:20px;">
 					Pause escape curve
-					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#[NTP]-velocity"><img class="helpIcon" src="../src/Images/help.png"></a>
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
 						
 				</div>
 
@@ -1478,7 +1430,7 @@ function getTimeGelTemplateRight(fitID){
 			<td colspan=3  style="width:100%; text-align:center; vertical-align:top">
 				<div style="font-size:20px;">
 					Gel electrophoresis of transcript lengths over time
-					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#[NTP]-velocity"><img class="helpIcon" src="../src/Images/help.png"></a>
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#ntpVelocity_ABCSectionHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
 				</div>
 			</td>
 
@@ -1930,8 +1882,6 @@ function deleteExperiment(fitID){
 		$("#GTPconc_fit" + (fitNum-1)).val($("#GTPconc_fit" + (fitNum)).val());
 		$("#UTPconc_fit" + (fitNum-1)).val($("#UTPconc_fit" + (fitNum)).val());
 		$("#ABC_force_fit" + (fitNum-1)).val($("#ABC_force_fit" + (fitNum)).val());
-        $("#pauseSitesInputData_fit" + (fitNum-1)).val($("#pauseSitesInputData_fit" + (fitNum)).val());
-        $("#pauseSitesSeq_fit" + (fitNum-1)).val($("#pauseSitesSeq_fit" + (fitNum)).val());
 		
 		
 	}
@@ -1979,6 +1929,7 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 		//console.log("getPosteriorDistribution_controller", result);
 
+		
 		var abcDataObjectForModel = getAbcDataObject();
 
 
@@ -1988,72 +1939,25 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 
 			var plotWidth = canvas.width - axisGap - margin;
 			var plotHeight = canvas.height - axisGap - margin;
-            
-            // Ticks
-            var xlabPos = [];
-            var xResult = getNiceAxesNumbers(minimumFromList(forces), maximumFromList(forces), plotWidth);
-            var xmin = xResult["min"]
-            var xmax = xResult["max"]
-            var widthScale = xResult["widthOrHeightScale"]
-            xlabPos = xResult["vals"]
-           // console.log("xResult", xResult);
-
-            var ylabPos = [];
-            var yResult = getNiceAxesNumbers(0, maximumFromList(velocities), plotHeight, true);
-            var ymin = yResult["min"]
-            var ymax = yResult["max"]
-            var heightScale = yResult["widthOrHeightScale"]
-            ylabPos = yResult["vals"]
-            //console.log("yResult", yResult);
-  
-  
-  
-            // X min and max
-            var axisPointMargin = 5 * canvasSizeMultiplier;
-            ctx.font = 12 * canvasSizeMultiplier + "px Arial";
-            ctx.textBaseline="top"; 
-            var tickLength = 10 * canvasSizeMultiplier;
-            ctx.lineWidth = 1 * canvasSizeMultiplier;
-
-            for (var labelID = 0; labelID < xlabPos.length; labelID++){
-            
-                var x0 = widthScale * (xlabPos[labelID] - xmin) + axisGap;
-                
-                ctx.textAlign = labelID == 0 ? "left" : "center";
-                ctx.fillText(xlabPos[labelID], x0, canvas.height - axisGap + axisPointMargin);
-                
-                // Draw a tick on the axis
-                ctx.beginPath();
-                ctx.moveTo(x0, canvas.height - axisGap - tickLength/2);
-                ctx.lineTo(x0, canvas.height - axisGap + tickLength/2);
-                ctx.stroke();
-
-            }
-            
-            
-            
-            
-            // Y min and max
-            ctx.textBaseline="bottom"; 
-
-            ctx.save()
-            ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
-            ctx.rotate(-Math.PI/2);
-            for (var labelID = 0; labelID < ylabPos.length; labelID++){
-                var y0 = heightScale * (ylabPos[labelID] - ymin);
-                ctx.fillText(ylabPos[labelID], y0, 0);
-
-                // Draw a tick on the axis
-                ctx.beginPath();
-                ctx.moveTo(y0, axisPointMargin - tickLength/2);
-                ctx.lineTo(y0, axisPointMargin + tickLength/2);
-                ctx.stroke();
 
 
-            }
-            ctx.restore();
+			var xmin = roundToSF(minimumFromList(forces), 2, "floor");
+			var xmax = roundToSF(maximumFromList(forces), 2, "ceil");
+			var ymin = 0;
+			var ymax = roundToSF(maximumFromList(velocities) * 1.3, 3, "ceil");
 
-  
+			if (xmax == xmin){
+				xmax += 5;
+				xmin -= 5;
+			}
+
+			if (ymax == ymin){
+				ymax += 5;
+			}
+
+			var widthScale = plotWidth / (xmax - xmin);
+			var heightScale = plotHeight / (ymax - ymin);
+
 
 
 			// Plot the posterior distribution of curves
@@ -2129,7 +2033,35 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 			}
 				
 
-		
+			// X min and max
+			var axisPointMargin = 10 * canvasSizeMultiplier;
+			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+			ctx.textBaseline="top"; 
+			ctx.textAlign="left"; 
+			ctx.fillText(xmin, axisGap, canvas.height - axisGap + axisPointMargin);
+			ctx.textAlign="right"; 
+			ctx.fillText(xmax, canvas.width - margin, canvas.height - axisGap + axisPointMargin);
+
+
+			// Y min and max
+			ctx.save()
+			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+			ctx.textBaseline="bottom"; 
+			ctx.textAlign="right"; 
+			ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
+			ctx.rotate(-Math.PI/2);
+			ctx.fillText(0, 0, 0);
+			ctx.restore();
+			
+			ctx.save()
+			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+			ctx.textAlign="right"; 
+			ctx.textBaseline="bottom"; 
+			ctx.translate(axisGap - axisPointMargin, margin);
+			ctx.rotate(-Math.PI/2);
+			ctx.fillText(ymax, 0, 0);
+			ctx.restore();
+			
 
 		}
 
@@ -2160,7 +2092,7 @@ function drawForceVelocityCurveCanvas(fitID, forces = null, velocities = null){
 		ctx.textAlign="center"; 
 		ctx.textBaseline="bottom"; 
 		ctx.save()
-		var ylabXPos = 1 * axisGap / 2;
+		var ylabXPos = 2 * axisGap / 3;
 		var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
 		ctx.translate(ylabXPos, ylabYPos);
 		ctx.rotate(-Math.PI/2);
@@ -2205,72 +2137,22 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 			var plotWidth = canvas.width - axisGap - margin;
 			var plotHeight = canvas.height - axisGap - margin;
 
-            
-            
-            
-            // Ticks
-            var xlabPos = [];
-            var xResult = getNiceAxesNumbers(0, maximumFromList(concentrations), plotWidth, true);
-            var xmin = xResult["min"]
-            var xmax = xResult["max"]
-            var widthScale = xResult["widthOrHeightScale"]
-            xlabPos = xResult["vals"]
-            //console.log("xResult", xResult);
 
-            var ylabPos = [];
-            var yResult = getNiceAxesNumbers(0, maximumFromList(velocities), plotHeight, true);
-            var ymin = yResult["min"]
-            var ymax = yResult["max"]
-            var heightScale = yResult["widthOrHeightScale"]
-            ylabPos = yResult["vals"]
-            //console.log("yResult", yResult);
-  
-            
-             // X min and max
-            var axisPointMargin = 5 * canvasSizeMultiplier;
-            ctx.font = 12 * canvasSizeMultiplier + "px Arial";
-            ctx.textBaseline="top"; 
-            var tickLength = 10 * canvasSizeMultiplier;
-            ctx.lineWidth = 1 * canvasSizeMultiplier;
+			var xmin = 0;
+			var xmax = roundToSF(maximumFromList(concentrations), 2, "ceil");
+			var ymin = 0;
+			var ymax = roundToSF(maximumFromList(velocities) * 1.3, 3, "ceil");
 
-            for (var labelID = 0; labelID < xlabPos.length; labelID++){
-            
-                var x0 = widthScale * (xlabPos[labelID] - xmin) + axisGap;
-                
-                ctx.textAlign = labelID == 0 ? "left" : "center";
-                ctx.fillText(xlabPos[labelID], x0, canvas.height - axisGap + axisPointMargin);
-                
-                // Draw a tick on the axis
-                ctx.beginPath();
-                ctx.moveTo(x0, canvas.height - axisGap - tickLength/2);
-                ctx.lineTo(x0, canvas.height - axisGap + tickLength/2);
-                ctx.stroke();
+			if (xmax == xmin){
+				xmax += 10;
+			}
 
-            }
-            
-            
-            
-            
-            // Y min and max
-            ctx.textBaseline="bottom"; 
+			if (ymax == ymin){
+				ymax += 5;
+			}
 
-            ctx.save()
-            ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
-            ctx.rotate(-Math.PI/2);
-            for (var labelID = 0; labelID < ylabPos.length; labelID++){
-                var y0 = heightScale * (ylabPos[labelID] - ymin);
-                ctx.fillText(ylabPos[labelID], y0, 0);
-
-                // Draw a tick on the axis
-                ctx.beginPath();
-                ctx.moveTo(y0, axisPointMargin - tickLength/2);
-                ctx.lineTo(y0, axisPointMargin + tickLength/2);
-                ctx.stroke();
-
-
-            }
-            ctx.restore();
-            
+			var widthScale = plotWidth / (xmax - xmin);
+			var heightScale = plotHeight / (ymax - ymin);
 
 
 
@@ -2345,7 +2227,38 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 
 			}
 
-		
+
+
+
+			
+			// X min and max
+			var axisPointMargin = 10 * canvasSizeMultiplier;
+			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+			ctx.textBaseline="top"; 
+			ctx.textAlign="left"; 
+			ctx.fillText(xmin, axisGap, canvas.height - axisGap + axisPointMargin);
+			ctx.textAlign="right"; 
+			ctx.fillText(xmax, canvas.width - margin, canvas.height - axisGap + axisPointMargin);
+
+
+			// Y min and max
+			ctx.save()
+			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+			ctx.textBaseline="bottom"; 
+			ctx.textAlign="right"; 
+			ctx.translate(axisGap - axisPointMargin, canvas.height - axisGap);
+			ctx.rotate(-Math.PI/2);
+			ctx.fillText(0, 0, 0);
+			ctx.restore();
+			
+			ctx.save()
+			ctx.font = 12 * canvasSizeMultiplier + "px Arial";
+			ctx.textAlign="right"; 
+			ctx.textBaseline="bottom"; 
+			ctx.translate(axisGap - axisPointMargin, margin);
+			ctx.rotate(-Math.PI/2);
+			ctx.fillText(ymax, 0, 0);
+			ctx.restore();
 			
 
 		}
@@ -2381,7 +2294,7 @@ function drawNtpVelocityCurveCanvas(fitID, concentrations = null, velocities = n
 		ctx.textAlign="center"; 
 		ctx.textBaseline="bottom"; 
 		ctx.save()
-		var ylabXPos = 1 * axisGap / 2;
+		var ylabXPos = 2 * axisGap / 3;
 		var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
 		ctx.translate(ylabXPos, ylabYPos);
 		ctx.rotate(-Math.PI/2);
@@ -5101,7 +5014,7 @@ function drawTimeGelDensityCanvas(fitID, laneData = null){
 
 
 // Loads a session from the XML file stored at url
-function uploadABCFromURL(url, resolve = function() {}){
+function uploadABCFromURL(url){
 	
 	console.log("Trying to open", url);
 	var xhttp = new XMLHttpRequest();
@@ -5114,8 +5027,7 @@ function uploadABCFromURL(url, resolve = function() {}){
 			var TSVstring = xhttp.responseText.replace(/(\r\n|\n|\r)/gm,"!");
 			TSVstring = TSVstring.replace(/(\t)/gm, "&");
 			
-            if (!$("#ABCPanelTableDIV").is(":visible")) showABCPanelFn();
-		    uploadABC_controller(TSVstring, resolve);
+		   uploadABC_controller(TSVstring);
 		   
 		}
 	};
@@ -5130,8 +5042,6 @@ function uploadABC(){
 	
 	
 	document.getElementById('uploadABCinput').addEventListener('change', loadSessionFile, false);
-    $("#uploadABC").after(getLoaderTemplate("uploadingABCloader", "", true));
-    $("#uploadABC").hide();
 	$("#uploadABCinput").click();
 
 	function loadSessionFile(evt) {
@@ -5154,9 +5064,7 @@ function uploadABC(){
 
 					//console.log("Sending TSVstring", TSVstring);
 
-					uploadABC_controller(TSVstring, function(){
-                        $("#uploadingABCloader").remove();
-                    });
+					uploadABC_controller(TSVstring);
 
 				};
 			})(fileName);
@@ -5442,7 +5350,7 @@ function addNewABCRows(lines){
 
 			lineWithNBSPpadding += "<br></div>";
 			ABClines.push(lineWithNBSPpadding);
-			
+			if (!rejected) ABClinesAcceptedOnly.push(lineWithNBSPpadding);
 
 		}
 
@@ -5460,25 +5368,12 @@ function addNewABCRows(lines){
 
 function renderABCoutput(){
 
-    if (!ABClines.length) return
-    $("#ABCoutput").show(300);
+
+
 
 	// Print ALL lines or just accepted lines?
-	var linesToUse = [];
-    if ($("#ABC_useMCMC").val() == 1 && !$("#ABCshowAll").prop("checked")){
-        
-        //console.log("ABClines", ABClines);
-        linesToUse.push(ABClines[0]); // Header
-        for (var i = 0; i < ABC_accepted_indices.length; i ++){
-            var lineNumber = ABC_accepted_indices[i];
-            linesToUse.push(ABClines[lineNumber]);
-        }
-        
-        
-    }else linesToUse = ABClines;
-    
-    
-    if (linesToUse == null || linesToUse.length == 0) return;
+	var linesToUse = $("#ABC_showRejectedParameters").prop("checked") ? ABClines : ABClinesAcceptedOnly;
+
 
 	var ABCoutputHTML = "";
 
@@ -5605,16 +5500,12 @@ function toggleAcceptedOrRejected(){
 
 function toggleMCMC(){
 
-    
-    enableABCbuttons_endABC();
-     
 
 	// Rejection ABC
 	if ($("#ABC_useMCMC").val() == 1){
 
 		$(".ABC_display").show(50);
 		$(".MCMC_display").hide(0);
-        
 
 	}
 
