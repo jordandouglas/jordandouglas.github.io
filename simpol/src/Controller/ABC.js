@@ -913,7 +913,7 @@ function getABCforceVelocityCurveTemplate(fitID){
 					 		</td>
 
 					 		<td>
-					 			<input class="param_box variable" value=1000   type="number" id="ATPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
+					 			<input class="param_box variable" value=1000   type="number" id="ATPconc_` + fitID + `">&mu;M 
 							</td>
 					 	</tr>
 
@@ -924,7 +924,7 @@ function getABCforceVelocityCurveTemplate(fitID){
 					 		</td>
 
 					 		<td>
-					 			<input class="param_box variable" value=1000  type="number"  id="CTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+					 			<input class="param_box variable" value=1000  type="number"  id="CTPconc_` + fitID + `">&mu;M
 							</td>
 					 	</tr>
 
@@ -937,7 +937,7 @@ function getABCforceVelocityCurveTemplate(fitID){
 					 		</td>
 
 					 		<td>
-								<input class="param_box variable" value=1000 type="number"  id="GTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+								<input class="param_box variable" value=1000 type="number"  id="GTPconc_` + fitID + `">&mu;M
 							</td>
 					 	</tr>
 
@@ -949,7 +949,7 @@ function getABCforceVelocityCurveTemplate(fitID){
 					 		</td>
 
 					 		<td>
-								<input class="param_box variable" value=1000 type="number" id="UTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
+								<input class="param_box variable" value=1000 type="number" id="UTPconc_` + fitID + `">&mu;M	
 							</td>
 					 	</tr>
 
@@ -1019,7 +1019,7 @@ function getABCntpVelocityCurveTemplate(fitID){
 					<br><br>
 					Force:
 						<input type="number" id="ABC_force_` + fitID + `" value=0 title="The force (pN) applied during this experiment"
-							 class="param_box variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA">pN <br> <br>
+							 class="param_box variable">pN <br> <br>
 
 					
 
@@ -1039,7 +1039,7 @@ function getABCntpVelocityCurveTemplate(fitID){
 					 		</td>
 
 					 		<td>
-					 			<input class="param_box variable" value=5   type="number" id="ATPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
+					 			<input class="param_box variable" value=5   type="number" id="ATPconc_` + fitID + `">&mu;M 
 							</td>
 					 	</tr>
 
@@ -1050,7 +1050,7 @@ function getABCntpVelocityCurveTemplate(fitID){
 					 		</td>
 
 					 		<td>
-					 			<input class="param_box variable" value=2.5  type="number"  id="CTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+					 			<input class="param_box variable" value=2.5  type="number"  id="CTPconc_` + fitID + `">&mu;M
 							</td>
 					 	</tr>
 
@@ -1063,7 +1063,7 @@ function getABCntpVelocityCurveTemplate(fitID){
 					 		</td>
 
 					 		<td>
-								<input class="param_box variable" value=10 type="number"  id="GTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+								<input class="param_box variable" value=10 type="number"  id="GTPconc_` + fitID + `">&mu;M
 							</td>
 					 	</tr>
 
@@ -1075,7 +1075,7 @@ function getABCntpVelocityCurveTemplate(fitID){
 					 		</td>
 
 					 		<td>
-								<input class="param_box variable" value=10 type="number" id="UTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
+								<input class="param_box variable" value=10 type="number" id="UTPconc_` + fitID + `">&mu;M	
 							</td>
 					 	</tr>
 
@@ -1199,7 +1199,7 @@ function getABCpauseSiteTemplate(fitID){
 
 					 		<td>
 					 			<input id="pauseEscape_site_` + fitID + `" onChange="validateAllAbcDataInputs()" title="The position(s) of the pause site. Enter a single pause site eg. 62, or a contiguous range which constitutes the pause site eg. 31-38."
-							 class="param_box variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> 
+							 class="param_box variable"> 
 							</td>
 					 	</tr>
 
@@ -1211,7 +1211,7 @@ function getABCpauseSiteTemplate(fitID){
 
 					 		<td>
 					 			<input type="number" id="pauseEscape_Emax_` + fitID + `" value=0 step=0.1 min=0 max=1 onChange="validateAllAbcDataInputs()"  title="The maximal pause probability of the pause. Leave blank if unknown."
-								 class="param_box variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> 
+								 class="param_box variable"> 
 							</td>
 					 	</tr>
 
@@ -1223,7 +1223,7 @@ function getABCpauseSiteTemplate(fitID){
 
 					 		<td>
 					 			<input type="number" id="pauseEscape_Emin_` + fitID + `" value=0 step=0.1 min=0 max=1 onChange="validateAllAbcDataInputs()"  title="The maixmum probability of arrest if the polymerase fails to recover. Leave blank if unknown."
-								 class="param_box variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> 
+								 class="param_box variable"> 
 							</td>
 					 	</tr>
 
@@ -1237,7 +1237,7 @@ function getABCpauseSiteTemplate(fitID){
 
 					 		<td>
 								<input type="number" id="pauseEscape_t12_` + fitID + `"  min=0 onChange="validateAllAbcDataInputs()" title="The half-life of the pause (s). Leave blank if unknown."
-							 class="param_box variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA">s</td>
+							 class="param_box variable">s</td>
 					 	</tr>
 
 
@@ -1293,7 +1293,7 @@ function getABCpauseSiteTemplate(fitID){
 					 		</td>
 
 					 		<td>
-					 			<input class="param_box variable" value=100   type="number" id="ATPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
+					 			<input class="param_box variable" value=100   type="number" id="ATPconc_` + fitID + `">&mu;M 
 							</td>
 					 	</tr>
 
@@ -1304,7 +1304,7 @@ function getABCpauseSiteTemplate(fitID){
 					 		</td>
 
 					 		<td>
-					 			<input class="param_box variable" value=100  type="number"  id="CTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+					 			<input class="param_box variable" value=100  type="number"  id="CTPconc_` + fitID + `">&mu;M
 							</td>
 					 	</tr>
 
@@ -1317,7 +1317,7 @@ function getABCpauseSiteTemplate(fitID){
 					 		</td>
 
 					 		<td>
-								<input class="param_box variable" value=100 type="number"  id="GTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+								<input class="param_box variable" value=100 type="number"  id="GTPconc_` + fitID + `">&mu;M
 							</td>
 					 	</tr>
 
@@ -1329,7 +1329,7 @@ function getABCpauseSiteTemplate(fitID){
 					 		</td>
 
 					 		<td>
-								<input class="param_box variable" value=100 type="number" id="UTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
+								<input class="param_box variable" value=100 type="number" id="UTPconc_` + fitID + `">&mu;M	
 							</td>
 					 	</tr>
 
@@ -1343,7 +1343,7 @@ function getABCpauseSiteTemplate(fitID){
 					 		<td>
 					 			<br><br>
 								<input type="number" id="ABC_haltPosition_` + fitID + `" value=0 title="The template position where the polymerase starts transcription from. Set to 0 to leave as transcription bubble default."
-							 class="param_box variable" style="vertical-align: middle; text-align:left; width: 70px;  font-size:14px; background-color:#008CBA"> nt
+							 class="param_box variable"> nt
 							</td>
 					 	</tr>
 
@@ -1522,7 +1522,7 @@ function getTimeGelTemplateRight(fitID){
 					 		</td>
 
 					 		<td>
-					 			<input class="param_box variable" value=100   type="number" id="ATPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M 
+					 			<input class="param_box variable" value=100   type="number" id="ATPconc_` + fitID + `" >&mu;M 
 							</td>
 					 	</tr>
 
@@ -1533,7 +1533,7 @@ function getTimeGelTemplateRight(fitID){
 					 		</td>
 
 					 		<td>
-					 			<input class="param_box variable" value=100  type="number"  id="CTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+					 			<input class="param_box variable" value=100  type="number"  id="CTPconc_` + fitID + `">&mu;M
 							</td>
 					 	</tr>
 
@@ -1546,7 +1546,7 @@ function getTimeGelTemplateRight(fitID){
 					 		</td>
 
 					 		<td>
-								<input class="param_box variable" value=100 type="number"  id="GTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M
+								<input class="param_box variable" value=100 type="number"  id="GTPconc_` + fitID + `">&mu;M
 							</td>
 					 	</tr>
 
@@ -1558,7 +1558,7 @@ function getTimeGelTemplateRight(fitID){
 					 		</td>
 
 					 		<td>
-								<input class="param_box variable" value=100 type="number" id="UTPconc_` + fitID + `" style="vertical-align: middle; text-align:left; width: 70px">&mu;M	
+								<input class="param_box variable" value=100 type="number" id="UTPconc_` + fitID + `">&mu;M	
 							</td>
 					 	</tr>
 
