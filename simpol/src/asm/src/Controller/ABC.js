@@ -746,20 +746,12 @@ function getNewCurveButtonsTemplate(){
 				<div style="padding: 5 5; background-color:#b3b3b3; font-size:16px; width:300px; margin:auto;">
 
 					Add experimental data <br><br>
-					<input type=button onClick='addNewABCData("forceVelocity")' value='+ Force-velocity curve' title="Add force-velocity experimental data" class="operation ABCbtn" style="background-color:#008CBA; width: 200px"> 
+					<span onClick='addNewABCData("forceVelocity")' title="Add force-velocity experimental data" class="ABCbtn button" style="background-color:#008CBA; width: 200px">+ Force-velocity curve</span>
 					<br><br>
-					<input type=button onClick='addNewABCData("ntpVelocity")' value='+ [NTP]-velocity curve' title="Add [NTP]-velocity experimental data" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
+					<span onClick='addNewABCData("ntpVelocity") title="Add [NTP]-velocity experimental data" class="ABCbtn button" style="background-color:#008CBA; width: 200px">+ [NTP]-velocity curve</span>
 					<br><br>
-
-					<!--<input type=button onClick='addNewABCData("timeGel")' value='+ Time gel' title="Upload a gel of transcript lengths over time" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
-					<br><br>-->
-
-					<!--<input type=button onClick='addNewABCData("pauseEscape")' value='+ Pause escape data' title="Add maximal pause probability and/or half life data about a pause site" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
-					<br><br>-->
-
-
-					<input type=button onClick='addNewABCData("pauseSites")' value='+ Pause sites' title="Enumerate all abundant transcript lengths after a given period of time" class="operation ABCbtn" style="background-color:#008CBA; width: 200px">
-					<br><br>
+					<span onClick='addNewABCData("pauseSites")' title="Enumerate all abundant transcript lengths after a given period of time" class="ABCbtn button" style="background-color:#008CBA; width: 200px">+ Pause sites</span>
+					<br>
 					
 				</div>
 

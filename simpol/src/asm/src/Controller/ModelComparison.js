@@ -146,7 +146,7 @@ function getModelComparisonNewRowButtonTemplate(modelRowNum) {
 		<tr id="modelRow_` + modelRowNum + `"  style="width:100%; padding:5 5;" class="selectedModel">
 			<td style="padding:5 5" colspan=3>
 				<br>
-				&nbsp;&nbsp;&nbsp;&nbsp;<input type=button onClick='buildNewModel()' value='+ New model' title="Create a new model from the current settings" class="operation ABCbtn" style="background-color:#008CBA; width: 150px">
+				&nbsp;&nbsp;&nbsp;&nbsp;<span onClick='buildNewModel()' title="Create a new model from the current settings" class="button ABCbtn" style="background-color:#008CBA; width: 150px">+ New model</span>
 
 				<br><br>
 			</td>
