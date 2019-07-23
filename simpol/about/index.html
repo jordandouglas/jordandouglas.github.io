@@ -285,7 +285,7 @@ function printContents(){
             $("#contents").append("<div class='contents_sect'>" + sectNum + " " + a_tag + "</div>");
                         
             
-            ele.append(`<span id='` + id + `_Btn' class='minimise' disp="true"  onClick="` + onclick + `">&plus;</span>`);
+            ele.prepend(`<span id='` + id + `_Btn' class='minimise' disp="true"  onClick="` + onclick + `">&plus;</span>`);
             ele.parent().next("div").attr("id", id + "_div");
             
             subsectNum = 0;
