@@ -440,7 +440,7 @@ div.vertical{
 
 
 
-.block-title > .minimise {
+.section .minimise {
     line-height: 1.2em;
     font-size: 30px;
     cursor: pointer;
