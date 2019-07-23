@@ -3111,13 +3111,13 @@ function closeNav() {
 						
 					<tr>
 						<td>
-							<div class="toolbarIcon" style="cursor:pointer;" onClick="resetBtn();" title="Reinitiate the polymerase"> <img id='refresh'   src="../src/Images/reset.png" style="padding:0 0; width:35px; height:35px"> </div>
+							<div class="toolbarIcon" style="cursor:pointer;" onClick="resetBtn();" title="Reinitiate the polymerase"> <img  class="icon" id='refresh'   src="../src/Images/reset.png"> </div>
 						</td>
 
 
 						<td>
-							<div id="simulateBtn" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="startTrials_controller()" title="Perform N simulations stochastically"> <img id='startTrials'   src="../src/Images/dice.png" style="vertical-align: middle; width:35px; height:35px;">   </div>
-							<div id="stopBtn_simulate" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="../src/Images/stop.png" style="width:35px; height:35px;"> </div>
+							<div id="simulateBtn" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="startTrials_controller()" title="Perform N simulations stochastically"> <img  class="icon" id='startTrials'   src="../src/Images/dice.png" >   </div>
+							<div id="stopBtn_simulate" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img  class="icon" id='stop'  src="../src/Images/stop.png"> </div>
 						</td>
 
 
@@ -3128,14 +3128,14 @@ function closeNav() {
 
 						<td>
 							<div class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="clearKineticDataCache();" title="Clear data from the cache" > 
-								<img id='deleteAllData' src="../src/Images/close.png" style="padding:5 0; height:25px;">
+								<img  class="icon" id='deleteAllData' src="../src/Images/close.png">
 							</div>
 						</td>
 
 
 						<td>
-							<div id="transcribeBtn" class="toolbarIcon" style="cursor:pointer;" onClick=transcribe_controller()  title="Copy the next N bases"> <img id='trans'  src="../src/Images/transcribe.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
-							<div id="stopBtn_transcribe" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="../src/Images/stop.png" style="width:35px; height:35px;"> </div>
+							<div id="transcribeBtn" class="toolbarIcon" style="cursor:pointer;" onClick=transcribe_controller()  title="Copy the next N bases"> <img class="icon" id='trans'  src="../src/Images/transcribe.png" >  </div>
+							<div id="stopBtn_transcribe" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img class="icon" id='stop'  src="../src/Images/stop.png" > </div>
 						
 						</td>
 
@@ -3143,19 +3143,19 @@ function closeNav() {
 					<tr>
 
 						<td>
-							<div id="foldBtnDiv" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="showFoldedRNA_controller()" title="Fold the mRNA (using the ViennaRNA suite)"> <img  src="../src/Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
+							<div id="foldBtnDiv" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick="showFoldedRNA_controller()" title="Fold the mRNA (using the ViennaRNA suite)"> <img  class="icon"  src="../src/Images/folding.png" >  </input> </div>
 						</td>
 
 						<td>
-							<div id="stutterBtn" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick=stutter_controller() title="Stutter N times (iteratively copy the current base N times)" > <img id='stutter'  src="../src/Images/stutter.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
-							<div id="stopBtn_stutter" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img id='stop'  src="../src/Images/stop.png" style="width:35px; height:35px;"> </div>
+							<div id="stutterBtn" class="toolbarIcon simulateRow" style="cursor:pointer;" onClick=stutter_controller() title="Stutter N times (iteratively copy the current base N times)" > <img  class="icon" id='stutter'  src="../src/Images/stutter.png" >  </div>
+							<div id="stopBtn_stutter" class="toolbarIcon" style="display:none; cursor:pointer;" onClick="stop_controller();" title="Stop (esc)" > <img class="icon" id='stop'  src="../src/Images/stop.png"> </div>
 						
 						</td>
 
 
 					<tr>
 						<td colspan=2>
-							<div id="progressToolbarCell" class="toolbarIcon" style="width:90px; height:22px; vertical-align:middle; background-color:#424f4f; color:white"> 
+							<div id="progressToolbarCell" class="toolbarIcon" style="vertical-align:middle; background-color:#424f4f; color:white"> 
 
 
 								<div style="position:relative">
@@ -3163,9 +3163,9 @@ function closeNav() {
 									<span id="progressSimSpan" style="font-size: 16px; display:none; cursor:auto; z-index:2; color:white; text-align:center; position:absolute; left:0; width:100%"></span> 
 								</div>
 
-								<span id="numSimSpan" title="Number of simulations to perform (if you press simulate), or number of bases to copy (if you press copy), or number of times to stutter (if you press stutter)"> 
-									<b>N = </b><input type="number" name="nbasesToSimulate" min="1" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:left; width: 60px; background-color: #858280; color:white"> 
-								</span> 
+								<div id="numSimSpan" title="Number of simulations to perform (if you press simulate), or number of bases to copy (if you press copy), or number of times to stutter (if you press stutter)"> 
+									<b>N = </b><input type="number" name="nbasesToSimulate" min="1" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:left; width: 4em; background-color: #858280; color:white"> 
+								</div> 
 							</div>
 						</td>
 
@@ -3196,12 +3196,12 @@ function closeNav() {
 					
 					<tr>
 						<td>
-							<div class="toolbarIcon" style="cursor:pointer;" onClick="saveSession();" title="Download the current session in xml format"> <img id='saveSessionID'   src="../src/Images/downloadGreen.png" style="padding:5 0; height:25px;"> </div>
+							<div class="toolbarIcon" style="cursor:pointer;" onClick="saveSession();" title="Download the current session in xml format"> <img  class="icon" id='saveSessionID'   src="../src/Images/downloadGreen.png"> </div>
 						</td>
 
 						<td>
 							<div id="loadSessionID_div" class="toolbarIcon" style="cursor:pointer;" onClick="loadSession();" title="Upload a session in xml format" > 
-								<img id='loadSessionID' class="rotate180" src="../src/Images/downloadGreen.png" style="padding:5 0; height:25px;">
+								<img id='loadSessionID' class="rotate180 icon" src="../src/Images/downloadGreen.png">
 							</div>
 							<input style="display:none" type="file" id="uploadSessionFile" accept=".xml"> 
 						</td>
