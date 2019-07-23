@@ -44,7 +44,7 @@ body {
 }
 
 #numSimSpan{
-	text-size-adjust: 160%;
+	text-size-adjust: 140%;
 }
 
 
@@ -363,7 +363,7 @@ div.vertical{
 
 @media only screen and ( max-device-width: 1000px ) {
 	.icon{
-		height:25px;
+		height:405px;
 	}
 }
 
