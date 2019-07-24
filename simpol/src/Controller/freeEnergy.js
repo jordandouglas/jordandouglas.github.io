@@ -583,7 +583,7 @@ function getModelDiagramTemplate(){
 			</div>
 			
 
-			<div style="font-size:24; height:60px;">
+			<div style="font-size:24;">
 				<div id="kineticStateDescription" style="display:block; text-align:left">  </div>
 			</div>
 			<div style="font-size:15"> Hover over a state or arrow to read its description. </div>

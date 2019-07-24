@@ -248,14 +248,15 @@ function getDistributionChangeTemplate(){
 				
 				<table>
 					<tr>
-						<td style="font-size:15"> Parameters are resampled from their specified distribution at the beginning of each simulation. Use this window to choose the distribution. </td>
+						<td style="font-size:15"> Parameters are resampled from their specified distribution at the beginning of each simulation. Use this window to choose the distribution.
+							<a title="Help" class="help" target="_blank" href="about/#priorDistribution_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+							
+						 </td>
 						
 						
 						<td> 
-							<span style='font-size: 30px; cursor:pointer; position:absolute; right:35px; top:10px'>
-								<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:right" href="about/#priorDistribution_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
-							</span>
-							<input type=button id='submitDistn' class="button" onClick=submitDistribution_controller() value='Save' title="Submit changes" style="width:60px; float:right"></input>
+							
+							<input type=button id='submitDistn' class="button" onClick=submitDistribution_controller() value='Save' title="Submit changes"></input>
 						</td>
 					</tr>
 				</table>
@@ -742,7 +743,7 @@ function changeDistribution(element){
 	
 	
 	var paramID = correspondingTextfield.attr("id");
-	var popupHTML = getDialogTemplate(paramID, correspondingTextfield.attr('name') + ": " + correspondingTextfield.attr('title'), "600px");
+	var popupHTML = getDialogTemplate("Prior distribution for " + paramID, correspondingTextfield.attr('name') + ": " + correspondingTextfield.attr('title'), "600px");
 	$(popupHTML).appendTo('body');
 	
 	
