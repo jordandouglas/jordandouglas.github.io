@@ -370,6 +370,11 @@ div.vertical{
 }
 
 
+.icon.small{
+	height:28px;
+}
+
+
 #plotsTableDIV .icon{
 	height:25px;
 }
@@ -1065,6 +1070,12 @@ input:checked + .slider:before {
 	font-family:Raleway, Arial;
 	font-weight:bold;
 	font-size:16px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .button{
@@ -1075,7 +1086,7 @@ input:checked + .slider:before {
 	font-size: 15px; 
 	background-color:#008CBA; 
 	padding: 8 8;
-	line-height:1.1em;
+	line-height:2em;
 	color:white;
 }
 

@@ -723,7 +723,6 @@ function addNewCurveButtons(){
 	var btns = getNewCurveButtonsTemplate();
 	$("#ABCPanelTable" + ABCtableToUse).append(btns);
 	
-	console.log("addNewCurveButtons", btns);
 
 
 	// Disable the Begin ABC button

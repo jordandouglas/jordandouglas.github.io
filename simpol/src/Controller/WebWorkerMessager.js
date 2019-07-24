@@ -1353,7 +1353,7 @@ function stutter_controller(nbasesToStutter = null, fastMode = false, resolve = 
 
 function forward_controller(state = null, UPDATE_COORDS = true, resolve = function() { }){
 
-
+	
 	if (variableSelectionMode) return resolve(false);
 
 	if ($("#fwdBtn").css("cursor") == "not-allowed") return resolve(false);
