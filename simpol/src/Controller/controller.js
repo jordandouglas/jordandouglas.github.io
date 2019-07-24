@@ -1661,7 +1661,7 @@ function getDialogTemplate(header, subtitle = "", width = "1000px"){
 		<div class="dialog_cont">
 			<div class="dialog_outer" style='width:` + width + `;'>
 				<div class="dialog_inner">
-					<span style='font-size: 30px'>` + header + `</span>
+					<span style='font-size: 26px'>` + header + `</span>
 					<span class="blueDarkblueCloseBtn" title="Close" onclick='closeDialogs()'>&times;</span>
 					<div style='padding:2; font-size:22px;'>` + subtitle + `</div>
 	

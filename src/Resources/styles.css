@@ -1137,6 +1137,7 @@ input:checked + .slider:before {
 	text-align:center;
 	margin-left:10%;
 	top:10vh; 
+	min-height:200px;
 }
 
 
@@ -1156,7 +1157,6 @@ input:checked + .slider:before {
 	padding: 10 10; 
 	text-align:center; 
 	font-size:15; 
-	font-family:Arial; 
 	overflow-y:auto
 }
 

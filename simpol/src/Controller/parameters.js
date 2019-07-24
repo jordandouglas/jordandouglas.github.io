@@ -387,6 +387,8 @@ function addFixedPrior(){
 	
 	plotFixedDistrbutionCanvas();
 	
+	
+	
 }
 
 
@@ -790,6 +792,7 @@ function changeDistribution(element){
 		}
 		
 		$("#dialogBody").html(innerHTML);
+		
 		if (discreteDescriptionStr != "") $("#discreteDescription").html(discreteDescriptionStr);
 	
 		$("#SelectDistribution").val(PHYSICAL_PARAMETERS_TEMP[paramID]["distribution"])
