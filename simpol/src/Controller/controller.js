@@ -913,21 +913,6 @@ function add_triphosphate(pos, x, y){
 
 
 
-function closeAllDialogs(){
-
-	closeModelDiagramPopup();
-	closePriorDistributionPopup();
-	closeNTPModelDiagramPopup();
-	closePlotDownloadPopup();
-	closePlotSettingsPopup();
-	closeKineticCachePopup();
-	closeNTPModelPopup();
-	closePosteriorSummaryPopup();
-	closeGelLaneInformationPopup();
-
-
-}
-
 
 
 function getFormattedDateAndTime(){
@@ -1471,7 +1456,7 @@ function getCacheClearTemplate(){
 		<div id='clearCachePopup' style='background-color:008cba; padding: 10 10; position:fixed; width: 500px; left:35vw; top:50vh; z-index:5'>
 			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto;'>
 				<span style='font-size: 22px'> Clear Cache </span>
-				<span style='font-size: 30px; cursor:pointer; position:absolute; left:490px; top:5px' onclick='closeKineticCachePopup()'>&times;</span>
+				<span style='font-size: 30px; cursor:pointer; position:absolute; left:490px; top:5px' onclick='closeDialogs()'>&times;</span>
 				<div style='padding:2; font-size:18px;'> Please select which data you would like to clear </div>
 				<table cellpadding=10 style='width:100%; margin:auto;'>
 				
@@ -1519,7 +1504,7 @@ function getCacheClearTemplate(){
 function clearKineticDataCache(){
 
 
-	closeAllDialogs();
+	closeDialogs();
 	
 	$("#main").css("opacity", 0.5);
 	$("#mySidenav").css("opacity", 0.5);
@@ -1542,11 +1527,11 @@ function clearKineticDataCache(){
 
 			
 			$("#main").click(function(){
-				closeKineticCachePopup();
+				closeDialogs();
 			});
 			
 			$("#mySidenav").click(function(){
-				closeKineticCachePopup();
+				closeDialogs();
 			});
 			
 		}, 50);
@@ -1575,7 +1560,7 @@ function clearCache(){
 	
 
 	if (!distanceVsTime_cleardata && !timeHistogram_cleardata && !timePerSite_cleardata && !customPlot_cleardata && !ABC_cleardata && !sequences_cleardata) {
-		closeKineticCachePopup();
+		closeDialogs();
 		return;
 	}
 
@@ -1583,7 +1568,7 @@ function clearCache(){
 
 		console.log("stopped");
 
-		closeKineticCachePopup();
+		closeDialogs();
 		setTimeout( function() { 
 			refresh(function(){
 				
@@ -1664,12 +1649,106 @@ function clearCache(){
 }
 
 
-function closeKineticCachePopup(){
 
-	$("#mySidenav").unbind('click');
-	$("#main").unbind('click');
-	$("#clearCachePopup").remove();
-	$("#main").css("opacity", 1);
-	$("#mySidenav").css("opacity", 1);
+
+
+function getDialogTemplate(header, subtitle = "", width = "1000px"){
+
+
+	if (IS_MOBILE) width = "90%";
+
+	return `
+		<div class="dialog_cont">
+			<div class="dialog_outer" style='width:` + width + `;'>
+				<div class="dialog_inner">
+					<span style='font-size: 30px'>` + header + `</span>
+					<span class="blueDarkblueCloseBtn" title="Close" onclick='closeDialogs()'>&times;</span>
+					<div style='padding:2; font-size:22px;'>` + subtitle + `</div>
+	
+					<div id="dialogBody">
+					
+					 	 <table  id="dialogLoader" title="Loading...">
+	                        <tr>
+	                            <td>
+	                                <div class="loader"></div> 
+	                            </td>
+	                            <td>
+	                                Loading...
+	                            </td>
+	                        </tr>
+	                    </table>
+						
+					</div>
+					
+	
+				</div>
+			</div>
+		</div>
+	`;
+
+
 
 }
+
+
+function openDialog(){
+
+
+	$("#main").css("opacity", 0.5);
+	$("#mySidenav").css("opacity", 0.5);
+
+	window.setTimeout(function(){
+		
+	
+		
+		$(".dialog_inner").click(function(event){
+			console.log("THE PROPAGATION HAS BEEN SEVERED");
+			event.stopPropagation();
+		});
+		
+		$("body").click(function(){
+			closeDialogs();
+		});
+		
+
+		
+	}, 50);
+	
+}
+
+
+function closeDialogs(){
+
+	
+	$("body").unbind('click');
+	$(".dialog_inner").unbind('click');
+	$(".dialog_cont").remove();
+	$("#main").css("opacity", 1);
+	$("#mySidenav").css("opacity", 1);
+	
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

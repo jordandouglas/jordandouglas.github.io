@@ -483,7 +483,7 @@ function begin_biophys6(){
 
 function addTutorialTemplate(tutorialName, tutorialSubtitle, tutorialMessage, tutorialFootnote){
 
-    closeAllDialogs();
+    closeDialogs();
     
     $("#main").css("opacity", 0.5);
     $("#mySidenav").css("opacity", 0.5);

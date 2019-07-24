@@ -435,7 +435,7 @@ function setModelOptions(){
 
 function viewMisincorporationModel(){
 
-	closeAllDialogs();
+	closeDialogs();
 	
 	
 	$("#main").css("opacity", 0.5);
@@ -498,11 +498,11 @@ function viewMisincorporationModel(){
 	window.setTimeout(function(){
 		
 		$("#main").click(function(){
-			closeNTPModelDiagramPopup();
+			closeDialogs();
 		});
 		
 		$("#mySidenav").click(function(){
-			closeNTPModelDiagramPopup();
+			closeDialogs();
 		});
 		
 	}, 50);
@@ -517,26 +517,19 @@ function viewMisincorporationModel(){
 
 function viewModel(){
 	
-	closeAllDialogs();
-	
-	
-	$("#main").css("opacity", 0.5);
-	$("#mySidenav").css("opacity", 0.5);
-	
-	var popupHTML = getModelDiagramTemplate();
-
-
+	closeDialogs();
+	openDialog();
 
 
 	getElongationModels_controller(function(result){
+	
+	
 
-
-		//console.log(result);
+		console.log(result);
 
 		if (WEB_WORKER_WASM != null) ELONGATION_MODEL_TEMP = result;
 		else ELONGATION_MODEL_TEMP = result["ELONGATION_MODELS"][result["currentElongationModel"]];
 
-		//popupHTML = popupHTML.replace("XX_NAME_XX", ELONGATION_MODEL_TEMP["name"]);
 
 		console.log("Backtracking is allowed:", ELONGATION_MODEL_TEMP["allowBacktracking"]);
 		console.log("Hypertranslocation is allowed:", ELONGATION_MODEL_TEMP["allowHypertranslocation"]);
@@ -560,67 +553,23 @@ function viewModel(){
 
 
 		}
-		popupHTML = popupHTML.replace("XX_DESC_XX", desc);
-
-
+		
+		var popupHTML = getDialogTemplate("Kinetic pathway", desc, "1400px");
+		
+		
 		$(popupHTML).appendTo('body');
+		$("#dialogBody").html(getModelDiagramTemplate());
 
 		drawModelDiagramCanvas();
 
 
 	});
 	
-	window.setTimeout(function(){
-		
-		$("#main").click(function(){
-			closeModelDiagramPopup();
-		});
-		
-		$("#mySidenav").click(function(){
-			closeModelDiagramPopup();
-		});
-		
-	}, 50);
-	
+
 	
 }
 
 
-function closeNTPModelDiagramPopup(){
-
-	if ($("#popup_NTPmodel").length == 0) return;
-	$("#mySidenav").unbind('click');
-	$("#main").unbind('click');
-	$("#popup_NTPmodel").remove();
-	$("#main").css("opacity", 1);
-	$("#mySidenav").css("opacity", 1);
-
-}
-
-
-function closeModelDiagramPopup(){
-	
-	if ($("#popup_model").length == 0) return;
-	$("#mySidenav").unbind('click');
-	$("#main").unbind('click');
-	$("#popup_model").remove();
-	$("#main").css("opacity", 1);
-	$("#mySidenav").css("opacity", 1);
-	
-}
-
-
-function closeNTPModelPopup(){
-	
-	if ($("#popup_NTPmodel").length == 0) return;
-	$("#mySidenav").unbind('click');
-	$("#main").unbind('click');
-	$("#popup_NTPmodel").remove();
-	$("#main").css("opacity", 1);
-	$("#mySidenav").css("opacity", 1);
-	
-	
-}
 
 
 function getModelDiagramTemplate(){
@@ -628,25 +577,17 @@ function getModelDiagramTemplate(){
 	
 	
 	return `
-		<div id='popup_model' style='background-color:#008cba; padding: 10 10; position:absolute; width: 1500px; left:380; top:20vh; z-index:5;'>
-			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
-				<span style='font-size: 30px'> Kinetic pathway</span>
-				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeModelDiagramPopup()'>&times;</span>
-				<div style='padding:2; font-size:22px;'> XX_DESC_XX </div>
-
-				<div id="modelDiagramDiv">
-					<canvas id="modelDiagramCanvas" class="noselect" style="padding:10 10;" width=1220px height=400px></canvas>
-				</div>
-				
-
-				<div style="font-size:24; height:60px;">
-					<div id="kineticStateDescription" style="display:block; text-align:left">  </div>
-				</div>
-				<div style="font-size:15"> Hover over a state or arrow to read its description. </div>
-				
-
+		
+			<div id="modelDiagramDiv">
+				<canvas id="modelDiagramCanvas" class="noselect" style="padding:10 10;" width=1220px height=400px></canvas>
 			</div>
-		</div>
+			
+
+			<div style="font-size:24; height:60px;">
+				<div id="kineticStateDescription" style="display:block; text-align:left">  </div>
+			</div>
+			<div style="font-size:15"> Hover over a state or arrow to read its description. </div>
+
 	`;
 	
 	
@@ -660,7 +601,7 @@ function getNTPModelDiagramTemplate(){
 		<div id='popup_NTPmodel' style='background-color:#008cba; padding: 10 10; position:fixed; width: 600px; left:380; top:20vh; z-index:5;'>
 			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 30px'> NTP binding rates </span>
-				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeNTPModelDiagramPopup()'>&times;</span>
+				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeDialogs()'>&times;</span>
 				<div style='padding:2; font-size:22px;'> Model for NTP binding which can lead to misincorporations</div>
 
 				<br>
@@ -724,7 +665,7 @@ function getNTPModelSettingsTemplate(){
 				<span style='font-size: 30px; cursor:pointer; position:absolute; left:770px; top:10px'>
 					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:right" href="about/#polymerisation_ModelHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
 				</span>
-				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeNTPModelPopup()'>&times;</span>
+				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeDialogs()'>&times;</span>
 				<div style='padding:2; font-size:22px;'> Select the parameters for nucleotide incorporation</div>
 
 				<div id="ntpmodelDiagramDiv" style="width:90%; margin:auto; vertical-align:middle; display:block">
@@ -1650,7 +1591,7 @@ function viewNTPModel(){
 	
 	
 	
-	closeAllDialogs();
+	closeDialogs();
 	$("#main").css("opacity", 0.5);
 	$("#mySidenav").css("opacity", 0.5);
 	
@@ -1682,11 +1623,11 @@ function viewNTPModel(){
 	window.setTimeout(function(){
 
 		$("#main").click(function(){
-			closeNTPModelPopup();
+			closeDialogs();
 		});
 		
 		$("#mySidenav").click(function(){
-			closeNTPModelPopup();
+			closeDialogs();
 		});
 		
 	}, 50);

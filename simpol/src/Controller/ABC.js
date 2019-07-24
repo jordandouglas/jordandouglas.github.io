@@ -787,7 +787,7 @@ function getNewCurveButtonsTemplate(){
 					<br><br>
 					<span onClick='addNewABCData("ntpVelocity")' title="Add [NTP]-velocity experimental data" class="ABCbtn button">+ [NTP]-velocity curve</span>
 					<br><br>
-					<span onClick='addNewABCData("pauseSites")' title="Enumerate all abundant transcript lengths after a given period of time" class="ABCbtn button">+ Pause sites</span>
+					<span onClick='addNewABCData("pauseSites")' title="Specify all abundant transcript lengths (ie. pause sites)" class="ABCbtn button">+ Pause sites</span>
 					<br><br><br>
 					
 				</div>
@@ -3364,7 +3364,7 @@ function displayGelLaneDialog(fitID){
 	}
 
 
-	closeAllDialogs();
+	closeDialogs();
 	
 	$("#main").css("opacity", 0.5);
 	$("#mySidenav").css("opacity", 0.5);
@@ -3392,11 +3392,11 @@ function displayGelLaneDialog(fitID){
 	window.setTimeout(function(){
 	
 		$("#main").click(function(){
-			closeGelLaneInformationPopup();
+			closeDialogs();
 		});
 		
 		$("#mySidenav").click(function(){
-			closeGelLaneInformationPopup();
+			closeDialogs();
 		});
 	
 	
@@ -3413,7 +3413,7 @@ function getGelLengthPriorInformationTemplate(fitID, MWlength){
 		<div id='laneDialog' style='background-color:#008cba; padding: 10 10; position:fixed; width: 20vw; left:40vw; top:30vh; z-index:5' fitID="` + fitID + `">
 			<div style='background-color:white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> Molecular weight prior distribution </span>
-				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeGelLaneInformationPopup("` + fitID + `")'>&times;</span>
+				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeDialogs("` + fitID + `")'>&times;</span>
 				<div style='font-size: 15px'> The rectangle you have drawn adds a constraint to the log linear model between molecular weight W (nt) and migration distance d (pixels). <br>
 				</div>
 				<table cellpadding=10 style='width:90%; margin:auto; font-size: 15px;'>
@@ -3436,7 +3436,7 @@ function getGelLengthPriorInformationTemplate(fitID, MWlength){
 				</tr>
 				<tr>
 					<td>
-						<input type="button" class="operation" onClick="closeGelLaneInformationPopup('` + fitID + `'); deleteFabricCanvasSelection('` + fitID + `')" value='Delete' title="Delete this lane" style="width:100px; float:right"></input>
+						<input type="button" class="operation" onClick="closeDialogs('` + fitID + `'); deleteFabricCanvasSelection('` + fitID + `')" value='Delete' title="Delete this lane" style="width:100px; float:right"></input>
 				
 					</td>
 					<td> 
@@ -3465,7 +3465,7 @@ function getGelLaneInformationTemplate(fitID, laneObj){
 		<div id='laneDialog' style='background-color:#008cba; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:50vh; z-index:5' fitID="` + fitID + `">
 			<div style='background-color:white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> Lane information </span>
-				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeGelLaneInformationPopup("` + fitID + `")'>&times;</span>
+				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeDialogs("` + fitID + `")'>&times;</span>
 				<table cellpadding=10 style='width:90%; margin:auto; font-size: 18px;'>
 				
 				<tr>
@@ -3495,7 +3495,7 @@ function getGelLaneInformationTemplate(fitID, laneObj){
 				</tr>
 				<tr>
 					<td>
-						<input type="button" class="operation" onClick="closeGelLaneInformationPopup('` + fitID + `'); deleteFabricCanvasSelection('` + fitID + `')" value='Delete' title="Delete this lane" style="width:100px; float:right"></input>
+						<input type="button" class="operation" onClick="closeDialogs('` + fitID + `'); deleteFabricCanvasSelection('` + fitID + `')" value='Delete' title="Delete this lane" style="width:100px; float:right"></input>
 				
 					</td>
 					<td> 
@@ -3538,7 +3538,7 @@ function saveLaneInformation(fitID, laneID){
 	lane.time = parseFloat($("#gelLaneTime").val());
 	lane.simulateLane = $("#simulateLaneChk").prop("checked");
 
-	closeGelLaneInformationPopup(fitID);
+	closeDialogs(fitID);
 	drawTimeGelPlotCanvas(fitID);
 
 }
@@ -3567,34 +3567,13 @@ function saveMWpriorInformation(fitID, MWpriorID){
 
 	MWprior.transcriptLengthOfNormalMean = parseFloat($("#transcriptLengthOfNormalMean").val());
 	MWprior.numberOf_SD_InRectWidth = parseFloat($("#numberOf_SD_InRectWidth").val());
-	closeGelLaneInformationPopup(fitID);
+	closeDialogs(fitID);
 	drawTimeGelPlotCanvas(fitID);
 
 }
 
 
 
-function closeGelLaneInformationPopup(fitID = null){
-	
-	if ($("#laneDialog").length) {
-		$("#mySidenav").unbind('click');
-		$("#main").unbind('click');
-		$("#laneDialog").remove();
-		$("#main").css("opacity", 1);
-		$("#mySidenav").css("opacity", 1);
-
-		/*
-		if (fitID != null){
-			var fabricCanvas = gelFabricCanvases[fitID];
-			if (fabricCanvas == null) return;
-			fabricCanvas.deactivateAllWithDispatch();
-		}
-		*/
-
-	}
-
-
-}
 
 
 
@@ -4795,17 +4774,6 @@ function uploadABC(){
 
 
 
-function closePosteriorSummaryPopup(){
-	
-	$("#mySidenav").unbind('click');
-	$("#main").unbind('click');
-	$("#posteriorSummaryPopup").remove();
-	$("#main").css("opacity", 1);
-	$("#mySidenav").css("opacity", 1);
-
-	
-	
-}
 
 function getPosteriorSummaryTemplate(){
 
@@ -4816,7 +4784,7 @@ function getPosteriorSummaryTemplate(){
 		<div id='posteriorSummaryPopup' style='background-color:#008cba; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:20vh; z-index:5'>
 			<div style='background-color:white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> Posterior Distribution Summary </span>
-				<span style='font-size: 30px; cursor:pointer; position:fixed; left:64.5vw; top:20.5vh' onclick='closePosteriorSummaryPopup()'>&times;</span>
+				<span style='font-size: 30px; cursor:pointer; position:fixed; left:64.5vw; top:20.5vh' onclick='closeDialogs()'>&times;</span>
 				<div style='padding:2; font-size:18px;'> Summarise the posterior distribution with a single state (the geometric median). </div>
 				<table cellpadding=10 style='width:90%; margin:auto;'>
 				
@@ -4868,7 +4836,7 @@ function posteriorSummary(){
 	
 	
 	
-	closeAllDialogs();
+	closeDialogs();
 	
 	$("#main").css("opacity", 0.5);
 	$("#mySidenav").css("opacity", 0.5);
@@ -4951,11 +4919,11 @@ function posteriorSummary(){
 	window.setTimeout(function(){
 		
 		$("#main").click(function(){
-			closePosteriorSummaryPopup();
+			closeDialogs();
 		});
 		
 		$("#mySidenav").click(function(){
-			closePosteriorSummaryPopup();
+			closeDialogs();
 		});
 		
 	}, 50);

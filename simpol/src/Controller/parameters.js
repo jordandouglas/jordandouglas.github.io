@@ -217,15 +217,10 @@ function getDistributionChangeTemplate(){
 	
 	
 	return `
-		<div id='popup_distn' style='background-color:#008cba; padding: 10 10; position:fixed; width: 600px; left:380; top:30vh; z-index:5' paramName="XX_NAME_XX" paramID="XX_ID_XX">
-			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
-				<span style='font-size: 22px'> Background distribution of XX_ID_XX </span>
+		<div id='popup_distn' paramName="XX_NAME_XX" paramID="XX_ID_XX">
+			
 
-				<span style='font-size: 30px; cursor:pointer; position:absolute; right:35px; top:10px'>
-					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:right" href="about/#priorDistribution_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
-				</span>
-				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closePriorDistributionPopup()'>&times;</span>
-				<div style='padding:2; font-size:18px;'> XX_NAME_XX: XX_TITLE_XX </div>
+				
 				<table cellpadding=10 style='width:90%; margin:auto;'>
 				
 					<tr>
@@ -254,13 +249,17 @@ function getDistributionChangeTemplate(){
 				<table>
 					<tr>
 						<td style="font-size:15"> Parameters are resampled from their specified distribution at the beginning of each simulation. Use this window to choose the distribution. </td>
+						
+						
 						<td> 
-							<input type=button id='submitDistn' class="operation" onClick=submitDistribution_controller() value='Save' title="Submit your changes" style="width:60px; float:right"></input>
+							<span style='font-size: 30px; cursor:pointer; position:absolute; right:35px; top:10px'>
+								<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:right" href="about/#priorDistribution_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+							</span>
+							<input type=button id='submitDistn' class="button" onClick=submitDistribution_controller() value='Save' title="Submit changes" style="width:60px; float:right"></input>
 						</td>
 					</tr>
 				</table>
 
-			</div>
 		</div>
 	`;
 	
@@ -348,7 +347,7 @@ function addFixedPrior(){
 	
 	var paramID = $("#popup_distn").attr("paramID")
 	var currentVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["fixedDistnVal"]);
-	var inputBox = $("#popup_distn").attr("paramName") + " = <input type='number' title='Select the fixed value for this parameter' id='fixedDistnVal' value=" + currentVal + " style='background-color: #008cba; color:white; vertical-align: middle; width: 70px'  onChange=plotFixedDistrbutionCanvas()></input>";
+	var inputBox = $("#popup_distn").attr("paramName") + " = <input class='variable param_box' type='number' title='Select the fixed value for this parameter' id='fixedDistnVal' value=" + currentVal + "  onChange=plotFixedDistrbutionCanvas()></input>";
 	
 	$("#parameterDistnCell").append(inputBox);
 
@@ -415,8 +414,8 @@ function addUniformPrior(){
 	
 	
 
-	var lowerLimitTextBox = "Lower: <input type='number' title='Select the lower limit for this parameter' id='uniformDistnLowerVal' value=" + lowerLimitVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:left; width: 70px' onChange=plotUniformDistrbutionCanvas()></input>";
-	var upperLimitTextBox = "Upper: <input type='number' title='Select the upper limit for this parameter' id='uniformDistnUpperVal' value=" + upperLimitVal + " style='background-color: #008cba; color:white; vertical-align: middle; text-align:left; width: 70px' onChange=plotUniformDistrbutionCanvas()></input>";
+	var lowerLimitTextBox = "Lower: <input class='variable param_box' type='number' title='Select the lower limit for this parameter' id='uniformDistnLowerVal' value=" + lowerLimitVal + " onChange=plotUniformDistrbutionCanvas()></input>";
+	var upperLimitTextBox = "Upper: <input class='variable param_box' type='number' title='Select the upper limit for this parameter' id='uniformDistnUpperVal' value=" + upperLimitVal + " onChange=plotUniformDistrbutionCanvas()></input>";
 	
 	$("#parameterDistnCell").append(lowerLimitTextBox + "&nbsp;" + upperLimitTextBox);
 
@@ -475,7 +474,7 @@ function addExponentialPrior(){
 	if (expRate == null || isNaN(expRate)) expRate = roundToSF(1/currentVal);
 	if (currentVal <= 0) expRate = 1; // We don't want infinite or negative rates
 	
-	var textBox = "&lambda;: <input type='number' title='Select the rate for this parameter. The rate is the inverse of the mean' id='exponentialDistnVal' value=" + expRate + " style='background-color: #008cba; color:white; vertical-align: middle; width: 70px' onChange=plotExponentialDistrbutionCanvas()></input>";
+	var textBox = "&lambda;: <input class='variable param_box' type='number' title='Select the rate for this parameter. The rate is the inverse of the mean.' id='exponentialDistnVal' value=" + expRate + " onChange=plotExponentialDistrbutionCanvas()></input>";
 	
 	$("#parameterDistnCell").append(textBox);
 	
@@ -523,8 +522,8 @@ function addNormalPrior(){
 	if (sd == 0) sd = 1;
 
 	
-	var meanTextBox = "&mu;: <input type='number' title='Select the mean value of this parameter' id='normalMeanVal' value=" + meanVal + " style='background-color: #008cba; color:white; vertical-align: middle; width: 70px' onChange=plotNormalDistrbutionCanvas()></input>";
-	var sdLimitTextBox = "&sigma;: <input type='number' title='Select the standard deviation of this parameter' id='normalSdVal' value=" + sd + " style='background-color: #008cba; color:white; vertical-align: middle; width: 70px' onChange=plotNormalDistrbutionCanvas()></input>";
+	var meanTextBox = "&mu;: <input  class='variable param_box' type='number' title='Select the mean value of this parameter' id='normalMeanVal' value=" + meanVal + " onChange=plotNormalDistrbutionCanvas()></input>";
+	var sdLimitTextBox = "&sigma;: <input  class='variable param_box' type='number' title='Select the standard deviation of this parameter' id='normalSdVal' value=" + sd + " onChange=plotNormalDistrbutionCanvas()></input>";
 	$("#parameterDistnCell").append(meanTextBox + "&nbsp;" + sdLimitTextBox);
 
 	
@@ -566,8 +565,8 @@ function addLognormalPrior(){
 	if (isNaN(meanVal) || meanVal <= 0) meanVal = 1;
 	
 	
-	var meanTextBox = "&mu;: <input type='number' title='Select the logarithmic mean value of this parameter' id='lognormalMeanVal' value=" + meanVal + " style='background-color: #008cba; color:white; vertical-align: middle; width: 70px' onChange=plotLognormalDistrbutionCanvas()></input>";
-	var sdLimitTextBox = "&sigma;: <input type='number' title='Select the logarithmic standard deviation of this parameter' id='lognormalSdVal' value=" + sd + " style='background-color: #008cba; color:white; vertical-align: middle;  width: 70px' onChange=plotLognormalDistrbutionCanvas()></input>";
+	var meanTextBox = "&mu;: <input  class='variable param_box' type='number' title='Select the logarithmic mean value of this parameter' id='lognormalMeanVal' value=" + meanVal + "  onChange=plotLognormalDistrbutionCanvas()></input>";
+	var sdLimitTextBox = "&sigma;: <input  class='variable param_box' type='number' title='Select the logarithmic standard deviation of this parameter' id='lognormalSdVal' value=" + sd + "  onChange=plotLognormalDistrbutionCanvas()></input>";
 	$("#parameterDistnCell").append(meanTextBox + "&nbsp;" + sdLimitTextBox);
 
 	
@@ -613,8 +612,8 @@ function addGammaPrior(){
 	if (currentVal <= 0) rateVal = 1; // We don't want infinite or negative rates
 	
 	
-	var shapeTextBox = "&alpha;: <input type='number' title='Select the shape for this gamma-distributed parameter' id='gammaShapeVal' value=" + shapeVal + " style='background-color: #008cba; color:white; vertical-align: middle; width: 70px' onChange=plotGammaDistrbutionCanvas()></input>";
-	var rateTextBox = "&beta;: <input type='number' title='Select the rate for this gamma-distributed parameter' id='gammaRateVal' value=" + rateVal + " style='background-color: #008cba; color:white; vertical-align: middle;  width: 70px' onChange=plotGammaDistrbutionCanvas()></input>";
+	var shapeTextBox = "&alpha;: <input  class='variable param_box' type='number' title='Select the shape for this gamma-distributed parameter' id='gammaShapeVal' value=" + shapeVal + "  onChange=plotGammaDistrbutionCanvas()></input>";
+	var rateTextBox = "&beta;: <input class='variable param_box'  type='number' title='Select the rate for this gamma-distributed parameter' id='gammaRateVal' value=" + rateVal + "  onChange=plotGammaDistrbutionCanvas()></input>";
 	$("#parameterDistnCell").append(shapeTextBox + "&nbsp;" + rateTextBox);
 
 	
@@ -717,8 +716,8 @@ function addDiscreteUniformPrior(){
 	}
 
 	
-	var lowerLimitTextBox = "Lower: <input type='number' title='Select the lower limit for this parameter' id='uniformDistnLowerVal' value=" + lowerLimitVal + " style='background-color: #008cba; color:white; vertical-align: middle; width: 70px'></input>";
-	var upperLimitTextBox = "Upper: <input type='number' title='Select the upper limit for this parameter' id='uniformDistnUpperVal' value=" + upperLimitVal + " style='background-color: #008cba; color:white; vertical-align: middle; width: 70px'></input>";
+	var lowerLimitTextBox = "Lower: <input  class='variable param_box' type='number' title='Select the lower limit for this parameter' id='uniformDistnLowerVal' value=" + lowerLimitVal + " ></input>";
+	var upperLimitTextBox = "Upper: <input class='variable param_box'  type='number' title='Select the upper limit for this parameter' id='uniformDistnUpperVal' value=" + upperLimitVal + " ></input>";
 	
 	$("#parameterDistnCell").append(lowerLimitTextBox + "&nbsp;" + upperLimitTextBox);
 
@@ -735,47 +734,50 @@ function changeDistribution(element){
 	console.log("Changing the distribution of", element);
 	
 
+
 	var correspondingTextfield = $("#" + $(element).attr('id').replace("_distn", ""));
 	
-	closeAllDialogs();
-	$("#main").css("opacity", 0.5);
-	$("#mySidenav").css("opacity", 0.5);
+	closeDialogs();
+	openDialog();
 	
-	
-	
-	var popupHTML = getDistributionChangeTemplate();
-	popupHTML = popupHTML.replace("XX_ID_XX", correspondingTextfield.attr('id'));
-	popupHTML = popupHTML.replace("XX_ID_XX", correspondingTextfield.attr('id'));
-	popupHTML = popupHTML.replace("XX_TITLE_XX", correspondingTextfield.attr('title'));
-	popupHTML = popupHTML.replace("XX_NAME_XX", correspondingTextfield.attr('name'));
-	popupHTML = popupHTML.replace("XX_NAME_XX", correspondingTextfield.attr('name'));
 	
 	var paramID = correspondingTextfield.attr("id");
+	var popupHTML = getDialogTemplate(paramID, correspondingTextfield.attr('name') + ": " + correspondingTextfield.attr('title'), "600px");
+	$(popupHTML).appendTo('body');
+	
+	
+
 
 	
-	
-	
 	var loadParams = function(PHYSICAL_PARAMETERS_LOCAL){
+	
+	
+		var innerHTML = getDistributionChangeTemplate();
+		
+
+		innerHTML = innerHTML.replace("XX_ID_XX", paramID);
+		innerHTML = innerHTML.replace("XX_NAME_XX", correspondingTextfield.attr('name'));
+	
 
 		PHYSICAL_PARAMETERS_TEMP = PHYSICAL_PARAMETERS_LOCAL;
 		
 		var discreteDescriptionStr = "";
 		if (PHYSICAL_PARAMETERS_TEMP[paramID]["integer"] == null || !PHYSICAL_PARAMETERS_TEMP[paramID]["integer"]){
-			popupHTML = popupHTML.replace("XX_DISTRIBUTION_XX", getContinuousVariableDistributionsTemplate());
+			innerHTML = innerHTML.replace("XX_DISTRIBUTION_XX", getContinuousVariableDistributionsTemplate());
 		}else{
-			popupHTML = popupHTML.replace("XX_DISTRIBUTION_XX", getDiscreteVariableDistributionsTemplate());
+			innerHTML = innerHTML.replace("XX_DISTRIBUTION_XX", getDiscreteVariableDistributionsTemplate());
 			
 			var minVal = null;
 			if (PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"] != null) minVal = parseFloat(PHYSICAL_PARAMETERS_TEMP[paramID]["minVal"]);
 			else if (PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"] != null && PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"]) minVal = 1;
 			if (minVal != null) {
-				popupHTML = popupHTML.replace("Poisson Distribution", "Shifted Poisson Distribution");
+				innerHTML = innerHTML.replace("Poisson Distribution", "Shifted Poisson Distribution");
 				discreteDescriptionStr += "The smallest value allowed is " + minVal;
 			}
 
 			var maxVal = PHYSICAL_PARAMETERS_TEMP[paramID]["maxVal"];
 			if (maxVal != null) {
-				popupHTML = popupHTML.replace("Poisson Distribution", "Shifted Poisson Distribution");
+				innerHTML = innerHTML.replace("Poisson Distribution", "Shifted Poisson Distribution");
 				discreteDescriptionStr += "<br>The largest value allowed is " + parseFloat(maxVal);
 			};
 			
@@ -783,50 +785,30 @@ function changeDistribution(element){
 		}
 		
 		if (PHYSICAL_PARAMETERS_TEMP[paramID]["zeroTruncated"]){
-			popupHTML = popupHTML.replace("Normal Distribution", "Zero-truncated Normal Distribution");
+			innerHTML = innerHTML.replace("Normal Distribution", "Zero-truncated Normal Distribution");
 		}
 		
-		$(popupHTML).appendTo('body');
+		$("#dialogBody").html(innerHTML);
 		if (discreteDescriptionStr != "") $("#discreteDescription").html(discreteDescriptionStr);
 	
 		$("#SelectDistribution").val(PHYSICAL_PARAMETERS_TEMP[paramID]["distribution"])
 		selectPriorDistribution();
+		
+		
+		
+		
 	};
+
 
 	get_PHYSICAL_PARAMETERS_controller(loadParams);
 	
 
-	window.setTimeout(function(){
-		
-		$("#main").click(function(){
-			closePriorDistributionPopup();
-		});
-		
-		$("#mySidenav").click(function(){
-			closePriorDistributionPopup();
-		});
-		
-	}, 50);
-	
 	
 	
 	
 	
 //	 background-color:008CBA
 
-}
-
-
-function closePriorDistributionPopup(){
-	
-	if ($("#popup_distn").length == 0) return;
-	$("#mySidenav").unbind('click');
-	$("#main").unbind('click');
-	$("#popup_distn").remove();
-	$("#main").css("opacity", 1);
-	$("#mySidenav").css("opacity", 1);
-	PHYSICAL_PARAMETERS_TEMP = {};
-	
 }
 
 

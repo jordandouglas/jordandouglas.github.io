@@ -4134,7 +4134,7 @@ function getDownloadPlotTemplate(){
 		<div id='downloadPopup' style='background-color:#008cba; padding: 10 10; position:fixed; width: 20vw; left:40vw; top:50vh; z-index:5' plotNum="XX_plotNum_XX">
 			<div style='background-color:white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> Download XX_plotName_XX </span>
-				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closePlotDownloadPopup()'>&times;</span>
+				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeDialogs()'>&times;</span>
 				<table cellpadding=10 style='width:90%; margin:auto; font-size: 18px;'>
 				
 				<tr>
@@ -4168,7 +4168,7 @@ function getDownloadPlotTemplate(){
 }
 
 
-function closePlotDownloadPopup(){
+function closeDialogs(){
 	
 
 		$("#mySidenav").unbind('click');
@@ -4183,7 +4183,7 @@ function closePlotDownloadPopup(){
 function downloadPlot(plotNum){
 
 
-	closeAllDialogs();
+	closeDialogs();
 	//var correspondingTextfield = $("#" + $(element).attr('id').replace("_distn", ""));
 	
 	$("#main").css("opacity", 0.5);
@@ -4203,11 +4203,11 @@ function downloadPlot(plotNum){
 	window.setTimeout(function(){
 		
 		$("#main").click(function(){
-			closePlotDownloadPopup();
+			closeDialogs();
 		});
 		
 		$("#mySidenav").click(function(){
-			closePlotDownloadPopup();
+			closeDialogs();
 		});
 		
 
@@ -4227,7 +4227,7 @@ function downloadPlotInFormat(){
 	var plotNum = parseFloat(downloadPopup.attr("plotNum"));
 	var downloadFormat = $("#SelectDownload").val();
 	
-	closePlotDownloadPopup();
+	closeDialogs();
 	
 	
 	console.log("Format of plot", plotNum, "is", downloadFormat);
@@ -4658,7 +4658,7 @@ function getPlotOptionsTemplate(){
 		<div id='settingsPopup' style='background-color:008cba; padding: 10 10; position:fixed; width: 36vw; left:32vw; top:10vh; z-index:5' plotNum="XX_plotNum_XX">
 			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
 				<span style='font-size: 22px'> XX_plotName_XX settings </span>
-				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closePlotSettingsPopup()'>&times;</span>
+				<span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeDialogs()'>&times;</span>
 				<div style='padding:2; font-size:18px;'> Choose the display settings for this plot </div>
 				<table cellpadding=10 style='width:90%; margin:auto;'>
 				
@@ -5220,7 +5220,7 @@ function plotOptions(plotNum){
 
 
 	
-	closeAllDialogs();
+	closeDialogs();
 	
 	$("#main").css("opacity", 0.5);
 	$("#mySidenav").css("opacity", 0.5);
@@ -5427,11 +5427,11 @@ function plotOptions(plotNum){
 	window.setTimeout(function(){
 		
 		$("#main").click(function(){
-			closePlotSettingsPopup();
+			closeDialogs();
 		});
 		
 		$("#mySidenav").click(function(){
-			closePlotSettingsPopup();
+			closeDialogs();
 		});
 		
 	}, 50);
@@ -5693,7 +5693,7 @@ function convertCommaStringToList(string){
 
 
 
-function closePlotSettingsPopup(){
+function closeDialogs(){
 	
 	$("#mySidenav").unbind('click');
 	$("#main").unbind('click');

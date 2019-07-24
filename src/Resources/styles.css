@@ -571,9 +571,6 @@ div.vertical{
 	vertical-align:top;
 	cursor:pointer;
 	float:right;
-	position:absolute;
-	top: -5px;
-	right: 5px;
 }
 
 #main {
@@ -1110,6 +1107,7 @@ input:checked + .slider:before {
 	background-color:#b20000;
 	border-color:#b20000;
 	color:white;
+	cursor:auto;
 }
 
 .button_disabled {
@@ -1130,6 +1128,42 @@ input:checked + .slider:before {
 .button.ntp {
 	line-height:1em;
 }
+
+
+.dialog_cont{
+	z-index:1000;
+	position:fixed;
+	width:80%;
+	text-align:center;
+	margin-left:10%;
+	top:10vh; 
+}
+
+
+.dialog_outer{
+	text-align:center;
+	background-color:#008cba; 
+	padding: 10 10; 
+	margin:auto;
+	border-radius: 5px;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+
+
+.dialog_inner{
+	background-color: white; 
+	padding: 10 10; 
+	text-align:center; 
+	font-size:15; 
+	font-family:Arial; 
+	overflow-y:auto
+}
+
+
+
+
+
 
 
 

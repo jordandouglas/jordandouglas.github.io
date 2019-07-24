@@ -196,9 +196,9 @@ function getModelComparisonRowTemplate(modelNum) {
 			<td style="padding:5 5; text-alight:right">
 
 
-				<img class="icon" onClick='deleteModel(` + modelNum + `)' src="../src/Images/close.png" style="cursor:pointer" title="Delete this model">
+				<img class="icon small" onClick='deleteModel(` + modelNum + `)' src="../src/Images/close.png" style="cursor:pointer" title="Delete this model">
 
-				<span id='activateModelBtn_` + modelNum + `' onClick='activateModel(` + modelNum + `)' title="Activate this model" class="operation button">Activate</span>
+				<span id='activateModelBtn_` + modelNum + `' onClick='activateModel(` + modelNum + `)' title="Activate this model" class="button">Activate</span>
 			
 
 			</td>

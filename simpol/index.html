@@ -365,7 +365,7 @@ function init(){
 		
 		
 		// Approximate Bayesian computation
-		$("#ABCpanel td").dblclick(function(event) {
+		$("#ABCPanelTableDIV").dblclick(function(event) {
 			event.stopPropagation();
 		});
 		$("#ABCpanel").dblclick(function(event) {
@@ -926,7 +926,7 @@ window.onkeyup = function(e) {
 		$("#nbasesToSimulate").select();
 	}else if (key == 27 && !e.ctrlKey && !e.shiftKey) { // Escape
 		stop_controller();
-		closeAllDialogs();
+		closeDialogs();
 		//bendDNA_controller();
 
 
@@ -1861,7 +1861,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#[NTP]"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 				 			<span id="NTPname"></span> = 
 				 		</td>
 
@@ -1884,7 +1884,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#[ATP]"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 				 			<span id="ATPname"></span> = 
 				 		</td>
 
@@ -1977,7 +1977,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Force"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 				 			F<sub>assist</sub> = 
 				 		</td>
 
@@ -2002,7 +2002,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Halt"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 				 			Halt: 
 				 		</td>
 
@@ -2040,7 +2040,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Hybrid"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 				 			Hybrid length:
 				 		</td>
 
@@ -2063,7 +2063,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Bubble_left"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 				 			Bubble size 3&prime;:
 				 		</td>
 
@@ -2086,7 +2086,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Bubble_right"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 				 			Bubble size 5&prime;:
 				 		</td>
 
@@ -2155,7 +2155,7 @@ function closeNav() {
 				 		</td>
 
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 							K<sub>D</sub> = 
 				 		</td>
 
@@ -2178,7 +2178,7 @@ function closeNav() {
 				 		</td>
 
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 							k<sub>cat</sub> = 
 				 		</td>
 
@@ -2203,7 +2203,7 @@ function closeNav() {
 				 		</td>
 
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 							k<sub>bind</sub> = 
 				 		</td>
 
@@ -2293,7 +2293,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Translocation_Gibbs_barrier"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 				 			&Delta;G<sup>&dagger;</sup><sub>&#120591;</sub> = 
 				 		</td>
 
@@ -2316,7 +2316,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Posttranslocated_Gibbs_energy"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 				 			&Delta;G<sub>&#120591;1</sub> = 
 				 		</td>
 
@@ -2340,7 +2340,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Translocation_force_dependency"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 				 			&delta;<sub>1</sub> = 
 				 		</td>
 
@@ -2511,7 +2511,7 @@ function closeNav() {
 				 		</td>
 
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 							k<sub>U</sub> = 
 				 		</td>
 
@@ -2539,7 +2539,7 @@ function closeNav() {
 				 		</td>
 
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 							k<sub>A</sub> = 
 				 		</td>
 
@@ -2586,7 +2586,7 @@ function closeNav() {
 				 		</td>
 
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 							&Delta;G<sup>&dagger;</sup><sub>&tau;&minus;</sub> = 
 				 		</td>
 
@@ -2658,7 +2658,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Gibbs_barrier_of_hypertranslocation"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:6em">
+						<td style="text-align:right; width:8em">
 				 			&Delta;G<sup>&dagger;</sup><sub>&tau;&plus;</sub> = 
 				 		</td>
 
@@ -2730,7 +2730,7 @@ function closeNav() {
 					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Fold_distance"><img class="helpIcon" src="../src/Images/help.png"></a>
 					 		</td>
 
-							<td style="text-align:right; width:6em">
+							<td style="text-align:right; width:8em">
 					 			Fold distance:
 					 		</td>
 
@@ -2828,7 +2828,7 @@ function closeNav() {
 					 		</td>
 
 
-							<td style="text-align:right; width:6em">
+							<td style="text-align:right; width:8em">
 								k<sub>cleave</sub> = 
 					 		</td>
 
@@ -2853,7 +2853,7 @@ function closeNav() {
 					 		</td>
 
 
-							<td style="text-align:right; width:6em">
+							<td style="text-align:right; width:8em">
 								&lambda;<sub>cleave</sub> = 
 					 		</td>
 
@@ -2927,7 +2927,7 @@ function closeNav() {
 					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Arrest_timeout"><img class="helpIcon" src="../src/Images/help.png"></a>
 					 		</td>
 
-							<td style="text-align:right; width:6em">
+							<td style="text-align:right; width:8em">
 					 			Arrest time: 
 					 		</td>
 
@@ -2950,7 +2950,7 @@ function closeNav() {
 					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Proposal_width"><img class="helpIcon" src="../src/Images/help.png"></a>
 					 		</td>
 
-							<td style="text-align:right; width:6em">
+							<td style="text-align:right; width:8em">
 					 			Proposal width:
 					 		</td>
 
@@ -3838,7 +3838,7 @@ function closeNav() {
                                         
                             <span id="showInMCMC" style="display:none">           
     							&nbsp;&nbsp;
-    							<span id="ABCacceptanceDIV" title="Accumulative acceptance probability. This value is reset once burn-in has been achieved.">
+    							<span id="ABCacceptanceDIV" title="Cumulative acceptance probability. This value is reset once burn-in has been achieved.">
     								Acceptance rate: <span id="ABCacceptanceVal"> </span>%
     							</span>
 
@@ -3885,14 +3885,16 @@ function closeNav() {
                         <a href="about/#Model_comparison" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
                             
 
-						<label style="cursor:pointer; float:right; vertical-align:top"  title = "Check to sample the model from the list of models below. Each model will be sampled with probability proportional to its weight."> 
-							<input class="variable "  type="checkbox" onChange="userChangeModelSampling_controller()" style="cursor:pointer;" id="sampleModelsChk">Sample models</input> 
-						</label> <br>
+						
  
 				</span>
 
 					
 					<div id="ModelBuildingTableDIV"  class="scrollbar" style="display:none; overflow-x:scroll; width:100%; position:relative">
+					
+						<label style="cursor:pointer; vertical-align:top"  title = "Check to sample the model from the list of models below. Each model will be sampled with probability proportional to its weight."> 
+							<input class="variable "  type="checkbox" onChange="userChangeModelSampling_controller()" style="cursor:pointer;" id="sampleModelsChk">Sample models</input> 
+						</label> 
 
 						<br>
 
