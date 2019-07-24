@@ -73,7 +73,7 @@ function showNavigationPanel(){
 function translocationCalculationSummary(){
 	
 	
-
+	$("#translocationSummaryContainer_loader").show();
 	
 	calculateMeanTranslocationEquilibriumConstant_controller(function(toReturn) {
 		
@@ -93,6 +93,8 @@ function translocationCalculationSummary(){
             $("#meanBackwardsHyperRate_div").hide(0);
         }
         
+        
+        $("#translocationSummaryContainer_loader").hide();
 		$("#translocationSummaryContainer").show(100);
 
 		
