@@ -861,9 +861,9 @@ function setNTP(ntpType){
 	if (ntpTypeHTML == "U") ntpTypeHTML = "T";
 	var allBases = ["A", "C", "G", "T"];
 	for (var i = 0; i < 4; i ++){
-		$("#ntp" + allBases[i]).removeClass("ntp-selected");
+		$("#ntp" + allBases[i]).removeClass("selected");
 	}
-	$("#ntp" + ntpTypeHTML).addClass("ntp-selected");
+	$("#ntp" + ntpTypeHTML).addClass("selected");
 	
 	
 	NTPtoAdd = ntpType;
@@ -1861,7 +1861,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#[NTP]"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 				 			<span id="NTPname"></span> = 
 				 		</td>
 
@@ -1884,7 +1884,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#[ATP]"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 				 			<span id="ATPname"></span> = 
 				 		</td>
 
@@ -1906,7 +1906,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#[CTP]"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right;  width:110px">
+						<td style="text-align:right;  width:6em">
 				 			<span id="CTPname"></span> = 
 				 		</td>
 
@@ -1930,7 +1930,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#[GTP]"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right;  width:110px">
+						<td style="text-align:right;  width:6em">
 				 			<span id="GTPname"></span> = 
 				 		</td>
 
@@ -1954,7 +1954,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#[UTP]"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right;  width:110px">
+						<td style="text-align:right;  width:6em">
 				 			<span id="UTPname"></span> = 
 				 		</td>
 
@@ -1977,7 +1977,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Force"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 				 			F<sub>assist</sub> = 
 				 		</td>
 
@@ -2002,7 +2002,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Halt"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 				 			Halt: 
 				 		</td>
 
@@ -2040,7 +2040,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Hybrid"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 				 			Hybrid length:
 				 		</td>
 
@@ -2063,7 +2063,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Bubble_left"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 				 			Bubble size 3&prime;:
 				 		</td>
 
@@ -2086,7 +2086,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Bubble_right"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 				 			Bubble size 5&prime;:
 				 		</td>
 
@@ -2155,7 +2155,7 @@ function closeNav() {
 				 		</td>
 
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 							K<sub>D</sub> = 
 				 		</td>
 
@@ -2178,7 +2178,7 @@ function closeNav() {
 				 		</td>
 
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 							k<sub>cat</sub> = 
 				 		</td>
 
@@ -2203,7 +2203,7 @@ function closeNav() {
 				 		</td>
 
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 							k<sub>bind</sub> = 
 				 		</td>
 
@@ -2293,7 +2293,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Translocation_Gibbs_barrier"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 				 			&Delta;G<sup>&dagger;</sup><sub>&#120591;</sub> = 
 				 		</td>
 
@@ -2316,7 +2316,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Posttranslocated_Gibbs_energy"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 				 			&Delta;G<sub>&#120591;1</sub> = 
 				 		</td>
 
@@ -2340,7 +2340,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Translocation_force_dependency"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 				 			&delta;<sub>1</sub> = 
 				 		</td>
 
@@ -2511,7 +2511,7 @@ function closeNav() {
 				 		</td>
 
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 							k<sub>U</sub> = 
 				 		</td>
 
@@ -2529,28 +2529,6 @@ function closeNav() {
 
 
 
-					<tr style="display:none" id="deltaGDaggerHybridDestabil_container">
-
-						<td style="text-align:left; font-size:10px; float:left; width:20px">
-				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#kU_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
-				 		</td>
-
-
-						<td style="text-align:right; width:110px">
-							&Delta;G<sup>&dagger;</sup><sub>&pi;</sub> = 
-				 		</td>
-
-				 		<td>
-							<input class="variable param_box"  type="number" id="deltaGDaggerHybridDestabil"  OnChange="update_this_parameter_controller(this)">  k<sub>B</sub>T 
-				 		</td>
-
-
-				 		<td>
-							<input type=image id='deltaGDaggerHybridDestabil_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  
-				 		</td>
-
-				 	</tr>
-
 
 
 				 	<tr style="display:none" id="RateActivate_container">
@@ -2561,7 +2539,7 @@ function closeNav() {
 				 		</td>
 
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 							k<sub>A</sub> = 
 				 		</td>
 
@@ -2608,7 +2586,7 @@ function closeNav() {
 				 		</td>
 
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 							&Delta;G<sup>&dagger;</sup><sub>&tau;&minus;</sub> = 
 				 		</td>
 
@@ -2680,7 +2658,7 @@ function closeNav() {
 				 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Gibbs_barrier_of_hypertranslocation"><img class="helpIcon" src="../src/Images/help.png"></a>
 				 		</td>
 
-						<td style="text-align:right; width:110px">
+						<td style="text-align:right; width:6em">
 				 			&Delta;G<sup>&dagger;</sup><sub>&tau;&plus;</sub> = 
 				 		</td>
 
@@ -2752,7 +2730,7 @@ function closeNav() {
 					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Fold_distance"><img class="helpIcon" src="../src/Images/help.png"></a>
 					 		</td>
 
-							<td style="text-align:right; width:110px">
+							<td style="text-align:right; width:6em">
 					 			Fold distance:
 					 		</td>
 
@@ -2850,7 +2828,7 @@ function closeNav() {
 					 		</td>
 
 
-							<td style="text-align:right; width:110px">
+							<td style="text-align:right; width:6em">
 								k<sub>cleave</sub> = 
 					 		</td>
 
@@ -2875,7 +2853,7 @@ function closeNav() {
 					 		</td>
 
 
-							<td style="text-align:right; width:110px">
+							<td style="text-align:right; width:6em">
 								&lambda;<sub>cleave</sub> = 
 					 		</td>
 
@@ -2949,7 +2927,7 @@ function closeNav() {
 					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Arrest_timeout"><img class="helpIcon" src="../src/Images/help.png"></a>
 					 		</td>
 
-							<td style="text-align:right; width:110px">
+							<td style="text-align:right; width:6em">
 					 			Arrest time: 
 					 		</td>
 
@@ -2972,7 +2950,7 @@ function closeNav() {
 					 			<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer" href="about/#Proposal_width"><img class="helpIcon" src="../src/Images/help.png"></a>
 					 		</td>
 
-							<td style="text-align:right; width:110px">
+							<td style="text-align:right; width:6em">
 					 			Proposal width:
 					 		</td>
 
@@ -3329,10 +3307,10 @@ function closeNav() {
 
 
 											Base to add:<br>
-											<input  type=button id='ntpA' onClick=userChangeNTPType('A') value='A' title="Set the NTP to A" class="ntp ntp-selected">
-											<input  type=button id='ntpC' onClick=userChangeNTPType('C') value='C' title="Set the NTP to C" class="ntp">
-											<input  type=button id='ntpG' onClick=userChangeNTPType('G') value='G' title="Set the NTP to G" class="ntp">
-											<input  type=button id='ntpT' onClick=userChangeNTPType('T') value='U' title="Set the NTP to U" class="ntp">
+											<input  type=button id='ntpA' onClick=userChangeNTPType('A') value='A' title="Set the NTP to A" class="selected button ntp">
+											<input  type=button id='ntpC' onClick=userChangeNTPType('C') value='C' title="Set the NTP to C" class="button ntp">
+											<input  type=button id='ntpG' onClick=userChangeNTPType('G') value='G' title="Set the NTP to G" class="button ntp">
+											<input  type=button id='ntpT' onClick=userChangeNTPType('T') value='U' title="Set the NTP to U" class="button ntp">
 										</div>
 
 									</td>
@@ -3655,8 +3633,8 @@ function closeNav() {
 									<div style="position:relative; vertical-align:top;">
 										
 										
-										<input type="range" min="1" max="2" value="1" class="rangeslider noselect" style="width:100px" OnChange="toggleMCMC()" id="ABC_useMCMC" title="Use the R-ABC or MCMC-ABC algorithm to fit the data">
-										<table style="margin-left: 4em; height: 100px; margin-top: -26px;">
+										<input type="range" min="1" max="2" value="1" class="rangeslider noselect" style="width:8em" OnChange="toggleMCMC()" id="ABC_useMCMC" title="Use the R-ABC or MCMC-ABC algorithm to fit the data">
+										<table style="margin-left: 4em; height: 8em; margin-top: -2em;">
 											<tr>
 												<td>
 													Rejection <br>(R-ABC)
@@ -3809,15 +3787,15 @@ function closeNav() {
 
 
 											<td>
-												<span id="posteriorSummary_btn" onClick="posteriorSummary()" title="Extract values from the posterior distribution" class="button" style="background-color:#008cba; width: 170px">Posterior Summary</span>
+												<span id="posteriorSummary_btn" onClick="posteriorSummary()" title="Extract values from the posterior distribution" class="button">Posterior Summary</span>
 												<br><br>
-												<span id="beginABC_btn" onClick="beginABC()"  title="Begin the approximate Bayesian computation via rejection with the current settings"  style="width: 170px" class="ABC_display button beginABC_btn"> Begin R-ABC </span>
-                                                <span id="beginMCMC_btn" onClick="beginABC()"  title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" style="width: 170px" class="MCMC_display button beginABC_btn" > Begin MCMC-ABC </span>
+												<span id="beginABC_btn" onClick="beginABC()"  title="Begin the approximate Bayesian computation via rejection with the current settings"  class="ABC_display button beginABC_btn"> Begin R-ABC </span>
+                                                <span id="beginMCMC_btn" onClick="beginABC()"  title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="MCMC_display button beginABC_btn" > Begin MCMC-ABC </span>
                                                 <br><br>
                                                             
                                                             
                                                 <div  style="text-align:left">
-                                                    <input type=image id="uploadABC" class="rotate180 icon" title="Upload an ABC output in .log format" onClick="uploadABC();" src="../src/Images/download.png" style="cursor: pointer;">  
+                                                    <input type=image id="uploadABC" class="rotate180 icon small" title="Upload an ABC output in .log format" onClick="uploadABC();" src="../src/Images/download.png" style="cursor: pointer;">  
                                                     <input style="display:none" type="file" id="uploadABCinput" accept=".log"> 
                                                     <input type=image id="downloadABC" class="icon small" title="Download the ABC output (displayed below) in .log format" onClick=downloadABC() src="../src/Images/download.png" style="cursor:pointer; display:none;">  
                                                  </div>

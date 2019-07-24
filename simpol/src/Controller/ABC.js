@@ -35,9 +35,7 @@ function initABCpanel(){
 	gelFabricCanvases = {};
 
 
-
-	$(".beginABC_btn").css("cursor", "auto");
-	$(".beginABC_btn").css("background-color", "#858280");
+	$(".beginABC_btn").addClass("button_disabled");
 	$(".beginABC_btn").attr("disabled", "disabled");
     
 	$("#uploadABC").show(50);
@@ -71,8 +69,10 @@ function initABCpanel(){
 
 
 // Loads all the settings from the DOM and sends them through to the model so ABC can begin
-// Assumes that all force-velocity input textareas have already been validated
 function beginABC(){
+
+
+	if (!validateAllAbcDataInputs()) return;
 
 
 	// Load the force-velocity values
@@ -110,28 +110,22 @@ function beginABC(){
 function disableABCbuttons(){
 
     // Disable the ntrials textboxes
-    $("#MCMCntrials").css("cursor", "auto");
-    $("#MCMCntrials").css("background-color", "#858280");
     $("#MCMCntrials").attr("disabled", "disabled");
+    $("#MCMCntrials").addClass("button_disabled");
     
     
     // Disable the inference method checkbox
-    $("#ABC_useMCMC").css("cursor", "auto");
-    $("#ABC_useMCMC").css("background-color", "#858280");
     $("#ABC_useMCMC").attr("disabled", "disabled");
+    $("#ABC_useMCMC").addClass("button_disabled");
     
     
     // Disable log every
-    $("#MCMC_logevery").css("cursor", "auto");
-    $("#MCMC_logevery").css("background-color", "#858280");
     $("#MCMC_logevery").attr("disabled", "disabled");
-    
+    $("#MCMC_logevery").addClass("button_disabled");
     
     // Disable epsilon settings for MCMC
-    $("#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("cursor", "auto");
-    $("#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("background-color", "#858280");
     $("#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").attr("disabled", "disabled");
-
+	$("#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").addClass("button_disabled");
 }
 
 
@@ -139,8 +133,7 @@ function disableABCbuttons(){
 function enableABCbuttons_endABC(){
 
     // Reactivate all the buttons
-    $("#MCMCntrials,#PreExp").css("cursor", "");
-    $("#MCMCntrials,#PreExp").css("background-color", "#008cba");
+    $("#MCMCntrials,#PreExp").removeClass("button_disabled");
     $("#MCMCntrials,#PreExp").attr("disabled", false);
     
 
@@ -151,8 +144,7 @@ function enableABCbuttons_endABC(){
 function enableSomeABCbuttons_deleteABC(){
 
     // Reactivate all the buttons
-    $("#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("cursor", "");
-    $("#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("background-color", "#008cba");
+    $("#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").removeClass("button_disabled");
     $("#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").attr("disabled", false);
     enableABCbuttons_endABC();
 
@@ -447,25 +439,27 @@ function validateAllAbcDataInputs(){
 	
 
 	var textareas = $(".ABCinputData");
-	var valid = true;
+	var valid = textareas.length > 0;
 	for (var i = 0; i < textareas.length; i ++){
+		if (!valid) break;
 		valid = valid && validateExperimentalDataInput(textareas[i]);
+		
 	}
 
 
 	// If something is invalid then deactivate the start ABC button
 	if (!valid && !running_ABC){
-		$(".beginABC_btn").css("cursor", "auto");
-		$(".beginABC_btn").css("background-color", "#858280");
 		$(".beginABC_btn").attr("disabled", "disabled");
+		$(".beginABC_btn").addClass("button_disabled");
+		return false;
 	}
 
 
 	// Else activate it
 	else{
-		$(".beginABC_btn").css("cursor", "pointer");
-		$(".beginABC_btn").css("background-color", "#008cba");
 		$(".beginABC_btn").attr("disabled", false);
+		$(".beginABC_btn").removeClass("button_disabled");
+		return true;
 	}
 
 
@@ -769,9 +763,8 @@ function addNewCurveButtons(){
 
 
 	// Disable the Begin ABC button
-	$(".beginABC_btn").css("cursor", "auto");
-	$(".beginABC_btn").css("background-color", "#858280");
 	$(".beginABC_btn").attr("disabled", "disabled");
+	$(".beginABC_btn").addClass("button_disabled");
 
 
 }

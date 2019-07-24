@@ -432,26 +432,7 @@ div.vertical{
 
 
 
-.ntp {
-    background-color: #008CBA;
-	color: white;
-    border: none;
-    padding: 0;
-    text-align: center;
-    text-decoration: none;
-    %display: inline-block;
-    font-size: 12px;
-    width:2em;
-    height:2em;
-    line-height:1em;
-	vertical-align: middle; 
-	cursor:pointer;
-}
 
-.ntp-selected {
-    background-color: #b20000;
-	cursor:auto;
-}
 
 
 
@@ -834,10 +815,6 @@ optgroup {
 }
 
 
-:disabled {
-	cursor:auto;
-	
-}
 
 input {
 	box-shadow: none;
@@ -1082,11 +1059,15 @@ input:checked + .slider:before {
 }
 
 
+:disabled {
+	cursor:auto;
+}
+
+
 
 
 
 .button{
-
 	cursor:pointer;
 	margin-left:5px;
 	margin-right:5px;
@@ -1095,7 +1076,30 @@ input:checked + .slider:before {
 	padding: 8 8;
 	line-height:2em;
 	color:white;
+	border-radius: 5px;
+	
+	border-style: solid; 
+	border-width: 1px; 
+	border-color:#008cba; 
+	
+	 -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    
 }
+
+.button:hover{
+	color:#008CBA; 
+	background-color:white;
+ 
+	
+}
+
+
+
 
 .button.extraline{
 	line-height:2.5em;
@@ -1104,6 +1108,29 @@ input:checked + .slider:before {
 
 .button.selected{
 	background-color:#b20000;
+	border-color:#b20000;
+	color:white;
 }
+
+.button_disabled {
+	cursor:auto;
+	background: #858280;
+	border-color:#858280;
+    color: white;
+}
+
+
+.button_disabled:hover {
+	cursor:auto;
+	background: #858280;
+    color: white;
+}
+
+
+.button.ntp {
+	line-height:1em;
+}
+
+
 
 
