@@ -365,6 +365,18 @@ div.vertical{
 .icon{
 	vertical-align: middle;
 	height:38px;
+	margin-left:5px;
+	margin-right:5px;
+}
+
+
+#plotsTableDIV .icon{
+	height:25px;
+}
+
+
+#plots4 .icon{
+	height:25px;
 }
 
 
@@ -441,6 +453,7 @@ div.vertical{
 
 
 .section .minimise {
+	
     line-height: 1.2em;
     font-size: 30px;
     cursor: pointer;
@@ -450,6 +463,7 @@ div.vertical{
 
 
 .minimise {
+	font-family: "Source Sans Pro", "Arial"; 
     background-color: #008CBA;
 	opacity: 1.0;
     border: none;
@@ -464,6 +478,16 @@ div.vertical{
 	line-height:1em;
 	cursor:pointer;
 	border-radius:5px;
+	
+	
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+	
+	
 }
 
 
@@ -609,7 +633,7 @@ div.vertical{
     font-size: 16px;
 	transition: 0.5s;
     margin-bottom:20px;
-    margin-left:130px;
+    margin-left:150px;
 
 }
 
@@ -676,8 +700,8 @@ input[type=checkbox] {
     color: white;
     outline: none;
     cursor: pointer;
-    margin-right:20px;
-    margin-left:20px;
+    margin-right:10px;
+    margin-left:10px;
 }
 
 .dropdown {

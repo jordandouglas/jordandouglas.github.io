@@ -1709,7 +1709,7 @@ function closeNav() {
 				<div class="parameter-title">
 					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#Sequence_selection"><img class="helpIcon" src="../src/Images/help.png"></a>
 
-					<span id="SequenceSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3;  float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
+					<span id="SequenceSettingsBtn" class="minimise" style="float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
 					Sequence Options
 				</div>
 
@@ -1756,39 +1756,17 @@ function closeNav() {
 
 
 
-			<div class="parameter-bg" id="polymeraseSelectionDiv" style="display:none">
-				
-				<div class="parameter-title">
-
-					<span id="PolymeraseSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
-					
-					Polymerase
-				</div>
-
-				<div id="PolymeraseSettings">
-
-				<br>Select polymerase: <select class="dropdown" style="width: 350px;" id = "SelectPolymerase" title="Select which polymerase to use. Different polymerases have different initial parameter estimates but these can be edited" OnChange="stop_controller(function() { userChangePolymerase_controller() }); ">
-				</select>
-
-				</div>
-				<br>
-			</div><br>
-
-			
-			
-			
-			
 			
 			
 			
 			<div class="parameter-bg">
 				
 				<div class="parameter-title" >
-				<span id="ExpeirmentalConditionsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
+				<span id="ExperimentalConditionsBtn" class="minimise" style="float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
 				Experimental Conditions</div> 
 
 
-				<table style="width:100%;" id="ExpeirmentalConditions">
+				<table style="width:100%;" id="ExperimentalConditions">
 
 
 
@@ -1996,7 +1974,7 @@ function closeNav() {
 			
 			<div class="parameter-bg">
 				<div class="parameter-title">
-				<span id="StructuralSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
+				<span id="StructuralSettingsBtn" class="minimise" style="float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
 				Structural Parameters </div>  
 
 
@@ -2080,7 +2058,7 @@ function closeNav() {
 			<br>
 			<div class="parameter-bg">
 				<div class="parameter-title">
-				<span id="NTPincorporationSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
+				<span id="NTPincorporationSettingsBtn" class="minimise" style="float:right" disp="false" onClick="minimiseSection(this)">&minus;</span>
 				<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#Kinetics_of_nucleotide_incorporation"><img class="helpIcon" src="../src/Images/help.png"></a>
                 NTP Incorporation Parameters 
 				</div>
@@ -2212,7 +2190,7 @@ function closeNav() {
 
 
 				<div class="parameter-title">
-					<span id="TranslocationSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
+					<span id="TranslocationSettingsBtn" class="minimise" style="float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
 					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#Kinetics_of_translocation"><img class="helpIcon" src="../src/Images/help.png"></a>
                     Translocation Parameters 
 					
@@ -2337,7 +2315,7 @@ function closeNav() {
 						<td colspan = 3 style="text-align:center">
 
 				 			Transition state, $\mathbb{TS}$:
-				 			<select class="dropdown modelSetting" style="width:150px;"  id = "currentTranslocationModel" title="Select which model to use for estimating translocation free energy barrier heights" OnChange="userInputModel_controller()">
+				 			<select class="dropdown modelSetting" style="width:8em;"  id = "currentTranslocationModel" title="Select which model to use for estimating translocation free energy barrier heights" OnChange="userInputModel_controller()">
 
 				 			    <option value="absoluteBarriers">Absolute barriers</option>
 				 				<option value="midpointBarriers">Midpoint barriers</option>
@@ -2416,7 +2394,7 @@ function closeNav() {
 			<br>
 			<div class="parameter-bg">
 				<div class="parameter-title">
-				<span id="PauseParametersSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
+				<span id="PauseParametersSettingsBtn" class="minimise" style="float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
 				Pause Parameters 
 				</div>  
 
@@ -2704,7 +2682,7 @@ function closeNav() {
 				<div  class="parameter-bg">
 					
 					<div class="parameter-title">
-					<span id="RNAfoldingSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
+					<span id="RNAfoldingSettingsBtn" class="minimise" style="float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
 					RNA Folding Settings 
 					</div> 
 
@@ -2800,7 +2778,7 @@ function closeNav() {
 			<div class="parameter-bg">
 				
 				<div class="parameter-title">
-					<span id="cleavageSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
+					<span id="cleavageSettingsBtn" class="minimise" style="float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
 					Cleavage Parameters 
 				</div>  
 
@@ -2864,10 +2842,32 @@ function closeNav() {
 
 				</table>
 				<br>
+			</div><br>
+
+
+
+			<div class="parameter-bg" id="polymeraseSelectionDiv">
+				
+				<div class="parameter-title">
+
+					<span id="PolymeraseSettingsBtn" class="minimise" style="float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
+					
+					Polymerase
+				</div>
+
+				<div id="PolymeraseSettings" style="display:none">
+
+				<br>Select polymerase: <select class="dropdown" style="width: 350px;" id = "SelectPolymerase" title="Select which polymerase to use. Different polymerases have different initial parameter estimates but these can be edited" OnChange="stop_controller(function() { userChangePolymerase_controller() }); ">
+				</select>
+
+				</div>
+				<br>
 			</div>
 
-
-
+			
+			
+			
+			
 
 
 
@@ -2876,7 +2876,7 @@ function closeNav() {
 			<div class="parameter-bg">
 				
 				<div class="parameter-title">
-				<span id="advancedModelSettingsBtn" class="minimise" style="font-size:20px; padding: 3 3; float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
+				<span id="advancedModelSettingsBtn" class="minimise" style="float:right" disp="true" onClick="minimiseSection(this)">&plus;</span>
 				Advanced Model Settings 
 				 </div>
 
@@ -3031,7 +3031,7 @@ function closeNav() {
 					
 					<tr>
 						<td style="height:30px; width: 30%; vertical-align:bottom; ">
-							<div id="mfeOutput" style="font-family:'Courier New'; "> </div>
+							
 							
 							
 						</td>
@@ -3039,12 +3039,12 @@ function closeNav() {
 
 
 
-                        <td  style="text-align:center; font-size: 20px; vertical-align:top; width: 40%;"> 
-                                <div style="width:100%; text-align:center;">
+                        	<td style="text-align:center; font-size: 20px; vertical-align:top; width: 40%;"> 
+                                <div style="text-align:center;">
 
-                                        <a href="" target="_blank" style="text-decoration:none;  color:#414b4b" title="Launch SimPol">
-                                            <div class="title" style="font-size: 107px; margin-bottom: -20px "> SimPol </div>
-                                            <div style="font-size: 18px; "> Simulation of Nucleic Acid Polymerases </div>
+                                        <a href="" target="_blank" style="text-decoration:none; color:#414b4b" title="Launch SimPol">
+                                            <span class="title" style="font-size: 107px; line-height:0.8em "> SimPol </span><br>
+                                            <span style="font-size: 18px; "> Simulation of Nucleic Acid Polymerases </span>
                                         </a>
                                     
                                     
@@ -3058,14 +3058,14 @@ function closeNav() {
 
 
 
-                              <a href="../../"  target="_blank" style="text-decoration:none; color:white; ">
-                                    <span class="button extraline" title="Go back home">Home</span> 
-                              </a>
-                               <span class="button selected extraline" title="Launch SimPol">SimPol</span> 
-                              
-                             <a href="about/"  target="_blank" style="text-decoration:none; color:white; ">
-                                    <span class="button extraline" title="Introductory tutorials and other information about SimPol">About</span>
-                                </a>    
+	                              <a href="../"  target="_blank" style="text-decoration:none; color:white; ">
+	                                    <span class="button extraline" title="Go back home">Home</span> 
+	                              </a>
+	                               <span class="button selected extraline" title="Launch SimPol">SimPol</span> 
+	                              
+	                             <a href="about/"  target="_blank" style="text-decoration:none; color:white; ">
+	                                    <span class="button extraline" title="Introductory tutorials and other information about SimPol">About</span>
+	                                </a>    
                          
                                     
                             </td>
@@ -3388,14 +3388,14 @@ function closeNav() {
 						<span id="plot4Buttons" style="display:none; font-size:16px">
 							&nbsp;&nbsp;&nbsp;
 
-							<input type=image id='plotOptions4' title="Change the settings of this plot" onClick=plotOptions(4) src="../src/Images/gear.png" style="vertical-align: middle; width:20px; height:20px;">  
+							<input class="icon" type=image id='plotOptions4' title="Change the settings of this plot" onClick=plotOptions(4) src="../src/Images/gear.png">  
 
 							&nbsp;&nbsp;
-							<input type=button id='minus100Sites' class='minimise dropdown-disabled' style='width:2.5em'  value='&larr;120' onClick=minus100Sites() title='See previous 120 sites'>
+							<input type=button id='minus100Sites' class='minimise dropdown-disabled' style='width:3.5em'  value='&larr;120' onClick=minus100Sites() title='See previous 120 sites'>
 							&nbsp;Showing sites <span id='numSitesDisplayed'></span> out of <span id='numSitesTotal'>0</span>&nbsp;
-							<input type=button id='plus100Sites' class='minimise dropdown-disabled' style='width:2.5em'  value='120&rarr;' onClick=plus100Sites() title='See next 120 sites'>
+							<input type=button id='plus100Sites' class='minimise dropdown-disabled' style='width:3.5em'  value='120&rarr;' onClick=plus100Sites() title='See next 120 sites'>
 
-							&nbsp;&nbsp;<input type=image id='downloadPlot4' title="Download the data displayed in this plot" onClick=downloadPlot(4) src="../src/Images/download.png" style="vertical-align: middle; height:20px;">  
+							&nbsp;&nbsp;<input class="icon" type=image id='downloadPlot4' title="Download the data displayed in this plot" onClick=downloadPlot(4) src="../src/Images/download.png">  
 						    <a id="helpPlot4" href="about/#Time_per_site" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
                             
                                     
@@ -3456,8 +3456,8 @@ function closeNav() {
 												</select>
 											
 
-											<input type=image id='plotOptions1' title="Change the settings of this plot" onClick=plotOptions(1) src="../src/Images/gear.png" style="cursor: pointer; vertical-align: middle; width:20px; height:20px; display:none">  
-											<input type=image id='downloadPlot1' title="Download the data displayed in this plot" onClick=downloadPlot(1) src="../src/Images/download.png" style="vertical-align: middle; cursor: pointer; height:20px; display:none">  
+											<input class="icon" type=image id='plotOptions1' title="Change the settings of this plot" onClick=plotOptions(1) src="../src/Images/gear.png" style="cursor: pointer; display:none">  
+											<input class="icon" type=image id='downloadPlot1' title="Download the data displayed in this plot" onClick=downloadPlot(1) src="../src/Images/download.png" style="cursor: pointer; display:none">  
 											<a id="helpPlot1" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="../src/Images/help.png"></a>
 							
 
@@ -3487,8 +3487,8 @@ function closeNav() {
 															  <option value="parameterHeatmap">Parameter plot</option>
 											</select>
 										
-										<input type=image id='plotOptions2' title="Change the settings of this plot" onClick=plotOptions(2) src="../src/Images/gear.png" style="cursor: pointer;vertical-align: middle; width:20px; height:20px; display:none">  
-										<input type=image id='downloadPlot2' title="Download the data displayed in this plot" onClick=downloadPlot(2) src="../src/Images/download.png" style="cursor: pointer;vertical-align: middle;  height:20px; display:none ">  
+										<input class="icon" type=image id='plotOptions2' title="Change the settings of this plot" onClick=plotOptions(2) src="../src/Images/gear.png" style="cursor: pointer; display:none">  
+										<input class="icon" type=image id='downloadPlot2' title="Download the data displayed in this plot" onClick=downloadPlot(2) src="../src/Images/download.png" style="cursor: pointer; display:none">  
 										<a id="helpPlot2" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="../src/Images/help.png"></a>
 							
 										
@@ -3522,8 +3522,8 @@ function closeNav() {
 													
 										</select>
 									
-									<input type=image id='plotOptions3' title="Change the settings of this plot" onClick=plotOptions(3) src="../src/Images/gear.png" style="cursor: pointer;vertical-align: middle; width:20px; height:20px; display:none">  
-									<input type=image id='downloadPlot3' title="Download the data displayed in this plot" onClick=downloadPlot(3) src="../src/Images/download.png" style="cursor: pointer;display:none; vertical-align: middle; height:20px; ">  
+									<input class="icon" type=image id='plotOptions3' title="Change the settings of this plot" onClick=plotOptions(3) src="../src/Images/gear.png" style="cursor: pointer; display:none">  
+									<input class="icon" type=image id='downloadPlot3' title="Download the data displayed in this plot" onClick=downloadPlot(3) src="../src/Images/download.png" style="cursor: pointer; display:none">  
 									<a id="helpPlot3" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; display:none"><img class="helpIcon" src="../src/Images/help.png"></a>
 							
 									

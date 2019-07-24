@@ -299,7 +299,7 @@ function printContents(){
         }
         else {
             subsubsectNum++;
-            $("#contents").append("<div class='contents_subsubsect'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + "." + subsubsectNum + " " + a_tag + "</div>");
+            //$("#contents").append("<div class='contents_subsubsect'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + "." + subsubsectNum + " " + a_tag + "</div>");
         }
         
         
@@ -454,31 +454,42 @@ function addCitations(){
 
 							</td>
 
-							<td  style="text-align:center; font-size: 20px; vertical-align:top; font-family: 'Palatino'; width: 40%;"> 
-								<div style="width:100%; text-align:center;">
+						
+                        	<td style="text-align:center; font-size: 20px; vertical-align:top; width: 40%;"> 
+                                <div style="text-align:center;">
 
-                                        <a href="../" style="text-decoration:none;  color:#414b4b" title="Launch SimPol">
-                                            <div style="font-size: 90px; margin-bottom: -20px "> SimPol </div>
-                                            <div style="font-size: 20px; "> Simulation of Nucleic Acid Polymerases </div>
+                                        <a href="../" target="_blank" style="text-decoration:none; color:#414b4b" title="Launch SimPol">
+                                            <span class="title" style="font-size: 107px; line-height:0.8em "> SimPol </span><br>
+                                            <span style="font-size: 18px; "> Simulation of Nucleic Acid Polymerases </span>
                                         </a>
-									
-									
-								</div>
+                                    
+                                    
+                                </div>
+                                        
+                            </td>
+								
+								 	
+								
+								
 										
 							</td>
 							
 							
 
-							<td style="height:30px; width: 30%; vertical-align:bottom; text-align:right;"> 
+							<td style="width: 30%; vertical-align:bottom; text-align:right;"> 
 
+      
+                                    
+                              <a href="../../"  target="_blank" style="text-decoration:none; color:white; ">
+                                    <span class="button extraline" title="Go back home">Home</span> 
+                              </a>
+                              
+                              <a href="../../"  target="_blank" style="text-decoration:none; color:white; ">
+                                    <span class="button extraline" title="Launch SimPol">SimPol</span> 
+                              </a>
 
-                              <a href="../../" style="text-decoration:none; color:white; ">
-                                    <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#008CBA; padding: 8 8;" title="Go back home">Home</span> 
-                              </a>&nbsp;
-                              <a href="../" style="text-decoration:none; color:white; ">
-                                    <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#008CBA; padding: 8 8;" title="Launch SimPol">SimPol</span> 
-                              </a>&nbsp;
-                                    <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#b20000; padding: 8 8;  color:white; " title="Introductory tutorials and other information about SimPol">About</span>
+                            
+                                <span class="button selected extraline" title="Introductory tutorials and other information about SimPol">About</span> 
                                     
                          
                                     
