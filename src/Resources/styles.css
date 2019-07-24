@@ -1078,6 +1078,10 @@ input:checked + .slider:before {
     user-select: none;
 }
 
+
+
+
+
 .button{
 
 	cursor:pointer;
