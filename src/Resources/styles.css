@@ -929,17 +929,21 @@ input {
   transition: .3s;
 }
 
+
+
 .slider:before {
 	position: absolute;
 	content: "";
-	height: 20px;
-	width: 20px;
-	left: 6px;
-	bottom: 3px;
+	height: 1.2em;
+	width: 1.2em;
+	left: 0.5em;
+	bottom: 0.25em;
 	background-color: white;
 	-webkit-transition: .3s;
 	transition: .3s;
 }
+
+
 
 .notboolean{
 	background-color: #008CBA;	
@@ -961,7 +965,7 @@ input:checked + .slider:before {
 
 /* Rounded sliders */
 .slider.round {
-	border-radius: 34px;
+	border-radius: 3em;
 }
 
 .slider.round:before {
@@ -973,15 +977,14 @@ input:checked + .slider:before {
 .rangeslider {
     -webkit-appearance: none;  /* Override default CSS styles */
     appearance: none;
-    height: 26px; /* Specified height */
+    height: 2em; /* Specified height */
     background: #008cba; 
     outline: none; /* Remove outline */
-	border-radius: 20px;
+	border-radius: 1.5em;
 	transform: rotate(90deg);
-	padding: 5 5;
 	transform-origin: left top 0;
 	margin-left: 26px;
-	
+	padding:0.5em 0.5em;
 }
 
 

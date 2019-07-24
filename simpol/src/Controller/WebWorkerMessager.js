@@ -3140,8 +3140,8 @@ function gelInference_controller(fitID, priors, resolve = function() { } ){
         $("#MCMCntrials,#PreExp,#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").css("background-color", "#008cba");
         $("#MCMCntrials,#PreExp,#ABC_useMCMC,#MCMC_logevery,#MCMC_chiSqthreshold_0,#MCMC_chiSqthreshold_gamma").attr("disabled", false);
         
-		$("#beginABC_btn").val("Resume ABC");
-		$("#beginMCMC_btn").val("Resume MCMC-ABC");
+		$("#beginABC_btn").html("Resume ABC");
+		$("#beginMCMC_btn").html("Resume MCMC-ABC");
 		$(".beginABC_btn").attr("onclick", "beginABC()");
 		
 		running_ABC = false;
@@ -3784,8 +3784,8 @@ function beginABC_controller(abcDataObjectForModel){
         $("#MCMCntrials,#PreExp").css("background-color", "#008cba");
         $("#MCMCntrials,#PreExp").attr("disabled", false);
         
-		$("#beginABC_btn").val("Resume ABC");
-		$("#beginMCMC_btn").val("Resume MCMC-ABC");
+		$("#beginABC_btn").html("Resume ABC");
+		$("#beginMCMC_btn").html("Resume MCMC-ABC");
 		$(".beginABC_btn").attr("onclick", "beginABC()");
 		running_ABC = false;
 		simulationRenderingController = false;

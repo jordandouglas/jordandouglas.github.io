@@ -351,7 +351,6 @@ function init(){
 		});
 			
 		$("#navigationPanel").dblclick(function(event) {
-			event.preventDefault();
 			showNavigationPanel();
 		});
 		
@@ -3725,7 +3724,7 @@ function closeNav() {
 
 
 
-								<td style="vertical-align:top; text-align:left; border: 1px solid black; min-width:20em">
+								<td style="vertical-align:top; text-align:left; border: 1px solid black; min-width:10em">
 
 									<b style="text-align:right">Threshold settings:</b><br><br>
 									<table style="text-align:right; float:right">
@@ -3802,7 +3801,7 @@ function closeNav() {
 
 
 
-								<td  style="vertical-align:top; text-align:left; border: 1px solid black; background-color:#d3d3d3;">
+								<td  style="vertical-align:top; text-center; border: 1px solid black; background-color:#d3d3d3; min-width:10em">
 
 									<b style="text-align:right">Actions:</b><br><br>
 									<table style="text-align:center">
@@ -3810,17 +3809,17 @@ function closeNav() {
 
 
 											<td>
-												<span class=button id="posteriorSummary_btn" onClick="posteriorSummary()" title="Extract values from the posterior distribution" class="operation" style="background-color:#008cba; width: 170px">Posterior Summary</span>
+												<span id="posteriorSummary_btn" onClick="posteriorSummary()" title="Extract values from the posterior distribution" class="button" style="background-color:#008cba; width: 170px">Posterior Summary</span>
 												<br><br>
-												<span class=button id="beginABC_btn" onClick="beginABC()"  title="Begin the approximate Bayesian computation via rejection with the current settings"  style="width: 170px" class="ABC_display operation beginABC_btn"> Begin R-ABC </span>
-                                                <span class=button id="beginMCMC_btn" onClick="beginABC()"  title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" style="width: 170px" class="MCMC_display operation beginABC_btn" > Begin MCMC-ABC </span>
+												<span id="beginABC_btn" onClick="beginABC()"  title="Begin the approximate Bayesian computation via rejection with the current settings"  style="width: 170px" class="ABC_display button beginABC_btn"> Begin R-ABC </span>
+                                                <span id="beginMCMC_btn" onClick="beginABC()"  title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" style="width: 170px" class="MCMC_display button beginABC_btn" > Begin MCMC-ABC </span>
                                                 <br><br>
                                                             
                                                             
                                                 <div  style="text-align:left">
                                                     <input type=image id="uploadABC" class="rotate180 icon" title="Upload an ABC output in .log format" onClick="uploadABC();" src="../src/Images/download.png" style="cursor: pointer;">  
                                                     <input style="display:none" type="file" id="uploadABCinput" accept=".log"> 
-                                                    <input type=image id="downloadABC" class="icon" title="Download the ABC output (displayed below) in .log format" onClick=downloadABC() src="../src/Images/download.png" style="cursor:pointer; display:none;">  
+                                                    <input type=image id="downloadABC" class="icon small" title="Download the ABC output (displayed below) in .log format" onClick=downloadABC() src="../src/Images/download.png" style="cursor:pointer; display:none;">  
                                                  </div>
                                                             
 											</td>
