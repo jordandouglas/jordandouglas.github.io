@@ -508,6 +508,8 @@ function getTutorialDialogTemplate(){
 
 
     return `
+    
+    		<div style="text-align:left">
                 <div style='padding:20; font-size:14px'>
                     XX_tutmessage_XX
                 </div>
@@ -519,8 +521,9 @@ function getTutorialDialogTemplate(){
                 
 
                 <span style="float:right">
-                    <input type=button class="button" onClick="closeTutorialDialog()" value='OK' title="OK" style="width:60px;"></input>
+                    <input type=button class="button" onClick="closeDialogs()" value='OK' title="OK" style="width:60px;"></input>
                 </span>
+            </div>
 
     `;
 
