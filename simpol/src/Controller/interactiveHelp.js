@@ -484,43 +484,23 @@ function begin_biophys6(){
 function addTutorialTemplate(tutorialName, tutorialSubtitle, tutorialMessage, tutorialFootnote){
 
     closeDialogs();
+	openDialog();
+	
+	
+	var popupHTML = getDialogTemplate(tutorialName, tutorialSubtitle, "800px");
+		
+		
+	$(popupHTML).appendTo('body');
+	
+    var innerHTML = getTutorialDialogTemplate();
+    innerHTML = innerHTML.replace("XX_tutmessage_XX", tutorialMessage);
+    innerHTML = innerHTML.replace("XX_tutfootnote_XX", tutorialFootnote);
     
-    $("#main").css("opacity", 0.5);
-    $("#mySidenav").css("opacity", 0.5);
+    $("#dialogBody").html(innerHTML);
     
-    var popupHTML = getTutorialDialogTemplate();
-    popupHTML = popupHTML.replace("XX_tutname_XX", tutorialName);
-    popupHTML = popupHTML.replace("XX_tutorialSubtitle_XX", tutorialSubtitle);
-    popupHTML = popupHTML.replace("XX_tutmessage_XX", tutorialMessage);
-    popupHTML = popupHTML.replace("XX_tutfootnote_XX", tutorialFootnote);
-    
-    $(popupHTML).appendTo('body');
-    
-    window.setTimeout(function(){
-        
-        $("#main").click(function(){
-            closeTutorialDialog();
-        });
-        
-        $("#mySidenav").click(function(){
-            closeTutorialDialog();
-        });
-        
-    }, 50);
-
 
 }
 
-
-function closeTutorialDialog(){
-    
-    $("#mySidenav").unbind('click');
-    $("#main").unbind('click');
-    $("#tutorialDialog").remove();
-    $("#main").css("opacity", 1);
-    $("#mySidenav").css("opacity", 1);
-    
-}
 
 
 function getTutorialDialogTemplate(){
@@ -528,13 +508,6 @@ function getTutorialDialogTemplate(){
 
 
     return `
-        <div id='tutorialDialog' style='background-color:008cba; padding: 10 10; position:fixed; width: 36vw; left:32vw; top:10vh; z-index:5' plotNum="XX_plotNum_XX">
-            <div style='background-color: white; padding: 15 15; text-align:left; font-size:15; font-family:Arial; overflow-y:auto'>
-                <b style='font-size: 22px'> XX_tutname_XX </b>
-                <span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeTutorialDialog()'>&times;</span>
-                <div style='padding-top: 10px; font-size:18px;'> XX_tutorialSubtitle_XX </div>
-                
-                
                 <div style='padding:20; font-size:14px'>
                     XX_tutmessage_XX
                 </div>
@@ -546,14 +519,10 @@ function getTutorialDialogTemplate(){
                 
 
                 <span style="float:right">
-                    <input type=button class="operation" onClick="closeTutorialDialog()" value='OK' title="OK" style="width:60px;"></input>
+                    <input type=button class="button" onClick="closeTutorialDialog()" value='OK' title="OK" style="width:60px;"></input>
                 </span>
-            </div>
-        </div>
+
     `;
-
-
-
 
 
 }
