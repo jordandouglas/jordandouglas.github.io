@@ -4145,7 +4145,7 @@ function getDownloadPlotTemplate(){
 						
 						
 						<td> 
-								<input type=button class="operation" onClick=downloadPlotInFormat() value='Download' title="Download plot in the selected format" style="width:100px; float:right"></input>
+								<input type=button class="button" onClick=downloadPlotInFormat() value='Download' title="Download plot in the selected format" style="width:100px; float:right"></input>
 						</td>
 						
 					</tr>
@@ -4680,8 +4680,8 @@ function getPlotOptionsTemplate(){
 				</table>
 
 				<span style="float:right">
-					<input type=button id='deleteDistn' class="operation" onClick="deletePlots_controller(false, false, false, true, false, false, function() { saveSettings_controller(); });" value='Delete Data and Save' title="You must delete all parameter plot data before you save these settings (because you added a site-specific time recording)" style="width:220px; display:none"></input>
-					<input type=button id='submitDistn' class="operation" onClick="saveSettings_controller()" value='Save' title="Submit your changes" style="width:60px;"></input>
+					<input type=button id='deleteDistn' class="button" onClick="deletePlots_controller(false, false, false, true, false, false, function() { saveSettings_controller(); });" value='Delete Data and Save' title="You must delete all parameter plot data before you save these settings (because you added a site-specific time recording)" style="width:220px; display:none"></input>
+					<input type=button id='submitDistn' class="button" onClick="saveSettings_controller()" value='Save' title="Submit your changes" style="width:60px;"></input>
 				</span>
 
 	`;

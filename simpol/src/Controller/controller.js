@@ -1453,12 +1453,8 @@ function getCacheClearTemplate(){
 
 
 	return `
-		<div id='clearCachePopup' style='background-color:008cba; padding: 10 10; position:fixed; width: 500px; left:35vw; top:50vh; z-index:5'>
-			<div style='background-color: white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto;'>
-				<span style='font-size: 22px'> Clear Cache </span>
-				<span style='font-size: 30px; cursor:pointer; position:absolute; left:490px; top:5px' onclick='closeDialogs()'>&times;</span>
-				<div style='padding:2; font-size:18px;'> Please select which data you would like to clear </div>
-				<table cellpadding=10 style='width:100%; margin:auto;'>
+		
+				<table id="clearCachePopup" cellpadding=10 style='width:100%; margin:auto;'>
 				
 					<tr>
 						<td style="vertical-align:top; text-align:left; width:100%; font-size:16px"> 
@@ -1482,17 +1478,13 @@ function getCacheClearTemplate(){
 					<tr >
 
 						<td style="vertical-align:top; text-align:center; width:100%"> 
-							<input type=button class="operation" onClick=clearCache() value='Delete' title="Deletes the selected data" style="width:100px"></input>
+							<input type=button class="button" onClick=clearCache() value='Delete' title="Deletes the selected data" style="width:100px"></input>
 						</td>
 					</tr>
 					
 
 				</table>
-				
 
-
-			</div>
-		</div>
 	`;
 
 }
@@ -1505,36 +1497,25 @@ function clearKineticDataCache(){
 
 
 	closeDialogs();
+	openDialog();
 	
-	$("#main").css("opacity", 0.5);
-	$("#mySidenav").css("opacity", 0.5);
 	
-	var popupHTML = getCacheClearTemplate();
+	var popupHTML = getDialogTemplate("Clear cache", "Please select which data you would like to clear", "600px");
+	$(popupHTML).appendTo('body');
 
 	getCacheSizes_controller(function(result){
 
+		var innerHTML = getCacheClearTemplate();
+		
 
-		popupHTML = popupHTML.replace("DVTSIZE", result["DVTsize"]);
-		popupHTML = popupHTML.replace("TIMESIZE", result["timeSize"]);
-		popupHTML = popupHTML.replace("PARAMSIZE", result["parameterPlotSize"]);
-		popupHTML = popupHTML.replace("NUMSEQ", terminatedSequences.length);
-		$(popupHTML).appendTo('body');
+		innerHTML = innerHTML.replace("DVTSIZE", result["DVTsize"]);
+		innerHTML = innerHTML.replace("TIMESIZE", result["timeSize"]);
+		innerHTML = innerHTML.replace("PARAMSIZE", result["parameterPlotSize"]);
+		innerHTML = innerHTML.replace("NUMSEQ", terminatedSequences.length);
+		
 
+		$("#dialogBody").html(innerHTML);
 
-
-		window.setTimeout(function(){
-
-
-			
-			$("#main").click(function(){
-				closeDialogs();
-			});
-			
-			$("#mySidenav").click(function(){
-				closeDialogs();
-			});
-			
-		}, 50);
 
 
 	});
@@ -1663,7 +1644,7 @@ function getDialogTemplate(header, subtitle = "", width = "1000px"){
 				<div class="dialog_inner">
 					<span style='font-size: 26px'>` + header + `</span>
 					<span class="blueDarkblueCloseBtn" title="Close" onclick='closeDialogs()'>&times;</span>
-					<div style='padding:2; font-size:22px;'>` + subtitle + `</div>
+					<div style='padding:2; font-size:18px;'>` + subtitle + `</div>
 	
 					<div id="dialogBody">
 					

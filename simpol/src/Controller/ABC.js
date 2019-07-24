@@ -4781,12 +4781,8 @@ function getPosteriorSummaryTemplate(){
 	
 
 	return `
-		<div id='posteriorSummaryPopup' style='background-color:#008cba; padding: 10 10; position:fixed; width: 30vw; left:35vw; top:20vh; z-index:5'>
-			<div style='background-color:white; padding: 10 10; text-align:center; font-size:15; font-family:Arial; overflow-y:auto'>
-				<span style='font-size: 22px'> Posterior Distribution Summary </span>
-				<span style='font-size: 30px; cursor:pointer; position:fixed; left:64.5vw; top:20.5vh' onclick='closeDialogs()'>&times;</span>
-				<div style='padding:2; font-size:18px;'> Summarise the posterior distribution with a single state (the geometric median). </div>
-				<table cellpadding=10 style='width:90%; margin:auto;'>
+		
+				<table id='posteriorSummaryPopup' cellpadding=10 style='width:90%; margin:auto;'>
 				
 					<tr>
 						<td style="vertical-align:top" title="The geometric median is the posterior sample which is closest in Euclidean space to all other posterior samples. The parameters are first normalised into z-scores."> 
@@ -4815,18 +4811,11 @@ function getPosteriorSummaryTemplate(){
 							</td>
 						</div>
 							
-						<!--<td  style="vertical-align:top"> 
-							<b>Sample from posterior:</b>
-							
-							
-						</td>-->
+						
 					</tr>
 					
 				</table>
-				
-				
-			</div>
-		</div>
+
 	`;
 
 }
@@ -4837,14 +4826,13 @@ function posteriorSummary(){
 	
 	
 	closeDialogs();
+	openDialog();
 	
-	$("#main").css("opacity", 0.5);
-	$("#mySidenav").css("opacity", 0.5);
 	
-	var popupHTML = getPosteriorSummaryTemplate();
-	//popupHTML = popupHTML.replace("XX_plotNum_XX", plotNum);
-	//popupHTML = popupHTML.replace("XX_plotName_XX", $("#selectPlot" + plotNum + " :selected").text());
+	var popupHTML = getDialogTemplate("Posterior Distribution Summary", "Summarise the posterior distribution with a single state (the geometric median).", "600px");
 	$(popupHTML).appendTo('body');
+	$("#dialogBody").html(getPosteriorSummaryTemplate());
+
 
 
 	// Show the loading icon only if it takes a while to load, otherwise the fast flickering is annoying to look at
@@ -4912,21 +4900,6 @@ function posteriorSummary(){
 	});
 
 
-
-
-
-	
-	window.setTimeout(function(){
-		
-		$("#main").click(function(){
-			closeDialogs();
-		});
-		
-		$("#mySidenav").click(function(){
-			closeDialogs();
-		});
-		
-	}, 50);
 	
 	
 }
