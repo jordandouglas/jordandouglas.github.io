@@ -249,7 +249,7 @@ function getDistributionChangeTemplate(){
 				<table>
 					<tr>
 						<td style="font-size:15"> Parameters are resampled from their specified distribution at the beginning of each simulation. Use this window to choose the distribution.
-							<a title="Help" class="help" target="_blank" href="about/#priorDistribution_ParamHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+							<a title="Help" class="help" target="_blank" href="about/#Adding_a_prior_distribution_to_a_parameter"><img class="helpIcon" src="../src/Images/help.png"></a>
 							
 						 </td>
 						
