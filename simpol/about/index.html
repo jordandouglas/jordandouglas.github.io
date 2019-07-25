@@ -373,9 +373,9 @@ function addCitations(){
 
 
 	var DOIspanTemplate = `
-		<span style="background-color:#ebe9e7; padding: 2 4" title="DOItitle">
-			<b style="color:#008cba">DOI:</b>
-			<a style="text-decoration:none; color:#008cba" href = "DOIhref">view</a>
+		<span class="DOIview" title="DOItitle">
+			<b>DOI:</b>
+			<a href = "DOIhref">view</a>
 		</span>
 		
 	
@@ -458,7 +458,7 @@ function addCitations(){
                         	<td style="text-align:center; font-size: 20px; vertical-align:top; width: 40%;"> 
                                 <div style="text-align:center;">
 
-                                        <a href="../" target="_blank" style="text-decoration:none; color:#414b4b" title="Launch SimPol">
+                                        <a href="../" style="text-decoration:none; color:#414b4b" title="Launch SimPol">
                                             <span class="title" style="font-size: 107px; line-height:0.8em "> SimPol </span><br>
                                             <span style="font-size: 18px; "> Simulation of Nucleic Acid Polymerases </span>
                                         </a>
@@ -480,11 +480,11 @@ function addCitations(){
 
       
                                     
-                              <a href="../../"  target="_blank" style="text-decoration:none; color:white; ">
+                              <a href="../../"  style="text-decoration:none; color:white; ">
                                     <span class="button extraline" title="Go back home">Home</span> 
                               </a>
                               
-                              <a href="../../"  target="_blank" style="text-decoration:none; color:white; ">
+                              <a href="../../"  style="text-decoration:none; color:white; ">
                                     <span class="button extraline" title="Launch SimPol">SimPol</span> 
                               </a>
 
@@ -642,93 +642,157 @@ function addCitations(){
 							<div class="about-block">
 								<div class="about-block-inner">
 									<div id="toolbarHelp" class="subsection block-subtitle"> The toolbar </div> <br>
-									<table class="toolbar" cellpadding=3 style="position:absolute; vertical-align:middle">
-										
-										<tr>
-											<td>
-												<div class="toolbarIcon" title="Reinitiate the polymerase"> <img src="../../src/Images/reset.png" style=" vertical-align: middle; padding:0 0; width:35px; height:35px"> </div>
-											</td>
-											<td>
-												<div class="toolbarIcon simulateRow" title="Perform N simulations stochastically"> <img src="../../src/Images/dice.png" style="vertical-align: middle; width:35px; height:35px;">   </div>
-											</td>
-										</tr>
-										<tr>
+									
+									
+									
+										<table class="toolbar" cellpadding=3 style="position:absolute; margin-top:5em">
+												
+						
+											<tr style="height:20px">
+												<td></td>
+												<td></td>
+											</tr>
+												
+											<tr>
+												<td>
+													<div class="toolbarIcon" style="cursor:pointer;" title="Reinitiate the polymerase"> <img  class="icon" id='refresh'   src="../../src/Images/reset.png"> </div>
+												</td>
+						
+						
+												<td>
+													<div id="simulateBtn" class="toolbarIcon simulateRow" style="cursor:pointer;" title="Perform N simulations stochastically"> <img  class="icon" id='startTrials'   src="../../src/Images/dice.png" >   </div>
+												</td>
+						
+						
+											</tr>
+											<tr>
+						
+												
+						
+												<td>
+													<div class="toolbarIcon simulateRow" style="cursor:pointer;"  title="Clear data from the cache" > 
+														<img  class="icon" id='deleteAllData' src="../../src/Images/close.png">
+													</div>
+												</td>
+						
+						
+												<td>
+													<div id="transcribeBtn" class="toolbarIcon" style="cursor:pointer;" title="Copy the next N bases"> <img class="icon" id='trans'  src="../../src/Images/transcribe.png" >  </div>
+													
+												</td>
+						
+											</tr>
+											<tr>
+						
+												<td>
+													<div id="foldBtnDiv" class="toolbarIcon simulateRow" style="cursor:pointer;"  title="Fold the mRNA (using the ViennaRNA suite)"> <img  class="icon"  src="../../src/Images/folding.png" >  </input> </div>
+												</td>
+						
+												<td>
+													<div id="stutterBtn" class="toolbarIcon simulateRow" style="cursor:pointer;"  title="Stutter N times (iteratively copy the current base N times)" > <img  class="icon" id='stutter'  src="../../src/Images/stutter.png" >  </div>
+												</td>
+						
+						
+											<tr style="height:2em">
+												<td colspan=2>
+													<div id="progressToolbarCell" class="toolbarIcon" style="vertical-align:middle; background-color:#424f4f; color:white"> 
+						
+						
+														<div style="position:relative">
+															<canvas id="progressSimCanvas" style="display:none; z-index:1; position:absolute; left:0" width="90px" height="22px"></canvas>
+															<span id="progressSimSpan" style="font-size: 16px; display:none; cursor:auto; z-index:2; color:white; text-align:center; position:relative; left:0; width:100%"></span> 
+														</div>
+						
+														<div id="numSimSpan" title="Number of simulations to perform (if you press simulate), or number of bases to copy (if you press copy), or number of times to stutter (if you press stutter)"> 
+															<b>N = </b><input type="number" name="nbasesToSimulate" min="1" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:left; width: 4em; background-color: #858280; color:white"> 
+														</div> 
+													</div>
+												</td>
+						
+											</tr>
 											
-											<td>
-												<div class="toolbarIcon" title="Clear data from the cache" > 
-													<img src="../../src/Images/close.png" style="padding:5 0; height:25px;">
-												</div>
-											</td>
-											<td>
-												<div class="toolbarIcon" title="Replicate/transcribe N bases"> <img id='trans'  src="../../src/Images/transcribe.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
 											
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<div id="foldBtnDiv" class="toolbarIcon"  title="Fold the mRNA (using the ViennaRNA suite)"> <img  src="../../src/Images/folding.png" style="vertical-align: middle; width:35px; height:35px;" >  </input> </div>
-											</td>
-											<td>
-												<div id="stutterBtn" class="toolbarIcon" title="Stutter N times" > <img src="../../src/Images/stutter.png" style="vertical-align: middle; width:35px; height:35px;">  </div>
+						
+						
+											<tr>
+												<td colspan=2>
+													<div class="toolbarIcon">
+														<select class="dropdown" title="Duration of each reaction" id = "PreExp"  style="vertical-align: middle; text-align:right;">
+															<option value="slow">Slow</option>
+															<option value="medium">Medium</option>
+															<option value="fast">Fast</option>
+															<!--<option value="ultrafast">Ultrafast</option>-->
+															<option value="hidden">Hidden</option>
+														</select>
+													</div>
+												</td>
+						
+											</tr>
 											
-											</td>
-										<tr>
-											<td colspan=2>
-												<div class="toolbarIcon" style="width:90px"> <span style="font-size: 16px; display:none; cursor: auto"></span> <span id="numSimSpan"> <b>N=</b><input type="number" name="nbasesToSimulate" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:left; width: 60px; background-color: #008CBA; color:white"> </span> </div>
-											</td>
-										</tr>
+											
+											</tr>
+						
+						
+											
+											<tr>
+												<td>
+													<div class="toolbarIcon" style="cursor:pointer;"  title="Download the current session in xml format"> <img  class="icon" id='saveSessionID'   src="../../src/Images/downloadGreen.png"> </div>
+												</td>
+						
+												<td>
+													<div id="loadSessionID_div" class="toolbarIcon" style="cursor:pointer;"  title="Upload a session in xml format" > 
+														<img id='loadSessionID' class="rotate180 icon" src="../../src/Images/downloadGreen.png">
+													</div>
+													
+												</td>
+											</tr>
+											
+											
+											<tr style="height:20px">
+												<td>
+													<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer; float:left" href="about/#The_toolbar"><img class="helpIcon" src="../../src/Images/help.png"></a>
+												</td>
+												<td></td>
+											</tr>
+						
+										</table>
 										
-										
-										<tr>
-											<td colspan=2>
-												<div class="toolbarIcon">
-													<select class="dropdown" title="Duration of each reaction" style="vertical-align: middle; text-align:right;">
-														<option value="slow">Slow</option>
-														<option value="medium">Medium</option>
-														<option value="fast">Fast</option>
-														<option value="hidden">Hidden</option>
-													</select>
-												</div>
-											</td>
-										</tr>
-										
-										
-										<tr>
-											<td>
-												<div class="toolbarIcon"  title="Download the current session in xml format"> <img id='saveSessionID'   src="../../src/Images/downloadGreen.png" style="padding:5 0; height:25px;"> </div>
-											</td>
-											<td>
-												<div class="toolbarIcon"  title="Upload a session in xml format" > 
-													<img id='loadSessionID' class="rotate180" src="../../src/Images/downloadGreen.png" style="padding:5 0; height:25px;">
-												</div>
-											</td>
-										</tr>
-									</table>
+									
+									
 								
-									<div style="margin-left: 150px">
-										<i>The toolbar contains some essential functions you may want to familiarise yourself with.</i> <br><br>
+									<div style="margin-left: 200px">
+										<i>The toolbar contains a range of essential functions.</i> <br><br>
                                             
-										<b>Reinitiate</b> <img  src="../../src/Images/reset.png" style="padding:0 0; width:20px; height:20px"> will reset the polymerase to its initial position. This will
-										not affect plots or any other outputs. If you have added a background distribution behind any parameters then they will be resampled. <br><br>
-										<b>Stop</b> <img src="../../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> will immediately halt any polymerase acitivies taking place.
+										<b>Reinitiate</b> <img  src="../../src/Images/reset.png" class="icon small"> resets the enzyme to its initial position. This will
+										not affect plots or any other outputs. If any parameters have prior distributions then they will be resampled. <br><br>
+										
+										<b>Stop</b> <img src="../../src/Images/stop.png" class="icon small"> immediately halts any polymerase acitivies taking place.
 										This will not affect any parameters, plots or other outputs.  <br><br>
-										<b>N = </b><input type="number" value=30 style="vertical-align: middle; text-align:left; width: 60px; background-color: #008CBA; color:white; display:inline-block"> is a variable. The meaning of <b>N</b> depends on which
+										
+										<b>N = </b><input type="number" name="nbasesToSimulate" min="1" id="nbasesToSimulate" value=30 style="vertical-align: middle; text-align:left; width: 4em; background-color: #858280; color:white"> 			
+										is a variable. The meaning of <b>N</b> depends on which
 										tool is being used.  <br><br>
-										<b>Simulate</b> <img src="../../src/Images/dice.png"  style="vertical-align:middle; width:25px; height:25px;"> begins the random simulation starting from the current position
+										
+										<b>Simulate</b> <img src="../../src/Images/dice.png" class="icon small"> begins the random simulation starting from the current position
 										of the polymerase. During the simulation, reactions are
 										randomly sampled according to their rate constants, which can be tweaked in the parameters menu. <b>N</b> trials are performed in the simulation. When the polymerase
-										finishes copying the sequence (or prematurely terminates) the next trial begins. The duration of each reaction in the simulation is determined by <b>Speed</b>.
-										The simulation can be stopped early using the Stop <img src="../../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button.  <br><br>
-										<b>Clear cache</b> <img src="../../src/Images/close.png"  style="vertical-align:middle; height:20px;"> opens up a dialog where you can delete any kinetic or sequence data which has been saved
+										finishes copying the sequence (or prematurely terminates) the next trial begins. The animation time of each reaction in the simulation is determined by <b>Speed</b>.
+										The simulation can be stopped early using the Stop <img src="../../src/Images/stop.png" class="icon small"> button.  <br><br>
+										
+										<b>Clear cache</b> <img src="../../src/Images/close.png" class="icon small"> opens up a dialog to allow the deletion of any kinetic or sequence data which has been saved
 										during the simulation. The kinetic data is displayed in plots so think of this button as resetting the plots.  <br><br>
-										<b>Copy</b> <img src="../../src/Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"> transcribes/replicates/copies the next <b>N</b> bases. The duration of this process is determined by <b>Speed</b>.
-										Copying can be stopped early using the Stop <img src="../../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button. <br><br>
-										<b>Stutter</b> <img src="../../src/Images/stutter.png"  style="vertical-align:middle; width:25px; height:25px;"> copies the current base <b>N</b> times, therefore adding an insertion of
-										size <b>N</b> into the nascent strand. Insertions are added through slippage. The duration of this process is determined by <b>Speed</b>.
-										Stuttering can be stopped early using the Stop </img src="../../src/Images/stop.png"  style="vertical-align:middle; width:20px; height:20px;"> button. <br><br>
-										<b>Fold</b> <img src="../../src/Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"> folds the mRNA into its predicted secondary structure and renders it onto the nascent strand. This function will only work
-										if the nascent strand is single-stranded RNA. Note that this function is only cosmetic and will not affect the polymerase's kinetics. If you want the mRNA secondary structure to affect reactions
-										then make sure that "Enable mRNA folding" is enabled. This function is disabled on mobile devices. Folding is performed by the ViennaRNA suite <cite val="lorenz2011viennarna"></cite>.  <br><br>
+										
+										<b>Copy</b> <img src="../../src/Images/transcribe.png" class="icon small"> transcribes/replicates/copies the next <b>N</b> bases. The animation time is determined by <b>Speed</b>.
+										Copying can be stopped early using the Stop <img src="../../src/Images/stop.png" class="icon small"> button. <br><br>
+										
+										<b>Stutter</b> <img src="../../src/Images/stutter.png" class="icon small"> copies the current base <b>N</b> times, therefore adding an insertion of
+										size <b>N</b> into the nascent strand. Insertions are added through slippage. The animation time is determined by <b>Speed</b>.
+										Stuttering can be stopped early using the Stop </img src="../../src/Images/stop.png" class="icon small"> button. <br><br>
+										
+										<b>Fold</b> <img src="../../src/Images/folding.png" class="icon small"> folds the mRNA into its predicted secondary structure and renders the predicted structure. This function will only work
+										if the nascent strand is single-stranded RNA. Note that this function is only cosmetic and will not affect the polymerase's kinetics. To incorporate mRNA secondary structure predictions into the kinetic model
+										see <param value="allowmRNAfolding"/>. Folding is performed by the ViennaRNA suite <cite val="lorenz2011viennarna"></cite>.  <br><br>
+										
 										<b>Speed</b> <select class="dropdown" title="Duration of each reaction" style="vertical-align: middle; text-align:right; display:inline-block">
 											<option value="slow">Slow</option>
 											<option value="medium">Medium</option>
@@ -740,9 +804,8 @@ function addCitations(){
 										<b>medium</b> or <b>fast</b>, then the polymerase will animate each reaction at a slow, medium or fast speed, respectively. If the speed is <b>hidden</b>,
 										then the polymerase is no longer displayed and will not animate at all. The plots will update periodically. <b>Hidden</b> is the fastest setting. <br><br>
 										
-										<b>Save</b> <img src="../../src/Images/downloadGreen.png"  style="vertical-align:middle; height:20px;"> downloads the current session in XML format. If the page is refreshed or if your web browser crashes you will 
-										lose your current settings. If you do not want to lose your settings then you should save. <br><br>
-										<b>Load</b> <img src="../../src/Images/downloadGreen.png" class="rotate180"  style="vertical-align:middle; height:20px;"> uploads a saved XML session file from your local storage.
+										<b>Save</b> <img src="../../src/Images/downloadGreen.png" class="icon small"> downloads the current session in XML format. If the page is refreshed or if your web browser crashes the settings will be lost. <br><br>
+										<b>Load</b> <img src="../../src/Images/downloadGreen.png" class="rotate180 icon small"> uploads a saved XML session file.
 										 <br><br>
 									</div>
 								</div>
@@ -818,8 +881,8 @@ function addCitations(){
                                                 
                                                     <br>
                                                     In SimPol, backtracking, hypertranslocation, and the IS can each be enabled or disabled from the &#9776; Parameters side-navigation menu.  The kinetic diagram of the current model can be viewed using
-                                                <input type=button value='View model diagram' title="View the kinetic diagram of this model" class="operation" style="width:160px; cursor:auto">.
-                                                    Pressing the simulate button  <img src="../../src/Images/dice.png" style="vertical-align: middle; width:25px; height:25px;"> simulates the system according to the
+                                                <input type=button value='View model diagram' title="View the kinetic diagram of this model" class="button">.
+                                                    Pressing the simulate button  <img src="../../src/Images/dice.png" class="icon small"> simulates the system according to the
                                                     currently specified pathway. See 
                                                 <a href="#Simulating" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">Simulating</a>.
                                                     
@@ -844,7 +907,7 @@ function addCitations(){
                                                 
                                                 
                                                 <br><br>
-                                                <div class="panelOuter">
+                                                <div class="panelOuter smallgap">
                                                         <div class="panelInner" >
                                                     <span class="block-subsubtitle" sect="Translocation" > Translocation: </span>
                                                     
@@ -855,7 +918,7 @@ function addCitations(){
                                                 </div>  
                                                 
                                                 
-                                                <div class="panelOuter">
+                                                <div class=" panelOuter smallgap">
                                                         <div class="panelInner" >
                                                     <span class="block-subsubtitle" sect="Nucleotide incorporation" > Nucleotide incorporation: </span>
                                                     
@@ -863,14 +926,14 @@ function addCitations(){
                                                         Once bound, the polymerase may catalyse the reaction, or it may release the NTP back into the cell. Reverse-catalysis may also be performed 
                                                         the Decay reaction, although this reaction is often considered to be irreversible. The canonical pathway of transcription 
                                                         elongation is a three step cycle: 1) forward translocation, 2) NTP binding, 3) catalysis. This may also be achieved with the Copy 
-                                                        <img src="../../src/Images/transcribe.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function. 
+                                                        <img src="../../src/Images/transcribe.png" class="icon small"></img> function. 
                                                     </div> 
                                                 </div> 
                                                 
                                                 
                                                 
                                                 
-                                                <div class="panelOuter">
+                                                <div class=" panelOuter smallgap">
                                                         <div class="panelInner" >
                                                             <span class="block-subsubtitle" sect="Inactivation" > Inactivation: </span>
                                                             
@@ -881,7 +944,7 @@ function addCitations(){
                                                        </div> 
                                                 </div> 
                                                     
-                                                <div class="panelOuter">
+                                                <div class=" panelOuter smallgap">
                                                         <div class="panelInner" >
                                                     <span class="block-subsubtitle" sect="Cleavage"> Cleavage: </span>
                                                     
@@ -896,7 +959,7 @@ function addCitations(){
                                                 
                                                 
                                                 
-                                                <div class="panelOuter">
+                                                <div class=" panelOuter smallgap">
                                                         <div class="panelInner" >
                                                     <span class="block-subsubtitle"  sect="Slippage"> Slippage: </span>
                                                     
@@ -907,7 +970,7 @@ function addCitations(){
                                                     diffuse left or right along the
                                                      hybrid. This process is favoured if the hybrid sequence is repetitive (eg. AAAAAAAAA/UUUUUUUUU). When positioned at either end of the hybrid, the bulge may be absorbed. This three step process (bulge formation, diffusion and absorption)
                                                      is based off the models proposed by Neher et al.<cite val="neher2004dynamics,kuhner2007force"></cite> and is believed to be the mechanism behind transcriptional slippage. Iterative slippage and elongation can lead to large insertions. This is sometimes called stuttering and
-                                                    can also be achieved with the Stutter <img src="../../src/Images/stutter.png"  style="vertical-align:middle; width:25px; height:25px;"></img> function.
+                                                    can also be achieved with the Stutter <img src="../../src/Images/stutter.png"  class="icon small"></img> function.
                                             
                                                     </div> 
                                                 </div> 
@@ -946,8 +1009,8 @@ function addCitations(){
 										
 										The output of the simulation can be visualised using various graphs, which are updated in real-time during the simulation.
 										These plots are displayed in the Plots panel and in the Sitewise panel. The display of each plot can be configured with its respective settings 
-									<img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>
-									button. The raw data (.tsv) or a high resolution image (.png) can be downloaded <img src="../../src/Images/download.png"  style="vertical-align:middle; height:20px;">. The different	
+									<img src="../../src/Images/gear.png"  class="icon small"></img>
+									button. The raw data (.tsv) or a high resolution image (.png) can be downloaded <img src="../../src/Images/download.png"  class="icon small">. The different	
 									plots available are detailed below.
 							
 									</div>
@@ -966,14 +1029,14 @@ function addCitations(){
                                     </tr>
                                     <tr>
                                         <td colspan="1">
-                                            <img src="../../src/TutorialImages/distanceVsTime.png" style="vertical-align:middle; width:100%;">
+                                            <img src="../../src/TutorialImages/distanceVsTime.png" class="icon small">
                                         </td>
                                     
                                     
                                         <td colspan="2">
                                             
                                             This graph shows the progress made by the polymerase over time. The blue line represents the current simulation
-                                            and the grey lines represent previous simulations. The x- and y-axis ranges can be set manually in the settings <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
+                                            and the grey lines represent previous simulations. The x- and y-axis ranges can be set manually in the settings <img src="../../src/Images/gear.png" class="icon small"></img>.
                                         
                                         </td>
                                     
@@ -990,7 +1053,7 @@ function addCitations(){
                                     </tr>
                                     <tr>
                                         <td colspan="1" style="width:33%">
-                                            Depending on the settings <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>, this will either show the total time taken to copy the template (one value per trial) or the time in
+                                            Depending on the settings <img src="../../src/Images/gear.png"  class="icon small"></img>, this will either show the total time taken to copy the template (one value per trial) or the time in
                                             between successive catalysis events.
                                         </td>
                                     
@@ -1035,7 +1098,7 @@ function addCitations(){
                                          <td colspan="1">
                                             These plots are histograms of the <i>instantaneous</i> velocities during elongation, as opposed to <i> mean </i> velocity. The instantaneous velocity at time $t$ is defined as the derivative of distance over time
                                             $v(t) = \frac{dx}{dt}$. However since the distance versus time function is discontinuous, there is no derivative. Instead, the instantaneous velocities are calculated as the mean
-                                            velocities within non-overlapping fixed-sized windows. The window size parameter $w$ can be changed in the settings  <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
+                                            velocities within non-overlapping fixed-sized windows. The window size parameter $w$ can be changed in the settings  <img src="../../src/Images/gear.png" class="icon small"></img>.
                                             The plots on the left illustrate the effect this parameter can have. Larger window sizes tend to underrepresent negative velocities, which correspond to net backwards translocation within the time window.
                                             
                                           
@@ -1053,9 +1116,9 @@ function addCitations(){
                                     </tr>
                                     <tr>
                                         <td colspan="1">
-                                            Any parameter in the &#9776; Parameters menu can be plotted onto this graph through the settings menu <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;"></img>.
+                                            Any parameter in the &#9776; Parameters menu can be plotted onto this graph through the settings menu <img src="../../src/Images/gear.png"  class="icon small"></img>.
                                             The parameter's value will remain constant unless changed either (1) manually, or (2) by adding a prior distribution
-                                            <img src="../../src/Images/distn.png" style="vertical-align:middle; width:38px; height:12px;"></img> 
+                                            <img src="../../src/Images/distn.png" class="distn"></img> 
                                             (see <a href="#Adding_a_prior_distribution_to_a_parameter" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">Adding a prior distribution to a parameter</a>).
                                                      
                                             Parameters are sampled from their prior distribution at the beginning of each simulation. 
@@ -1128,7 +1191,7 @@ function addCitations(){
                                              
                                             This is instrumental in interpreting chain convergence. The adjustable burn-in period
                                             is denoted by the red line. The variable displayed on the y-axis as well as the x- and y- axis limits can
-                                            be adjusted in the settings <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;">.
+                                            be adjusted in the settings <img src="../../src/Images/gear.png" class="icon small">.
                                             This plot is only accessible after MCMC has been initiated. Alternatively, the 
                                             posterior distribution may be downloaded a as a .log file and opening in 
                                             <a href="http://www.beast2.org/tracer-2/">Tracer</a><cite val="rambaut2015tracer"></cite>.
@@ -1166,7 +1229,7 @@ function addCitations(){
                                     <tr>
                                         <td colspan="3">
                                             The time per site plots report the amount (or proportion) of time spent at each site in the template. Three options for the y-axis measure
-                                            are available in the settings <img src="../../src/Images/gear.png"  style="vertical-align:middle; height:20px;">.
+                                            are available in the settings <img src="../../src/Images/gear.png" class="icon small">.
                                             First, the "Time to catalysis" of site $i$ is the mean time required to incorporate an NTP at site $i$, where the timer starts upon the incorporation of site $i-1$.
                                             Second, the "Time spent at site" of site $i$ is the mean time that the RNAP active site is positioned on $i$. This can illuminate where the RNAP is spending its time during backtracking.
                                             Third, the "Time per transcript length" of site $i$ is the mean time that the nascent strand has length $i$.
@@ -1520,7 +1583,7 @@ function addCitations(){
                                                                         of unfolding secondary structures in the mRNA may need to be overcome when the polymerase translocates backwards. When the nascent strand
                                                                         is not ssRNA, this feature is not applicable. Note that enabling this option will slow down the first trial of the simulation as the
                                                                         secondary structure of the RNA is computed (MFE algorithm <cite val="zuker1981optimal"></val></cite>) using the ViennaRNA suite <cite val="lorenz2011viennarna"></cite>. You can view the RNA secondary structure with the Fold 
-                                                                        <img src="../../src/Images/folding.png"  style="vertical-align:middle; width:25px; height:25px;"></img> button. Default: false <br><br>
+                                                                        <img src="../../src/Images/folding.png"  class="icon small"></img> button. Default: false <br><br>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -1594,7 +1657,7 @@ function addCitations(){
 											
 											
 											<br>
-											If you are uncertain about the value of a parameter you can give it a background distribution <img src="../../src/Images/distn.png" style="vertical-align:middle; width:38px; height:12px;"></img> 
+											If you are uncertain about the value of a parameter you can give it a background distribution <img src="../../src/Images/distn.png" class="distn"></img> 
 											to capture your uncertainty. The probability distributions supported are uniform, normal, lognormal, and exponential. The parameter is resampled at the beginning of each simulation. 
 											All parameters are sampled independently of each other.
 											<br><br>
@@ -1706,7 +1769,7 @@ function addCitations(){
 									<div class="subsection block-subtitle"> The Gillespie algorithm </div> <br>
 								
                                     
-                                    Transcription is simulated <img src="../../src/Images/dice.png"  style="vertical-align:middle; width:25px; height:25px;"></img> using the Gillespie algorithm<cite val="gillespie1977exact,lecca2013stochastic"></cite>. 
+                                    Transcription is simulated <img src="../../src/Images/dice.png" class="icon small"></img> using the Gillespie algorithm<cite val="gillespie1977exact,lecca2013stochastic"></cite>. 
                                     
 									A critical assumption of this method is that these reactions are Poisson processes; the amount of time until a reaction occurs is independent of all other reactions 
                                     and independent of the amount of time elapsed. 
@@ -1922,7 +1985,7 @@ function addCitations(){
                                     
                                     
                                     <br><br>
-                                    <div class="panelOuter">
+                                    <div class=" panelOuter smallgap">
                                         <div class="panelInner" >
                                             <span class="block-subsubtitle" > i. Absolute model </span>
                                         
@@ -1942,7 +2005,7 @@ function addCitations(){
                                     
                                     
                                     
-                                    <div class="panelOuter">
+                                    <div class=" panelOuter smallgap">
                                         <div class="panelInner" >
                                             <span class="block-subsubtitle" > ii. Midpoint model </span>
                                         
@@ -1966,7 +2029,7 @@ function addCitations(){
                                     
                                     
                                     
-                                    <div class="panelOuter">
+                                    <div class=" panelOuter smallgap">
                                         <div class="panelInner" >
                                             <span class="block-subsubtitle" >  iii. Hybrid/bubble melting models </span>
                                         
@@ -2119,7 +2182,7 @@ function addCitations(){
                                     
                                     
                                     <br><br>
-                                    <div class="panelOuter">
+                                    <div class=" panelOuter smallgap">
                                         <div class="panelInner" >
                                             <span class="block-subsubtitle subsubsection" sect="Force-velocity" > Force-velocity data </span><br><br>
                                         
@@ -2164,7 +2227,7 @@ function addCitations(){
                                     
                                     
                                     
-                                    <div class="panelOuter">
+                                    <div class=" panelOuter smallgap">
                                         <div class="panelInner" >
                                             <span class="block-subsubtitle subsubsection" sect="[NTP]-velocity" > [NTP]-velocity data </span><br><br>
                                         
@@ -2189,7 +2252,7 @@ function addCitations(){
                                     
                                     
                                     
-                                    <div class="panelOuter">
+                                    <div class=" panelOuter smallgap">
                                         <div class="panelInner" >
                                             <span class="block-subsubtitle subsubsection" sect="Pause sites" > Pause site data </span><br><br>
                                         
@@ -2244,7 +2307,7 @@ function addCitations(){
                                                 
                                                    
                                                 The posterior distribution can be summarised into a single state using
-                                                <input type="button" value="Posterior Summary" title="Extract values from the posterior distribution" class="operation" style="background-color:#008cba; cursor:auto; width: 170px">.
+                                                <input type="button" value="Posterior Summary" title="Extract values from the posterior distribution" class="button">.
                                                 
                                                 
                                                 <br><br>
@@ -2364,7 +2427,7 @@ function addCitations(){
                                 <br>
                                 To test this algorithm on motivating example 1, follow the link below and then find and press 
                                     
-                                    <input type="button" value="Begin ABC" title="Begin the approximate Bayesian computation via rejection with the current settings" style="width: 170px; cursor: auto; background-color: rgb(0, 140, 186);" class="ABC_display operation beginABC_btn">
+                                    <input type="button" value="Begin ABC" title="Begin the approximate Bayesian computation via rejection with the current settings" style="width: 170px; cursor: auto; background-color: rgb(0, 140, 186);" class="ABC_display button beginABC_btn">
                                  <br><br>  
                                 <span class="xml_link" style="text-align:center">
                                     <b>R-ABC motivating example 1 session:</b> 
@@ -2542,7 +2605,7 @@ function addCitations(){
                                     <br>
                                     To test this algorithm on motivating example 1, follow the link below and then find and press 
                                         
-                                        <input type="button" value="Begin MCMC-ABC" title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" style="width: 170px; cursor: auto; background-color: rgb(0, 140, 186);" class="MCMC_display operation beginABC_btn">.
+                                        <input type="button" value="Begin MCMC-ABC" title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" style="width: 170px; cursor: auto; background-color: rgb(0, 140, 186);" class="MCMC_display button beginABC_btn">.
                                     
                                     The chain is not guaranteed to converge and may tay a long time even if it does.
                                      <br><br>  
@@ -2594,7 +2657,7 @@ function addCitations(){
                                     or the prior probability of that model during approximate Bayesian computation, is proportional to that weight. <br><br>
                                     
                                     Upon pressing 
-                                        <input type="button" value="+ New model" title="Create a new model from the current settings" class="operation ABCbtn" style="background-color:#008CBA; cursor:auto; width: 150px">
+                                        <input type="button" value="+ New model" title="Create a new model from the current settings" class="button ABCbtn">
                                     a new kinetic model will be created. The settings of that model will be those that are currently specified. Any parameters which do not have
                                     a prior distribution will be held fixed at their current value, and those which do have a prior distribution will be omitted from the model description.
                                     The model description can be manually edited. <br><br>
@@ -3618,9 +3681,9 @@ function addCitations(){
                                     
                                     <br><br>
                                     <div class="ref">Douglas, Jordan, Richard Kingston, and Alexei Drummond. "Bayesian inference and comparison of stochastic transcription elongation models." bioRxiv (2018): 499277.
-                                        <span style="background-color:#ebe9e7; padding: 2 4" title="https://doi.org/10.1101/499277 ">
-                                            <b style="color:#008cba">DOI:</b>
-                                            <a style="text-decoration:none; color:#008cba" href="https://doi.org/10.1101/499277 ">view</a>
+                                        <span class="DOIview" title="https://doi.org/10.1101/499277 ">
+                                            <b>DOI:</b>
+                                            <a href="https://doi.org/10.1101/499277">view</a>
                                         </span>
                                     </div>
   
