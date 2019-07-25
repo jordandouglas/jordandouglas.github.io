@@ -1124,6 +1124,12 @@ input:checked + .slider:before {
     color: white;
 }
 
+.button.glowing {
+	color:#008CBA; 
+	background-color:white;
+}
+
+
 
 .button.ntp {
 	line-height:1em;

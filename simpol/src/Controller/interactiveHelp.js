@@ -88,12 +88,12 @@ function begin_tutorial(tut_id = null){
             
             
             
-       case "ex1":
+       case "exRABC":
             begin_RABC_example();
             break;
             
             
-       case "ex2":
+       case "exMCMCABC":
             begin_MCMCABC_example();
             break;
     
@@ -456,16 +456,16 @@ function begin_RABC_example(){
 	    `In this example we will use the R-ABC algorithm to infer two parameters from a toy dataset that describes the relationship between elongation velocity and NTP concentration. <br><br> 
 	    
 	    The two parameters we will infer are the rate of catalysis k<sub>cat</sub> and the NTP dissociation constant K<sub>D</sub>. These two parameters each affect the average 
-	    velocity of the RNA polymerase, and the relationship between the two parameters is complex. <br><br>
+	    velocity of the RNA polymerase, as a function of NTP concentration. <br><br>
 	    
 	    
 	    During R-ABC, k<sub>cat</sub> and K<sub>D</sub> are randomly sampled at the beginning of each simulation. The sampled values are only accepted into the posterior
 	    distribution when the chi-squared, measuring the distance between the simulated data and the toy data, is less than &epsilon;. To begin the fitting process,
 	    press the glowing 'Begin R-ABC' button down below. &epsilon; can be adjusted to tune the quality of the model fit. <br><br>
 	    
-	    In the histograms below, the yellow underlays show the prior distributions while the blue bars are the posterior distributions. If the
+	    After pressing begin, the histograms below will show the prior distributions (yellow underlays) and the posterior distribution (blue bars). If the
 	        two distributions are different, then the data taught us something about the parameters.`,
-	        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?ex=1'>http://www.polymerase.nz/simpol/?ex=1</a>");
+	        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?ex=RABC'>http://www.polymerase.nz/simpol/?ex=RABC</a>");
 	        
 	        
 	    // Add a glow around the simulate button
@@ -503,6 +503,55 @@ function begin_RABC_example(){
 // MCMC-ABC on motivating example 1 from about/ page
 function begin_MCMCABC_example(){
 
+
+	var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/MCMCABC.xml";
+	var toDoAfterLoadSession = function() {
+
+		 addTutorialTemplate("The Markov chain Monte Carlo ABC (MCMC-ABC) algorithm", 
+	    "Motivating example 1",
+	    `In this example we will use the MCMC-ABC algorithm to infer two parameters from a toy dataset that describes the relationship between elongation velocity and NTP concentration. <br><br> 
+	    
+	    The two parameters we will infer are the rate of catalysis k<sub>cat</sub> and the NTP dissociation constant K<sub>D</sub>. These two parameters each affect the average 
+	    velocity of the RNA polymerase, as a function of NTP concentration. <br><br>
+	    
+	    
+	    At the beginning MCMC-ABC, k<sub>cat</sub> and K<sub>D</sub> are randomly sampled. The two parameters then embark on a random walk and are only accepted
+	    into the posterior distribution when the chi-squared, measuring the distance between the simulated data and the toy data, is less than &epsilon;. To begin the fitting process,
+	    press the glowing 'Begin MCMC-ABC' button down below. <br><br>
+	    
+	    After pressing begin, and after the MCMC chain has converged, the histograms below will show the prior distributions (yellow underlays) and the posterior distribution (blue bars). If the
+	        two distributions are different, then the data taught us something about the parameters.`,
+	        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?ex=RABC'>http://www.polymerase.nz/simpol/?ex=RABC</a>");
+	        
+	        
+	    // Add a glow around the simulate button
+	    var btn = $("#beginMCMC_btn");
+	
+	    var intervalID = window.setInterval(function() {  
+	        btn.toggleClass('glowing');
+	    }, 750);
+	    
+	    
+	   
+	    
+	    window.setTimeout(function(){
+	    
+	        btn.click(function(){
+	            window.clearInterval(intervalID);
+	            btn.removeClass("glowing");
+	            btn.unbind('click');
+	        });
+	    
+	    }, 50);
+	    
+    
+            
+    };
+    
+
+    loadSessionFromURL(sessionFileLocation, toDoAfterLoadSession);
+        
+        
 
 }
 
@@ -592,12 +641,12 @@ function getTutorialDialogTemplate(){
     return `
     
     		<div style="text-align:left">
-                <div style='padding:20; font-size:14px'>
+                <div style='padding:20; font-size:16px'>
                     XX_tutmessage_XX
                 </div>
                 
                 
-                <span style='vertical-align:bottom; padding-left:20; padding-right:20; font-size:12px'>
+                <span style='vertical-align:bottom; padding-left:20; padding-right:20; font-size:14px'>
                     XX_tutfootnote_XX
                 </span>
                 

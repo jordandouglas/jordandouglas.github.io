@@ -900,7 +900,7 @@ function getABCforceVelocityCurveTemplate(fitID){
 					<textarea class="ABCinputData forceVelocityInputData" id="forceVelocityInputData_` + fitID + `" onChange="validateAllAbcDataInputs()" style="font-size:14px; padding: 5 10;  width: 200px; height: 200px; max-width:200px; max-height:500px; min-height:100px; min-width:200px"  
 					title="Input force-velocity data in the specified format" placeholder="Example.                                  -5, 15.5                                 10, 17.4                                14, 18.5"></textarea>
 					<br><br>
-					<span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
+					<span style="font-size:12px; vertical-align:middle; "> 
 						Input force (pN) and velocity (bp/s) observations. Separate force and velocity values with a comma and separate observations with a line break. 
 						Ensure there are no duplicate forces.
 					</span>
@@ -956,7 +956,7 @@ function getABCforceVelocityCurveTemplate(fitID){
 					 	</tr>
 					 </table>
 					 <br>
-					 <div style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
+					 <div style="font-size:12px; vertical-align:middle; "> 
 						Enter the NTP concentrations for this experiment.
 					</div> <br> <br>
 			</td>
@@ -976,7 +976,7 @@ function getABCntpVelocityCurveTemplate(fitID){
 					<textarea class="ABCinputData ntpVelocityInputData" id="ntpVelocityInputData_` + fitID + `" onChange="validateAllAbcDataInputs()" style="font-size:14px; padding: 5 10;  width: 200px; height: 200px; max-width:200px; max-height:500px; min-height:100px; min-width:200px"  
 					title="Input NTP-velocity data in the specified format" placeholder="Example.                                  1, 0.5                                 10, 12.8                                50, 19.6"></textarea>
 					<br><br>
-					<span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
+					<span style="font-size:12px; vertical-align:middle; "> 
 						Input [NTP]/[NTP]<sub>eq</sub> ratios, and velocity (bp/s) observations. Separate concentration and velocity values with a comma and separate observations with a line break. 
 						Ensure there are no duplicate concentrations.
 					</span>
@@ -1037,7 +1037,7 @@ function getABCntpVelocityCurveTemplate(fitID){
 					 	</tr>
 					 </table>
 					 <br>
-					 <div style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
+					 <div style="font-size:12px; vertical-align:middle; "> 
 						Enter the four concentrations which are equal to 1[NTP]<sub>eq</sub>
 					</div> <br> <br>
 			</td>
@@ -1057,7 +1057,7 @@ function getPauseSitesTemplate(fitID){
                     <textarea class="ABCinputData pauseSitesInputData" id="pauseSitesInputData_` + fitID + `" onChange="validateAllAbcDataInputs()" style="font-size:14px; padding: 5 10;  width: 200px; height: 200px; max-width:200px; max-height:500px; min-height:100px; min-width:200px"  
                     title="Input all pause sites in this sequence" placeholder="Example.                                  20, 30, 41-45"></textarea>
                     <br><br>
-                    <span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
+                    <span style="font-size:12px;  vertical-align:middle; "> 
                         Enter the pause site indices for this sequence. The index of a pause site is the length of the mRNA
                         when the pause begins. 
                     </span>
@@ -1138,7 +1138,7 @@ function getABCpauseSiteTemplate(fitID){
 					<textarea class="ABCinputData pauseEscapeInputData" id="pauseEscapeInputData_` + fitID + `" onChange="validateAllAbcDataInputs()" style="font-size:14px; padding: 5 10;  width: 200px; height: 80px; max-width:200px; max-height:500px; min-height:100px; min-width:200px"  
 					title="Input the times when samples were taken (mandatory field)." placeholder="Example: 1,2,5,10,60,120"></textarea>
 					<br><br >
-					<span style="font-size:12px; font-family:Arial; vertical-align:middle; "> 
+					<span style="font-size:12px;  vertical-align:middle; "> 
 						Input the times when samples were taken (units s), seperated with commas. 
 					</span>
 			</td>
