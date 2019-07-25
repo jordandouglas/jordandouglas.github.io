@@ -65,6 +65,11 @@ body {
 }
 
 
+.glowing{
+	filter: invert(100%);
+}
+
+
 a {
 
     text-decoration:none;
