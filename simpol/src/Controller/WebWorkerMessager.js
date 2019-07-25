@@ -2914,9 +2914,13 @@ function loadSession_controller(XMLData, resolve = function() { }){
 		// Update the ABC panel
 		if (experimentalData != null){
 		
-			console.log("experimentalData", experimentalData);
+			var thereAreDatasets = false;
+			for (var f in experimentalData["fits"]) {
+				thereAreDatasets = true
+				break;
+			}
 
-            if (experimentalData["fits"] != null && !$("#ABCPanelTableDIV").is(":visible")) showABCPanelFn();
+            if (thereAreDatasets && !$("#ABCPanelTableDIV").is(":visible")) showABCPanelFn();
 
 			// Reset the ABC DOM
 			initABCpanel();
