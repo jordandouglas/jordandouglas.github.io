@@ -1112,7 +1112,7 @@ function drawModelDiagramCanvas_givenParams(canvasID, kineticStateDescriptionID,
 	plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",+1)\u1D3A", xCoordOfMainState,	yCoordOfMainState - spacingBetweenStates - stateHeight, "The polymerase is <b>posttranslocated</b> with NTP bound and ready for catalysis. The nascent strand is " + m + " nt long.", isCurrentState, "#328332");
 
 	rateSum = krelease + kcat;
-	if (!elongationModel.assumeBindingEquilibrium) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + stateWidth -  arrowSpace, yCoordOfMainState - spacingBetweenStates + arrowSpace, "down", "krelease", krelease, rateSum, kineticStateDescriptionID, "k<sub>release</sub>");
+	if (!elongationModel.assumeBindingEquilibrium) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + stateWidth -  arrowSpace, yCoordOfMainState - spacingBetweenStates + arrowSpace, "down", "krel", krelease, rateSum, kineticStateDescriptionID, "k<sub>release</sub>");
 	plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + arrowSpace + stateWidth,	yCoordOfMainState - spacingBetweenStates - stateHeight/2, "right", "kcat", kcat, rateSum, kineticStateDescriptionID, "k<sub>cat</sub>");
 	////////////////
 

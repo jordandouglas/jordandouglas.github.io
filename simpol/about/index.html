@@ -141,7 +141,7 @@ function init(){
 function drawModelDiagrams(){
 
 	var paramsResult = { leftGBase: 6, rightGBase: 15, leftMBase: 6, rightMBase: 15, NTPtoAdd: "A",
-					 mRNAPosInActiveSite: -5, NTPbound: false, nbases: 0, mRNALength: "L", activated:true, rateOfBindingNextBase:0,
+					 mRNAPosInActiveSite: -5, NTPbound: false, nbases: 0, mRNALength: "l", activated:true, rateOfBindingNextBase:0,
 					 bulgePos: [0], bulgedBase: [-1], bulgeSize: [0], partOfBulgeID: [0], nextBaseToCopy: 16, terminated: false };
 					 
 	paramsResult["k -2,-1"] = 0;
@@ -208,7 +208,7 @@ function populateParameterLinks(){
 
         RateCleave:{anchor:"Rate_of_cleavage", latex:"$k_{cleave}$"},
         CleavageLimit:{anchor:"Cleavage_limit", latex:"$\\lambda_{cleave}$"},
-        rnaFoldDistance:{anchor:"Fold_distance", latex:"Fold distance"},
+        rnaFoldDistance:{anchor:"Fold_distance", latex:"$\\lambda_{b}$"},
 
         proposalWidth:{anchor:"Proposal_width", latex:"Proposal width"}, 
             
@@ -639,11 +639,11 @@ function addCitations(){
 										        
 		                                   RNA polymerases reads the template strand (the gene) in the 3&prime; &rarr; 5&prime; direction, and copies it to create the nascent strand (the mRNA) which grows in the 5&prime; &rarr; 3&prime; direction. 
                                     The transcription bubble consists of a hybrid between the nascent strand and the template strand within the polymerase, and a set of unpaired 
-                                    template bases upstream and downstream of the polymerase. In the example below, the transcription bubble contains 2 + 9 + 1 = 12 bp.  <br><br>
+                                    template bases upstream and downstream of the polymerase. In this example, the transcription bubble contains 2 + 11 + 0 = 13 bp.  <br><br>
 									
 									
 										The size of the transcription bubble differs between polymerases.
-									These three parameters may have an effect on the activity of the polymerase and can be changed from the &#9776; Parameters side-navigation menu. 
+									These three parameters have a large effect on the sequence-dependent properties of the enzyme and can be changed from the &#9776; Parameters side-navigation menu. 
 					
 
 										</div>
@@ -868,22 +868,22 @@ function addCitations(){
                                        
                                         <div class="about-block">
                                             <div class="about-block-inner">
-                                                <div class="subsection block-subtitle">Kinetic model of transcription</div> 
+                                                <div class="subsection block-subtitle">Kinetic model of transcription</div> <br>
                                                     
                                                 
                                                 
-                                                    Let $S(L,\tau)$ denote the current state, where $L$ is the length of the mRNA and $\tau$ is the position of the RNA polymerase (RNAP)
+                                                    Let $S(l,t)$ denote the current state, where $l$ is the length of the mRNA and $t$ is the position of the RNA polymerase (RNAP)
                                                     active site with respect to the $3^\prime$ mRNA. 
                                                     Under the Brownian ratchet model, transcription elongation is a three step cycle <cite val="abbondanzieri2005direct,bai2004sequence,maoileidigh2011unified,erie1992single"></cite>. 
-                                                    First, RNAP translocates from the <b>pretranslocated</b> position $S(L,0)$ into the <b>posttranslocated</b> position $S(L,1)$. 
-                                                    Second, the incoming nucleoside triphosphate (NTP) binds to the active site of RNAP.
-                                                    Finally, the bound NTP is incorporated onto the $3^\prime$ mRNA, returning the RNAP into the pretranslocated position $S(L+1,0)$. <br><br>
+                                                    First, RNAP translocates from the <b>pretranslocated</b> position $S(l,0)$ into the <b>posttranslocated</b> position $S(l,1)$. 
+                                                    Second, the incoming nucleoside triphosphate (NTP) binds to the active site of RNAP, $S_N(l,1)$.
+                                                    Finally, the bound NTP is incorporated onto the $3^\prime$ mRNA, returning the RNAP into the pretranslocated position $S(l+1,0)$. <br><br>
                                                 
                                                 
-                                                    However, RNAP does not always conform to this pathway. Every once in a while RNAP <b>backtracks</b> $S(L,\tau), \tau$ &lt; 0 whereby RNAP slides upstream
-                                                    causing the $3^\prime$ mRNA to exit through the NTP entry channel <cite val="komissarova1997transcriptional,cheung2011structural"></cite>. This renders the enzyme catalytically inactive.
-                                                    It has been hypothesised that an intermediate state (IS) acts as a precursor for backtracking from the pretranslocated state <cite val="artsimovitch2000pausing,imashimizu2013intrinsic,saba2019elemental"></cite>.
-                                                    Alternatively, RNAP may <b>hypertranslocate</b> $S(L,\tau), \tau$ &gt; 1 whereby RNAP slides further downstream causing the shortening of the DNA/RNA hybrid <cite val="yarnell1999mechanism,larson2008applied"></cite>. 
+                                                    However, RNAP does not always conform to this pathway. Periodically, RNAP <b>backtracks</b> ($t < 0$), whereby the enzyme translocates upstream
+                                                    causing the $3^\prime$ mRNA to exit through the NTP entry channel <cite val="abbondanzieri2005direct,komissarova1997transcriptional,cheung2011structural"></cite>. This renders the enzyme catalytically inactive.
+                                                    It has been hypothesised that an intermediate state (IS) acts as a precursor for backtracking from the pretranslocated state <cite val="artsimovitch2000pausing,imashimizu2013intrinsic,saba2019elemental,maoileidigh2011unified"></cite>.
+                                                    Alternatively, RNAP can <b>hypertranslocate</b> ($t>1$), whereby the enzyme translocates further downstream causing the shortening of the DNA/RNA hybrid <cite val="yarnell1999mechanism,larson2008applied"></cite>. 
 
                                                     
                                                     <br><br>
@@ -926,7 +926,7 @@ function addCitations(){
                                         <br><br>
                                         <div class="about-block">
                                             <div  class="about-block-inner">
-                                                <div class="subsection block-subtitle" > Reactions </div>
+                                                <div class="subsection block-subtitle" > Reactions </div><br>
                                             
                                                 
                                                 The polymerase can be controlled manually using the Navigation panel at the top of the main page. 
@@ -938,7 +938,7 @@ function addCitations(){
                                                     <span class="block-subsubtitle" sect="Translocation" > Translocation: </span>
                                                     
                                                         There are two translocation reactions: Backwards and Forwards. These operations move the polymerase one position left and right respectively, with respect to the 
-                                                    template and nascent strand. These operations involve reconfiguring the base-pairs within the hybrid, and within the gene if it is double-stranded. If the polymerase moves beyond the 3&prime; end of the nascent strand, 
+                                                    template and nascent strand. These operations involve reconfiguring the base-pairs within the hybrid, and within the gene if it is double-stranded. If the polymerase moves beyond the 3&prime; end of the nascent strand (ie. hypertranslocation), 
                                                     then the nascent strand will be released (termination). 
                                                 </div> 
                                                 </div>  
@@ -950,7 +950,7 @@ function addCitations(){
                                                     
                                                         If the active site is free and next to the 3&prime; end of the nascent strand, then the polymerase may bind NTP.
                                                         Once bound, the polymerase may catalyse the reaction, or it may release the NTP back into the cell. Reverse-catalysis may also be performed 
-                                                        the Decay reaction, although this reaction is often considered to be irreversible. The canonical pathway of transcription 
+                                                        (Lysis), although this reaction is often considered to be irreversible <cite val="erie1992single,rhodes1974ribonucleic,maoileidigh2011unified"></cite>. The canonical pathway of transcription 
                                                         elongation is a three step cycle: 1) forward translocation, 2) NTP binding, 3) catalysis. This may also be achieved with the Copy 
                                                         <img src="../../src/Images/transcribe.png" class="icon small"></img> function. 
                                                     </div> 
@@ -964,7 +964,7 @@ function addCitations(){
                                                             <span class="block-subsubtitle" sect="Inactivation" > Inactivation: </span>
                                                             
                                                             
-                                                            It is hypothesised that the catalytically inactive intermediate state, IS, acts as a precursor for backtracking. The Deactivate reaction causes the
+                                                            It is hypothesised that the catalytically inactive intermediate state, IS, acts as a precursor for backtracking <cite val="artsimovitch2000pausing,imashimizu2013intrinsic,saba2019elemental,maoileidigh2011unified"></cite>. The Deactivate reaction causes the
                                                             polymerase to enter the IS from the pretranslocated state, thus enabling backtracking to occur. The Activate reaction is the reverse.
                    
                                                        </div> 
@@ -974,7 +974,7 @@ function addCitations(){
                                                         <div class="panelInner" >
                                                     <span class="block-subsubtitle" sect="Cleavage"> Cleavage: </span>
                                                     
-                                                        When a nucleic acid polymerase backtracks for too long <i>in vivo</i> it can delay the production of its product and potentially cause roadblocks for other polymerases.
+                                                        When a nucleic acid polymerase backtracks for too long <i>in vivo</i> it can delay the production of its product and potentially cause roadblocks for other polymerases <cite val="klumpp2008stochasticity,davis2014traffic"></cite>.
                                                         Many organisms have evolved elongation factors which serve to rescue the polymerase from this state. One mechanism these factors may act is by cleaving the 3<sup>&prime;</sup> 
                                                         end of the nascent strand when it pokes out the front of the polymerase during backtracking. This is carried out by GreA and GreB for prokaryotic
                                                         RNA polymerases and S-II for eukaryotic RNA polymerase II <cite val="toulme2000grea"></cite> and can be performed in SimPol using the cleavage reaction.
@@ -989,9 +989,9 @@ function addCitations(){
                                                         <div class="panelInner" >
                                                     <span class="block-subsubtitle"  sect="Slippage"> Slippage: </span>
                                                     
-                                                        Sometimes the nascent and template strand temporarily melt and a bulge forms in one of the strands. This can be performed by the
-                                                    Form Bulge reaction.
-                                                    When this happens, a bulge forms within the duplex. This can occur within either the template or nascent strand (although in SimPol it can currently only occur within the nascent strand). When a bulge forms,
+                                                    	During slippage, one strand in the (DNA/RNA) hybrid moves with respect to the other (ie. they <i>slip</i> along each other) <cite val="streisinger1966frameshift"></cite>.
+                                                    	Slippage is a key mechanism of insertion and deletion. In SimPol, this can be initialised using the Form Bulge reaction.
+                                                    When this happens, a nucleotide bulge forms within the duplex. This can occur within either the template or nascent strand (however in SimPol it can currently only occur within the nascent strand). When a bulge forms,
                                                     the active site may be opened up, allowing one of the template bases to be copied twice. This would lead to an insertion. The bulge may 
                                                     diffuse left or right along the
                                                      hybrid. This process is favoured if the hybrid sequence is repetitive (eg. AAAAAAAAA/UUUUUUUUU). When positioned at either end of the hybrid, the bulge may be absorbed. This three step process (bulge formation, diffusion and absorption)
@@ -1033,7 +1033,7 @@ function addCitations(){
 									<div class="about-block-inner">
 										
 										
-										The output of the simulation can be visualised using various graphs, which are updated in real-time during the simulation.
+										The output of the simulation can be visualised using various graphs, which are updated in real-time.
 										These plots are displayed in the Plots panel and in the Sitewise panel. The display of each plot can be configured with its respective settings 
 									<img src="../../src/Images/gear.png"  class="icon small"></img>
 									button. The raw data (.tsv) or a high resolution image (.png) can be downloaded <img src="../../src/Images/download.png"  class="icon small">. The different	
@@ -1129,7 +1129,7 @@ function addCitations(){
 												<div class="caption">
 												    Any parameter in the &#9776; Parameters menu can be plotted onto this graph through the settings menu <img src="../../src/Images/gear.png"  class="icon small"></img>.
 		                                            The parameter's value will remain constant unless changed either (1) manually, or (2) by adding a prior distribution
-		                                            <img src="../../src/Images/distn.png" class="distn"></img> 
+		                                            <img src="../../src/Images/distn.png" class="icon small" style="height:1em; width:2em"></img> 
 		                                            (see <a href="#Adding_a_prior_distribution_to_a_parameter" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">Adding a prior distribution to a parameter</a>).
 		                                                     
 		                                            Parameters are sampled from their prior distribution at the beginning of each simulation. 
@@ -1202,10 +1202,10 @@ function addCitations(){
 			                                            (see <a href="#MCMC_ABC" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">MCMC ABC</a>).
 			                                             
 			                                            This is instrumental in interpreting chain convergence. The adjustable burn-in period
-			                                            is denoted by the red line. The variable displayed on the y-axis as well as the x- and y- axis limits can
+			                                            is indicated by the red line. The variable displayed on the y-axis as well as the x- and y- axis limits can
 			                                            be adjusted in the settings <img src="../../src/Images/gear.png" class="icon small">.
 			                                            This plot is only accessible after MCMC has been initiated. Alternatively, the 
-			                                            posterior distribution may be downloaded a as .log file and opening in 
+			                                            posterior distribution may be downloaded a as .log file and opened in 
 			                                            <a href="http://www.beast2.org/tracer-2/">Tracer</a><cite val="rambaut2015tracer"></cite>.
 												</div>
 												
@@ -1340,14 +1340,14 @@ function addCitations(){
 													<div class="parameter-title" style="font-size:18px">Basepairing configuration within the transcription bubble and polymerase.</div>  <br> 
 													
 														<div class="subsubsection paramHelp" sect="Hybrid">
-															<b>Hybrid length (h)</b> - number of basepairs in the template/nascent hybrid within the polymerase. As translocation rates are determined from sequence composition, this value may affect
+															<b>Hybrid length</b> $h$ - number of basepairs in the template/nascent hybrid within the polymerase. As translocation rates are determined from sequence composition, this value may affect
 																			   the predicted location of pause sites. Default: 11 bp 
 														</div><br>				   
 														<div class="subsubsection paramHelp" sect="Bubble left">			   
-															<b>Bubble size 3&prime; (&beta;<sub>1</sub>)</b> - number of unpaired template bases 3&prime; (left hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 1 bp
+															<b>Bubble size 3&prime;</b> $\beta_1$ - number of unpaired template bases 3&prime; (left hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 2 bp
 														</div><br>	
 														<div class="subsubsection paramHelp" sect="Bubble right">
-															<b>Bubble size 5&prime; (&beta;<sub>2</sub>)</b> - number of unpaired template bases 5&prime; (right hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 0 bp
+															<b>Bubble size 5&prime;</b> $\beta_2$ - number of unpaired template bases 5&prime; (right hand side) of the hybrid. This parameter is only applicable if the template is double stranded. Default: 0 bp
 														</div><br>	
 									
 												</div>
@@ -1388,8 +1388,8 @@ function addCitations(){
                                             
                                             
                                                         <div class="subsubsection paramHelp" sect="NTP dissociation constant">
-                                                            <b style="font-size:20px">$K_D$</b> - equilibrium constant of NTP dissociation. If binding is assumed to be an equilibrium process, $K_D$ is the ratio between the rates of NTP binding and release $K_D = \frac{k_{release}}{k_{bind}}$. Whereas, in a kinetic binding model $K_D$ is used in conjunction with $k_{bind}$ to calculate the rate of releasing
-                                                            bound NTP: $k_{release} = K_D k_{bind}$. Default: 1.8 &mu;M
+                                                            <b style="font-size:20px">$K_D$</b> - equilibrium constant of NTP dissociation. If binding is assumed to be an equilibrium process, $K_D$ is the ratio between the rates of NTP binding and release $K_D = \frac{k_{rel}}{k_{bind}}$. Whereas, in a kinetic binding model $K_D$ is used in conjunction with $k_{bind}$ to calculate the rate of releasing
+                                                            bound NTP: $k_{rel} = K_D k_{bind}$. Default: 1.8 &mu;M
                                                         </div><br>
                                                         <div class="subsubsection paramHelp" sect="Rate of catalysis"> 
                                                             <b style="font-size:20px">$k_{cat}$</b> - rate constant of incorporating bound NTP, thus extending the 3<sup>&prime;</sup> end of the nascent chain by one nucleotide. When translocation is fast,
@@ -1397,8 +1397,8 @@ function addCitations(){
                                                         </div><br>
                                                         
                                                         <div class="subsubsection paramHelp" sect="Rate of NTP binding">
-                                                            <b style="font-size:20px">$k_{bind}$</b> - second order rate constant used to calculate rate constant of binding the complementary NTP, which is calculated as [NTP] k<sub>bind</sub>. If binding is assumed to be
-                                                                    an equilibrium process, this parameter has no meaning and the textbox will disappear.
+                                                            <b style="font-size:20px">$k_{bind}$</b> - second order rate constant used to calculate rate constant of binding the complementary NTP, which is calculated as [NTP] k<sub>bind</sub>. 
+                                                            If binding is assumed to be an equilibrium process ($\mathbb{BE} = 1$), this parameter has no meaning and the textbox will disappear.
                                                                      Default: 0.5448 &mu;M<sup>-1</sup>.s<sup>-1</sup>  
                                                         </div><br>
                                                         
@@ -1441,7 +1441,7 @@ function addCitations(){
 														<div class="subsubsection paramHelp" sect="Translocation Gibbs barrier">
 															<b style="font-size:20px">$\Delta G^\dagger_{\tau}$</b> - Gibbs energy barrier of translocation. To translocate forwards or backwards, several
 															basepairs may need to be broken. The energy barrier which must be overcome in order to translocate is estimated as the energy needed to break these basepairs
-															plus the value of this parameter. Increasing this value will make translocation slower. When translocation is assumed to reach at equilibrium, this parameter only
+															plus the value of this parameter. Increasing this value will make translocation slower. When translocation is assumed to reach at equilibrium ($\mathbb{TE} = 1$), this parameter only
                                                             applies to backtracking and hypertranslocation. Default: 9.079 k<sub>B</sub>T <cite val="douglas2018bayesian"></cite>
 														</div><br>	
 														
@@ -1453,7 +1453,7 @@ function addCitations(){
 														<div class="subsubsection paramHelp" sect="Translocation force dependency">
 															<b style="font-size:20px">$\delta_1$</b> - position of the translocation transition state, compared with the two adjacent translocation positions. 
 															This parameter lies between 0 and the width of a single basepair in DNA (3.4 &#x212b;<cite val="watson1953molecular"></cite>). This term only applies
-															when translocation is kinetic and when an assisting force $F_{assist}$ is applied. Default: 2.838 &#x212b; <cite val="douglas2018bayesian"></cite>
+															when translocation is kinetic ($\mathbb{TE} = 0$) and when an assisting force $F_{assist}$ is applied. Default: 2.838 &#x212b; <cite val="douglas2018bayesian"></cite>
 														</div><br>	
 														
 									
@@ -1571,7 +1571,7 @@ function addCitations(){
                                                         
                                             
                                                             <div class="subsubsection paramHelp" sect="Fold distance">
-                                                                <b style="font-size:20px">Fold distance</b> - the number of RNA nucleotides upstream and downstream from the polymerase which are sterically
+                                                                $\lambda_b$ - the number of RNA nucleotides upstream and downstream from the polymerase which are sterically
                                                                 prohibited from folding. Default: 8 nt <cite val="palangat1998transcriptional"></cite>
                                                             </div><br>  
                                             
@@ -1615,12 +1615,12 @@ function addCitations(){
                                                     <div class="parameter-title" style="font-size:18px">Model for cleaving the nascent strand while backtracked.</div>  <br> 
                                                        <div class="subsubsection paramHelp" sect="Rate of cleavage" id="RateCleave_ParamHelp">
                                                             <b style="font-size:20px">$k_{cleave}$</b> - rate constant of cleaving the 3<sup>&prime;</sup> end of the nascent strand when the polymerase is backtracked. 
-                                                            <i>In vivo</i> this reaction may be carried out by elongation factors, for example, GreA. Default: 0s <sup>-1</sup>
+                                                            <i>In vivo</i> this reaction may be carried out by elongation factors, for example, GreA <cite val="toulme2000grea"></cite>. Default: 0s <sup>-1</sup>
                                                         </div><br>
                                             
                                             
                                                      <div class="subsubsection paramHelp" sect="Cleavage limit" id="RateCleave_ParamHelp">
-                                                            <b style="font-size:20px">$\lambda_{cleave}$</b> - the maximum number of backtracked nucleotides which can be cleaved. 
+                                                            <b style="font-size:20px">$\lambda_{cleave}$</b> - the maximum number of positions that the polymerase may backtrack by in order for cleavage to occur. 
                                                             Set to 0 to have no upper limit. Default: 10 nt <cite val="lisica2016mechanisms"></cite>
                                                         </div><br>
                                                 </div>
@@ -1634,8 +1634,8 @@ function addCitations(){
 													
                                             
                                                     <div class="subsubsection paramHelp" sect="Arrest timeout">
-														<b>Arrest time </b> - the amount of time the polymerase may take to terminate before the simulation trial is aborted. When the timeout is
-																reached, copying will prematurely terminate and the next trial will begin. Default: 0 s 
+														<b>Arrest time </b> - the amount of time the polymerase may take to termination before the simulation trial is aborted. When the timeout is
+																reached, copying will prematurely terminate and the next trial will begin. Set to 0 to disable this feature. Default: 0 s 
 													</div><br>		
                                             
                                             
@@ -1668,18 +1668,12 @@ function addCitations(){
 											
 											
 											<br>
-											If you are uncertain about the value of a parameter you can give it a background distribution <img src="../../src/Images/distn.png" class="distn"></img> 
-											to capture your uncertainty. The probability distributions supported are uniform, normal, lognormal, and exponential. The parameter is resampled at the beginning of each simulation. 
-											All parameters are sampled independently of each other.
-											<br><br>
+											If uncertain about the value of a parameter, it can be given a background / prior distribution <img src="../../src/Images/distn.png" class="distn"></img> 
+											to capture its uncertainty. The probability distributions supported are uniform, normal, lognormal, and exponential. The parameter is resampled at the beginning of each simulation. 
+											All parameters are sampled independently of each other. This feature is useful for exploring the effect that parameters have on the system, or for fitting to a dataset.
 											
-											<!--
-											<b>Example 1:</b> [ATP] is defaulted to Traut 1994’s<cite val="traut1994physiological"></cite> estimate of the mean ATP concentration (3152&mu;M) but one may wish to refine this value to reflect their own 
-											experimental settings. Or one may recognise that cellular NTP concentrations are not constant, and they fluctuate throughout the cell cycle. In this case, it may be more accurate to 
-											add a prior distribution behind [ATP]. Yaginuma et al. 2014 <cite val="yaginuma2014diversity"></cite> describe heterogeneity in [ATP] across E.coli cells with [ATP] following a positive-skewed modal distribution 
-											(mean: 1540&mu;M, SD: 1220&mu;M). Using SimPol and some algebra, one could model [ATP] approximately with a lognormal distribution (where &mu; = 7.10, &sigma; = 0.698). Then the ATP 
-											concentration would be resampled from this distribution at the beginning of each trial. <br><br>
-											-->
+											
+											
 											
 									</div>
 								</div>
@@ -1788,27 +1782,36 @@ function addCitations(){
 									many times someone else has flipped their coin. Similarly, whether a chemical reaction has been waiting 1 second or 1 hour for the reaction to occur, the probability of it happening right now is always the same.
 									The amount of time until reaction $s \rightarrow s^\prime$ occurs follows the exponential distribution with rate $k$. <br><br>
 									
-									<img id="exponential" src="../../src/TutorialImages/exponential.png" style="width:60%; padding: 10 30;" align=left></img>
-									
-									If there are multiple chemical reactions competing with each other, then the reaction with the shortest reaction time will be selected. For example, suppose we have have a test-tube containing 
-									a single molecule of compound $A$, which can spontaneously undergo two reactions: $A \rightarrow B$ or $A \rightarrow C$, with rate constants 0.001s<sup>-1</sup> and 0.002s<sup>-1</sup> respectively. 
-									The test-tube will flash a different colour of light for each reaction. <br><br>
-									
-									
-									The amount of time until either one of these reactions occurs is random, and exponentially distributed (see figures on the left). If we were to simulate this on a computer, we could 
-									generate two exponential random variables, one from each distribution. For example, suppose we sampled time 769.14s for Exponential(0.001) and 339.81s for Exponential(0.002). Then 
-									reaction $A \rightarrow C$ would be selected because it has the shorter reaction time. The probability of sampling reaction $A \rightarrow B$ is 
-									
-									
-									<h3>
-										$$ p(A \rightarrow B) = \frac{0.001}{0.001 + 0.002} = 0.333,$$
-									</h3>
+								
+								       If there are multiple chemical reactions competing with each other, then the reaction with the shortest reaction time will be selected. For example, suppose we have have a test-tube containing 
+										a single molecule of compound $A$, which can spontaneously undergo two reactions: $A \rightarrow B$ or $A \rightarrow C$, with rate constants 0.001s<sup>-1</sup> and 0.002s<sup>-1</sup> respectively. 
+										The test-tube will flash a different colour of light for each reaction. <br><br>
 										
 									
-									
-									and the probability of sampling reaction $A \rightarrow C$ is $0.667$. 
-									
+									<div class="flex-image large">
 
+										<img class="about_screenshot large" src="../../src/TutorialImages/exponential.png"></img>	
+										
+										<div class="caption">
+										        
+				                          
+											
+											The amount of time until either one of these reactions occurs is random, and exponentially distributed (see figures on the left). If we were to simulate this on a computer, we could 
+											generate two exponential random variables, one from each distribution. For example, suppose we sampled time 769.14s for Exponential(0.001) and 339.81s for Exponential(0.002). Then 
+											reaction $A \rightarrow C$ would be selected because it has the shorter reaction time. The probability of sampling reaction $A \rightarrow B$ is 
+											
+											
+											<h3>
+												$$ p(A \rightarrow B) = \frac{0.001}{0.001 + 0.002} = 0.333,$$
+											</h3>
+												
+											
+											
+											and the probability of sampling reaction $A \rightarrow C$ is $0.667$. 
+										
+										</div>
+
+									</div>
 									
 									
 							
@@ -2126,7 +2129,7 @@ function addCitations(){
 									
                                     
                                     
-                                    Let $D$ be some dataset and let $\Theta = ${$\theta_1, \theta_2, \dotso, \theta_b$} be a set of parameters for a model. The goal of statistical inference
+                                    Let $D$ be a dataset and let $\Theta = ${$\theta_1, \theta_2, \dotso, \theta_b$} be a set of parameters for a model. The goal of statistical inference
                                     is to find values for each parameter in $\Theta$ such that the model adequately describes the data $D$. <br><br>
                                     
                                     
@@ -2137,7 +2140,7 @@ function addCitations(){
                                     
                                     where $P(D|\Theta_k)$ is the likelihood - the probability of observing data $D$ under the model assuming that the parameters in $\Theta_k$
                                     are set to their true values - and $P(\Theta_k)$ is the prior probability of $\Theta_k$ being the true values before observing new data $D$. $P(D)$ is a 
-                                    normalisation constant and is intractable to evaluate directly. Subsequently, sampling methods are typically used to estimate the posterior distribution $P(\Theta|D)$.
+                                    normalisation constant and is often intractable to evaluate directly. Subsequently, sampling methods are typically used to estimate the posterior distribution $P(\Theta|D)$.
                                     In a Bayesian framework, parameters are estimated as probability distributions
                                     - ie. the posterior distribution - instead of as point estimates. <br><br>
                                     
@@ -2203,32 +2206,32 @@ function addCitations(){
                                             
                                             
                                             
-                                             Experimental dataset $d_i \in D$ consists of a set of experimental settings $x$ and observations $y$. 
+                                             Experimental dataset $d_i \in D$ consists of a set of experimental settings $F$ and observations $V$. 
                                              
                                             $$d_i = \begin{bmatrix}
-                                                        x_i^1 & y_i^1 \\
-                                                        x_i^2 & y_i^2 \\
-                                                        x_i^3 & y_i^3 \\
+                                                        F_i^1 & V_i^1 \\
+                                                        F_i^2 & V_i^2 \\
+                                                        F_i^3 & V_i^3 \\
                                                         \vdots & \vdots
                                                     \end{bmatrix}$$
                                             
                                             
                                             
                                             
-                                            Vector $x$ describes the varying values of the applied
+                                            Vector $F$ describes the varying values of the applied
                                                 <a href="#Force" onclick="minimiseSection('#Parameters_and_Settings_Btn', true)" style="text-decoration:none; color:#008cba">Force</a>
                                             used in the experiment. The NTP concentrations are held constant at specified values. 
-                                            The observations $y$ are the velocities of the polymerase, as measured under the applied force.   <br><br>
+                                            The observations $V$ are the mean velocities of the polymerase, as measured under the applied force.   <br><br>
                                             
                                             
                                             For force-velocity data, $\rho$ is the chi-squared statistic $X^2$:
                                             
                                             
                                             $$
-                                                \rho(d_i, \hat{d_i}) = X^2 = \sum_j \frac{(y_i^j - \hat{y}_j^j)^2}{\hat{y}_j^j}
+                                                \rho(d_i, \hat{d_i}) = X^2 = \sum_j \frac{(V_i^j - \hat{V}_j^j)^2}{\hat{V}_j^j}
                                             $$
                                             
-                                            where $y_i$ are the true velocities for experiment $i$, and $\hat{y}_i$ are the simulated velocities.
+                                            where $V_i$ are the true velocities for experiment $i$, and $\hat{V}_i$ are the simulated velocities.
                                             
 
                                     </div> 
@@ -2246,13 +2249,13 @@ function addCitations(){
                                             By increasing the concentrations of the four NTPs, the elongation velocity is expected to increase with it. <br><br>
                                             
                                             
-                                            Similar to force-velocity data, experimental dataset $d_i \in D$ is expressed as a matrix with experimental settings vector $x$ and measurements $y$.
+                                            Similar to force-velocity data, experimental dataset $d_i \in D$ is expressed as a matrix with experimental settings vector [NTP] and measurements $V$.
                                             
-                                            For this data type, $x$ describes the varying values of the
+                                            For this data type, [NTP] describes the varying values of the
                                                 <a href="#[NTP]" onclick="minimiseSection('#Parameters_and_Settings_Btn', true)" style="text-decoration:none; color:#008cba">NTP concentrations</a>
                                             used in the experiment. Each NTP is associated with a concentration multiplier [ATP]<sub>eq</sub>, [CTP]<sub>eq</sub>, [GTP]<sub>eq</sub>, and [UTP]<sub>eq</sub>.
-                                            The resulting concentrations for species _TP are computed as $x$[_TP]<sub>eq</sub>. The applied force is held constant at a specified value.
-                                            The observations $y$ are the velocities of the polymerase, as measured under the NTP concentrations. <br><br>
+                                            The resulting concentrations for species _TP are computed as [NTP][_TP]<sub>eq</sub>. The applied force is held constant at a specified value.
+                                            The observations $V$ are the velocities of the polymerase, as measured under the NTP concentrations. <br><br>
                                             
                                             For [NTP]-velocity data, $\rho$ is the chi-squared statistic $X^2$, calculated the same as for force-velocity data.
                                             
@@ -2277,7 +2280,8 @@ function addCitations(){
                                             <br><br>
                                             Let $f_P(j)$ describe the median time that nascent strand has length $j$, averaged across multiple simulations of the specified gene.  
                                             SimPol treats pause site prediction as a binary classification problem. Subsequently, $\rho$ is equal to 1 minus the area under the curve (AUC) of a ROC curve <cite val="fawcett2006introduction"></cite>,
-                                            computed by comparing the known locations of pause sites with continuous function $f_P$. A single AUC is computed across all pause site experimental datasets, not one per dataset.
+                                            computed by comparing the known locations of pause sites with continuous function $f_P$. A single $\rho$ is computed across all pause site experimental datasets, as opposed to one per dataset as 
+                                            is the case in the previous data formats.
                                             
                                              
                                     </div> 
@@ -2312,11 +2316,7 @@ function addCitations(){
                                                 using the R-ABC and MCMC-ABC algorithms.<br><br>
                                                 
                                                 
-                                                   
-                                                The posterior distribution can be summarised into a single state using
-                                                <input type="button" value="Posterior Summary" title="Extract values from the posterior distribution" class="button">.
-                  
-                                                
+                                              
                                                        
                                                 <br><br>For examples of ABC applied to real data, see 
                                                     <a href="#SimPol_in_the_Literature" onclick="minimiseSection('#SimPol_in_the_Literature_Btn', true)" style="text-decoration:none; color:#008cba">SimPol in the Literature</a>.
@@ -2428,7 +2428,11 @@ function addCitations(){
                                 <br>
                                 To test this algorithm on motivating example 1, follow the link below and then find and press 
                                     
-                                    <input type="button" value="Begin ABC" title="Begin the approximate Bayesian computation via rejection with the current settings" class="ABC_display button beginABC_btn">
+                                    <input type="button" value="Begin ABC" title="Begin the approximate Bayesian computation via rejection with the current settings" class="ABC_display button beginABC_btn">.      
+                                                The posterior distribution can be summarised into a single state using
+                                                <input type="button" value="Posterior Summary" title="Extract values from the posterior distribution" class="button">.
+                  
+                                                
                                  <br><br>  
                                 <span class="xml_link" style="text-align:center">
                                     <b>R-ABC motivating example 1 session:</b> 
@@ -2470,7 +2474,7 @@ function addCitations(){
                                         <li>$\epsilon_{0}$: the initial value of $\epsilon$. </li>
                                         <li>$\gamma$: the rate of $\epsilon$ cooling. </li>
                                         <li><i>Burn-in (%)</i>: the percentage of samples to discard before reaching the posterior distribution. Set to -1 to allow automatic detection. </li>
-                                        <li><i>Log every (states)</i>, $L$: the frequency of storing posterior samples. Storing every sample is wasteful because of autocorrelation between successive sample. </li>
+                                        <li><i>Log every (states)</i>, $L$: the frequency of storing posterior samples. Storing every sample is wasteful because of autocorrelation between successive samples. </li>
                                        
                                        
                                     </ul>
@@ -2606,7 +2610,11 @@ function addCitations(){
                                     <br>
                                     To test this algorithm on motivating example 1, follow the link below and then find and press 
                                         
-                                        <input type="button" value="Begin MCMC-ABC" title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="MCMC_display button beginABC_btn">.
+                                        <input type="button" value="Begin MCMC-ABC" title="Begin the approximate Bayesian computation via Markov chain Monte Carlo with the current settings" class="MCMC_display button beginABC_btn">.      
+                                                The posterior distribution can be summarised into a single state using
+                                                <input type="button" value="Posterior Summary" title="Extract values from the posterior distribution" class="button">.
+                  
+                                                
                                     
                                     The chain is not guaranteed to converge and may tay a long time even if it does.
                                      <br><br>  

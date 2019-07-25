@@ -136,10 +136,12 @@ BIBLIOGRAPHY["de2003slow"] = {name: `de la Mata, Manuel, et al. "A slow RNA poly
 BIBLIOGRAPHY["fawcett2006introduction"] = {name: `Fawcett, Tom. "An introduction to ROC analysis." Pattern recognition letters 27.8 (2006): 861-874.`, DOI: "10.1016/j.patrec.2005.10.010"};
 
 
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
-BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
+BIBLIOGRAPHY["rhodes1974ribonucleic"] = {name: `Rhodes, Gary, and Michael J. Chamberlin. "Ribonucleic acid chain elongation by Escherichia coli ribonucleic acid polymerase I. Isolation of ternary complexes and the kinetics of elongation." Journal of Biological Chemistry 249.20 (1974): 6675-6683.`, DOI: ""};
+BIBLIOGRAPHY["klumpp2008stochasticity"] = {name: `Klumpp, Stefan, and Terence Hwa. "Stochasticity and traffic jams in the transcription of ribosomal RNA: Intriguing role of termination and antitermination." Proceedings of the National Academy of Sciences 105.47 (2008): 18159-18164.`, DOI: "10.1073/pnas.0806084105"};
+
+BIBLIOGRAPHY["davis2014traffic"] = {name: `Davis, Lisa, et al. "A traffic flow model for bio-polymerization processes." Journal of mathematical biology 68.3 (2014): 667-700.`, DOI: ""};
+BIBLIOGRAPHY["streisinger1966frameshift"] = {name: `Streisinger, George, et al. "Frameshift mutations and the genetic code." Cold Spring Harbor Symposia on Quantitative Biology. Vol. 31. Cold Spring Harbor Laboratory Press, 1966.`, DOI: "10.1101/SQB.1966.031.01.014"};
+
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};
 BIBLIOGRAPHY["XXX"] = {name: ``, DOI: "XXXX"};

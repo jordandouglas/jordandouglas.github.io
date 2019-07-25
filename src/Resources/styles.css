@@ -337,7 +337,7 @@ div.vertical{
 .block-subtitle{
 	text-align:left; 
 	font-size:32px; 
-	margin-left:2em;
+	%margin-left:2em;
 	font:bold; 
 	color:#008CBA;
     display: inline-block;
