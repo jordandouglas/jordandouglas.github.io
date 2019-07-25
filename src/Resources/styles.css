@@ -125,7 +125,7 @@ canvas {
 
 
 
-.code.ol { 
+ol.code { 
     counter-reset: item;
     width: 90%;
 }
