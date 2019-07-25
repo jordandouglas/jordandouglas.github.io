@@ -124,10 +124,11 @@ canvas {
 }
 
 
-.code ol { 
-	    counter-reset: item;
-	    width: 90%;
-	}
+
+.code.ol { 
+    counter-reset: item;
+    width: 90%;
+}
 	
 
 .code ol li { 
