@@ -275,6 +275,7 @@ div.vertical{
 	%border:1px solid black;
 	background-color: #858280;
 	width:80%;
+	min-width:30em;
 	margin:auto;
 	padding: 5 5;
 	border-radius:10px;
@@ -319,9 +320,11 @@ div.vertical{
 
 
 
+
 .block-subtitle{
 	text-align:left; 
 	font-size:32px; 
+	margin-left:2em;
 	font:bold; 
 	color:#008CBA;
     display: inline-block;
@@ -333,6 +336,12 @@ div.vertical{
 	font-size:20px; 
 	color:#008CBA
 }
+
+.block-subtitle.centered{
+	%text-align:center;
+	%width:100%;
+}
+
 
 
 #theToolbar{
@@ -1048,13 +1057,21 @@ input:checked + .slider:before {
 
 
 .about_screenshot{
-	 width:20em; 
+	 width:22em; 
 	 margin: 10 30;
 	 border-style: solid;
 	 border-color:black;
 	 border-width:1px;
 	 display: inline-block;
 	 box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.about_screenshot.full_width{
+	 width:90%; 
+	 margin-left:5%;
+	 text-align:center;
+	 margin-top:1em;
+	 margin-bottom:1em;
 }
 
 
@@ -1071,7 +1088,7 @@ input:checked + .slider:before {
 
 .flex-image > .caption {
 	%width:32.4em; 
-	width:20em; 
+	width:22em; 
 	vertical-align:middle;
 }
 
