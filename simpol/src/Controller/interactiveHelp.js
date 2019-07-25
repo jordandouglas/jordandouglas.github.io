@@ -641,7 +641,8 @@ function getTutorialDialogTemplate(){
                 
                 
                 <span style='vertical-align:bottom; padding-left:20; padding-right:20; font-size:14px'>
-                    XX_tutfootnote_XX
+                    XX_tutfootnote_XX <br>
+                    <div class="mobile-display">(This page is best suited for landscape mode)</div>
                 </span>
                 
 

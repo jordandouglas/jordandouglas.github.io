@@ -29,6 +29,14 @@ body {
 	%background-color:#ebe9e7;
 }
 
+
+
+@media only screen and ( min-device-width: 1000px ) {
+	.mobile-display{
+		display:none;
+	}
+}
+
 #sequencesTableDIV{
 	text-size-adjust: 100%;
 }
