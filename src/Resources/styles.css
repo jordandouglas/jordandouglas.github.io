@@ -1031,7 +1031,7 @@ input:checked + .slider:before {
     background-color:#F8F8F8;
     color:#008cba;
     border-style:solid;
-    border-width:0.5px;
+    border-width:1px;
     border-color:black;
 	border-radius: 5px;
 }
