@@ -1100,13 +1100,13 @@ input:checked + .slider:before {
 
 
 .flex-image.large .about_screenshot {
-	width:32.4em; 
+	width:26em; 
 }
 
 
 .flex-image.large > .caption {
 	%width:20em; 
-	width:32.4em; 
+	width:26em; 
 }
 
 
