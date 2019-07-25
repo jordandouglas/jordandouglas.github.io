@@ -6,7 +6,7 @@
 		<allowHypertranslocation val="false" />
 		<allowInactivation val="true" />
 		<deactivateUponMisincorporation val="false" />
-		<allowGeometricCatalysis val="true" />
+		<allowGeometricCatalysis val="false" />
 		<subtractMeanBarrierHeight val="false" />
 		<allowmRNAfolding val="true" />
 		<allowMisincorporation val="false" />

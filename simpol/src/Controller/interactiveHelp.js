@@ -222,7 +222,7 @@ function begin_biophys1(){
     "Example 1: simulating transcription elongation.",
     `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
     
-    To begin the stochastic simulation, press the glowing <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
+    To begin the stochastic simulation, press the glowing <img class="icon small" src='../src/Images/dice.png'>
     button on the far left. See the plots further down this page to visualise the simulation results.`,
     "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=1'>www.polymerase.nz/simpol/?biophys=1</a>");
 
@@ -272,10 +272,10 @@ function begin_biophys2(){
     "Example 2: visualising cotranscriptional folding.",
     `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
     
-    To begin the demonstration, press the glowing <img id='startTrials' src='../src/Images/folding.png' style='vertical-align: middle; width:20px; height:20px;'>
+    To begin the demonstration, press the glowing <img  class="icon small"  src='../src/Images/folding.png'>
     button on the far left to toggle RNA folding.
     
-    Then, use <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
+    Then, use <img  class="icon small"  src='../src/Images/dice.png'>
     to begin the stochastic simulation`,
     "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=2'>www.polymerase.nz/simpol/?biophys=2</a>");
 
@@ -343,7 +343,7 @@ function begin_biophys3(){
     "Example 3: visualising transcriptional slippage.",
     `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
     
-    To add a 10A insert into the mRNA, press the glowing <img id='startTrials' src='../src/Images/stutter.png' style='vertical-align: middle; width:20px; height:20px;'>
+    To add a 10A insert into the mRNA, press the glowing <img class="icon small" src='../src/Images/stutter.png'>
     button on the far left. This iterative slippage is known as stuttering. During transcription, anywhere up to 4 inserts could be added into this region of the murC2 gene<sup>1</sup>.`,
     `This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=3'>www.polymerase.nz/simpol/?biophys=3</a> <br> <br>
     <sup>1</sup> Tamas, Ivica, et al. "Endosymbiont gene functions impaired and rescued by polymerase infidelity at poly (A) tracts." Proceedings of the National Academy of Sciences 105.39 (2008): 14934-14939.<br> <br>`);
@@ -401,7 +401,7 @@ function begin_biophys5(){
     at the beginning of each simulation. These two parameters each increase the average velocity of the RNA polymerase, however the relationship 
     between these three variables is complex. <br><br>
     
-    To begin the stochastic simulation, press the glowing <img id='startTrials' src='../src/Images/dice.png' style='vertical-align: middle; width:20px; height:20px;'>
+    To begin the stochastic simulation, press the glowing <img class="icon small"  src='../src/Images/dice.png'>
     button on the far left. 5,000 simulations will be performed on the 0.5 kb lacZ gene.
      See the plots further down this page to visualise the simulation results. Each coloured dot is one simulation.`,
     "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=5'>www.polymerase.nz/simpol/?biophys=4</a>");
