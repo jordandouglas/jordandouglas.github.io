@@ -460,11 +460,8 @@ function begin_RABC_example(){
 	    
 	    
 	    During R-ABC, k<sub>cat</sub> and K<sub>D</sub> are randomly sampled at the beginning of each simulation. The sampled values are only accepted into the posterior
-	    distribution when the chi-squared, measuring the distance between the simulated data and the toy data, is less than &epsilon;. To begin the fitting process,
-	    press the glowing 'Begin R-ABC' button down below. &epsilon; can be adjusted to tune the quality of the model fit. <br><br>
-	    
-	    After pressing begin, the histograms below will show the prior distributions (yellow underlays) and the posterior distribution (blue bars). If the
-	        two distributions are different, then the data taught us something about the parameters.`,
+	    distribution when the chi-squared, measuring the distance between the simulated data and the toy data, is less than &epsilon;. <b>To begin the fitting process,
+	    press the glowing 'Begin R-ABC' button down below</b>. &epsilon; can be adjusted to tune the quality of the model fit.`,
 	        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?ex=RABC'>http://www.polymerase.nz/simpol/?ex=RABC</a>");
 	        
 	        
@@ -516,11 +513,8 @@ function begin_MCMCABC_example(){
 	    
 	    
 	    At the beginning MCMC-ABC, k<sub>cat</sub> and K<sub>D</sub> are randomly sampled. The two parameters then embark on a random walk and are only accepted
-	    into the posterior distribution when the chi-squared, measuring the distance between the simulated data and the toy data, is less than &epsilon;. To begin the fitting process,
-	    press the glowing 'Begin MCMC-ABC' button down below. <br><br>
-	    
-	    After pressing begin, and after the MCMC chain has converged, the histograms below will show the prior distributions (yellow underlays) and the posterior distribution (blue bars). If the
-	        two distributions are different, then the data taught us something about the parameters.`,
+	    into the posterior distribution when the chi-squared, measuring the distance between the simulated data and the toy data, is less than &epsilon;. <b>To begin the fitting process,
+	    press the glowing 'Begin MCMC-ABC' button down below.</b>`,
 	        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?ex=RABC'>http://www.polymerase.nz/simpol/?ex=RABC</a>");
 	        
 	        

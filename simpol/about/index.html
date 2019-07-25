@@ -600,19 +600,26 @@ function addCitations(){
 									<div id="sequenceSelection" class="subsection block-subtitle"> Sequence selection </div> <br>
 									
 									
-									<img src="../../src/TutorialImages/sequenceParams.png" style="width:350px; padding: 10 30;" align=left></img>
+									<div class="flex-image">
+
+										<img class="about_screenshot" src="../../src/TutorialImages/sequenceParams.png"></img>	
+										
+										<div class="caption">
+										        
+		                                    To enter a nucleic acid sequence, open up the &#9776; Parameters side-navigation menu, under "Select sequence" choose "Input sequence", enter a sequence and then press Submit.
+		                                    A range of example sequences have also been provided.
+		                                        
+		                   
+											
+											SimPol is designed primarily for transcription with DNA-dependent RNA-polymerases. Your choice of template-type (DNA or RNA) and nascent-type (DNA or RNA) will dictate
+											which thermodynamic parameters are used - Turner's RNA/RNA parameters<cite val="xia1998thermodynamic"></cite>, Sugimoto's DNA/RNA parameters<cite val="wu2002temperature"></cite>, or SantaLucia's DNA/DNA parameters<cite val="santalucia1998unified"></cite>. <br><br>
+										
+										</div>
+
+									</div>
 									
-									<br><br><br><br><br>
-									
-                                        
-                                    To enter a nucleic acid sequence, open up the &#9776; Parameters side-navigation menu, under "Select sequence" choose "Input sequence", enter a sequence and then press Submit.
-                                    A range of example sequences have also been provided.
-                                        
-                   
-									
-									SimPol is designed primarily for transcription with DNA-dependent RNA-polymerases. Your choice of template-type (DNA or RNA) and nascent-type (DNA or RNA) will dictate
-									which thermodynamic parameters are used - Turner's RNA/RNA parameters<cite val="xia1998thermodynamic"></cite>, Sugimoto's DNA/RNA parameters<cite val="wu2002temperature"></cite>, or SantaLucia's DNA/DNA parameters<cite val="santalucia1998unified"></cite>. <br><br>
-								
+		
+                                
 							
 								</div>
 							</div>
@@ -621,18 +628,37 @@ function addCitations(){
 							<div class="about-block">
 								<div class="about-block-inner">
 									<div class="subsection block-subtitle"> Polymerase structure </div> <br>
-								
-									Polymerases read the template strand (ie. the gene) in the 3&prime; &rarr; 5&prime; direction, and copy it to create the nascent strand (eg. mRNA) which grows in the 5&prime; &rarr; 3&prime; direction. 
+									
+									
+									<div class="flex-image large">
+
+						
+										
+										
+										<div class="caption">
+										        
+		                                   Polymerases read the template strand (ie. the gene) in the 3&prime; &rarr; 5&prime; direction, and copy it to create the nascent strand (eg. mRNA) which grows in the 5&prime; &rarr; 3&prime; direction. 
                                     The transcription bubble consists of a hybrid between the nascent strand and the template strand within the polymerase, and a set of unpaired 
                                     template bases upstream and downstream of the polymerase. In the example below, the transcription bubble contains 2 + 9 + 1 = 12 bp.  <br><br>
 									
-									<img id="polStructure" src="../../src/TutorialImages/polStructure.png" style="height:200px; padding: 10 30;" align=left></img>
-									<img id="structureParams" src="../../src/TutorialImages/structureParams.png" style="height:200px; padding: 10 30;" align=right></img>
 									
-									 <br><br><br><br><br><br><br><br><br><br><br><br><br>
-									The size of the transcription bubble differs between polymerases.
+										The size of the transcription bubble differs between polymerases.
 									These three parameters may have an effect on the activity of the polymerase and can be changed from the &#9776; Parameters side-navigation menu. 
-							
+					
+
+										</div>
+										
+										
+										<div class="flex-image-vertical large">
+											<img class="about_screenshot" src="../../src/TutorialImages/polStructure.png"></img>	
+											<img class="about_screenshot" src="../../src/TutorialImages/structureParams.png"></img>	
+										</div>
+										
+									</div>
+									
+									
+								
+					
 								</div>
 							</div>
                                 
@@ -760,7 +786,7 @@ function addCitations(){
 									
 									
 								
-									<div style="margin-left: 200px">
+									<div style="margin-left: 250px">
 										<i>The toolbar contains a range of essential functions.</i> <br><br>
                                             
 										<b>Reinitiate</b> <img  src="../../src/Images/reset.png" class="icon small"> resets the enzyme to its initial position. This will

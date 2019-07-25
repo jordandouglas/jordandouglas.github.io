@@ -1047,6 +1047,53 @@ input:checked + .slider:before {
 }
 
 
+.about_screenshot{
+	 width:20em; 
+	 margin: 10 30;
+	 border-style: solid;
+	 border-color:black;
+	 border-width:1px;
+	 display: inline-block;
+	 box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+
+.flex-image{
+	display:flex; 
+	flex-wrap: wrap; 
+	 align-items: center;
+	%align-content: flex-start; 
+	justify-content: center; 
+	%align-content: space-between
+	vertical-align:middle;
+}
+
+
+.flex-image > .caption {
+	%width:32.4em; 
+	width:20em; 
+	vertical-align:middle;
+}
+
+.flex-image-vertical{
+	display:flex; 
+	flex-direction: column;
+}
+
+
+
+.flex-image.large .about_screenshot {
+	width:32.4em; 
+}
+
+
+.flex-image.large > .caption {
+	%width:20em; 
+	width:32.4em; 
+}
+
+
+
 
 .DOIview{
 	 %background-color:#ebe9e7;
