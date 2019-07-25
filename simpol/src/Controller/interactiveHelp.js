@@ -219,7 +219,7 @@ function begin_biophys1(){
 
     
     addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
-    "Example 1: simulating transcription elongation.",
+    "Example 1: simulation of transcription elongation",
     `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
     
     To begin the stochastic simulation, press the glowing <img class="icon small" src='../src/Images/dice.png'>
@@ -269,7 +269,7 @@ function begin_biophys2(){
 
 
     addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
-    "Example 2: visualising cotranscriptional folding.",
+    "Example 2: visualisation of cotranscriptional folding",
     `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
     
     To begin the demonstration, press the glowing <img  class="icon small"  src='../src/Images/folding.png'>
@@ -340,7 +340,7 @@ function begin_biophys3(){
 
     
     addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
-    "Example 3: visualising transcriptional slippage.",
+    "Example 3: visualisation of transcriptional slippage",
     `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
     
     To add a 10A insert into the mRNA, press the glowing <img class="icon small" src='../src/Images/stutter.png'>
@@ -394,7 +394,7 @@ function begin_biophys5(){
 
     
     addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
-    "Example 5: exploring the relationships between parameters.",
+    "Example 5: exploring the relationships between parameters",
     `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
     
     Two of the parameters: the rate of catalysis k<sub>cat</sub> and the rate of NTP binding k<sub>bind</sub>, will be randomly sampled
@@ -563,7 +563,7 @@ function begin_biophys6(){
         
         
         addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
-        "Example 6: approximate Bayesian computation.",
+        "Example 6: approximate Bayesian computation",
         `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
         
         A toy [NTP]-velocity dataset has been uploaded into the 'Approximate Bayesian Computation' section below. Approximate Bayesian
@@ -641,12 +641,12 @@ function getTutorialDialogTemplate(){
                 
                 
                 <span style='vertical-align:bottom; padding-left:20; padding-right:20; font-size:14px'>
-                    XX_tutfootnote_XX <br>
-                    <div class="mobile-display">(This page is best suited for landscape mode)</div>
+                    XX_tutfootnote_XX 
                 </span>
                 
 
                 <span style="float:right">
+                	<span class="mobile-display">(This page is best suited for landscape mode)</span>
                     <input type=button class="button" onClick="closeDialogs()" value='OK' title="OK" style="width:60px;"></input>
                 </span>
             </div>
