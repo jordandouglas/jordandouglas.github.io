@@ -118,6 +118,7 @@ canvas {
 
 .code ol { 
 	    counter-reset: item;
+	    width: 90%;
 	}
 	
 

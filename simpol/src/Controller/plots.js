@@ -4680,8 +4680,8 @@ function getPlotOptionsTemplate(){
 				</table>
 
 				<span style="float:right">
-					<input type=button id='deleteDistn' class="button" onClick="deletePlots_controller(false, false, false, true, false, false, function() { saveSettings_controller(); });" value='Delete Data and Save' title="You must delete all parameter plot data before you save these settings (because you added a site-specific time recording)" style="width:220px; display:none"></input>
-					<input type=button id='submitDistn' class="button" onClick="saveSettings_controller()" value='Save' title="Submit your changes" style="width:60px;"></input>
+					<input type=button id='deleteDistn' class="button" onClick="deletePlots_controller(false, false, false, true, false, false, function() { saveSettings_controller(); });" value='Delete Data and Save' title="You must delete all parameter plot data before you save these settings (because you added a site-specific time recording)" style="display:none"></input>
+					<input type=button id='submitDistn' class="button" onClick="saveSettings_controller()" value='Save' title="Submit your changes"></input>
 				</span>
 
 	`;
