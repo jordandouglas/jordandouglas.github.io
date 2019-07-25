@@ -57,6 +57,7 @@ body {
 
 
 .glowing {
+	filter: invert(100%);
     background-color:#f0c36d; 
     border-color: #FFFFB2; 
     -webkit-box-shadow: 0 0 10px #FFFFB2; 
@@ -65,9 +66,6 @@ body {
 }
 
 
-.glowing{
-	filter: invert(100%);
-}
 
 
 a {
@@ -1251,10 +1249,6 @@ input:checked + .slider:before {
     color: white;
 }
 
-.button.glowing {
-	color:#008CBA; 
-	background-color:white;
-}
 
 
 

@@ -189,7 +189,7 @@ function getModelComparisonRowTemplate(modelNum) {
 
 			<td style="padding:5 5; vertical-align:middle; width: 70%">
 
-				<textarea id="modelBuildingDescription_` + modelNum + `" title="Description of all the model settings and the values of all parameters which do not have a prior distribution. A parameter may only have one prior distribution." style="width:100%; max-width:100%; min-width:100%; height: 6em; min-height:4em font-size: 16px" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">Retrieving model JSON...</textarea>
+				<textarea id="modelBuildingDescription_` + modelNum + `" title="Description of all the model settings and the values of all parameters which do not have a prior distribution. A parameter may only have one prior distribution." style="width:100%; height: 6em; min-height:4em font-size: 16px" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">Retrieving model JSON...</textarea>
 
 			</td>
 
