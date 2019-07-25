@@ -242,6 +242,11 @@ function init(){
                     }
             
             
+            	 	if (JSONurl.ex != null) {
+                        begin_tutorial("ex" + JSONurl.ex);
+                    }
+            
+            
 					else if (JSONurl.s != null){
 						var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/" + JSONurl.s;
 						var toDoAfterLoadSession = function() {

@@ -85,12 +85,26 @@ function begin_tutorial(tut_id = null){
         case "biophys6":
             begin_biophys6();
             break; 
+            
+            
+            
+       case "ex1":
+            begin_RABC_example();
+            break;
+            
+            
+       case "ex2":
+            begin_MCMCABC_example();
+            break;
     
     }
 
 
 
 }
+
+
+
 
 
 
@@ -107,6 +121,9 @@ function loadSessionAndPosterior(sessionFileName, posteriorFileName, resolve = f
 
     loadSessionFromURL(sessionFileLocation, toDoAfterLoadSession);
 }
+
+
+
 
 
 
@@ -421,6 +438,71 @@ function begin_biophys5(){
     
 
     loadSessionFromURL(sessionFileLocation, toDoAfterLoadSession);
+
+}
+
+
+
+
+// R-ABC on motivating example 1 from about/ page
+function begin_RABC_example(){
+
+
+	var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/RABC.xml";
+	var toDoAfterLoadSession = function() {
+
+		 addTutorialTemplate("The rejection ABC (R-ABC) algorithm", 
+	    "Motivating example 1",
+	    `In this example we will use the R-ABC algorithm to infer two parameters from a toy dataset that describes the relationship between elongation velocity and NTP concentration. <br><br> 
+	    
+	    The two parameters we will infer are the rate of catalysis k<sub>cat</sub> and the NTP dissociation constant K<sub>D</sub>. These two parameters each affect the average 
+	    velocity of the RNA polymerase, and the relationship between the two parameters is complex. <br><br>
+	    
+	    
+	    During R-ABC, k<sub>cat</sub> and K<sub>D</sub> are randomly sampled at the beginning of each simulation. The sampled values are only accepted into the posterior
+	    distribution when the chi-squared, measuring the distance between the simulated data and the toy data, is less than &epsilon;. To begin the fitting process,
+	    press the glowing 'Begin R-ABC' button down below. &epsilon; can be adjusted to tune the quality of the model fit. <br><br>
+	    
+	    In the histograms below, the yellow underlays show the prior distributions while the blue bars are the posterior distributions. If the
+	        two distributions are different, then the data taught us something about the parameters.`,
+	        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?ex=1'>http://www.polymerase.nz/simpol/?ex=1</a>");
+	        
+	        
+	    // Add a glow around the simulate button
+	    var btn = $("#beginABC_btn");
+	
+	    var intervalID = window.setInterval(function() {  
+	        btn.toggleClass('glowing');
+	    }, 750);
+	    
+	    
+	   
+	    
+	    window.setTimeout(function(){
+	    
+	        btn.click(function(){
+	            window.clearInterval(intervalID);
+	            btn.removeClass("glowing");
+	            btn.unbind('click');
+	        });
+	    
+	    }, 50);
+	    
+    
+            
+    };
+    
+
+    loadSessionFromURL(sessionFileLocation, toDoAfterLoadSession);
+        
+        
+
+
+}
+
+// MCMC-ABC on motivating example 1 from about/ page
+function begin_MCMCABC_example(){
+
 
 }
 
