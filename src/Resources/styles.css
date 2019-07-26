@@ -281,11 +281,14 @@ div.vertical{
 	background-color: #ebe9e7;
 }
 
-.scrollbar::-webkit-scrollbar-thumb
-{
+.scrollbar::-webkit-scrollbar-thumb {
 	border-radius: 10px;
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
 	background-color: #008cba;
+}
+
+.scrollbar::-webkit-scrollbar-thumb.pauser {
+	background-color: #a5cf19;
 }
 
 
