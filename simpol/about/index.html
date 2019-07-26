@@ -102,6 +102,8 @@ function init(){
     		console.log(window.location.hash);
             
             var id = window.location.hash.substring(1);
+            
+            console.log("id", id);
                 
                 
             // Find the contents button for this element
@@ -115,7 +117,7 @@ function init(){
     		
     		setTimeout(function(){
     		
-    			// Add back the anchor to ensure that the page is in the right place. If the webpage takes too long to load and
+				// Add back the anchor to ensure that the page is in the right place. If the webpage takes too long to load and
 	    		// the anchored section is hidden, then the page won't anchor
 	    		var hash = window.location.hash;
 	    		window.location.hash = hash;
@@ -309,7 +311,7 @@ function printContents(){
         }
         else {
             subsubsectNum++;
-            //$("#contents").append("<div class='contents_subsubsect'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + "." + subsubsectNum + " " + a_tag + "</div>");
+            $("#contents").append("<div style='display:none' class='contents_subsubsect'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + "." + subsubsectNum + " " + a_tag + "</div>");
         }
         
         
