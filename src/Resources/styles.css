@@ -290,7 +290,7 @@ div.vertical{
 
 
 .main-block{
-	min-width:38em;
+	min-width:32em;
 	%border:1px solid black;
 	background-color: #858280;
 	width:80%;
