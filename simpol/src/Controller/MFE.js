@@ -32,6 +32,7 @@ MFE_simulationNodes = [];
 
 
 function destroySecondaryStructure(){
+	
 	$("#mRNAsvg").remove();
 	$("#bases").height(300);
 	$("#bases").children().show(0);
@@ -63,11 +64,9 @@ function updateSecondaryStructure(new_nodes, edges){
 	if (MFE_simulation == null && $("PreExp").val() != "hidden") {
 		renderSecondaryStructure();
 	}
-	else if (MFE_simulation == null) return;
-
+	
 
 	if (MFE_simulation == null) {
-		//renderSecondaryStructure(data);
 		return;
 	}
 
@@ -89,7 +88,7 @@ function updateSecondaryStructure(new_nodes, edges){
 
 
 	// If there are any new vertices add them to the list. If some need removing then remove them
-	// console.log(MFE_simulationNodes);
+	//console.log(MFE_width, MFE_simulationNodes);
 	for (var i = 0; i < new_nodes.length; i ++){
 		var baseNum = parseFloat(new_nodes[i].id.substring(1));
 		MFE_simulationNodes[baseNum] = new_nodes[i];
@@ -181,8 +180,6 @@ function updateSecondaryStructure(new_nodes, edges){
 function renderSecondaryStructure(){
 	
 	
-
-	
 		$("#bases").height(800);
 		MFE_width = parseFloat($("#pol").offset().left) + parseFloat($("#pol").width()) + $("#bases").scrollLeft() + 300;
 		MFE_height = parseFloat($("#bases").height()) - MFE_yShift - 100;
@@ -193,22 +190,6 @@ function renderSecondaryStructure(){
 		var svg = d3.select("#mRNAsvg");
 
 
-		/*
-
-		console.log("data", data);
-		//return;
-		if (data == null || data.vertices == null) return;
-
-		$("#bases").children().show(0);
-		for (var i = 0; i < data["toHide"].length; i ++){
-			$(data["toHide"][i]).hide(0);
-		}
-
-
-		*/
-		//if (data == null || data.vertices == null) return;
-		//var nodes = data["vertices"];
-		//var edges = data["bonds"];
 
 
 

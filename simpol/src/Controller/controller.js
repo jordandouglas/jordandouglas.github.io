@@ -676,6 +676,7 @@ function renderObjects(override = false, resolve = function(){}){
 				}
 
 				if (nt.id == "" || nt.id == null) continue;
+				
 
 
 				if (nt.needsUnfolding){
@@ -687,24 +688,25 @@ function renderObjects(override = false, resolve = function(){}){
 
 
 
-
 				// Remove the object from the page
-				if(nt["needsDeleting"]){
+				if(nt.needsDeleting){
 
 					//console.log("Deleting", nt["id"]);
 
 					$("#" + nt["id"]).remove();
 					if (nt["hasTP"]) delete_TP(nt["pos"]);
-					nt["needsDeleting"] = false;
+					nt.needsDeleting = false;
 
 
 					continue;
 
 				}
 				
+				
+				
 
 				// Add the nucleotide object on to html
-				if($("#" + nt["id"]).length == 0 || nt["needsGenerating"]){
+				if( $("#" + nt.id).length == 0 || nt.needsGenerating){
 
 
 					// Bond between folded nucleotides. This is handled by the force directed graph
@@ -747,14 +749,16 @@ function renderObjects(override = false, resolve = function(){}){
 					nt["dx"] = 0;
 					nt["dy"] = 0;	
 					if (nt["id"] == "pol") moveScrollBar();
-					continue;
+					
+					if (!nt.needsFolding) continue;
 
 
 				}
 
 
+
 				// Change the source image
-				if (nt["needsSourceUpdate"]){
+				if (nt.needsSourceUpdate){
 
 					// Polymerase is generated differently since it is a canvas not an image
 					if (nt["id"] == "pol" && nt["src"] != "paraPol") {
@@ -769,11 +773,10 @@ function renderObjects(override = false, resolve = function(){}){
 
 
 
-
-
+				
 				if (nt.needsFolding){
 
-					//console.log("Will fold", nt);
+					
 					if (!nt.fixed) {
 						$("#" + nt["id"]).hide(0);
 						if (nt.foldX != null && nt.foldX >= 0) nt.x = nt.foldX;

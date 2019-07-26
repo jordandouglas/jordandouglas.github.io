@@ -180,6 +180,7 @@ function init(){
 			 
 			 
 		SIDENAV_WIDTH = IS_MOBILE ? 700 : 380;
+		if (IS_MOBILE) $("#progressSimCanvas").attr("height", "45px");
 	
             
 		// Use webassembly? Defaults to false unless specified in url
@@ -740,7 +741,7 @@ function refresh(resolve = function(){}){
 		bindAnimationFrameID = 0;
 		activationAnimationFrameID = 0;
 		ANIMATION_TIME_controller = 1;
-	
+		destroySecondaryStructure();
 
 
 		slipHtrough= 0;
@@ -785,6 +786,7 @@ function refresh(resolve = function(){}){
 			// userInputModel_controller();
 			changeSpeed_controller();
 			setNextBaseToAdd_controller();
+			
 
 			sendModels_controller(function() {
 
