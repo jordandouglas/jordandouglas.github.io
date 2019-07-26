@@ -1772,7 +1772,7 @@ function addCitations(){
 										Suppose we have a single molecule which can exist in a number of chemical states. When the system has reached equilibrium, the probability of the molecule being in state $s$ 
 										at any given time is estimated with a Boltzmann distribution:
 										
-										<h3>
+										<h3 class="equation">
 										$$ p(s) \propto e^{-\frac{\Delta G_s}{k_B T}}, $$
 										</h3>
 										
@@ -1784,7 +1784,7 @@ function addCitations(){
 										respectively. We would therefore expect the molecule to be in state $A$ 4.7% of the time:
 										
 										
-										<h3>
+										<h3 class="equation">
 											$$p(A) = \frac{e^{-\frac{\Delta G_A}{k_B T}}}{e^{-\frac{\Delta G_A}{k_B T}} + e^{-\frac{\Delta G_B}{k_B T}}} = 
 													 \frac{e^{-\frac{-3\;k_B T}{k_B T}}}{e^{-\frac{-3\;k_B T}{k_B T}} + e^{-\frac{-6\;k_B T}{k_B T}}}  = 
 													 \frac{e^{3}}{e^{3} + e^{6}}  =
@@ -1823,7 +1823,7 @@ function addCitations(){
 										The Arrhenius equation can estimate the rate constant of transiting from state $s$ to state $s^\prime$:
 										
 										
-										<h3>
+										<h3 class="equation">
 											$$ k_{s \rightarrow s^\prime} = A e^{-\frac{\Delta G^\dagger - \Delta G_s}{k_B T}}, $$
 										</h3>
 										
@@ -1872,7 +1872,7 @@ function addCitations(){
 											reaction $A \rightarrow C$ would be selected because it has the shorter reaction time. The probability of sampling reaction $A \rightarrow B$ is 
 											
 											
-											<h3>
+											<h3 class="equation">
 												$$ p(A \rightarrow B) = \frac{0.001}{0.001 + 0.002} = 0.333,$$
 											</h3>
 												
@@ -1950,7 +1950,7 @@ function addCitations(){
 											
 										
 											
-											<h3>
+											<h3 class="equation">
 												$$ p(\text{bound}) = \frac{ \frac{\text{[NTP]}}{K_D} }{\frac{\text{[NTP]}}{K_D} + 1} = \frac{ \frac{1000\text{ &mu;M}}{35 \text{ &mu;M}} }{\frac{1000\text{ &mu;M}}{35 \text{ &mu;M}} + 1} = 0.966. $$
 											</h3>
 										
@@ -1979,7 +1979,7 @@ function addCitations(){
                                     	The basepairing energetic contribution of a transcription state is computed by summing the Gibbs energy of the gene to that of the hybrid:
                                     
                                     
-                                     	<h3>
+                                     	<h3 class="equation">
                                             $$
                                                \Delta G_{total}^{(bp)} = \Delta G_{gene}^{(bp)} + \Delta G_{hybrid}^{(bp)}
                                             $$
@@ -1989,7 +1989,7 @@ function addCitations(){
                                         Let $\Delta G_{S(l, t)}$ be the Gibbs energy of state $S(L, t)$. This term is calculated using:
                                     
                                     
-                                        <h3>
+                                        <h3 class="equation">
                                             $$
                                                 \Delta G_{S(l, t)} = \Delta G_{S(l, t)}^{(bp)} + \begin{cases} \Delta G_{\tau 1} &\text{ if } t = 1 \text { (posttranslocated) } \\ 0 &\text { if } t \neq 1 \end{cases}
                                             $$
@@ -2004,7 +2004,7 @@ function addCitations(){
                                         the system spends in the two states. This is described by translocation equilibrium constant $K_\tau$.
                                     
                                     
-                                    	<h3>
+                                    	<h3 class="equation">
                                             $$
                                                 K_\tau = \frac{k_{S(l,1) \rightarrow S(l,0)}}{k_{S(l,0) \rightarrow S(l,1)}} = \frac{k_{bck}(S(l,1))}{k_{fwd}(S(l,0))}
                                             $$
@@ -2018,7 +2018,7 @@ function addCitations(){
 										However, in the general case, translocation is not assumed to reach equilibrium (<param value="assumeTranslocationEquilibrium"/>$ = 0$).
 										 Basepairs may need to be broken in order for the polymerase to translocate forwards (right) or backwards (left) from its current position. For example, consider the state below. 
 										<br><br>
-										<img id="breakingPairs" src="../../src/TutorialImages/basepairbreaking.png" style="width:90%; display:block;  margin: 0 auto;" ></img>
+										<img class="about_screenshot full_width" id="breakingPairs" src="../../src/TutorialImages/basepairbreaking.png"></img>
 										<br><br>
 										<div style="line-height:35px">
 											For the polymerase to translocate one step backwards, the 
@@ -2059,7 +2059,7 @@ function addCitations(){
                                         Using transition state theory, the Gibbs energy of this transition state is calculated as:
                                     
                                     
-                                         <h3>
+                                         <h3 class="equation">
                                             $$
                                                 \Delta G_{T(l, t)} = \Delta G_{T(l, t)}^{(bp)} + \Delta G_\tau^\dagger + \begin{cases}    \Delta G_{\tau -}^\dagger &\text{ if } t \leq -1 \text{ (backtracking) }\\ 
                                                                                                                                                 0 & \text { if } t = 0  \text{ (elongation) } \\
@@ -2076,7 +2076,7 @@ function addCitations(){
                                         several methods (discussed below). After the translocation energy barrier has been estimated, the rates of translocating between
                                         $S(l,t)$ and $S(l,t+1)$ can be calculated using the Arrhenius equation:
                                     
-											<h3>
+											<h3 class="equation">
 											$$
 												k_{S(l,t) \rightarrow S(l,t+1)} = k_{fwd}(S(l,t)) = A e^{-(\Delta G_{T(l, t)} - \Delta G_{S(l, t)})} \\
                                                 k_{S(l,t+1) \rightarrow S(l,t)} = k_{bck}(S(l,t+1)) = A e^{-(\Delta G_{T(l, t)} - \Delta G_{S(l, t+1)})}
@@ -2097,7 +2097,7 @@ function addCitations(){
                                              Translocation rates are determined exclusively from the energies of the translocation states and not the transition states.
                                             This is the simplest model, where
                                             
-                                            <h3>
+                                            <h3 class="equation">
                                             $$
                                                 \Delta G_{T(l, t)}^{(bp)} = 0. 
                                             $$
@@ -2116,7 +2116,7 @@ function addCitations(){
                                         
                                             The Gibbs energy of basepairing of the transition state between $S(l,t)$ and $S(l,t+1)$ is calculated as 
                                         
-                                            <h3>
+                                            <h3 class="equation">
                                             $$
                                                 \Delta G_{T(l, t)}^{(bp)} = \frac{\Delta G_{S(l,t)} + \Delta G_{S(l,t+1)}}{2}.
                                             $$
@@ -2148,7 +2148,7 @@ function addCitations(){
                                             
                                             
                                             
-                                            <h3>
+                                            <h3 class="equation">
                                             $$
                                                 \Delta G_{T(l, t)}^{(bp)} = \begin{cases} 
                                                                                                 \Delta G^{(bp)}(G \cap G^\prime, H \cap H^\prime) & \; \text{ if } \mathbb{TS} = H_IG_I \\
@@ -2181,7 +2181,7 @@ function addCitations(){
 										<h3>
 											
                                             
-                                            <h3>
+                                            <h3 class="equation">
                                                 $$
                                                     k_{fwd}(S(l,t)) = A e^{-(\Delta G_{T(l, t)} - \Delta G_{S(l, t)} - F(\delta_1))} \\
                                                     k_{bck}(S(l,t)) = A e^{-(\Delta G_{T(l, t-1)} - \Delta G_{S(l, t)} - F(\delta - \delta_1))}
