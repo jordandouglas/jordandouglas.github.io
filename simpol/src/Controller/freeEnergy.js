@@ -1102,24 +1102,24 @@ function drawModelDiagramCanvas_givenParams(canvasID, kineticStateDescriptionID,
 
 	// Translocation equilibrium: add an equilibrium arrow between states 0 and 1
 	if (elongationModel.assumeTranslocationEquilibrium){
-		plotEquilibriumArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState - spacingBetweenStates + arrowSpace, yCoordOfMainState + 2 * arrowSpace, stateWidth, "horizontal", "Kt", "", paramsResult["Kt"], kineticStateDescriptionID, "K<sub>t</sub> = k<sub>bck</sub> / k<sub>fwd</sub>")
+		plotEquilibriumArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState - spacingBetweenStates + arrowSpace, yCoordOfMainState + 2 * arrowSpace, stateWidth, "horizontal", "K\u03C4", "", paramsResult["Kt"], kineticStateDescriptionID, "K<sub>\u03C4</sub> = k<sub>bck</sub> / k<sub>fwd</sub>")
 	}
 
 
 	/////////////////
 	// m+1 N state //
 	isCurrentState = paramsResult["mRNAPosInActiveSite"] == 1 && paramsResult["NTPbound"];
-	plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "S(" + m + ",+1)\u1D3A", xCoordOfMainState,	yCoordOfMainState - spacingBetweenStates - stateHeight, "The polymerase is <b>posttranslocated</b> with NTP bound and ready for catalysis. The nascent strand is " + m + " nt long.", isCurrentState, "#328332");
+	plotState(ctx, stateHoverEvents, kineticStateDescriptionID, "SN(" + m + ",+1)", xCoordOfMainState,	yCoordOfMainState - spacingBetweenStates - stateHeight, "The polymerase is <b>posttranslocated</b> with NTP bound and ready for catalysis. The nascent strand is " + m + " nt long.", isCurrentState, "#328332");
 
 	rateSum = krelease + kcat;
-	if (!elongationModel.assumeBindingEquilibrium) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + stateWidth -  arrowSpace, yCoordOfMainState - spacingBetweenStates + arrowSpace, "down", "krel", krelease, rateSum, kineticStateDescriptionID, "k<sub>release</sub>");
+	if (!elongationModel.assumeBindingEquilibrium) plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + stateWidth -  arrowSpace, yCoordOfMainState - spacingBetweenStates + arrowSpace, "down", "krel", krelease, rateSum, kineticStateDescriptionID, "k<sub>rel</sub>");
 	plotArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + arrowSpace + stateWidth,	yCoordOfMainState - spacingBetweenStates - stateHeight/2, "right", "kcat", kcat, rateSum, kineticStateDescriptionID, "k<sub>cat</sub>");
 	////////////////
 
 
 	// Binding equilibrium: add an equilibrium arrow between states 1 and 1N
 	if (elongationModel.assumeBindingEquilibrium){
-		plotEquilibriumArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + 2*arrowSpace, yCoordOfMainState - 1*arrowSpace, stateHeight, "vertical", "KD", "&mu;M", paramsResult["KD"], kineticStateDescriptionID, "K<sub>D</sub> = k<sub>release</sub> / k<sub>bind</sub>")
+		plotEquilibriumArrow_stateDiagram(ctx, stateHoverEvents, xCoordOfMainState + 2*arrowSpace, yCoordOfMainState - 1*arrowSpace, stateHeight, "vertical", "KD", "&mu;M", paramsResult["KD"], kineticStateDescriptionID, "K<sub>D</sub> = k<sub>rel</sub> / k<sub>bind</sub>")
 	}
 
 

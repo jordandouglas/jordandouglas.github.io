@@ -462,7 +462,7 @@ function begin_RABC_example(){
 	    During R-ABC, k<sub>cat</sub> and K<sub>D</sub> are randomly sampled at the beginning of each simulation. The sampled values are only accepted into the posterior
 	    distribution when the chi-squared, measuring the distance between the simulated data and the toy data, is less than &epsilon;. <b>To begin the fitting process,
 	    press the glowing 'Begin R-ABC' button down below</b>. &epsilon; can be adjusted to tune the quality of the model fit.`,
-	        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?ex=RABC'>http://www.polymerase.nz/simpol/?ex=RABC</a>");
+	        "");
 	        
 	        
 	    // Add a glow around the simulate button
@@ -515,7 +515,7 @@ function begin_MCMCABC_example(){
 	    At the beginning MCMC-ABC, k<sub>cat</sub> and K<sub>D</sub> are randomly sampled. The two parameters then embark on a random walk and are only accepted
 	    into the posterior distribution when the chi-squared, measuring the distance between the simulated data and the toy data, is less than &epsilon;. <b>To begin the fitting process,
 	    press the glowing 'Begin MCMC-ABC' button down below.</b>`,
-	        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?ex=RABC'>http://www.polymerase.nz/simpol/?ex=RABC</a>");
+	        "");
 	        
 	        
 	    // Add a glow around the simulate button

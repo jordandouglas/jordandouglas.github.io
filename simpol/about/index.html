@@ -69,6 +69,8 @@ function init(){
          
             
             
+    $("#TS_box").val("HIGI_barriers");
+    
     // Contents
     printContents();
             
@@ -213,11 +215,13 @@ function populateParameterLinks(){
         proposalWidth:{anchor:"Proposal_width", latex:"Proposal width"}, 
             
             
-        assumeBindingEquilibrium:{anchor:"Binding_equilibrium", latex:"$\\mathbb{BE}$"},
-        assumeTranslocationEquilibrium:{anchor:"Translocation_equilibrium", latex:"$\\mathbb{TE}$"},
-        allowmRNAfolding:{anchor:"Enable_RNA_folding", latex:"$\\mathbb{RB}$"}
+        assumeBindingEquilibrium: {anchor:"Binding_equilibrium", latex:"$\\mathbb{BE}$"},
+        assumeTranslocationEquilibrium: {anchor:"Translocation_equilibrium", latex:"$\\mathbb{TE}$"},
+        allowInactivation: {anchor:"Enable_inactivation", latex:"$\\mathbb{IS}$"},
+        allowmRNAfolding: {anchor:"Enable_RNA_folding", latex:"$\\mathbb{RB}$"},
+        currentTranslocationModel: {anchor:"Translocation_transition_state", latex:"$\\mathbb{TS}$"}
             
-            
+           
     };
             
             
@@ -230,7 +234,7 @@ function populateParameterLinks(){
             
         var ele = $(paramsTags[i]);  
         var paramID = ele.attr("value");
-        console.log("paramID", paramID);
+        //console.log("paramID", paramID);
         var newTag = `<a onclick="minimiseSection('#Parameters_and_Settings_Btn', true)" class="param_link" href="#` + paramToAnchorTag[paramID].anchor + `">` + paramToAnchorTag[paramID].latex + `</a>`;
             
         ele.replaceWith(newTag);
@@ -364,6 +368,7 @@ function openReferences(){
 }
 
 $(window).on('hashchange', function() {
+	$(".helpSelected").removeClass("helpSelected");
   	$(window.location.hash).addClass("helpSelected");
 });
 
@@ -388,6 +393,10 @@ function addCitations(){
 		var vals = $(citationTags[i]).attr("val").split(",");
 		if (vals.length == 0) continue;
 		
+		
+		
+		var citations = [];
+		
 		var citationHTML = "<sup class='refLink'>(";
 		
 		for (var j = 0; j < vals.length; j ++){
@@ -410,13 +419,29 @@ function addCitations(){
 
 			}
 			
-			citationHTML +=  `<a onclick="openReferences();" class='refLink'  href="#` + val + `">` + referenceNumbers[val] + `</a>`;
-			if (j < vals.length-1) citationHTML += ",";
+			
+			citations.push({num: referenceNumbers[val], html: `<a onclick="openReferences();" class='refLink'  href="#` + val + `">` + referenceNumbers[val] + `</a>`});
+			//referenceHTMLs.push();
+			
+			
 			
 		}
 		
 		
+		
+		// Sort the citations by number
+		citations.sort(function(a, b) {
+			return a.num - b.num;
+		});
+		
+		
+		
+		var referenceHTMLs = [];
+		for (var j = 0; j < citations.length; j ++) referenceHTMLs.push(citations[j].html)
+		
+	
 		// Create the link to the reference
+		citationHTML +=  referenceHTMLs.join(",");
 		citationHTML += ")</sup>";
 		$(citationTags[i]).append(citationHTML);
 		
@@ -484,7 +509,7 @@ function addCitations(){
                                     <span class="button extraline" title="Go back home">Home</span> 
                               </a>
                               
-                              <a href="../../"  style="text-decoration:none; color:white; ">
+                              <a href="../"  style="text-decoration:none; color:white; ">
                                     <span class="button extraline" title="Launch SimPol">SimPol</span> 
                               </a>
 
@@ -515,7 +540,7 @@ function addCitations(){
                             
                             
                         
-						SimPol is a free open-source web-based program aimed to help researchers, teachers and students visualise transcription at the level of a single molecule. 
+						SimPol is a free open-source web-based program aimed to help researchers, teachers and students visualise transcription. 
 						<u>Transcription</u> is an essential pathway for all living organisms. It involves the copying of a template, typically DNA, 
 						into messenger RNA (mRNA) which is used to produce protein. Transcription is carried out by an enzyme called RNA polymerase. 
                         This webpage contains tutorials about SimPol and is hopefully friendly to all users. 
@@ -580,7 +605,7 @@ function addCitations(){
                                         the relevant section on this page.
                                         <br><br>
                                         
-                                         Conversely, there are direct links from this page to SimPol: &nbsp;&nbsp;&nbsp;
+                                         Conversely, there are direct links from this page to SimPol which look like this: &nbsp;&nbsp;&nbsp;
                                         <span class="xml_link" style="text-align:center">
                                                <b>Example session:</b> 
                                                <a >Open</a> | 
@@ -817,7 +842,7 @@ function addCitations(){
 										
 										<b>Fold</b> <img src="../../src/Images/folding.png" class="icon small"> folds the mRNA into its predicted secondary structure and renders the predicted structure. This function will only work
 										if the nascent strand is single-stranded RNA. Note that this function is only cosmetic and will not affect the polymerase's kinetics. To incorporate mRNA secondary structure predictions into the kinetic model
-										see <param value="allowmRNAfolding"/>. Folding is performed by the ViennaRNA suite <cite val="lorenz2011viennarna"></cite>.  <br><br>
+										see <param value="allowmRNAfolding"/>. Folding is performed by the ViennaRNA suite<cite val="lorenz2011viennarna"></cite>.  <br><br>
 										
 										<b>Speed</b> <select class="dropdown" title="Duration of each reaction" style="vertical-align: middle; text-align:right; display:inline-block">
 											<option value="slow">Slow</option>
@@ -874,16 +899,16 @@ function addCitations(){
                                                 
                                                     Let $S(l,t)$ denote the current state, where $l$ is the length of the mRNA and $t$ is the position of the RNA polymerase (RNAP)
                                                     active site with respect to the $3^\prime$ mRNA. 
-                                                    Under the Brownian ratchet model, transcription elongation is a three step cycle <cite val="abbondanzieri2005direct,bai2004sequence,maoileidigh2011unified,erie1992single"></cite>. 
+                                                    Under the Brownian ratchet model, transcription elongation is a three step cycle<cite val="abbondanzieri2005direct,bai2004sequence,maoileidigh2011unified,erie1992single"></cite>. 
                                                     First, RNAP translocates from the <b>pretranslocated</b> position $S(l,0)$ into the <b>posttranslocated</b> position $S(l,1)$. 
                                                     Second, the incoming nucleoside triphosphate (NTP) binds to the active site of RNAP, $S_N(l,1)$.
                                                     Finally, the bound NTP is incorporated onto the $3^\prime$ mRNA, returning the RNAP into the pretranslocated position $S(l+1,0)$. <br><br>
                                                 
                                                 
                                                     However, RNAP does not always conform to this pathway. Periodically, RNAP <b>backtracks</b> ($t < 0$), whereby the enzyme translocates upstream
-                                                    causing the $3^\prime$ mRNA to exit through the NTP entry channel <cite val="abbondanzieri2005direct,komissarova1997transcriptional,cheung2011structural"></cite>. This renders the enzyme catalytically inactive.
-                                                    It has been hypothesised that an intermediate state (IS) acts as a precursor for backtracking from the pretranslocated state <cite val="artsimovitch2000pausing,imashimizu2013intrinsic,saba2019elemental,maoileidigh2011unified"></cite>.
-                                                    Alternatively, RNAP can <b>hypertranslocate</b> ($t>1$), whereby the enzyme translocates further downstream causing the shortening of the DNA/RNA hybrid <cite val="yarnell1999mechanism,larson2008applied"></cite>. 
+                                                    causing the $3^\prime$ mRNA to exit through the NTP entry channel<cite val="abbondanzieri2005direct,komissarova1997transcriptional,cheung2011structural"></cite>. This renders the enzyme catalytically inactive.
+                                                    It has been hypothesised that an intermediate state (IS) acts as a precursor for backtracking from the pretranslocated state<cite val="artsimovitch2000pausing,imashimizu2013intrinsic,saba2019elemental,maoileidigh2011unified"></cite>.
+                                                    Alternatively, RNAP can <b>hypertranslocate</b> ($t>1$), whereby the enzyme translocates further downstream causing the shortening of the DNA/RNA hybrid<cite val="yarnell1999mechanism,larson2008applied"></cite>. 
 
                                                     
                                                     <br><br>
@@ -950,7 +975,7 @@ function addCitations(){
                                                     
                                                         If the active site is free and next to the 3&prime; end of the nascent strand, then the polymerase may bind NTP.
                                                         Once bound, the polymerase may catalyse the reaction, or it may release the NTP back into the cell. Reverse-catalysis may also be performed 
-                                                        (Lysis), although this reaction is often considered to be irreversible <cite val="erie1992single,rhodes1974ribonucleic,maoileidigh2011unified"></cite>. The canonical pathway of transcription 
+                                                        (Lysis), although this reaction is often considered to be irreversible<cite val="erie1992single,rhodes1974ribonucleic,maoileidigh2011unified"></cite>. The canonical pathway of transcription 
                                                         elongation is a three step cycle: 1) forward translocation, 2) NTP binding, 3) catalysis. This may also be achieved with the Copy 
                                                         <img src="../../src/Images/transcribe.png" class="icon small"></img> function. 
                                                     </div> 
@@ -964,7 +989,7 @@ function addCitations(){
                                                             <span class="block-subsubtitle" sect="Inactivation" > Inactivation: </span>
                                                             
                                                             
-                                                            It is hypothesised that the catalytically inactive intermediate state, IS, acts as a precursor for backtracking <cite val="artsimovitch2000pausing,imashimizu2013intrinsic,saba2019elemental,maoileidigh2011unified"></cite>. The Deactivate reaction causes the
+                                                            It is hypothesised that the catalytically inactive intermediate state, IS, acts as a precursor for backtracking<cite val="artsimovitch2000pausing,imashimizu2013intrinsic,saba2019elemental,maoileidigh2011unified"></cite>. The Deactivate reaction causes the
                                                             polymerase to enter the IS from the pretranslocated state, thus enabling backtracking to occur. The Activate reaction is the reverse.
                    
                                                        </div> 
@@ -974,10 +999,10 @@ function addCitations(){
                                                         <div class="panelInner" >
                                                     <span class="block-subsubtitle" sect="Cleavage"> Cleavage: </span>
                                                     
-                                                        When a nucleic acid polymerase backtracks for too long <i>in vivo</i> it can delay the production of its product and potentially cause roadblocks for other polymerases <cite val="klumpp2008stochasticity,davis2014traffic"></cite>.
+                                                        When a nucleic acid polymerase backtracks for too long <i>in vivo</i> it can delay the production of its product and potentially cause roadblocks for other polymerases<cite val="klumpp2008stochasticity,davis2014traffic"></cite>.
                                                         Many organisms have evolved elongation factors which serve to rescue the polymerase from this state. One mechanism these factors may act is by cleaving the 3<sup>&prime;</sup> 
                                                         end of the nascent strand when it pokes out the front of the polymerase during backtracking. This is carried out by GreA and GreB for prokaryotic
-                                                        RNA polymerases and S-II for eukaryotic RNA polymerase II <cite val="toulme2000grea"></cite> and can be performed in SimPol using the cleavage reaction.
+                                                        RNA polymerases and S-II for eukaryotic RNA polymerase II<cite val="toulme2000grea"></cite> and can be performed in SimPol using the cleavage reaction.
                                                     </div> 
                                                 </div> 
                                                 
@@ -989,7 +1014,7 @@ function addCitations(){
                                                         <div class="panelInner" >
                                                     <span class="block-subsubtitle"  sect="Slippage"> Slippage: </span>
                                                     
-                                                    	During slippage, one strand in the (DNA/RNA) hybrid moves with respect to the other (ie. they <i>slip</i> along each other) <cite val="streisinger1966frameshift"></cite>.
+                                                    	During slippage, one strand in the (DNA/RNA) hybrid moves with respect to the other (ie. they <i>slip</i> along each other)<cite val="streisinger1966frameshift"></cite>.
                                                     	Slippage is a key mechanism of insertion and deletion. In SimPol, this can be initialised using the Form Bulge reaction.
                                                     When this happens, a nucleotide bulge forms within the duplex. This can occur within either the template or nascent strand (however in SimPol it can currently only occur within the nascent strand). When a bulge forms,
                                                     the active site may be opened up, allowing one of the template bases to be copied twice. This would lead to an insertion. The bulge may 
@@ -1321,7 +1346,7 @@ function addCitations(){
 																			   
 														<div class="subsubsection paramHelp" sect="Force">
 															<b style="font-size:20px">$F_{assist}$</b> - the size of the force being applied to the polymerase during a single-molecule experiment. Positive forces are assisting loads and increase
-																	the rate of transcription <cite val="abbondanzieri2005direct"></cite>. Negative forces are hindering loads and decrease the rate of transcription. In a natural cellular environment this external force
+																	the rate of transcription<cite val="abbondanzieri2005direct"></cite>. Negative forces are hindering loads and decrease the rate of transcription. In a natural cellular environment this external force
 																	is not applicable. Default: 0 pN
 														</div><br>	
                                             
@@ -1398,7 +1423,7 @@ function addCitations(){
                                                         
                                                         <div class="subsubsection paramHelp" sect="Rate of NTP binding">
                                                             <b style="font-size:20px">$k_{bind}$</b> - second order rate constant used to calculate rate constant of binding the complementary NTP, which is calculated as [NTP] k<sub>bind</sub>. 
-                                                            If binding is assumed to be an equilibrium process ($\mathbb{BE} = 1$), this parameter has no meaning and the textbox will disappear.
+                                                            If binding is assumed to be an equilibrium process  (<param value="assumeBindingEquilibrium"></param>$ = 1$), this parameter has no meaning and the textbox will disappear.
                                                                      Default: 0.5448 &mu;M<sup>-1</sup>.s<sup>-1</sup>  
                                                         </div><br>
                                                         
@@ -1441,20 +1466,59 @@ function addCitations(){
 														<div class="subsubsection paramHelp" sect="Translocation Gibbs barrier">
 															<b style="font-size:20px">$\Delta G^\dagger_{\tau}$</b> - Gibbs energy barrier of translocation. To translocate forwards or backwards, several
 															basepairs may need to be broken. The energy barrier which must be overcome in order to translocate is estimated as the energy needed to break these basepairs
-															plus the value of this parameter. Increasing this value will make translocation slower. When translocation is assumed to reach at equilibrium ($\mathbb{TE} = 1$), this parameter only
-                                                            applies to backtracking and hypertranslocation. Default: 9.079 k<sub>B</sub>T <cite val="douglas2018bayesian"></cite>
+															plus the value of this parameter. Increasing this value will make translocation slower. When translocation is assumed to reach at equilibrium  (<param value="assumeTranslocationEquilibrium"></param>$ = 1$), this parameter only
+                                                            applies to backtracking and hypertranslocation. Default: 9.079 k<sub>B</sub>T<cite val="douglas2018bayesian"></cite>
 														</div><br>	
 														
 														<div class="subsubsection paramHelp" sect="Posttranslocated Gibbs energy">
 															<b style="font-size:20px">$\Delta G_{\tau 1}$</b> - Gibbs energy term added to that of the posttranslocated state. When this value is low,
-															RNA polymerase spends more time in the posttranslocated state (compared with the pretranslocated state). Default: -2.007 k<sub>B</sub>T <cite val="douglas2018bayesian"></cite>
+															RNA polymerase spends more time in the posttranslocated state (compared with the pretranslocated state). Default: -2.007 k<sub>B</sub>T<cite val="douglas2018bayesian"></cite>
 														</div> <br>	
 														
 														<div class="subsubsection paramHelp" sect="Translocation force dependency">
 															<b style="font-size:20px">$\delta_1$</b> - position of the translocation transition state, compared with the two adjacent translocation positions. 
 															This parameter lies between 0 and the width of a single basepair in DNA (3.4 &#x212b;<cite val="watson1953molecular"></cite>). This term only applies
-															when translocation is kinetic ($\mathbb{TE} = 0$) and when an assisting force $F_{assist}$ is applied. Default: 2.838 &#x212b; <cite val="douglas2018bayesian"></cite>
+															when translocation is kinetic  (<param value="assumeTranslocationEquilibrium"></param>$ = 0$) and when an assisting force $F_{assist}$ is applied. Default: 2.838 &#x212b;<cite val="douglas2018bayesian"></cite>
 														</div><br>	
+														
+													
+												 			
+												 			
+														
+														
+														<div class="subsubsection paramHelp" sect="Translocation transition state">
+                                                            <table >
+                                                            <tr title="Select which model to use for estimating translocation free energy barrier heights">
+                                                                <td style="width:320px" >
+                                                                   <select id="TS_box" class="dropdown modelSetting" style="width:8em;">
+														 			    <option value="absoluteBarriers">Absolute barriers</option>
+														 				<option value="midpointBarriers">Midpoint barriers</option>
+														 				<optgroup label="Hybrid/bubble melting:">
+															 				<option value="HIGI_barriers">HIGI model</option>
+															 				<option value="HIGU_barriers">HIGU model</option>
+															 				<option value="HUGI_barriers">HUGI model</option>
+															 				<option value="HUGU_barriers">HUGU model</option>
+														 				</optgroup>
+																	</select>
+                                                                   
+                                                                   
+                                                                   
+                                                                    <span style="font-size:15px; vertical-align:middle" >Transition state, $\mathbb{TS}$</span>
+                                                                </td>
+                                                                <td>
+                                                                    <div style="margin-left:50px">
+                                                                        A range of models for estimating the basepairing configuration of the translocation transition state. These models have a strong effect on the sequence
+                                                                        dependent properties of the enzyme. 
+                                                                        See <a id="Kinetics_of_translocation_con" href="#Kinetics_of_translocation" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none;color:#008cba">Kinetics of translocation</a>.
+                                                                        Default: HIGI model.
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        
+                                                            </table>
+                                                        </div><br>
+														
+														
 														
 									
 												</div>
@@ -1490,10 +1554,10 @@ function addCitations(){
                                             
 														<div class="subsubsection paramHelp" sect="Rate of inactivation">
 															<b style="font-size:20px">$k_{U}$</b> - rate constant of polymerase entering the intermediate state. This state acts as a precursor for backtracking from the
-                                                            pretranslocated state. Default: 0.1s<sup>-1</sup>
+                                                            pretranslocated state. Default: 0.1 s<sup>-1</sup>
 														</div><br>
 														<div class="subsubsection paramHelp" sect="Rate of reactivation">
-															<b style="font-size:20px">$k_{A}$</b> - rate constant of polymerase entering the pretranslocated state from the intermediate state. Default: 4s<sup>-1</sup>
+															<b style="font-size:20px">$k_{A}$</b> - rate constant of polymerase entering the pretranslocated state from the intermediate state. Default: 4 s<sup>-1</sup>
 														</div><br>
                                             
                                             
@@ -1512,7 +1576,8 @@ function addCitations(){
                                                                 <td>
                                                                     <div style="margin-left:50px">
                                                                         
-                                                                        If enabled, the polymerase may backtrack. If $\mathbb{IS}$ is also enabled, then entry into the intermediate state is necessary to begin backtracking. Default: false.
+                                                                        If enabled, the polymerase may backtrack. If the intermediate state is also enabled  (<param value="allowInactivation"></param>$ = 1$), 
+                                                                        then entry into the intermediate state is necessary to begin backtracking. Default: false.
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -1572,7 +1637,7 @@ function addCitations(){
                                             
                                                             <div class="subsubsection paramHelp" sect="Fold distance">
                                                                 $\lambda_b$ - the number of RNA nucleotides upstream and downstream from the polymerase which are sterically
-                                                                prohibited from folding. Default: 8 nt <cite val="palangat1998transcriptional"></cite>
+                                                                prohibited from folding. Default: 8 nt<cite val="palangat1998transcriptional"></cite>
                                                             </div><br>  
                                             
                                             
@@ -1593,7 +1658,7 @@ function addCitations(){
                                                                         If enabled, the nascent RNA strand will fold automatically during the simulation. The predicted energy barrier 
                                                                         of unfolding secondary structures in the mRNA may need to be overcome when the polymerase translocates backwards. When the nascent strand
                                                                         is not ssRNA, this feature is not applicable. Note that enabling this option will slow down the first trial of the simulation as the
-                                                                        secondary structure of the RNA is computed (MFE algorithm <cite val="zuker1981optimal"></val></cite>) using the ViennaRNA suite <cite val="lorenz2011viennarna"></cite>. You can view the RNA secondary structure with the Fold 
+                                                                        secondary structure of the RNA is computed (MFE algorithm<cite val="zuker1981optimal"></val></cite>) using the ViennaRNA suite<cite val="lorenz2011viennarna"></cite>. You can view the RNA secondary structure with the Fold 
                                                                         <img src="../../src/Images/folding.png"  class="icon small"></img> button. Default: false <br><br>
                                                                         </div>
                                                                     </td>
@@ -1615,13 +1680,13 @@ function addCitations(){
                                                     <div class="parameter-title" style="font-size:18px">Model for cleaving the nascent strand while backtracked.</div>  <br> 
                                                        <div class="subsubsection paramHelp" sect="Rate of cleavage" id="RateCleave_ParamHelp">
                                                             <b style="font-size:20px">$k_{cleave}$</b> - rate constant of cleaving the 3<sup>&prime;</sup> end of the nascent strand when the polymerase is backtracked. 
-                                                            <i>In vivo</i> this reaction may be carried out by elongation factors, for example, GreA <cite val="toulme2000grea"></cite>. Default: 0s <sup>-1</sup>
+                                                            <i>In vivo</i> this reaction may be carried out by elongation factors, for example, GreA<cite val="toulme2000grea"></cite>. Default: 0s <sup>-1</sup>
                                                         </div><br>
                                             
                                             
                                                      <div class="subsubsection paramHelp" sect="Cleavage limit" id="RateCleave_ParamHelp">
                                                             <b style="font-size:20px">$\lambda_{cleave}$</b> - the maximum number of positions that the polymerase may backtrack by in order for cleavage to occur. 
-                                                            Set to 0 to have no upper limit. Default: 10 nt <cite val="lisica2016mechanisms"></cite>
+                                                            Set to 0 to have no upper limit. Default: 10 nt<cite val="lisica2016mechanisms"></cite>
                                                         </div><br>
                                                 </div>
                                         
@@ -1698,7 +1763,12 @@ function addCitations(){
 								<div class="about-block-inner">
 									<div class="subsection block-subtitle" > Equilibrium and the Boltzmann distribution </div> <br>
 								
-										Gibb's free energy, $\Delta G$, describes how energetically favourable a state is. A system will spend more time in states which have low free energies. 
+										The Gibbs energy $G$ describes the work that can be performed by a thermodynamic system. The
+										standard Gibbs energy of a reaction $\Delta G$ describes the change in Gibbs energy that accompanies a
+										reaction of 1 M of reactants, under standard conditions (at 25&deg;C and 100 kPa).
+								
+								
+										$\Delta G_s$ describes how energetically favourable state $s$ is. A system spends more time in states which have low Gibbs energies. 
 										Suppose we have a single molecule which can exist in a number of chemical states. When the system has reached equilibrium, the probability of the molecule being in state $s$ 
 										at any given time is estimated with a Boltzmann distribution:
 										
@@ -1709,13 +1779,14 @@ function addCitations(){
 										where $\Delta G_s$ is the Gibbs energy of state $s$, $k_B$ is Boltzmann's constant ($1.3806 \times 10^{-23}$J.K$^{-1}$), and $T$ is the temperature in Kelvins. 
 										Energy is expressed in units of $k_B T$, by taking the experimental energy (in units of J) and dividing by $k_B T$.   <br><br>
 										
-										For example, suppose a single molecule is in equilibrium between two states, $A$ and $B$. These two states have free energies of $\Delta G_A = -3k_B T$ and $\Delta G_B = -6k_B T$,
+										For example, suppose a single molecule is in equilibrium between two states, $A$ and $B$. This is expressed as $A \rightleftharpoons B$. Suppose that
+										the states have Gibbs energies of $\Delta G_A = -3\;k_B T$ and $\Delta G_B = -6\;k_B T$,
 										respectively. We would therefore expect the molecule to be in state $A$ 4.7% of the time:
 										
 										
 										<h3>
 											$$p(A) = \frac{e^{-\frac{\Delta G_A}{k_B T}}}{e^{-\frac{\Delta G_A}{k_B T}} + e^{-\frac{\Delta G_B}{k_B T}}} = 
-													 \frac{e^{-\frac{-3k_B T}{k_B T}}}{e^{-\frac{-3k_B T}{k_B T}} + e^{-\frac{-6k_B T}{k_B T}}}  = 
+													 \frac{e^{-\frac{-3\;k_B T}{k_B T}}}{e^{-\frac{-3\;k_B T}{k_B T}} + e^{-\frac{-6\;k_B T}{k_B T}}}  = 
 													 \frac{e^{3}}{e^{3} + e^{6}}  =
 													 0.047.$$
 										</h3>
@@ -1726,7 +1797,7 @@ function addCitations(){
 										The Boltzmann distribution assumes that the system has been fluctuating for long enough to achieve equilibrium. 
                                         However, since the competing processes of transcription 
                                         (see <a style="text-decoration:none; color:#008cba" href="#Reactions" onclick="minimiseSection('#States_and_Reactions_Btn', true)" style="text-decoration:none; color:black">Reactions</a>)
-										occur on similar timescales, directly applying the Boltzmann distribution is not always a good assumption. 
+										occur on similar timescales, equilibrium approximations do not always make good assumptions in this context. 
                                         
 							
 								</div>
@@ -1756,7 +1827,7 @@ function addCitations(){
 											$$ k_{s \rightarrow s^\prime} = A e^{-\frac{\Delta G^\dagger - \Delta G_s}{k_B T}}, $$
 										</h3>
 										
-										where $A$ is a pre-exponential constant (units s$^{-1}$), and $\Delta G^\dagger$ is the absolute height of the Gibbs energy barrier between states $s$ and $s^\prime$. 
+										for some pre-exponential constant (units s$^{-1}$), where $\Delta G^\dagger$ is the absolute height of the Gibbs energy barrier between states $s$ and $s^\prime$. 
 										Once the rate constants of all possible reactions are known, we can start the single-molecule simulation. 
 										
 										
@@ -1796,7 +1867,7 @@ function addCitations(){
 										        
 				                          
 											
-											The amount of time until either one of these reactions occurs is random, and exponentially distributed (see figures on the left). If we were to simulate this on a computer, we could 
+											The amount of time until either one of these reactions occurs is random, and is exponentially distributed (see figure). If we were to simulate this on a computer, we could 
 											generate two exponential random variables, one from each distribution. For example, suppose we sampled time 769.14s for Exponential(0.001) and 339.81s for Exponential(0.002). Then 
 											reaction $A \rightarrow C$ would be selected because it has the shorter reaction time. The probability of sampling reaction $A \rightarrow B$ is 
 											
@@ -1828,7 +1899,7 @@ function addCitations(){
 										Adding the next base onto the $3^\prime$ end of the nascent strand requires one translocation step 
                                         (see <a href="#Kinetics_of_translocation" onclick="minimiseSection('#Simulating_Btn', true)" style="text-decoration:none; color:#008cba">Kinetics of translocation</a>) 
                                     
-                                     and at least three chemical steps<cite val="erie1992single"></cite>: <br>
+                                     and at least three chemical steps<cite val="erie1992single"></cite>: <br><br>
 										
 										
 										
@@ -1848,7 +1919,7 @@ function addCitations(){
 										
 										Any of these steps could be reversible.
 										As there is not sufficent information to model all three steps, nucleotide incorporation has been compressed into a two step 
-										process<cite val="bai2004sequence,abbondanzieri2005direct,maoileidigh2011unified"></cite>.
+										process<cite val="bai2004sequence,abbondanzieri2005direct,maoileidigh2011unified"></cite>. <br><br>
 										
 										
 										<div style="padding: 10 10; background-color:#ebe9e7" >
@@ -1866,26 +1937,28 @@ function addCitations(){
 										 
 											<param value="RateBind"/> (units s$^{-1}$&mu;M$^{-1}$) is the second order rate constant of binding NTP.
 											The rate of binding an NTP is equal to <param value="RateBind"/> $\times$ <param value="NTPconc"/>. Once the NTP has been bound, it may be released back into solution.
-											The rate of release is calculated from the dissociation constant <param value="Kdiss"/> (units &mu;M). Rate of NTP release is equal to <param value="Kdiss"/> $\times$ <param value="RateBind"/>. 
-											<br><br>
+											The rate of release is calculated from the dissociation constant <param value="Kdiss"/> (units &mu;M). Rate of NTP release is equal to <param value="Kdiss"/> $\times$ <param value="RateBind"/>.  <br><br>
 											
 											
-											When the NTP concentration is high, or if <param value="RateBind"/> is large, then NTP binding becomes so rapid that equilibrium between these two states is achieved. Under these conditions,
-											the kinetics of NTP binding are no longer relevant. <param value="Kdiss"/> simply the ratio between the rates of binding and release, and can be 
-                                            used to calculate the proportion of time that NTP is bound. For example, if <param value="Kdiss"/> = 35&mu;M and <param value="NTPconc"/> = 1000&mu;M,
+											
+											When the NTP concentration is high, or if <param value="RateBind"/> is large, or if NTP binding is approximated as an equilibrium process (<param value="assumeBindingEquilibrium"></param>$ = 1$), then NTP binding becomes so rapid that equilibrium between these two states is achieved. Under these conditions,
+											the kinetics of NTP binding are no longer relevant. <param value="Kdiss"/> is simply the ratio between the rates of binding and release, and can be 
+                                            used to calculate the proportion of time that NTP is bound.
+                                            
+                                            For example, suppose that <param value="Kdiss"/> = 35&mu;M and <param value="NTPconc"/> = 1000&mu;M,
 											then the proportion of time that NTP is bound (while in this two-state system) is around 97%:
 											
 										
 											
 											<h3>
-												$$ p(\text{bound}) = \frac{ \frac{\text{[NTP]}}{K_D} }{\frac{\text{[NTP]}}{K_D} + 1} = \frac{ \frac{1000\text{&mu;M}}{35 \text{&mu;M}} }{\frac{1000\text{&mu;M}}{35 \text{&mu;M}} + 1} = 0.966. $$
+												$$ p(\text{bound}) = \frac{ \frac{\text{[NTP]}}{K_D} }{\frac{\text{[NTP]}}{K_D} + 1} = \frac{ \frac{1000\text{ &mu;M}}{35 \text{ &mu;M}} }{\frac{1000\text{ &mu;M}}{35 \text{ &mu;M}} + 1} = 0.966. $$
 											</h3>
 										
 											<br>
 											
 									
-                                             NTP binding/release can be approximated as an equilibrium process using <param value="assumeBindingEquilibrium"/>. 
-                                            This assumption is equivalent to setting <param value="RateBind"/> to a high value, and is much faster to simulate.
+                                            Approximating NTP binding/release as an equilibrium process (using <param value="assumeBindingEquilibrium"/>)
+                                            is equivalent to setting <param value="RateBind"/> to a high value, however is much faster to simulate.
 											
 											
 											
@@ -1899,33 +1972,51 @@ function addCitations(){
 							<br><br>
 							<div class="about-block">
 								<div class="about-block-inner">
-									<div id="translocation_ModelHelp" class="subsection block-subtitle" >Kinetics of translocation</div> <br>
+									<div id="translocation_ModelHelp" class="subsection block-subtitle">Kinetics of translocation</div> <br>
 								
                                     
-                                        Let $\Delta G_{S(L, \tau)}$ be the Gibbs energy of state $S(L, \tau)$. This term is calculated using:
+                                    	Let $\Delta G_{S}$ be the Gibbs energy of state $S$. In the context of nucleic acids, this can be approximated using nearest neighbour models<cite val="xia1998thermodynamic,wu2002temperature,santalucia1998unified"></cite>.
+                                    	The basepairing energetic contribution of a transcription state is computed by summing the Gibbs energy of the gene to that of the hybrid:
+                                    
+                                    
+                                     	<h3>
+                                            $$
+                                               \Delta G_{total}^{(bp)} = \Delta G_{gene}^{(bp)} + \Delta G_{hybrid}^{(bp)}
+                                            $$
+                                        </h3>
+                                    
+                                    
+                                        Let $\Delta G_{S(l, t)}$ be the Gibbs energy of state $S(L, t)$. This term is calculated using:
                                     
                                     
                                         <h3>
                                             $$
-                                                \Delta G_{S(L, \tau)} = \Delta G_{S(L, \tau)}^{(bp)} + \begin{cases} \Delta G_{\tau 1} &\text{ if } \tau = 1 \\ 0 &\text { if } \tau \neq 1 \end{cases}
+                                                \Delta G_{S(l, t)} = \Delta G_{S(l, t)}^{(bp)} + \begin{cases} \Delta G_{\tau 1} &\text{ if } t = 1 \text { (posttranslocated) } \\ 0 &\text { if } t \neq 1 \end{cases}
                                             $$
                                         </h3>
                                     
-                                        where $\Delta G_{S(L, \tau)}^{(bp)}$ is computed from themodynamic parameters of nucleotide basepairing<cite val="xia1998thermodynamic,wu2002temperature,santalucia1998unified"></cite>
-                                        and <param value="DGtau1"/> is the Gibbs energy added onto the posttranslocated position<cite val="douglas2018bayesian"></cite>. The basepairing energetic contribution
-                                        of a state is computed by summing the Gibbs energy of the gene to that of the hybrid:
+                                        where $\Delta G_{S(l, t)}^{(bp)}$ is computed from themodynamic parameters of nucleotide basepairing<cite val="xia1998thermodynamic,wu2002temperature,santalucia1998unified"></cite>
+                                        and <param value="DGtau1"/> is the Gibbs energy added onto the posttranslocated position<cite val="douglas2018bayesian"></cite>. <br><br>
+                                        
+                                        
+                                        If the rate of translocation is very rapid, or if translocation between the pre and posttranslocated states is approximated
+                                        as an equilibrium process (<param value="assumeTranslocationEquilibrium"/>$ = 1$), then these energetic terms describe the proportion of time
+                                        the system spends in the two states. This is described by translocation equilibrium constant $K_\tau$.
                                     
                                     
-                                    
-                                         <h3>
+                                    	<h3>
                                             $$
-                                               \Delta G_{total}^{(bp)} = \Delta G_{gene}^{(bp)} + \Delta G_{hybrid}^{(bp)}.
+                                                K_\tau = \frac{k_{S(l,1) \rightarrow S(l,0)}}{k_{S(l,0) \rightarrow S(l,1)}} = \frac{k_{bck}(S(l,1))}{k_{fwd}(S(l,0))}
                                             $$
                                         </h3>
+                                        
+                                        
+                                        
+                             
                                     
                                     
-                                    
-										Basepairs may need to be broken in order for the polymerase to translocate forwards (right) or backwards (left) from its current position. For example, consider the state below. 
+										However, in the general case, translocation is not assumed to reach equilibrium (<param value="assumeTranslocationEquilibrium"/>$ = 0$).
+										 Basepairs may need to be broken in order for the polymerase to translocate forwards (right) or backwards (left) from its current position. For example, consider the state below. 
 										<br><br>
 										<img id="breakingPairs" src="../../src/TutorialImages/basepairbreaking.png" style="width:90%; display:block;  margin: 0 auto;" ></img>
 										<br><br>
@@ -1964,37 +2055,37 @@ function addCitations(){
 										</div>
 										<br>
 										
-                                        Let $S(L,\tau)$ and $S(L,\tau+1)$ be two neighbouring states and let $T(L,\tau)$ be the translocation transition state between the two.
-                                        The Gibbs energy of this transition state is calculated as:
+                                        Let $S(l,t)$ and $S(l,t+1)$ be two neighbouring states and let $T(l,t)$ be the translocation transition state between the two.
+                                        Using transition state theory, the Gibbs energy of this transition state is calculated as:
                                     
                                     
                                          <h3>
                                             $$
-                                                \Delta G_{T(L, \tau)} = \Delta G_{T(L, \tau)}^{(bp)} + \Delta G_\tau^\dagger + \begin{cases}    \Delta G_{\tau -}^\dagger &\text{ if } \tau \leq -1 \text{ (backtracking) }\\ 
-                                                                                                                                                0 & \text { if } \tau = 0  \text{ (elongation) } \\
-                                                                                                                                                \Delta G_{\tau +}^\dagger &\text { if } \tau \geq 1  \text{ (hypertranslocation) }
+                                                \Delta G_{T(l, t)} = \Delta G_{T(l, t)}^{(bp)} + \Delta G_\tau^\dagger + \begin{cases}    \Delta G_{\tau -}^\dagger &\text{ if } t \leq -1 \text{ (backtracking) }\\ 
+                                                                                                                                                0 & \text { if } t = 0  \text{ (elongation) } \\
+                                                                                                                                                \Delta G_{\tau +}^\dagger &\text { if } t \geq 1  \text{ (hypertranslocation) }
                                                                                                                                 \end{cases}
                                             $$
                                         </h3>
                                     
                                     
-                                        where $\Delta G_{T(L, \tau)}^{(bp)}$ is the Gibbs energy of basepairing in the transition state,
+                                        where $\Delta G_{T(l, t)}^{(bp)}$ is the Gibbs energy of basepairing in the transition state,
                                         <param value="DGtaudag"/> is the Gibbs energy barrier of translocation, 
                                         <param value="DGtaudagM"/> is the Gibbs energy barrier of backtracking, and
-                                        <param value="DGtaudagP"/> is the Gibbs energy barrier of hypertranslocation. Estimating $\Delta G_{T(L, \tau)}^{(bp)}$ can be achieved through
+                                        <param value="DGtaudagP"/> is the Gibbs energy barrier of hypertranslocation. Estimating $\Delta G_{T(l, t)}^{(bp)}$ can be achieved through
                                         several methods (discussed below). After the translocation energy barrier has been estimated, the rates of translocating between
-                                        $S(L,\tau)$ and $S(L,\tau+1)$ can be calculated using the Arrhenius equation:
+                                        $S(l,t)$ and $S(l,t+1)$ can be calculated using the Arrhenius equation:
                                     
 											<h3>
 											$$
-												k_{S(L,\tau) \rightarrow S(L,\tau+1)} = k_{fwd}(S(L,\tau)) = A e^{-(\Delta G_{T(L, \tau)} - \Delta G_{S(L, \tau)})} \\
-                                                k_{S(L,\tau+1) \rightarrow S(L,\tau)} = k_{bck}(S(L,\tau+1)) = A e^{-(\Delta G_{T(L, \tau)} - \Delta G_{S(L, \tau+1)})}
+												k_{S(l,t) \rightarrow S(l,t+1)} = k_{fwd}(S(l,t)) = A e^{-(\Delta G_{T(l, t)} - \Delta G_{S(l, t)})} \\
+                                                k_{S(l,t+1) \rightarrow S(l,t)} = k_{bck}(S(l,t+1)) = A e^{-(\Delta G_{T(l, t)} - \Delta G_{S(l, t+1)})}
 											$$
 											</h3>
 										
 										
 											using pre-exponential constant $A = 10^6$ s<sup>-1</sup>.	<br><br>
-                                            SimPol has several methods for estimating $\Delta G_{T(L, \tau)}^{(bp)}$ (denoted by $\mathbb{TS}$):
+                                            SimPol has several methods for estimating $\Delta G_{T(l, t)}^{(bp)}$ (models are denoted by <param value="currentTranslocationModel"/>):
                                     
                                     
                                     
@@ -2004,11 +2095,11 @@ function addCitations(){
                                             <span class="block-subsubtitle" > i. Absolute model </span>
                                         
                                              Translocation rates are determined exclusively from the energies of the translocation states and not the transition states.
-                                            This is the most simple model, where
+                                            This is the simplest model, where
                                             
                                             <h3>
                                             $$
-                                                \Delta G_{T(L, \tau)}^{(bp)} = 0. 
+                                                \Delta G_{T(l, t)}^{(bp)} = 0. 
                                             $$
                                             </h3>
                                             
@@ -2023,11 +2114,11 @@ function addCitations(){
                                         <div class="panelInner" >
                                             <span class="block-subsubtitle" > ii. Midpoint model </span>
                                         
-                                            The Gibbs energy of basepairing of the transition state between $S(L,\tau)$ and $S(L,\tau+1)$ is calculated as 
+                                            The Gibbs energy of basepairing of the transition state between $S(l,t)$ and $S(l,t+1)$ is calculated as 
                                         
                                             <h3>
                                             $$
-                                                \Delta G_{T(L, \tau)}^{(bp)} = \frac{\Delta G_{S(L,\tau)} + \Delta G_{S(L,\tau+1)}}{2}.
+                                                \Delta G_{T(l, t)}^{(bp)} = \frac{\Delta G_{S(l,t)} + \Delta G_{S(l,t+1)}}{2}.
                                             $$
                                             </h3>
                                         
@@ -2048,25 +2139,28 @@ function addCitations(){
                                             <span class="block-subsubtitle" >  iii. Hybrid/bubble melting models </span>
                                         
                                              
-                                             Let $G$ be the set of basepairs within the gene of state $S(L, \tau)$,
-                                            and let $G^\prime$ be that of $S(L, \tau)$. Similarly, let $H$ and $H^\prime$ be the sets of basepairs within the hybrid of $S(L, \tau)$ and $S(L, \tau+1)$ respectively. 
-                                            Then, there are four ways of directly evaluating $\Delta G_{T(L, \tau)}^{(bp)}$ using thermodynamic parameters:
+                                             Let $G$ be the set of basepairs within the gene of state $S(l, t)$,
+                                            and let $G^\prime$ be that of $S(l, t+1)$. Similarly, let $H$ and $H^\prime$ be the sets of basepairs within the hybrid of $S(l, t)$ and $S(l, t+1)$ respectively. 
+                                            Then, the $H_IG_U$ model describes a transition state that is comprised of the <u>i</u>ntersection $\cap$ of the two hybrid basepairs sets, and the 
+                                            <u>u</u>nion $\cup$ of the two gene basepairs sets.
+                                            
+                                            Following this notation, there are four ways of directly evaluating $\Delta G_{T(l, t)}^{(bp)}$ using thermodynamic parameters:
                                             
                                             
                                             
                                             <h3>
                                             $$
-                                                \Delta G_{T(L, \tau)}^{(bp)} = \begin{cases} 
-                                                                                                \Delta G^{(bp)}(G \cap G^\prime, H \cap H^\prime) & \; \text{ if }  H_IG_I \text { model} \\
-                                                                                                \Delta G^{(bp)}(G \cap G^\prime, H \cup H^\prime) & \; \text{ if }  H_IG_U \text { model} \\
-                                                                                                \Delta G^{(bp)}(G \cup G^\prime, H \cap H^\prime) & \; \text{ if }  H_UG_I \text { model} \\ 
-                                                                                                \Delta G^{(bp)}(G \cup G^\prime, H \cup H^\prime) & \; \text{ if }  H_UG_U \text { model}.
+                                                \Delta G_{T(l, t)}^{(bp)} = \begin{cases} 
+                                                                                                \Delta G^{(bp)}(G \cap G^\prime, H \cap H^\prime) & \; \text{ if } \mathbb{TS} = H_IG_I \\
+                                                                                                \Delta G^{(bp)}(G \cap G^\prime, H \cup H^\prime) & \; \text{ if } \mathbb{TS} = H_IG_U \\
+                                                                                                \Delta G^{(bp)}(G \cup G^\prime, H \cap H^\prime) & \; \text{ if } \mathbb{TS} = H_UG_I \\ 
+                                                                                                \Delta G^{(bp)}(G \cup G^\prime, H \cup H^\prime) & \; \text{ if } \mathbb{TS} = H_UG_U.
                                                                                 \end{cases}
                                             $$
                                             </h3>
                                         
                                             
-                                            $\Delta G^{(bp)}(x,y)$ denotes the Gibbs energy of a state comprised of a gene containing basepairs in set $x$ and a hybrid containing basepairs in set $y$. 
+                                            Here, $\Delta G^{(bp)}(x,y)$ denotes the Gibbs energy of a state comprised of a gene containing basepairs in set $x$ and a hybrid containing basepairs in set $y$. 
                                             These four models describe physical mechanisms of translocation, each describing the ordering of basepairing melting and forming required to translocate.
  
                                 
@@ -2089,8 +2183,8 @@ function addCitations(){
                                             
                                             <h3>
                                                 $$
-                                                    k_{fwd}(S(L,\tau)) = A e^{-(\Delta G_{T(L, \tau)} - \Delta G_{S(L, \tau)} - F(\delta_1))} \\
-                                                    k_{bck}(S(L,\tau)) = A e^{-(\Delta G_{T(L, \tau-1)} - \Delta G_{S(L, \tau)} - F(\delta - \delta_1))}
+                                                    k_{fwd}(S(l,t)) = A e^{-(\Delta G_{T(l, t)} - \Delta G_{S(l, t)} - F(\delta_1))} \\
+                                                    k_{bck}(S(l,t)) = A e^{-(\Delta G_{T(l, t-1)} - \Delta G_{S(l, t)} - F(\delta - \delta_1))}
                                                 $$
                                             </h3>
                                             
@@ -2103,9 +2197,8 @@ function addCitations(){
                                                                                    
                                             
                                     <br><br>
-                                    Translocation between the pretranslocated $\tau=0$ and posttranslocated $\tau=1$ positions can alternatively be modelled with an equilibrium approximation
-                                    <param value="assumeTranslocationEquilibrium"/>. This assumption asserts that <param value="DGtaudag"/> is so small that translocation
-                                    occurs on a timescale similar to NTP binding or incorporation. 
+                                    The translocation equilibrium approximation <param value="assumeTranslocationEquilibrium"/> asserts that <param value="DGtaudag"/> is so small that translocation
+                                    between the pretranslocated ($t=0$) and posttranslocated ($t=1$) states occurs on a timescale significantly faster than other reactions eg. NTP binding and incorporation. 
 							
 								</div>
 							</div>
@@ -2279,7 +2372,7 @@ function addCitations(){
                                             
                                             <br><br>
                                             Let $f_P(j)$ describe the median time that nascent strand has length $j$, averaged across multiple simulations of the specified gene.  
-                                            SimPol treats pause site prediction as a binary classification problem. Subsequently, $\rho$ is equal to 1 minus the area under the curve (AUC) of a ROC curve <cite val="fawcett2006introduction"></cite>,
+                                            SimPol treats pause site prediction as a binary classification problem. Subsequently, $\rho$ is equal to 1 minus the area under the curve (AUC) of a ROC curve<cite val="fawcett2006introduction"></cite>,
                                             computed by comparing the known locations of pause sites with continuous function $f_P$. A single $\rho$ is computed across all pause site experimental datasets, as opposed to one per dataset as 
                                             is the case in the previous data formats.
                                             
@@ -3272,22 +3365,22 @@ function addCitations(){
 												</td>
 												
 												<td>
-													7.3 bp/s <cite val="davenport2000single"></cite> <br>
-													9.4 bp/s <cite val="neuman2003ubiquitous"></cite> <br>
-													11.7 bp/s <cite val="mejia2015trigger"></cite> <br>
-													12.8 bp/s <cite val="adelman2002single"></cite> <br>
-													15.9 bp/s <cite val="tolic2004diversity"></cite> <br>
-													20.6 bp/s <cite val="bai2007mechanochemical"></cite> <br>
-													23 bp/s <cite val="abbondanzieri2005direct"></cite>
+													7.3 bp/s<cite val="davenport2000single"></cite> <br>
+													9.4 bp/s<cite val="neuman2003ubiquitous"></cite> <br>
+													11.7 bp/s<cite val="mejia2015trigger"></cite> <br>
+													12.8 bp/s<cite val="adelman2002single"></cite> <br>
+													15.9 bp/s<cite val="tolic2004diversity"></cite> <br>
+													20.6 bp/s<cite val="bai2007mechanochemical"></cite> <br>
+													23 bp/s<cite val="abbondanzieri2005direct"></cite>
 												</td>
 												
 												<td>
-													25 bp/s <cite val="iost1992bacteriophage"></cite> <br>
-													28-89 bp/s <cite val="vogel1994rna"></cite> <br>
-													30-103 bp/s <cite val="ryals1982temperature"></cite> <br>
-													39-85 bp/s <cite val="bremer1996modulation"></cite>  <br>
+													25 bp/s<cite val="iost1992bacteriophage"></cite> <br>
+													28-89 bp/s<cite val="vogel1994rna"></cite> <br>
+													30-103 bp/s<cite val="ryals1982temperature"></cite> <br>
+													39-85 bp/s<cite val="bremer1996modulation"></cite>  <br>
 													
-													90 bp/s <cite val="richardson1996control"></cite> <br>
+													90 bp/s<cite val="richardson1996control"></cite> <br>
 													
 													
 													
@@ -3320,14 +3413,14 @@ function addCitations(){
 														
 															<td>
 																<i> FRAP </i> <br>
-																30 bp/s <cite val="boireau2007transcriptional"></cite> <br>
-																72 bp/s <cite val="darzacq2007vivo"></cite> <br><br>
+																30 bp/s<cite val="boireau2007transcriptional"></cite> <br>
+																72 bp/s<cite val="darzacq2007vivo"></cite> <br><br>
 															</td>
 															
 															<td>
 																<i> qRT-PCR </i> <br>
-																40 bp/s <cite val="tennyson1995human"></cite> <br>
-																63 bp/s <cite val="singh2009rates"></cite> <br><br>
+																40 bp/s<cite val="tennyson1995human"></cite> <br>
+																63 bp/s<cite val="singh2009rates"></cite> <br><br>
 															</td>
 															
 														</tr>
@@ -3337,7 +3430,7 @@ function addCitations(){
 														
 															<td>
 																
-																50-100 bp/s <cite val="sehgal19765"></cite> <br>
+																50-100 bp/s<cite val="sehgal19765"></cite> <br>
 															</td>
 															
 															<td>
@@ -3368,8 +3461,8 @@ function addCitations(){
 												
 												<td>
 												
-													40 bp/s <cite val="kovs2010yeast"></cite> <br>
-													60 bp/s <cite val="french2003exponentially"></cite> <br>
+													40 bp/s<cite val="kovs2010yeast"></cite> <br>
+													60 bp/s<cite val="french2003exponentially"></cite> <br>
 													
 													
 													
@@ -3386,9 +3479,9 @@ function addCitations(){
 												</td>
 												
 												<td>
-													10-20 bp/s <cite val="galburt2009single"></cite> <br>
-													17.5 bp/s <cite val="hodges2009nucleosomal"></cite> <br>
-													25 bp/s <cite val="dangkulwanich2013complete"></cite> <br>
+													10-20 bp/s<cite val="galburt2009single"></cite> <br>
+													17.5 bp/s<cite val="hodges2009nucleosomal"></cite> <br>
+													25 bp/s<cite val="dangkulwanich2013complete"></cite> <br>
 													
 													
 													
@@ -3396,7 +3489,7 @@ function addCitations(){
 												
 												<td>
 												
-													33.3 bp/s <cite val="mason2005distinction"></cite> <br>
+													33.3 bp/s<cite val="mason2005distinction"></cite> <br>
 													
 													
 													
@@ -3421,8 +3514,8 @@ function addCitations(){
 												
 												<td>
 												
-													20-25 bp/s <cite val="ucker1984early"></cite> <br>
-													22 bp/s <cite val="mejia2015trigger"></cite> <br>
+													20-25 bp/s<cite val="ucker1984early"></cite> <br>
+													22 bp/s<cite val="mejia2015trigger"></cite> <br>
 													
 													
 												</td>
@@ -3441,10 +3534,10 @@ function addCitations(){
 												
 												<td>
 												
-													18 bp/s <cite val="thummel1990spatial"></cite> <br>
-													22 bp/s <cite val="o1993rapid"></cite> <br>
-													23 bp/s <cite val="shermoen1991progression"></cite> <br>
-													25 bp/s <cite val="yao2007intranuclear"></cite> <br>
+													18 bp/s<cite val="thummel1990spatial"></cite> <br>
+													22 bp/s<cite val="o1993rapid"></cite> <br>
+													23 bp/s<cite val="shermoen1991progression"></cite> <br>
+													25 bp/s<cite val="yao2007intranuclear"></cite> <br>
 													
 													
 												</td>
@@ -3462,15 +3555,15 @@ function addCitations(){
 												</td>
 												
 												<td>
-													43 bp/s <cite val="skinner2004promoter"></cite> <br>
-													98-141 bp/s <cite val="thomen2008t7"></cite> <br>
+													43 bp/s<cite val="skinner2004promoter"></cite> <br>
+													98-141 bp/s<cite val="thomen2008t7"></cite> <br>
 													
 												</td>
 												
 												<td>
-													200 bp/s <cite val="iost1992bacteriophage"></cite> <br>
-													222 bp/s <cite val="anand2006transient"></cite> <br>
-													240 bp/s <cite val="makarova1995transcribing"></cite> <br>
+													200 bp/s<cite val="iost1992bacteriophage"></cite> <br>
+													222 bp/s<cite val="anand2006transient"></cite> <br>
+													240 bp/s<cite val="makarova1995transcribing"></cite> <br>
 													
 			
 												</td>
@@ -3488,12 +3581,12 @@ function addCitations(){
 												</td>
 												
 												<td>
-													16.7 bp/s <cite val="dulin2015elongation"></cite> <br>
+													16.7 bp/s<cite val="dulin2015elongation"></cite> <br>
 													
 												</td>
 												
 												<td>
-													20-30 bp/s <cite val="kainov2004packaging"></cite> <br>
+													20-30 bp/s<cite val="kainov2004packaging"></cite> <br>
 													
 			
 												</td>
@@ -3517,7 +3610,7 @@ function addCitations(){
 												</td>
 												
 												<td>
-													1.7 bp/s <cite val="gubbay2001sendai"></cite> <br>
+													1.7 bp/s<cite val="gubbay2001sendai"></cite> <br>
 													
 			
 												</td>
@@ -3536,7 +3629,7 @@ function addCitations(){
 												</td>
 												
 												<td>
-													3 bp/s <cite val="plumet2005dynamics"></cite> <br>
+													3 bp/s<cite val="plumet2005dynamics"></cite> <br>
 													
 			
 												</td>
@@ -3556,7 +3649,7 @@ function addCitations(){
 												</td>
 												
 												<td>
-													3.1-4.3 bp/s <cite val="iverson1981localized"></cite> <br>
+													3.1-4.3 bp/s<cite val="iverson1981localized"></cite> <br>
 													
 			
 												</td>
