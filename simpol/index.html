@@ -3280,13 +3280,12 @@ function closeNav() {
 							</span>
 	 
 						
-						<!--<input type=image id='viewModelBtn' title="View the kinetic diagram of this model" onClick="viewModel()" src="../src/Images/diagram.png" style="padding: 3 3; width:50px; height:25px; vertical-align: middle; ">-->
 					</span>
 
 						
 							<div id="navigationPanelTable" class="scrollbar" style="overflow-x:scroll; width:100%; position:relative">
 							<br>
-							<span class="button" id='viewModelBtn' onClick=viewModel() title="View the kinetic diagram of this model" style="z-index: 100; float:left;">View model diagram</span>
+							<span class="button" id='viewModelBtn' onClick=viewModel() title="View the kinetic diagram of this model" style="z-index: 100; float:right;">View model diagram</span>
 							<table  cellspacing="0" style="width:100%;">
 
 
@@ -3906,7 +3905,7 @@ function closeNav() {
 					
 					<div id="ModelBuildingTableDIV"  class="scrollbar" style="display:none; overflow-x:scroll; width:100%; position:relative">
 					
-						<label style="cursor:pointer; vertical-align:top"  title = "Check to sample the model from the list of models below. Each model will be sampled with probability proportional to its weight."> 
+						<label style="cursor:pointer; vertical-align:top; float:right"  title = "Check to sample the model from the list of models below. Each model will be sampled with probability proportional to its weight."> 
 							<input class="variable "  type="checkbox" onChange="userChangeModelSampling_controller()" style="cursor:pointer;" id="sampleModelsChk">Sample models</input> 
 						</label> 
 
