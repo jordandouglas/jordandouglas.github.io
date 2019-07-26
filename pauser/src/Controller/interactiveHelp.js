@@ -121,43 +121,24 @@ function begin_biophys4(){
 
 function addTutorialTemplate(tutorialName, tutorialSubtitle, tutorialMessage, tutorialFootnote){
 
+    closeDialogs();
+	openDialog();
+	
+	
+	var popupHTML = getDialogTemplate(tutorialName, tutorialSubtitle, "800px");
+		
+		
+	$(popupHTML).appendTo('body');
+	
+    var innerHTML = getTutorialDialogTemplate();
+    innerHTML = innerHTML.replace("XX_tutmessage_XX", tutorialMessage);
+    innerHTML = innerHTML.replace("XX_tutfootnote_XX", tutorialFootnote);
     
-    $("#main").css("opacity", 0.5);
-    $("#mySidenav").css("opacity", 0.5);
+    $("#dialogBody").html(innerHTML);
     
-    var popupHTML = getTutorialDialogTemplate();
-    popupHTML = popupHTML.replace("XX_tutname_XX", tutorialName);
-    popupHTML = popupHTML.replace("XX_tutorialSubtitle_XX", tutorialSubtitle);
-    popupHTML = popupHTML.replace("XX_tutmessage_XX", tutorialMessage);
-    popupHTML = popupHTML.replace("XX_tutfootnote_XX", tutorialFootnote);
-    
-    $(popupHTML).appendTo('body');
-    
-    window.setTimeout(function(){
-        
-        $("#main").click(function(){
-            closeTutorialDialog();
-        });
-        
-        $("#mySidenav").click(function(){
-            closeTutorialDialog();
-        });
-        
-    }, 50);
-
 
 }
 
-
-function closeTutorialDialog(){
-    
-    $("#mySidenav").unbind('click');
-    $("#main").unbind('click');
-    $("#tutorialDialog").remove();
-    $("#main").css("opacity", 1);
-    $("#mySidenav").css("opacity", 1);
-    
-}
 
 
 function getTutorialDialogTemplate(){
@@ -165,32 +146,107 @@ function getTutorialDialogTemplate(){
 
 
     return `
-        <div id='tutorialDialog' style='background-color:A5CF19; padding: 10 10; position:fixed; width: 36vw; left:32vw; top:10vh; z-index:5' plotNum="XX_plotNum_XX">
-            <div style='background-color: white; padding: 15 15; text-align:left; font-size:15;  overflow-y:auto'>
-                <b style='font-size: 22px'> XX_tutname_XX </b>
-                <span class="blueDarkblueCloseBtn" title="Close" style="right: 15px; top: 4px;" onclick='closeTutorialDialog()'>&times;</span>
-                <div style='padding-top: 10px; font-size:18px;'> XX_tutorialSubtitle_XX </div>
-                
-                
-                <div style='padding:20; font-size:14px'>
+    
+    		<div style="text-align:left">
+                <div style='padding:20; font-size:16px'>
                     XX_tutmessage_XX
                 </div>
                 
                 
-                <span style='vertical-align:bottom; padding-left:20; padding-right:20; font-size:12px'>
-                    XX_tutfootnote_XX
+                <span style='vertical-align:bottom; padding-left:20; padding-right:20; font-size:14px'>
+                    XX_tutfootnote_XX 
                 </span>
                 
 
                 <span style="float:right">
-                    <input type=button class="operation" onClick="closeTutorialDialog()" value='OK' title="OK" style="width:60px;"></input>
+                	<span class="mobile-display">(This page is best suited for landscape mode)</span>
+                    <input type=button class="button" onClick="closeDialogs()" value='OK' title="OK" style="width:60px;"></input>
                 </span>
             </div>
-        </div>
+
     `;
 
 
+}
+
+
+function openDialog(){
+
+
+	$("#main").css("opacity", 0.5);
+	$("#mySidenav").css("opacity", 0.5);
+
+	window.setTimeout(function(){
+		
+	
+		
+		$(".dialog_inner").click(function(event){
+			console.log("THE PROPAGATION HAS BEEN SEVERED");
+			event.stopPropagation();
+		});
+		
+		$("body").click(function(){
+			closeDialogs();
+		});
+		
+
+		
+	}, 50);
+	
+}
+
+
+function closeDialogs(){
+
+	
+	$("body").unbind('click');
+	$(".dialog_inner").unbind('click');
+	$(".dialog_cont").remove();
+	$("#main").css("opacity", 1);
+	$("#mySidenav").css("opacity", 1);
+	
+	
+}
+
+
+
+
+function getDialogTemplate(header, subtitle = "", width = "1000px"){
+
+
+	if (IS_MOBILE) width = "90%";
+
+	return `
+		<div class="dialog_cont pauser">
+			<div class="dialog_outer pauser" style='width:` + width + `;'>
+				<div class="dialog_inner pauser">
+					<span style='font-size: 26px'>` + header + `</span>
+					<span class="blueDarkblueCloseBtn pauser" title="Close" onclick='closeDialogs()'>&times;</span>
+					<div style='padding:2; font-size:18px;'>` + subtitle + `</div>
+	
+					<div id="dialogBody">
+					
+					 	 <table  id="dialogLoader" title="Loading...">
+	                        <tr>
+	                            <td>
+	                                <div class="loader"></div> 
+	                            </td>
+	                            <td>
+	                                Loading...
+	                            </td>
+	                        </tr>
+	                    </table>
+						
+					</div>
+					
+	
+				</div>
+			</div>
+		</div>
+	`;
 
 
 
 }
+
+

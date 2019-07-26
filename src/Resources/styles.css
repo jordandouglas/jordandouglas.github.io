@@ -606,6 +606,10 @@ div.vertical{
 	right: 5px;
 }
 
+.blueCloseBtn.pauser{
+	color:#a5cf19; 
+}
+
 
 .blueDarkblueCloseBtn:hover{
     color: #708090;
@@ -1360,6 +1364,10 @@ input:checked + .slider:before {
 	margin:auto;
 	border-radius: 5px;
 	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.dialog_outer.pauser{
+	background-color:#a5cf19; 
 }
 
 
