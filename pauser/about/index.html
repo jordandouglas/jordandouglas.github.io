@@ -4,7 +4,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=0.41, maximum-scale=1" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rel="stylesheet" type="text/css" href="../../src/Resources/phylo.css">
+<link rel="stylesheet" type="text/css" href="../../src/Resources/styles.css">
 <script language='JavaScript' type='text/JavaScript' src="../../src/Resources/jquery-3.1.1.min.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="../../src/Resources/bibliography.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="../src/Controller/freeEnergy.js"></script>
@@ -132,7 +132,7 @@ $(window).on('hashchange', function() {
             
             
             
-             
+              
 function printContents(){
 
             
@@ -170,22 +170,24 @@ function printContents(){
             sectNum++;
             
             
-            $("#contents").append("<div class='contents_sect'>" + sectNum + " " + a_tag + "</div>");
+            $("#contents").append("<div class='contents_sect pauser'>" + sectNum + " " + a_tag + "</div>");
                         
             
-            ele.before(`<span id='` + id + `_Btn' class='minimise' style="font-size:30px; padding: 5 5" disp="true"  onClick="` + onclick + `">&plus;</span>`);
+            ele.prepend(`<span id='` + id + `_Btn' class='minimise pauser' disp="true"  onClick="` + onclick + `">&plus;</span>`);
             ele.parent().next("div").attr("id", id + "_div");
             
             subsectNum = 0;
             subsubsectNum = 0;
+            
+            
         }else if (isSubsect){
             subsectNum++;
-            $("#contents").append("<div  class='contents_subsect'>&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + " " + a_tag + "</div>");
+            $("#contents").append("<div class='contents_subsect pauser'>&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + " " + a_tag + "</div>");
             subsubsectNum = 0;
         }
         else {
             subsubsectNum++;
-            $("#contents").append("<div class='contents_subsubsect'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + "." + subsubsectNum + " " + a_tag + "</div>");
+            $("#contents").append("<div style='display:none' class='contents_subsubsect pauser'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + sectNum + "." + subsectNum + "." + subsubsectNum + " " + a_tag + "</div>");
         }
         
         
@@ -195,8 +197,7 @@ function printContents(){
 
 
 
-}
-            
+}     
 
 
 function addCitations(){
@@ -204,9 +205,9 @@ function addCitations(){
 
 
 	var DOIspanTemplate = `
-		<span style="background-color:#ebe9e7; padding: 2 4" title="DOItitle">
-			<b style="color:#A5CF19">DOI:</b>
-			<a style="text-decoration:none; color:#A5CF19" href = "DOIhref">view</a>
+		<span class="DOIview pauser" title="DOItitle">
+			<b>DOI:</b>
+			<a href = "DOIhref">view</a>
 		</span>
 		
 	
@@ -219,7 +220,11 @@ function addCitations(){
 		var vals = $(citationTags[i]).attr("val").split(",");
 		if (vals.length == 0) continue;
 		
-		var citationHTML = "<sup class='refLink'>(";
+		
+		
+		var citations = [];
+		
+		var citationHTML = "<sup class='refLink pauser'>(";
 		
 		for (var j = 0; j < vals.length; j ++){
 		
@@ -241,13 +246,29 @@ function addCitations(){
 
 			}
 			
-			citationHTML +=  `<a onclick="openReferences();" class='refLink'  href="#` + val + `">` + referenceNumbers[val] + `</a>`;
-			if (j < vals.length-1) citationHTML += ",";
+			
+			citations.push({num: referenceNumbers[val], html: `<a onclick="openReferences();" class='refLink pauser'  href="#` + val + `">` + referenceNumbers[val] + `</a>`});
+			//referenceHTMLs.push();
+			
+			
 			
 		}
 		
 		
+		
+		// Sort the citations by number
+		citations.sort(function(a, b) {
+			return a.num - b.num;
+		});
+		
+		
+		
+		var referenceHTMLs = [];
+		for (var j = 0; j < citations.length; j ++) referenceHTMLs.push(citations[j].html)
+		
+	
 		// Create the link to the reference
+		citationHTML +=  referenceHTMLs.join(",");
 		citationHTML += ")</sup>";
 		$(citationTags[i]).append(citationHTML);
 		
@@ -258,6 +279,7 @@ function addCitations(){
 
 
 };
+
 
 
 
@@ -307,12 +329,12 @@ function addCitations(){
 
 
                               <a href="../../" style="text-decoration:none; color:white; ">
-                                    <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#A5CF19; padding: 8 8;" title="Go back home">Home</span> 
+                                    <span class="button pauser"  title="Go back home">Home</span> 
                               </a>&nbsp;
                               <a href="../" style="text-decoration:none; color:white; ">
-                                <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#A5CF19; padding: 8 8; color:white" title="Launch Pauser">Pauser</span> 
+                                <span class="button pauser" title="Launch Pauser">Pauser</span> 
                                </a>&nbsp;
-                                    <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#0B522D; padding: 8 8;  color:white; " title="Introductory tutorials and other information about Pauser">About</span>
+                                    <span class="button selected pauser" title="Introductory tutorials and other information about Pauser">About</span>
                          
                                     
                             </td>
@@ -332,7 +354,7 @@ function addCitations(){
 				<br>
 				<div class="about-block" style="width:70%; margin:auto">
 					<div class="about-block-inner">
-						<div class="block-subtitle" style="font-size:45px"> Prediction of transcriptional pause sites </div> <br>
+						<div class="block-subtitle pauser" style="font-size:45px"> Prediction of transcriptional pause sites </div> <br>
 					
 						<b>Disclaimer:</b> Pauser is currently in prerelease. It has not been peer-reviewed or published. <br><br>
                             
@@ -350,7 +372,7 @@ function addCitations(){
                             
                        
                             
-                        The two predictors - <span style="color:#008cba">SimPol</span> and a <span style="color:#FFA500">Naive Bayes classifier</span> - were trained on the <i>E. coli</i> RNAP using published data<cite val="larson2014pause"></cite>.
+                        The two predictors - <span style="color:#A5CF19">SimPol</span> and a <span style="color:#FFA500">Naive Bayes classifier</span> - were trained on the <i>E. coli</i> RNAP using published data<cite val="larson2014pause"></cite>.
                         
                             
                             
@@ -366,7 +388,7 @@ function addCitations(){
                 <br>
                 <div class="about-block" style="width:70%; margin:auto">
                     <div class="about-block-inner">
-                        <div class="block-subtitle" style="font-size:45px">Contents</div> <br>
+                        <div class="block-subtitle pauser" style="font-size:45px">Contents</div> <br>
                     
                             
                             
@@ -375,7 +397,7 @@ function addCitations(){
                                 <table  id="contentsLoader" title="Loading...">
                                 <tr>
                                     <td>
-                                        <div class="loader"></div> 
+                                        <div class="loader pauser"></div> 
                                     </td>
                                     <td>
                                         Loading...
@@ -394,8 +416,8 @@ function addCitations(){
                 <br><br><br><br>
                 <div class="main-block">
                     <div class="main-block-inner">
-                        <div class="block-title"> 
-                                <span class="section">Getting started</span>
+                        <div class="block-title pauser"> 
+                                <div class="section">Getting started</div>
                             </div> 
                             <div style="display:none">          
                                 <div class="about-block" style="width:90%; margin:auto">
@@ -405,7 +427,7 @@ function addCitations(){
                                                     
                                         <div class="about-block">
                                             <div class="about-block-inner">
-                                                <div id="sequenceSelection" class="subsection block-subtitle">Information icons</div> <br>
+                                                <div id="sequenceSelection" class="subsection block-subtitle pauser">Information icons</div> <br>
                                                 
                                                 
                                                     Help icons <img title="Help" src="../../src/Images/help.png" style="vertical-align:middle; width:25px; height:25px;"> are scattered throughout the interface of Pauser. Pressing one of these buttons will redirect to
@@ -420,7 +442,7 @@ function addCitations(){
                                        
                                         <div class="about-block">
                                             <div class="about-block-inner">
-                                                <div class="subsection block-subtitle">Uploading nucleotide sequences</div>  <br>
+                                                <div class="subsection block-subtitle pauser">Uploading nucleotide sequences</div>  <br>
                                                     
                                                 
                                                     One or more nucleotide sequences must be uploaded to begin Pauser, in .fasta format. Ensure that the sequences are positive sense and are specified $5^\prime \rightarrow 3^\prime$.
@@ -450,16 +472,20 @@ function addCitations(){
                                        
                                         <div class="about-block">
                                             <div class="about-block-inner">
-                                                <div class="subsection block-subtitle">Uploading a SimPol session</div>  <br>
+                                                <div class="subsection block-subtitle pauser">Uploading a SimPol session</div>  <br>
                                                     
                                                 
                                                     Optionally, a session file may be generated using SimPol and uploaded to Pauser, in .xml format. This will determine the kinetic model to use for
                                                     predicting pause sites. The session file specifies the parameters and model settings, including their prior distributions, and the number of simulations
-                                                    to perform per sequence. The default XML file can be viewed <a href="../pauser.xml" class="xml_link">here</a> and session files can be generated at 
-                                                    <a style="color:#A5CF19" href="http://www.polymerase.nz/simpol">www.polymerase.nz/simpol</a>.
+                                                    to perform per sequence. The default XML file can be viewed below
+                                                     and session files can be generated at 
+                                                    <a style="color:#0B522D" href="http://www.polymerase.nz/simpol">www.polymerase.nz/simpol</a>. <br><br>
                                                     
                                                     
-                                                   
+                                                    <span class="xml_link pauser" style="text-align:center">
+			                                               <b>Default session:</b> 
+			                                               <a  href="../pauser.xml">view XML</a>
+			                                        </span> 
                                                     
             
                                             </div>
@@ -484,8 +510,8 @@ function addCitations(){
                 <br><br><br><br>
                 <div class="main-block">
                     <div class="main-block-inner">
-                        <div class="block-title"> 
-                                <span class="section">Prediction of transcriptional pause sites</span>
+                        <div class="block-title pauser"> 
+                                <div class="section">Prediction of transcriptional pause sites</div>
                             </div> 
                             <div style="display:none">          
                                 <div class="about-block" style="width:90%; margin:auto">
@@ -508,13 +534,13 @@ function addCitations(){
                                                     
                                         <div class="about-block">
                                             <div class="about-block-inner">
-                                                <div id="sequenceSelection" class="subsection block-subtitle">Classifiers</div> <br>
+                                                <div id="sequenceSelection" class="subsection block-subtitle pauser">Classifiers</div> <br>
                                                 
                                                 
                                                    
-                                                    <div class="panelOuter">
+                                                    <div class="panelOuter smallgap">
                                                         <div class="panelInner" >
-                                                            <span class="subsubsection block-subsubtitle" sect="SimPol">SimPol</span> <br><br>
+                                                            <span class="subsubsection block-subsubtitle pauser" sect="SimPol">SimPol</span> <br><br>
                                                     
                                                                 SimPol is a framework for developing kinetic models of transcription elongation. These models are physically
                                                                 informed by the thermodynamics of nucleic acids<cite val="wu2002temperature,xia1998thermodynamic,santalucia1998unified"></cite>.
@@ -533,9 +559,9 @@ function addCitations(){
                                             
                                             
                                             
-                                                <div class="panelOuter">
+                                                <div class="panelOuter smallgap">
                                                         <div class="panelInner" >
-                                                            <span class="subsubsection block-subsubtitle" sect="Naive Bayes">Naive Bayes</span><br><br>
+                                                            <span class="subsubsection block-subsubtitle pauser" sect="Naive Bayes">Naive Bayes</span><br><br>
                                                     
                                                                             
                                                                 A Naive Bayes classifier (NBC) is a simple statistical technique and is a sequence-based model. All nucleotides within a window of size $w_1 + w_2$ around
@@ -572,7 +598,7 @@ function addCitations(){
                                     
                                         <div class="about-block">
                                             <div class="about-block-inner">
-                                                <div id="sequenceSelection" class="subsection block-subtitle">Evaluating classifier adequacy</div> <br>
+                                                <div id="sequenceSelection" class="subsection block-subtitle pauser">Evaluating classifier adequacy</div> <br>
                                                 
                                                     If the locations of pause sites are already known (see
                                                         <a href="#Uploading_nucleotide_sequences" onclick="minimiseSection('#Getting_started_Btn', true)" style="text-decoration:none; color:#A5CF19">Uploading nucleotide sequences</a>
@@ -604,7 +630,7 @@ function addCitations(){
                                     
                                      <div class="about-block">
                                             <div class="about-block-inner">
-                                                <div id="sequenceSelection" class="subsection block-subtitle">ROC curve</div> <br>
+                                                <div id="sequenceSelection" class="subsection block-subtitle pauser">ROC curve</div> <br>
                                                 
                                                     If the locations of pause sites are already known, then a ROC curve will be constructed. A ROC analysis accounts for all possible evidence thresholds
                                                     of a classifier and explores true and false positive rates simultaneously. The total adequacy of a classifier can be summarised by integrating the area
@@ -633,8 +659,8 @@ function addCitations(){
                 <br><br><br><br>
                 <div class="main-block">
                     <div class="main-block-inner">
-                        <div class="block-title"> 
-                                <span class="section">Software information</span>
+                        <div class="block-title pauser"> 
+                                <div class="section">Software information</div>
                             </div> 
                             <div style="display:none">          
                                 <div class="about-block" style="width:90%; margin:auto">
@@ -644,7 +670,7 @@ function addCitations(){
                                                     
                                         <div class="about-block">
                                             <div class="about-block-inner">
-                                                <div id="sequenceSelection" class="subsection block-subtitle">Running Pauser from the command line</div> <br>
+                                                <div id="sequenceSelection" class="subsection block-subtitle pauser">Running Pauser from the command line</div> <br>
                                                 
                                                 
                                                     
@@ -723,10 +749,10 @@ function addCitations(){
                 <br><br><br><br>
                 <div class="main-block">
                     <div class="main-block-inner">
-                        <div class="block-title"> 
+                        <div class="block-title pauser"> 
                         
                         
-                                <span class="section">References</span>
+                                <div class="section">References</div>
                             </div> 
                                 <div style="display:none">
                                     <br><br>

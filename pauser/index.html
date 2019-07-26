@@ -29,7 +29,7 @@
 <!--<link rel="icon" href="../src/Images/transcribe.png">-->
 <meta name="viewport" content="width=device-width, initial-scale=0.41, maximum-scale=1" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rel="stylesheet" type="text/css" href="../src/Resources/phylo.css">
+<link rel="stylesheet" type="text/css" href="../src/Resources/styles.css">
 <script language='JavaScript' type='text/JavaScript' src="../src/Resources/mersenne-twister.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="../src/Resources/jsPhyloSVG/raphael-min.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="../src/Resources/jsPhyloSVG/jsphylosvg-min.js"></script>
@@ -41,7 +41,7 @@
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/NBC.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/WebWorkerMessager.js"></script>
 <script language='JavaScript' type="text/javascript" src ="https://rawgit.com/eligrey/canvas-toBlob.js/master/canvas-toBlob.js"></script>
-<script language='JavaScript' type="text/javascript" src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.js"></script>
+<script language='JavaScript' type="text/javascript" src="http://cdn.jsdelivr.net/g/filesaver.js"></script>
 
 
 <script type="text/x-mathjax-config">
@@ -204,7 +204,7 @@ function getLoaderTemplate(id, msg = ""){
 		<table  id="` + id + `" title="Loading...">
 			<tr>
 				<td>
-					<div class="loader"></div> 
+					<div class="loader pauser"></div> 
 				</td>
 				<td>
 					` + msg + `
@@ -265,13 +265,13 @@ function getLoaderTemplate(id, msg = ""){
 
 
 
-                              <a href="../../"  target="_blank" style="text-decoration:none; color:white; ">
-                                    <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#A5CF19; padding: 8 8;" title="Go back home">Home</span> 
+                              <a href="../"  target="_blank" style="text-decoration:none; color:white; ">
+                                    <span class="button pauser" title="Go back home">Home</span> 
                               </a>&nbsp;
-                                <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#0B522D; padding: 8 8; color:white" title="Launch Pauser">Pauser</span> 
+                                <span class="button selected pauser" title="Launch Pauser">Pauser</span> 
                               &nbsp;
                              <a href="about/"  target="_blank" style="text-decoration:none; color:white; ">
-                                    <span class="noselect" style="padding:5 5; font-size: 18px; background-color:#A5CF19; padding: 8 8;  color:white; " title="Introductory tutorials and other information about Pauser">About</span>
+                                    <span class="button pauser" title="Introductory tutorials and other information about Pauser">About</span>
                                 </a>    
                          
                                     
@@ -298,7 +298,7 @@ function getLoaderTemplate(id, msg = ""){
 				<div class="panelInner">
 
 					<span class="noselect"  style="font-size:18px; ">
-						<input type=button id='importSettingsBtn' class='minimise' value='-' onClick="minimiseSection(this)">
+						<input type=button id='importSettingsBtn' class='minimise pauser' value='-' onClick="minimiseSection(this)">
 						<b style="color:#0B522D">Import files</b>
 						&nbsp;&nbsp;&nbsp;
 
@@ -312,7 +312,7 @@ function getLoaderTemplate(id, msg = ""){
                                         <a href="about/#Uploading_nucleotide_sequences" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
 									<span class="uploadAlignmentFirst greenTick" style="display:none" title="Successful upload"> &#10004; </span>
                          
-									<input type=button id='uploadAlignmentBtn' onClick=uploadAlignment() value='Select file' title=".fasta" class="button" style="z-index: 100; float:right; width:100px"> 
+									<input type=button id='uploadAlignmentBtn' onClick=uploadAlignment() value='Select file' title=".fasta" class="button pauser" style="z-index: 100; float:right;"> 
 									<input style="display:none" type="file" id="uploadAlignment" accept=".fasta"> 
 
 								<br><br></div>
@@ -335,7 +335,7 @@ function getLoaderTemplate(id, msg = ""){
 									<span class="uploadSessionFirst greenTick" style="display:none" title="Successful upload"> &#10004; </span>
                                          <a href="about/#Uploading_a_SimPol_session" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
                                 
-                                    <input type=button id='uploadSessionBtn' onClick=uploadSession() value='Select file' title=".xml" class="button" style="z-index: 100; float:right; width:100px"> 
+                                    <input type=button id='uploadSessionBtn' onClick=uploadSession() value='Select file' title=".xml" class="button pauser" style="z-index: 100; float:right;"> 
                                     <input style="display:none" type="file" id="uploadSession" accept=".xml"> 
 
                                 <br><br></div>
@@ -372,12 +372,12 @@ function getLoaderTemplate(id, msg = ""){
 				<div class="panelInner">
 
 					<span class="noselect"  style="font-size:18px; ">
-						<input type=button id='conservationSectionBtn' class='minimise' value='-' onClick="minimiseSection(this)">
+						<input type=button id='conservationSectionBtn' class='minimise pauser' value='-' onClick="minimiseSection(this)">
 						<b style="color:#0B522D">Prediction of transcriptional pause sites </b>
 						&nbsp;&nbsp;&nbsp;
                          <span class="finishPauserFirst" style="display:none; cursor:pointer;" onclick="downloadClassifications();" title="Download the full pause site prediction results."> <img src="../src/Images/downloadGreen.png" style="vertical-align:middle; padding:5 0; width:30px;"> </span>
                                 
-                         <input class="uploadAlignmentFirst operation" type=button id='beginPauser' onClick="beginPauser(false);" value=" Begin Pauser" title="Predict the locations of pause sites in each sequence." style="z-index: 100; float:right; width:160px; display:none"> 
+                         <input class="uploadAlignmentFirst button pauser" type=button id='beginPauser' onClick="beginPauser(false);" value=" Begin Pauser" title="Predict the locations of pause sites in each sequence." style="z-index: 100; float:right; display:none"> 
 
                          <br><br>
 						<div id="conservationSection" style="padding: 20 20">
@@ -596,7 +596,7 @@ function getLoaderTemplate(id, msg = ""){
                                                         
                                                  <b style="color:#0B522D">ROC curve</b> 
                                                  <a href="about/#ROC_curve" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
-                                                 <span style="cursor:pointer;" onclick="downloadROC();" title="Download the plot (.png)."> <img src="../src/Images/downloadGreen.png" style="vertical-align:middle; padding:5 0; width:30px;"> </span>
+                                                 <span style="cursor:pointer;" onclick="downloadROC();" title="Download the plot (.png)."> <img src="../src/Images/downloadGreen.png" class="icon small"> </span>
                                                  <br><br>
                                                         
                                                  <canvas id="ROC_curve_canvas" width="0" height="0"></canvas>      
