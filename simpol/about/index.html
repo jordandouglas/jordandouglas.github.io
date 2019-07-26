@@ -113,12 +113,18 @@ function init(){
     		$(window.location.hash).addClass("helpSelected");
     		
     		
-    		// Add back the anchor to ensure that the page is in the right place. If the webpage takes too long to load and
-    		// the anchored section is hidden, then the page won't anchor
-    		var hash = window.location.hash;
-    		window.location.hash = hash;
-    		window.location.hash = window.location.hash;
-
+    		setTimeout(function(){
+    		
+    			// Add back the anchor to ensure that the page is in the right place. If the webpage takes too long to load and
+	    		// the anchored section is hidden, then the page won't anchor
+	    		var hash = window.location.hash;
+	    		window.location.hash = hash;
+	    		window.location.hash = window.location.hash;
+    		
+		    
+			}, 500);
+    		
+    	
 
     	}
             
@@ -1591,6 +1597,32 @@ function addCitations(){
                                                             basepairs may need to be broken. The energy barrier which must be overcome in order to backtrack is estimated as the energy needed to break these basepairs
                                                             plus $\Delta G_\tau^\dagger$ plus the value of this parameter. Increasing this value will make backtracking slower. Default: 0 k<sub>B</sub>T 
                                                         </div><br>  
+                                            
+                                            			
+														<div class="subsubsection paramHelp" sect="Gating tyrosine">
+                                                            <table >
+                                                            <tr title="SSelect which model to use for backtracking">
+                                                                <td style="width:320px" >
+                                                                   <select class="dropdown modelSetting" style="width:10em;">
+														 			   <option value="backstep0">0 &rightarrow; -1 barrier </option>
+																		<option value="backstep1">-1 &rightarrow; -2 barrier </option>
+																	</select>
+                                                                   
+                                                                   
+                                                                   
+                                                                    <span style="font-size:15px; vertical-align:middle" >Gating tyrosine, $\mathbb{GT}$</span>
+                                                                </td>
+                                                                <td>
+                                                                    <div style="margin-left:50px">
+                                                                        If this setting is enabled (-1 &rightarrow; -2 barrier), fast translocation between $S(l,0)$ and $S(l,-1)$ is permitted. 
+                                                                        Default: 0 &rightarrow; -1 barrier 
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        
+                                                            </table>
+                                                        </div><br>
+                                            
                                             
                                             
                                             
