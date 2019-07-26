@@ -606,9 +606,7 @@ div.vertical{
 	right: 5px;
 }
 
-.blueCloseBtn.pauser{
-	color:#a5cf19; 
-}
+
 
 
 .blueDarkblueCloseBtn:hover{
@@ -621,6 +619,10 @@ div.vertical{
 	vertical-align:top;
 	cursor:pointer;
 	float:right;
+}
+
+.blueDarkblueCloseBtn.pauser{
+	color:#a5cf19; 
 }
 
 #main {
