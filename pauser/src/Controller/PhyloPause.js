@@ -178,6 +178,8 @@ function downloadROC(){
 function plotROC(canvasID = "ROC_curve_canvas", canvasSizeMultiplier = 1, resolve = function() { }){
 
     if (!$("#ROC_curve_cont").is(":visible")) return;
+    
+    if (IS_MOBILE && canvasSizeMultiplier == 1) canvasSizeMultiplier = 2;
 
     getROCanalysis_controller(function(result) {
     
@@ -218,8 +220,8 @@ function ROC_plot(values, range, id, canvasSizeMultiplier = 1, xlab = "Variable 
     if (canvas == null) return;
     
 
-    canvas.width = IS_MOBILE ? 800 * (canvasSizeMultiplier) : 400 * canvasSizeMultiplier;
-    canvas.height =IS_MOBILE ? 800 * (canvasSizeMultiplier) : 400 * canvasSizeMultiplier;
+    canvas.width = 400 * canvasSizeMultiplier;
+    canvas.height = 400 * canvasSizeMultiplier;
     
     
     

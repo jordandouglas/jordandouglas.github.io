@@ -1392,8 +1392,11 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, burnin
             // Start the exponential decay curve
             ctx.globalAlpha = 0.7;
             ctx.strokeStyle = "black";
-            ctx.fillStyle = "#d3d3d3"; //#d3d3d3
-            ctx.beginPath();
+            
+           
+            //ctx.fillStyle = "#d3d3d3"; //#d3d3d3
+            ctx.strokeStyle = "#d3d3d3";
+         	ctx.beginPath();
             ctx.moveTo(axisGap, canvas.height - axisGap);
             
             
@@ -1402,6 +1405,7 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, burnin
 			var pixelX = axisGap
 			for (pixelX = axisGap; pixelX <= canvas.width - outerMargin; pixelX++){
 				var trueX = (pixelX - axisGap) / widthScale + range[0];
+				
                 
 				if (!converged){
 					var trueY = Math.max(epsilon.e0 * Math.pow(epsilon.gamma, trueX), epsilon.emin);
@@ -1421,22 +1425,28 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, burnin
 			}
             
             
-            ctx.lineTo(canvas.width - outerMargin, canvas.height - axisGap);
+            //ctx.lineTo(canvas.width - outerMargin, canvas.height - axisGap);
             ctx.stroke();
             //ctx.fill();
-            ctx.closePath();
+            //ctx.closePath();
             
+            
+            
+	            		
+			// Plot "epsilon" at the right side
+			ctx.fillStyle = "#b20000";
+			ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+			ctx.textAlign="right"; 
+			ctx.textBaseline="bottom"; 
+			var trueX = (pixelX - axisGap) / widthScale + range[0];
+			var trueY = Math.max(epsilon.e0 * Math.pow(epsilon.gamma, trueX), epsilon.emin);
+			var pixelY = plotHeight - heightScale * (trueY - range[2]) + outerMargin; // - 5*canvasSizeMultiplier;
+			ctx.fillText("\u03B5", pixelX, pixelY);
+	            
 		}
 		
-		
-		// Plot "epsilon" at the right side
-		ctx.font = 20 * canvasSizeMultiplier + "px Arial";
-		ctx.textAlign="right"; 
-		ctx.textBaseline="top"; 
-		ctx.fillText("\u03B5", pixelX, canvas.height - heightScale * (epsilon.emin - range[2]) - axisGap);
-		
 
-       
+		
 
 
 		// Burnin line in grey, main line in col
