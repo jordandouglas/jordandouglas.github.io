@@ -1175,26 +1175,6 @@ function plot_MCMC_trace(){
 		if (xVals == null) xVals = [];
 		if (yVals == null) yVals = [];
 
-		/*
-		for (var postNum = 0; postNum < PLOT_DATA["whichPlotInWhichCanvas"][pltNum].xData.length; postNum++){
-
-
-			// Get the sample number
-			var trialNum = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].xData.vals;
-			xVals.push(parseFloat(trialNum));
-
-
-			// Get the y-axis value
-			var yVal = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].yData.vals;
-			//if (yVal.val != null) yVal = yVal.val;
-			//else if (yVal.priorVal != null) yVal = yVal.priorVal;
-
-			yVals.push(yVal);
-
-
-		}
-		*/
-
 
 		// Xmax and xmin
 		var xmax = 1000;
@@ -1419,7 +1399,8 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, burnin
             
 			var pixelY = 0;
 			var converged = false;
-			for (var pixelX = axisGap; pixelX <= canvas.width - outerMargin; pixelX++){
+			var pixelX = axisGap
+			for (pixelX = axisGap; pixelX <= canvas.width - outerMargin; pixelX++){
 				var trueX = (pixelX - axisGap) / widthScale + range[0];
                 
 				if (!converged){
@@ -1446,6 +1427,13 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, burnin
             ctx.closePath();
             
 		}
+		
+		
+		// Plot "epsilon" at the right side
+		ctx.font = 20 * canvasSizeMultiplier + "px Arial";
+		ctx.textAlign="right"; 
+		ctx.textBaseline="top"; 
+		ctx.fillText("\u03B5", pixelX, canvas.height - heightScale * (epsilon.emin - range[2]) - axisGap);
 		
 
        
