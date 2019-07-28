@@ -194,7 +194,7 @@ function renderAdequacyTable(){
     if (!thereAreTruePauseSites) {
         $("#classifierAdequacy_nodata").show(100);
         $("#classifierAdequacyTable").hide(0);
-        $("#ROC_curve_td").hide();
+        $("#ROC_curve_cont").hide();
         return;
     }
     

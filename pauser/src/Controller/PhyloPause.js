@@ -177,7 +177,7 @@ function downloadROC(){
 // Plot ROC curve and AUC
 function plotROC(canvasID = "ROC_curve_canvas", canvasSizeMultiplier = 1, resolve = function() { }){
 
-    if (!$("#ROC_curve_td").is(":visible")) return;
+    if (!$("#ROC_curve_cont").is(":visible")) return;
 
     getROCanalysis_controller(function(result) {
     
