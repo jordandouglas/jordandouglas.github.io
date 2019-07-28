@@ -151,7 +151,7 @@ function downloadROC(){
     $("#main").after(canvasHTML);
     
     
-    plotROC("ROCcanvasTemp", 4, function() {
+    plotROC("ROCcanvasTemp", IS_MOBILE ? 2 : 4, function() {
     
     
         // Save the temporary canvas to a file
@@ -218,8 +218,9 @@ function ROC_plot(values, range, id, canvasSizeMultiplier = 1, xlab = "Variable 
     if (canvas == null) return;
     
 
-    canvas.width = 400 * canvasSizeMultiplier;
-    canvas.height = 400 * canvasSizeMultiplier;
+    canvas.width = IS_MOBILE ? 800 * (canvasSizeMultiplier) : 400 * canvasSizeMultiplier;
+    canvas.height =IS_MOBILE ? 800 * (canvasSizeMultiplier) : 400 * canvasSizeMultiplier;
+    
     
     
 
