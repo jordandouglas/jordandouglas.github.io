@@ -33,7 +33,7 @@
 		<RateBind distribution="Lognormal" fixedDistnVal="250" lognormalMeanVal="-1.498" lognormalSdVal="1.585">Rate of binding  (μM⁻¹ s⁻¹)</RateBind>
 	</parameters>
 	
-	<ABC inferenceMethod="MCMC" ntrials="10000000" testsPerData="3" testsPerData_preburnin="1" chiSqthreshold_min="4.63" chiSqthreshold_0="4.63" chiSqthreshold_gamma="0.9996" burnin="10" logEvery="100" showRejectedParameters="false">
+	<ABC inferenceMethod="MCMC" ntrials="10000000" testsPerData="3" testsPerData_preburnin="1" chiSqthreshold_min="4.63" chiSqthreshold_0="4.63" chiSqthreshold_gamma="0.9996" burnin="0" logEvery="1000" showRejectedParameters="false">
 		<fit1 dataType="forceVelocity" ATPconc="29" CTPconc="29" GTPconc="29" UTPconc="29" obs1="-5,25.6" obs2="-11.5,19.0" obs3="-15.5,14.4" />
 		<fit2 dataType="forceVelocity" ATPconc="50" CTPconc="50" GTPconc="50" UTPconc="50" obs1="-5,29.5" obs2="-11.5,25.3" obs3="-15.5,21.1" />
 		<fit3 dataType="forceVelocity" ATPconc="73" CTPconc="73" GTPconc="73" UTPconc="73" obs1="-5,38.3" obs2="-11.5,32.1" obs3="-15.5,28.4" />
