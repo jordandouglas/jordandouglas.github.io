@@ -452,7 +452,7 @@ void BayesianCalculations::sampleFromPosterior(vector<PosteriorDistributionSampl
 void BayesianCalculations::perform_1_rejectionABC_iteration(PosteriorDistributionSample* state){
 
 
-    cout << "Current model " << currentModel->getID() << endl;
+    //cout << "Current model " << currentModel->getID() << " | " << currentModel->toJSON() << endl;
 
     if (!MCMC::resetExperiment()){
         cout << "Could not initialise experiment" << endl;

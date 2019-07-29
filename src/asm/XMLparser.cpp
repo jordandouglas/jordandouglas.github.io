@@ -710,6 +710,9 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 			// Sample a model and its parameters randomly
 			Settings::sampleModel();
 			_sampleModels = true;
+			
+			
+			//cout << "modelsToEstimate " << modelsToEstimate.size() << endl;
             
             // delete estimateModelsEle;
             

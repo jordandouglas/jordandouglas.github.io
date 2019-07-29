@@ -3082,12 +3082,8 @@ function loadSession_controller(XMLData, resolve = function() { }){
 
 
 			console.log("modelsToEstimate", result.modelsToEstimate);
-			for (var i = 0; i < result.modelsToEstimate.length; i ++){
-				var model = result.modelsToEstimate[i];
-				populateModelDescription(model.weight, model.description);
-			}
-
-			sendModels_controller();
+			populateModelDescriptions(result.modelsToEstimate);
+		
 
 		}
 
@@ -3427,7 +3423,8 @@ function sendModels_controller(resolve = function() { } ){
 	var modelIDs = [];
 	var modelWeights = []; 
 	var modelDescriptions = [];  // Remove all white spaces here because C++ is annoying
-	for (var i = 1; i < numberModelsBuilt; i ++){
+	for (var i = 1; i < currentModelID; i ++){
+		if ($("#modelRow_" + i).length == 0) continue;
 		modelIDs.push(i);
 		modelWeights.push($("#modelWeight_" + i).val());
 		modelDescriptions.push($("#modelBuildingDescription_" + i).val().replace(/ /g,''));
@@ -4028,9 +4025,7 @@ function get_unrendered_ABCoutput_controller(resolve = function() { }){
 
 	
 
-
-
-		if (result["newLines"] != null) {
+		if (result != null && result["newLines"] != null) {
 
 
 			// Update the numbers of accepted values

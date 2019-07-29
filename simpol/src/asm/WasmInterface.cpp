@@ -653,7 +653,7 @@ extern "C" {
 		modelsToEstimate.clear();
 		
         
-        // Parse XML
+       		 // Parse XML	
 		XMLparser::parseXMLFromString(chunk_string.c_str(), _GUI_PLOTS);
         
 		Settings::sampleAll();
@@ -1949,6 +1949,12 @@ extern "C" {
 			currentModel->setPriorProb(0);
 			modelsToEstimate.push_back(currentModel);
 		}
+		
+		// Else clear the list of models
+		for (deque<Model*>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){
+			(*it)->clear();
+		} 
+		modelsToEstimate.clear();
 
 
 		// Split the model details into tokens
@@ -2020,7 +2026,8 @@ extern "C" {
 		// If there are no models on the list to estimate return the empty string
 		// Otherwise return a string containing a list of all models
 		string models_JSON = "{'models':[";
-
+		
+		
 
 		// Iterate through all models to estimate (except for the default model)
 		for (deque<Model*>::iterator it = modelsToEstimate.begin(); it != modelsToEstimate.end(); ++it){

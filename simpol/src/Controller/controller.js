@@ -1246,7 +1246,6 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 			getEstimatedModels_controller(function(result){
 
 
-
 				// There are models to compare
 				if (result.models.length > 0){
 

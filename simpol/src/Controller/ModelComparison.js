@@ -30,7 +30,7 @@ function initModelComparisonpanel(){
 	numberModelsBuilt = 1;
 	currentModelID = 1;
 	$("#ModelBuildingTable").html("");
-	$("#ModelBuildingTable").append(getModelComparisonNewRowButtonTemplate(numberModelsBuilt));
+	$("#ModelBuildingTable").append(getModelComparisonNewRowButtonTemplate(currentModelID));
 
 	
 }
@@ -40,7 +40,8 @@ function initModelComparisonpanel(){
 function buildNewModel(){
 
 	// Replace the current +new button with an empty template
-	$("#modelRow_" + numberModelsBuilt_temp).html(getModelComparisonRowTemplate(currentModelID));
+	var numberModelsBuilt_temp = currentModelID;
+	$("#modelRow_" + numberModelsBuilt_temp).html(getModelComparisonRowTemplate(numberModelsBuilt_temp));
 	getParametersAndModelSettings_compact_controller(function(result){
 
 		var objs = [];
@@ -52,13 +53,13 @@ function buildNewModel(){
 		}
 
 
-		$("#modelBuildingDescription_" + currentModelID).html(objs.join(", "));
+		$("#modelBuildingDescription_" + numberModelsBuilt_temp).html(objs.join(", "));
 	});
 
 	// Add a new +new button
 	numberModelsBuilt++;
 	currentModelID++;
-	$("#ModelBuildingTable").append(getModelComparisonNewRowButtonTemplate(numberModelsBuilt));
+	$("#ModelBuildingTable").append(getModelComparisonNewRowButtonTemplate(currentModelID));
 
 }
 
@@ -68,31 +69,53 @@ function deleteModel(modelNum){
 	$("#modelRow_" + modelNum).remove();
 	numberModelsBuilt --;
 
+	stop_controller();
+}
+
+
+function populateModelDescriptions(models){
+
+
+	if (models.length == 0) return;
+
+	$("#ModelBuildingTable").html("");
+	currentModelID = 1;
+	for (var i = 0; i < models.length; i ++){
+		var model = models[i];
+		$("#ModelBuildingTable").append(getModelComparisonNewRowButtonTemplate(model.id));
+		populateModelDescription(model.id, model.weight, model.description);
+		currentModelID = Math.max(model.id, currentModelID);
+	}
+	
+	
+	
+	
+	// Add a new +new button
+	numberModelsBuilt = models.length + 1;
+	currentModelID ++;
+	$("#ModelBuildingTable").append(currentModelID);
+	
+	
+	sendModels_controller();
 
 }
 
 
 // Create a new model where the settings are specified in the function arguments
-function populateModelDescription(weight, description){
+function populateModelDescription(id, weight, description){
 
 	// Replace the current +new button with an empty template
-	var numberModelsBuilt_temp = numberModelsBuilt;
-	$("#modelRow_" + numberModelsBuilt_temp).html(getModelComparisonRowTemplate(numberModelsBuilt_temp));
+	$("#modelRow_" + id).html(getModelComparisonRowTemplate(id));
 
 	// Model weight
-	$("#modelWeight_" + numberModelsBuilt_temp).val(weight);
+	$("#modelWeight_" + id).val(weight);
 
 	// Model properties
 	var objs = [];
 	for (var property in description){
 		objs.push(property + "=" + description[property]);
 	}
-	$("#modelBuildingDescription_" + numberModelsBuilt_temp).html(objs.join(", "));
-
-	// Add a new +new button
-	numberModelsBuilt++;
-	$("#ModelBuildingTable").append(getModelComparisonNewRowButtonTemplate(numberModelsBuilt));
-
+	$("#modelBuildingDescription_" + id).html(objs.join(", "));
 
 }
 
