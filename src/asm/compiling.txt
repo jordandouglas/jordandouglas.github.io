@@ -23,6 +23,10 @@ cd /home/jdou557/Documents/Sequences/emsdk
 source ./emsdk_env.sh --build=Release
 cd /home/jdou557/Documents/Cimpol/SimPol/SimPol/SimpolC/src/asm
 
+cd ../../../../emsdk-portable
+source ./emsdk_env.sh --build=Release
+cd ../jordandouglas.github.io/src/asm
+
 
 
 # Compile the vRNA module with emscripten

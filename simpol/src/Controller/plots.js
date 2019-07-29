@@ -5450,6 +5450,7 @@ function changePosteriorDistribution(){
 		$("#traceVariableY").val(PLOT_DATA["whichPlotInWhichCanvas"][plotNum].customParamY);
         
          // Exponential decay?
+        console.log("exponentialDecayChk", PLOT_DATA["whichPlotInWhichCanvas"]);
         $("#exponentialDecayChk").prop('checked', (PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["exponentialDecay"]));
         
 

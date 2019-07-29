@@ -1,12 +1,9 @@
 
 
 
-
-
-cd ../../../src/emsdk-portable
+cd ../../../../emsdk-portable
 source ./emsdk_env.sh --build=Release
-cd ../../pauser/src/asm
-
+cd ../jordandouglas.github.io/pauser/src/asm
 
 
 emcc -s WASM=1 -o simpol_asm.html  -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'UTF8ToString']"  -std=c++11 -fpermissive  -s ALLOW_MEMORY_GROWTH=1 -s WASM_MEM_MAX=1073741824 -s NO_EXIT_RUNTIME=1  WasmInterface.cpp Pauser.cpp ../../../src/asm/BayesClassifier.cpp ../../../src/asm/SitewiseSummary.cpp ../../../src/asm/MultipleSequenceAlignment.cpp ../../../src/asm/PauseSiteUtil.cpp ../../../src/asm/WasmMessenger.cpp  ../../../src/asm/Plots.cpp ../../../src/asm/Sequence.cpp ../../../src/asm/Parameter.cpp ../../../src/asm/HTMLobject.cpp ../../../src/asm/Coordinates.cpp ../../../src/asm/MCMC.cpp ../../../src/asm/ExperimentalData.cpp ../../../src/asm/Polymerase.cpp ../../../src/asm/PosteriorDistributionSample.cpp ../../../src/asm/XMLparser.cpp ../../../src/asm/Model.cpp ../../../src/asm/Simulator.cpp ../../../src/asm/GelCalibrationSearch.cpp  ../../../src/asm/State.cpp ../../../src/asm/Settings.cpp ../../../src/asm/FreeEnergy.cpp ../../../src/asm/PlotSettings.cpp ../../../src/asm/SlippageLandscapes.cpp ../../../src/asm/ParameterHeatmapData.cpp ../../../src/asm/TranslocationRatesCache.cpp ../../../src/asm/randomc/mersenne.cpp ../../../src/asm/tinyxml/tinystr.cpp ../../../src/asm/tinyxml/tinyxml.cpp ../../../src/asm/tinyxml/tinyxmlerror.cpp ../../../src/asm/tinyxml/tinyxmlparser.cpp ../../../src/asm/SimulatorPthread.cpp ../../../src/asm/SimulatorResultSummary.cpp ../../../src/asm/BayesianCalculations.cpp ../../../src/asm/GelLaneData.cpp ../../../src/asm/Vienna.bc
