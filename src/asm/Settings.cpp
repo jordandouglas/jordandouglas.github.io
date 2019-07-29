@@ -164,7 +164,7 @@ Parameter* RateCleave = new Parameter("RateCleave", false, "inclusive", "Rate of
 Parameter* CleavageLimit = new Parameter("CleavageLimit", true, "inclusive", "Cleavage limit (nt)", "Maximum number of backtracked nucleotides which can be cleaved. Set to 0 to have no upper limit.", "\u03BB_[cleave]  (nt)");
 
 
-Parameter* rnaFoldDistance = new Parameter("rnaFoldDistance", true, "inclusive", "Fold distance (nt)", "Number of nucleotides upstream from the polymerase which cannot fold");
+Parameter* rnaFoldDistance = new Parameter("rnaFoldDistance", true, "inclusive", "Fold distance (nt)", "Number of nucleotides upstream from the polymerase which cannot fold", "\u03BB_[b]  (nt)");
 
 
 Parameter* upstreamCurvatureCoeff = new Parameter("upstreamCurvatureCoeff", false, "false", "3\u2032 DNA curvature coeff.", "Change in free energy of translocation associated with DNA upstream from the hybrid, per degree of curvature", "\u0394G_{3\u2032bend}  (k_{B}T)");

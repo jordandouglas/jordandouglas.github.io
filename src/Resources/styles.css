@@ -852,6 +852,7 @@ optgroup {
 	border-style:solid;
 	border-width:0.2em;
 	border-color:#008cba;
+	filter: invert(100%);
 }
 
 
