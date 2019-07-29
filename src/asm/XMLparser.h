@@ -32,11 +32,11 @@ using namespace std;
 
 class XMLparser{
 
-	static void parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj);
+	static string parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj);
 
 	public:
 		static bool parseXMLFromFilename(char* fileName, Plots* plotsObj);
-		static bool parseXMLFromString(const char* XMLdata, Plots* plotsObj);
+		static string parseXMLFromString(const char* XMLdata, Plots* plotsObj);
 
 };
 

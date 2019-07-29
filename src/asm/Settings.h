@@ -140,6 +140,7 @@ extern bool _sampleModels;
 
 // User interface information
 extern bool _USING_GUI;
+extern int _MAX_GUI_SEQUENCE_LEN;
 extern bool _GUI_STOP;
 extern bool _needToReinitiateAnimation;
 extern bool _GUI_simulating;

@@ -53,35 +53,34 @@ bool XMLparser::parseXMLFromFilename(char* fileName, Plots* plotsObj){
 		return false;
 	}
 
-	XMLparser::parseXMLFromDocument(doc, plotsObj);
+	string errorMsg = XMLparser::parseXMLFromDocument(doc, plotsObj);
+	
+	if (errorMsg != "") cout << errorMsg;
 	return true;
 
 }
 
 
-bool XMLparser::parseXMLFromString(const char* XMLdata, Plots* plotsObj){
+string XMLparser::parseXMLFromString(const char* XMLdata, Plots* plotsObj){
 
 
 	TiXmlDocument* doc = new TiXmlDocument();
 	doc->Parse(XMLdata, 0, TIXML_ENCODING_UTF8);
 
-	//if (!succ) {
-		//cout << "Cannot read XML string: \n" << string(XMLdata) << endl;
-		//return false;
-	//}
-	XMLparser::parseXMLFromDocument(*doc, plotsObj);
+	string errorMsg = XMLparser::parseXMLFromDocument(*doc, plotsObj);
 	delete doc;
 
-	return true;
+	return errorMsg;
 
 }
 
 
 // Parse all information from the XML file
 // If MCMC is in already progress (ie. MCMC::isInitialised() is set to true) then there are certain variables which we do not want to change eg. the experiments used by MCMC
-void XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
+string XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 
 
+	string errorMsg = "";
 
 	//model->print();
 
@@ -111,6 +110,13 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 				string templateSeq = sequenceEle->Attribute("seq") ? sequenceEle->Attribute("seq") : "AAAAAAAAAAAAAAAAAAAAAAAAAA";
 				string templateType = sequenceEle->Attribute("TemplateType") ? sequenceEle->Attribute("TemplateType") : "dsDNA";
 				string primerType = sequenceEle->Attribute("PrimerType") ? sequenceEle->Attribute("PrimerType") : "ssRNA";
+				
+				
+				// If sequence goes beyond limit and using GUI, stop here
+				if (_USING_GUI && templateSeq.size() > _MAX_GUI_SEQUENCE_LEN) {
+					templateSeq = templateSeq.substr(0, _MAX_GUI_SEQUENCE_LEN);
+					errorMsg += "WARNING: maximum sequence length has been exceeded. Using the first " + to_string(_MAX_GUI_SEQUENCE_LEN) + " nucleotides only.";
+				}	
 
 
 				Sequence* newSeq = new Sequence(_seqID, templateType, primerType, templateSeq);
@@ -727,6 +733,8 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 
 	//complementSequence = Settings::complementSeq(templateSequence, TemplateType.substr(2) == "RNA");
 	//Settings::print();
+	
+	return errorMsg;
 
 
 }

@@ -658,14 +658,14 @@ extern "C" {
 		const char* chunk_cstr = chunk_string.c_str();
         
        	// Parse XML	
-		XMLparser::parseXMLFromString(chunk_cstr, _GUI_PLOTS);
+		string errorMsg = XMLparser::parseXMLFromString(chunk_cstr, _GUI_PLOTS);
 		
 		Settings::sampleAll();
 		//Settings::initSequences();
 
 
 		// Send the globals settings back to the DOM 
-		string parametersJSON = "{" + Settings::toJSON() + "}";
+		string parametersJSON = "{'errorMsg':'" + errorMsg + "'," + Settings::toJSON() + "}";
 
 		cout << "Finished parsing XML" << endl;
         chunk_string = "";
@@ -735,11 +735,22 @@ extern "C" {
 	// User enter their own sequence. Return whether or not it worked
 	void EMSCRIPTEN_KEEPALIVE userInputSequence(char* newSeq, char* newTemplateType, char* newPrimerType, int inputSequenceIsNascent, int msgID){
 
+		string errorMsg = "";
+
 		string seq = inputSequenceIsNascent == 1 ? Settings::complementSeq(string(newSeq), string(newTemplateType).substr(2) == "RNA") : string(newSeq);
-		if (seq.length() < hybridLen->getVal(true) + 2) {
-			messageFromWasmToJS("{'succ':false}", msgID);
+		if (seq.length() < hybridLen->getVal(true) + 3) {
+			messageFromWasmToJS("{'succ':false, 'errorMsg':'Sequence is too short.'}", msgID);
 			return;
 		}
+		
+		
+		if (_USING_GUI && seq.length() > _MAX_GUI_SEQUENCE_LEN) {
+			errorMsg = "WARNING: maximum sequence length has been exceeded. Using the first " + to_string(_MAX_GUI_SEQUENCE_LEN) + " nucleotides only.";
+			seq = seq.substr(0, _MAX_GUI_SEQUENCE_LEN);
+		}	
+		
+		
+		
 		Sequence* newSequence = new Sequence("$user", string(newTemplateType), string(newPrimerType), seq); 
 		sequences["$user"] = newSequence;
 		Settings::setSequence("$user");
@@ -748,7 +759,7 @@ extern "C" {
 		_GUI_PLOTS->init(); // Reinitialise plot data every time sequence changes
 
 
-		messageFromWasmToJS("{'succ':true}", msgID);
+		messageFromWasmToJS("{'succ':true, 'errorMsg':'" + errorMsg + "'}", msgID);
 
 
 

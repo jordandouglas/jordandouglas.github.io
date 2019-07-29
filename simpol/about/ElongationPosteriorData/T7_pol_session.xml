@@ -23,8 +23,8 @@
 		<hybridLen val="9" distribution="Fixed" fixedDistnVal="9">Hybrid length (bp)</hybridLen>
 		<bubbleLeft val="2" distribution="Fixed" fixedDistnVal="2">Bubble length left (bp)</bubbleLeft>
 		<bubbleRight val="1" distribution="Fixed" fixedDistnVal="1">Bubble length right (bp)</bubbleRight>
-		<GDagSlide val="10.004748058847037" distribution="Normal" fixedDistnVal="10" uniformDistnLowerVal="8" uniformDistnUpperVal="14" normalMeanVal="2.5" normalSdVal="1.36">ΔΔG†t</GDagSlide>
-		<DGPost val="-0.976483270078767" distribution="Normal" fixedDistnVal="0" uniformDistnLowerVal="-5" uniformDistnUpperVal="5" normalMeanVal="-3.3" normalSdVal="1.55">ΔΔGt1</DGPost>
+		<DGtaudag val="10.004748058847037" distribution="Normal" fixedDistnVal="10" uniformDistnLowerVal="8" uniformDistnUpperVal="14" normalMeanVal="2.5" normalSdVal="1.36">ΔΔG†t</DGtaudag>
+		<DGtau1 val="-0.976483270078767" distribution="Normal" fixedDistnVal="0" uniformDistnLowerVal="-5" uniformDistnUpperVal="5" normalMeanVal="-3.3" normalSdVal="1.55">ΔΔGt1</DGtau1>
 		<FAssist val="0" distribution="Fixed" fixedDistnVal="0" uniformDistnLowerVal="-10" uniformDistnUpperVal="30">Force  (pN)</FAssist>
 		<barrierPos val="1.7" distribution="Uniform" fixedDistnVal="1.7" uniformDistnLowerVal="0" uniformDistnUpperVal="3.4" normalMeanVal="1.7" normalSdVal="0.4">Barrier height position  (Å)</barrierPos>
 		<arrestTime val="0" distribution="Fixed" fixedDistnVal="0">Arrest timeout  (s)</arrestTime>
@@ -45,19 +45,19 @@
 	</ABC>
 
 	<estimated-models>
-		<model1 id="1" weight="2" assumeBindingEquilibrium="true" assumeTranslocationEquilibrium="true" DGPost="0" />
+		<model1 id="1" weight="2" assumeBindingEquilibrium="true" assumeTranslocationEquilibrium="true" DGtau1="0" />
 
-		<model2 id="2" weight="2" assumeBindingEquilibrium="false" assumeTranslocationEquilibrium="true" DGPost="0" />
-		<model3 id="3" weight="1" assumeBindingEquilibrium="true" assumeTranslocationEquilibrium="false" DGPost="0" barrierPos="1.7"  />
+		<model2 id="2" weight="2" assumeBindingEquilibrium="false" assumeTranslocationEquilibrium="true" DGtau1="0" />
+		<model3 id="3" weight="1" assumeBindingEquilibrium="true" assumeTranslocationEquilibrium="false" DGtau1="0" barrierPos="1.7"  />
 		<model4 id="4" weight="2" assumeBindingEquilibrium="true" assumeTranslocationEquilibrium="true"  />
 
 		<model5 id="5" weight="2" assumeBindingEquilibrium="false" assumeTranslocationEquilibrium="true"  />
-		<model6 id="6" weight="1" assumeBindingEquilibrium="false" assumeTranslocationEquilibrium="false" DGPost="0" barrierPos="1.7"  />
-		<model7 id="7" weight="1" assumeBindingEquilibrium="true" assumeTranslocationEquilibrium="false" DGPost="0"  />
+		<model6 id="6" weight="1" assumeBindingEquilibrium="false" assumeTranslocationEquilibrium="false" DGtau1="0" barrierPos="1.7"  />
+		<model7 id="7" weight="1" assumeBindingEquilibrium="true" assumeTranslocationEquilibrium="false" DGtau1="0"  />
 		<model8 id="8" weight="1" assumeBindingEquilibrium="true" assumeTranslocationEquilibrium="false" barrierPos="1.7" />
 
 		<model9 id="9" weight="1" assumeBindingEquilibrium="false" assumeTranslocationEquilibrium="false" barrierPos="1.7" />
-		<model10 id="10" weight="1" assumeBindingEquilibrium="false" assumeTranslocationEquilibrium="false" DGPost="0"  />
+		<model10 id="10" weight="1" assumeBindingEquilibrium="false" assumeTranslocationEquilibrium="false" DGtau1="0"  />
 		<model11 id="11" weight="1" assumeBindingEquilibrium="true" assumeTranslocationEquilibrium="false"  />
 
 		<model12 id="12" weight="1" assumeBindingEquilibrium="false" assumeTranslocationEquilibrium="false"  />

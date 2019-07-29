@@ -257,7 +257,7 @@ function init(){
 					
 				}else{
                     // begin_tutorial("biophys" + 2);
-                    //begin_tutorial("ploscompbio" + 3);
+                    begin_tutorial("ploscompbio" + 3);
                     //begin_tutorial("exMCMCABC");
 					userChangeSequence();
 				}
@@ -488,7 +488,7 @@ function setSequenceOptions(callback = function() { }){
 
 	getAllSequences_controller(function(all_sequences){
 
-		SEQS_JS = all_sequences;
+		
 		//console.log("getAllSequences_controller", all_sequences);
 
 		var dropdown = document.getElementById('SelectSequence');
@@ -534,9 +534,18 @@ function submitCustomSequence(resolveAfterRefresh = function() { }){
 		var toCall = (newSequenceID, newTemplateType, newPrimerType) => new Promise((resolve) => userInputSequence_controller(newSequenceID, newTemplateType, primerType, inputSequenceIsNascent, resolve));
 		toCall(newSeq, templateType, primerType, inputSequenceIsNascent).then((result) => {
 		
-		
+			if (result.errorMsg != null && result.errorMsg != "") alert(result.errorMsg);
 
 			if (!result.succ) return;
+			
+			
+			//getAllSequences_controller(function(res){
+			
+				//$("#UserSequence").html(res["$user"]);
+			
+			//});
+			
+			
 
 			var refr = () => new Promise((resolve) => refresh(resolve));
 			var sequenceChangeRefreshTemp = function(){
@@ -553,6 +562,7 @@ function submitCustomSequence(resolveAfterRefresh = function() { }){
 					$("#ABCacceptance_span").hide(50);
 					resolveAfterRefresh();
 					drawPlots(true);
+					
 					
 				});
 

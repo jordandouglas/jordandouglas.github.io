@@ -27,12 +27,20 @@
 */
 
 
-
+_LOADING_INTERACTIVE_SESSION = false;
 
 function begin_tutorial(tut_id = null){
 
     if (tut_id == null) return;
     console.log("Beginning tutorial", tut_id)
+    
+    
+    _LOADING_INTERACTIVE_SESSION = true;
+    
+    
+    var whenDone = function(){
+    	_LOADING_INTERACTIVE_SESSION = false;
+    }
     
     
     switch(tut_id){
@@ -41,17 +49,17 @@ function begin_tutorial(tut_id = null){
         // Plos computational biology elongation
         // Bayesian inference and comparison of stochastic transcription elongation models
         case "ploscompbio1":
-            begin_ploscompbio_RNAP();
+            begin_ploscompbio_RNAP(whenDone);
             break;
             
             
         case "ploscompbio2":
-            begin_ploscompbio_polII();
+            begin_ploscompbio_polII(whenDone);
             break;
             
             
         case "ploscompbio3":
-            begin_ploscompbio_T7pol();
+            begin_ploscompbio_T7pol(whenDone);
             break;
     
     
@@ -59,16 +67,16 @@ function begin_tutorial(tut_id = null){
     
         // Biophysical journal examples
         case "biophys1":
-            begin_biophys1();
+            begin_biophys1(whenDone);
             break;
     
         case "biophys2":
-            begin_biophys2();
+            begin_biophys2(whenDone);
             break;  
             
             
         case "biophys3":
-            begin_biophys3();
+            begin_biophys3(whenDone);
             break; 
             
             
@@ -78,23 +86,23 @@ function begin_tutorial(tut_id = null){
             
             
         case "biophys5":
-            begin_biophys5();
+            begin_biophys5(whenDone);
             break; 
             
             
         case "biophys6":
-            begin_biophys6();
+            begin_biophys6(whenDone);
             break; 
             
             
             
        case "exRABC":
-            begin_RABC_example();
+            begin_RABC_example(whenDone);
             break;
             
             
        case "exMCMCABC":
-            begin_MCMCABC_example();
+            begin_MCMCABC_example(whenDone);
             break;
     
     }
@@ -110,8 +118,13 @@ function begin_tutorial(tut_id = null){
 
 function loadSessionAndPosterior(sessionFileName, posteriorFileName, resolve = function() {} ){
 
+
+
+
     var sessionFileLocation = "http://www.polymerase.nz/simpol/about/" + sessionFileName;
     var toDoAfterLoadSession = function() {
+    
+    	console.log("Loading posterior");
             
         var posteriorFileLocation = "http://www.polymerase.nz/simpol/about/" + posteriorFileName;
         uploadABCFromURL(posteriorFileLocation, resolve);
@@ -128,7 +141,7 @@ function loadSessionAndPosterior(sessionFileName, posteriorFileName, resolve = f
 
 
 // Load the E.coli RNAP posterior distribution
-function begin_ploscompbio_RNAP(){
+function begin_ploscompbio_RNAP(resolve = function() { }){
 
 
     var urlNum = 1;
@@ -148,6 +161,7 @@ function begin_ploscompbio_RNAP(){
     
     loadSessionAndPosterior(sessionFileName, posteriorFileName, function(){
          $("#posteriorLoader").html(`Loaded &#10004;`);
+         resolve();
     });
 
 
@@ -155,7 +169,7 @@ function begin_ploscompbio_RNAP(){
 
 
 // Load the Yeast pol IIposterior distribution
-function begin_ploscompbio_polII(){
+function begin_ploscompbio_polII(resolve = function() { }){
 
 
     var urlNum = 2;
@@ -174,6 +188,7 @@ function begin_ploscompbio_polII(){
     
     loadSessionAndPosterior(sessionFileName, posteriorFileName, function(){
         $("#posteriorLoader").html(`Loaded &#10004;`);
+        resolve();
     });
 
 
@@ -184,7 +199,7 @@ function begin_ploscompbio_polII(){
 
 
 // Load the Bacteriophage T7 pol posterior distribution
-function begin_ploscompbio_T7pol(){
+function begin_ploscompbio_T7pol(resolve = function() { }){
 
 
     var urlNum = 3;
@@ -204,6 +219,7 @@ function begin_ploscompbio_T7pol(){
     
     loadSessionAndPosterior(sessionFileName, posteriorFileName, function(){
         $("#posteriorLoader").html(`Loaded &#10004;`);
+        resolve();
     });
 
 
@@ -214,7 +230,7 @@ function begin_ploscompbio_T7pol(){
 
 
 // Perform 30 transcription elongation simulations of the first 80 nt of the E. coli lacZ gene.
-function begin_biophys1(){
+function begin_biophys1(resolve = function() { }){
 
 
     
@@ -249,7 +265,7 @@ function begin_biophys1(){
     var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys1.xml";
     var toDoAfterLoadSession = function() {
         
-        
+        resolve();
         
         
     };
@@ -263,7 +279,7 @@ function begin_biophys1(){
 
 
 // Visualise the simulated change in RNA structure during transcription elongation.
-function begin_biophys2(){
+function begin_biophys2(resolve = function() { }){
 
 
 
@@ -319,7 +335,7 @@ function begin_biophys2(){
     var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys2.xml";    
     var toDoAfterLoadSession = function() {
         
-        
+        resolve();
         
     };
     
@@ -336,7 +352,7 @@ function begin_biophys2(){
 
 
 // Add insertions into a poly(T) tract of the Buchnera aphidicola murC1 gene
-function begin_biophys3(){
+function begin_biophys3(resolve = function() { }){
 
     
     addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
@@ -374,7 +390,7 @@ function begin_biophys3(){
     var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys3.xml";
     var toDoAfterLoadSession = function() {
         
-        
+        resolve();
         
     };
     
@@ -388,7 +404,7 @@ function begin_biophys3(){
 
 
 // Explore the third-order relationship between catalysis rate kcat , NTP binding rate kbind , and elongation velocity.
-function begin_biophys5(){
+function begin_biophys5(resolve = function() { }){
 
 
 
@@ -432,7 +448,7 @@ function begin_biophys5(){
     var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys5.xml";
     var toDoAfterLoadSession = function() {
         
-    
+    	resolve();
         
     };
     
@@ -445,7 +461,7 @@ function begin_biophys5(){
 
 
 // R-ABC on motivating example 1 from about/ page
-function begin_RABC_example(){
+function begin_RABC_example(resolve = function() { }){
 
 
 	var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/RABC.xml";
@@ -473,7 +489,7 @@ function begin_RABC_example(){
 	    }, 750);
 	    
 	    
-	   
+	   resolve();
 	    
 	    window.setTimeout(function(){
 	    
@@ -498,7 +514,7 @@ function begin_RABC_example(){
 }
 
 // MCMC-ABC on motivating example 1 from about/ page
-function begin_MCMCABC_example(){
+function begin_MCMCABC_example(resolve = function() { }){
 
 
 	var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/MCMCABC.xml";
@@ -538,6 +554,8 @@ function begin_MCMCABC_example(){
 	    
 	    }, 50);
 	    
+	    resolve();
+	    
     
             
     };
@@ -556,7 +574,7 @@ function begin_MCMCABC_example(){
 
 
 // Fit parameters kcat and kbind to a toy [NTP]-velocity dataset using R-ABC.
-function begin_biophys6(){
+function begin_biophys6(resolve = function() { }){
     var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys6.xml";
     var toDoAfterLoadSession = function() {
         
@@ -594,6 +612,8 @@ function begin_biophys6(){
             });
         
         }, 50);
+        
+        resolve();
         
         
     };

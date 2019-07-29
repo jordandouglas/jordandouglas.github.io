@@ -684,6 +684,8 @@ function bendDNA_controller(){
 
 function userInputSequence_controller(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent, resolve){
 
+
+
 	if (WEB_WORKER == null) {
 		resolve(WW_JS.userInputSequence_WW(newSeq, newTemplateType, newPrimerType, inputSequenceIsNascent));
 
@@ -757,7 +759,6 @@ function setNThreads_contoller(n){
 
 
 function refreshPlotDataSequenceChangeOnly_controller(resolve = function() { }){
-
 
 
 	if (WEB_WORKER == null) {
@@ -2819,9 +2820,16 @@ function getMFESequenceBonds_controller(){
 
 function getAllSequences_controller(resolve = function(allSeqs) { }){
 
+	var updateDom = function(all_sequences){
+		SEQS_JS = all_sequences;
+		resolve(all_sequences);
+	}
+
+
 	if (WEB_WORKER_WASM == null) {
 		resolve(SEQS_JS);
 	}
+
 
 	else{
 
@@ -2829,7 +2837,7 @@ function getAllSequences_controller(resolve = function(allSeqs) { }){
 		var fnStr = "wasm_" + res[0];
 		var msgID = res[1];
 		var toCall = () => new Promise((resolve) => callWebWorkerFunction(fnStr, resolve, msgID));
-		toCall().then((seqs) => resolve(seqs));
+		toCall().then((seqs) => updateDom(seqs));
 
 	}
 
@@ -2843,6 +2851,8 @@ function loadSession_controller(XMLData, resolve = function() { }){
 	var updateDom = function(result){
 
 		console.log("updateDom", result);
+		
+		if (result.errorMsg != null && result.errorMsg != "" && !_LOADING_INTERACTIVE_SESSION) alert(result.errorMsg);
 
 		var seqObject = result["seq"];
 		var model = result["model"];
@@ -2855,7 +2865,7 @@ function loadSession_controller(XMLData, resolve = function() { }){
 		var openPlots = function(){
 
 
-         console.log("openPlots", result);
+         	console.log("openPlots", result);
 			// Open up the appropriate plots
 			//PLOT_DATA = {};
 			//PLOT_DATA["whichPlotInWhichCanvas"] = result["whichPlotInWhichCanvas"];
