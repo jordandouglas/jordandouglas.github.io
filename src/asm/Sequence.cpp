@@ -117,8 +117,7 @@ void Sequence::clear(){
 void Sequence::initRNAunfoldingTable(){
 
 	if (this->RNAunfoldingTableBuilt) return;
-	//cout << "Initialising unfolding tables for " << seqID << endl;
-	
+	// cout << "Initialising unfolding tables for " << seqID << endl;
 	this->translocationRatesCache->buildUpstreamRNABlockadeTable(this->templateSequence); 
    	this->translocationRatesCache->buildDownstreamRNABlockadeTable(this->templateSequence);
    	this->RNAunfoldingTableBuilt = true;

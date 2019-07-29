@@ -65,6 +65,9 @@ void messageFromWasmToJS(const string & msg) {
 
 void messageFromWasmToJS(const string & msg, int msgID) {
 	if (msgID == -1) return;
+	
+	//if (msg.size() > 1000) cout << "Parsing string of size " << msg.size() << " msgID " << msgID << endl;
+	
 	EM_ASM_ARGS({
     	var msg = UTF8ToString($0); // Convert message to JS string                              
     	messageFromWasmToJS(msg, $1);                                       
@@ -652,10 +655,11 @@ extern "C" {
 		//currentModel = new Model();
 		modelsToEstimate.clear();
 		
+		const char* chunk_cstr = chunk_string.c_str();
         
-       		 // Parse XML	
-		XMLparser::parseXMLFromString(chunk_string.c_str(), _GUI_PLOTS);
-        
+       	// Parse XML	
+		XMLparser::parseXMLFromString(chunk_cstr, _GUI_PLOTS);
+		
 		Settings::sampleAll();
 		//Settings::initSequences();
 

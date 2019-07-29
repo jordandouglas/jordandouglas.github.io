@@ -42,6 +42,7 @@ using namespace std;
 
 TranslocationRatesCache::TranslocationRatesCache(){
 	this->meanGibbsEnergyBarrier = -INF;
+	this->usingDownstreamTable = true;
 }
 
 
@@ -509,35 +510,33 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 
 	if (!currentModel->get_allowmRNAfolding()) return 0;
 
-
-
-	// If the barrier height has already been cached, return it
+	
 	int pos = state->getRightNascentBaseNumber() - 1 + rnaFoldDistance->getVal(true);
 	if (pos < 0 || pos+1 > state->get_nascentLength() /* || pos >= templateSequence.length()*/) return 0;
 
     int rowNum = state->get_nascentLength() - 1;
     int colNum = state->get_mRNAPosInActiveSite() + state->get_nascentLength();
 
-    /*
-    cout << "-INF " << -INF <<  " rowNum " << rowNum << " colNum " << colNum << " len: ";
-    cout << this->downstreamRNABlockadeTable.size() <<  " len2:";
-    cout << this->downstreamRNABlockadeTable.at(rowNum).size() << " val: ";
-    cout << this->downstreamRNABlockadeTable.at(rowNum).at(colNum) << endl;
-    */
-	if (this->downstreamRNABlockadeTable.at(rowNum).at(colNum) != -INF) return this->downstreamRNABlockadeTable.at(rowNum).at(colNum);
-
-    // If multiple threads are being used need to ensure that there is not another thread currently calculating the RNA structure
-    if (N_THREADS > 1) {
-
-        // Lock the thread
-        pthread_mutex_lock(&MUTEX_LOCK_VRNA); 
-
-        // Double check that the value still does not need to be calculated
-        if (this->downstreamRNABlockadeTable.at(rowNum).at(colNum) != -INF) {
-            pthread_mutex_unlock(&MUTEX_LOCK_VRNA); 
-            return this->downstreamRNABlockadeTable.at(rowNum).at(colNum);
-        }
-
+	   
+   	// The downstream cache is not used when the sequence is long and on GUI, for memory purposes
+   	// If the barrier height has already been cached, return it
+	if (this->usingDownstreamTable) {
+		if (this->downstreamRNABlockadeTable.at(rowNum).at(colNum) != -INF) return this->downstreamRNABlockadeTable.at(rowNum).at(colNum);
+	
+	    // If multiple threads are being used need to ensure that there is not another thread currently calculating the RNA structure
+	    if (N_THREADS > 1) {
+	
+	        // Lock the thread
+	        pthread_mutex_lock(&MUTEX_LOCK_VRNA); 
+	
+	        // Double check that the value still does not need to be calculated
+	        if (this->downstreamRNABlockadeTable.at(rowNum).at(colNum) != -INF) {
+	            pthread_mutex_unlock(&MUTEX_LOCK_VRNA); 
+	            return this->downstreamRNABlockadeTable.at(rowNum).at(colNum);
+	        }
+	
+	    }
+    
     }
 
 
@@ -623,7 +622,7 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 
 
 
-    this->downstreamRNABlockadeTable.at(rowNum).at(colNum) = barrierHeight;
+    if (this->usingDownstreamTable) this->downstreamRNABlockadeTable.at(rowNum).at(colNum) = barrierHeight;
 
     //cout << "downstream " << barrierHeight << endl;
 
@@ -655,6 +654,15 @@ void TranslocationRatesCache::buildUpstreamRNABlockadeTable(string templSequence
 // Build a table of rates for translocating downstream from the current position.
 // The active site position and transcript length don't matter - only the transcript position that is one basepair downstream of the polymerase matters
 void TranslocationRatesCache::buildDownstreamRNABlockadeTable(string templSequence){
+
+	// This table is of size O(L^2) and is often not used. Large memory consumption
+	// When using the GUI, will not build cache if sequence length is beyond a certain limit
+	// Instead, rates will not be cached and are recalculated each time.
+	
+	if (templSequence.length() > 8000 && _USING_GUI) {
+		this->usingDownstreamTable = false;
+		return; 
+	}
 
 
     // Element i,j: the mRNA currently has length i and the polymerase position is j

@@ -685,7 +685,6 @@ function refresh(resolve = function(){}){
 		//document.getElementById("randomOutput").value = "";
 		if (document.getElementById("SelectSequence").value != "$user"){
 		
-			
 			if (SEQS_JS[document.getElementById("SelectSequence").value]["template"] != "") {
 				document.getElementById("SelectTemplateType").value = SEQS_JS[document.getElementById("SelectSequence").value]["template"];
 				$("#SelectTemplateType").prop("disabled", true);

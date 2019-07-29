@@ -521,14 +521,14 @@ void Settings::setSequence(Sequence* seq){
     TemplateType = currentSequence->get_templateType();
     PrimerType = currentSequence->get_primerType();
 
+
     currentSequence->initRateTable();
     currentSequence->initRNAunfoldingTable();
     _translocationRatesCache = currentSequence->getRatesCache();
-
     //currentSequence->print();
 
-
     if (PrimerType == "ssRNA") vRNA_init(Settings::complementSeq(templateSequence, true).c_str());
+
 
 
 }

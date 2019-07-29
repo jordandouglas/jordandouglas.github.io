@@ -85,6 +85,7 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 
 	//model->print();
 
+
 	TiXmlElement *sessionEle = doc.FirstChildElement("session");
 	if (sessionEle){
 
@@ -112,7 +113,6 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 				string primerType = sequenceEle->Attribute("PrimerType") ? sequenceEle->Attribute("PrimerType") : "ssRNA";
 
 
-
 				Sequence* newSeq = new Sequence(_seqID, templateType, primerType, templateSeq);
 				sequences[_seqID] = newSeq;
 				Settings::setSequence(_seqID);
@@ -123,7 +123,6 @@ void XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 
 
 		}
-        
         
         
         // Parse plots
