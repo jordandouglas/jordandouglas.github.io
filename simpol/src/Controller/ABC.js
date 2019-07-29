@@ -4796,7 +4796,7 @@ function getPosteriorSummaryTemplate(){
 							<div id="geometricMedianDIV" style="display:none">
 								<br>
 								State: <span id="geometricMedianStateVal"></span> &nbsp;&nbsp;&nbsp;
-								X<sup>2</sup> = <span id="geometricMedianX2Val"></span>
+								&rho; = <span id="geometricMedianX2Val"></span>
 								<table id="geometricMedianTable" style="width:100%" cellpadding=5 cellspacing=2>
 								
 									<tr style="background-color:#b3b3b3">

@@ -707,7 +707,7 @@ void PosteriorDistributionSample::printHeader(bool toFile){
 	if (!this->ABC){
 		priorStr += "logLikelih" + gapUnit + "logPosteri" + endLine;
 	}
-	else priorStr += "chiSquared" + endLine;
+	else priorStr += "rho" + endLine;
 
 	(_USING_GUI ? _ABCoutputToPrint : toFile ? (*logFile) : cout) << priorStr;
 	
@@ -928,7 +928,7 @@ void PosteriorDistributionSample::parseFromLogFileLine(vector<string> splitLine,
 		if (header == "State") this->setStateNumber(stoi(value));
 		else if (header == "Model") this->set_modelIndicator(value);
 		else if (header == "logPrior") this->logPriorProb = stof(value);
-		else if (header == "chiSquared") this->chiSquared = stof(value);
+		else if (header == "rho" || header == "chiSquared") this->chiSquared = stof(value);
 		else if (std::regex_match (header, velocityMatch)) {
 			simulatedValues.at(simulatedVal) = value; // Parse value
 			simulatedVal++;
