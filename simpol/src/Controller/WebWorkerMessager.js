@@ -3719,9 +3719,10 @@ function uploadABC_controller(TSVstring, resolve = function() { }){
 				onABCStart();
 				get_unrendered_ABCoutput_controller();
 				validateAllAbcDataInputs();
-				drawPlots(true);
+				drawPlots(true, function(){
+					if (result.inferenceMethod == "MCMC") addTracePlots();
+				});
 
-				if (result.inferenceMethod == "MCMC") addTracePlots();
 
 
 				$("#ABCacceptanceVal").html(roundToSF(result.acceptanceRate));
