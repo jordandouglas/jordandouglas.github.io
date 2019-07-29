@@ -1016,6 +1016,7 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 						saveXML.writeStartElement("plot" + i);
 						for (pltData in PLOT_DATA["whichPlotInWhichCanvas"][i]){
 							if (pltData == "xData" || pltData == "yData" || pltData == "zData") continue; // Don't save the data just the settings
+							if (pltData="burnin" || pltData=="ESS" || pltData == "selectedPosteriorID") continue;
 							saveXML.writeAttributeString(pltData, PLOT_DATA["whichPlotInWhichCanvas"][i][pltData]);
 						}
 						saveXML.writeEndElement();

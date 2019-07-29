@@ -64,6 +64,12 @@ function begin_tutorial(tut_id = null){
             window.location.replace("../simpol/?biophys=6");
             break; 
             
+            
+            
+        case "expauser":
+            begin_pauserExample();
+            break; 
+            
     
     }
 
@@ -73,7 +79,7 @@ function begin_tutorial(tut_id = null){
 
 
 
-// Perform 30 transcription elongation simulations of the first 80 nt of the E. coli lacZ gene.
+
 function begin_biophys4(){
 
 
@@ -113,6 +119,50 @@ function begin_biophys4(){
     uploadAlignmentFromURL(fastaFileLocation);
 
 }
+
+
+
+
+function begin_pauserExample(){
+
+
+    var fastaFileName = "biophys4.fasta";
+    var fastaFileLocation = "http://www.polymerase.nz/pauser/about/Examples/" + fastaFileName;
+    
+    addTutorialTemplate("Evaluating the prediction accuracy SimPol and NBC", 
+    "Pauser example session.",
+    `Welcome to Pauser. This series of examples is complementary to the above article. <br><br> 
+    
+    To predict the locations of pause sites in the loaded sequences, press the glowing 'Begin Pauser' button below. This will predict the locations using 
+    both SimPol and a Naive Bayes classifier (NBC). Because the locations of pause sites are already known, recall, precision, accuracy and a ROC curve can be computed.`,
+    "");
+
+   
+    // Add a glow around the simulate button
+    var btn = $("#beginPauser");
+
+    var intervalID = window.setInterval(function() {  
+        btn.toggleClass('glowing');
+    }, 750);
+   
+    
+    window.setTimeout(function(){
+    
+        btn.click(function(){
+            window.clearInterval(intervalID);
+            btn.removeClass("glowing");
+            btn.unbind('click');
+        });
+    
+    }, 50);
+
+
+
+    
+    uploadAlignmentFromURL(fastaFileLocation);
+
+}
+
 
 
 
