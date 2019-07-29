@@ -131,9 +131,7 @@ function begin_pauserExample(){
     
     addTutorialTemplate("Evaluating the prediction accuracy SimPol and NBC", 
     "Pauser example session.",
-    `Welcome to Pauser. This series of examples is complementary to the above article. <br><br> 
-    
-    To predict the locations of pause sites in the loaded sequences, press the glowing 'Begin Pauser' button below. This will predict the locations using 
+    `To predict the locations of pause sites in the loaded sequences, press the glowing 'Begin Pauser' button below. This will predict the locations using 
     both SimPol and a Naive Bayes classifier (NBC). Because the locations of pause sites are already known, recall, precision, accuracy and a ROC curve can be computed.`,
     "");
 
