@@ -1220,11 +1220,11 @@ function updateGlobalBufferViews() {
 
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 473584,
+    STACK_BASE = 471792,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 5716464,
-    DYNAMIC_BASE = 5716464,
-    DYNAMICTOP_PTR = 473552;
+    STACK_MAX = 5714672,
+    DYNAMIC_BASE = 5714672,
+    DYNAMICTOP_PTR = 471760;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1703,7 +1703,7 @@ function _emscripten_asm_const_iii(code, a0, a1) {
 
 
 
-// STATICTOP = STATIC_BASE + 472560;
+// STATICTOP = STATIC_BASE + 470768;
 /* global initializers */  __ATINIT__.push({ func: function() { globalCtors() } });
 
 
@@ -1714,7 +1714,7 @@ function _emscripten_asm_const_iii(code, a0, a1) {
 
 
 /* no memory initializer */
-var tempDoublePtr = 473568
+var tempDoublePtr = 471776
 assert(tempDoublePtr % 8 == 0);
 
 function copyTempFloat(ptr) { // functions, because inlining this code increases code size too much
@@ -5386,8 +5386,6 @@ function copyTempDouble(ptr) {
       return _getenv.ret;
     }
 
-  var _llvm_cos_f64=Math_cos;
-
   
    
 
@@ -5938,7 +5936,6 @@ var asmLibraryArg = {
   "_emscripten_resize_heap": _emscripten_resize_heap,
   "_exit": _exit,
   "_getenv": _getenv,
-  "_llvm_cos_f64": _llvm_cos_f64,
   "_llvm_sin_f64": _llvm_sin_f64,
   "_llvm_stackrestore": _llvm_stackrestore,
   "_llvm_stacksave": _llvm_stacksave,
@@ -6015,12 +6012,6 @@ var real__applyReaction = asm["_applyReaction"]; asm["_applyReaction"] = functio
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return real__applyReaction.apply(null, arguments);
-};
-
-var real__bendDNA = asm["_bendDNA"]; asm["_bendDNA"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return real__bendDNA.apply(null, arguments);
 };
 
 var real__bindOrCatalyseNTP = asm["_bindOrCatalyseNTP"]; asm["_bindOrCatalyseNTP"] = function() {
@@ -6597,10 +6588,6 @@ var _applyReaction = Module["_applyReaction"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["_applyReaction"].apply(null, arguments) };
-var _bendDNA = Module["_bendDNA"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["_bendDNA"].apply(null, arguments) };
 var _bindOrCatalyseNTP = Module["_bindOrCatalyseNTP"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
