@@ -83,6 +83,7 @@ State* State::setToInitialState(){
 	this->nextTemplateBaseToCopy = sequenceLength + 1;
 	this->activated = true;
 	this->thereHaveBeenMutations = false;
+	this->applyingMacroReaction = false;
 
 
 	// Which base number is on left and right side of hybrid
@@ -109,6 +110,7 @@ State* State::setToInitialState(){
 	
 	// Transcribe a few bases forward to avoid left bubble effects
 	int transcribeDistance = max(int(haltPosition->getVal(true)) - this->rightTemplateBase, _nBasesToTranscribeInit + max(2, (int)(bubbleLeft->getVal(true))));
+	transcribeDistance = min(int(transcribeDistance), int(templateSequence.length()-sequenceLength-1));
 	this->transcribe(transcribeDistance);
 	this->backward();
 	if (this->isGuiState) _applyingReactionsGUI = false;
@@ -133,6 +135,7 @@ State* State::clone(){
 	s->leftNascentBase = this->leftNascentBase;
 	s->rightNascentBase = this->rightNascentBase;
 	s->changeInLeftBulgePosition = this->changeInLeftBulgePosition;
+	s->applyingMacroReaction = this->applyingMacroReaction;
 
 	s->_5primeStructure = this->_5primeStructure;
 	s->_3primeStructure = this->_3primeStructure;
@@ -225,6 +228,8 @@ State* State::print(){
 State* State::transcribe(int N){
 
 
+	this->applyingMacroReaction = true;
+
 	//cout << "transcribing " << N << endl;
 
 	if (!this->activated) this->activate();
@@ -248,6 +253,8 @@ State* State::transcribe(int N){
 		this->bindNTP();
 		this->forward();
 	}
+	
+	this->applyingMacroReaction = false;
 
 	return this;
 }
@@ -288,6 +295,7 @@ list<int> State::getTranscribeActions(int N){
 State* State::stutter(int N){
 
 
+	this->applyingMacroReaction = true;
 	//cout << "transcribing " << N << endl;
 
 	if (!this->activated) this->activate();
@@ -317,6 +325,8 @@ State* State::stutter(int N){
 		for (int j = 0; i < hybridLen->getVal(true) - 4; j ++) this->slipLeft(0);
 
 	}
+	
+	this->applyingMacroReaction = false;
 	
 	return this;
 }
@@ -478,7 +488,7 @@ State* State::forward(){
 
 
 	// Fold the mRNA if applicable
-	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden") this->fold(true, true);
+	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden" && !this->applyingMacroReaction) this->fold(true, true);
 
 
 	// If this is GUI state then we will be applying these changes to the DOM 
@@ -677,7 +687,7 @@ State* State::backward(){
 
 
 	// Fold the mRNA if applicable
-	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden") this->fold(true, true);
+	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden" && !this->applyingMacroReaction) this->fold(true, true);
 
 
 	// If this is GUI state then we will be applying these changes to the DOM 
@@ -901,7 +911,6 @@ State* State::releaseNTP(){
 		this->mRNAPosInActiveSite = 1;
 		this->nextTemplateBaseToCopy --;
 
-		//if (SEQS_JS.all_sequences[sequenceID]["primer"].substring(0,2) == "ds") PARAMS_JS.PHYSICAL_PARAMETERS["hybridLen"]["val"]--;
 		
 
 	}

@@ -745,14 +745,10 @@ extern "C" {
 			delete _currentStateGUI;
 			_currentStateGUI = new State(true, true);
 			Plots::init(); // Reinitialise plot data every time sequence changes
-
-			cout << "done" << endl;
 		}
 
-		messageFromWasmToJS("", msgID);
+		messageFromWasmToJS("{'succ':true}", msgID);
 
-
-		// Clean up
 		free(seqID);
 
 	}

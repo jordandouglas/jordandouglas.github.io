@@ -278,9 +278,7 @@ void Coordinates::generateAllCoordinates(State* state){
 			if (i > state->getRightTemplateBaseNumber() && i < state->getRightTemplateBaseNumber() + (bubbleRight->getVal(true)+1) + 1) dy += -52/(bubbleRight->getVal(true)+1);
 		} else ntY += 52;
 
-		//if (SEQS_JS.all_sequences[sequenceID]["primer"] != "dsRNA") 
-		//for (i = state["leftMBase"] - 1; UPDATE_COORDS &&  i > state["leftMBase"] - (PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1) - 1 && i >= 0; i--) WW_JS.move_nt_WW(i, "m", 0, -52/(PARAMS_JS.PHYSICAL_PARAMETERS["bubbleLeft"]["val"]+1));
-
+		
 		 Coordinates::move_nt_absolute(i, "g", ntX, ntY + dy); 
 
 

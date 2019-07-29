@@ -49,6 +49,8 @@ class State{
 
 	bool isGuiState;
 	bool thereHaveBeenMutations;
+	
+	bool applyingMacroReaction;
 
 
 	// Left and right base numbers in the hybrid. The template and nascent left / right may not be the same due to slippage

@@ -260,7 +260,6 @@ userInputSequence = function(newSeq, newTemplateType, newPrimerType, inputSequen
 
     // Create the callback function
     var toDoAfterCall = function(toReturn){
-        //console.log("Returning", JSON.parse(resultStr));
         if (msgID != null) {
             postMessage(msgID + "~X~" + toReturn);
         }
@@ -277,8 +276,7 @@ userInputSequence = function(newSeq, newTemplateType, newPrimerType, inputSequen
 userSelectSequence = function(newSequenceID, msgID = null){
 
     // Create the callback function
-    var toDoAfterCall = function(){
-        //console.log("Returning", JSON.parse(resultStr));
+    var toDoAfterCall = function(resultStr){
         if (msgID != null) {
             var toReturn = {succ: true}; 
             postMessage(msgID + "~X~" + JSON.stringify(toReturn));

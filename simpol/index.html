@@ -142,7 +142,7 @@ function init(){
 		mersenneTwister = new MersenneTwister();
 		
 
-
+		SEQS_JS = {};
 		ABClines = [];
 		ABClinesAcceptedOnly = [];
 		nTimes30ABCrowsToDisplay = 1;
@@ -256,7 +256,7 @@ function init(){
 
 					
 				}else{
-                    //begin_tutorial("biophys" + 5);
+                    begin_tutorial("biophys" + 2);
                     //begin_tutorial("ploscompbio" + 3);
                     //begin_tutorial("exMCMCABC");
 					userChangeSequence();
@@ -307,7 +307,6 @@ function init(){
 				}
 
 
-				barchart(true);
                 
                 // Initialise ABC
                 $("#ABC_useMCMC").val(1);
@@ -489,6 +488,9 @@ function setSequenceOptions(callback = function() { }){
 
 	getAllSequences_controller(function(all_sequences){
 
+		SEQS_JS = all_sequences;
+		//console.log("getAllSequences_controller", all_sequences);
+
 		var dropdown = document.getElementById('SelectSequence');
 		$("#SelectSequence").empty();
 		console.log("Adding sequences", all_sequences);
@@ -531,6 +533,8 @@ function submitCustomSequence(resolveAfterRefresh = function() { }){
 
 		var toCall = (newSequenceID, newTemplateType, newPrimerType) => new Promise((resolve) => userInputSequence_controller(newSequenceID, newTemplateType, primerType, inputSequenceIsNascent, resolve));
 		toCall(newSeq, templateType, primerType, inputSequenceIsNascent).then((result) => {
+		
+		
 
 			if (!result.succ) return;
 
@@ -587,7 +591,6 @@ function userChangeSequence(resolveAfterRefresh = function() { }){
 		$("#SelectPrimerType").removeClass("dropdown-disabled");
 		
 		refreshNTP();
-		//barchart(true);
 
 
 
@@ -603,8 +606,10 @@ function userChangeSequence(resolveAfterRefresh = function() { }){
 
 
 		var toCall = (newSequenceID) => new Promise((resolve) => userSelectSequence_controller(newSequenceID, null, null, resolve));
-		toCall(sequenceID).then((uselessVar) => {
+		toCall(sequenceID).then((newSequences) => {
 			showFoldedRNA_controller(false);
+			
+			
 			
 
 			var refr = () => new Promise((resolve) => refresh(resolve));
@@ -630,7 +635,6 @@ function userChangeSequence(resolveAfterRefresh = function() { }){
 
 			refreshNTP();
 			clearSequences();
-			//barchart(true);
 			
 			if (document.getElementById("SelectPrimerType").value.substring(2) == "RNA") $("#ntpT").val("U");
 			else $("#ntpT").val("T");
@@ -681,19 +685,19 @@ function refresh(resolve = function(){}){
 		//document.getElementById("randomOutput").value = "";
 		if (document.getElementById("SelectSequence").value != "$user"){
 		
-			/*
-			if (SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["template"] != "") {
-				document.getElementById("SelectTemplateType").value = SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["template"];
+			
+			if (SEQS_JS[document.getElementById("SelectSequence").value]["template"] != "") {
+				document.getElementById("SelectTemplateType").value = SEQS_JS[document.getElementById("SelectSequence").value]["template"];
 				$("#SelectTemplateType").prop("disabled", true);
 				$("#SelectTemplateType").addClass("dropdown-disabled");
 			}else $("#SelectTemplateType").attr('disabled', false);
 		
-			if (SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["primer"] != "") {
-				document.getElementById("SelectPrimerType").value = SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["primer"];
+			if (SEQS_JS[document.getElementById("SelectSequence").value]["primer"] != "") {
+				document.getElementById("SelectPrimerType").value = SEQS_JS[document.getElementById("SelectSequence").value]["primer"];
 				$("#SelectPrimerType").prop("disabled", true);
 				$("#SelectPrimerType").addClass("dropdown-disabled");
 			} else 	$("#SelectPrimerType").attr('disabled', false);
-			*/
+			
 
 
 		} else{
@@ -721,11 +725,6 @@ function refresh(resolve = function(){}){
 		document.getElementById('bases').innerHTML  = "";
 		disabledButtons = false;
 
-		TbulgePos = 0;
-		TbulgedBase = -1;
-		TbulgeSize = 0;
-
-	
 		slideAnimationFrameID = 0;
 		slipAnimationFrameID = 0;
 		bindAnimationFrameID = 0;
@@ -733,11 +732,6 @@ function refresh(resolve = function(){}){
 		ANIMATION_TIME_controller = 1;
 		destroySecondaryStructure();
 
-
-		slipHtrough= 0;
-		TslipH = 0;
-		TslipHtrough= 0;
-	
 
 	
 		rateOfBindingNextBase = 0;
@@ -764,16 +758,9 @@ function refresh(resolve = function(){}){
 
 			activateModel_changeView(result.ID);
 
-
-			//renderObjects();
-			//refreshPlotData();
 			
-			
-			//refreshNTP();
 			update_parameters();
-			//sample_parameters_controller();
 			renderParameters();
-			// userInputModel_controller();
 			changeSpeed_controller();
 			setNextBaseToAdd_controller();
 			
@@ -789,25 +776,15 @@ function refresh(resolve = function(){}){
 
 			});
 			
-			//return;
-
-
-			/*
-			toggleSlip(0);
-			toggleSlip(0);
-			toggleSlipT();
-			toggleSlipT();
-			*/
-		
-		
-			//plotTimeChart(0, true);
-		
 
 			//transcribe_controller(2, true);
 			var afterRender = function(){
 				//if ($("#foldBtnDiv").hasClass("toolbarIconDisabled")) {
 					//showFoldedRNA_controller(true);
 				//}
+				
+				//showFoldedRNA_controller($("#foldBtnDiv").hasClass("toolbarIconDisabled"));
+				
 				update_sliding_curve(0)
 				resolve();
 

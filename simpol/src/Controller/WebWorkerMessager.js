@@ -2820,7 +2820,7 @@ function getMFESequenceBonds_controller(){
 function getAllSequences_controller(resolve = function(allSeqs) { }){
 
 	if (WEB_WORKER_WASM == null) {
-		resolve(SEQS_JS.all_sequences);
+		resolve(SEQS_JS);
 	}
 
 	else{
