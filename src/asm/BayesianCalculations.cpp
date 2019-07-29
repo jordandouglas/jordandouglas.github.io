@@ -537,7 +537,7 @@ list<ParameterHeatmapData*> BayesianCalculations::getPosteriorDistributionAsHeat
 		heatMapData.push_back(new ParameterHeatmapData("logLikelihood", "Log Likelihood"));
 		heatMapData.push_back(new ParameterHeatmapData("logPosterior", "Log Posterior"));
 	}else{
-		heatMapData.push_back(new ParameterHeatmapData("chiSq", "Chi-squared", "X^{2}"));
+		heatMapData.push_back(new ParameterHeatmapData("chiSq", "Rho distance", "\u03C1"));
 	}
 	heatMapData.push_back(new ParameterHeatmapData("state", "State"));
 	for (int i = 0; i < posteriorDistribution.front()->getParameterNames().size(); i++){
