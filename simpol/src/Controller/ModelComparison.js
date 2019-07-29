@@ -22,11 +22,13 @@
 
 
 numberModelsBuilt = 1;
+currentModelID = 1;
 
 
 function initModelComparisonpanel(){
 
 	numberModelsBuilt = 1;
+	currentModelID = 1;
 	$("#ModelBuildingTable").html("");
 	$("#ModelBuildingTable").append(getModelComparisonNewRowButtonTemplate(numberModelsBuilt));
 
@@ -38,8 +40,7 @@ function initModelComparisonpanel(){
 function buildNewModel(){
 
 	// Replace the current +new button with an empty template
-	var numberModelsBuilt_temp = numberModelsBuilt;
-	$("#modelRow_" + numberModelsBuilt_temp).html(getModelComparisonRowTemplate(numberModelsBuilt_temp));
+	$("#modelRow_" + numberModelsBuilt_temp).html(getModelComparisonRowTemplate(currentModelID));
 	getParametersAndModelSettings_compact_controller(function(result){
 
 		var objs = [];
@@ -51,12 +52,22 @@ function buildNewModel(){
 		}
 
 
-		$("#modelBuildingDescription_" + numberModelsBuilt_temp).html(objs.join(", "));
+		$("#modelBuildingDescription_" + currentModelID).html(objs.join(", "));
 	});
 
 	// Add a new +new button
 	numberModelsBuilt++;
+	currentModelID++;
 	$("#ModelBuildingTable").append(getModelComparisonNewRowButtonTemplate(numberModelsBuilt));
+
+}
+
+
+function deleteModel(modelNum){
+
+	$("#modelRow_" + modelNum).remove();
+	numberModelsBuilt --;
+
 
 }
 
