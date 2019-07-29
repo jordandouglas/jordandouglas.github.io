@@ -58,7 +58,7 @@ using namespace std;
 // Send a message to javascript
 void messageFromWasmToJS(const string & msg) {
 	EM_ASM_ARGS({
-    	var msg = Pointer_stringify($0); // Convert message to JS string                              
+    	var msg = UTF8ToString($0); // Convert message to JS string                              
     	messageFromWasmToJS(msg);                                            
   	}, msg.c_str());
 }
@@ -67,7 +67,7 @@ void messageFromWasmToJS(const string & msg) {
 void messageFromWasmToJS(const string & msg, int msgID) {
 	if (msgID == -1) return;
 	EM_ASM_ARGS({
-    	var msg = Pointer_stringify($0); // Convert message to JS string                              
+    	var msg = UTF8ToString($0); // Convert message to JS string                              
     	messageFromWasmToJS(msg, $1);                                       
   	}, msg.c_str(), msgID);
 }

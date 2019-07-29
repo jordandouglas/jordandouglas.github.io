@@ -512,7 +512,17 @@ State* State::terminate(){
 
 	}
 
-	
+	/*
+	if (WW_JS.isWebWorker && !RUNNING_FROM_COMMAND_LINE && !ABC_JS.ABC_simulating){
+		postMessage("_renderTermination(" + JSON.stringify({primerSeq: primerSeq, insertPositions: insertPositions}) + ")" );
+	}else if(!RUNNING_FROM_COMMAND_LINE && !ABC_JS.ABC_simulating){
+		renderTermination({primerSeq: primerSeq, insertPositions: insertPositions});
+	}
+
+	for (var i = 0; i <= primerSequence.length - 1; i ++){
+		delete_nt_WW(i, "m");
+	}
+	*/
 	return this;
 }
 

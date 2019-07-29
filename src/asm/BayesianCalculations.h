@@ -45,7 +45,7 @@ class BayesianCalculations{
 		static list<ParameterHeatmapData*>  getPosteriorDistributionAsHeatmap(int id);
 		static string getParametersInPosteriorDistributionJSON(int id);
         static void perform_1_rejectionABC_iteration(PosteriorDistributionSample* posteriorSample);
-
+        static void performSitewiseSummary(vector<PosteriorDistributionSample*> posteriorDistribution, string fastaInFile, string outputFileName);
 
 
 

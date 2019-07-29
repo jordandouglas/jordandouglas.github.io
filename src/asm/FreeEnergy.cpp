@@ -546,7 +546,7 @@ double FreeEnergy::getFreeEnergyOfTranscriptionBubbleHybridString(string templat
 
 
 // Calculates the mean pre-posttranslocated equilibrium constant (kfwd / kbck) across the whole sequence
-// Populates the provided array[3] with 1) meanEquilibriumConstant, 2) meanForwardRate and 3) meanBackwardsRate
+// Populates the provided array[6] with 1) meanEquilibriumConstant, 2) meanEquilibriumConstant inverse, 3) meanForwardRate, 4) meanBackwardsRate, 5) meanForwardHyperRate, and 6) meanBackwardHyperRate
 void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
 
 
@@ -562,6 +562,8 @@ void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
 	vector<double> equilibriumConstantsFwdOverBck(nsites);
 	vector<double> forwardRates(nsites);
 	vector<double> backwardsRates(nsites);
+    vector<double> forwardHyperRates(nsites);
+    vector<double> backwardHyperRates(nsites);
 	for (int i = 0; i < nsites; i ++){
 	//while (state->get_mRNAPosInActiveSite() + state->get_nascentLength() + 1 <= templateSequence.length()){
 		
@@ -580,6 +582,17 @@ void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
 		equilibriumConstantsFwdOverBck.at(i) = kPreToPost / kPostToPre;
 		forwardRates.at(i) = kPreToPost;
 		backwardsRates.at(i) = kPostToPre;
+        
+        
+        // Hypertranslocation rates
+        double postToHyper = state->calculateForwardRate(true, true);
+        state->forward();
+        double hyperToPost = state->calculateBackwardRate(true, true);
+        state->backward();
+        forwardHyperRates.at(i) = postToHyper;
+        backwardHyperRates.at(i) = hyperToPost;
+        
+        
 		
 		// Bind NTP and catalyse to get next state
 		state->transcribe(1);
@@ -593,11 +606,15 @@ void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
 	double meanEquilibriumConstant_FwdOverBck = 0;
 	double meanForwardRate = 0;
 	double meanBackwardsRate = 0;
+    double meanForwardHyperRate = 0;
+    double meanBackwardsHyperRate = 0;
 	for (int i = 0; i < nsites; i ++) {
 		meanEquilibriumConstant_BckOverFwd += log(equilibriumConstantsBckOverFwd.at(i));
 		meanEquilibriumConstant_FwdOverBck += log(equilibriumConstantsFwdOverBck.at(i));
 		meanForwardRate += forwardRates.at(i) / nsites;
 		meanBackwardsRate += backwardsRates.at(i) / nsites;
+        meanForwardHyperRate += forwardHyperRates.at(i) / nsites;
+        meanBackwardsHyperRate += backwardHyperRates.at(i) / nsites;
 	}
 
 
@@ -606,6 +623,8 @@ void FreeEnergy::calculateMeanTranslocationEquilibriumConstant(double* results){
 	results[1] = exp(meanEquilibriumConstant_FwdOverBck / nsites);
 	results[2] = meanForwardRate;
 	results[3] = meanBackwardsRate;
+    results[4] = meanForwardHyperRate;
+    results[5] = meanBackwardsHyperRate;
 
 	delete state;
 

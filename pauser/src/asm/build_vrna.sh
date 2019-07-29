@@ -16,7 +16,7 @@ g++ $vrna_wd_option -std=c++11 -O3 -fpermissive -pthread Pauser.cpp ../../../src
 ../../../src/asm/SlippageLandscapes.cpp ../../../src/asm/ParameterHeatmapData.cpp ../../../src/asm/TranslocationRatesCache.cpp \
 ../../../src/asm/randomc/mersenne.cpp ../../../src/asm/tinyxml/tinystr.cpp ../../../src/asm/tinyxml/tinyxml.cpp \
 ../../../src/asm/tinyxml/tinyxmlerror.cpp ../../../src/asm/tinyxml/tinyxmlparser.cpp ../../../src/asm/SimulatorPthread.cpp \
-../../../src/asm/SimulatorResultSummary.cpp ../../../src/asm/BayesianCalculations.cpp ../../../src/asm/GelLaneData.cpp \
+../../../src/asm/SimulatorResultSummary.cpp ../../../src/asm/BayesianCalculations.cpp ../../../src/asm/GelLaneData.cpp ../../../src/asm/SitewiseSummary.cpp  \
 ../../../src/asm/WasmMessengerNull.cpp  ../../../src/asm/BayesClassifier.cpp  -o Pauser -lViennaRNA
 
-echo "Done! Saved to Pauser"
+echo "Done!"

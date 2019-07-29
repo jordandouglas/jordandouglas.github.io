@@ -505,7 +505,7 @@ var toC = {
 // C calling interface.
 function ccall(ident, returnType, argTypes, args, opts) {
   function convertReturnValue(ret) {
-    if (returnType === 'string') return Pointer_stringify(ret);
+    if (returnType === 'string') return UTF8ToString(ret);
     if (returnType === 'boolean') return Boolean(ret);
     return ret;
   }
@@ -665,7 +665,7 @@ function getMemory(size) {
 }
 
 /** @type {function(number, number=)} */
-function Pointer_stringify(ptr, length) {
+function UTF8ToString(ptr, length) {
   if (length === 0 || !ptr) return '';
   // Find the length, and check for UTF while doing so
   var hasUtf = 0;
@@ -1678,7 +1678,7 @@ Module['asm'] = function(global, env, providedBuffer) {
 
 // === Body ===
 
-var ASM_CONSTS = [function($0, $1) { var msg = Pointer_stringify($0); messageFromWasmToJS(msg, $1); }];
+var ASM_CONSTS = [function($0, $1) { var msg = UTF8ToString($0); messageFromWasmToJS(msg, $1); }];
 
 function _emscripten_asm_const_iii(code, a0, a1) {
   return ASM_CONSTS[code](a0, a1);
@@ -6446,7 +6446,7 @@ if (!Module["setValue"]) Module["setValue"] = function() { abort("'setValue' was
 if (!Module["getValue"]) Module["getValue"] = function() { abort("'getValue' was not exported. add it to EXTRA_EXPORTED_RUNTIME_METHODS (see the FAQ)") };
 if (!Module["allocate"]) Module["allocate"] = function() { abort("'allocate' was not exported. add it to EXTRA_EXPORTED_RUNTIME_METHODS (see the FAQ)") };
 if (!Module["getMemory"]) Module["getMemory"] = function() { abort("'getMemory' was not exported. add it to EXTRA_EXPORTED_RUNTIME_METHODS (see the FAQ). Alternatively, forcing filesystem support (-s FORCE_FILESYSTEM=1) can export this for you") };
-Module["Pointer_stringify"] = Pointer_stringify;
+Module["UTF8ToString"] = UTF8ToString;
 if (!Module["AsciiToString"]) Module["AsciiToString"] = function() { abort("'AsciiToString' was not exported. add it to EXTRA_EXPORTED_RUNTIME_METHODS (see the FAQ)") };
 if (!Module["stringToAscii"]) Module["stringToAscii"] = function() { abort("'stringToAscii' was not exported. add it to EXTRA_EXPORTED_RUNTIME_METHODS (see the FAQ)") };
 if (!Module["UTF8ArrayToString"]) Module["UTF8ArrayToString"] = function() { abort("'UTF8ArrayToString' was not exported. add it to EXTRA_EXPORTED_RUNTIME_METHODS (see the FAQ)") };

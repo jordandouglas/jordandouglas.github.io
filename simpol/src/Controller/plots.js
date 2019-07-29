@@ -841,11 +841,12 @@ function download_distanceVsTimeTSV(){
 
 
 	var tsv="Distance (nt) versus time (s), DateTime " + getFormattedDateAndTime() + "\n\n";
+	var trueSimNum = 1;
 	for (var simNum = 0; simNum < DISTANCE_VS_TIME_CONTROLLER.length; simNum++){
 
 		if (DISTANCE_VS_TIME_CONTROLLER[simNum] == null) continue;
 
-		tsv += "trial\t" + (simNum+1) + "\n";
+		tsv += "trial\t" + trueSimNum + "\n";
 		var xvalsSim = DISTANCE_VS_TIME_CONTROLLER[simNum]["times"];
 		var yvalsSim = DISTANCE_VS_TIME_CONTROLLER[simNum]["distances"];
 
@@ -859,6 +860,8 @@ function download_distanceVsTimeTSV(){
 			tsv += yvalsSim[distanceNum] + "\t";
 		}
 		tsv += "\n\n";
+		
+		trueSimNum++;
 
 	}
 
@@ -1825,18 +1828,24 @@ function download_velocityHistogramTSV(plotNum){
 function download_pauseHistogramTSV(){
 
 
-	if (DWELL_TIMES_CONTROLLER.length < 5) return;
+	
+	//if (DWELL_TIMES_CONTROLLER.length < 5) return;
 
 	var tsv = "Time(s) between catalysis events, DateTime " + getFormattedDateAndTime() + "\n\n";
+	var trueSimNum = 1;
 	for (var simNum = 0; simNum < DWELL_TIMES_CONTROLLER.length; simNum++){
-		tsv += "trial\t" + (simNum+1) + "\n";
+		if (DWELL_TIMES_CONTROLLER[simNum] == null) continue;
+		tsv += "trial\t" + trueSimNum + "\n";
 		tsv += "times\t";
 		for (var timeNum = 0; timeNum < DWELL_TIMES_CONTROLLER[simNum].length; timeNum++){
 			tsv += DWELL_TIMES_CONTROLLER[simNum][timeNum] + "\t";
 		}
 		tsv += "\n";
+		trueSimNum ++;
 
 	}
+	
+	if (tsv == "") return;
 
 
 	download("time_histogram.tsv", tsv);

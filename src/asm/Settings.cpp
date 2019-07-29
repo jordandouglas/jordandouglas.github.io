@@ -552,7 +552,8 @@ Sequence* Settings::getSequence(string seqID){
 // Instruct all sequences to rebuild their translocation rate cache next time requested
 void Settings::resetRateTables(){
 
-	for(std::map<string, Sequence*>::iterator iter = sequences.begin(); iter != sequences.end(); ++iter){
+    if (currentSequence) currentSequence->flagForRateTableRebuilding();
+	for (std::map<string, Sequence*>::iterator iter = sequences.begin(); iter != sequences.end(); ++iter){
 		Sequence* seq = iter->second;
 		seq->flagForRateTableRebuilding();
 	}

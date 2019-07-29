@@ -112,9 +112,9 @@ void MCMC::initMCMC(bool uploadingLogFile, bool performFirstSimulation){
 		MCMC::previousMCMCstate->setParametersFromState();
 
         // Rebuild translocation rate tables
-        //Settings::resetRateTables();
-        //Settings::resetUnfoldingTables();
-        //Settings::setSequence(currentSequence);
+        Settings::resetRateTables();
+        Settings::resetUnfoldingTables();
+        
 	}
 
 
@@ -351,8 +351,10 @@ void MCMC::makeProposal(){
 
 		}
 
+
 		// Update the global settings to apply the parameters in this model
 		currentModel->activateModel();
+      
 
 	}
 
@@ -395,6 +397,7 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistributionSample* this_M
 
 		// Reject
 		if (runifNum > priorRatio){
+            // cout << "Rejecting based on prior " << exp(this_MCMCState->get_logPriorProb()) << " - " << exp(prev_MCMCState->get_logPriorProb()) << endl;
 			return false;
 		}
 

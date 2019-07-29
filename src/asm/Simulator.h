@@ -28,6 +28,7 @@
 #include "State.h"
 #include "randomc/randomc.h"
 #include "SimulatorResultSummary.h"
+#include "SitewiseSummary.h"
 
 
 #include <string>
@@ -53,6 +54,7 @@ class Simulator{
 
 	// Plots object
     Plots* simulator_plots;
+    SitewiseSummary* sitewise_summary;
 
 
 	// Store the number of trials remaining and the current state for GUI purposes
@@ -72,6 +74,7 @@ class Simulator{
 
     public:
     	Simulator(Plots* plots);
+        Simulator(SitewiseSummary* sitewise_summary);
     	void perform_N_Trials(SimulatorResultSummary* resultSummary, State* state, bool verbose);
     	int getNtrialsTotal_GUI();
     	int getNtrialsCompleted_GUI();

@@ -24,7 +24,12 @@
 #include "Settings.h"
 #include "MCMC.h"
 #include "SimulatorPthread.h"
+#include "Simulator.h"
 #include "Model.h"
+#include "SitewiseSummary.h"
+#include "MultipleSequenceAlignment.h"
+#include "State.h"
+
 
 #include <iostream>
 #include <vector>
@@ -57,9 +62,7 @@ vector<PosteriorDistributionSample*> BayesianCalculations::loadLogFile(string lo
     	while (line == "") getline(logfile, line);
     	vector<string> headerLineSplit = Settings::split(line, '\t');
 
-    	//cout << "line: " << line << endl;
-    	//for (int i = 0; i < headerLineSplit.size(); i ++) cout << headerLineSplit.at(i) << endl;
-    	//cout << headerLineSplit.at(54) << endl;
+
 
     	// Iterate through states in logfile and build list of burnin states
     	vector<string> splitLine;
@@ -67,7 +70,7 @@ vector<PosteriorDistributionSample*> BayesianCalculations::loadLogFile(string lo
         	
         	
         	if (line == "") continue;
-
+            
 
         	// Parse state
           	PosteriorDistributionSample* state = new PosteriorDistributionSample(0, _numExperimentalObservations, true);
@@ -648,3 +651,122 @@ string BayesianCalculations::getParametersInPosteriorDistributionJSON(int id){
 
 
 
+/* Performs a sitewise summary and prints to the specified file. Summary contains:
+
+        - Probability of the polymerase being ratcheted forward into elongation by an upstream RNA blockade
+        - Probability of a hypertranslocation-induced arrest
+        
+ Where the probabilities are obtained by summing up the number of times the event occurs and dividing by N trials
+      
+*/      
+void BayesianCalculations::performSitewiseSummary(vector<PosteriorDistributionSample*> posteriorDistribution, string fastaInFile, string outputFileName){
+
+
+    cout << "performSitewiseSummary" << endl;
+    
+    
+    
+    
+    // Open the file. Do not append
+    ofstream* outfile;
+    outfile = new ofstream(outputFileName);
+    if (!outfile->is_open()) {
+        cout << "Cannot open file " << outputFileName << endl;
+        exit(0);
+    }
+    
+
+
+    // Loads the multiple sequence alignment
+    MultipleSequenceAlignment* sequences = new MultipleSequenceAlignment();
+    string errorMsg = sequences->parseFromFastaFile(fastaInFile);
+    if (errorMsg != "") {
+        cout << errorMsg << endl;
+        exit(1);
+    }
+    cout << "Alignment successfully parsed." << endl;
+    
+
+    
+    SitewiseSummary* sitewiseSummary;
+    for (int i = 0; i < sequences->get_nseqs(); i ++){
+    
+    
+        // Initialise summary object
+        Sequence* currentSeq = sequences->getSequenceAtIndex(i);
+        sitewiseSummary = new SitewiseSummary(currentSeq);
+        Settings::setSequence(currentSeq);
+    
+    
+        // Initialise simulator
+        Simulator* simulator = new Simulator(sitewiseSummary);
+        SimulatorResultSummary* result = new SimulatorResultSummary(1);
+        State* initialState = new State(true, true);
+        
+        
+        cout << "Performing " << ntrials_sim << " simulations on " << currentSeq->getID() << endl;
+    
+        // Perform N simualtions on this sequence
+        for (int trial = 0; trial < ntrials_sim; trial ++){
+        
+        
+            // Sample from posterior distribution
+            if (posteriorDistribution.size() > 0) {
+                int stateToSample = std::floor(Settings::runif() * posteriorDistribution.size());
+                PosteriorDistributionSample* posteriorSample = posteriorDistribution.at(stateToSample);
+                posteriorSample->setParametersFromState();
+            }
+
+            // Sample from prior distribution
+            else {
+                Settings::sampleAll();
+            }
+            
+            
+           // cout << hybridLen->getVal(true) << endl;
+            
+            
+            // Ensure that the current sequence's translocation rate cache is up to date
+            currentSeq->initRateTable(); 
+            currentSeq->initRNAunfoldingTable();
+            
+            
+            // Perform 1 trial
+            sitewiseSummary->nextTrial();
+            simulator->perform_N_Trials(result, initialState, false);
+        
+        
+        }
+        
+   
+        // Print probabilities to file
+        vector<double> ratchetProbs = sitewiseSummary->get_ratchet_prob();
+        vector<double> arrestProbs = sitewiseSummary->get_RNA_arrest_prob();
+        (*outfile) << currentSeq->getID() << endl;
+        
+        // Ratchet probabilities
+        for (int i = 0; i < ratchetProbs.size(); i ++){
+            (*outfile) << ratchetProbs.at(i);
+            if (i < ratchetProbs.size() - 1) (*outfile) << ",";
+        }
+        (*outfile) << endl;
+        
+        
+        // Arrest probabilities
+        for (int i = 0; i < arrestProbs.size(); i ++){
+            (*outfile) << arrestProbs.at(i);
+            if (i < arrestProbs.size() - 1) (*outfile) << ",";
+        }
+        (*outfile) << endl;
+        
+        currentSeq->deconstructRateTable();
+        sitewiseSummary->clear();
+    
+    }
+    
+     
+
+    outfile->close();
+     
+
+}

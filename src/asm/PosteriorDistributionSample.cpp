@@ -173,7 +173,7 @@ vector<string> PosteriorDistributionSample::getParameterNames(){
 // Stores a string of values to plot if saveString is enabled
 void PosteriorDistributionSample::calculateAUC(bool saveString, bool calculateAgain){
 
-    cout << "calculateAUC" << endl;
+    //cout << "calculateAUC" << endl;
 
     if (this->meanDwellTimes_pauseSites.size() == 0 && this->meanDwellTimes_notpauseSites.size() == 0) return;
     if (!calculateAgain && this->haveCalculatedAUC) return;
@@ -363,7 +363,7 @@ void PosteriorDistributionSample::calculateAUC(bool saveString, bool calculateAg
     AUC = min(AUC, 1.0);
 
     
-    cout << "AUC " << AUC << endl;
+    //cout << "AUC " << AUC << endl;
     
     // Add 1-AUC to the X2
     if (calculateAgain) this->chiSquared = 1-AUC;
@@ -376,7 +376,7 @@ void PosteriorDistributionSample::calculateAUC(bool saveString, bool calculateAg
 // Cache the simulated value, and use the simulated and observed values to update the chi squared test statistic
 void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSummary* simulated, ExperimentalData* observed){
 
-    cout << "Adding data for " << observed->getDataType() << endl;
+    //cout << "Adding data for " << observed->getDataType() << endl;
 
     if (this->currentObsNum >= this->simulatedValues.size() && observed->getDataType() != "pauseSites") return;
 	
@@ -575,7 +575,7 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
 	else if (observed->getDataType() == "pauseSites"){
     
     
-        cout << "Adding pauseSites" << endl;
+        //cout << "Adding pauseSites" << endl;
     
         vector<double> relativeDwellTimes = simulated->get_meanRelativeTimePerLength();
 

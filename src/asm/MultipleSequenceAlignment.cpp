@@ -123,7 +123,7 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
     list<Sequence*> alignment_list;
     
     
-    std::regex nucleotide_pattern ("[ACGTU-]");
+    std::regex nucleotide_pattern ("[ACGTU]");
     std::regex gap_pattern ("[-]");
 
     // Parse the fasta 
@@ -235,15 +235,15 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
 
 
                 if (seqNoACGTU.size() != 0) {
-                    return "ERROR: please ensure that the alignment contains only nucleotide characters (A,C,G,T,U,-)";
+                    return "ERROR: please ensure that the sequences contains only nucleotide characters (A,C,G,T,U)";
                 }
 
                 currentSequenceStr += line;
                 
                 
                 // Check if there are any gaps
-                string seqNoGaps = std::regex_replace (line, gap_pattern, "");
-                if (seqNoGaps.size() < line.size()) this->isAlignment = true;
+                //string seqNoGaps = std::regex_replace (line, gap_pattern, "");
+                //if (seqNoGaps.size() < line.size()) this->isAlignment = true;
                 
 
 
@@ -292,7 +292,7 @@ string MultipleSequenceAlignment::parseFromFasta(string fasta){
 
 
    if (this->alignment.size() == 0) {
-        return "ERROR: the alignment needs at least one sequence.";
+        return "Nucleotide parsing ERROR: please upload at least one sequence.";
     }
 
 
@@ -608,6 +608,8 @@ void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, BayesClassifier
         }   
         
         
+        if (!this->initialisedSimulator) continue;
+        
 
         // Sequence completed. Save the time per length information and move on to the next sequence
         this->current_sequence_summary->add_proportionOfTimePerLength(simulator->getPlots()->getProportionOfTimePerLength());
@@ -640,6 +642,16 @@ void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, BayesClassifier
         this->current_sequence_summary->clear();
 
         this->initialisedSimulator = false;
+        
+        
+        // Activate the timeout to update the DOM
+        this->currentSequenceForSimulation ++;
+        result[0] = currentSequenceForSimulation ;
+        result[1] = 0;
+        result[2] = 0;
+        return;
+        
+        
     }
 
 

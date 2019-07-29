@@ -1,0 +1,5 @@
+export PATH="/home/jdou557/Documents/Cimpol/github/eclipse/polymerase/jordandouglas.github.io/src/emsdk-portable:/home/jdou557/Documents/Cimpol/github/eclipse/polymerase/jordandouglas.github.io/src/emsdk-portable/clang/e1.38.31_64bit:/home/jdou557/Documents/Cimpol/github/eclipse/polymerase/jordandouglas.github.io/src/emsdk-portable/node/8.9.1_64bit/bin:/home/jdou557/Documents/Cimpol/github/eclipse/polymerase/jordandouglas.github.io/src/emsdk-portable/emscripten/1.38.31:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+export EMSDK="/home/jdou557/Documents/Cimpol/github/eclipse/polymerase/jordandouglas.github.io/src/emsdk-portable"
+export EM_CONFIG="/home/jdou557/.emscripten"
+export BINARYEN_ROOT="/home/jdou557/Documents/Cimpol/github/eclipse/polymerase/jordandouglas.github.io/src/emsdk-portable/clang/e1.38.31_64bit/binaryen"
+export EMSCRIPTEN="/home/jdou557/Documents/Cimpol/github/eclipse/polymerase/jordandouglas.github.io/src/emsdk-portable/emscripten/1.38.31"
