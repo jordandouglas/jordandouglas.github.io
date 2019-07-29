@@ -782,7 +782,11 @@ function getNewCurveButtonsTemplate(){
 				<br><br>
 				<div style="padding: 5 5; background-color:#b3b3b3; font-size:16px; width:500px; margin:auto;">
 
-					Add experimental data <br><br>
+					Add experimental data 
+					<a href="about/#Experimental_Data" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
+                        
+					
+					<br><br>
 					<span onClick='addNewABCData("forceVelocity")' title="Add force-velocity experimental data" class="ABCbtn button">+ Force-velocity curve</span>
 					<br><br>
 					<span onClick='addNewABCData("ntpVelocity")' title="Add [NTP]-velocity experimental data" class="ABCbtn button">+ [NTP]-velocity curve</span>
@@ -908,7 +912,7 @@ function getABCforceVelocityCurveTemplate(fitID){
 			<td class="` + fitID + `" style="width:300px; text-align:center; vertical-align:top">
 				<div style="font-size:20px;">
 					Force-velocity curve
-					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#forceVelocity_ABCSectionHelp"><img class="helpIcon" src="../src/Images/help.png"></a>
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#Force-velocity"><img class="helpIcon" src="../src/Images/help.png"></a>
 				</div>
 					<canvas id="forceVelocityCurve_` + fitID + `" width=300 height=300> </canvas>
 			</td>
@@ -984,7 +988,7 @@ function getABCntpVelocityCurveTemplate(fitID){
 			<td class="` + fitID + `" style="width:300px; text-align:center; vertical-align:top">
 				<div style="font-size:20px;">
 					[NTP]-velocity curve
-					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#[NTP]-velocity"><img class="helpIcon" src="../src/Images/help.png"></a>
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#NTP-velocity"><img class="helpIcon" src="../src/Images/help.png"></a>
 						
 				</div>
 					
@@ -1258,7 +1262,7 @@ function getTimeGelTemplateRight(fitID){
 			<td colspan=3  style="width:100%; text-align:center; vertical-align:top">
 				<div style="font-size:20px;">
 					Gel electrophoresis of transcript lengths over time
-					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#[NTP]-velocity"><img class="helpIcon" src="../src/Images/help.png"></a>
+					<a title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;" href="about/#NTP-velocity"><img class="helpIcon" src="../src/Images/help.png"></a>
 				</div>
 			</td>
 		</tr>

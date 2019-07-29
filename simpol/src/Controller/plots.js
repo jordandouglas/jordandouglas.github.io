@@ -1238,9 +1238,10 @@ function plot_MCMC_trace(){
 		$("#plotLabelVariable" + pltNum).html(Math.round(PLOT_DATA["whichPlotInWhichCanvas"][pltNum].ESS * 100) / 100);
 		$("#plotLabelVariable" + pltNum).css("color", PLOT_DATA["whichPlotInWhichCanvas"][pltNum].ESS < 100 ? "red" : PLOT_DATA["whichPlotInWhichCanvas"][pltNum].ESS < 200 ? "#EE7600" : "black");
 
-		//console.log("Values", xVals, yVals);
-
-		var ylab = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].yData.name != null ? PLOT_DATA["whichPlotInWhichCanvas"][pltNum].yData.name : "chiSq";
+		
+		var ylab = PLOT_DATA["whichPlotInWhichCanvas"][pltNum].yData.latexName != null ? PLOT_DATA["whichPlotInWhichCanvas"][pltNum].yData.latexName
+				 : PLOT_DATA["whichPlotInWhichCanvas"][pltNum].yData.name != null ? PLOT_DATA["whichPlotInWhichCanvas"][pltNum].yData.name != null:
+				 "Rho distance";
 		trace_plot(xVals, yVals, range, epsilon, "plotCanvas" + pltNum, "plotCanvasContainer" + pltNum, PLOT_DATA["whichPlotInWhichCanvas"][pltNum].burnin,  "State", ylab, PLOT_DATA["whichPlotInWhichCanvas"][pltNum]["canvasSizeMultiplier"]);
 
 	}
@@ -1441,9 +1442,10 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, burnin
 			ctx.font = 20 * canvasSizeMultiplier + "px Arial";
 			ctx.textAlign="right"; 
 			ctx.textBaseline="bottom"; 
+			pixelX = Math.max(pixelX, axisGap + 10*canvasSizeMultiplier);
 			var trueX = (pixelX - axisGap) / widthScale + range[0];
 			var trueY = Math.max(epsilon.e0 * Math.pow(epsilon.gamma, trueX), epsilon.emin);
-			var pixelY = plotHeight - heightScale * (trueY - range[2]) + outerMargin; // - 5*canvasSizeMultiplier;
+			var pixelY = plotHeight - heightScale * (trueY - range[2]) + outerMargin; // - 10*canvasSizeMultiplier;
 			ctx.fillText("\u03B5", pixelX, pixelY);
 	            
 		}
@@ -1561,8 +1563,13 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, burnin
 	var xlabYPos = canvas.height - axisGap / 2;
 	ctx.fillText(xlab, xlabXPos, xlabYPos);
 	
+	
+	
+	
+	
+	
+
 	// Y label
-	ctx.font = 20 * canvasSizeMultiplier + "px Arial";
 	ctx.textAlign="center"; 
 	ctx.textBaseline="bottom"; 
 	ctx.save()
@@ -1570,7 +1577,8 @@ function trace_plot(xVals, yVals, range, epsilon = null, id, canvasDivID, burnin
 	var ylabYPos = canvas.height - (canvas.height - axisGap) / 2 - axisGap;
 	ctx.translate(ylabXPos, ylabYPos);
 	ctx.rotate(-Math.PI/2);
-	ctx.fillText(ylab, 0 ,0);
+	//ctx.fillText(ylab, 0 ,0);
+	writeLatexLabelOnCanvas(ctx, ylab, 0, 0, 20 * canvasSizeMultiplier);
 	ctx.restore();
 	
 	
