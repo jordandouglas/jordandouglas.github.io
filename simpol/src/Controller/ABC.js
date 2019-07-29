@@ -176,9 +176,6 @@ function onABCStart(){
 
 function addTracePlots(){
 
-	// Check if there is already a trace plot
-	for (var i = 1; i <=3; i ++) if( PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] == "tracePlot") return;
-	
 
 	if ($(".MCMCtraceOption").length == 0){
 		var option = `<option value="tracePlot" class="MCMCtraceOption">MCMC trace</option>`;
@@ -186,6 +183,11 @@ function addTracePlots(){
 		$("#selectPlot2").append(option);
 		$("#selectPlot3").append(option);
 	}
+	
+	
+	// Check if there is already a trace plot
+	for (var i = 1; i <=3; i ++) if( PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] == "tracePlot") return;
+	
 
 	// Open a trace plot
 	for (var i = 1; i <=3; i ++){
