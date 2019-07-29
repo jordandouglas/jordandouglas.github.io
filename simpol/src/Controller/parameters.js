@@ -141,9 +141,7 @@ function update_parameters() {
 	//$("#hybridLen").val(hybridLenTemp);
 	//if (hybridLenTemp != hybridLen) refresh();
 
-	
-	if (document.getElementById("SelectSequence").value != "$user") specialSite = SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["editSite"];//parseFloat(document.getElementById("specialSite").value);
-	else specialSite = -1;
+
 	
 	//renderGraphicsEveryNsteps = Math.max(Math.ceil(15 * PHYSICAL_PARAMETERS["RateUnbind"]["val"] / PHYSICAL_PARAMETERS["kCat"]["val"]), 100);
 	
@@ -189,7 +187,7 @@ function refreshNTP(){
 	
 	//update_parameters();
 	
-	
+	/*
 	var updateTextbox = function(PHYSICAL_PARAMETERS_LOCAL){
 
 		var ids = FE_JS.ELONGATION_MODELS[FE_JS.currentElongationModel]["useFourNTPconcentrations"] ? ["ATPconc", "GTPconc", "CTPconc", "UTPconc"] : ["NTPconc", "NTPconc", "NTPconc", "NTPconc"];
@@ -201,8 +199,10 @@ function refreshNTP(){
 		}
 
 	};
+	*/
 	
-	get_PHYSICAL_PARAMETERS_controller(updateTextbox);
+	
+	get_PHYSICAL_PARAMETERS_controller(/*updateTextbox*/);
 	
 
 

@@ -38,12 +38,13 @@ function register_WebWorker(resolve = function() { }){
 					    if (USE_WASM) WEB_WORKER_WASM = new Worker("src/asm/WasmInterface.js");
 
 
-            			WEB_WORKER = new Worker("src/Model/WebWorker.js");
+            			WEB_WORKER = false; // new Worker("src/Model/WebWorker.js");
 
 
 
             			// Tell the WebWorker to initialise
-   						callWebWorkerFunction(function() { WW_JS.init_WW(true); });
+            			
+   						//callWebWorkerFunction(function() { WW_JS.init_WW(true); });
 
 
 				} catch(err){
@@ -185,6 +186,8 @@ function onWebWorkerReceiveMessage(event, resolveAfterWebassemblyInitialised = f
 function callWebWorkerFunction(fn, resolve = null, msgID = null, removeAfter = true){
 
 
+	//console.log("Calling ", fn);
+
 	WorkerToUse = WEB_WORKER;
 	var fnStr = "" + fn;
 	if (fnStr.substring(0, 5) == "wasm_"){
@@ -195,8 +198,13 @@ function callWebWorkerFunction(fn, resolve = null, msgID = null, removeAfter = t
     fnStr = "(" + fnStr + ")";
 
 	// No WebWorker, call function directly
-	if(WorkerToUse == null) {
-		var result = eval(fnStr)();
+	if(WorkerToUse == null || !WorkerToUse) {
+		var fn_fn = eval(fnStr);
+		if (fn_fn.length == 0) {
+			if (resolve != null) resolve(result);
+			return;
+		}
+		var result = fn_fn();
 		console.log("Resolving", result);
 		if (resolve != null) resolve(result);
 	}
@@ -289,9 +297,6 @@ function executeFunctionFromString(fnStr){
 
 function refresh_controller(resolve_fn = function(x) {}){
 
-
-
-	
 
 
 	if (WEB_WORKER == null) {

@@ -57,18 +57,12 @@
 
 
 <script language='JavaScript' type='text/JavaScript' src='../src/Resources/d3.v5.min.js'></script> 
-<!--<script src="https://d3js.org/d3.v5.min.js"></script>-->
-<!--<script language='JavaScript' type='text/JavaScript' src='http://d3js.org/d3.v4.min.js'></script> -->
-<!-- <script language='JavaScript' type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.bundle.min.js"></script> -->
-<!--<script language='JavaScript' type="text/javascript" src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.js"></script>-->
-<script language='JavaScript' type="text/javascript" src="http://cdn.jsdelivr.net/g/filesaver.js"></script>
 
-
-<script language='JavaScript' type="text/javascript" src ="https://rawgit.com/eligrey/canvas-toBlob.js/master/canvas-toBlob.js"></script>
+<script language='JavaScript' type="text/javascript" src="../src/Resources/filesaver.js"></script>
+<script language='JavaScript' type="text/javascript" src ="../src/Resources/canvas-toBlob.js"></script>
 
 
 <script language='JavaScript' type='text/JavaScript' src="../src/Resources/jquery-3.1.1.min.js"></script>
-<!--<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>-->
 
@@ -79,7 +73,6 @@
 
 
 
-<!--<script language='JavaScript' type='text/JavaScript' src="src/Controller/webassembly.js"></script>-->
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/WebWorkerMessager.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/plots.js"></script>
 <script language='JavaScript' type='text/JavaScript' src="src/Controller/freeEnergy.js"></script>
@@ -692,6 +685,8 @@ function refresh(resolve = function(){}){
 
 		//document.getElementById("randomOutput").value = "";
 		if (document.getElementById("SelectSequence").value != "$user"){
+		
+			/*
 			if (SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["template"] != "") {
 				document.getElementById("SelectTemplateType").value = SEQS_JS.all_sequences[document.getElementById("SelectSequence").value]["template"];
 				$("#SelectTemplateType").prop("disabled", true);
@@ -703,7 +698,7 @@ function refresh(resolve = function(){}){
 				$("#SelectPrimerType").prop("disabled", true);
 				$("#SelectPrimerType").addClass("dropdown-disabled");
 			} else 	$("#SelectPrimerType").attr('disabled', false);
-
+			*/
 
 
 		} else{
@@ -2693,32 +2688,8 @@ function closeNav() {
 					
 	
 
-
-
-
-
-
 		 		</table>
 
-
-				
-				<span style="display:none"> <br> &Delta;G<sup>&dagger;</sup><sub style='position: relative; left: -.5em;'>special</sub> = <input class="variable param_box"  type="number" title="Free energy barrier height of sliding in or out of the edit site" name="GDaggerSpecial" id="GDaggerSpecial" value=0  OnChange="update_this_parameter_controller(this)"> k<sub>B</sub>T <br> </span>  
-				
-				<!--
-				<div id="kUspecial_container">
-				 	<span style="">k<sup>`</sup><sub style='position: relative; left: -.20em;'>U</sub> = <input class="variable param_box"  type="number"  id="kUspecial" OnChange="update_this_parameter_controller(this)"> </span> 
-					<input type=image id='kUspecial_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">  		
-				</div>
-				
-				<div id="kAspecial_container">
-					<span style="">k<sup>`</sup><sub style='position: relative; left: -.20em;'>A</sub> = <input class="variable param_box"  type="number" id="kAspecial" OnChange="update_this_parameter_controller(this)"> </span>  
-					<input type=image id='kAspecial_distn' title="Set the prior distribution for this parameter" onClick="changeDistribution(this)" src="../src/Images/distn.png" class="distn">   
-				</div>
-				-->
-				
-				<span style="display:none">Special site = <input class="variable param_box"  type="number" name="specialSite" id="specialSite" value=33  OnChange="update_this_parameter_controller(this)"></span>
-				
-				<br>
 				
 			</div>
 
