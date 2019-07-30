@@ -185,12 +185,12 @@ function addTracePlots(){
 	}
 	
 	
-	if (PLOT_DATA["whichPlotInWhichCanvas"] != null) {
+	//if (PLOT_DATA["whichPlotInWhichCanvas"] != null) {
 	
 		// Check if there is already a trace plot
-		for (var i = 1; i <=3; i ++) if( PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] == "tracePlot") return;
+		//for (var i = 1; i <=3; i ++) if( PLOT_DATA["whichPlotInWhichCanvas"][plotNum]["name"] == "tracePlot") return;
 	
-	}
+	//}
 	
 
 	// Open a trace plot

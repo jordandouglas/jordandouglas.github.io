@@ -259,6 +259,9 @@ function resetAllPlots(){
 
 function selectPlot(plotNum, deleteData = null){
 
+
+	console.log("select plot", plotNum);
+
 	var plotSelect = $("#selectPlot" + plotNum);
 	var value = plotSelect.val();
 

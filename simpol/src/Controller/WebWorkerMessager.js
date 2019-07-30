@@ -2462,6 +2462,7 @@ function saveSettings_controller(){
 	var functionToCallAfterSaving = function() { };
 	
 	
+	
 	switch(plotType){
 
 

@@ -1990,6 +1990,9 @@ extern "C" {
 	// User saves plot settings for a given plot
 	void EMSCRIPTEN_KEEPALIVE savePlotSettings(int plotNum, char* values_str, int msgID){
 		
+		// cout << "savePlotSettings " << string(values_str) << endl;
+		
+		
 		Plots::savePlotSettings(plotNum, string(values_str));
 		string plotsJSON = Plots::getPlotDataAsJSON();
 		messageFromWasmToJS(plotsJSON, msgID);

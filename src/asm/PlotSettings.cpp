@@ -366,16 +366,19 @@ string PlotSettings::toJSON(){
 		settingsJSON += "'yRange':'" + this->yRange + "',";
 		settingsJSON += "'xData':" + this->xData + ",";
 		settingsJSON += "'yData':" + this->yData + ",";
+		settingsJSON += "'exponentialDecay':" + string(this->exponentialDecay ? "true" : "false") + ",";
+		settingsJSON += "'selectedPosteriorID':" + to_string(this->selectedPosteriorID) + ",";
 		settingsJSON += "'burnin':" + to_string( burnin < 0 ? MCMC::get_nStatesUntilBurnin() : floor(burnin / 100 * _GUI_posterior.size()) ) + ",";
 		settingsJSON += "'ESS':" + to_string(this->ESS) + ",";
-		settingsJSON += "'selectedPosteriorID':" + to_string(this->selectedPosteriorID) + ",";
-        settingsJSON += "'exponentialDecay':" + string(this->exponentialDecay ? "true" : "false") + ",";
+		
+       
         
 
 	}
 
 
 	if (settingsJSON.substr(settingsJSON.length()-1, 1) == ",") settingsJSON = settingsJSON.substr(0, settingsJSON.length() - 1);
+	
 
 	return settingsJSON;
 
@@ -730,6 +733,8 @@ void PlotSettings::savePlotSettings(string plotSettingStr){
         
         // Show the exponential decay?
         this->exponentialDecay = values.at(3) == "true";
+        
+       // cout << "Parsing " << plotSettingStr <<  " " << this->exponentialDecay << endl;
 
 
 	}
