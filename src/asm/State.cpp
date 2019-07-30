@@ -391,7 +391,7 @@ State* State::forward(){
 		for (int s = 0; s < this->bulgePos.size(); s++){
 			if (this->partOfBulgeID.at(s) != s) continue;
 			if (this->bulgePos.at(s) > 0 && this->bulgePos.at(s) == hybridLen->getVal(true) - 1) this->absorb_bulge(s, false, true, DOMupdates);
-			//if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) ++;
+			if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) ++;
 		}
 
 	}
@@ -598,7 +598,7 @@ State* State::backward(){
 		for (int s = 0; s < this->bulgePos.size(); s++){
 			if (this->partOfBulgeID.at(s) != s) continue;
 			if (this->bulgedBase.at(s) == this->rightNascentBase - 1) this->absorb_bulge(s, true, true, DOMupdates);
-			//if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) --;
+			if (this->bulgePos.at(s) > 0) this->bulgePos.at(s) --;
 		}
 
 	}
@@ -1265,6 +1265,9 @@ void State::form_bulge(int S, bool form_left, SlippageLandscapes* DOMupdates){
 			int graphID = this->create_new_slipping_params();
 			DOMupdates->add_where_to_create_new_slipping_landscape(graphID);
 		}
+		
+		
+		cout << "bulgedBase " << this->bulgedBase.at(S) << " bulgePos " << this->bulgePos.at(S) << endl;
 
 
 

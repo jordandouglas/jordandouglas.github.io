@@ -693,7 +693,7 @@ function renderObjects(override = false, resolve = function(){}){
 				// Remove the object from the page
 				if(nt.needsDeleting){
 
-					console.log("Deleting", nt);
+					//console.log("Deleting", nt);
 
 					$("#" + nt["id"]).remove();
 					if (nt["hasTP"]) delete_TP(nt["pos"]);
