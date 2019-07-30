@@ -28,6 +28,7 @@ MFE_repulsionForce = -10;
 MFE_yShift = 100;
 
 MFE_simulationNodes = [];
+MFE_edges = [];
 
 
 
@@ -37,6 +38,7 @@ function destroySecondaryStructure(){
 	$("#bases").height(300);
 	$("#bases").children().show(0);
 	MFE_simulationNodes = [];
+	MFE_edges = [];
 	MFE_simulation = null;
 }
 
@@ -52,6 +54,32 @@ function removeNodeSecondaryStructure(nt){
 }
 
 
+function deleteEdgesFromNode(nt){
+	console.log("Deleting edges from", nt);
+	for (var i = MFE_edges.length-1; i >= 0; i --){
+		if (MFE_edges[i] == null) continue; 
+		if (MFE_edges[i].source.id == nt.id || MFE_edges[i].target.id == nt.id) {
+			console.log("Deleting bond", MFE_edges[i]);
+			MFE_edges = MFE_edges.slice(i,1);
+		}
+	
+	}
+
+}
+
+
+
+function refreshSecondaryStructure(){
+	var linkForce = d3.forceLink(MFE_edges).distance(MFE_dist).strength(2);
+	MFE_simulation = d3.forceSimulation(MFE_simulationNodes)
+		.alphaDecay(0.007)
+		.force("linkForce", linkForce)
+		.force("charge", d3.forceManyBody().strength(MFE_repulsionForce))
+		.on("tick", tick)
+		.alpha(0.8).restart();
+}
+
+
 // Call this function when the force directed graph already exists and you have new edges/vertices to add/remove
 // https://bl.ocks.org/mbostock/1095795
 function updateSecondaryStructure(new_nodes, edges){
@@ -59,7 +87,7 @@ function updateSecondaryStructure(new_nodes, edges){
 
 	//console.log("edges", edges);
 
-	if (new_nodes.length == 0) return;
+	if (edges.length == 0) return;
 
 	if (MFE_simulation == null && $("PreExp").val() != "hidden") {
 		renderSecondaryStructure();
@@ -71,6 +99,7 @@ function updateSecondaryStructure(new_nodes, edges){
 	}
 
 	MFE_simulation.stop();
+	MFE_edges = edges;
 
 	//renderSecondaryStructure({vertices: nodes, bonds: []});
 	//return;
@@ -109,9 +138,12 @@ function updateSecondaryStructure(new_nodes, edges){
 
 
 	// Add the new bonds
-	var linkForce = d3.forceLink(edges).distance(MFE_dist).strength(2);
+	
+	
+	
+
 	MFE_links = svg.selectAll("foo")
-		 .data(edges);
+		 .data(MFE_edges);
 
 	MFE_links.exit().remove();
 
@@ -150,29 +182,9 @@ function updateSecondaryStructure(new_nodes, edges){
 	 //.attr("x", d => d.fixed ? d.fx - $("#bases").scrollLeft() : d.x)
 	 //.attr("y", d => d.fixed ? d.fy : d.y);
 
-
-	// Restart the simulation
-	MFE_simulation = d3.forceSimulation(MFE_simulationNodes)
-		.alphaDecay(0.007)
-		.force("linkForce", linkForce)
-		.force("charge", d3.forceManyBody().strength(MFE_repulsionForce))
-		.on("tick", tick)
-		.alpha(0.8).restart();
-
-
-	//MFE_simulation.nodes(MFE_node);
-	// MFE_simulation.alpha(1).restart();
-
-	/*
-	for (var i = 0; i < data.vertices.length; i ++){
-
-		// If this vertex already exists
-		var vertex = data.vertices[i];
-
-
-	}
-	*/
-
+	refreshSecondaryStructure();
+	
+	
 }
 
 

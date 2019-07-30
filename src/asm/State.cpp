@@ -592,7 +592,7 @@ State* State::backward(){
 	SlippageLandscapes* DOMupdates = NULL;
 	if (this->isGuiState && _animationSpeed != "hidden") {
 
-		// If bulge will move too far to the left then absorb it
+		// If bulge will move too far to the right then absorb it
 		DOMupdates = new SlippageLandscapes();
 
 		for (int s = 0; s < this->bulgePos.size(); s++){
@@ -1034,6 +1034,7 @@ State* State::cleave(){
 			for (int baseNum = newLength+1; baseNum <= this->nascentSequence.length(); baseNum++){
 				//Coordinates::move_nt(baseNum, "m", 20, 50);
 				Coordinates::delete_nt(baseNum, "m");
+			
 			}
 
 		}
@@ -1045,6 +1046,11 @@ State* State::cleave(){
 		this->nextTemplateBaseToCopy -= nbasesCleaved;
 		this->nascentSequence = this->nascentSequence.substr(0, newLength);
 		this->mRNAPosInActiveSite = 0;
+		
+		
+		// Fold the mRNA if applicable
+		if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden") this->fold(false, true);
+		
 		return this->activate();
 
 	}
@@ -1263,6 +1269,7 @@ void State::form_bulge(int S, bool form_left, SlippageLandscapes* DOMupdates){
 
 
 
+
 		
 	}
 	
@@ -1306,6 +1313,12 @@ void State::form_bulge(int S, bool form_left, SlippageLandscapes* DOMupdates){
 
 
 	}
+	
+	
+	
+
+	// Fold the mRNA if applicable
+	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden") this->fold(true, true);
 	
 }
 
@@ -1435,6 +1448,10 @@ void State::absorb_bulge(int S, bool absorb_right, bool destroy_entire_bulge, Sl
 
 		
 	}
+	
+	
+	// Fold the mRNA if applicable
+	if (_showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden") this->fold(true, true);
 	
 	//return false;
 
@@ -2106,7 +2123,7 @@ float State::foldDownstream(){
 		this->_3primeStructure = "";
 
 
-		// Unfold the downstream bases 
+		// Unfold the downstream bases
 		if (this->mRNAPosInActiveSite == 0 && PrimerType == "ssRNA" && !this->terminated && _showRNAfold_GUI && this->isGuiState && _animationSpeed != "hidden"){
 
 
@@ -2538,3 +2555,6 @@ float State::get_5primeStructureMFE(){
 float State::get_3primeStructureMFE(){
 	return this->_3primeMFE;
 }
+
+
+

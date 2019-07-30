@@ -46,7 +46,7 @@ Model::Model(){
 	useFourNTPconcentrations = false;
 	assumeBindingEquilibrium = true;
 	assumeTranslocationEquilibrium = false;
-	allowMultipleBulges = true;
+	allowMultipleBulges = false;
 	allowDNAbending = false;
 	
 	//modelIsActive = false;
@@ -84,7 +84,7 @@ Model* Model::clone(){
 	clonedModel->currentRNABlockadeModel = this->currentRNABlockadeModel;
 	clonedModel->currentInactivationModel = this->currentInactivationModel;
 	clonedModel->currentBacksteppingModel = this->currentBacksteppingModel;
-    clonedModel->currentBacksteppingModel_int = this->currentBacksteppingModel_int;
+    	clonedModel->currentBacksteppingModel_int = this->currentBacksteppingModel_int;
 	clonedModel->allowMultipleBulges = this->allowMultipleBulges;
 	clonedModel->allowDNAbending = this->allowDNAbending;
 

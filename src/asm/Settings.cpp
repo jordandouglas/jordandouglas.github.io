@@ -489,11 +489,11 @@ void Settings::initSequences(){
 	seq = new Sequence("HIV-1 LTR WT", "dsDNA", "ssRNA", "CCCAGAGAGACCAATCTGGTCTAGACTCGGACCCTCGAGAGACCGATCGATCCCTTGGGTGACGAATTCGGAGTTATTTCGAACGTACGGACGTCTCC");
 	sequences[seq->getID()] = seq;
 
-	seq = new Sequence("Haemoglobin subunit &beta; 100bp", "ssDNA", "dsDNA", "TGTAAACGAAGACTGTGTTGACACAAGTGATCGTTGGAGTTTGTCTGTGGTACCACGTAGACTGAGGACTCCTCTTCAGACGGCAATGACGGGACACCCC");
-	sequences[seq->getID()] = seq;
+	//seq = new Sequence("Haemoglobin subunit &beta; 100bp", "ssDNA", "dsDNA", "TGTAAACGAAGACTGTGTTGACACAAGTGATCGTTGGAGTTTGTCTGTGGTACCACGTAGACTGAGGACTCCTCTTCAGACGGCAATGACGGGACACCCC");
+	//sequences[seq->getID()] = seq;
 
-	seq = new Sequence("Human Huntingtin poly(Q) region", "ssDNA", "dsDNA", "CAGGAAGGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTTGTCGGCGG");
-	sequences[seq->getID()] = seq;
+	//seq = new Sequence("Human Huntingtin poly(Q) region", "ssDNA", "dsDNA", "CAGGAAGGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTCGTTGTCGGCGG");
+	//sequences[seq->getID()] = seq;
 
 
 	setSequence("Buchnera aphidicola murC1 EU274658");

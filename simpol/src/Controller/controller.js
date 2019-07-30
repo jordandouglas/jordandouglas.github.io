@@ -663,6 +663,7 @@ function renderObjects(override = false, resolve = function(){}){
 
 
 			//renderingObjects = true;
+			var foldedNucleotidesDeleted = false;
 			var nucleotidesToFold_nodes = [];
 			var nucleotidesToFold_edges = [];
 			while (unrenderedObjects_controller.length > 0){
@@ -684,6 +685,7 @@ function renderObjects(override = false, resolve = function(){}){
 					//console.log("Will unfold", nt);
 					removeNodeSecondaryStructure(nt);
 					$("#" + nt["id"]).show(0);
+					foldedNucleotidesDeleted = true;
 				}
 
 
@@ -691,13 +693,18 @@ function renderObjects(override = false, resolve = function(){}){
 				// Remove the object from the page
 				if(nt.needsDeleting){
 
-					//console.log("Deleting", nt["id"]);
+					console.log("Deleting", nt);
 
 					$("#" + nt["id"]).remove();
 					if (nt["hasTP"]) delete_TP(nt["pos"]);
 					nt.needsDeleting = false;
+					
+					
+					if (nt.isFolded){
+						deleteEdgesFromNode(nt);
+					}
 
-
+					
 					continue;
 
 				}
@@ -866,8 +873,8 @@ function renderObjects(override = false, resolve = function(){}){
 			}
 
 			updateSecondaryStructure(nucleotidesToFold_nodes, nucleotidesToFold_edges);
-
-				
+			
+			//if(nucleotidesToFold_nodes.length == 0 && foldedNucleotidesDeleted) refreshSecondaryStructure();
 
 			//$("#bases").children().promise().done(function(){
 				//renderingObjects = false;
