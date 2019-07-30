@@ -764,6 +764,8 @@ function changeDistribution(element){
 
 		PHYSICAL_PARAMETERS_TEMP = PHYSICAL_PARAMETERS_LOCAL;
 		
+		//console.log("PHYSICAL_PARAMETERS_TEMP", PHYSICAL_PARAMETERS_TEMP);
+		
 		var discreteDescriptionStr = "";
 		if (PHYSICAL_PARAMETERS_TEMP[paramID]["integer"] == null || !PHYSICAL_PARAMETERS_TEMP[paramID]["integer"]){
 			innerHTML = innerHTML.replace("XX_DISTRIBUTION_XX", getContinuousVariableDistributionsTemplate());

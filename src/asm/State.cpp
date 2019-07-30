@@ -1267,7 +1267,7 @@ void State::form_bulge(int S, bool form_left, SlippageLandscapes* DOMupdates){
 		}
 		
 		
-		cout << "bulgedBase " << this->bulgedBase.at(S) << " bulgePos " << this->bulgePos.at(S) << endl;
+		//cout << "bulgedBase " << this->bulgedBase.at(S) << " bulgePos " << this->bulgePos.at(S) << endl;
 
 
 

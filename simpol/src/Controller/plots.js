@@ -4434,9 +4434,9 @@ function plot_probability_distribution(distn_fn, xmin, xmax, canvasID, xlab = ""
 	ctx.font = "12px Arial";
 	ctx.textBaseline="top"; 
 	ctx.textAlign="left"; 
-	ctx.fillText(xmin, axisGap, canvas.height - axisGap + axisPointMargin);
+	ctx.fillText(xmin, axisGap, canvas.height - axisGap + 3 * axisPointMargin);
 	ctx.textAlign="right"; 
-	ctx.fillText(xmax, canvas.width, canvas.height - axisGap + axisPointMargin);
+	ctx.fillText(xmax, canvas.width, canvas.height - axisGap + 3 * axisPointMargin);
 
 
 

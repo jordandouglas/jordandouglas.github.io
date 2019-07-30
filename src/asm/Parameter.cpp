@@ -187,6 +187,11 @@ void Parameter::recomputeNormalisationTerms(){
 	if (currentModel->get_subtractMeanBarrierHeight() && this->id == "DGtaudag") {
 		this->normalisationAdditiveTerm = currentModel->getTranslocationModelConstant();
 		//cout << " normalisationAdditiveTerm " << this->normalisationAdditiveTerm << endl;
+		
+		
+		// Set the 'fixedValue' estimate to the current true value after normalisation
+		//distributionParameters["fixedDistnVal"] = this->getVal(true);
+		
 	}
 
 	else this->normalisationAdditiveTerm = 0;
@@ -196,9 +201,9 @@ void Parameter::recomputeNormalisationTerms(){
 
 
 void Parameter::sample(){
-
-
-
+	
+	
+	
 	double prevVal = this->val;
 
 	if (this->isMetaParameter) {
@@ -631,8 +636,8 @@ string Parameter::toJSON(){
 
 	double valJSON = 0;
 
-	if (this->isHardcoded) valJSON = this->hardcodedVal + this->normalisationAdditiveTerm;
-	else valJSON = this->val + this->normalisationAdditiveTerm;
+	if (this->isHardcoded) valJSON = this->hardcodedVal; // + this->normalisationAdditiveTerm;
+	else valJSON = this->val; // + this->normalisationAdditiveTerm;
 
 
 	JSON += "'distribution':'" + this->distributionName + "',";
