@@ -80,10 +80,17 @@ void messageFromWasmToJS(const string & msg, int msgID) {
 extern "C" {
 
 
-	void EMSCRIPTEN_KEEPALIVE initGUI(bool isMobile){
+	void EMSCRIPTEN_KEEPALIVE initGUI(){
 		_USING_GUI = true;
         _GUI_PLOTS = new Plots();
 		//_currentStateGUI = new State(true, true);
+	}
+	
+	
+	void EMSCRIPTEN_KEEPALIVE setMobileStatus(bool isMobile){
+		cout << "Using mobile device: " << isMobile << endl;
+        _GUI_MOBILE = isMobile;
+        _MAX_GUI_SEQUENCE_LEN = 5000;
 	}
 
 

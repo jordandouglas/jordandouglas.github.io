@@ -185,6 +185,7 @@ CRandomMersenne* Settings::SFMT;
 // User interface information
 bool _USING_GUI = false;
 int _MAX_GUI_SEQUENCE_LEN = 7000;
+bool _GUI_MOBILE = false;
 bool _GUI_STOP = false;
 bool _needToReinitiateAnimation = false;
 bool _GUI_simulating = false;

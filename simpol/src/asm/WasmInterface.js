@@ -28,7 +28,7 @@ WASM_MESSAGE_LISTENER = {};
 
 // Send a message back to the original JS module to inform that the program has initialised
 onRuntimeInitialised = function(){
-    Module.ccall("initGUI", null, ["number"], [IS_MOBILE]); // Initialise the WASM module for GUI use
+    Module.ccall("initGUI", null, [], []); // Initialise the WASM module for GUI use
     postMessage("wasm_initialised");
 }
 Module['onRuntimeInitialized'] = onRuntimeInitialised;
@@ -118,6 +118,13 @@ getCppArrayFromDict = function(dict, dataType = "double"){
 
 setNThreads = function(n){
     Module.ccall("setNThreads", null, ["number"], [n]);
+}
+
+
+
+setMobileStatus = function(isMobile){
+	IS_MOBILE = isMobile;
+	Module.ccall("setMobileStatus", null, ["int"], [isMobile]);
 }
 
 

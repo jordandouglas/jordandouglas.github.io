@@ -142,6 +142,7 @@ extern bool _sampleModels;
 extern bool _USING_GUI;
 extern int _MAX_GUI_SEQUENCE_LEN;
 extern bool _GUI_STOP;
+extern bool _GUI_MOBILE;
 extern bool _needToReinitiateAnimation;
 extern bool _GUI_simulating;
 extern bool _applyingReactionsGUI;

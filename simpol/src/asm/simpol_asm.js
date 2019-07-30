@@ -1220,11 +1220,11 @@ function updateGlobalBufferViews() {
 
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 471472,
+    STACK_BASE = 471504,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 5714352,
-    DYNAMIC_BASE = 5714352,
-    DYNAMICTOP_PTR = 471440;
+    STACK_MAX = 5714384,
+    DYNAMIC_BASE = 5714384,
+    DYNAMICTOP_PTR = 471472;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1703,7 +1703,7 @@ function _emscripten_asm_const_iii(code, a0, a1) {
 
 
 
-// STATICTOP = STATIC_BASE + 470448;
+// STATICTOP = STATIC_BASE + 470480;
 /* global initializers */  __ATINIT__.push({ func: function() { globalCtors() } });
 
 
@@ -1714,7 +1714,7 @@ function _emscripten_asm_const_iii(code, a0, a1) {
 
 
 /* no memory initializer */
-var tempDoublePtr = 471456
+var tempDoublePtr = 471488
 assert(tempDoublePtr % 8 == 0);
 
 function copyTempFloat(ptr) { // functions, because inlining this code increases code size too much
@@ -6386,6 +6386,12 @@ var real__setInputFilename = asm["_setInputFilename"]; asm["_setInputFilename"] 
   return real__setInputFilename.apply(null, arguments);
 };
 
+var real__setMobileStatus = asm["_setMobileStatus"]; asm["_setMobileStatus"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return real__setMobileStatus.apply(null, arguments);
+};
+
 var real__setModelSettings = asm["_setModelSettings"]; asm["_setModelSettings"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
@@ -6848,6 +6854,10 @@ var _setInputFilename = Module["_setInputFilename"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["_setInputFilename"].apply(null, arguments) };
+var _setMobileStatus = Module["_setMobileStatus"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return Module["asm"]["_setMobileStatus"].apply(null, arguments) };
 var _setModelSettings = Module["_setModelSettings"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');

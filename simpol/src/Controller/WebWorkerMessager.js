@@ -106,8 +106,7 @@ function register_WebWorker(resolve = function() { }){
     	WEB_WORKER_WASM.onmessage = function(event) {
 			onWebWorkerReceiveMessage(event, resolve);
 		}
-	
-    	
+
 
     }  else resolve();
 
@@ -362,6 +361,19 @@ function stop_controller(resolve = function() { }){
 
 
 }
+
+
+// Specify whether or not using a mobile device
+function setMobileStatus_controller(isMobile) {
+	if (WEB_WORKER_WASM != null){
+		var fnStr = "wasm_" + stringifyFunction("setMobileStatus", [isMobile]);
+		callWebWorkerFunction(fnStr);
+	}
+}
+
+		
+
+
 
 
 function create_HTMLobject_controller(id, x, y, width, height, src, zIndex = 1){
