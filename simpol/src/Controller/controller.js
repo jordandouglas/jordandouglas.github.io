@@ -1013,10 +1013,13 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 					for (var i = 1; i <=4; i ++){
 						if (PLOT_DATA["whichPlotInWhichCanvas"][i] == null || PLOT_DATA["whichPlotInWhichCanvas"][i].name == "none") continue;
 						
+						
+						
 						saveXML.writeStartElement("plot" + i);
 						for (pltData in PLOT_DATA["whichPlotInWhichCanvas"][i]){
+							console.log(pltData);
 							if (pltData == "xData" || pltData == "yData" || pltData == "zData") continue; // Don't save the data just the settings
-							if (pltData="burnin" || pltData=="ESS" || pltData == "selectedPosteriorID") continue;
+							if (pltData == "burnin" || pltData=="ESS" || pltData == "selectedPosteriorID") continue;
 							saveXML.writeAttributeString(pltData, PLOT_DATA["whichPlotInWhichCanvas"][i][pltData]);
 						}
 						saveXML.writeEndElement();
@@ -1025,18 +1028,6 @@ function getXMLstringOfSession(datetime = "", callback = function(str) { }){
 				
 				saveXML.writeEndElement();
 			}
-
-			// Current state
-			/*
-			saveXML.writeStartElement('state');
-				saveXML.writeAttributeString('nascentLen', STATE[0]);
-				saveXML.writeAttributeString('activeSitePosition', STATE[1]);
-				saveXML.writeAttributeString('NTPbound', STATE[2]);
-				saveXML.writeAttributeString('activated', STATE[3]);
-			saveXML.writeEndElement();
-			*/
-
-		
 
 		// Model settings
 		saveXML.writeStartElement('elongation-model');
