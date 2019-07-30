@@ -4579,7 +4579,7 @@ function distanceVsTimeOptionsTemplate1(){
 					Min = 
 				</td>
 				<td>
-					<input class="textboxBlue" type="number" style="width:50px; text-align:right" id="xMin_textbox" value = 0> XUNITS 
+					<input class="textboxBlue" type="number" style="width:5em; text-align:right" id="xMin_textbox" value = 0> XUNITS 
 				</td>
 			</tr>
 			<tr style="cursor:pointer" onclick= " $('input[name=xRange][value=specifyX]').prop('checked', true); enableTextbox('#xMin_textbox'); enableTextbox('#xMax_textbox') ">
@@ -4588,7 +4588,7 @@ function distanceVsTimeOptionsTemplate1(){
 					Max = 
 				</td>
 				<td>
-					<input class="textboxBlue" type="number" style="width:50px; text-align:right" id="xMax_textbox" value = 1> XUNITS 
+					<input class="textboxBlue" type="number" style="width:5em; text-align:right" id="xMax_textbox" value = 1> XUNITS 
 				</td>
 			</tr>
 		</table>
@@ -4617,7 +4617,7 @@ function distanceVsTimeOptionsTemplate2(){
 					Min = 
 				</td>
 				<td>
-					<input class="textboxBlue" type="number" style="width:50px; text-align:right" id="yMin_textbox" value=YMINDEFAULT> YUNITS 
+					<input class="textboxBlue" type="number" style="width:5em; text-align:right" id="yMin_textbox" value=YMINDEFAULT> YUNITS 
 				</td>
 			</tr>
 			<tr style="cursor:pointer" onclick= " $('input[name=yRange][value=specifyY]').prop('checked', true); enableTextbox('#yMin_textbox'); enableTextbox('#yMax_textbox') ">
@@ -4626,7 +4626,7 @@ function distanceVsTimeOptionsTemplate2(){
 					Max = 
 				</td>
 				<td>
-					<input class="textboxBlue" type="number" style="width:50px; text-align:right" id="yMax_textbox" value=YMAXDEFAULT> YUNITS 
+					<input class="textboxBlue" type="number" style="width:5em; text-align:right" id="yMax_textbox" value=YMAXDEFAULT> YUNITS 
 				</td>
 			</tr>
 		</table>
@@ -4658,7 +4658,7 @@ function distanceVsTimeOptionsTemplate3(){
 					Min = 
 				</td>
 				<td>
-					<input class="textboxBlue" type="number" style="width:50px; text-align:right" id="zMin_textbox" value=ZMINDEFAULT> 
+					<input class="textboxBlue" type="number" style="width:5em; text-align:right" id="zMin_textbox" value=ZMINDEFAULT> 
 				</td>
 			</tr>
 			<tr style="cursor:pointer" onclick= " $('input[name=zRange][value=specifyZ]').prop('checked', true); enableTextbox('#zMin_textbox'); enableTextbox('#zMax_textbox') ">
@@ -4667,7 +4667,7 @@ function distanceVsTimeOptionsTemplate3(){
 					Max = 
 				</td>
 				<td>
-					<input class="textboxBlue" type="number" style="width:50px; text-align:right" id="zMax_textbox" value=ZMAXDEFAULT> 
+					<input class="textboxBlue" type="number" style="width:5em; text-align:right" id="zMax_textbox" value=ZMAXDEFAULT> 
 				</td>
 			</tr>
 		</table>
@@ -4736,7 +4736,7 @@ function logSpaceTemplateY(){
 function windowSizeOptionsTemplate(){
 	
 	return `
-		<b>Window size</b>  <input id="windowSizeInput" type="number" class="textboxBlue" style="width:50px; text-align:right"></input>s.
+		<b>Window size</b>  <input id="windowSizeInput" type="number" class="textboxBlue" style="width:5em; text-align:right"></input>s.
 	`;
 	
 }
@@ -4798,7 +4798,7 @@ function parameterPlotSiteSpecificTemplate(varID){
 			<legend>Constrain to the following sites:</legend>
 			<label style="cursor:pointer"> <input type="radio" name="sitesToRecord` + varID + `" onChange="updateParameterPlotSettings()" onclick="disableTextbox('#sitesToRecord_textbox` + varID + `')" value="allSites">All sites<br> </label>
 			<label style="cursor:pointer"  title="Enabling this will mean that only the specified template positions will be displayed in the plot. You may need to run the simulations again to acquire this data."> <input onChange="updateParameterPlotSettings()" type="radio" name="sitesToRecord` + varID + `" onclick="enableTextbox('#sitesToRecord_textbox` + varID + `')"  value="specifySites">Just these ones: 
-				&nbsp;&nbsp;<input onfocusout="updateParameterPlotSettings()" onclick="updateParameterPlotSettings(true);" type="text" placeholder="eg. 10,13,20-30" style="width:150px; padding: 5 5" id="sitesToRecord_textbox` + varID + `"> </label>
+				&nbsp;&nbsp;<input onfocusout="updateParameterPlotSettings()" onclick="updateParameterPlotSettings(true);" type="text" placeholder="eg. 10,13,20-30" style="width:15em; padding: 5 5" id="sitesToRecord_textbox` + varID + `"> </label>
 		</div>
 	`;
 

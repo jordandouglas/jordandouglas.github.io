@@ -207,7 +207,6 @@ function getTutorialDialogTemplate(){
                 
 
                 <span style="float:right">
-                	<span class="mobile-display">(This page is best suited for landscape mode)</span>
                     <input type=button class="button pauser" onClick="closeDialogs()" value='OK' title="OK" style="width:60px;"></input>
                 </span>
             </div>
