@@ -115,7 +115,7 @@ PlotSettings::PlotSettings(int plotNumber, string name){
 		this->yData = "{}"; // Custom Y variable
 		this->ESS = 0;
 		this->selectedPosteriorID = 0;
-        this->exponentialDecay = false;
+        this->exponentialDecay = true;
 	}
 
 
