@@ -769,10 +769,6 @@ extern "C" {
 		messageFromWasmToJS("{'succ':true, 'errorMsg':'" + errorMsg + "'}", msgID);
 
 
-
-
-
-
 	}
 
 

@@ -251,6 +251,7 @@ class Settings{
 		static list<PosteriorDistributionSample*> getPosteriorDistributionByID(int fitID);
 		static void addToPosteriorDistribution(int fitID, PosteriorDistributionSample* obj);
 		static void parseModel(string modelID, double modelWeight, string modelDescription);
+		static void toggleNasecentDnaRna(string newNascentType);
 	
 
 		// Utilities

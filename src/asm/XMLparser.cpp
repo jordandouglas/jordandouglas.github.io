@@ -227,36 +227,16 @@ string XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 
 
 				// Get the parameter object
-				Parameter *param;
-				if (paramID == "NTPconc") param = NTPconc;
-				else if (paramID == "ATPconc") param = ATPconc;
-				else if (paramID == "CTPconc") param = CTPconc;
-				else if (paramID == "GTPconc") param = GTPconc;
-				else if (paramID == "UTPconc") param = UTPconc;
-
-				else if (paramID == "hybridLen") param = hybridLen; 
-				else if (paramID == "bubbleLeft") param = bubbleLeft; 
-				else if (paramID == "bubbleRight") param = bubbleRight; 
-				else if (paramID == "DGtaudag") param = DGtaudag; 
-				else if (paramID == "DGtau1") param = DGtau1; 
-				else if (paramID == "barrierPos") param = barrierPos; 
-				else if (paramID == "FAssist") param = FAssist; 
-				else if (paramID == "arrestTime") param = arrestTime; 
-				else if (paramID == "rnaFoldDistance") param = rnaFoldDistance; 
-				else if (paramID == "kCat") param = kCat; 
-				else if (paramID == "Kdiss") param = Kdiss; 
-				else if (paramID == "RateBind") param = RateBind; 
-				else if (paramID == "RateActivate") param = RateActivate; 
-				else if (paramID == "RateDeactivate") param = RateDeactivate; 
-				else if (paramID == "deltaGDaggerHybridDestabil") param = deltaGDaggerHybridDestabil; 
-				else if (paramID == "DGtaudagM") param = DGtaudagM; 
-				else if (paramID == "RateCleave") param = RateCleave; 
-				else if (paramID == "CleavageLimit") param = CleavageLimit; 
-				else if (paramID == "DGtaudagP") param = DGtaudagP; 
-                else if (paramID == "haltPosition") param = haltPosition; 
-                else if (paramID == "proposalWidth") param = proposalWidth; 
-
-				else continue;
+				Parameter *param = nullptr;
+				
+				for (int paramNum = 0; paramNum < Settings::paramList.size(); paramNum ++){
+					if (Settings::paramList.at(paramNum)->getID() == paramID){
+						param = Settings::paramList.at(paramNum);
+						break;
+					}
+				}
+				
+				if (param == nullptr) continue;
 
 
 
@@ -665,37 +645,18 @@ string XMLparser::parseXMLFromDocument(TiXmlDocument doc, Plots* plotsObj){
 						else if (attrName == "assumeTranslocationEquilibrium") model->set_assumeTranslocationEquilibrium(value == "true");
 						
 						
-						// Parameters
-						else if (attrName == "NTPconc") model->addParameterHardcoding("NTPconc", value);
-						else if (attrName == "ATPconc") model->addParameterHardcoding("ATPconc", value);
-						else if (attrName == "CTPconc") model->addParameterHardcoding("CTPconc", value);
-						else if (attrName == "GTPconc") model->addParameterHardcoding("GTPconc", value);
-						else if (attrName == "UTPconc") model->addParameterHardcoding("UTPconc", value);
-						else if (attrName == "FAssist") model->addParameterHardcoding("FAssist", value); 
-
-						else if (attrName == "hybridLen") model->addParameterHardcoding("hybridLen", value); 
-						else if (attrName == "bubbleLeft") model->addParameterHardcoding("bubbleLeft", value); 
-						else if (attrName == "bubbleRight") model->addParameterHardcoding("bubbleRight", value); 
-
-						else if (attrName == "DGtaudag") model->addParameterHardcoding("DGtaudag", value); 
-						else if (attrName == "DGtau1") model->addParameterHardcoding("DGtau1", value); 
-						else if (attrName == "barrierPos") model->addParameterHardcoding("barrierPos", value); 
-
-						else if (attrName == "kCat") model->addParameterHardcoding("kCat", value); 
-						else if (attrName == "Kdiss") model->addParameterHardcoding("Kdiss", value); 
-						else if (attrName == "RateBind") model->addParameterHardcoding("RateBind", value); 
-
-						else if (attrName == "arrestTime") model->addParameterHardcoding("arrestTime", value);
-						else if (attrName == "rnaFoldDistance") model->addParameterHardcoding("rnaFoldDistance", value);
-
-
-						else if (attrName == "RateActivate") model->addParameterHardcoding("RateActivate", value); 
-						else if (attrName == "RateDeactivate") model->addParameterHardcoding("RateDeactivate", value); 
-						else if (attrName == "DGtaudagM") model->addParameterHardcoding("DGtaudagM", value); 
-						else if (attrName == "deltaGDaggerHybridDestabil") model->addParameterHardcoding("deltaGDaggerHybridDestabil", value); 
-						else if (attrName == "RateCleave") model->addParameterHardcoding("RateCleave", value); 
-						else if (attrName == "CleavageLimit") model->addParameterHardcoding("CleavageLimit", value); 
-						else if (attrName == "DGtaudagP") model->addParameterHardcoding("DGtaudagP", value); 
+						// Parameter hardcodings
+						else {
+						
+							for (int paramNum = 0; paramNum < Settings::paramList.size(); paramNum ++){
+								if (Settings::paramList.at(paramNum)->getID() == attrName){
+									model->addParameterHardcoding(attrName, value);
+									break;
+								}
+							}
+							
+						}
+						
 
 					}
 

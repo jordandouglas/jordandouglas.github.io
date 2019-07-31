@@ -136,6 +136,7 @@ Parameter* ATPconc = new Parameter("ATPconc", false, "inclusive", " [ATP] (\u03b
 Parameter* CTPconc = new Parameter("CTPconc", false, "inclusive", " [CTP] (\u03bcM)", "Cellular concentration of CTP");
 Parameter* GTPconc = new Parameter("GTPconc", false, "inclusive", " [GTP] (\u03bcM)", "Cellular concentration of GTP");
 Parameter* UTPconc = new Parameter("UTPconc", false, "inclusive", " [UTP] (\u03bcM)", "Cellular concentration of UTP");
+
 Parameter* FAssist = new Parameter("FAssist", false, "false", "Force  (pN)", "Assisting force applied to the polymerase during single-molecule experiments.");
 Parameter* haltPosition = new Parameter("haltPosition", true, "exclusive", "Halt position (nt)", "Position where the polymerase is halted prior to the start of the experiment.");
 
@@ -154,7 +155,6 @@ Parameter* RateBind = new Parameter("RateBind", false, "inclusive", "Rate of bin
 
 Parameter* RateActivate = new Parameter("RateActivate", false, "inclusive", "Rate of activation (s\u207B\u00B9)", "Rate constant of polymerase leaving the intermediate state", "k_[A]  (s^[\u22121\u2009])");
 Parameter* RateDeactivate = new Parameter("RateDeactivate", false, "inclusive", "Rate of inactivation (s\u207B\u00B9)", "Rate constant of polymerase entering the intermediate state", "k_[U]  (s^[\u22121\u2009])");
-Parameter* deltaGDaggerHybridDestabil = new Parameter("deltaGDaggerHybridDestabil", false, "false", "\u0394G\u2020\u03C0", "Gibbs energy barrier of hybrid destabilisation, which causes catalytic inactivation.");
 Parameter* DGtaudagM = new Parameter("DGtaudagM", false, "false", "\u0394G\u2020\U0001D70F-", "Additive Gibbs energy barrier height of backtracking. Added onto the value of \u0394G\u2020\U0001D70F.", "\u0394G_{\U0001D70F-}^{\u2020}  (k_{B}T)");
 Parameter* DGtaudagP = new Parameter("DGtaudagP", false, "false", "\u0394G\u2020\U0001D70F+", "Additive Gibbs energy barrier height of hypertranslocation. Added onto the value of \u0394G\u2020\U0001D70F.", "\u0394G_{\U0001D70F+}^{\u2020}  (k_{B}T)");
 
@@ -166,7 +166,7 @@ Parameter* CleavageLimit = new Parameter("CleavageLimit", true, "inclusive", "Cl
 
 Parameter* rnaFoldDistance = new Parameter("rnaFoldDistance", true, "inclusive", "Fold distance (nt)", "Number of nucleotides upstream from the polymerase which cannot fold", "\u03BB_[b]  (nt)");
 
-
+Parameter* deltaGDaggerHybridDestabil = new Parameter("deltaGDaggerHybridDestabil", false, "false", "\u0394G\u2020\u03C0", "Gibbs energy barrier of hybrid destabilisation, which causes catalytic inactivation.");
 Parameter* upstreamCurvatureCoeff = new Parameter("upstreamCurvatureCoeff", false, "false", "3\u2032 DNA curvature coeff.", "Change in free energy of translocation associated with DNA upstream from the hybrid, per degree of curvature", "\u0394G_{3\u2032bend}  (k_{B}T)");
 Parameter* downstreamCurvatureCoeff = new Parameter("downstreamCurvatureCoeff", false, "false", "5\u2032 DNA curvature coeff.", "Change in free energy of translocation associated with DNA downstream from the hybrid, per degree of curvature", "\u0394G_{5\u2032bend}  (k_{B}T)");
 Parameter* upstreamWindow = new Parameter("upstreamWindow", true, "exclusive", "3\u2032 DNA curvature window", "Window size to calculate the upstream DNA curvature", "3\u2032 bend window (bp)");
@@ -177,7 +177,7 @@ Parameter* downstreamWindow = new Parameter("downstreamWindow", true, "exclusive
 Parameter* proposalWidth = new Parameter("proposalWidth", false, "exclusive", "Proposal width", "Scale width of MCMC proposals, relative to the width of the prior distribution.");
 
 
-vector<Parameter*> Settings::paramList(28); // Number of parameters
+vector<Parameter*> Settings::paramList(25); // Number of parameters
 
 CRandomMersenne* Settings::SFMT;
 
@@ -231,14 +231,15 @@ void Settings::init(){
 	CTPconc->setDistributionParameter("fixedDistnVal", 278)->hide();
 	GTPconc->setDistributionParameter("fixedDistnVal", 468)->hide();
 	UTPconc->setDistributionParameter("fixedDistnVal", 567)->hide();
+	
 	FAssist->setDistributionParameter("fixedDistnVal", 0)->setDistributionParameter("uniformDistnLowerVal", -30)->setDistributionParameter("uniformDistnUpperVal", 30);
 	haltPosition->setDistributionParameter("fixedDistnVal", 14)->setDistributionParameter("lowerVal", 14);
 
 
 
-	hybridLen->setDistributionParameter("fixedDistnVal", 9);
+	hybridLen->setDistributionParameter("fixedDistnVal", 11);
 	bubbleLeft->setDistributionParameter("fixedDistnVal", 2);
-	bubbleRight->setDistributionParameter("fixedDistnVal", 1);
+	bubbleRight->setDistributionParameter("fixedDistnVal", 0);
 
 	DGtaudag->setDistributionParameter("fixedDistnVal", 9)->setDistributionParameter("uniformDistnLowerVal", 9)->setDistributionParameter("uniformDistnUpperVal", 15);
 	DGtau1->setDistributionParameter("fixedDistnVal", 0);
@@ -256,7 +257,7 @@ void Settings::init(){
 
 	RateActivate->setDistributionParameter("fixedDistnVal", 0.1);
 	RateDeactivate->setDistributionParameter("fixedDistnVal", 0.05);
-	deltaGDaggerHybridDestabil->setDistributionParameter("fixedDistnVal", -1);
+	//deltaGDaggerHybridDestabil->setDistributionParameter("fixedDistnVal", -1);
 	DGtaudagM->setDistributionParameter("fixedDistnVal", 0);
 	DGtaudagP->setDistributionParameter("fixedDistnVal", 0);
 	RateCleave->setDistributionParameter("fixedDistnVal", 0);
@@ -265,8 +266,8 @@ void Settings::init(){
 
 	upstreamCurvatureCoeff->setDistributionParameter("fixedDistnVal", 0);
 	downstreamCurvatureCoeff->setDistributionParameter("fixedDistnVal", 0);
-	upstreamWindow->setDistributionParameter("fixedDistnVal", 12);
-	downstreamWindow->setDistributionParameter("fixedDistnVal", 12);
+	//upstreamWindow->setDistributionParameter("fixedDistnVal", 12);
+	//downstreamWindow->setDistributionParameter("fixedDistnVal", 12);
 
 
 	rnaFoldDistance->setDistributionParameter("fixedDistnVal", 8);
@@ -274,8 +275,8 @@ void Settings::init(){
 
 	upstreamCurvatureCoeff->hide();
 	downstreamCurvatureCoeff->hide();
-	upstreamWindow->hide();
-	downstreamWindow->hide();
+	//upstreamWindow->hide();
+	//downstreamWindow->hide();
 
 
 
@@ -286,36 +287,43 @@ void Settings::init(){
 	paramList.at(2) = CTPconc;
 	paramList.at(3) = GTPconc;
 	paramList.at(4) = UTPconc;
+	
+	
 	paramList.at(5) = FAssist;
-
-	paramList.at(6) = hybridLen;
-	paramList.at(7) = bubbleLeft;
-	paramList.at(8) = bubbleRight;
-	paramList.at(9) = DGtaudag;
-	paramList.at(10) = DGtau1;
-	paramList.at(11) = barrierPos;
-	paramList.at(12) = arrestTime;
-	paramList.at(13) = kCat;
-	paramList.at(14) = Kdiss;
-	paramList.at(15) = RateBind;
-	paramList.at(16) = RateActivate;
-	paramList.at(17) = RateDeactivate;
-	paramList.at(18) = RateCleave;
-	paramList.at(19) = deltaGDaggerHybridDestabil;
-	paramList.at(20) = DGtaudagM;
-	paramList.at(21) = rnaFoldDistance;
+	paramList.at(6) = haltPosition;
+	
+	paramList.at(7) = hybridLen;
+	paramList.at(8) = bubbleLeft;
+	paramList.at(9) = bubbleRight;
+	
+	paramList.at(10) = Kdiss;
+	paramList.at(11) = kCat;
+	paramList.at(12) = RateBind;
+	
+	
+	paramList.at(13) = DGtaudag;
+	paramList.at(14) = DGtau1;
+	paramList.at(15) = barrierPos;
+	
+	paramList.at(16) = RateDeactivate;
+	paramList.at(17) = RateActivate;
+	paramList.at(18) = DGtaudagM;
+	paramList.at(19) = DGtaudagP;
+	
+	paramList.at(20) = rnaFoldDistance;
+	
+	paramList.at(21) = RateCleave;
 	paramList.at(22) = CleavageLimit;
-
-
-	//paramList.at(19) = upstreamCurvatureCoeff;
-	//paramList.at(20) = downstreamCurvatureCoeff;
-	paramList.at(23) = upstreamWindow;
-	paramList.at(24) = downstreamWindow;
-	paramList.at(25) = haltPosition;
-	paramList.at(26) = DGtaudagP;
-
-	paramList.at(27) = proposalWidth;
-
+	
+	paramList.at(23) = arrestTime;
+	paramList.at(24) = proposalWidth;
+	
+	
+	
+	//paramList.at(25) = deltaGDaggerHybridDestabil;
+	//paramList.at(26) = upstreamWindow;
+	//paramList.at(27) = downstreamWindow;
+	
 
 
 	// Create the polymerase objects
@@ -348,9 +356,7 @@ void Settings::initPolymerases(){
 	ecoliPol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 25.56));
 	ecoliPol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 1.8));
 	ecoliPol->setParameter(RateBind->clone()->setDistributionParameter("fixedDistnVal", 0.5448));
-	ecoliPol->setParameter(hybridLen->clone()->setDistributionParameter("fixedDistnVal", 9));
-	ecoliPol->setParameter(bubbleLeft->clone()->setDistributionParameter("fixedDistnVal", 2));
-	ecoliPol->setParameter(bubbleRight->clone()->setDistributionParameter("fixedDistnVal", 1));
+
 
 	// S. cerevisiae parameters
 	yeastPol->setParameter(DGtaudag->clone()->setDistributionParameter("fixedDistnVal", 8.536));
@@ -358,17 +364,13 @@ void Settings::initPolymerases(){
 	yeastPol->setParameter(barrierPos->clone()->setDistributionParameter("fixedDistnVal", 2.889));
 	yeastPol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 29.12));
 	yeastPol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 72));
-	yeastPol->setParameter(hybridLen->clone()->setDistributionParameter("fixedDistnVal", 10));
-	yeastPol->setParameter(bubbleLeft->clone()->setDistributionParameter("fixedDistnVal", 1));
-	yeastPol->setParameter(bubbleRight->clone()->setDistributionParameter("fixedDistnVal", 1));
+
 
 	// T7 parameters
 	T7pol->setParameter(DGtau1->clone()->setDistributionParameter("fixedDistnVal", -4.709));
 	T7pol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 127.3));
 	T7pol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 105));
-	T7pol->setParameter(hybridLen->clone()->setDistributionParameter("fixedDistnVal", 8));
-	T7pol->setParameter(bubbleLeft->clone()->setDistributionParameter("fixedDistnVal", 1));
-	T7pol->setParameter(bubbleRight->clone()->setDistributionParameter("fixedDistnVal", 1));
+
 
 
 	// Choose the default model settings
@@ -420,6 +422,43 @@ vector<Parameter*> Settings::getParamListClone(){
 }
 
 
+// If the nascent sequence has switched between DNA and RNA, then change the default concentrations of the NTPs
+void Settings::toggleNasecentDnaRna(string newNascentType){
+	
+	if (newNascentType == "ssDNA" && newNascentType != PrimerType){
+	
+		NTPconc->setDistributionParameter("fixedDistnVal", 20);
+		ATPconc->setDistributionParameter("fixedDistnVal", 24);
+		CTPconc->setDistributionParameter("fixedDistnVal", 29);
+		GTPconc->setDistributionParameter("fixedDistnVal", 5.2);
+		UTPconc->setDistributionParameter("fixedDistnVal", 37);
+	
+	}
+	
+	
+	else if (newNascentType == "ssRNA" && newNascentType != PrimerType){
+	
+	
+		//NTPconc = new Parameter("NTPconc", false, "inclusive", " [NTP] (\u03bcM)", "Cellular concentration of NTP");
+		//ATPconc = new Parameter("ATPconc", false, "inclusive", " [ATP] (\u03bcM)", "Cellular concentration of ATP");
+		//CTPconc = new Parameter("CTPconc", false, "inclusive", " [CTP] (\u03bcM)", "Cellular concentration of CTP");
+		//GTPconc = new Parameter("GTPconc", false, "inclusive", " [GTP] (\u03bcM)", "Cellular concentration of GTP");
+		//UTPconc = new Parameter("UTPconc", false, "inclusive", " [UTP] (\u03bcM)", "Cellular concentration of UTP");
+	
+	
+		NTPconc->setDistributionParameter("fixedDistnVal", 1000);
+		ATPconc->setDistributionParameter("fixedDistnVal", 3152);
+		CTPconc->setDistributionParameter("fixedDistnVal", 278);
+		GTPconc->setDistributionParameter("fixedDistnVal", 468);
+		UTPconc->setDistributionParameter("fixedDistnVal", 567);
+	
+	}
+	
+
+
+}
+
+
 
 void Settings::setParameterList(vector<Parameter*> params){
 
@@ -432,42 +471,45 @@ void Settings::setParameterList(vector<Parameter*> params){
 	CTPconc = paramList.at(2);
 	GTPconc = paramList.at(3);
 	UTPconc = paramList.at(4);
+	
+	
 	FAssist = paramList.at(5);
+	haltPosition = paramList.at(6);
 
-	hybridLen = paramList.at(6);
-	bubbleLeft = paramList.at(7);
-	bubbleRight = paramList.at(8);
-	DGtaudag = paramList.at(9);
-	DGtau1 = paramList.at(10);
-	barrierPos = paramList.at(11);
-	arrestTime = paramList.at(12);
-	kCat = paramList.at(13);
-	Kdiss = paramList.at(14);
-	RateBind = paramList.at(15);
-	RateActivate = paramList.at(16);
-	RateDeactivate = paramList.at(17);
-	RateCleave = paramList.at(18);
-	deltaGDaggerHybridDestabil = paramList.at(19);
-	DGtaudagM = paramList.at(20);
-	rnaFoldDistance = paramList.at(21);
+	hybridLen = paramList.at(7);
+	bubbleLeft = paramList.at(8);
+	bubbleRight = paramList.at(9);
+	
+	Kdiss = paramList.at(10);
+	kCat = paramList.at(11);
+	RateBind = paramList.at(12);
+	
+	
+	DGtaudag = paramList.at(13);
+	DGtau1 = paramList.at(14);
+	barrierPos = paramList.at(15);
+	
+	RateDeactivate = paramList.at(16);
+	RateActivate = paramList.at(17);
+	DGtaudagM = paramList.at(18);
+	DGtaudagP = paramList.at(19);
+	
+	rnaFoldDistance = paramList.at(20);
+	
+	RateCleave = paramList.at(21);
 	CleavageLimit = paramList.at(22);
-	upstreamWindow = paramList.at(23);
-	downstreamWindow = paramList.at(24);
+	
+	arrestTime = paramList.at(23);
+	proposalWidth = paramList.at(24);
+	
+	
+	
+	//deltaGDaggerHybridDestabil = paramList.at(25);
+	//upstreamWindow = paramList.at(26);
+	//downstreamWindow = paramList.at(27);
+	
 
-	haltPosition = paramList.at(25);
-	DGtaudagP = paramList.at(26);
 
-
-	proposalWidth = paramList.at(27);
-
-
-
-	/*
-	upstreamCurvatureCoeff = paramList.at(19);
-	downstreamCurvatureCoeff = paramList.at(20);
-	upstreamWindow = paramList.at(21);
-	downstreamWindow = paramList.at(22);
-	*/
 
 
 
@@ -517,12 +559,21 @@ void Settings::setSequence(Sequence* seq){
 
     currentSequence = seq;
 
+	// Change between dNTP and NTP if applicable
+	Settings::toggleNasecentDnaRna(currentSequence->get_primerType());
+
+
+    
     _seqID = currentSequence->getID();
     templateSequence = currentSequence->get_templateSequence();
     complementSequence = currentSequence->get_complementSequence();
     TemplateType = currentSequence->get_templateType();
     PrimerType = currentSequence->get_primerType();
 
+
+
+
+	
 
     currentSequence->initRateTable();
     currentSequence->initRNAunfoldingTable();
@@ -721,14 +772,14 @@ void Settings::print(){
 	RateDeactivate->print();
 	RateCleave->print();
 	CleavageLimit->print();
-	deltaGDaggerHybridDestabil->print();
+	//deltaGDaggerHybridDestabil->print();
 	DGtaudagP->print();
 	DGtaudagM->print();
 
 	upstreamCurvatureCoeff->print();
 	downstreamCurvatureCoeff->print();
-	upstreamWindow->print();
-	downstreamWindow->print();
+	//upstreamWindow->print();
+	//downstreamWindow->print();
 	rnaFoldDistance->print();
 
 
@@ -967,13 +1018,13 @@ Parameter* Settings::getParameterByName(string paramID){
 	if (paramID == "RateDeactivate") return RateDeactivate;
 	if (paramID == "RateCleave") return RateCleave;
 	if (paramID == "CleavageLimit") return CleavageLimit;
-	if (paramID == "deltaGDaggerHybridDestabil") return deltaGDaggerHybridDestabil;
+	//if (paramID == "deltaGDaggerHybridDestabil") return deltaGDaggerHybridDestabil;
 	if (paramID == "DGtaudagM") return DGtaudagM;
 	if (paramID == "DGtaudagP") return DGtaudagP;
 	if (paramID == "upstreamCurvatureCoeff") return upstreamCurvatureCoeff;
 	if (paramID == "downstreamCurvatureCoeff") return downstreamCurvatureCoeff;
-	if (paramID == "upstreamWindow") return upstreamWindow;
-	if (paramID == "downstreamWindow") return downstreamWindow;
+	//if (paramID == "upstreamWindow") return upstreamWindow;
+	//if (paramID == "downstreamWindow") return downstreamWindow;
 	if (paramID == "rnaFoldDistance") return rnaFoldDistance;
 
 
