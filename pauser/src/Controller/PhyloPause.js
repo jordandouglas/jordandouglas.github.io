@@ -179,7 +179,7 @@ function plotROC(canvasID = "ROC_curve_canvas", canvasSizeMultiplier = 1, resolv
 
     if (!$("#ROC_curve_cont").is(":visible")) return;
     
-    if (IS_MOBILE && canvasSizeMultiplier == 1) canvasSizeMultiplier = 2;
+    if (IS_MOBILE && canvasSizeMultiplier == 1) canvasSizeMultiplier = 1.8;
 
     getROCanalysis_controller(function(result) {
     
