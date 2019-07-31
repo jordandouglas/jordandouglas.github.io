@@ -264,7 +264,9 @@ startPauser = function(resume = false, msgID = null){
 
             // Resume the trials and tell the messenger to not delete the message
             if (msgID != null) postMessage(msgID + "~X~" + resultStr);
-            resumePauser(msgID);
+            setTimeout(function(){
+            	resumePauser(msgID);
+            }, 50);
         }
     }
 
@@ -352,7 +354,9 @@ resumePauser = function(msgID = null){
              
                 // Resume the trials and tell the messenger to not delete the message
                 if (msgID != null) postMessage(msgID + "~X~" + resultStr);
-                resumePauser(msgID);
+                setTimeout(function(){
+                	resumePauser(msgID);
+                }, 50);
             }
         }
 
