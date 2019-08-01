@@ -4465,19 +4465,27 @@ function plot_probability_distribution(distn_fn, xmin, xmax, canvasID, xlab = ""
 }
 
 
+
 function roundToSF(val, sf=2, ceilOrFloor = "none"){
 	
 	var magnitude = Math.floor(log(val, 10));
 
+
+
 	if (val < 0 && ceilOrFloor == "ceil") ceilOrFloor = "floor";
 	else if (val < 0 && ceilOrFloor == "floor") ceilOrFloor = "ceil";
 
-	var num = val * Math.pow(10, sf-magnitude);
+	var num = val * tenToThePowerOf(sf-magnitude);
+
 	if (ceilOrFloor == "ceil") num = Math.ceil(num)
 	else if (ceilOrFloor == "floor") num = Math.floor(num)
 	else num = Math.round(num);
 
-	num = num * Math.pow(10, magnitude-sf);
+
+	
+
+	num = num * tenToThePowerOf(magnitude-sf);
+
 	
 	// Sometimes this picks up a trailing .00000000001 which we want to remove
 
@@ -4492,6 +4500,31 @@ function roundToSF(val, sf=2, ceilOrFloor = "none"){
 	
 	return num;
 		
+}
+
+
+// Compute 10^n without using Math.pow which presents numerical instabilities
+function tenToThePowerOf(n){
+
+	if (n == 0) return 0;
+	var val = "1";
+	if (n < 0) {
+		val = "." + val;
+		for (var i = 1; i >= n; i --){
+			val = "0" + val;
+		}
+	}
+
+	else {
+		for (var i = 1; i <= n; i ++){
+			val = val + "0";
+		}
+
+	}
+
+	return parseFloat(val);
+
+
 }
 
 

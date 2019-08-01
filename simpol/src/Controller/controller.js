@@ -1618,6 +1618,10 @@ function clearCache(){
 						ABClinesAcceptedOnly = [];
 						validateAllAbcDataInputs();
 						removeTracePlots();
+						
+						$("#beginMCMC_btn").html("Begin MCMC-ABC");
+						$("#beginABC_btn").html("Begin R-ABC");
+						
 					}
 
 					
