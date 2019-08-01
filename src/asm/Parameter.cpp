@@ -141,6 +141,9 @@ double Parameter::getTrueVal(){
 }
 
 void Parameter::setVal(double val){
+
+	//cout << this->id << " is set to " << val << endl;
+
 	if (this->isMetaParameter) this->instances.at(this->currentInstance)->setVal(val);
 	else this->val = val;
 }
@@ -314,7 +317,7 @@ void Parameter::sample(){
 		Settings::resetRateTables();
 	}
 
-
+	//cout << "Resampled " << this->id << " from " << prevVal << " to " << this->val << endl;
 
 
 	// if (prevVal != this->val && this->id == "rnaFoldDistance") Settings::resetUnfoldingTables();
@@ -510,7 +513,6 @@ void Parameter::makeProposal(){
 		}
 				
 				
-		// TODO: gamma, exponential, poisson
 		//cout << "Changed parameter " << this->id << " from " << this->valBeforeMakingProposal  << " to " << this->val << endl;
 		
 	}

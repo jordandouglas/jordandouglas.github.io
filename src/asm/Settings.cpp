@@ -968,6 +968,7 @@ void Settings::clearParameterHardcodings(){
 // Samples all parameters
 void Settings::sampleAll(){
 
+
 	// Sample all model parameters
 	for (int i = 0; i < Settings::paramList.size(); i ++){
 		Settings::paramList.at(i)->sample();

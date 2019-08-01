@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
 
 		if (arg == "-MCMC") doMCMC = true;
         
-         else if (arg == "-h") printHelp = true;
+         	else if (arg == "-h") printHelp = true;
 		
 		else if (arg == "-sim") doMCMC = false;
 		

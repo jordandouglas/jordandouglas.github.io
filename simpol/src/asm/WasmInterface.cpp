@@ -905,6 +905,11 @@ extern "C" {
         
     		// Initialise MCMC
     		MCMC::initMCMC(false, true);
+    		
+    		// Set the last state as the new MCMC state
+			if (_GUI_posterior.size() >= 1) {
+				MCMC::setPreviousState(_GUI_posterior.back()->clone(true));
+			}
         
         }
         
@@ -1377,7 +1382,7 @@ extern "C" {
 
 
 				// Set the last state as the new MCMC state
-				if (_GUI_posterior.size() > 1) {
+				if (_GUI_posterior.size() >= 1) {
 
 					MCMC::setPreviousState(_GUI_posterior.back()->clone(true));
 					success = true;
@@ -1395,6 +1400,8 @@ extern "C" {
 		toReturnJSON += "'status':'" + MCMC::getStatus() + "',";
 		toReturnJSON += "'epsilon':" + to_string(MCMC::getEpsilon());
 		toReturnJSON += "}";
+		
+		
 
 
 		// Notify the plots that ABC is in effect

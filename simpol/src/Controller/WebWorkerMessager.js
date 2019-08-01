@@ -3725,7 +3725,7 @@ function uploadABC_controller(TSVstring, resolve = function() { }){
 				console.log("Rendering");
 
 				//$("#ABCoutput").html("");
-				$("#beginMCMC_btn").val("Resume MCMC-ABC");
+				$("#beginMCMC_btn").html("Resume MCMC-ABC");
 				addNewABCRows(linesResult.lines.split("!"));
 
 

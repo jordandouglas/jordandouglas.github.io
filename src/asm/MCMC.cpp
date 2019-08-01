@@ -106,6 +106,7 @@ void MCMC::initMCMC(bool uploadingLogFile, bool performFirstSimulation){
     if (!performFirstSimulation) return;
     
     
+    
 	// Load initial state from file
 	if (_resumeFromLogfile){
 		MCMC::previousMCMCstate->loadFromLogFile(_outputFilename);
@@ -149,6 +150,9 @@ void MCMC::initMCMC(bool uploadingLogFile, bool performFirstSimulation){
 		MCMC::initialStateNum = MCMC::previousMCMCstate->getStateNumber() + 1;
 		MCMC::epsilon = max(_chiSqthreshold_0 * pow(_chiSqthreshold_gamma, MCMC::initialStateNum-1), _chiSqthreshold_min);
 	}
+	
+	
+	cout << "Initialised" << endl;
 
 
 
@@ -157,6 +161,8 @@ void MCMC::initMCMC(bool uploadingLogFile, bool performFirstSimulation){
 bool MCMC::isInitialised() {
 	return MCMC::initialised;
 }
+
+
 
 // Reverse-initialisation
 void MCMC::cleanup(){
@@ -208,6 +214,9 @@ void MCMC::beginMCMC(){
 
 void MCMC::perform_1_iteration(int n){
 
+
+	//cout << "Performing " << n << endl;
+
 	if ((n == MCMC::initialStateNum || n % logEvery == 0) && !_USING_GUI){
 		cout << "Performing MCMC trial " << n << "; epsilon = " << MCMC::epsilon << "; Acceptance rate = " << ((double)MCMC::nacceptances/(n - MCMC::nTrialsUntilBurnin - MCMC::initialStateNum + 1)) <<  endl;
 	}
@@ -235,7 +244,7 @@ void MCMC::perform_1_iteration(int n){
 	}
 	
 	
-	// Temp HACK: if burnin has not been achieved but it should have then exit
+	// If burnin has not been achieved but it should have then exit
 	if (!MCMC::hasAchievedBurnin && MCMC::epsilon <= _chiSqthreshold_min && MCMC::previousMCMCstate->get_chiSquared() > MCMC::epsilon){
 		
 		// Wait 500 states after convergence has failed until exiting
@@ -249,6 +258,9 @@ void MCMC::perform_1_iteration(int n){
 	
 
 
+	//cout << "Making proposal" << endl;
+	
+
 	// Make proposal and alter the parameters to those of the new state
 	makeProposal();
 
@@ -258,7 +270,8 @@ void MCMC::perform_1_iteration(int n){
 	MCMC::currentMCMCstate = new PosteriorDistributionSample(n, _numExperimentalObservations, true);
 	bool accepted = MCMC::metropolisHastings(n, MCMC::currentMCMCstate, MCMC::previousMCMCstate);
 
-	//currentMCMCstate->print(false);
+	
+	
 
 
 
@@ -383,6 +396,12 @@ bool MCMC::metropolisHastings(int sampleNum, PosteriorDistributionSample* this_M
 		this_MCMCState->addParameterEstimate((*it)->getID(), (*it)->getTrueVal());
 	}
 	if (_sampleModels) this_MCMCState->set_modelIndicator(currentModel->getID());
+	
+	
+	
+		
+	
+	
 
 
 
@@ -619,6 +638,17 @@ void MCMC::setPreviousState(PosteriorDistributionSample* state){
 
 	// The state where convergence was achieved
 	if (MCMC::hasAchievedBurnin) MCMC::nStatesUntilBurnin = ceil(cutoff - 500) / logEvery;
+	
+	
+	
+	// Activate the state
+	MCMC::previousMCMCstate->setParametersFromState();
+
+    // Rebuild translocation rate tables
+    Settings::resetRateTables();
+    Settings::resetUnfoldingTables();
+        
+	
 
 
 }
@@ -656,3 +686,14 @@ list<Parameter*>* MCMC::get_parametersToEstimate(){
 void MCMC::activatePreviousState() {
 	MCMC::previousMCMCstate->setParametersFromState();
 }
+
+
+
+
+
+
+
+
+
+
+

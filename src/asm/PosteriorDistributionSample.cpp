@@ -859,6 +859,8 @@ string PosteriorDistributionSample::toJSON(){
 void PosteriorDistributionSample::loadFromLogFile(string filename){
 
 
+
+
 	// Get the last line in the logfile
 	ifstream logfile;
 	string line;
@@ -870,6 +872,8 @@ void PosteriorDistributionSample::loadFromLogFile(string filename){
     	vector<string> headerLineSplit;
     	bool headerParsed = false;
         while(getline(logfile, line)) {
+        
+        
 
         	if (line == "" || line == "\n") break;
         	numLines++;
@@ -892,6 +896,7 @@ void PosteriorDistributionSample::loadFromLogFile(string filename){
         vector<string> splitLine;
         while(getline(logfile, line)) {
         	currentLine++;
+        	
 
         	// Parse this line
         	if (currentLine == numLines) {
@@ -904,6 +909,9 @@ void PosteriorDistributionSample::loadFromLogFile(string filename){
         logfile.close();
         headerLineSplit.clear();
 
+    } else {
+    
+    	cout << "Could not open " << filename << endl;
     }
 
 }
@@ -911,6 +919,8 @@ void PosteriorDistributionSample::loadFromLogFile(string filename){
 
 
 void PosteriorDistributionSample::parseFromLogFileLine(vector<string> splitLine, vector<string> headerLineSplit){
+
+	cout << "parseFromLogFileLine" << endl;
 
 	regex velocityMatch("(V)([0-9]+)$");
 
@@ -923,10 +933,11 @@ void PosteriorDistributionSample::parseFromLogFileLine(vector<string> splitLine,
 
 		//cout << "i = " << i << endl;
 		//cout << header << " = " << value << endl;
-		//cout << "i = " << i << ":" << headerLineSplit.at(54) << " header = " << header << endl;
+		
+		
 
-		if (header == "State") this->setStateNumber(stoi(value));
-		else if (header == "Model") this->set_modelIndicator(value);
+		if (header == "Model") this->set_modelIndicator(value);
+		else if (header == "State") this->setStateNumber(stoi(value));
 		else if (header == "logPrior") this->logPriorProb = stof(value);
 		else if (header == "rho" || header == "chiSquared") this->chiSquared = stof(value);
 		else if (std::regex_match (header, velocityMatch)) {
@@ -946,12 +957,15 @@ void PosteriorDistributionSample::parseFromLogFileLine(vector<string> splitLine,
 // Update global settings to the parameters etc. specified by this state
 void PosteriorDistributionSample::setParametersFromState(){
 	
+	
+
 
 	// Set the parameters
 	regex instanceMatch("(.+)(instance[0-9]+)(.+)");
 	for(map<string, double>::iterator iter = this->parameterEstimates.begin(); iter != this->parameterEstimates.end(); ++iter){
 		string paramID =  iter->first;
 		double value = iter->second;
+		
 
 
 		// If parameter has multiple instances then need to do one at a time
