@@ -4515,7 +4515,7 @@ function tenToThePowerOf(n){
 
 	}
 	else {
-		return 1;
+		return 0;
 	}
 	//console.log(n, "->", parseFloat(val));
 	return parseFloat(val);
