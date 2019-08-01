@@ -935,7 +935,7 @@ void PosteriorDistributionSample::loadFromLogFile(string filename){
 
 void PosteriorDistributionSample::parseFromLogFileLine(vector<string> splitLine, vector<string> headerLineSplit){
 
-	cout << "parseFromLogFileLine" << endl;
+	//cout << "parseFromLogFileLine" << endl;
 
 	regex velocityMatch("(V)([0-9]+)$");
 
