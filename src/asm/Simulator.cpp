@@ -195,6 +195,8 @@ list<int> Simulator::sample_action_GUI(){
 	// Upto 3 reactions may be sampled at a time (depending on equilibrium assumptions)
 	this->actionsToReturn.clear();
 	this->animatingGUI = true;
+	
+	
 
 
 	// Move onto next trial if terminated
@@ -242,6 +244,9 @@ void Simulator::perform_N_Trials_and_stop_GUI(double* toReturn){
 	double result[3];
 
     cout << nTrialsTotalGUI << endl;
+    
+
+    
 
 	for (int n = 1; n <= nTrialsTotalGUI; n ++){
 		//if (n == 1 || n % 100 == 0) cout << "Starting trial " << n << endl;
@@ -409,6 +414,15 @@ void Simulator::performSimulation(State* s, double* toReturn) {
 
 	// GUI timeout function
 	int checkTimeoutEveryNIterations = 10000;
+	
+	
+	    
+    // Terminate if slippage/mutations have occurred
+ 	if(s->get_thereHaveBeenMutations()) {
+		if (!this->animatingGUI) executeAction(s, 6);
+		else this->actionsToReturn.push_back(6);
+ 	}
+	
 	
 	while(!s->isTerminated()){
         

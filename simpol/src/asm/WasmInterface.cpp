@@ -2078,6 +2078,8 @@ extern "C" {
 		// Start timer
 		_interfaceSimulation_startTime = chrono::system_clock::now();
 		
+	
+		
 		// Prepare for simulating
 		_interfaceSimulator = new Simulator(_GUI_PLOTS);
         

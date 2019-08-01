@@ -1080,7 +1080,7 @@ State* State::slipLeft(int S){
 
 	if (!this->terminated){ // && !(currentModel->get_allowMultipleBulges() &&  this->partOfBulgeID.at(S) != S && state["bulgePos"][ this->partOfBulgeID.at(S) ] == hybridLen->getval() - 1)) {
 
-		
+		this->thereHaveBeenMutations = true;
 
 
 		// If this is part of a larger bulge, then split one base off to the left and leave the rest as it is (fissure). Do Not Return. It will be followed up by a 2nd operation.
@@ -1120,6 +1120,8 @@ State* State::slipRight(int S){
 
 	if (!this->terminated) {// && !(currentModel->get_allowMultipleBulges() && this->partOfBulgeID.at(S) != S && state["bulgePos"][ this->partOfBulgeID.at(S) ] - Math.max(0, this->mRNAPosInActiveSite) == 1)) {
 		
+		
+		this->thereHaveBeenMutations = true;
 
 		// Absorb bulge
 		if (!this->NTPbound() && this->partOfBulgeID.at(S) == S && this->bulgePos.at(S) - max(0, this->mRNAPosInActiveSite) == 1) this->absorb_bulge(S, true, false, DOMupdates);
