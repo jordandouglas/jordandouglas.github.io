@@ -1215,6 +1215,7 @@ void Plots::deletePlotData(State* stateToInitFor, bool distanceVsTime_cleardata,
 	// Set non posterior distribution as the default option for all plots
 	if (ABC_cleardata) {
 
+
 		_currentLoggedPosteriorDistributionID = -1;
 		for (int pltNum = 0; pltNum < this->plotSettings.size(); pltNum++){
 			if (this->plotSettings.at(pltNum) != nullptr) {

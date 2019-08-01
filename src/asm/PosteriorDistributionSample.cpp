@@ -93,6 +93,21 @@ PosteriorDistributionSample* PosteriorDistributionSample::clone(bool copySimulat
 
 }
 
+
+
+void PosteriorDistributionSample::clear(){
+
+	this->parameterEstimates.clear();
+	this->simulatedValues.clear();
+	for (int i = 0; i < this->simulatedDensities.size(); i ++) this->simulatedDensities.at(i).clear();
+	this->simulatedDensities.clear();
+	this->meanDwellTimes_pauseSites.clear();
+	this->meanDwellTimes_notpauseSites.clear();
+
+}
+
+
+
 void PosteriorDistributionSample::setStateNumber(int sampleNum){
 	this->sampleNum = sampleNum;
 }

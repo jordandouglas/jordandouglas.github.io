@@ -87,7 +87,7 @@ class PosteriorDistributionSample {
     	void loadFromLogFile(string filename);
     	void setParametersFromState();
         string get_ROC_curve_JSON();
-        //void clear();
+        void clear();
 
 
 };

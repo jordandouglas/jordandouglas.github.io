@@ -168,15 +168,31 @@ bool MCMC::isInitialised() {
 void MCMC::cleanup(){
 
 
-	// Reset GUI list of posterior distribution samples
-	for (list<PosteriorDistributionSample*>::iterator it = _GUI_posterior.begin(); it != _GUI_posterior.end(); ++it){
-		delete *it;
+
+	if(_USING_GUI) {
+
+		// Reset GUI list of posterior distribution samples
+		for (list<PosteriorDistributionSample*>::iterator it = _GUI_posterior.begin(); it != _GUI_posterior.end(); ++it){
+			(*it)->clear();
+			delete *it;
+		}
+		_GUI_posterior.clear();
+	
 	}
-	if(_USING_GUI) _GUI_posterior.clear();
+	
 
 	MCMC::initialised = false;
-	delete previousMCMCstate;
-	delete currentMCMCstate;
+	if (MCMC::previousMCMCstate != nullptr) {
+		MCMC::previousMCMCstate->clear();
+		delete MCMC::previousMCMCstate;
+	}
+	
+	if (MCMC::currentMCMCstate != nullptr) {
+		MCMC::currentMCMCstate->clear();
+		delete MCMC::currentMCMCstate;
+	}
+	
+	
 
 
 	MCMC::parametersToEstimate.clear();
@@ -188,6 +204,8 @@ void MCMC::cleanup(){
 	MCMC::nTrialsUntilBurnin = 0;
 	MCMC::nStatesUntilBurnin = -1;
 	MCMC::initialStateNum = 0;
+	
+	
 
 	
 }

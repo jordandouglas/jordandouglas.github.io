@@ -173,7 +173,7 @@ double ParameterHeatmapData::getESS(){
 
 
 
-    //cout << "ESS = " << trace.size() / ACT << " ACT = " << ACT << endl;
+    cout << "ESS = " << trace.size() / ACT << " ACT = " << ACT << endl;
 
     if (isnan(ACT)) this->ESS = 0;
 	else this->ESS = trace.size() / ACT;
