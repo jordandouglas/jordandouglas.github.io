@@ -554,8 +554,8 @@ function landscape_plot(fn, range, id, col) {
 
 	ctx.font="12px Arial";
 	ctx.textBaseline="bottom"; 
-	ctx.fillText(-roundToSF(yDashedLinePos[0]),5, heightScale * (yDashedLinePos[0] - range[2]));
-	ctx.fillText(-roundToSF(yDashedLinePos[yDashedLinePos.length-1]),5, heightScale * (yDashedLinePos[yDashedLinePos.length-1] - range[2]));
+	ctx.fillText(-roundToSF(yDashedLinePos[0], 2, "none", true),5, heightScale * (yDashedLinePos[0] - range[2]));
+	ctx.fillText(-roundToSF(yDashedLinePos[yDashedLinePos.length-1], 2, "none", true),5, heightScale * (yDashedLinePos[yDashedLinePos.length-1] - range[2]));
 
 
 	
@@ -612,7 +612,7 @@ function plotTimeChart(){
 				ymax = distTravelled * 1.2;
 			}
 
-			ymax = roundToSF(ymax, 2, "ceil");
+			ymax = roundToSF(ymax, 2, "ceil", true);
 			if (ymin == ymax) ymax++;
 
 
@@ -646,7 +646,7 @@ function plotTimeChart(){
 			}
 			
 			
-			xmax = roundToSF(xmax, 2, "ceil");
+			xmax = roundToSF(xmax, 2, "ceil", true);
 
 			if (xmin == xmax) xmax++;
 
@@ -1057,8 +1057,8 @@ function plot_MCMC_trace(){
 			ymin = minimumFromList(yVals);
 			ymax = maximumFromList(yVals);
 
-			ymin = roundToSF(ymin, 3, "floor");
-			ymax = roundToSF(ymax, 3, "ceil");
+			ymin = roundToSF(ymin, 3, "floor", true);
+			ymax = roundToSF(ymax, 3, "ceil", true);
 
 
 		}else{
@@ -1872,7 +1872,7 @@ function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = 
 		}
 
 		var ymin = logSpace ? minimumFromList(barHeights) : 0;
-		var ymax = roundToSF(maximumFromList(barHeights)); // Math.min(Math.ceil(Math.max.apply(Math, barHeights) * 10.5) / 10, 1);
+		var ymax = roundToSF(maximumFromList(barHeights), 2, "none", true); // Math.min(Math.ceil(Math.max.apply(Math, barHeights) * 10.5) / 10, 1);
 		
 
 		// Prior distribution underlay (if applicable)
@@ -2104,10 +2104,6 @@ function add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbi
 	var orderOfMagnitudeString = meanBarOrderOfMagnitude == 0 ? "" :  meanBarOrderOfMagnitude == 0 ? "0" : "e" + meanBarOrderOfMagnitude;
 
 
-	// 1 label for first bin and then every 3rd one after that
-	//ctx.textAlign= "left";
-	//var txtLabel = roundToSF((minVal) * Math.pow(10, -meanBarOrderOfMagnitude), 2) + orderOfMagnitudeString;
-	//ctx.fillText(txtLabel, axisGap, canvas.height - axisGap + axisPointMargin);
 
 
 
@@ -2117,7 +2113,7 @@ function add_histogram_labels(canvas, ctx, axisGap, binSize, minVal, maxVal, nbi
 	for (i = 1; i <= nbins; i += binsEvery){
 
 		var x0 = widthScale * (i-1) + axisGap + binGap * (i) + canvasSizeMultiplier;
-		var txtLabel = roundToSF((minVal + binSize * (i-1)) * Math.pow(10, -meanBarOrderOfMagnitude), 3) + orderOfMagnitudeString;
+		var txtLabel = roundToSF((minVal + binSize * (i-1)) * Math.pow(10, -meanBarOrderOfMagnitude), 3, "none", true) + orderOfMagnitudeString;
 
 
 		//if (i == 1) ctx.textAlign= "left";
@@ -2808,7 +2804,7 @@ function misincorporation_plot(canvasID, canvasDivID, yvals, ntrials, ylab = "",
 	}
 	if (ymax == 0) ymax = ntrials;
 	ymax = ymax / ntrials;
-	ymax = roundToSF(ymax * 1.1, 2);
+	ymax = roundToSF(ymax * 1.1, 2, "none", true);
 	
 	
 	
@@ -3395,12 +3391,12 @@ function plot_parameter_heatmap(plotNumCustom = null){
 		}
 
 
-		xmin = roundToSF(xmin, 2, "floor");
-		xmax = roundToSF(xmax, 2, "ceil");
-		ymin = roundToSF(ymin, 2, "floor");
-		ymax = roundToSF(ymax, 2, "ceil");
-		zmin = roundToSF(zmin, 2, "floor");
-		zmax = roundToSF(zmax, 2, "ceil");
+		xmin = roundToSF(xmin, 2, "floor", true);
+		xmax = roundToSF(xmax, 2, "ceil", true);
+		ymin = roundToSF(ymin, 2, "floor", true);
+		ymax = roundToSF(ymax, 2, "ceil", true);
+		zmin = roundToSF(zmin, 2, "floor", true);
+		zmax = roundToSF(zmax, 2, "ceil", true);
 
 
 		//console.log("ymax", ymax, "ymin", ymin, "yvals", yvals);
@@ -3489,10 +3485,10 @@ function plot_custom(plotNumCustom = null){
 		}
 
 
-		xmin = roundToSF(xmin, 2, "floor");
-		xmax = roundToSF(xmax, 2, "ceil");
-		ymin = roundToSF(ymin, 2, "floor");
-		ymax = roundToSF(ymax, 2, "ceil");
+		xmin = roundToSF(xmin, 2, "floor", true);
+		xmax = roundToSF(xmax, 2, "ceil", true);
+		ymin = roundToSF(ymin, 2, "floor", true);
+		ymax = roundToSF(ymax, 2, "ceil", true);
 
 
 		//console.log("ymax", ymax, "ymin", ymin, "yvals", yvals);
@@ -4325,8 +4321,8 @@ function plot_probability_distribution(distn_fn, xmin, xmax, canvasID, xlab = ""
 	
 	
 	// Tidy up the xmin and xmax
-	xmin = roundToSF(xmin);
-	xmax = roundToSF(xmax);
+	xmin = roundToSF(xmin, 2, "none", true);
+	xmax = roundToSF(xmax, 2, "none", true);
 	
 	if (xmin == xmax) xmax = xmin+1;
 
@@ -4373,7 +4369,7 @@ function plot_probability_distribution(distn_fn, xmin, xmax, canvasID, xlab = ""
 
 		
 		var ymax = maximumFromList(yVals);  
-		ymax = roundToSF(ymax * 1.1, 1);
+		ymax = roundToSF(ymax * 1.1, 1, "none", true);
 	
 	
 		var heightScale = plotHeight / ymax;
@@ -4465,19 +4461,19 @@ function plot_probability_distribution(distn_fn, xmin, xmax, canvasID, xlab = ""
 }
 
 
-function roundToSF(val, sf=2, ceilOrFloor = "none"){
+function roundToSF(val, sf=2, ceilOrFloor = "none", precise = false){
 	
 	var magnitude = Math.floor(log(val, 10));
 
 	if (val < 0 && ceilOrFloor == "ceil") ceilOrFloor = "floor";
 	else if (val < 0 && ceilOrFloor == "floor") ceilOrFloor = "ceil";
 
-	var num = val * tenToThePowerOf(sf-magnitude);
+	var num = val * tenToThePowerOf(sf-magnitude, precise);
 	if (ceilOrFloor == "ceil") num = Math.ceil(num)
 	else if (ceilOrFloor == "floor") num = Math.floor(num)
 	else num = Math.round(num);
 
-	num = num * tenToThePowerOf(magnitude-sf);
+	num = num * tenToThePowerOf(magnitude-sf, precise);
 	
 	// Sometimes this picks up a trailing .00000000001 which we want to remove
 
@@ -4495,27 +4491,30 @@ function roundToSF(val, sf=2, ceilOrFloor = "none"){
 }
 
 
-// Compute 10^n without using Math.pow which presents numerical instabilities
-function tenToThePowerOf(n){
+// Compute 10^n without using Math.pow for negative n which presents numerical instabilities
+function tenToThePowerOf(n, precise = false){
 
+	if (!precise) return Math.pow(10, n);
 
-	if (n == 0) return 0;
+	if (n == Infinity || n == -Infinity) return n;
+
+	if (n == 0) return 1;
 	var val = "1";
 	if (n < 0) {
-		for (var i = -1; i > n; i --){
+	
+	
+		for (var index = -1; index > n; index --){
 			val = "0" + val;
 		}
 		val = "." + val;
 	}
 
 	else if (n > 0) {
-		for (var i = 0; i < n; i ++){
-			val = val + "0";
-		}
+		return Math.pow(10, n);
 
 	}
 	else {
-		return 0;
+		return 1;
 	}
 	//console.log(n, "->", parseFloat(val));
 	return parseFloat(val);
