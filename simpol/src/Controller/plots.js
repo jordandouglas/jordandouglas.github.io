@@ -4461,7 +4461,7 @@ function plot_probability_distribution(distn_fn, xmin, xmax, canvasID, xlab = ""
 }
 
 
-function roundToSF(val, sf=2, ceilOrFloor = "none", precise = false){
+function roundToSF(val, sf=2, ceilOrFloor = "none", precise = true){
 	
 	var magnitude = Math.floor(log(val, 10));
 
