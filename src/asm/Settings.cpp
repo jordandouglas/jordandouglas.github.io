@@ -350,33 +350,35 @@ void Settings::initPolymerases(){
 	T7pol->setParameters(Settings::getParamListClone());
 
 	// E. coli parameters
-	ecoliPol->setParameter(DGtaudag->clone()->setDistributionParameter("fixedDistnVal", 9.079));
-	ecoliPol->setParameter(DGtau1->clone()->setDistributionParameter("fixedDistnVal", -2.007));
-	ecoliPol->setParameter(barrierPos->clone()->setDistributionParameter("fixedDistnVal", 2.838));
-	ecoliPol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 25.56));
-	ecoliPol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 1.8));
-	ecoliPol->setParameter(RateBind->clone()->setDistributionParameter("fixedDistnVal", 0.5448));
+	ecoliPol->setParameter(DGtaudag->clone()->setDistributionParameter("fixedDistnVal", 5));
+	ecoliPol->setParameter(DGtau1->clone()->setDistributionParameter("fixedDistnVal", -2));
+	ecoliPol->setParameter(barrierPos->clone()->setDistributionParameter("fixedDistnVal", 3.25));
+	ecoliPol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 25));
+	ecoliPol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 97));
+	
 
 
 	// S. cerevisiae parameters
-	yeastPol->setParameter(DGtaudag->clone()->setDistributionParameter("fixedDistnVal", 8.536));
-	yeastPol->setParameter(DGtau1->clone()->setDistributionParameter("fixedDistnVal", -4.323));
-	yeastPol->setParameter(barrierPos->clone()->setDistributionParameter("fixedDistnVal", 2.889));
-	yeastPol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 29.12));
-	yeastPol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 72));
+	yeastPol->setParameter(DGtaudag->clone()->setDistributionParameter("fixedDistnVal", 4.6));
+	yeastPol->setParameter(DGtau1->clone()->setDistributionParameter("fixedDistnVal", -4.5));
+	yeastPol->setParameter(barrierPos->clone()->setDistributionParameter("fixedDistnVal", 3.1));
+	yeastPol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 28.6));
+	yeastPol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 17));
+	yeastPol->setParameter(RateBind->clone()->setDistributionParameter("fixedDistnVal", 0.5));
 
 
 	// T7 parameters
-	T7pol->setParameter(DGtau1->clone()->setDistributionParameter("fixedDistnVal", -4.709));
-	T7pol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 127.3));
-	T7pol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 105));
+	T7pol->setParameter(DGtau1->clone()->setDistributionParameter("fixedDistnVal", -4));
+	T7pol->setParameter(kCat->clone()->setDistributionParameter("fixedDistnVal", 128));
+	T7pol->setParameter(Kdiss->clone()->setDistributionParameter("fixedDistnVal", 14));
+	T7pol->setParameter(RateBind->clone()->setDistributionParameter("fixedDistnVal", 1.4));
 
 
 
 	// Choose the default model settings
-	ecoliPol->setModel((new Model())->set_assumeTranslocationEquilibrium(false)->set_assumeBindingEquilibrium(false)->set_allowGeometricCatalysis(false));
-	yeastPol->setModel((new Model())->set_assumeTranslocationEquilibrium(false)->set_assumeBindingEquilibrium(true)->set_allowGeometricCatalysis(false));
-	T7pol->setModel((new Model())->set_assumeTranslocationEquilibrium(true)->set_assumeBindingEquilibrium(true)->set_allowGeometricCatalysis(false));
+	ecoliPol->setModel((new Model())->set_assumeTranslocationEquilibrium(false)->set_assumeBindingEquilibrium(true)->set_allowGeometricCatalysis(false));
+	yeastPol->setModel((new Model())->set_assumeTranslocationEquilibrium(false)->set_assumeBindingEquilibrium(false)->set_allowGeometricCatalysis(false));
+	T7pol->setModel((new Model())->set_assumeTranslocationEquilibrium(true)->set_assumeBindingEquilibrium(false)->set_allowGeometricCatalysis(false));
 
 
 	_polymerases.at(0) = ecoliPol;

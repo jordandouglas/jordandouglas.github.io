@@ -52,7 +52,7 @@ Model::Model(){
 	//modelIsActive = false;
 
 
-	currentTranslocationModel = "HIGU_barriers";
+	currentTranslocationModel = "HIGI_barriers";
 	currentRNABlockadeModel = "terminalBlockade";
 	currentInactivationModel = "sequenceIndependent";
 	currentBacksteppingModel = "backstep0";
