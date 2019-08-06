@@ -1406,7 +1406,7 @@ function addCitations(){
                                                             <tr title="Assume that NTP binding is an equilibrium process?">
                                                                 <td style="width:320px" >
                                                                     <label class="switch">
-                                                                         <input type="checkbox"> </input>
+                                                                         <input  checked type="checkbox"> </input>
                                                                          <span class="slider round"></span>
                                                                     </label> 
                                                                     <span style="font-size:15px; vertical-align:middle" >Assume NTP binding equilibrium, $\mathbb{BE}$</span>
@@ -1414,7 +1414,7 @@ function addCitations(){
                                                                 <td>
                                                                     <div style="margin-left:50px">
                                                                         
-                                                                        If enabled, NTP binding is assumed to occur on such a rapid timescale that the NTP binding partial equilibrium assumption is applied. This will change how $K_D$ and $k_{bind}$ are interpreted. Default: false.
+                                                                        If enabled, NTP binding is assumed to occur on such a rapid timescale that the NTP binding partial equilibrium assumption is applied. This will change how $K_D$ and $k_{bind}$ are interpreted. Default: true.
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -1424,8 +1424,9 @@ function addCitations(){
                                             
                                             
                                                         <div class="subsubsection paramHelp" sect="NTP dissociation constant">
-                                                            <b style="font-size:20px">$K_D$</b> - equilibrium constant of NTP dissociation. If binding is assumed to be an equilibrium process, $K_D$ is the ratio between the rates of NTP binding and release $K_D = \frac{k_{rel}}{k_{bind}}$. Whereas, in a kinetic binding model $K_D$ is used in conjunction with $k_{bind}$ to calculate the rate of releasing
-                                                            bound NTP: $k_{rel} = K_D k_{bind}$. Default: 1.8 &mu;M
+                                                            <b style="font-size:20px">$K_D$</b> - equilibrium constant of NTP dissociation. If binding is assumed to be an equilibrium process  (<param value="assumeBindingEquilibrium"></param>$ = 1$), 
+                                                            $K_D$ is the ratio between the rates of NTP binding and release $K_D = \frac{k_{rel}}{k_{bind}}$. Whereas, in a kinetic binding model  (<param value="assumeBindingEquilibrium"></param>$ = 0$) $K_D$ is used in conjunction with $k_{bind}$ to calculate the rate of releasing
+                                                            bound NTP: $k_{rel} = K_D k_{bind}$. Default: 97 &mu;M
                                                         </div><br>
                                                         <div class="subsubsection paramHelp" sect="Rate of catalysis"> 
                                                             <b style="font-size:20px">$k_{cat}$</b> - rate constant of incorporating bound NTP, thus extending the 3<sup>&prime;</sup> end of the nascent chain by one nucleotide. When translocation is fast,
@@ -1478,18 +1479,18 @@ function addCitations(){
 															<b style="font-size:20px">$\Delta G^\dagger_{\tau}$</b> - Gibbs energy barrier of translocation. To translocate forwards or backwards, several
 															basepairs may need to be broken. The energy barrier which must be overcome in order to translocate is estimated as the energy needed to break these basepairs
 															plus the value of this parameter. Increasing this value will make translocation slower. When translocation is assumed to reach at equilibrium  (<param value="assumeTranslocationEquilibrium"></param>$ = 1$), this parameter only
-                                                            applies to backtracking and hypertranslocation. Default: 9.079 k<sub>B</sub>T<cite val="douglas2018bayesian"></cite>
+                                                            applies to backtracking and hypertranslocation. Default: 5 k<sub>B</sub>T<cite val="douglas2018bayesian"></cite>
 														</div><br>	
 														
 														<div class="subsubsection paramHelp" sect="Posttranslocated Gibbs energy">
 															<b style="font-size:20px">$\Delta G_{\tau 1}$</b> - Gibbs energy term added to that of the posttranslocated state. When this value is low,
-															RNA polymerase spends more time in the posttranslocated state (compared with the pretranslocated state). Default: -2.007 k<sub>B</sub>T<cite val="douglas2018bayesian"></cite>
+															RNA polymerase spends more time in the posttranslocated state (compared with the pretranslocated state). Default: -2 k<sub>B</sub>T<cite val="douglas2018bayesian"></cite>
 														</div> <br>	
 														
 														<div class="subsubsection paramHelp" sect="Translocation force dependency">
 															<b style="font-size:20px">$\delta_1$</b> - position of the translocation transition state, compared with the two adjacent translocation positions. 
 															This parameter lies between 0 and the width of a single basepair in DNA (3.4 &#x212b;<cite val="watson1953molecular"></cite>). This term only applies
-															when translocation is kinetic  (<param value="assumeTranslocationEquilibrium"></param>$ = 0$) and when an assisting force $F_{assist}$ is applied. Default: 2.838 &#x212b;<cite val="douglas2018bayesian"></cite>
+															when translocation is kinetic  (<param value="assumeTranslocationEquilibrium"></param>$ = 0$) and when an assisting force $F_{assist}$ is applied. Default: 3.25 &#x212b;<cite val="douglas2018bayesian"></cite>
 														</div><br>	
 														
 													
@@ -3741,77 +3742,134 @@ function addCitations(){
                                             </th>
                                             
                                             <th>
-                                                View sample
+                                                View .xml
                                             </th>
                                             
                                             <th>
-                                                Download .xml
+                                                Model
+                                            </th>
+                                            
+                                            <th>
+                                                Open
                                             </th>
                                             
                                             <th>
                                                 Download .log
                                             </th>
                                             
+                                            
+                                            
                                        </tr>
                                         
                                         
                                         <tr class="xml_link" style="text-align:center">
-                                            <td>
+                                            <td rowspan=2>
                                                 <b><i>E. coli</i> RNAP</b>
                                             </td>
+                                            
+                                            
+                                            <td rowspan=2 style="border-style:solid; border-color:black; border-width:1px">
+                                                <a href="ElongationPosteriorData/Ecoli_RNAP_session.xml">Ecoli_RNAP_session.xml</a>
+                                            </td>
+                                            
+                                            <td> 11 </td>
                                             
                                             <td>
                                                 <a href="../?ploscompbio=1">Open</a>
                                             </td>
                                             
-                                            <td>
-                                                <a href="ElongationPosteriorData/Ecoli_RNAP_session.xml">Ecoli_RNAP_session.xml</a>
+                                             <td>
+                                                <a href="ElongationPosteriorData/Ecoli_RNAP_posterior.M11.log">Download</a>
                                             </td>
                                             
-                                            <td>
-                                                <a href="ElongationPosteriorData/Ecoli_RNAP_posterior.log">Ecoli_RNAP_posterior.log</a>
-                                            </td>
+                                            
+                                            
+                                           
                                             
                                        </tr>
-                                        
-                                        
-                                        <tr class="xml_link" style="text-align:center">
-                                            <td>
-                                                <b><i>S. cerevisiae</i> pol II</b>
-                                            </td>
+                                       
+                                       
+                                       <tr class="xml_link" style="text-align:center">
+
+                                            
+                                            <td> 12 </td>
                                             
                                             <td>
                                                 <a href="../?ploscompbio=2">Open</a>
                                             </td>
-                                           
+                                            
                                             
                                             <td>
-                                                <a href="ElongationPosteriorData/Yeast_polII_session.xml">Yeast_polII_session.xml</a>
-                                            </td>
-                                            
-                                            <td>
-                                                <a href="ElongationPosteriorData/Yeast_polII_posterior.log">Yeast_polII_posterior.log</a>
+                                                <a href="ElongationPosteriorData/Ecoli_RNAP_posterior.M12.log">Download</a>
                                             </td>
                                             
                                        </tr>
                                         
                                         
                                         <tr class="xml_link" style="text-align:center">
-                                            <td>
-                                                <b>Bacteriophage T7 pol</b>
+                                            <td rowspan=2>
+                                                <b><i>S. cerevisiae</i> pol II</b>
                                             </td>
+                                            
+                                            <td rowspan=2 style="border-style:solid; border-color:black; border-width:1px">
+                                                <a href="ElongationPosteriorData/Yeast_polII_session.xml">Yeast_polII_session.xml</a>
+                                            </td>
+                                            
+                                            <td> 11 </td>
                                             
                                             <td>
                                                 <a href="../?ploscompbio=3">Open</a>
                                             </td>
+                                           
                                             
+
                                             
                                             <td>
+                                                <a href="ElongationPosteriorData/Yeast_polII_posterior.M11.log">Download</a>
+                                            </td>
+                                            
+                                       </tr>
+                                       
+                                       
+                                        <tr class="xml_link" style="text-align:center">
+                                           
+                                            
+                                            <td> 12 </td>
+                                            
+                                            <td>
+                                                <a href="../?ploscompbio=4">Open</a>
+                                            </td>
+                                           
+                                            
+
+                                            
+                                            <td>
+                                                <a href="ElongationPosteriorData/Yeast_polII_posterior.M12.log">Download</a>
+                                            </td>
+                                            
+                                       </tr>
+                                        
+                                        
+                                        <tr class="xml_link" style="text-align:center">
+                                            <td rowspan=1>
+                                                <b>Bacteriophage T7 pol</b>
+                                            </td>
+                                            
+                                            <td  style="border-style:solid; border-color:black; border-width:1px">
                                                 <a href="ElongationPosteriorData/T7_pol_session.xml">T7_pol_session.xml</a>
                                             </td>
                                             
+                                            <td> 5 </td>
+                                            
                                             <td>
-                                                <a href="ElongationPosteriorData/T7_pol_posterior.log">T7_pol_posterior.log</a>
+                                                <a href="../?ploscompbio=5">Open</a>
+                                            </td>
+                                            
+                                            
+
+                                            
+                                            <td>
+                                                <a href="ElongationPosteriorData/T7_pol_posterior.M5.log">Download</a>
                                             </td>
                                             
                                        </tr>

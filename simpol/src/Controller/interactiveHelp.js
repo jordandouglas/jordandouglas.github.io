@@ -49,17 +49,27 @@ function begin_tutorial(tut_id = null){
         // Plos computational biology elongation
         // Bayesian inference and comparison of stochastic transcription elongation models
         case "ploscompbio1":
-            begin_ploscompbio_RNAP(whenDone);
+            begin_ploscompbio_RNAP(11, whenDone);
             break;
             
             
         case "ploscompbio2":
-            begin_ploscompbio_polII(whenDone);
+            begin_ploscompbio_RNAP(12, whenDone);
             break;
             
             
         case "ploscompbio3":
-            begin_ploscompbio_T7pol(whenDone);
+            begin_ploscompbio_polII(11, whenDone);
+            break;
+            
+            
+        case "ploscompbio4":
+            begin_ploscompbio_polII(12, whenDone);
+            break;
+            
+            
+        case "ploscompbio5":
+            begin_ploscompbio_T7pol(5, whenDone);
             break;
     
     
@@ -141,13 +151,13 @@ function loadSessionAndPosterior(sessionFileName, posteriorFileName, resolve = f
 
 
 // Load the E.coli RNAP posterior distribution
-function begin_ploscompbio_RNAP(resolve = function() { }){
+function begin_ploscompbio_RNAP(modelNum = 11, resolve = function() { }){
 
 
     var urlNum = 1;
 
     addTutorialTemplate("Bayesian inference and comparison of stochastic transcription elongation models", 
-        "<i>E. coli</i> RNAP posterior distribution (sample).",
+        "<i>E. coli</i> RNAP posterior distribution for Model " + modelNum + ".",
         `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
         
         The posterior distribution may take several seconds to load. Scroll down to 'Approximate Bayesian Computation' and 'Plots panel' 
@@ -156,7 +166,7 @@ function begin_ploscompbio_RNAP(resolve = function() { }){
     
 
 
-    var posteriorFileName = "ElongationPosteriorData/Ecoli_RNAP_posterior_small.log";
+    var posteriorFileName = "ElongationPosteriorData/Ecoli_RNAP_posterior.M" + modelNum + ".log";
     var sessionFileName = "ElongationPosteriorData/Ecoli_RNAP_session.xml";
     
     loadSessionAndPosterior(sessionFileName, posteriorFileName, function(){
@@ -169,13 +179,13 @@ function begin_ploscompbio_RNAP(resolve = function() { }){
 
 
 // Load the Yeast pol IIposterior distribution
-function begin_ploscompbio_polII(resolve = function() { }){
+function begin_ploscompbio_polII(modelNum = 11, resolve = function() { }){
 
 
     var urlNum = 2;
 
     addTutorialTemplate("Bayesian inference and comparison of stochastic transcription elongation models", 
-        "<i>S. cerevisiae</i> pol II posterior distribution (sample).",
+        "<i>S. cerevisiae</i> pol II posterior distribution for Model " + modelNum + ".",
         `Welcome to SimPol. This series of examples is complementary to the above article. <br><br>
         The posterior distribution may take several seconds to load. Scroll down to 'Approximate Bayesian Computation' and 'Plots panel' 
         to view the results when they have loaded.<br><br>` + getLoaderTemplate("posteriorLoader", "Loading files...", false),
@@ -183,7 +193,7 @@ function begin_ploscompbio_polII(resolve = function() { }){
     
 
 
-    var posteriorFileName = "ElongationPosteriorData/Yeast_polII_posterior_small.log";
+    var posteriorFileName = "ElongationPosteriorData/Yeast_polII_posterior.M" + modelNum + ".log";
     var sessionFileName = "ElongationPosteriorData/Yeast_polII_session.xml";
     
     loadSessionAndPosterior(sessionFileName, posteriorFileName, function(){
@@ -199,13 +209,13 @@ function begin_ploscompbio_polII(resolve = function() { }){
 
 
 // Load the Bacteriophage T7 pol posterior distribution
-function begin_ploscompbio_T7pol(resolve = function() { }){
+function begin_ploscompbio_T7pol(modelNum = 5, resolve = function() { }){
 
 
     var urlNum = 3;
 
     addTutorialTemplate("Bayesian inference and comparison of stochastic transcription elongation models", 
-        "Bacteriophage T7 pol posterior distribution (sample).",
+        "Bacteriophage T7 pol posterior distribution for Model " + modelNum + ".",
         `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
         
         The posterior distribution may take several seconds to load. Scroll down to 'Approximate Bayesian Computation' and 'Plots panel' 
@@ -214,7 +224,7 @@ function begin_ploscompbio_T7pol(resolve = function() { }){
     
 
 
-    var posteriorFileName = "ElongationPosteriorData/T7_pol_posterior_small.log";
+    var posteriorFileName = "ElongationPosteriorData/T7_pol_posterior.M" + modelNum + ".log";
     var sessionFileName = "ElongationPosteriorData/T7_pol_session.xml";
     
     loadSessionAndPosterior(sessionFileName, posteriorFileName, function(){
