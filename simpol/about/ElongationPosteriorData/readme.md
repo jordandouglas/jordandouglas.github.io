@@ -1,6 +1,6 @@
 
 
-# Posterior distributions for "Bayesian inference and comparison of stochastic transcription elongation models."
+## Posterior distributions for "Bayesian inference and comparison of stochastic transcription elongation models."
 
 https://doi.org/10.1101/499277
 
