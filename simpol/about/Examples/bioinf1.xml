@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<session datetime="2019_8_12-14.21.3" N="30" speed="medium" polymerase="RNAP">
+	<sequence seqID="Buchnera aphidicola murC1 EU274658" TemplateType="dsDNA" PrimerType="ssRNA" seq="GGAAGACTATTAGGTCTTTAATATCGTCGATTTTTTTTTTGTAAGGATATGATAATTCTCGACTTTA" />
+	<plots hidden="false">
+		<plot1 name="distanceVsTime" plotFunction="plotTimeChart" xRange="automaticX" yRange="automaticY" />
+		<plot2 name="velocityHistogram" plotFunction="plot_velocity_distribution" windowSize="1" xRange="automaticX" />
+		<plot3 name="pauseHistogram" plotFunction="plot_pause_distribution" perTime="perCatalysis" xRange="automaticX" />
+	</plots>
+	<elongation-model>
+		<allowBacktracking val="false" />
+		<allowHypertranslocation val="false" />
+		<allowInactivation val="false" />
+		<deactivateUponMisincorporation val="false" />
+		<allowGeometricCatalysis val="false" />
+		<subtractMeanBarrierHeight val="false" />
+		<allowmRNAfolding val="false" />
+		<allowMisincorporation val="false" />
+		<useFourNTPconcentrations val="false" />
+		<allowMultipleBulges val="false" />
+		<NTPbindingNParams val="2" />
+		<currentTranslocationModel val="HIGI_barriers" />
+		<currentRNABlockadeModel val="terminalBlockade" />
+		<currentInactivationModel val="sequenceIndependent" />
+		<currentBacksteppingModel val="backstep0" />
+		<assumeBindingEquilibrium val="true" />
+		<allowDNAbending val="false" />
+		<assumeTranslocationEquilibrium val="false" />
+	</elongation-model>
+	<parameters>
+		<NTPconc val="1000" distribution="Fixed" fixedDistnVal="1000"> [NTP] (μM)</NTPconc>
+		<ATPconc val="3152" distribution="Fixed" fixedDistnVal="3152"> [ATP] (μM)</ATPconc>
+		<CTPconc val="278" distribution="Fixed" fixedDistnVal="278"> [CTP] (μM)</CTPconc>
+		<GTPconc val="468" distribution="Fixed" fixedDistnVal="468"> [GTP] (μM)</GTPconc>
+		<UTPconc val="567" distribution="Fixed" fixedDistnVal="567"> [UTP] (μM)</UTPconc>
+		<FAssist val="0" distribution="Fixed" fixedDistnVal="0" uniformDistnLowerVal="-30" uniformDistnUpperVal="30">Force  (pN)</FAssist>
+		<haltPosition val="14" distribution="Fixed" fixedDistnVal="14">Halt position (nt)</haltPosition>
+		<hybridLen val="11" distribution="Fixed" fixedDistnVal="11">Hybrid length (bp)</hybridLen>
+		<bubbleLeft val="2" distribution="Fixed" fixedDistnVal="2">Bubble length left (bp)</bubbleLeft>
+		<bubbleRight val="0" distribution="Fixed" fixedDistnVal="0">Bubble length right (bp)</bubbleRight>
+		<Kdiss val="97" distribution="Fixed" fixedDistnVal="97">KD (μM)</Kdiss>
+		<kCat val="25" distribution="Fixed" fixedDistnVal="25" lognormalMeanVal="3.454" lognormalSdVal="0.587">Rate of catalysis (s⁻¹)</kCat>
+		<RateBind val="0.5" distribution="Fixed" fixedDistnVal="0.5">Rate of binding  (μM⁻¹ s⁻¹)</RateBind>
+		<DGtaudag val="5" distribution="Fixed" fixedDistnVal="5" uniformDistnLowerVal="9" uniformDistnUpperVal="15">ΔG†𝜏</DGtaudag>
+		<DGtau1 val="-2" distribution="Fixed" fixedDistnVal="-2">ΔG𝜏1</DGtau1>
+		<barrierPos val="3.25" distribution="Fixed" fixedDistnVal="3.25">Transition state position  (Å)</barrierPos>
+		<RateDeactivate val="0.05" distribution="Fixed" fixedDistnVal="0.05">Rate of inactivation (s⁻¹)</RateDeactivate>
+		<RateActivate val="0.1" distribution="Fixed" fixedDistnVal="0.1">Rate of activation (s⁻¹)</RateActivate>
+		<DGtaudagM val="0" distribution="Fixed" fixedDistnVal="0">ΔG†𝜏-</DGtaudagM>
+		<DGtaudagP val="0" distribution="Fixed" fixedDistnVal="0">ΔG†𝜏+</DGtaudagP>
+		<rnaFoldDistance val="8" distribution="Fixed" fixedDistnVal="8">Fold distance (nt)</rnaFoldDistance>
+		<RateCleave val="0" distribution="Fixed" fixedDistnVal="0">Rate of cleavage (s⁻¹)</RateCleave>
+		<CleavageLimit val="10" distribution="Fixed" fixedDistnVal="10">Cleavage limit (nt)</CleavageLimit>
+		<arrestTime val="0" distribution="Fixed" fixedDistnVal="0">Arrest timeout  (s)</arrestTime>
+		<proposalWidth val="1" distribution="Fixed" fixedDistnVal="1">Proposal width</proposalWidth>
+	</parameters>
+	<ABC inferenceMethod="ABC" ntrials="10000" testsPerData="5" epsilon="1" quantile="0" showRejectedParameters="false" />
+</session>
