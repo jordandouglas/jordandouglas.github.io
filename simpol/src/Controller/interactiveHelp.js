@@ -23,7 +23,7 @@
 
 /*
     Contains a series of dialogs to guide the user through the website
-    Used in conjunction with biophys journal publication examples
+    Used in conjunction with bioinf journal publication examples
 */
 
 
@@ -75,36 +75,31 @@ function begin_tutorial(tut_id = null){
     
     
     
-        // Biophysical journal examples
-        case "biophys1":
-            begin_biophys1(whenDone);
+        // Bioinformatics journal examples
+        case "bioinf1":
+            begin_bioinf1(whenDone);
             break;
     
-        case "biophys2":
-            begin_biophys2(whenDone);
+        case "bioinf2":
+            begin_bioinf2(whenDone);
             break;  
             
             
-        case "biophys3":
-            begin_biophys3(whenDone);
+        case "bioinf3":
+            begin_bioinf3(whenDone);
             break; 
             
             
-        case "biophys4":
-            window.location.replace("../pauser/?biophys=4");
+        case "bioinf4":
+            window.location.replace("../pauser/?bioinf=4");
             break; 
             
             
-        case "biophys5":
-            begin_biophys5(whenDone);
+        case "bioinf5":
+            begin_bioinf5(whenDone);
             break; 
             
-            
-        case "biophys6":
-            begin_biophys6(whenDone);
-            break; 
-            
-            
+
             
        case "exRABC":
             begin_RABC_example(whenDone);
@@ -240,7 +235,7 @@ function begin_ploscompbio_T7pol(modelNum = 5, resolve = function() { }){
 
 
 // Perform 30 transcription elongation simulations of the first 80 nt of the E. coli lacZ gene.
-function begin_biophys1(resolve = function() { }){
+function begin_bioinf1(resolve = function() { }){
 
 
     
@@ -250,7 +245,7 @@ function begin_biophys1(resolve = function() { }){
     
     To begin the stochastic simulation, press the glowing <img class="icon small" src='../src/Images/dice.png'>
     button on the far left. See the plots further down this page to visualise the simulation results.`,
-    "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=1'>www.polymerase.nz/simpol/?biophys=1</a>");
+    "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?bioinf=1'>www.polymerase.nz/simpol/?bioinf=1</a>");
 
    
     // Add a glow around the simulate button
@@ -272,7 +267,7 @@ function begin_biophys1(resolve = function() { }){
     }, 50);
 
 
-    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys1.xml";
+    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/bioinf1.xml";
     var toDoAfterLoadSession = function() {
         
         resolve();
@@ -289,7 +284,7 @@ function begin_biophys1(resolve = function() { }){
 
 
 // Visualise the simulated change in RNA structure during transcription elongation.
-function begin_biophys2(resolve = function() { }){
+function begin_bioinf2(resolve = function() { }){
 
 
 
@@ -303,7 +298,7 @@ function begin_biophys2(resolve = function() { }){
     
     Then, use <img  class="icon small"  src='../src/Images/dice.png'>
     to begin the stochastic simulation`,
-    "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=2'>www.polymerase.nz/simpol/?biophys=2</a>");
+    "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?bioinf=2'>www.polymerase.nz/simpol/?bioinf=2</a>");
 
    
     // Add a glow around the simulate and folding buttons
@@ -342,7 +337,7 @@ function begin_biophys2(resolve = function() { }){
 
 
 
-    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys2.xml";    
+    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/bioinf2.xml";    
     var toDoAfterLoadSession = function() {
         
         resolve();
@@ -362,7 +357,7 @@ function begin_biophys2(resolve = function() { }){
 
 
 // Add insertions into a poly(T) tract of the Buchnera aphidicola murC1 gene
-function begin_biophys3(resolve = function() { }){
+function begin_bioinf3(resolve = function() { }){
 
     
     addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
@@ -371,7 +366,7 @@ function begin_biophys3(resolve = function() { }){
     
     To add a 10A insert into the mRNA, press the glowing <img class="icon small" src='../src/Images/stutter.png'>
     button on the far left. This iterative slippage is known as stuttering. During transcription, anywhere up to 4 inserts could be added into this region of the murC2 gene<sup>1</sup>.`,
-    `This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=3'>www.polymerase.nz/simpol/?biophys=3</a> <br> <br>
+    `This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?bioinf=3'>www.polymerase.nz/simpol/?bioinf=3</a> <br> <br>
     <sup>1</sup> Tamas, Ivica, et al. "Endosymbiont gene functions impaired and rescued by polymerase infidelity at poly (A) tracts." Proceedings of the National Academy of Sciences 105.39 (2008): 14934-14939.<br> <br>`);
 
    
@@ -397,7 +392,7 @@ function begin_biophys3(resolve = function() { }){
     
 
 
-    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys3.xml";
+    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/bioinf3.xml";
     var toDoAfterLoadSession = function() {
         
         resolve();
@@ -411,10 +406,10 @@ function begin_biophys3(resolve = function() { }){
 
 
 
+/*
 
-
-// Explore the third-order relationship between catalysis rate kcat , NTP binding rate kbind , and elongation velocity.
-function begin_biophys5(resolve = function() { }){
+// OBSOLETE: Explore the third-order relationship between catalysis rate kcat , NTP binding rate kbind , and elongation velocity.
+function begin_bioinf6(resolve = function() { }){
 
 
 
@@ -430,7 +425,7 @@ function begin_biophys5(resolve = function() { }){
     To begin the stochastic simulation, press the glowing <img class="icon small"  src='../src/Images/dice.png'>
     button on the far left. 5,000 simulations will be performed on the 0.5 kb lacZ gene.
      See the plots further down this page to visualise the simulation results. Each coloured dot is one simulation.`,
-    "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=5'>www.polymerase.nz/simpol/?biophys=4</a>");
+    "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?bioinf=5'>www.polymerase.nz/simpol/?bioinf=4</a>");
 
    
     // Add a glow around the simulate button
@@ -455,7 +450,7 @@ function begin_biophys5(resolve = function() { }){
     
 
 
-    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys5.xml";
+    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/bioinf5.xml";
     var toDoAfterLoadSession = function() {
         
     	resolve();
@@ -467,7 +462,7 @@ function begin_biophys5(resolve = function() { }){
 
 }
 
-
+*/
 
 
 // R-ABC on motivating example 1 from about/ page
@@ -584,8 +579,8 @@ function begin_MCMCABC_example(resolve = function() { }){
 
 
 // Fit parameters kcat and kbind to a toy [NTP]-velocity dataset using R-ABC.
-function begin_biophys6(resolve = function() { }){
-    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/biophys6.xml";
+function begin_bioinf5(resolve = function() { }){
+    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/bioinf5.xml";
     var toDoAfterLoadSession = function() {
         
         
@@ -600,7 +595,7 @@ function begin_biophys6(resolve = function() { }){
         
         In the histograms below, the yellow underlays show the prior distributions while the blue bars are the posterior distributions. If the
         two distributions are different, then the data taught us something about the parameters.`,
-        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?biophys=6'>www.polymerase.nz/simpol/?biophys=5</a>");
+        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?bioinf=5'>www.polymerase.nz/simpol/?bioinf=5</a>");
     
        
         // Add a glow around the simulate button

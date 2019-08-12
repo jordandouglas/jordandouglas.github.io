@@ -23,7 +23,7 @@
 
 /*
     Contains a series of dialogs to guide the user through the website
-    Used in conjunction with biophys journal publication examples
+    Used in conjunction with bioinf journal publication examples
 */
 
 function begin_tutorial(tut_id = null){
@@ -35,34 +35,31 @@ function begin_tutorial(tut_id = null){
     switch(tut_id){
     
             
-        // Biophysical journal examples
-        case "biophys1":
-            window.location.replace("../simpol/?biophys=1");
+        // Bioinformatics journal examples
+        case "bioinf1":
+            window.location.replace("../simpol/?bioinf=1");
             break;
     
-        case "biophys2":
-            window.location.replace("../simpol/?biophys=2");
+        case "bioinf2":
+            window.location.replace("../simpol/?bioinf=2");
             break;  
             
             
-        case "biophys3":
-            window.location.replace("../simpol/?biophys=3");
+        case "bioinf3":
+            window.location.replace("../simpol/?bioinf=3");
             break; 
             
             
-        case "biophys4":
-            begin_biophys4();
+        case "bioinf4":
+            begin_bioinf4();
             break; 
             
             
-        case "biophys5":
-            window.location.replace("../simpol/?biophys=5");
+        case "bioinf5":
+            window.location.replace("../simpol/?bioinf=5");
             break; 
             
-            
-        case "biophys6":
-            window.location.replace("../simpol/?biophys=6");
-            break; 
+ 
             
             
             
@@ -80,10 +77,10 @@ function begin_tutorial(tut_id = null){
 
 
 
-function begin_biophys4(){
+function begin_bioinf4(){
 
 
-    var fastaFileName = "biophys4.fasta";
+    var fastaFileName = "bioinf4.fasta";
     var fastaFileLocation = "http://www.polymerase.nz/pauser/about/Examples/" + fastaFileName;
     
     addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
@@ -92,7 +89,7 @@ function begin_biophys4(){
     
     To predict the locations of pause sites in the loaded sequences, press the glowing 'Begin Pauser' button below. This will predict the locations using 
     both SimPol and a Naive Bayes classifier (NBC). Because the locations of pause sites are already known, recall, precision, accuracy and a ROC curve can be computed.`,
-    "This example was loaded from <a style='color:#0B522D' href='http://www.polymerase.nz/pauser/?biophys=4'>www.polymerase.nz/pauser/?biophys=4</a>");
+    "This example was loaded from <a style='color:#0B522D' href='http://www.polymerase.nz/pauser/?bioinf=4'>www.polymerase.nz/pauser/?bioinf=4</a>");
 
    
     // Add a glow around the simulate button
@@ -126,7 +123,7 @@ function begin_biophys4(){
 function begin_pauserExample(){
 
 
-    var fastaFileName = "biophys4.fasta";
+    var fastaFileName = "bioinf4.fasta";
     var fastaFileLocation = "http://www.polymerase.nz/pauser/about/Examples/" + fastaFileName;
     
     addTutorialTemplate("Evaluating the prediction accuracy SimPol and NBC", 

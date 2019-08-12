@@ -111,8 +111,8 @@ function init(){
                 var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
                 
         
-                if (JSONurl.biophys != null) {
-                    begin_tutorial("biophys" + JSONurl.biophys);
+                if (JSONurl.bioinf != null) {
+                    begin_tutorial("bioinf" + JSONurl.bioinf);
                 }
                 
                 
