@@ -9,7 +9,7 @@
 		<deactivateUponMisincorporation val="false" />
 		<allowGeometricCatalysis val="true" />
 		<subtractMeanBarrierHeight val="true" />
-		<allowmRNAfolding val="true" />
+		<allowmRNAfolding val="false" />
 		<allowMisincorporation val="false" />
 		<useFourNTPconcentrations val="true" />
 		<allowMultipleBulges val="true" />
