@@ -586,14 +586,14 @@ function begin_bioinf5(resolve = function() { }){
         
         
         addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
-        "Example 6: approximate Bayesian computation",
+        "Example 5: approximate Bayesian computation",
         `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
         
         A toy [NTP]-velocity dataset has been uploaded into the 'Approximate Bayesian Computation' section below. Approximate Bayesian
-        computation will be used to fit two parameters - k<sub>cat</sub> and k<sub>bind</sub> - to the data. To begin the fitting process,
+        computation will be used to fit two parameters - the rate of catalysis k<sub>cat</sub> and the rate of binding k<sub>bind</sub> - to the data. To begin the fitting process,
         press the glowing 'Begin R-ABC' button down below.<br><br>
         
-        In the histograms below, the yellow underlays show the prior distributions while the blue bars are the posterior distributions. If the
+        In the histograms below, the yellow underlays will show the prior distributions while the blue bars will be the posterior distributions. If the
         two distributions are different, then the data taught us something about the parameters.`,
         "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?bioinf=5'>www.polymerase.nz/simpol/?bioinf=5</a>");
     
