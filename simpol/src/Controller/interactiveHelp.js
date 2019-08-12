@@ -365,7 +365,7 @@ function begin_bioinf3(resolve = function() { }){
     `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
     
     To add a 10A insert into the mRNA, press the glowing <img class="icon small" src='../src/Images/stutter.png'>
-    button on the far left. This iterative slippage is known as stuttering. During transcription, anywhere up to 4 inserts could be added into this region of the murC2 gene<sup>1</sup>.`,
+    button on the far left. This iterative process of nucleotide insertion is known as transcriptional stuttering. During transcription, anywhere up to 4 inserts could be added into this region of the murC2 gene<sup>1</sup>.`,
     `This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?bioinf=3'>www.polymerase.nz/simpol/?bioinf=3</a> <br> <br>
     <sup>1</sup> Tamas, Ivica, et al. "Endosymbiont gene functions impaired and rescued by polymerase infidelity at poly (A) tracts." Proceedings of the National Academy of Sciences 105.39 (2008): 14934-14939.<br> <br>`);
 
