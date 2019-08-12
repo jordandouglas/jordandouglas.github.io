@@ -90,7 +90,7 @@ function begin_bioinf4(){
     To predict the locations of pause sites in the loaded sequences, press the glowing 'Begin Pauser' button below. This will predict the locations using 
     both SimPol and a Naive Bayes classifier (NBC). Because the locations of pause sites are already known<sup>1</sup>, the recall, precision, accuracy, and a ROC curve can be computed.
      <br><br>
-    <sup>1</sup> 1) Larson, Matthew H., et al. "A pause sequence enriched at translation start sites drives transcription dynamics in vivo." Science 344.6187 (2014): 1042-1047`,
+    <sup>1</sup>Larson, Matthew H., et al. "A pause sequence enriched at translation start sites drives transcription dynamics in vivo." Science 344.6187 (2014): 1042-1047`,
     
     "This example was loaded from <a style='color:#0B522D' href='http://www.polymerase.nz/pauser/?bioinf=4'>www.polymerase.nz/pauser/?bioinf=4</a>");
 
