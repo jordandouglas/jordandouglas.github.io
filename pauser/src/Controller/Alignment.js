@@ -177,6 +177,9 @@ function renderPredictionSummary(resolve = function() { }){
     $("#predictionSummaryTable").hide(0);
     
 
+
+	$("#predictionSummaryTable").append(getPredictionSummaryHeaderTemplate());
+
     var odd = true;
     for (var acc in NUCLEOTIDE_ALIGNMENT){
 
@@ -554,6 +557,36 @@ function getClassifierAdequacyRowTemplate(name, average = false){
     `;
     
     return row;
+
+}
+
+
+
+function getPredictionSummaryHeaderTemplate(){
+
+	return `
+		 <tr style="color:#0B522D">
+		    <td style="min-width:100px;">
+		         Accession       
+		    </td>
+		            
+		            
+		    <td style="max-width:300px; width:300px;" title="The predicted locations of pause sites, as classified by SimPol.">
+		         SimPol    
+		    </td>
+		            
+		            
+		    <td style="max-width:300px; width:300px;" title="The predicted locations of pause sites, as classified by the Naive Bayes classifier.">
+		         NBC
+		    </td>
+		            
+		        
+		    <td style="max-width:300px; width:300px;" title="The known locations of pause sites. These are optionally specified when uploading the .fasta file.">
+		         Known pause sites
+		    </td>
+		            
+		</tr>
+	`;
 
 }
 
