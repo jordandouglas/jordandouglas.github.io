@@ -157,10 +157,25 @@ function parseAlignment(align_str, resolve = function() { }){
 
 
 // Construct a table which shows the locations of the pause site predictions in each sequence, and the locations of the true pause sites
-function renderPredictionSummary(){
+function renderPredictionSummary(resolve = function() { }){
+
+	if ($("#pauseSitePredictionsBtn").val() == "+") {
+		resolve();
+		return;
+	}
 
 
     console.log("renderPredictionSummary", NUCLEOTIDE_ALIGNMENT);
+    
+    
+    // Add a loading wheel
+    $("#predictionSummaryTable").before(getLoaderTemplate("prePredictionsLoader"));
+    
+    
+    // Clear and hide the table
+    $("#predictionSummaryTable").html("");
+    $("#predictionSummaryTable").hide(0);
+    
 
     var odd = true;
     for (var acc in NUCLEOTIDE_ALIGNMENT){
@@ -173,12 +188,23 @@ function renderPredictionSummary(){
         odd = !odd;
 
     }
+    
+    
+	// Remove loading wheel and show the table
+	$("#prePredictionsLoader").remove();
+	$("#predictionSummaryTable").show(0);
+	
+	resolve();
+    
 
 }
 
 
 // Draw the classification adequacy table. Cells will not be populated.
 function renderAdequacyTable(){
+
+
+	if ($("#classifierAdequacy").is(":hidden")) return;
 
 
     // Check if any uploaded sequences actually contain known pause site information
@@ -194,18 +220,20 @@ function renderAdequacyTable(){
     if (!thereAreTruePauseSites) {
         $("#classifierAdequacy_nodata").show(100);
         $("#classifierAdequacyTable").hide(0);
+        minimiseSection($("#classifierAdequacyBtn"), false);
+        minimiseSection($("#pauseSitePredictionsBtn"), true);
         $("#ROC_curve_cont").hide();
         return;
     }
     
-    
-    
-    // Create the table
-    $("#classifierAdequacyTable").show(100);
+    minimiseSection($("#pauseSitePredictionsBtn"), false);
     $("#classifierAdequacy_nodata").hide(0);
+    
     
   
     
+  
+    // Create the table
     for (var acc in NUCLEOTIDE_ALIGNMENT){
         var seq = NUCLEOTIDE_ALIGNMENT[acc];
         if (seq.known_pauseSites == null) continue;
@@ -216,6 +244,10 @@ function renderAdequacyTable(){
      
     // Total row
     $("#classifierAdequacyTable").append(getClassifierAdequacyRowTemplate("Average", true));
+    
+    
+	// Show the table
+	$("#classifierAdequacyTable").show(0);
 
 
 
@@ -224,9 +256,18 @@ function renderAdequacyTable(){
 
 
 
+
+
+
 // Draw the multiple sequence alignment onto the DOM (not including pause sites)
 function renderAlignment(resolve = function() { }){
 
+	
+	if ($("#sequencesPanelBtn").val() == "+") {
+		resolve();
+		return;
+	}
+	
 	
 	console.log("renderAlignment", NUCLEOTIDE_ALIGNMENT);
     
@@ -238,6 +279,14 @@ function renderAlignment(resolve = function() { }){
     getNtrials_controller(function(result) {
          $("#nTrialsTotal").html(result.ntrials);
     });
+    
+    // Add a loading wheel
+    $("#conservationMSA").before(getLoaderTemplate("preMSAloader"));
+    
+    
+    // Clear and hide the table
+    $("#conservationMSA").html("");
+    $("#conservationMSA").hide(0);
 
 
 	$("#conservationMSA").append(getMSAheaderTemplate(NUCLEOTIDE_ALIGNMENT_NSITES));
@@ -254,6 +303,9 @@ function renderAlignment(resolve = function() { }){
 
     }
 
+	// Remove loading wheel and show the table
+	$("#preMSAloader").remove();
+	$("#conservationMSA").show(0);
 
 	resolve();
 
@@ -546,7 +598,7 @@ function appendMSArowTemplate(appendTo, name, seq, known_pauseSites = null, simp
     if (known_pauseSites != null){
         for (var i = 0; i < known_pauseSites.length; i ++){
             var pauseSite = known_pauseSites[i];
-            seq_list[pauseSite-1] = `<b title="According to the uploaded .fasta file, this site is a pause site." style="color:red">` + seq_list[pauseSite-1] + `</b>`;
+            seq_list[pauseSite-1] = `<b title="According to the uploaded .fasta file, this site is a pause site." style="background-color:red; color:white">` + seq_list[pauseSite-1] + `</b>`;
         }
     }
     

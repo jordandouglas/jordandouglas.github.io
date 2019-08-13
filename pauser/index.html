@@ -159,12 +159,26 @@ function minimiseSection(element, setTo = null){
 
 	
 	if(setTo == false || (setTo == null && !currentlyShown)){
+	
 		$(element).val("+");
 		$("#" + toHide).hide(setTo == null ? 300 : 0);
+		
+		if (toHide == "sequencesPanel") $("#conservationMSA").html("");
+		if (toHide == "pauseSitePredictions") $("#predictionSummaryTable").html("");
+		
 	}
 	else{
+	
 		$(element).val("-");
-		$("#" + toHide).show(setTo == null ? 300 : 0);
+	
+		var toDoAfterRender = function() {
+			$("#" + toHide).show(setTo == null ? 300 : 0);
+		}
+		
+		if (toHide == "sequencesPanel") renderAlignment(toDoAfterRender);
+		else if (toHide == "pauseSitePredictions") renderPredictionSummary(toDoAfterRender);
+		toDoAfterRender();
+		
 	}
 
 }
@@ -371,7 +385,7 @@ function getLoaderTemplate(id, msg = ""){
 
 						 		<div style="display:none" class="uploadAlignmentFirst"> Sequence(s) successfully uploaded. </div>
 
-						 		<div class="beforeUploadingAlignment"> Upload one or more nucleotide sequences in .fasta format. Optionally include the locations of pause sites.
+						 		<div class="beforeUploadingAlignment"> Upload one or more nucleotide sequences, in .fasta format. Optionally include the locations of pause sites.
                                           </div>
 
 
@@ -392,7 +406,7 @@ function getLoaderTemplate(id, msg = ""){
                                 <br><br></div>
 
 								<div class="beforeUploadingSession">
-                                      Upload a SimPol session file containing all the model and parameter settings to use for pause site prediction in .xml format.
+                                      Upload a SimPol session file containing all the model and parameter settings to use for pause site prediction, in .xml format. 
                                 </div>   
 
                                 <div style="display:none" class="uploadSessionFirst">
@@ -412,30 +426,81 @@ function getLoaderTemplate(id, msg = ""){
 					</div>
 				</div>
 
+
+
+
+			
+			<div class="panelOuter uploadAlignmentFirst" style=" margin-left:50px; margin-right:50px; margin-top:50px">
+				<div class="panelInner">
+
+					<span class="noselect"  style="font-size:18px; ">
+						<input type=button id='sequencesPanelBtn' class='minimise pauser' value='-' onClick="minimiseSection(this)">
+						<b style="color:#0B522D">Sequences</b>
+						&nbsp;&nbsp;&nbsp;
+
+
+						<div id="sequencesPanel" style="padding: 20 10">
+
+                                    
+                            The highlighted nucleotides in the sequence(s) below indicate known pause sites, as specified in the uploaded .fasta file.       
+                                    
+                            <div  id="conservationMSA_DIV"  class='scrollbar pauser' style='scrollbar-x-position: top; overflow-x: scroll; position:relative; width:100%;'>
+
+    							
+                                <br><br>
+                                   
+                                        
+
+    							<div style="display:none" id="alignmentLoading"></div>
+                                
+                                            
+                                            
+                                            
+                                    
+    							<table id="conservationMSA" style="font-size:20px; font-family: 'Courier New';" cellpadding=2 cellspacing=0> 
+
+
+
+    							</table>
+                                            
+                                       
+                            </div>
+
+
+						</div>
+
+					</span>
+					
+
+				</div>
+			</div>
+
                     
 
 
 
 
-			<br><br>
+			
 
-			<div  class="panelOuter" style=" margin-left:50px; margin-right:50px">
+			<div class="panelOuter" style="margin-left:50px; margin-right:50px; margin-top:50px">
 				<div class="panelInner">
 
 					<span class="noselect"  style="font-size:18px; ">
 						<input type=button id='conservationSectionBtn' class='minimise pauser' value='-' onClick="minimiseSection(this)">
 						<b style="color:#0B522D">Prediction of transcriptional pause sites </b>
+						 <a href="about/#Prediction_of_transcriptional_pause_sites" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
+								
 						&nbsp;&nbsp;&nbsp;
                          <span class="finishPauserFirst" style="display:none; cursor:pointer;" onclick="downloadClassifications();" title="Download the full pause site prediction results."> <img src="../src/Images/downloadGreen.png" style="vertical-align:middle; padding:5 0; width:30px;"> </span>
                                 
-                         <input class="uploadAlignmentFirst button pauser" type=button id='beginPauser' onClick="beginPauser(false);" value=" Begin Pauser" title="Predict the locations of pause sites in each sequence." style="z-index: 100; float:right; display:none"> 
-
-                         <br><br>
+                        
 						<div id="conservationSection" style="padding: 20 20">
+						
+								
 
 
                                 <div style="display:none" class="uploadAlignmentFirst"> 
-                                    When you are ready to start the transcription simulations press Begin. This will be executed client-side (ie. using your CPU) and may take a while to finish.
+                                    When ready, press Begin to start the transcription simulations. This will be executed client-side (ie. using your CPU) and may take a while to finish.
                                 </div>
 
 
@@ -477,191 +542,212 @@ function getLoaderTemplate(id, msg = ""){
                                 
                                         
                                         
+                             <div class="flex-image" style="text-align:top; justify-content: left;">
                                         
-                             <div style="margin:20px; margin-bottom:50px">
-                                 
-                                <b style="color:#0B522D">Classifiers</b> 
-                                <a href="about/#Classifiers" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
-                                
-                                <table id="classifiersTable" style="margin:10px; text-align:center" cellpadding=0 cellspacing=0> 
-                                
-                                    <tr style="color:#0B522D">
-                                        <td style="min-width:100px;"  title="The method used to classify pause sites.">
-                                             Classifier
-                                        </td>
-                                                    
-                                                              
-                                        <td style="width:100px;" title="The colour of a site which has been classified as a pause site by this method.">
-                                             Positive
-                                        </td>
-                                                
-                                                
-                                        <td style="width:300px;" title="Adjust the threshold to select which sites are classified as pause sites.">
-                                             Evidence threshold
-                                        </td>
-                                                    
-                                                    
-                                        <td style="width:300px">
-                                        </td>
-                                                    
-                                                    
-                                            
-                                    </tr>
-                                                
-                                                
-                                                
-                                     <tr>
-                                        <td style="color:#0B522D">
-                                             SimPol       
-                                        </td>
-                                              
-                                                    
-                                                            
-                                        <td style="position:relative">
-                                             <span class="dot simpol_class_dot" style="top:0.5em; left:45%"></span>
-                                        </td>
-                                                
-                                        <td style="position:relative">
-                                             <input type="range" min="0" max="1" step="0.01" value="0.8" style="width:100%" class="slider simpol_class" onchange="updateThreshold_controller('simpol')" id="simpol_threshold">
-                                        </td>
-                                                    
-                                                    
-                                        <td rowspan="2">
-                                              Higher thresholds result in fewer sites classified as pause sites. 
-                                        </td>
-                                                
-                                        
-                                            
-                                    </tr>
-                                                
-                                                
-                                                
-                                     <tr>
-                                        <td style="color:#0B522D">
-                                             Naive Bayes (NBC)       
-                                        </td>
-                                                    
-                                         <td style="position:relative">
-                                             <span class="dot NBC_class_dot" style="top:0.5em; left:45%"></span>
-                                        </td>
-                                                
-                                        <td style="position:relative">
-                                             <input type="range" min="0" max="1" step="0.01" value="0.2" style="width:100%" class="slider NBC_class" onchange="updateThreshold_controller('nbc')" id="nbc_threshold">
-                                        </td>
-                                                
-                                                
-                                            
-                                    </tr>
-
-
-                                </table>
-                            </div>
-                                        
-                                        
-                                        
-                                        
-                                
-
-                                    
-                            <div  id="conservationMSA_DIV"  class='scrollbar pauser' style='scrollbar-x-position: top; overflow-x: scroll; position:relative; width:100%;'>
-
-    							
-                                <br><br>
-                             
-                                   
-                                        
-
-    							<div style="display:none" id="alignmentLoading"></div>
-                                
-                                            
-                                            
-                                            
-                                    
-    							<table id="conservationMSA" style="font-size:20px; font-family: 'Courier New';" cellpadding=2 cellspacing=0> 
-
-
-
-    							</table>
-                                            
-                                       
-                            </div>
-                                        
-                                        
-                                        
-                             <div class="flex-image" style="text-align:top">
-                             
-                             
-                         
-                                     <div style="margin:20px; margin-bottom:50px">
-                                                    
-                                         
-                                        <b style="color:#0B522D">Classifier adequacy</b> 
-                                        <a href="about/#Evaluating_classifier_adequacy" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
-                                               
-                                                    
-                                        <div id="classifierAdequacy_nodata" style="display:none">
-                                             Specify the locations of pause sites in one or more sequences in the .fasta file to assess the classifier adequacies.      
-                                                        
-                                        </div>
-                                                    
-                                        <table id="classifierAdequacyTable" style="margin:10px; text-align:center; display:none" cellpadding=0 cellspacing=0> 
-                                        
-                                            <tr style="color:#0B522D">
-                                                <td style="min-width:100px;" title="The accession of any sequences whose pause sites are known.">
-                                                     Accession
-                                                </td>
-                                                        
-                                                            
-                                                <td style="min-width:100px;" title="The method used to generate classifications.">
-                                                     Classifier
-                                                </td>
-                                                            
-                                                                      
-                                                <td style="width:100px;" title="Recall / sensitivity / true positive rate. The probability of a known pause site being classified as one under the current threshold.">
-                                                     Recall
-                                                </td>
-                                                        
-                                                        
-                                                <td style="width:100px;" title="The probability of a site classified as a pause site actually being one under the current threshold.">
-                                                     Precision
-                                                </td>
-                                                            
-                                                            
-                                                <td style="width:100px" title="The overall proportion of correct classifications under the current threshold.">
-                                                     Accuracy
-                                                </td>
-                                                            
-                                                    
-                                            </tr>
-
-
-                                        </table>
-                                    </div>
-
-	                            	
+	                                        
+	                             <div style="margin:20px; margin-bottom:50px">
+	                                 
+	                                <b style="color:#0B522D">Classifiers</b> 
+	                                <a href="about/#Classifiers" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
+	                                
+	                                <table id="classifiersTable" style="margin:10px; text-align:center" cellpadding=0 cellspacing=0> 
+	                                
+	                                    <tr style="color:#0B522D">
+	                                        <td style="min-width:100px;"  title="The method used to classify pause sites.">
+	                                             Classifier
+	                                        </td>
+	                                                    
+	                                                              
+	                                        <td style="width:100px;" title="The colour of a site which has been classified as a pause site by this method.">
+	                                             Positive
+	                                        </td>
+	                                                
+	                                                
+	                                        <td style="width:300px;" title="Adjust the threshold to select which sites are classified as pause sites.">
+	                                             Evidence threshold
+	                                        </td>
+	                                                    
+	                                                    
+	                                        <td style="width:300px">
+	                                        </td>
+	                                                    
+	                                                    
+	                                            
+	                                    </tr>
+	                                                
+	                                                
+	                                                
+	                                     <tr>
+	                                        <td style="color:#0B522D">
+	                                             SimPol       
+	                                        </td>
+	                                              
+	                                                    
+	                                                            
+	                                        <td style="position:relative">
+	                                             <span class="dot simpol_class_dot" style="top:0.5em; left:45%"></span>
+	                                        </td>
+	                                                
+	                                        <td style="position:relative">
+	                                             <input type="range" min="0" max="1" step="0.01" value="0.8" style="width:100%" class="slider simpol_class" onchange="updateThreshold_controller('simpol')" id="simpol_threshold">
+	                                        </td>
+	                                                    
+	                                                    
+	                                        <td rowspan="2">
+	                                              Higher thresholds result in fewer sites classified as pause sites. 
+	                                        </td>
+	                                                
+	                                        
+	                                            
+	                                    </tr>
+	                                                
+	                                                
+	                                                
+	                                     <tr>
+	                                        <td style="color:#0B522D">
+	                                             Naive Bayes (NBC)       
+	                                        </td>
+	                                                    
+	                                         <td style="position:relative">
+	                                             <span class="dot NBC_class_dot" style="top:0.5em; left:45%"></span>
+	                                        </td>
+	                                                
+	                                        <td style="position:relative">
+	                                             <input type="range" min="0" max="1" step="0.01" value="0.2" style="width:100%" class="slider NBC_class" onchange="updateThreshold_controller('nbc')" id="nbc_threshold">
+	                                        </td>
+	                                                
+	                                                
+	                                            
+	                                    </tr>
+	
+	
+	                                </table>
+	                           	 </div>
+	                           	 
+	                           	 
+	                           	                        	
 	                             
-	                             
-	                              	<div id="ROC_curve_cont" style="margin:20px; margin-bottom:50px; text-align:center">
-	                                                        
-	                                                        
-	                                                 <b style="color:#0B522D">ROC curve</b> 
-	                                                 <a href="about/#ROC_curve" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
-	                                                 <span style="cursor:pointer;" onclick="downloadROC();" title="Download the plot (.png)."> <img src="../src/Images/downloadGreen.png" class="icon small"> </span>
-	                                                 <br><br>
-	                                                        
-	                                                 <canvas id="ROC_curve_canvas" width="0" height="0"></canvas>      
-	                                                        
-	                                  </div>
+                             
+                              	<div id="ROC_curve_cont" style="margin:20px; margin-bottom:50px; text-align:center">
+                                                        
+                                                        
+                                     <b style="color:#0B522D">ROC curve</b> 
+                                     <a href="about/#ROC_curve" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
+                                     <span style="cursor:pointer;" onclick="downloadROC();" title="Download the plot (.png)."> <img src="../src/Images/downloadGreen.png" class="icon small"> </span>
+                                     <br><br>
+                                            
+                                     <canvas id="ROC_curve_canvas" width="0" height="0"></canvas>      
+                                                        
+                              	</div>
+                              	
+                              	
+                           </div>
                              
              
-		                         
+	                                        
+                                        
+     
+                                        
+
+                            </div>
+
+
+						</div>
+
+					</span>
+					
+
+				</div>
+			</div>
+
+
+
+
+			
+			<div class="panelOuter uploadAlignmentFirst" style="margin-left:50px; margin-right:50px; margin-top:50px">
+				<div class="panelInner">
+
+					<span class="noselect"  style="font-size:18px; ">
+						<input type=button id='classifierAdequacyBtn' class='minimise pauser' value='-' onClick="minimiseSection(this)">
+						<b style="color:#0B522D">Classifier adequacy</b>
+						 <a href="about/#Evaluating_classifier_adequacy" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
+						&nbsp;&nbsp;&nbsp;
+
+
+						<div id="classifierAdequacy" style="padding: 20 10">
+
+	                      
+	                         <div style="margin:20px; margin-bottom:50px">
+	    
+	                                   
+	                                        
+	                            <div id="classifierAdequacy_nodata" style="display:none">
+	                                 Specify the locations of pause sites in one or more sequences in the .fasta file to assess the classifier adequacies.      
+	                                            
+	                            </div>
+	                                        
+	                            <table id="classifierAdequacyTable" style="margin:10px; text-align:center; display:none" cellpadding=0 cellspacing=0> 
+	                            
+	                                <tr style="color:#0B522D">
+	                                    <td style="min-width:100px;" title="The accession of any sequences whose pause sites are known.">
+	                                         Accession
+	                                    </td>
+	                                            
+	                                                
+	                                    <td style="min-width:100px;" title="The method used to generate classifications.">
+	                                         Classifier
+	                                    </td>
+	                                                
+	                                                          
+	                                    <td style="width:100px;" title="Recall / sensitivity / true positive rate. The probability of a known pause site being classified as one under the current threshold.">
+	                                         Recall
+	                                    </td>
+	                                            
+	                                            
+	                                    <td style="width:100px;" title="The probability of a site classified as a pause site actually being one under the current threshold.">
+	                                         Precision
+	                                    </td>
+	                                                
+	                                                
+	                                    <td style="width:100px" title="The overall proportion of correct classifications under the current threshold.">
+	                                         Accuracy
+	                                    </td>
+	                                                
+	                                        
+	                                </tr>
+	
+	
+	                            </table>
+	                        </div>
+                                  
+						</div>
+
+					</span>
+					
+
+				</div>
+			</div>
+			
+			
+			
+			
+			
+			<div class="panelOuter uploadAlignmentFirst" style="margin-left:50px; margin-right:50px; margin-top:50px">
+				<div class="panelInner">
+
+					<span class="noselect"  style="font-size:18px; ">
+						<input type=button id='pauseSitePredictionsBtn' class='minimise pauser' value='-' onClick="minimiseSection(this)">
+						<b style="color:#0B522D">Pause site classification summary</b>
+						<a href="about/#Classifiers" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
+		                                  
+						&nbsp;&nbsp;&nbsp;
+						
+							<div id="pauseSitePredictions" style="padding: 20 10">
+							
 		                                        
 		                                        
 		                             <div style="margin:20px">
 		                                 
-		                                <b style="color:#0B522D">Pause site classification summary</b> 
-		                                 <a href="about/#Classifiers" title="Help" class="help" target="_blank" style="font-size:10px; padding:3; cursor:pointer;"><img class="helpIcon" src="../src/Images/help.png"></a>
-		                                  
 		                                <table id="predictionSummaryTable" style="margin:10px; text-align:right" cellpadding=0 cellspacing=0> 
 		                                
 		                                    <tr style="color:#0B522D">
@@ -690,24 +776,14 @@ function getLoaderTemplate(id, msg = ""){
 		                                </table>
 		                            </div>
 		                                
-                                    
-                                </div>
-                                    
-                                        
-
-                            </div>
-
-
-						</div>
+							
+							</div>
 
 					</span>
 					
 
 				</div>
 			</div>
-
-
-
 
 
 
