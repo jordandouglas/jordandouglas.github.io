@@ -30,7 +30,7 @@
 		<UTPconc val="1000" distribution="Fixed" fixedDistnVal="567"> [UTP] (μM)</UTPconc>
 		<FAssist val="0" distribution="Fixed" fixedDistnVal="0" uniformDistnLowerVal="-30" uniformDistnUpperVal="30">Force  (pN)</FAssist>
 		<hybridLen val="10" distribution="Fixed" fixedDistnVal="11" uniformDistnLowerVal="8" uniformDistnUpperVal="12">Hybrid length (bp)</hybridLen>
-		<bubbleLeft val="2" distribution="Fixed" fixedDistnVal="2" uniformDistnLowerVal="0" uniformDistnUpperVal="3">Bubble length left (bp)</bubbleLeft>
+		<bubbleLeft val="2" distribution="Fixed" fixedDistnVal="0" uniformDistnLowerVal="0" uniformDistnUpperVal="3">Bubble length left (bp)</bubbleLeft>
 		<bubbleRight val="2" distribution="Fixed" fixedDistnVal="0" uniformDistnLowerVal="0" uniformDistnUpperVal="3">Bubble length right (bp)</bubbleRight>
 		<DGtaudag val="13.48049" distribution="Fixed" fixedDistnVal="20.7513" uniformDistnLowerVal="9" uniformDistnUpperVal="15" normalMeanVal="21" normalSdVal="1">ΔG†𝜏</DGtaudag>
 		<DGtau1 val="-5.110798" distribution="Fixed" fixedDistnVal="-2" normalMeanVal="-2" normalSdVal="1">ΔG𝜏1</DGtau1>
