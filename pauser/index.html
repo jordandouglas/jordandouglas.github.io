@@ -501,6 +501,9 @@ function getLoaderTemplate(id, msg = ""){
 
                                 <div style="display:none" class="uploadAlignmentFirst"> 
                                     When ready, press Begin to start the transcription simulations. This will be executed client-side (ie. using your CPU) and may take a while to finish.
+                               
+       		                         <input class="uploadAlignmentFirst button pauser" type=button id='beginPauser' onClick="beginPauser(false);" value=" Begin Pauser" title="Predict the locations of pause sites in each sequence." style="z-index: 100; float:right; display:none"> 
+                               
                                 </div>
 
 
