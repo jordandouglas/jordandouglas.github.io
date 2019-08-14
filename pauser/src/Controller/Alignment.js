@@ -207,7 +207,7 @@ function renderPredictionSummary(resolve = function() { }){
 function renderAdequacyTable(){
 
 
-	if ($("#classifierAdequacy").is(":hidden")) return;
+	
 
 
     // Check if any uploaded sequences actually contain known pause site information
@@ -231,6 +231,7 @@ function renderAdequacyTable(){
     
     minimiseSection($("#pauseSitePredictionsBtn"), false);
     $("#classifierAdequacy_nodata").hide(0);
+    $("#ROC_curve_cont").show();
     
     
   
@@ -355,9 +356,18 @@ updatePauserResultDisplays = function(){
             var seq = NUCLEOTIDE_ALIGNMENT[acc];
             
         
+        
+        	//var simpol_pauseSites_html = seq.simpol_pauseSites.join(", ");
+        	//var pauser_pauseSites_html = seq.nbc_pauseSites.join(", ");
+    		//$("#simpol_summary_" + acc.substr(1)).html(seq.simpol_pauseSites == null ? "" : simpol_pauseSites_html);
+            //$("#nbc_summary_" + acc.substr(1)).html(seq.nbc_pauseSites == null ? "" : pauser_pauseSites_html);
+        
+        
             // Update the summary table
             $("#simpol_summary_" + acc.substr(1)).html(seq.simpol_pauseSites == null ? "" : convertListToCommaString(seq.simpol_pauseSites));
             $("#nbc_summary_" + acc.substr(1)).html(seq.nbc_pauseSites == null ? "" : convertListToCommaString(seq.nbc_pauseSites));
+            
+           
             
             // Update the adequacy table
             if (seq.known_pauseSites != null) {
@@ -480,8 +490,35 @@ updatePauserResultDisplays = function(){
     });
 
 
+}
+
+
+/*
+
+// Input lists of pause sites
+// Output html formats for simpol and pauser predictions. Highlighted if true prediction. Underlined if predicted by both Simpol and Pauser
+function getPauseSitePredictionsListHTML(predictedPausesSimpol, predictedPausesPauser, knownPauses = []){
+
+
+	for (var i = 0; i < predictedPausesSimpol.length; i ++){
+	
+		for (var j = 0; j < predictedPausesPauser.length; j ++){
+		
+		
+			if (predictedPausesSimpol[i] == predictedPausesPauser[j]) {
+				
+			
+			}
+		
+		
+		
+		}
+	
+	}
 
 }
+
+*/
 
 
 // Add dots below the sequence showing that a classifier classified it as a pause site
@@ -631,7 +668,7 @@ function appendMSArowTemplate(appendTo, name, seq, known_pauseSites = null, simp
     if (known_pauseSites != null){
         for (var i = 0; i < known_pauseSites.length; i ++){
             var pauseSite = known_pauseSites[i];
-            seq_list[pauseSite-1] = `<b title="According to the uploaded .fasta file, this site is a pause site." style="background-color:red; color:white">` + seq_list[pauseSite-1] + `</b>`;
+            seq_list[pauseSite-1] = `<span class="truePauseSite" title="According to the uploaded .fasta file, this site is a pause site.">` + seq_list[pauseSite-1] + `</span>`;
         }
     }
     
