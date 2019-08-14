@@ -52,20 +52,22 @@ class TranslocationRatesCache{
 
 
 		double meanGibbsEnergyBarrier;
+		
+		int templateLength;
 
 
 	
 	public:
 		double getTranslocationRates(State* state, bool fwd);
-		void buildTranslocationRateTable(string templSequence);
-		void buildBacktrackRateTable(string templSequence);
-		void buildUpstreamRNABlockadeTable(string templSequence);
-		void buildDownstreamRNABlockadeTable(string templSequence);
+		void buildTranslocationRateTable();
+		void buildBacktrackRateTable();
+		void buildUpstreamRNABlockadeTable();
+		void buildDownstreamRNABlockadeTable();
 		double get_meanGibbsEnergyBarrier();
 		void reset_meanGibbsEnergyBarrier();
 
-		TranslocationRatesCache();
-		void initTranslocationRates(string templateSequence);
+		TranslocationRatesCache(int templateLength);
+		void initTranslocationRates();
         void clear();
 
 };

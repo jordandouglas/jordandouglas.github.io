@@ -175,9 +175,17 @@ function minimiseSection(element, setTo = null){
 			$("#" + toHide).show(setTo == null ? 300 : 0);
 		}
 		
-		if (toHide == "sequencesPanel") renderAlignment(toDoAfterRender);
-		else if (toHide == "pauseSitePredictions") renderPredictionSummary(toDoAfterRender);
+		if (toHide == "sequencesPanel") {
+			renderAlignment(toDoAfterRender);
+			updatePauserResultDisplays();
+		}
+		else if (toHide == "pauseSitePredictions") {
+			renderPredictionSummary(toDoAfterRender);
+			updatePauserResultDisplays();
+		}
 		toDoAfterRender();
+		
+		if (toHide == "classifierAdequacy") updatePauserResultDisplays();
 		
 	}
 
@@ -429,55 +437,6 @@ function getLoaderTemplate(id, msg = ""){
 
 
 
-			
-			<div class="panelOuter uploadAlignmentFirst" style=" margin-left:50px; margin-right:50px; margin-top:50px">
-				<div class="panelInner">
-
-					<span class="noselect"  style="font-size:18px; ">
-						<input type=button id='sequencesPanelBtn' class='minimise pauser' value='-' onClick="minimiseSection(this)">
-						<b style="color:#0B522D">Sequences</b>
-						&nbsp;&nbsp;&nbsp;
-
-
-						<div id="sequencesPanel" style="padding: 20 10">
-
-                                    
-                            The highlighted nucleotides in the sequence(s) below indicate known pause sites, as specified in the uploaded .fasta file.       
-                                    
-                            <div  id="conservationMSA_DIV"  class='scrollbar pauser' style='scrollbar-x-position: top; overflow-x: scroll; position:relative; width:100%;'>
-
-    							
-                                <br><br>
-                                   
-                                        
-
-    							<div style="display:none" id="alignmentLoading"></div>
-                                
-                                            
-                                            
-                                            
-                                    
-    							<table id="conservationMSA" style="font-size:20px; font-family: 'Courier New';" cellpadding=2 cellspacing=0> 
-
-
-
-    							</table>
-                                            
-                                       
-                            </div>
-
-
-						</div>
-
-					</span>
-					
-
-				</div>
-			</div>
-
-                    
-
-
 
 
 			
@@ -662,6 +621,59 @@ function getLoaderTemplate(id, msg = ""){
 
 				</div>
 			</div>
+			
+			
+			
+			
+			
+			<div class="panelOuter uploadAlignmentFirst" style=" margin-left:50px; margin-right:50px; margin-top:50px">
+				<div class="panelInner">
+
+					<span class="noselect"  style="font-size:18px; ">
+						<input type=button id='sequencesPanelBtn' class='minimise pauser' value='-' onClick="minimiseSection(this)">
+						<b style="color:#0B522D">Sequences</b>
+						&nbsp;&nbsp;&nbsp;
+
+
+						<div id="sequencesPanel" style="padding: 20 10">
+
+                                    
+                            The highlighted nucleotides in the sequence(s) below indicate known pause sites, as specified in the uploaded .fasta file.       
+                                    
+                            <div  id="conservationMSA_DIV"  class='scrollbar pauser' style='scrollbar-x-position: top; overflow-x: scroll; position:relative; width:100%;'>
+
+    							
+                                <br><br>
+                                   
+                                        
+
+    							<div style="display:none" id="alignmentLoading"></div>
+                                
+                                            
+                                            
+                                            
+                                    
+    							<table id="conservationMSA" style="font-size:20px; font-family: 'Courier New';" cellpadding=2 cellspacing=0> 
+
+
+
+    							</table>
+                                            
+                                       
+                            </div>
+
+
+						</div>
+
+					</span>
+					
+
+				</div>
+			</div>
+
+                    
+
+			
 
 
 

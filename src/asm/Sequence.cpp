@@ -43,12 +43,14 @@ Sequence::Sequence(string seqID, string TemplateType, string PrimerType, string 
 
 	this->rateTableBuilt = false;
 	this->RNAunfoldingTableBuilt = false;
-	this->translocationRatesCache = new TranslocationRatesCache();
+	this->translocationRatesCache = new TranslocationRatesCache(this->templateSequence.length());
 
     this->MSAsequence = "";
     this->nsitesMSA = 0;
     this->pauser_finished = false;
 }
+
+
 
 // MSA sequence (gaps allowed)
 Sequence::Sequence(string seqID, string MSAsequence){
@@ -67,7 +69,7 @@ Sequence::Sequence(string seqID, string MSAsequence){
 
     this->rateTableBuilt = false;
     this->RNAunfoldingTableBuilt = false;
-    this->translocationRatesCache = new TranslocationRatesCache();
+    this->translocationRatesCache = new TranslocationRatesCache(this->templateSequence.length());
 
     this->nsitesMSA = this->MSAsequence.size();
     this->pauser_finished = false;
@@ -93,7 +95,7 @@ void Sequence::initRateTable(){
 
 	if (this->rateTableBuilt) return;
 	//cout << "Initialising rate tables for " << seqID << endl;
-	this->translocationRatesCache->initTranslocationRates(this->templateSequence);
+	this->translocationRatesCache->initTranslocationRates();
 	Settings::renormaliseParameters();
    	this->rateTableBuilt = true;
 }
@@ -118,8 +120,8 @@ void Sequence::initRNAunfoldingTable(){
 
 	if (this->RNAunfoldingTableBuilt) return;
 	// cout << "Initialising unfolding tables for " << seqID << endl;
-	this->translocationRatesCache->buildUpstreamRNABlockadeTable(this->templateSequence); 
-   	this->translocationRatesCache->buildDownstreamRNABlockadeTable(this->templateSequence);
+	this->translocationRatesCache->buildUpstreamRNABlockadeTable(); 
+   	this->translocationRatesCache->buildDownstreamRNABlockadeTable();
    	this->RNAunfoldingTableBuilt = true;
 }
 

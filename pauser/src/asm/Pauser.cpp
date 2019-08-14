@@ -231,15 +231,34 @@ int main(int argc, char** argv) {
     _nbc_min_evidence = min_max.at(0);
     _nbc_max_evidence = min_max.at(1);
     
+    
+    
+    // AUC calculators
+    PosteriorDistributionSample* simpol_AUC_calculator = new PosteriorDistributionSample(0, 1, true);
+    PosteriorDistributionSample* nbc_AUC_calculator = new PosteriorDistributionSample(0, 1, true);
+    
 
     // Begin Pauser
     cout << "Beginning Pauser" << endl;
-    _PP_multipleSequenceAlignment->Pauser(bayes_classifier);
+    _PP_multipleSequenceAlignment->Pauser(bayes_classifier, simpol_AUC_calculator, nbc_AUC_calculator);
 
     
     
     // Print to file
     _PP_multipleSequenceAlignment->printPauserToFile(_outputFilename);
+    
+    
+	// Print AUC
+	cout << "\n-------- ROC analysis --------" << endl;
+	
+	nbc_AUC_calculator->calculateAUC(true, true);
+	simpol_AUC_calculator->calculateAUC(true, true);
+	
+	cout << "NBC:\tAUC = " << round((1-nbc_AUC_calculator->get_chiSquared()) * 1000) / 1000 << endl;
+	cout << "SimPol:\tAUC = " << round((1-simpol_AUC_calculator->get_chiSquared()) * 1000) / 1000 << endl;
+	
+	cout << "------------------------------\n" << endl;
+	
 
 
     auto endTime = std::chrono::system_clock::now();
@@ -249,3 +268,19 @@ int main(int argc, char** argv) {
     return 0;
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

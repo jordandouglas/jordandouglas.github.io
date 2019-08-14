@@ -32,6 +32,11 @@ function beginPauser(resume_simulation = false){
     // Change the description of the begin Pauser button
     $("#beginPauser").val("Stop Pauser");
     $("#beginPauser").attr("onclick", "stop_controller()");
+    
+    
+    getNtrials_controller(function(result) {
+         $("#nTrialsTotal").html(result.ntrials);
+    });
 
 
 

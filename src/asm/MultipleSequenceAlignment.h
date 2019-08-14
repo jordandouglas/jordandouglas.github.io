@@ -60,7 +60,7 @@ class MultipleSequenceAlignment{
         string parseFromFastaFile(string filename);
         string toJSON();
         void clear();
-        void Pauser(BayesClassifier* bayes_classifier);
+        void Pauser(BayesClassifier* bayes_classifier, PosteriorDistributionSample* simpol_AUC_calculator, PosteriorDistributionSample* nbc_AUC_calculator);
         void Pauser_GUI(Simulator* simulator, BayesClassifier* bayes_classifier, PosteriorDistributionSample* simpol_AUC_calculator, PosteriorDistributionSample* nbc_AUC_calculator, int* result);
         string getCurrentSequence();
         void classify();

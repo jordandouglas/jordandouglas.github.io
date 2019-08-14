@@ -40,17 +40,18 @@ using namespace std;
 
 
 
-TranslocationRatesCache::TranslocationRatesCache(){
+TranslocationRatesCache::TranslocationRatesCache(int templateLength){
 	this->meanGibbsEnergyBarrier = -INF;
 	this->usingDownstreamTable = true;
+	this->templateLength = templateLength;
 }
 
 
 // Reset all translocation rate related caches. Does not reset the mRNA folding energy cache
-void TranslocationRatesCache::initTranslocationRates(string templateSequence){
+void TranslocationRatesCache::initTranslocationRates(){
 	this->reset_meanGibbsEnergyBarrier();
-	this->buildTranslocationRateTable(templateSequence); 
-	this->buildBacktrackRateTable(templateSequence);
+	this->buildTranslocationRateTable(); 
+	this->buildBacktrackRateTable();
 }
 
 
@@ -273,7 +274,7 @@ double TranslocationRatesCache::getTranslocationRates(State* state, bool fwd){
 
 
 
-void TranslocationRatesCache::buildTranslocationRateTable(string templSequence){
+void TranslocationRatesCache::buildTranslocationRateTable(){
 
 	// Don't calculate all at once, only calculating for active site positions 0 and 1. Simulation caches hypertranslocated rates as it goes. 
 	
@@ -289,7 +290,7 @@ void TranslocationRatesCache::buildTranslocationRateTable(string templSequence){
 
 
 
-	int nLengths = templSequence.length() - h + 1;
+	int nLengths = this->templateLength - h + 1;
 	int nPositions = h + 1;
 	if (nLengths <= 0) return;
 
@@ -308,7 +309,7 @@ void TranslocationRatesCache::buildTranslocationRateTable(string templSequence){
 
 
 	this->translocationRateTable.resize(nLengths);
-	for(int nascentLen = h-1; nascentLen < templSequence.length(); nascentLen ++){
+	for(int nascentLen = h-1; nascentLen < this->templateLength; nascentLen ++){
 		
 		int rowNum = nascentLen - (h-1);
 		this->translocationRateTable.at(rowNum).resize(nPositions);
@@ -329,7 +330,7 @@ void TranslocationRatesCache::buildTranslocationRateTable(string templSequence){
 
 
 
-void TranslocationRatesCache::buildBacktrackRateTable(string templSequence){
+void TranslocationRatesCache::buildBacktrackRateTable(){
 	
 
 
@@ -343,7 +344,7 @@ void TranslocationRatesCache::buildBacktrackRateTable(string templSequence){
 
 
 	int h = (int)hybridLen->getVal(true);
-	if (templSequence.length() - h - 1 < 0) return;
+	if (this->templateLength - h - 1 < 0) return;
 
 
 
@@ -354,9 +355,9 @@ void TranslocationRatesCache::buildBacktrackRateTable(string templSequence){
 	this->backtrackRateTable.clear();
 
 
-	this->backtrackRateTable.resize(templSequence.length() - h - 1);
+	this->backtrackRateTable.resize(this->templateLength - h - 1);
 
-	for (int leftHybridBase = 1; leftHybridBase <= templSequence.length() - h - 1; leftHybridBase ++){
+	for (int leftHybridBase = 1; leftHybridBase <= this->templateLength - h - 1; leftHybridBase ++){
 		int indexNum = leftHybridBase - 1;
 
 		// Will leave it empty and add values only as they are needed
@@ -640,11 +641,11 @@ double TranslocationRatesCache::getDownstreamRNABlockadeBarrierHeight(State* sta
 
 // Build a table of rates for translocating upstream from the current position.
 // The active site position and transcript length don't matter - only the transcript position that is one basepair upstream of the polymerase matters
-void TranslocationRatesCache::buildUpstreamRNABlockadeTable(string templSequence){
-	this->upstreamRNABlockadeTable = new double[templSequence.length()];
+void TranslocationRatesCache::buildUpstreamRNABlockadeTable(){
+	this->upstreamRNABlockadeTable = new double[this->templateLength];
 
 	// Initialise all values at negative infinity
-	for (int i = 0; i < templSequence.length(); i ++){
+	for (int i = 0; i < this->templateLength; i ++){
 		this->upstreamRNABlockadeTable[i] = -INF; 
 	}
 
@@ -653,13 +654,13 @@ void TranslocationRatesCache::buildUpstreamRNABlockadeTable(string templSequence
 
 // Build a table of rates for translocating downstream from the current position.
 // The active site position and transcript length don't matter - only the transcript position that is one basepair downstream of the polymerase matters
-void TranslocationRatesCache::buildDownstreamRNABlockadeTable(string templSequence){
+void TranslocationRatesCache::buildDownstreamRNABlockadeTable(){
 
 	// This table is of size O(L^2) and is often not used. Large memory consumption
 	// When using the GUI, will not build cache if sequence length is beyond a certain limit
 	// Instead, rates will not be cached and are recalculated each time.
 	
-	if (templSequence.length() > 8000 && _USING_GUI) {
+	if (this->templateLength > 8000 && _USING_GUI) {
 		this->usingDownstreamTable = false;
 		return; 
 	}
@@ -668,7 +669,7 @@ void TranslocationRatesCache::buildDownstreamRNABlockadeTable(string templSequen
     // Element i,j: the mRNA currently has length i and the polymerase position is j
     if (hybridLen == nullptr || (int)hybridLen->getVal(true) <= 0) return;
 
-    int nLengths = templSequence.length();
+    int nLengths = this->templateLength;
     if (nLengths <= 0) return;
 
     this->downstreamRNABlockadeTable.clear();
@@ -700,8 +701,8 @@ void TranslocationRatesCache::clear(){
 
 
     // Clear the translocation table
-    for(unsigned int i = 0; i < this->translocationRateTable.size(); ++i){
-        for (unsigned int j = 0; j < this->translocationRateTable.at(i).size(); ++j){
+    for(unsigned int i = 0; i < this->translocationRateTable.size(); ++i) {
+        for (unsigned int j = 0; j < this->translocationRateTable.at(i).size(); ++j) {
             this->translocationRateTable.at(i).at(j).clear();
         }
         this->translocationRateTable.at(i).clear();
@@ -710,9 +711,31 @@ void TranslocationRatesCache::clear(){
 
 
     // Clear the backtrack table
-    for (unsigned int i = 0; i < this->backtrackRateTable.size(); ++i){
+    for (unsigned int i = 0; i < this->backtrackRateTable.size(); ++i) {
         this->backtrackRateTable.at(i).clear();
     }
     this->backtrackRateTable.clear();
+    
+    
+    
+    // Clear the RNA folding tables
+    delete [] this->upstreamRNABlockadeTable;
+    
+    for (unsigned int i = 0; i < this->downstreamRNABlockadeTable.size(); ++i) {
+        this->downstreamRNABlockadeTable.at(i).clear();
+    }
+    this->downstreamRNABlockadeTable.clear();
+	
+    
 
 }
+
+
+
+
+
+
+
+
+
+

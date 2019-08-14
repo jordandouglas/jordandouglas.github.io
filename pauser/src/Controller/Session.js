@@ -95,6 +95,12 @@ function uploadSession(){
 
                     //$("#alignmentLoading").html(getLoaderTemplate("alignmentLoader", "Loading alignment..."));
                     //$("#alignmentLoading").show(50);
+                    
+                    
+                    
+                    
+
+
 
 
                 }

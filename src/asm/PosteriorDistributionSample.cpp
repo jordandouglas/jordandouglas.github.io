@@ -188,12 +188,10 @@ vector<string> PosteriorDistributionSample::getParameterNames(){
 // Stores a string of values to plot if saveString is enabled
 void PosteriorDistributionSample::calculateAUC(bool saveString, bool calculateAgain){
 
-    //cout << "calculateAUC" << endl;
 
     if (this->meanDwellTimes_pauseSites.size() == 0 && this->meanDwellTimes_notpauseSites.size() == 0) return;
     if (!calculateAgain && this->haveCalculatedAUC) return;
     this->haveCalculatedAUC = true;
-
 
 
     // If there are no dwell times on pause sites and/or non-pause sites then the simulation probably terminated at the very beginning
@@ -207,6 +205,8 @@ void PosteriorDistributionSample::calculateAUC(bool saveString, bool calculateAg
     }
     
     
+    
+    
     // If any given gene has a zero ratio between pause-times and non-pause-times, set AUC to 0
     for (int i = 0; !_USING_PAUSER && i < this->simulatedValues.size(); i ++){
         if (stof(this->simulatedValues.at(i)) == 0){
@@ -216,6 +216,8 @@ void PosteriorDistributionSample::calculateAUC(bool saveString, bool calculateAg
             return;
         }
     }
+    
+    
 
 
     // Sort the pause and non-pause dwell time lists
@@ -233,6 +235,7 @@ void PosteriorDistributionSample::calculateAUC(bool saveString, bool calculateAg
         this->chiSquared += 1-AUC;
         return;
     }
+    
 
     //cout << "calculateAUC " << maxDwellTime << "," << minDwellTime << "," << isinf(maxDwellTime) << endl; 
 
@@ -383,6 +386,7 @@ void PosteriorDistributionSample::calculateAUC(bool saveString, bool calculateAg
     // Add 1-AUC to the X2
     if (calculateAgain) this->chiSquared = 1-AUC;
     else this->chiSquared += 1-AUC;
+    
 
 
 }
@@ -593,6 +597,10 @@ void PosteriorDistributionSample::addSimulatedAndObservedValue(SimulatorResultSu
         //cout << "Adding pauseSites" << endl;
     
         vector<double> relativeDwellTimes = simulated->get_meanRelativeTimePerLength();
+        
+        //cout << "relativeDwellTimes: ";
+        //for (int i = 1; i < 30; i ++) cout << relativeDwellTimes.at(i) << ",";
+        //cout << endl;
 
         // Do not calculate X2 until the very end of all experiments. Cache the relative dwell times and come back to them later
         vector<int> pauseSiteIndices = observed->get_pauseSiteIndices();

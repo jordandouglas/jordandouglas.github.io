@@ -442,7 +442,7 @@ string MultipleSequenceAlignment::getCurrentSequence(){
 
 
 // Perform simulations on each sequence in the alignment
-void MultipleSequenceAlignment::Pauser(BayesClassifier* bayes_classifier){
+void MultipleSequenceAlignment::Pauser(BayesClassifier* bayes_classifier, PosteriorDistributionSample* simpol_AUC_calculator, PosteriorDistributionSample* nbc_AUC_calculator){
 
     // Initialise simulator
     Plots* simulator_plots = new Plots();
@@ -463,8 +463,25 @@ void MultipleSequenceAlignment::Pauser(BayesClassifier* bayes_classifier){
         this->NBC_evidence_per_site.at(currentSequenceForSimulation) = NBC_seq;
         
         
+         // Add the NBC predicted pause sites of this sequence to the AUC calculator
+        if (currentSeq->get_known_pauseSites().size() > 0){
+            ExperimentalData* pauseSiteData = new ExperimentalData(-1, "pauseSites", currentSeq->get_known_pauseSites().size());
+            pauseSiteData->set_pauseSiteIndices(currentSeq->get_known_pauseSites());
+            SimulatorResultSummary* temp = new SimulatorResultSummary(ntrials_sim);
+            temp->add_proportionOfTimePerLength(NBC_seq);
+            temp->compute_meanRelativeTimePerLength();
+            nbc_AUC_calculator->addSimulatedAndObservedValue(temp, pauseSiteData);
+            
+            // Clean-up
+            pauseSiteData->clear();
+            delete pauseSiteData;
+            temp->clear();
+            delete temp;
+        }
+        
+        
 
-        cout << "Starting " << ntrials_sim << " for sequence " << currentSeq->getID() << endl;
+        cout << "Performing " << ntrials_sim << " simulations for " << currentSeq->getID() << endl;
         cout << "Starting sequence " << (currentSequenceForSimulation + 1) << " out of " << this->alignment.size() << endl;
 
         // Activate the sequence
@@ -481,7 +498,7 @@ void MultipleSequenceAlignment::Pauser(BayesClassifier* bayes_classifier){
         simulator->perform_N_Trials(sequence_summary, initialState, false);
         
 
-        // Simualtion completed. Save the time per length information and move on to the next sequence
+        // Simulation completed. Save the time per length information and move on to the next sequence
         sequence_summary->add_proportionOfTimePerLength(simulator_plots->getProportionOfTimePerLength());
         sequence_summary->compute_meanRelativeTimePerLength();
         this->relativeTimePerLengths.at(currentSequenceForSimulation) = sequence_summary->get_meanRelativeTimePerLength();
@@ -492,6 +509,17 @@ void MultipleSequenceAlignment::Pauser(BayesClassifier* bayes_classifier){
             double relativeTime = this->relativeTimePerLengths.at(currentSequenceForSimulation).at(i);
             if (relativeTime > _simpol_max_evidence) _simpol_max_evidence = relativeTime;
         }
+        
+        
+         // Add the predicted pause sites of this sequence to the AUC calculator
+        if (currentSeq->get_known_pauseSites().size() > 0){
+            ExperimentalData* pauseSiteData = new ExperimentalData(-1, "pauseSites", currentSeq->get_known_pauseSites().size());
+            pauseSiteData->set_pauseSiteIndices(currentSeq->get_known_pauseSites());
+            simpol_AUC_calculator->addSimulatedAndObservedValue(sequence_summary, pauseSiteData);
+            pauseSiteData->clear();
+            delete pauseSiteData;
+        }
+        
         
 
         // Clear the rate table to liberate memory
@@ -576,7 +604,6 @@ void MultipleSequenceAlignment::Pauser_GUI(Simulator* simulator, BayesClassifier
             // Prepare for simulating
             this->current_sequence_summary = new SimulatorResultSummary(ntrials_sim);
             simulator->initialise_GUI_simulation(this->current_sequence_summary, 1000);
-            
             
             // Start the simulations for this sequence
             simulator->perform_N_Trials_and_stop_GUI(simulator_result);
