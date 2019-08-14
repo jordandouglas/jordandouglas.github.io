@@ -332,6 +332,8 @@ function renderAlignment(resolve = function() { }){
 updatePauserResultDisplays = function(){
 
 
+	// Do not get results if the relevant panels are hidden
+	if ($("#classifierAdequacy").is(":hidden") && $("#sequencesPanel").is(":hidden") && $("#pauseSitePredictions").is(":hidden")) return;
     
     getPauserResults_controller(function(result){
     
