@@ -333,7 +333,10 @@ updatePauserResultDisplays = function(){
 
 
 	// Do not get results if the relevant panels are hidden
-	if ($("#classifierAdequacy").is(":hidden") && $("#sequencesPanel").is(":hidden") && $("#pauseSitePredictions").is(":hidden")) return;
+	if ($("#classifierAdequacy").is(":hidden") && $("#sequencesPanel").is(":hidden") && $("#pauseSitePredictions").is(":hidden")) {
+		plotROC();
+		return;
+	}
     
     getPauserResults_controller(function(result){
     
