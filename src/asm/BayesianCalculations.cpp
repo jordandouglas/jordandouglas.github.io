@@ -227,6 +227,12 @@ PosteriorDistributionSample* BayesianCalculations::getGeometricMedian(vector<Pos
 	for (int i = 0; i < paramIDs.size(); i ++){
 
 		string paramID = paramIDs.at(i);
+		
+		
+		// If integer, then use Hamming distance instead
+		if (Settings::getParameterByName(paramID)->isInteger()) {
+			continue;
+		}
 
 		// Calculate mean
 		double mean = 0;
@@ -270,7 +276,14 @@ PosteriorDistributionSample* BayesianCalculations::getGeometricMedian(vector<Pos
 			double distance = 0;
 			for (int i = 0; i < paramIDs.size(); i ++){
 				string paramID = paramIDs.at(i);
-				distance += pow(state_j->getParameterEstimate(paramID) - state_k->getParameterEstimate(paramID), 2);
+				
+				// If integer, then use Hamming distance instead
+				if (Settings::getParameterByName(paramID)->isInteger()) {
+					distance += state_j->getParameterEstimate(paramID) == state_k->getParameterEstimate(paramID) ? 0 : 1;
+				}
+				
+				// Continuous
+				else distance += pow(state_j->getParameterEstimate(paramID) - state_k->getParameterEstimate(paramID), 2);
 		 	} 
 
 		 	// Cache euclidean distance

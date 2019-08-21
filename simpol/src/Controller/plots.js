@@ -1522,7 +1522,7 @@ function plot_velocity_distribution(){
 
 
 				
-		histogram(velocitiesWindowSize, "plotCanvas" + canvasesToPrintTo[i], "plotCanvasContainer" + canvasesToPrintTo[i], PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[i]]["xRange"], "Translocation velocity (bp/s)", "Probability density", false, PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[i]]["canvasSizeMultiplier"], PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[i]]["timeSpaceX"] == "logSpace" );
+		histogram(velocitiesWindowSize, "plotCanvas" + canvasesToPrintTo[i], "plotCanvasContainer" + canvasesToPrintTo[i], PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[i]]["xRange"], "Translocation velocity (bp/s)", "Probability", false, PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[i]]["canvasSizeMultiplier"], PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[i]]["timeSpaceX"] == "logSpace" );
 
 	}
 	
@@ -1611,7 +1611,7 @@ function plot_pause_distribution(){
 
 
 		if ($("#plotDIV" + canvasesToPrintTo[canvasNum]).is( ":hidden" )) continue;
-		histogram(timesToPlot, "plotCanvas" + canvasesToPrintTo[canvasNum], "plotCanvasContainer" + canvasesToPrintTo[canvasNum], PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["xRange"], xAxisLabel, "Probability density",  false, PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["canvasSizeMultiplier"], PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["timeSpaceX"] == "logSpace" );
+		histogram(timesToPlot, "plotCanvas" + canvasesToPrintTo[canvasNum], "plotCanvasContainer" + canvasesToPrintTo[canvasNum], PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["xRange"], xAxisLabel, "Probability",  false, PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["canvasSizeMultiplier"], PLOT_DATA["whichPlotInWhichCanvas"][canvasesToPrintTo[canvasNum]]["timeSpaceX"] == "logSpace" );
 	}
 	
 	
@@ -1742,7 +1742,7 @@ function maximumFromList(list){
 
 
 // Assumes that values are sorted
-function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = "", ylab = "Probability density", hoverLabels = false, canvasSizeMultiplier = 1, logSpace = false, underlayFn = null, isInteger = false, col = "#008CBA"){
+function histogram(values, canvasID, canvasDivID, xRange = "automaticX", xlab = "", ylab = "Probability", hoverLabels = false, canvasSizeMultiplier = 1, logSpace = false, underlayFn = null, isInteger = false, col = "#008CBA"){
 
 	if (canvasDivID != null && $("#" + canvasDivID).is( ":hidden" )) return;
 	
@@ -3304,11 +3304,11 @@ function plot_parameter_heatmap(plotNumCustom = null){
                         }
                     
                     
-                        histogram(xvals, "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, xRange, xLab, "Probability density", false, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], false, underlayFn, isInteger);
+                        histogram(xvals, "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, xRange, xLab, "Probability", false, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], false, underlayFn, isInteger);
                     
                     
     			} else {
-                    histogram(xvals, "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"], xLab, "Probability density", false, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], false, null, isInteger);
+                    histogram(xvals, "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"], xLab, "Probability", false, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"], false, null, isInteger);
                 }
                     
     			return;
@@ -3462,7 +3462,7 @@ function plot_custom(plotNumCustom = null){
 
 		// If are is no y vals then make a histogram, or if there is x but y is 'prob' 
 		if (xvals != null && PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["customMetric"] == "probability"){
-			histogram(xvals, "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"], xLab, "Probability density", false, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"]);
+			histogram(xvals, "plotCanvas" + plotNumCustom, "plotCanvasContainer" + plotNumCustom, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["xRange"], xLab, "Probability", false, PLOT_DATA["whichPlotInWhichCanvas"][plotNumCustom]["canvasSizeMultiplier"]);
 			return;
 		}
 

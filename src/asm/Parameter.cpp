@@ -68,6 +68,11 @@ Parameter::Parameter(string id, bool integer, string zeroTruncated){
 }
 
 
+bool Parameter::isInteger(){
+	return this->integer;
+}
+
+
 void Parameter::init(){
 
 	this->distributionName = "Fixed";

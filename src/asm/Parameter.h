@@ -91,6 +91,7 @@ class Parameter{
 		string toJSON_compact();
 		Parameter* hide();
 		Parameter* show();
+		bool isInteger();
 
 		void convertToMetaParameter(int ninstances); // Convert this parameter into an object which points to other parameter objects (one for each instance)
 		Parameter* getParameterFromMetaParameter(int instanceNum);
