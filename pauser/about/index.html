@@ -812,7 +812,94 @@ function addCitations(){
 		                                    
 		                                    <div class="subsection block-subtitle pauser">Approximate Bayesian computation of transcriptional pausing mechanisms</div> <br> 
 		                                    
-		                                 	Manuscript in preparation.
+		                                 	In this project we inferred mechanisms of transcriptional pausing as a binary classification problem. 
+		                                 	The known locations of pause sites were experimentally measured by Larson et al. 2014<cite val="larson2014pause"></cite>. 
+		                                 	The SimPol session file (.xml) used to train the model can be downloaded below, as can the posterior distribution (.log, which can be viewed with SimPol or with Tracer<cite val="rambaut2015tracer"></cite>). 
+		                                 	Training set (50 genes) and test set (2403 genes) are available for download or to visualise and test the two classifiers on in Pauser.
+		                                 	
+		                                 	
+		                                 	<br><br>
+				                                 	
+		                                    <table style="font-size:80%; border-collapse: collapse; padding: 10; text-align:center;" cellpadding="5">
+		                                        
+		                                       <tr style="color:black">
+		                                            <th>
+		                                                Enzyme
+		                                            </th>
+		                                            
+		                                            <th>
+		                                                View .xml
+		                                            </th>
+		                                            
+		                                            <th>
+		                                                Download .log
+		                                            </th>
+		                                            
+		                                            <th>
+		                                                Training set
+		                                            </th>
+		                                            
+		                                            <th>
+		                                                Test set
+		                                            </th>
+		                                            
+		                                            
+		                                            
+		                                       </tr>
+		                                        
+		                                        
+		                                        <tr class="xml_link pauser" style="text-align:center">
+		                                            <td rowspan=2>
+		                                                <b><i>E. coli</i> RNAP</b>
+		                                            </td>
+		                                            
+		                                            
+		                                            <td rowspan=2  style="border-style:solid; border-color:black; border-width:1px">
+		                                                <a href="PausePredictionData/pausing_session.xml">pausing_session.xml</a>
+		                                            </td>
+		                                            
+		                                            <td  rowspan=2  style="border-style:solid; border-color:black; border-width:1px"> <a href="PausePredictionData/pausing_posterior.log">pausing_posterior.log</a> </td>
+		                                            
+		                                            <td title="View in Pauser">
+		                                                <a href="../?ploscompbio=6">Open</a>
+		                                            </td>
+		                                            
+		                                            
+		                                             <td title="View an 80 gene sample of the test set in Pauser">
+		                                                <a href="../?ploscompbio=7">Open sample</a>
+		                                            </td>
+		                                            
+		                                             
+		                                            
+		                                            
+		                                           
+		                                            
+		                                       </tr>
+		                                       
+		                                       
+		                                       <tr class="xml_link pauser" style="text-align:center">
+		
+		                                            
+		                                            <td>
+		                                                <a href="PausePredictionData/trainingSet.fasta">Download</a>
+		                                            </td>
+		                                            
+		                                           
+		                                            
+		                                             <td>
+		                                                <a href="PausePredictionData/testSet.fasta">Download</a>
+		                                            </td>
+		                                            
+		                                       </tr>
+		                                        
+		                                        
+		                                    </table>
+				                                 	
+		                                 	
+		                                 	 <br><br>
+		                                    <div class="ref">Jordan Douglas, Richard Kingston, and Alexei Drummond. "Approximate Bayesian computation of transcriptional pausing mechanisms." 2019, Manuscript in preparation 
+		                                    </div>
+                        
 		  
 		                                    
 		                        </div>

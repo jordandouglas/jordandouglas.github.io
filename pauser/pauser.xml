@@ -3,7 +3,7 @@
 	<sequence seqID="Buchnera aphidicola murC1 EU274658" TemplateType="dsDNA" PrimerType="ssRNA" seq="GGAAGACTATTAGGTCTTTAATATCGTCGATTTTTTTTTTGTAAGGATATGATAATTCTCGACTTTA" />
 	<elongation-model>
 		<allowBacktracking val="false" />
-		<allowHypertranslocation val="true" />
+		<allowHypertranslocation val="false" />
 		<allowInactivation val="false" />
 		<allowBacktrackWithoutInactivation val="false" />
 		<deactivateUponMisincorporation val="false" />
@@ -22,6 +22,8 @@
 		<allowDNAbending val="false" />
 		<assumeTranslocationEquilibrium val="false" />
 	</elongation-model>
+
+
 	<parameters>
 		<NTPconc val="1000" distribution="Fixed" fixedDistnVal="1000"> [NTP] (μM)</NTPconc>
 		<ATPconc val="1000" distribution="Fixed" fixedDistnVal="3152"> [ATP] (μM)</ATPconc>
@@ -29,26 +31,26 @@
 		<GTPconc val="1000" distribution="Fixed" fixedDistnVal="468"> [GTP] (μM)</GTPconc>
 		<UTPconc val="1000" distribution="Fixed" fixedDistnVal="567"> [UTP] (μM)</UTPconc>
 		<FAssist val="0" distribution="Fixed" fixedDistnVal="0" uniformDistnLowerVal="-30" uniformDistnUpperVal="30">Force  (pN)</FAssist>
-		<hybridLen val="10" distribution="Fixed" fixedDistnVal="11" uniformDistnLowerVal="8" uniformDistnUpperVal="12">Hybrid length (bp)</hybridLen>
-		<bubbleLeft val="2" distribution="Fixed" fixedDistnVal="0" uniformDistnLowerVal="0" uniformDistnUpperVal="3">Bubble length left (bp)</bubbleLeft>
-		<bubbleRight val="2" distribution="Fixed" fixedDistnVal="0" uniformDistnLowerVal="0" uniformDistnUpperVal="3">Bubble length right (bp)</bubbleRight>
-		<DGtaudag val="13.48049" distribution="Fixed" fixedDistnVal="20.7513" uniformDistnLowerVal="9" uniformDistnUpperVal="15" normalMeanVal="21" normalSdVal="1">ΔG†𝜏</DGtaudag>
-		<DGtau1 val="-5.110798" distribution="Fixed" fixedDistnVal="-2" normalMeanVal="-2" normalSdVal="1">ΔG𝜏1</DGtau1>
+		<hybridLen val="11" distribution="Fixed" fixedDistnVal="11" uniformDistnLowerVal="8" uniformDistnUpperVal="9">Hybrid length (bp)</hybridLen>
+		<bubbleLeft val="0" distribution="Fixed" fixedDistnVal="0" uniformDistnLowerVal="0" uniformDistnUpperVal="3">Bubble length left (bp)</bubbleLeft>
+		<bubbleRight val="0" distribution="Fixed" fixedDistnVal="0" uniformDistnLowerVal="0" uniformDistnUpperVal="3">Bubble length right (bp)</bubbleRight>
+		<DGtaudag val="20.1" distribution="Fixed" fixedDistnVal="20.1" uniformDistnLowerVal="9" uniformDistnUpperVal="15" normalMeanVal="21" normalSdVal="1">ΔG†𝜏</DGtaudag>
+		<DGtau1 val="-2" distribution="Fixed" fixedDistnVal="-2" normalMeanVal="-2" normalSdVal="1">ΔG𝜏1</DGtau1>
 		<barrierPos val="2.889" distribution="Fixed" fixedDistnVal="2.889">Transition state position  (Å)</barrierPos>
-		<arrestTime val="1800" distribution="Fixed" fixedDistnVal="3600">Arrest timeout  (s)</arrestTime>
+		<arrestTime val="3600" distribution="Fixed" fixedDistnVal="3600">Arrest timeout  (s)</arrestTime>
 		<kCat val="200" distribution="Fixed" fixedDistnVal="200" lognormalMeanVal="4" lognormalSdVal="0.5">Rate of catalysis (s⁻¹)</kCat>
-		<Kdiss val="3.5" distribution="Fixed" fixedDistnVal="50">KD (μM)</Kdiss>
-		<RateBind val="0.4" distribution="Fixed" fixedDistnVal="7">Rate of binding  (μM⁻¹ s⁻¹)</RateBind>
-		<RateActivate val="0.043468" distribution="Fixed" fixedDistnVal="0.0404" lognormalMeanVal="-1.93" lognormalSdVal="1.54">Rate of activation (s⁻¹)</RateActivate>
-		<RateDeactivate val="0.027912" distribution="Fixed" fixedDistnVal="0.237" lognormalMeanVal="-1.93" lognormalSdVal="1.54">Rate of inactivation (s⁻¹)</RateDeactivate>
-		<RateCleave val="0.007874" distribution="Fixed" fixedDistnVal="0.1665" lognormalMeanVal="-1.93" lognormalSdVal="1.54">Rate of cleavage (s⁻¹)</RateCleave>
-		<DGtaudagM val="0.024298" distribution="Fixed" fixedDistnVal="5.17444" normalMeanVal="5" normalSdVal="2">ΔG†𝜏-</DGtaudagM>
+		<Kdiss val="50" distribution="Fixed" fixedDistnVal="50">KD (μM)</Kdiss>
+		<RateBind val="0.4" distribution="Fixed" fixedDistnVal="0.4">Rate of binding  (μM⁻¹ s⁻¹)</RateBind>
+		<RateActivate val="0.043468" distribution="Fixed" fixedDistnVal="0.324" lognormalMeanVal="-1.93" lognormalSdVal="1.54">Rate of activation (s⁻¹)</RateActivate>
+		<RateDeactivate val="0.286" distribution="Fixed" fixedDistnVal="0.286" lognormalMeanVal="-1.93" lognormalSdVal="1.54">Rate of inactivation (s⁻¹)</RateDeactivate>
+		<RateCleave val="0.278" distribution="Fixed" fixedDistnVal="0.278" lognormalMeanVal="-1.93" lognormalSdVal="1.54">Rate of cleavage (s⁻¹)</RateCleave>
+		<DGtaudagM val="4.39" distribution="Fixed" fixedDistnVal="4.39" normalMeanVal="5" normalSdVal="2">ΔG†𝜏-</DGtaudagM>
 		<rnaFoldDistance val="8" distribution="Fixed" fixedDistnVal="8">Fold distance (nt)</rnaFoldDistance>
 		<CleavageLimit val="10" distribution="Fixed" fixedDistnVal="10">Cleavage limit (nt)</CleavageLimit>
 		<upstreamWindow val="12" distribution="Fixed" fixedDistnVal="12">3′ DNA curvature window</upstreamWindow>
 		<downstreamWindow val="12" distribution="Fixed" fixedDistnVal="12">5′ DNA curvature window</downstreamWindow>
 		<haltPosition val="14" distribution="Fixed" fixedDistnVal="14">Halt position (nt)</haltPosition>
-		<DGtaudagP val="3.33468" distribution="Fixed" fixedDistnVal="2.3756" normalMeanVal="5" normalSdVal="2">ΔG†𝜏+</DGtaudagP>
+		<DGtaudagP val="2.49" distribution="Fixed" fixedDistnVal="2.49" normalMeanVal="5" normalSdVal="2">ΔG†𝜏+</DGtaudagP>
 		<proposalWidth val="0.01" distribution="Fixed" fixedDistnVal="0.01">Proposal width</proposalWidth>
 	</parameters>
 	<ABC inferenceMethod="ABC" ntrials="100000000" testsPerData="100" chiSqthreshold_min="0.3" chiSqthreshold_0="0.3" chiSqthreshold_gamma="0.9999" burnin="-1" logEvery="100" showRejectedParameters="false">

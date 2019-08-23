@@ -381,6 +381,9 @@ double TranslocationRatesCache::getUpstreamRNABlockadeBarrierHeight(State* state
 
 
 
+	
+
+
 	// If the barrier height has already been cached, return it
 	int pos = state->getLeftNascentBaseNumber() - 1 - rnaFoldDistance->getVal(true);
 	if (pos < 0) return 0;

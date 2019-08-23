@@ -59,6 +59,16 @@ function begin_tutorial(tut_id = null){
             window.location.replace("../simpol/?bioinf=5");
             break; 
             
+            
+        case "ploscompbio6":
+            begin_ploscompbio6();
+            break; 
+            
+            
+        case "ploscompbio7":
+            begin_ploscompbio7();
+            break; 
+            
  
             
             
@@ -119,6 +129,104 @@ function begin_bioinf4(){
     uploadAlignmentFromURL(fastaFileLocation);
 
 }
+
+
+
+function begin_ploscompbio6(){
+
+
+    var fastaFileName = "trainingSet.fasta";
+    var fastaFileLocation = "http://www.polymerase.nz/pauser/about/PausePredictionData/" + fastaFileName;
+    
+    addTutorialTemplate("Approximate Bayesian computation of transcriptional pausing mechanisms", 
+    "Classification of pause sites on the training set",
+    `Welcome to Pauser. This series of examples is complementary to the above article. <br><br> 
+    
+    To predict the locations of pause sites in the loaded sequences, press the glowing 'Begin Pauser' button below. This will predict the locations using 
+    both a kinetic model classifier (SimPol) and a Naive Bayes classifier (NBC). Because the locations of pause sites are already known<sup>1</sup>, the recall, precision, accuracy, and a ROC curve can be computed.
+     <br><br>
+    <sup>1</sup>Larson, Matthew H., et al. "A pause sequence enriched at translation start sites drives transcription dynamics in vivo." Science 344.6187 (2014): 1042-1047`,
+    
+    "This example was loaded from <a style='color:#0B522D' href='http://www.polymerase.nz/pauser/?bioinf=4'>www.polymerase.nz/pauser/?ploscompbio=6</a>");
+
+   
+    // Add a glow around the simulate button
+    var btn = $("#beginPauser");
+
+    var intervalID = window.setInterval(function() {  
+        btn.toggleClass('glowing');
+    }, 750);
+   
+    
+    window.setTimeout(function(){
+    
+        btn.click(function(){
+            window.clearInterval(intervalID);
+            btn.removeClass("glowing");
+            btn.unbind('click');
+        });
+    
+    }, 50);
+
+
+
+    
+    uploadAlignmentFromURL(fastaFileLocation);
+
+
+
+
+}
+
+
+
+
+function begin_ploscompbio7(){
+
+
+    var fastaFileName = "testSet_sample.fasta";
+    var fastaFileLocation = "http://www.polymerase.nz/pauser/about/PausePredictionData/" + fastaFileName;
+    
+    addTutorialTemplate("Approximate Bayesian computation of transcriptional pausing mechanisms", 
+    "Classification of pause sites on the test set (sample)",
+    `Welcome to Pauser. This series of examples is complementary to the above article. <br><br> 
+    
+    To predict the locations of pause sites in the loaded sequences, press the glowing 'Begin Pauser' button below. This will predict the locations using 
+    both a kinetic model classifier (SimPol) and a Naive Bayes classifier (NBC). Because the locations of pause sites are already known<sup>1</sup>, the recall, precision, accuracy, and a ROC curve can be computed.
+     <br><br>
+    <sup>1</sup>Larson, Matthew H., et al. "A pause sequence enriched at translation start sites drives transcription dynamics in vivo." Science 344.6187 (2014): 1042-1047`,
+    
+    "This example was loaded from <a style='color:#0B522D' href='http://www.polymerase.nz/pauser/?bioinf=4'>www.polymerase.nz/pauser/?ploscompbio=7</a>");
+
+   
+    // Add a glow around the simulate button
+    var btn = $("#beginPauser");
+
+    var intervalID = window.setInterval(function() {  
+        btn.toggleClass('glowing');
+    }, 750);
+   
+    
+    window.setTimeout(function(){
+    
+        btn.click(function(){
+            window.clearInterval(intervalID);
+            btn.removeClass("glowing");
+            btn.unbind('click');
+        });
+    
+    }, 50);
+
+
+
+    
+    uploadAlignmentFromURL(fastaFileLocation);
+
+
+
+
+}
+
 
 
 

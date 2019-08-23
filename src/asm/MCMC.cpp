@@ -521,12 +521,19 @@ double MCMC::calculateLogPriorProbability(){
 		logPrior += log(currentModel->getPriorProb() / weightSum);
 
 	}
+	
+	
+	cout << "modelPrior = " << logPrior << endl;
 
 
 	// Parameter priors
 	for (list<Parameter*>::iterator it = parametersToEstimate.begin(); it != parametersToEstimate.end(); ++it){
+		cout << "Log prior for " << (*it)->getID() << " = " << (*it)->getVal(true) << " is " << (*it)->calculateLogPrior() << endl;
 		logPrior += (*it)->calculateLogPrior();
 	}
+	
+	cout << "logPrior = " << logPrior << endl;
+	
 	return logPrior;
 
 }
