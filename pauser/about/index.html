@@ -524,10 +524,10 @@ function addCitations(){
                                     <div class="about-block-inner">
                                                 
                                                     
-                                        Let $X = (x_1, x_2, \dotso , x_L)$ be a sequence with $L$ nucleotides. Each site within $X$ is classified as being a pause site $C_i = \mathcal{P}$ or as not
-                                        being a pause site $C_i = \mathcal{N}$.
+                                        Let $X = (x_1, x_2, \dotso , x_L)$ be a sequence with $L$ nucleotides. Each site within $X$ is classified as being a pause site $C_l = \mathcal{P}$ or as not
+                                        being a pause site $C_l = \mathcal{N}$.
                                      
-                                        Site $i$ is defined as a <b>pause site</b> if the average time to transcribe $i+1$ is significantly long, as specified by an adjustable threshold.
+                                        Site $l$ is defined as a <b>pause site</b> if the average time to transcribe $l+1$ is significantly long, as specified by an adjustable threshold.
                                         
                                     
                                     
@@ -555,7 +555,7 @@ function addCitations(){
                                                                     <a href="#Uploading_a_SimPol_session" onclick="minimiseSection('#Getting_started_Btn', true)" style="text-decoration:none; color:#A5CF19">Uploading a SimPol session</a>.
                                                                 
                                                                 <br><br>
-                                                                <b>Evidence:</b> the evidence that site $i$ is a pause site is equal to the median time that the mRNA has length $i$, averaged across 
+                                                                <b>Evidence:</b> the evidence that site $l$ is a pause site is equal to the median time that the mRNA has length $l$, averaged across 
                                                                 all simulations of the sequence.
                                                     
                                                     
@@ -571,7 +571,7 @@ function addCitations(){
                                                     
                                                                             
                                                                 A Naive Bayes classifier (NBC) is a simple statistical technique and is a sequence-based model. All nucleotides within a window of size $w_1 + w_2$ around
-                                                                site $i$ are examined by the model, and this is used to classify $i$ into one of the two classes. The NBC assumes independence between sites. While NBC 
+                                                                site $l$ are examined by the model, and this is used to classify $l$ into one of the two classes. The NBC assumes independence between sites. While NBC 
                                                                 has significantly stronger predictive power than SimPol, it lacks explanatory power.
                                                     
                                                     
@@ -579,12 +579,12 @@ function addCitations(){
                                                     
                                                     
                                                                 <br><br>
-                                                                <b>Evidence:</b> the evidence that site $i$ is a pause site is equal to the log posterior ratio:
+                                                                <b>Evidence:</b> the evidence that site $l$ is a pause site is equal to the log posterior ratio:
                                                     
                                                                 $$
-                                                                    \log \frac{P(C_i = \mathcal{P}|X)}{P(C_i = \mathcal{N}|X)} = \log \frac
-                                                                                                       {P(\mathcal{P}) \sum\limits_{j=i-w_1}^{i+w_2} P(x_j| C_i = \mathcal{P}) } 
-                                                                                                       {P(\mathcal{N}) \sum\limits_{j=i-w_1}^{i+w_2} P(x_j| C_i = \mathcal{N})  }
+                                                                    \log \frac{P(C_l = \mathcal{P}|X)}{P(C_l = \mathcal{N}|X)} = \log \frac
+                                                                                                       {P(\mathcal{P}) \sum\limits_{j=l-w_1}^{l+w_2} P(x_j| C_l = \mathcal{P}) } 
+                                                                                                       {P(\mathcal{N}) \sum\limits_{j=l-w_1}^{l+w_2} P(x_j| C_l = \mathcal{N})  }
                                                                 $$
                                                                 
                                                                 where $P(\mathcal{P})$ and $P(\mathcal{N})$ are the prior probabilities of a site being a pause site / not a pause site (equal to 0.007 and 0.993 respectively).
@@ -610,19 +610,19 @@ function addCitations(){
                                                         <a href="#Uploading_nucleotide_sequences" onclick="minimiseSection('#Getting_started_Btn', true)" style="text-decoration:none; color:#A5CF19">Uploading nucleotide sequences</a>
                                             
                                                     ), then the adequacy of the classifiers can be quantified. The recall, precision, and accuracy of each sequence, and the average across all sequences
-                                                    are given. Let $T_i = \mathcal{P}$ if site $i$ is a known pause site, and let $T_i = \mathcal{N}$ if $i$ is known to not be a pause site.
+                                                    are given. Let $T_l = \mathcal{P}$ if site $l$ is a known pause site, and let $T_l = \mathcal{N}$ if $l$ is known to not be a pause site.
                                             
                                                     <br><br>
-                                                    <b>Recall</b> is the probability of a true pause being classified as a pause: $P(C_i = \mathcal{P}|T_i  = \mathcal{P}) = \frac{P(C_i = \mathcal{P} \; \cap \; T_i  = \mathcal{P})}{P(T_i  = \mathcal{P})}$
+                                                    <b>Recall</b> is the probability of a true pause being classified as a pause: $P(C_l = \mathcal{P}|T_l  = \mathcal{P}) = \frac{P(C_l = \mathcal{P} \; \cap \; T_l  = \mathcal{P})}{P(T_l  = \mathcal{P})}$
                                             
                                                     
                                                     <br><br>
-                                                    <b>Precision</b> is the probability that a site classified as a pause is actually a pause: $P(T_i = \mathcal{P}|C_i  = \mathcal{P}) = \frac{P(C_i = \mathcal{P} \; \cap \; T_i  = \mathcal{P})}{P(C_i  = \mathcal{P})}$
+                                                    <b>Precision</b> is the probability that a site classified as a pause is actually a pause: $P(T_l = \mathcal{P}|C_l  = \mathcal{P}) = \frac{P(C_l = \mathcal{P} \; \cap \; T_l  = \mathcal{P})}{P(C_l  = \mathcal{P})}$
                                             
                                             
                                             
                                                     <br><br>
-                                                    <b>Accuracy</b> is the overall proportion of correct classifications: $P(T_i = \mathcal{P} \; \cap \; C_i  = \mathcal{P}) + P(T_i = \mathcal{N} \; \cap \; C_i  = \mathcal{N})$
+                                                    <b>Accuracy</b> is the overall proportion of correct classifications: $P(T_l = \mathcal{P} \; \cap \; C_l  = \mathcal{P}) + P(T_l = \mathcal{N} \; \cap \; C_l  = \mathcal{N})$
                                             
                                                 
                                         
@@ -641,7 +641,7 @@ function addCitations(){
                                                     If the locations of pause sites are already known, then a ROC curve will be constructed. A ROC analysis accounts for all possible evidence thresholds
                                                     of a classifier and explores true and false positive rates simultaneously. The total adequacy of a classifier can be summarised by integrating the area
                                                     under the curve (AUC) of a ROC plot. The AUC lies in the range [0,1]. A perfect classifier will have an AUC of 1, while a classifier with an AUC of 0.5
-                                                    or less is no better than a coin toss. See review by Fawcett<cite val="fawcett2006introduction"></cite> for an introduction to ROC analyses.
+                                                    or less is no better than a coin toss. See review by Fawcett for an introduction to ROC analyses<cite val="fawcett2006introduction"></cite>.
                                                 
                                         
                                             </div>
@@ -678,7 +678,7 @@ function addCitations(){
                                                     </div>
                                                     
                                                     By following the link below, the .fasta content above will be loaded into Pauser. The SimPol and NBC pause site predictions can be compared with the known locations specified above.
-                                                    The algorithms should take up to 2 minutes to complete, depending on your machine.
+                                                    The algorithms should take several seconds to complete, depending on your machine.
                                                      
                                                      <br><br>
                                                      <span class="xml_link pauser" style="text-align:center">
