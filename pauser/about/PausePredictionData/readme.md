@@ -14,3 +14,7 @@ pausing_session.xml is the SimPol session used to train the kinetic model classi
 model_number_guide.pdf is a visual guide for the 128 models specified in pausing_session.xml
 
 pausing_posterior.log is the posterior distribution obtained from training the kinetic model classifier on the training set
+
+
+To visualise the files distributions in this folder, using Pauser, please go to the link below: 
+http://www.polymerase.nz/pauser/about/#Approximate_Bayesian_computation_of_transcriptional_pausing_mechanisms
