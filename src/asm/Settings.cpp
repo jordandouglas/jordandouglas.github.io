@@ -207,7 +207,7 @@ Plots* _GUI_PLOTS;
 // Pauser
 MultipleSequenceAlignment* _PP_multipleSequenceAlignment;
 bool _USING_PAUSER = false;
-double _simpol_evidence_threshold = 0.9;
+double _simpol_evidence_threshold = 0.4;
 double _simpol_max_evidence = 0;
 double _nbc_evidence_threshold = 0.5;
 double _nbc_min_evidence = 0;
