@@ -60,6 +60,11 @@ function begin_tutorial(tut_id = null){
             break; 
             
             
+        case "bioinf6":
+            window.location.replace("../simpol/?bioinf=6");
+            break; 
+            
+            
         case "ploscompbio6":
             begin_ploscompbio6();
             break; 
