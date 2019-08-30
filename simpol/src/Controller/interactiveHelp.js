@@ -99,6 +99,11 @@ function begin_tutorial(tut_id = null){
             begin_bioinf5(whenDone);
             break; 
             
+            
+     	case "bioinf6":
+            begin_bioinf6(whenDone);
+            break; 
+            
 
             
        case "exRABC":
@@ -406,10 +411,10 @@ function begin_bioinf3(resolve = function() { }){
 
 
 
-/*
 
-// OBSOLETE: Explore the third-order relationship between catalysis rate kcat , NTP binding rate kbind , and elongation velocity.
-function begin_bioinf6(resolve = function() { }){
+
+// Explore the third-order relationship between catalysis rate kcat , NTP binding rate kbind , and elongation velocity.
+function begin_bioinf5(resolve = function() { }){
 
 
 
@@ -425,7 +430,7 @@ function begin_bioinf6(resolve = function() { }){
     To begin the stochastic simulation, press the glowing <img class="icon small"  src='../src/Images/dice.png'>
     button on the far left. 5,000 simulations will be performed on the 0.5 kb lacZ gene.
      See the plots further down this page to visualise the simulation results. Each coloured dot is one simulation.`,
-    "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?bioinf=5'>www.polymerase.nz/simpol/?bioinf=4</a>");
+    "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?bioinf=5'>www.polymerase.nz/simpol/?bioinf=5</a>");
 
    
     // Add a glow around the simulate button
@@ -462,7 +467,7 @@ function begin_bioinf6(resolve = function() { }){
 
 }
 
-*/
+
 
 
 // R-ABC on motivating example 1 from about/ page
@@ -579,14 +584,14 @@ function begin_MCMCABC_example(resolve = function() { }){
 
 
 // Fit parameters kcat and kbind to a toy [NTP]-velocity dataset using R-ABC.
-function begin_bioinf5(resolve = function() { }){
-    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/bioinf5.xml";
+function begin_bioinf6(resolve = function() { }){
+    var sessionFileLocation = "http://www.polymerase.nz/simpol/about/Examples/bioinf6.xml";
     var toDoAfterLoadSession = function() {
         
         
         
         addTutorialTemplate("SimPol: An engine for visualisation, simulation, and inference of RNA polymerase kinetics", 
-        "Example 5: approximate Bayesian computation",
+        "Example 6: approximate Bayesian computation",
         `Welcome to SimPol. This series of examples is complementary to the above article. <br><br> 
         
         A toy [NTP]-velocity dataset has been uploaded into the 'Approximate Bayesian Computation' section below. Approximate Bayesian
@@ -595,7 +600,7 @@ function begin_bioinf5(resolve = function() { }){
         
         In the histograms below, the yellow underlays will show the prior distributions while the blue bars will be the posterior distributions. If the
         two distributions are different, then the data taught us something about the parameters.`,
-        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?bioinf=5'>www.polymerase.nz/simpol/?bioinf=5</a>");
+        "This example was loaded from <a style='color:#008cba' href='http://www.polymerase.nz/simpol/?bioinf=6'>www.polymerase.nz/simpol/?bioinf=6</a>");
     
        
         // Add a glow around the simulate button
