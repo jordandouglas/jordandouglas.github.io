@@ -1,0 +1,816 @@
+<html>
+
+
+
+	<head>
+		<title>Bactrian Beta</title>
+		
+		<meta charset="UTF-8">
+		<meta name="description" content="A browser-based multispecies coalescent tree visualiser">
+		<meta name="keywords" content="phylogenetics,bayesian,multispecies,coalescent,tree,uglytrees,javascript,svg">
+		<meta name="author" content="Jordan Douglas">
+		<meta name="viewport" content="width=1200">
+		
+		<link rel="icon" href="images/uglytreeslogo.png">
+		<link rel="stylesheet" href="src/styles.css">
+
+		
+	<script type="text/x-mathjax-config">
+	  MathJax.Hub.Config({
+	    tex2jax: {
+	      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+	      processEscapes: true
+	    }
+	  });
+	</script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		<script language='JavaScript' type='text/JavaScript' src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script language='JavaScript' type='text/JavaScript' src="lib/velocity.min.js"></script>
+		<script language='JavaScript' type='text/JavaScript' src="lib/dropzone.js"></script>
+		<script language='JavaScript' type='text/JavaScript' src="lib/chroma.min.js"></script>
+		<script language='JavaScript' type='text/JavaScript' src="lib/easypz.latest.js"></script>
+		<script language='JavaScript' type='text/JavaScript' src="lib/math.min.js"></script>
+		<script language='JavaScript' type='text/JavaScript' src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"> </script>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.3/d3.min.js"></script>
+		<script src="https://d3js.org/topojson.v2.min.js"></script>
+
+
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-106202043-2"></script>
+		
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+
+			gtag('config', 'UA-106202043-2');
+		</script>
+
+
+		<script>
+
+
+			function init(){
+
+
+				
+				DISTRIBUTION_NUM = 0;
+				AXIS_GAP = 100;
+				NUM_PIECES = 300;
+				ANIMATION_TIME = 500;
+
+
+				newDistributionRow();
+				newDistributionRow();
+
+				//newDistributionRow();
+
+				//$("#select_distribution").val("modal")
+
+				var svg = $("#plotSVG");
+				svg.height(500);
+				svg.width(700);
+				svg.html("");
+			
+
+				SCALER = getSVGScaler(svg);
+				drawSVGAxes(svg, SCALER);
+
+				setParams();
+
+
+			}
+
+
+
+			function setParams() {
+
+
+				var svg = $("#plotSVG");
+				svg.find(".curve").velocity("stop");
+
+				var curveObjs = [];
+				var ymax = -Infinity;
+				var xmin = Infinity;
+				var xmax = -Infinity;
+				for (var distNum = 0; distNum < DISTRIBUTION_NUM; distNum++) {
+
+
+
+					var rowEle = $("#distributionRow_" + distNum);
+					var distr = rowEle.find("#select_distribution_" + distNum).val();
+
+					rowEle.find(".distr").hide();
+					rowEle.find(".distr_" + distr).show();
+
+
+					var distributionObj = getDistribution(distr, distNum);
+					ymax = Math.max(ymax, getYMax(distributionObj.xmin, distributionObj.xmax, distributionObj.distribution));
+					xmin = Math.min(xmin, distributionObj.xmin);
+					xmax = Math.max(xmax, distributionObj.xmax);
+	
+					//console.log(distNum, ymax, distributionObj);
+
+					curveObjs[distNum] = {distribution: distributionObj, col: distNum == 0 ? "red" : "#008cba"};
+
+
+				}
+					
+					//svg.height(500);
+					//svg.width(500);
+					//svg.html("");
+
+
+
+
+				for (var distNum = 0; distNum < DISTRIBUTION_NUM; distNum++) {
+
+					var distributionObj = curveObjs[distNum].distribution;
+
+					//console.log(distributionObj, xmin, xmax);
+					var col = curveObjs[distNum].col;
+					var scaler = getSVGScaler(svg, xmin, xmax, ymax);
+					drawSVGAxes(svg, scaler);
+
+					drawCurve(svg, "distr_" + distNum, scaler, distributionObj.distribution, col);
+
+				}
+
+					//drawCurve(svg, "quad", SCALER, quadratic, "blue");
+
+				
+
+
+			}
+
+
+
+
+
+
+			function getDistribution(distr, distNum) {
+
+
+				
+				switch (distr) {
+
+
+					case "beta": {
+
+
+						var alpha = parseFloat($("#alpha_input_" + distNum).val());
+						var beta = parseFloat($("#beta_input_" + distNum).val());
+
+
+						if (alpha <= 0) alpha = 0.01;
+						$("#alpha_input_" + distNum).val(alpha)
+
+						if (beta <= 0) beta = 0.01;
+						$("#beta_input_" + distNum).val(beta)
+
+						//console.log(alpha, beta);
+
+
+						var norm = math.gamma(alpha) * math.gamma(beta) / math.gamma(alpha + beta);
+
+						
+						var distribution = function(x) {
+							var density = Math.exp((alpha-1)*Math.log(x) + (beta-1)*Math.log(1-x)) / norm;
+							//console.log(x, alpha, beta);
+							return density;
+						}
+
+						return {distribution: distribution, xmin: 0, xmax: 1};
+						break;
+
+					}
+
+
+					case "bactrian": {
+
+
+						var m = parseFloat($("#bactrian_input_" + distNum).val());
+						if (m >= 1) m = 0.99;
+						$("#bactrian_input_" + distNum).val(m);
+
+						var distribution = function(x) {
+							var density = 1 / (2*Math.sqrt(2*Math.PI*(1-m*m)));
+							density = density * (Math.exp( -(x + m)*(x + m) / (2 * (1-m*m)) ) + Math.exp( -(x - m)*(x - m) / (2 * (1-m*m)) ));
+							return density;
+						}
+
+						return {distribution: distribution, xmin: -2, xmax: 2};
+						break;
+					}
+
+
+					case "modal": {
+
+
+						var s = parseFloat($("#s_input_" + distNum).val());
+						var c = parseFloat($("#c_input_" + distNum).val());
+						if (c <= 0) c = 0.01;
+						if (c >= 1) c = 0.99;
+						$("#c_input_" + distNum).val(c);
+
+						var beta = Math.exp(s);
+						var alpha = (c*(beta-2) + 1) / (1-c);
+
+
+						if (c > 0.5) {
+							alpha = beta; 
+							beta = -(c*(alpha-2) - alpha + 1) / c;
+						}
+
+
+						console.log("CSAB", c, s, alpha, beta);
+
+
+						var norm = Math.log(math.gamma(alpha)) + Math.log(math.gamma(beta)) - Math.log(math.gamma(alpha + beta));
+						
+						var distribution = function(x) {
+							//var density = Math.pow(x, alpha-1) * Math.pow(1-x, beta-1) / norm;
+							var density = Math.exp((alpha-1)*Math.log(x) + (beta-1)*Math.log(1-x) - norm);
+							//console.log(alpha,beta, x, (alpha-1)*Math.log(x) + (beta-1)*Math.log(1-x), density);
+							return density;
+							//if (isNaN(density)) return maxDensity;
+							//return Math.min(density, maxDensity);
+						}
+
+						return {distribution: distribution, xmin: 0, xmax: 1};
+
+						break;
+					}
+
+
+					case "bactrianbeta": {
+
+						var s = parseFloat($("#s_input_" + distNum).val());
+						var c = parseFloat($("#c_input_" + distNum).val());
+						var k = parseFloat($("#k_input_" + distNum).val());
+						if (c <= 0) c = 0.01;
+						if (c >= 1) c = 0.99;
+						$("#c_input_" + distNum).val(c);
+
+
+
+						var d = 0.5; // Math.exp(-s*s*s*k) / (Math.exp(-s*s*s*k) + 1);
+						var gap = Math.min(d*c, d*(1-c));
+						//var c1 = c - d*c;  //Math.pow(c, 1+d);
+						//var c2 = c + d*(1-c)//Math.pow(c, 1-d);
+
+						var c1 = c-gap;
+						var c2 = c+gap;
+
+						
+						//var c1 = Math.pow(c, 1+d);
+						//var c2 = Math.pow(c, 1-d);
+
+
+						var beta1 = Math.exp(s + s*Math.abs(0.5-c1)*k);
+						var beta2 = Math.exp(s + s*Math.abs(0.5-c2)*k);
+						var alpha1 = (c1*(beta1-2) + 1) / (1-c1);
+						var alpha2 = (c2*(beta2-2) + 1) / (1-c2);
+						if (c1 > 0.5) {
+							alpha1 = beta1; 
+							beta1 = -(c1*(alpha1-2) - alpha1 + 1) / c1;
+						}
+						if (c2 > 0.5) {
+							alpha2 = beta2; 
+							beta2 = -(c2*(alpha2-2) - alpha2 + 1) / c2;
+						}
+
+
+						//console.log("c=", c, "c1=", c1, "c2=", c2,"s=", s, "k=",k,"d=", d, "a1=",alpha1,"b1=", beta1, "a2=", alpha2, "b2=", beta2);
+
+						var norm1 = math.gamma(alpha1) * math.gamma(beta1) / math.gamma(alpha1 + beta1);
+						var norm2 = math.gamma(alpha2) * math.gamma(beta2) / math.gamma(alpha2 + beta2);
+						distribution = function(x) {
+							var density = 0.5 * Math.pow(x, alpha1-1) * Math.pow(1-x, beta1-1) / norm1;
+							density += 0.5 * Math.pow(x, alpha2-1) * Math.pow(1-x, beta2-1) / norm2;
+							return density;
+						}
+
+						return {distribution: distribution, xmin: 0, xmax: 1};
+						
+						break;
+					}
+
+
+
+				}
+
+				return null;
+
+
+			}
+
+
+
+			function getYMax(xmin, xmax, fn) {
+
+
+				var ymax = 0;
+				for (var i = 1; i < NUM_PIECES; i ++){
+					var x = xmin + i*(xmax - xmin)/NUM_PIECES; 
+					var y = fn(x);
+					ymax = Math.max(ymax, y);
+				}
+
+				return ymax;
+
+
+			}
+
+
+			function drawCurve(svg, id, scaler, quadratic, col = "red") {
+
+
+
+				var x2 = scaler.xmin + 1*(scaler.xmax - scaler.xmin)/NUM_PIECES; 
+				var x1;
+				for (var i = 2; i < NUM_PIECES; i ++){
+
+					var x1 = x2;
+					var x2 = scaler.xmin + i*(scaler.xmax - scaler.xmin)/NUM_PIECES; 
+					var y1 = quadratic(x1);
+					var y2 = quadratic(x2);
+
+
+					if (y1 > scaler.ymax || y2 > scaler.ymax) {
+						//$("#" + curveID).remove();
+						//continue;
+					}
+
+
+					if (isNaN(y1)) y1 = 0;
+					if (isNaN(y2)) y2 = 0;
+
+					if (y1 == Infinity) y1 = scaler.ymax;
+					if (y2 == Infinity) y2 = scaler.ymax;
+
+
+					var curveID = "curve_" + id + "_" + i;
+					if ($("#" + curveID).length == 0) {
+
+						
+					
+						drawSVGobj(svg, "line", {class: "curve", id: curveID,
+								x1: scaler.scaleX(x1), 
+								y1: scaler.scaleY(y1), 
+								x2: scaler.scaleX(x2),
+								y2: scaler.scaleY(y2), 
+								style: "stroke:" + col + "; stroke-width:1.5px;stroke-linecap:round" });
+
+					}else {
+						var element = $("#" + curveID);
+						element.velocity({x1: scaler.scaleX(x1), x2: scaler.scaleX(x2), y1: scaler.scaleY(y1), y2: scaler.scaleY(y2)}, ANIMATION_TIME );
+
+					}
+
+				}
+
+			}
+
+
+
+			function quadratic(x) {
+				return 10 * x * x;
+			}
+
+
+			function cubic(x) {
+				return 10 * x * x * 10;
+			}
+
+
+			function getSVGScaler(svg, xmin = 0, xmax = 1, ymax = 10) {
+				var scaler = scaleRanges(xmin, 0, xmax, ymax, AXIS_GAP, svg.height() - AXIS_GAP, svg.width() - AXIS_GAP, AXIS_GAP);
+				return scaler;
+			}
+
+			
+
+
+			function drawSVGAxes(svg, scaler){
+
+
+				svg.find(".axis").remove();
+
+
+				var x_axis = planAxis("X", scaler.xmin, scaler.xmax);
+				drawAxis(svg, svg, x_axis, 3, scaler);
+
+				//console.log("x_axis", x_axis);
+
+				var y_axis = planAxis("Y", scaler.ymin, scaler.ymax);
+				drawAxis(svg, svg, y_axis, 4, scaler);
+
+				//console.log("y_axis", y_axis);
+
+
+
+			}
+
+
+			// Scales from the current (c) into the target (t) interval
+			function scaleRanges(c_minX, c_minY, c_maxX, c_maxY, t_minX, t_minY, t_maxX, t_maxY) {
+				
+				
+				
+				var scaleX = function(x) {
+					return (x - c_minX) / (c_maxX - c_minX) * (t_maxX - t_minX) + t_minX;
+				}
+				
+				var scaleY = function(y) {
+					return (y - c_minY) / (c_maxY - c_minY) * (t_maxY - t_minY) + t_minY;
+				}
+				
+				var scaler = {scaleX: scaleX, scaleY: scaleY, ymax: c_maxY, xmax: c_maxX, ymin: c_minY, xmin: c_minX};
+				return scaler;
+				
+			}
+
+
+
+
+			// Plan axes
+			function planAxis(label, min, max, minAtZero = min == 0, zeroLabel = true, niceBinSizes = [1, 5]){
+
+				if (min > max) max = min+1;
+
+				var maxNumLabels = 8;
+				var nLabels = maxNumLabels;
+
+				var niceBinSizeID = niceBinSizes.length - 1;
+				var basePower = Math.floor(log(max, base = 10));
+				
+				var binSize = niceBinSizes[niceBinSizeID] * Math.pow(10, basePower);
+
+
+				if (minAtZero) min = 0;
+
+				var numLoops = 0;	
+				if (min != max) {
+					while(true){
+
+
+						if (numLoops > 50 || (max - min) / binSize - nLabels > 0) break;
+						niceBinSizeID --;
+						if (niceBinSizeID < 0) {
+							niceBinSizeID = niceBinSizes.length - 1;
+							basePower --;
+						}
+						binSize = niceBinSizes[niceBinSizeID] * Math.pow(10, basePower);
+						numLoops++;
+
+					}
+
+
+
+					if (!minAtZero){
+						if (min > 0) min = min - min % binSize;
+						else		 min = min - (binSize + min % binSize);
+					}
+
+					if (max > 0) max = max + binSize - max % binSize;
+					else		 max = max + binSize - (binSize + max % binSize);
+
+
+					nLabels = Math.ceil((max - min) / binSize);
+
+					
+
+
+				}else{
+					binSize = 1;
+					if (!minAtZero) min--;
+					max++;
+					nLabels = Math.ceil((max - min) / binSize);
+				}
+				
+
+
+				var vals = [];
+				var tooBigByFactorOf = Math.max(Math.ceil(nLabels / maxNumLabels), 1)
+				for(var labelID = 0; labelID < nLabels; labelID ++){
+					if (labelID == 0 && !zeroLabel) continue;
+					if (labelID % tooBigByFactorOf == 0 /*&& labelID * binSize / (max - min) < 0.95*/) vals.push(roundToSF(labelID * binSize + min));
+				}
+
+
+
+
+				return {label: label, min: min, max: max, vals: vals};
+				
+
+
+			}
+
+
+
+
+			// Draw an axis. Sides: 1, 2, 3, 4 correspond to top, right, bottom, left
+			function drawAxis(svg, axisGroup, axis, side, scaler, axisMargin = AXIS_GAP, tickSize = 5){
+
+
+				axisGroup.find(".axis_" + side).remove();
+				
+				if (axis == null) return;
+
+				var stroke = "black";
+
+				var tx, tx1, tx2, ty, ty1, ty2;
+
+
+					
+				if (side == 3){
+					tx1 = axisMargin;
+					tx2 = svg.width() - axisMargin;
+					ty1 = svg.height() - axisMargin;
+					ty2 = svg.height() - axisMargin;
+				}
+
+				else if (side == 4) {
+					tx1 = axisMargin;
+					tx2 = axisMargin;
+					ty1 = axisMargin;
+					ty2 = svg.height() - axisMargin;
+				}
+
+
+				drawSVGobj(axisGroup, "line", {class: "axis axis_" + side ,id: "axis_" + side, 
+						x1: tx1, 
+						y1: ty1, 
+						x2: tx2,
+						y2: ty2, 
+						axis_val: val,
+						style: "stroke:" + stroke + "; stroke-width:1px;stroke-linecap:round" });
+				
+
+				
+				// Draw the ticks
+				for (var i = 0; i < axis.vals.length; i++){
+					var val = axis.vals[i];
+
+					if (side == 1 || side == 3){
+						
+						ty = (side == 3 ? svg.height() - axisMargin : axisMargin);
+						ty2 = ty + tickSize;
+						ty1 = ty - tickSize;
+						tx = scaler.scaleX(val);
+						tx1 = tx;
+						tx2 = tx;
+
+					}
+					else {
+						tx =  (side == 4 ? axisMargin : svg.width() - axisMargin);
+						tx1 = tx + tickSize;
+						tx2 = tx - tickSize;
+						ty = scaler.scaleY(val);
+						ty1 = ty;
+						ty2 = ty;
+
+					} 
+
+
+					if (tx < axisMargin || tx > svg.width() - axisMargin || ty < axisMargin || axisMargin > svg.height() - axisMargin) continue;
+
+
+					
+					drawSVGobj(axisGroup, "line", {class: "axis axis_" + side ,id: "axis_" + side + "_" + i, 
+							x1: tx1, 
+							y1: ty1, 
+							x2: tx2,
+							y2: ty2, 
+							axis_val: val,
+							style: "stroke:" + stroke + "; stroke-width:1px;stroke-linecap:round" });
+
+
+					drawSVGobj(axisGroup, "text", {class: "axis axis_" + side ,id: "axisText_" + side + "_" + i, 
+							x: (side == 4 ? tx - 3*tickSize : tx),
+							y: (side == 3 ? ty + 3*tickSize : ty),
+							axis_val: val,
+							style: "text-anchor:" + (side == 2 ? "start" : side == 4 ? "end" : "middle")}, val);
+
+
+
+					
+
+
+				}
+
+
+			}
+
+
+
+
+
+
+			function drawSVGobj(svg, type, attr, val = null, isNode = false, addBackground = false){
+
+				//console.log("attr", attr);
+				var newObj = document.createElementNS('http://www.w3.org/2000/svg', type);
+
+
+	
+
+				for (var a in attr){
+					if (a == "text_anchor") newObj.setAttribute("text-anchor", attr[a]);
+					else if (a == "alignment_baseline") newObj.setAttribute("alignment-baseline", attr[a]);
+					else if (a == "stroke_dasharray") newObj.setAttribute("stroke-dasharray", attr[a]);
+					else newObj.setAttribute(a, attr[a]);
+				}
+				if (val != null) newObj.innerHTML = val;
+				newObj.setAttribute("animatable", "true");
+
+
+				// Set some of the styles as attributes because safari and IE do not like styles for svgs
+				var styles = getComputedStyle(newObj);
+				//if (styles.fill != null) newObj.setAttribute("fill", styles.fill);
+				if (styles.stroke != null) newObj.setAttribute("stroke", styles.stroke);
+				if (styles["stroke-width"] != null) newObj.setAttribute("stroke-width", styles["stroke-width"]);
+				if (isNode) newObj.setAttribute("class", "node");
+				//console.log(styles["stroke-width"]);
+
+				//window.requestAnimationFrame(function() {
+				svg.append(newObj);
+
+				
+				
+				
+				return newObj;
+
+			}	
+
+
+
+
+
+			
+
+			function roundToSF(val, sf=2, ceilOrFloor = "none", precise = true){
+				
+				var magnitude = Math.floor(log(val, 10));
+
+				if (val < 0 && ceilOrFloor == "ceil") ceilOrFloor = "floor";
+				else if (val < 0 && ceilOrFloor == "floor") ceilOrFloor = "ceil";
+
+				var num = val * tenToThePowerOf(sf-magnitude, precise);
+				if (ceilOrFloor == "ceil") num = Math.ceil(num)
+				else if (ceilOrFloor == "floor") num = Math.floor(num)
+				else num = Math.round(num);
+
+				num = num * tenToThePowerOf(magnitude-sf, precise);
+				
+				// Sometimes this picks up a trailing .00000000001 which we want to remove
+
+				var expectedStringLength = 0;
+				if (magnitude >= 0) expectedStringLength = magnitude >= sf ? magnitude+1 : sf+2; // Add 1 for the decimal point
+				else expectedStringLength = 2 -magnitude + sf;
+				if (num < 0) expectedStringLength++; // Also need the negative symbol
+
+
+
+				num = parseFloat(num.toString().substring(0, expectedStringLength+1));
+				
+				return num;
+					
+			}
+
+
+
+
+			// Compute 10^n without using Math.pow for negative n which presents numerical instabilities
+			function tenToThePowerOf(n, precise = true){
+
+				if (!precise) return Math.pow(10, n);
+
+				if (n == Infinity || n == -Infinity) return n;
+
+				if (n == 0) return 1;
+				var val = "1";
+				if (n < 0) {
+				
+				
+					for (var index = -1; index > n; index --){
+						val = "0" + val;
+					}
+					val = "." + val;
+				}
+
+				else if (n > 0) {
+					return Math.pow(10, n);
+
+				}
+				else {
+					return 1;
+				}
+				//console.log(n, "->", parseFloat(val));
+				return parseFloat(val);
+
+
+			}
+
+
+			function log(num, base = null){
+				
+				if (num == 0) return 0;
+				if (base == null) return Math.log(Math.abs(num));
+				return Math.log(Math.abs(num)) / Math.log(base);
+				
+				
+			}
+
+
+
+			function newDistributionRow(){
+
+				$("#distributionsDiv").append(getDistributionTemplate(DISTRIBUTION_NUM));
+				DISTRIBUTION_NUM ++;
+
+			}
+
+
+
+			function getDistributionTemplate(num) {
+
+
+				return `
+					<div class="distributionRow" id="distributionRow_` + num + `">
+
+						Distribution:
+						<select class="dropdown" id="select_distribution_` + num + `" onchange="setParams();">
+								<option value="beta">Beta</option>
+								<option value="bactrian">Bactrian</option>
+								<option value="modal">Modal beta</option>
+								<!--<option value="bactrianbeta">Bactrian beta</option>-->
+				
+						</select>
+
+			
+
+						<span class="distr distr_modal distr_bactrianbeta">
+							 c = <input type="number" step="0.05" min=0 max=1 class="numberinput cranberry" onclick="$(this).select()" id="c_input_` + num + `" style="width:5em;" value="0.5" onchange="setParams();">
+						</span>
+
+						<span class="distr distr_modal distr_bactrianbeta">
+							s = <input type="number" step="0.5" min=0 max=40 class="numberinput cranberry" onclick="$(this).select()" id="s_input_` + num + `" style="width:5em;" value="1.0" onchange="setParams();"> 
+						</span>
+
+						<span class="distr distr_bactrianbeta">
+							k = <input type="number" step="0.5" class="numberinput cranberry" onclick="$(this).select()" id="k_input_` + num + `" style="width:5em;" value="10" onchange="setParams();"> 
+						</span>
+
+						<span class="distr distr_beta">
+							&alpha; = <input type="number" step="0.5" min=0 class="numberinput cranberry" onclick="$(this).select()" id="alpha_input_` + num + `" style="width:5em;" value="1.0" onchange="setParams();">
+						</span>
+						
+						<span class="distr distr_beta">
+							&beta; = <input type="number" step="0.5" min=0 class="numberinput cranberry" onclick="$(this).select()" id="beta_input_` + num + `" style="width:5em;" value="1.0" onchange="setParams();"> 
+						</span>
+
+						<span class="distr distr_bactrian">
+							m = <input type="number" step="0.02" min=0 max="1" class="numberinput cranberry" onclick="$(this).select()" id="bactrian_input_` + num + `" style="width:5em;" value="0.9" onchange="setParams();"> 
+						</span>
+					</div>`;
+					
+
+
+
+			}
+
+
+
+
+
+			
+
+
+		</script>
+
+	</head>
+	<body  onload="init()">
+
+
+
+		<div id="main">
+
+			<svg id="plotSVG" />
+
+
+			
+			<div id="distributionsDiv"> </div>
+
+
+		</div>
+
+
+
+	</body>
+
+
+
+
+</html>
