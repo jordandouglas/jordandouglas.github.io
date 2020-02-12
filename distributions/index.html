@@ -55,8 +55,8 @@
 
 				
 				DISTRIBUTION_NUM = 0;
-				AXIS_GAP = 100;
-				NUM_PIECES = 300;
+				AXIS_GAP = [50, 50, 50, 50];
+				NUM_PIECES = 200;
 				ANIMATION_TIME = 500;
 
 
@@ -68,7 +68,7 @@
 				//$("#select_distribution").val("modal")
 
 				var svg = $("#plotSVG");
-				svg.height(500);
+				svg.height(450);
 				svg.width(700);
 				svg.html("");
 			
@@ -385,7 +385,7 @@
 
 
 			function getSVGScaler(svg, xmin = 0, xmax = 1, ymax = 10) {
-				var scaler = scaleRanges(xmin, 0, xmax, ymax, AXIS_GAP, svg.height() - AXIS_GAP, svg.width() - AXIS_GAP, AXIS_GAP);
+				var scaler = scaleRanges(xmin, 0, xmax, ymax, AXIS_GAP[3], svg.height() - AXIS_GAP[2], svg.width() - AXIS_GAP[1], AXIS_GAP[0]);
 				return scaler;
 			}
 
@@ -511,9 +511,9 @@
 
 
 			// Draw an axis. Sides: 1, 2, 3, 4 correspond to top, right, bottom, left
-			function drawAxis(svg, axisGroup, axis, side, scaler, axisMargin = AXIS_GAP, tickSize = 5){
+			function drawAxis(svg, axisGroup, axis, side, scaler, tickSize = 5){
 
-
+				var axisMargin = AXIS_GAP[side-1];
 				axisGroup.find(".axis_" + side).remove();
 				
 				if (axis == null) return;
@@ -574,7 +574,7 @@
 					} 
 
 
-					if (tx < axisMargin || tx > svg.width() - axisMargin || ty < axisMargin || axisMargin > svg.height() - axisMargin) continue;
+					if (tx < AXIS_GAP[3] || tx > svg.width() - AXIS_GAP[1] || ty < AXIS_GAP[0] || ty > svg.height() - AXIS_GAP[2]) continue;
 
 
 					
