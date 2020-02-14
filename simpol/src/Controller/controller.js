@@ -1686,8 +1686,7 @@ function openDialog(){
 
 	window.setTimeout(function(){
 		
-	
-		
+
 		$(".dialog_inner").click(function(event){
 			console.log("THE PROPAGATION HAS BEEN SEVERED");
 			event.stopPropagation();

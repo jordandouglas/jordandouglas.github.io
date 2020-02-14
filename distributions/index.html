@@ -46,7 +46,9 @@
 
 			function init(){
 
-				DISTRIBUTIONS = [Normal, LogNormal, Beta, Bactrian, Uniform, Exponential].sort() ;
+				DISTRIBUTIONS = [InverseGamma, Normal, LogNormalMean, Gamma, 
+								LogNormal, Beta, Bactrian, Uniform, Exponential,
+								Laplace].sort() ;
 				DISTRIBUTION_OBJECTS = [];
 
 				
@@ -124,7 +126,8 @@
 					$(".unemdeddable").show(0);
 				
 					//newDistributionRow({distr: "LogNormal", p: [1, 2], col: "red"});
-					newDistributionRow({distr: "Bactrian", p: [0.9]});
+					//newDistributionRow({distr: "Bactrian", p: [0.9]});
+					newDistributionRow();
 
 					//$("#select_distribution").val("modal")
 
@@ -171,7 +174,7 @@
 						$("#distributionRow_" + distNum).find(".paramrow").html("");
 						$("#distributionRow_" + distNum).find(".paramrow").append(dist.getParamHTML());
 					} 
-					
+					$("#distributionRow_" + distNum).attr("title", dist.getDesc());
 					
 
 					//console.log("dist", dist.toJSON());
@@ -787,8 +790,10 @@
 					}
 
 					// If this is the first distribution, default it to uniform
-					else distr = new Uniform(DISTRIBUTION_NUM);
-
+					else {
+						var randNum = Math.floor(Math.random() * DISTRIBUTIONS.length);
+						distr = new (eval(DISTRIBUTIONS[randNum]))(DISTRIBUTION_NUM);
+					}
 				} 
 				catch (error) {
 					alert("Unable to parse distribution " + (distrJSON == null ? "" : JSON.stringify(distrJSON)));
@@ -907,7 +912,7 @@
 			</table>
 
 			<span class="unemdeddable btn" style="display:none" title="Add new distribution" onclick="newDistributionRow(); setParams();">&plus; Distribution</span>	
-
+			<div class="unemdeddable">Hover over a table row for more information on the distribution.</div>
 
 		</div>
 

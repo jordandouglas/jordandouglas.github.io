@@ -88,8 +88,10 @@ class Distribution {
 		this.distNum = distNum;
 		this.col = col == null ? getDefaultColour(distNum) : col;
 		this.parameters = [];
+		this.desc = "";
 		this.initialise();
 		this.loadParams();
+		
 	}
 
 
@@ -124,6 +126,10 @@ class Distribution {
 	getDensity(x) {
 		if (x <= 0 || x >= 1) return 0;
 		return 1;
+	}
+	
+	getDesc() {
+		return this.desc;
 	}
 
 	setColour(col) {
@@ -189,6 +195,7 @@ class Uniform extends Distribution {
 		this.lower = new Parameter(this.distNum, "lower", "lower", 0, null, null, 1);
 		this.upper = new Parameter(this.distNum, "upper", "upper", 1, null, null, 1);
 		this.parameters = [this.lower, this.upper];
+		this.desc = "x is uniformly distributed between the lower and upper limits.";
 	}
 
 
@@ -215,6 +222,7 @@ class Bactrian extends Distribution {
 		this.m = new Parameter(this.distNum, "m", "m", 0.9, 0, 1, 0.02);
 		this.m.setInclusive(0);
 		this.parameters = [this.m];
+		this.desc = "A bimodal normal distribution with a mean of 0 and a standard deviation of 1-m^2.";
 	}
 
 
@@ -240,6 +248,8 @@ class Normal extends Distribution {
 		this.mu = new Parameter(this.distNum, "mu", "&mu;", 0, null, null, 0.5);
 		this.sigma = new Parameter(this.distNum, "sigma", "&sigma;", 1, 0, null, 0.5);
 		this.parameters = [this.mu, this.sigma];
+		this.desc = "Normal distribution with mean mu and standard deviation sigma.";
+	
 	}
 
 
@@ -266,6 +276,7 @@ class LogNormal extends Distribution {
 		this.mu = new Parameter(this.distNum, "mu", "&mu;", 0, null, null, 0.5);
 		this.sigma = new Parameter(this.distNum, "sigma", "&sigma;", 1, 0, null, 0.25);
 		this.parameters = [this.mu, this.sigma];
+		this.desc = "Log-normal distribution where the mean and standard deviation are mu and sigma in log-space.";
 	}
 
 
@@ -288,6 +299,36 @@ class LogNormal extends Distribution {
 }
 
 
+class LogNormalMean extends Distribution {
+
+	initialise() {
+		this.mean = new Parameter(this.distNum, "mean", "mean", 1, 0, null, 0.5);
+		this.sigma = new Parameter(this.distNum, "sigma", "&sigma;", 0.5, 0, null, 0.05);
+		this.parameters = [this.mean, this.sigma];
+		this.desc = "Log-normal distribution where the mean is 'mean' and the standard deviation in log-space is 'sigma'.";
+	
+	}
+
+
+	getXRange() {
+		var mean = this.mean.get();
+		var sigma = this.sigma.get();
+		var mu = Math.log(mean) - sigma*sigma/2;
+		return [0, Math.exp(mu) * 3];
+	}
+
+
+	getDensity(x) {
+		if (x <= 0) return 0;
+		var mean = this.mean.get();
+		var sigma = this.sigma.get();
+		var mu = Math.log(mean) - sigma*sigma/2;
+		var exponent =  ((Math.log(x)-mu)**2) /(2*sigma*sigma);
+		var density = 1 / (x * sigma * Math.sqrt(2*Math.PI)) * Math.exp(-exponent);
+		return density;
+	}
+
+}
 
 
 class Beta extends Distribution {
@@ -297,21 +338,21 @@ class Beta extends Distribution {
 		this.beta = new Parameter(this.distNum, "beta", "&beta;", 1, 0, null, 0.2);
 		this.parameters = [this.alpha, this.beta];
 		this.norm = 1;
+		this.desc = "Beta distribution with shape alpha and scale beta.";
+	
 	}
 
 
 	prepareDensity() {
 		var alpha = this.alpha.get();
 		var beta = this.beta.get();
-		if (alpha <= 0 || beta <= 0) this.norm = 1;
-		else this.norm = math.gamma(alpha) * math.gamma(beta) / math.gamma(alpha + beta);
+		this.norm = math.gamma(alpha) * math.gamma(beta) / math.gamma(alpha + beta);
 	}
 
 	getDensity(x) {
 		if (x <= 0 || x >= 1) return 0;
 		var alpha = this.alpha.get();
 		var beta = this.beta.get();
-		if (alpha <= 0 || beta <= 0) return 1;
 		var density = Math.exp((alpha-1)*Math.log(x) + (beta-1)*Math.log(1-x)) / this.norm;
 		return density;
 	}
@@ -326,6 +367,7 @@ class Exponential extends Distribution {
 	initialise() {
 		this.rate = new Parameter(this.distNum, "rate", "&lambda;", 1, 0, null, 0.2);
 		this.parameters = [this.rate];
+		this.desc = "Exponential distribution with a mean of 1/lambda.";
 	}
 
 
@@ -346,9 +388,97 @@ class Exponential extends Distribution {
 
 
 
+class Gamma extends Distribution {
+
+	initialise() {
+		this.alpha = new Parameter(this.distNum, "alpha", "&alpha;", 1, 0, null, 0.2);
+		this.beta = new Parameter(this.distNum, "beta", "&beta;", 1, 0, null, 0.2);
+		this.parameters = [this.alpha, this.beta];
+		this.norm = 1;
+		this.desc = "Gamma distribution with shape alpha and scale beta. The mean is alpha/beta.";
+	}
+
+	getXRange() {
+		var alpha = this.alpha.get();
+		var beta = this.beta.get();
+		return [0, alpha/beta * 5];
+	}
+
+	prepareDensity() {
+		var alpha = this.alpha.get();
+		var beta = this.beta.get();
+		this.norm = beta ** alpha / math.gamma(alpha);
+	}
+
+	getDensity(x) {
+		if (x <= 0) return 0;
+		var alpha = this.alpha.get();
+		var beta = this.beta.get();
+		var density = this.norm * Math.exp((alpha - 1) * Math.log(x) - (beta*x) );
+		return density;
+	}
+
+}
 
 
 
+
+class InverseGamma extends Distribution {
+
+	initialise() {
+		this.alpha = new Parameter(this.distNum, "alpha", "&alpha;", 1, 0, null, 0.2);
+		this.beta = new Parameter(this.distNum, "beta", "&beta;", 1, 0, null, 0.2);
+		this.parameters = [this.alpha, this.beta];
+		this.norm = 1;
+		this.desc = "Inverse-gamma distribution with shape alpha and scale beta.";
+	}
+
+	getXRange() {
+		var alpha = this.alpha.get();
+		var beta = this.beta.get();
+		return [0, alpha > 1 ? 5*beta/(alpha-1) : 15*beta/(alpha+1)];
+	}
+
+	prepareDensity() {
+		var alpha = this.alpha.get();
+		var beta = this.beta.get();
+		this.norm = beta ** alpha / math.gamma(alpha);
+	}
+
+	getDensity(x) {
+		if (x <= 0) return 0;
+		var alpha = this.alpha.get();
+		var beta = this.beta.get();
+		var density = this.norm * Math.exp((-alpha - 1) * Math.log(x) + (-beta/x) );
+		return density;
+	}
+
+}
+
+
+
+
+class Laplace extends Distribution {
+
+	initialise() {
+		this.rate = new Parameter(this.distNum, "rate", "&lambda;", 1, 0, null, 0.2);
+		this.parameters = [this.rate];
+		this.desc = "Laplace distribution with a rate of lambda, or a scale of 1/lambda.";
+	}
+
+
+	getXRange() {
+		var rate = this.rate.get();
+		return [-Math.log(2) / rate * 6, Math.log(2) / rate * 6];
+	}
+
+	getDensity(x) {
+		var rate = this.rate.get();
+		var density = rate/2 * Math.exp(-Math.abs(x) * rate);
+		return density;
+	}
+
+}
 
 
 
