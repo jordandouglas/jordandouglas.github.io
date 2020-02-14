@@ -3,7 +3,7 @@
 
 
 	<head>
-		<title>Bactrian Beta</title>
+		<title>Embeddable Distribution</title>
 		
 		<meta charset="UTF-8">
 		<meta name="description" content="A browser-based multispecies coalescent tree visualiser">
@@ -30,40 +30,40 @@
 		<script language='JavaScript' type='text/JavaScript' src="lib/chroma.min.js"></script>
 		<script language='JavaScript' type='text/JavaScript' src="lib/easypz.latest.js"></script>
 		<script language='JavaScript' type='text/JavaScript' src="lib/math.min.js"></script>
+		<script language='JavaScript' type='text/JavaScript' src="src/colourPicker.js"></script>
+		<script language='JavaScript' type='text/JavaScript' src="src/distribution.js"></script>
 		<script language='JavaScript' type='text/JavaScript' src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"> </script>
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.3/d3.min.js"></script>
 		<script src="https://d3js.org/topojson.v2.min.js"></script>
 
 
-		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-106202043-2"></script>
-		
-		<script>
-			window.dataLayer = window.dataLayer || [];
-			function gtag(){dataLayer.push(arguments);}
-			gtag('js', new Date());
-
-			gtag('config', 'UA-106202043-2');
-		</script>
 
 
 		<script>
+
 
 
 			function init(){
 
+				DISTRIBUTIONS = [Normal, LogNormal, Beta, Bactrian, Uniform, Exponential].sort() ;
+				DISTRIBUTION_OBJECTS = [];
 
 				
 				DISTRIBUTION_NUM = 0;
 				AXIS_GAP = [50, 50, 50, 50];
 				NUM_PIECES = 200;
 				ANIMATION_TIME = 500;
+				DEFAULT_COLOURS = [	"#50b2db", "#db506d", "#50db79", "#7950DB", "#b2db50", "#db7950", 
+				"#4e8791", "#ff1919", "#228B22", "#91584e", "#584e91", "#009fe1", "#ffff1a", "#ff8d1a", "#DB5079",
+				"#000000", "#606060", "#707070", "#A0A0A0", "#BEBEBE", "#d3d3d3", "#E0E0E0", "#FFFFFF"];
 
 
-				newDistributionRow();
-				newDistributionRow();
 
-				//newDistributionRow();
+				var distrJSON = {distr: "LogNormal", p: [1, 2], col: "red"};
+				var distrJSON = {distr: "Normal", p: [1, 2]};
+				newDistributionRow({distr: "LogNormal", p: [1, 2], col: "red"});
+				newDistributionRow({distr: "Normal", p: [1, 2]});
 
 				//$("#select_distribution").val("modal")
 
@@ -73,76 +73,93 @@
 				svg.html("");
 			
 
-				SCALER = getSVGScaler(svg);
-				drawSVGAxes(svg, SCALER);
+				var scaler = getSVGScaler(svg);
+				drawSVGAxes(svg, scaler);
 
 				setParams();
+				/*
+				getColourPicker($("#beta_input_1"), "colourpickertest", "red", function(colEle) {
+					var col = $(colEle).css('background-color');
+					alert('user picked ' + col);
+				});
+				*/
+				
+
+
+				var beta = new Beta(0);
+				//console.log(beta.toJSON());
+
+
 
 
 			}
 
 
 
-			function setParams() {
 
+			function setParams(reset = false) {
 
+				
 				var svg = $("#plotSVG");
 				svg.find(".curve").velocity("stop");
+				if (reset) svg.html("");
 
-				var curveObjs = [];
+				var distributions = [];
 				var ymax = -Infinity;
 				var xmin = Infinity;
 				var xmax = -Infinity;
 				for (var distNum = 0; distNum < DISTRIBUTION_NUM; distNum++) {
 
+					var dist = DISTRIBUTION_OBJECTS[distNum];
+					if (dist == null) continue;
+					dist.loadParams();
 
 
-					var rowEle = $("#distributionRow_" + distNum);
-					var distr = rowEle.find("#select_distribution_" + distNum).val();
+					// Update DOM
+					var ele = $("#distributionRow_" + distNum).find(`[distnum="` + distNum + `"][distr="` + dist.getName() + `"]`);
+					if (ele.length == 0) {
+						$("#distributionRow_" + distNum).find(".paramrow").html("");
+						$("#distributionRow_" + distNum).find(".paramrow").append(dist.getParamHTML());
+					} 
+					
+					
 
-					rowEle.find(".distr").hide();
-					rowEle.find(".distr_" + distr).show();
+					//console.log("dist", dist.toJSON());
 
-
-					var distributionObj = getDistribution(distr, distNum);
-					ymax = Math.max(ymax, getYMax(distributionObj.xmin, distributionObj.xmax, distributionObj.distribution));
-					xmin = Math.min(xmin, distributionObj.xmin);
-					xmax = Math.max(xmax, distributionObj.xmax);
+					ymax = Math.max(ymax, dist.getYMax());
+					xmin = Math.min(xmin, dist.getXRange()[0]);
+					xmax = Math.max(xmax, dist.getXRange()[1]);
 	
-					//console.log(distNum, ymax, distributionObj);
-
-					curveObjs[distNum] = {distribution: distributionObj, col: distNum == 0 ? "red" : "#008cba"};
+					distributions[distNum] = dist;
 
 
 				}
 					
-					//svg.height(500);
-					//svg.width(500);
-					//svg.html("");
 
-
-
-
+				var drawn = false;
 				for (var distNum = 0; distNum < DISTRIBUTION_NUM; distNum++) {
 
-					var distributionObj = curveObjs[distNum].distribution;
-
-					//console.log(distributionObj, xmin, xmax);
-					var col = curveObjs[distNum].col;
+					var dist = distributions[distNum];
+					if (dist == null) continue;
+					drawn = true;
 					var scaler = getSVGScaler(svg, xmin, xmax, ymax);
 					drawSVGAxes(svg, scaler);
 
-					drawCurve(svg, "distr_" + distNum, scaler, distributionObj.distribution, col);
+					drawCurve(svg, "distr_" + distNum, scaler, dist);
 
 				}
 
-					//drawCurve(svg, "quad", SCALER, quadratic, "blue");
+
+				if (!drawn) {
+					var scaler = getSVGScaler(svg);
+					drawSVGAxes(svg, scaler);
+				}
+
 
 				
 
 
 			}
-
 
 
 
@@ -306,35 +323,27 @@
 			}
 
 
-
-			function getYMax(xmin, xmax, fn) {
-
-
-				var ymax = 0;
-				for (var i = 1; i < NUM_PIECES; i ++){
-					var x = xmin + i*(xmax - xmin)/NUM_PIECES; 
-					var y = fn(x);
-					ymax = Math.max(ymax, y);
-				}
-
-				return ymax;
-
-
+			
+			function getDefaultColour(num) {
+				return DEFAULT_COLOURS[num % DEFAULT_COLOURS.length];
 			}
 
 
-			function drawCurve(svg, id, scaler, quadratic, col = "red") {
 
 
 
+			function drawCurve(svg, id, scaler, distribution) {
+
+
+				var col = distribution.getColour();
 				var x2 = scaler.xmin + 1*(scaler.xmax - scaler.xmin)/NUM_PIECES; 
 				var x1;
 				for (var i = 2; i < NUM_PIECES; i ++){
 
 					var x1 = x2;
 					var x2 = scaler.xmin + i*(scaler.xmax - scaler.xmin)/NUM_PIECES; 
-					var y1 = quadratic(x1);
-					var y2 = quadratic(x2);
+					var y1 = distribution.getDensity(x1);
+					var y2 = distribution.getDensity(x2);
 
 
 					if (y1 > scaler.ymax || y2 > scaler.ymax) {
@@ -355,41 +364,27 @@
 
 						
 					
-						drawSVGobj(svg, "line", {class: "curve", id: curveID,
+						drawSVGobj(svg, "line", {class: "curve curve" + id, id: curveID,
 								x1: scaler.scaleX(x1), 
 								y1: scaler.scaleY(y1), 
 								x2: scaler.scaleX(x2),
 								y2: scaler.scaleY(y2), 
-								style: "stroke:" + col + "; stroke-width:1.5px;stroke-linecap:round" });
+								style: "stroke:" + col + "; stroke-width:2px;stroke-linecap:round" });
 
 					}else {
 						var element = $("#" + curveID);
 						element.velocity({x1: scaler.scaleX(x1), x2: scaler.scaleX(x2), y1: scaler.scaleY(y1), y2: scaler.scaleY(y2)}, ANIMATION_TIME );
-
+						element.css("stroke", col);
 					}
 
 				}
 
 			}
 
-
-
-			function quadratic(x) {
-				return 10 * x * x;
-			}
-
-
-			function cubic(x) {
-				return 10 * x * x * 10;
-			}
-
-
 			function getSVGScaler(svg, xmin = 0, xmax = 1, ymax = 10) {
 				var scaler = scaleRanges(xmin, 0, xmax, ymax, AXIS_GAP[3], svg.height() - AXIS_GAP[2], svg.width() - AXIS_GAP[1], AXIS_GAP[0]);
 				return scaler;
 			}
-
-			
 
 
 			function drawSVGAxes(svg, scaler){
@@ -407,8 +402,6 @@
 				drawAxis(svg, svg, y_axis, 4, scaler);
 
 				//console.log("y_axis", y_axis);
-
-
 
 			}
 
@@ -606,8 +599,6 @@
 
 
 
-
-
 			function drawSVGobj(svg, type, attr, val = null, isNode = false, addBackground = false){
 
 				//console.log("attr", attr);
@@ -647,8 +638,6 @@
 
 
 
-
-			
 
 			function roundToSF(val, sf=2, ceilOrFloor = "none", precise = true){
 				
@@ -725,63 +714,107 @@
 
 
 
-			function newDistributionRow(){
+			function newDistributionRow(distrJSON = null){
+				
 
-				$("#distributionsDiv").append(getDistributionTemplate(DISTRIBUTION_NUM));
+
+				var distr;
+				var prevDistributions = $(".distributionRow");
+
+				// If a distribution is specified then add that one
+				if (distrJSON != null) { 
+					distr = new (eval(distrJSON.distr))(DISTRIBUTION_NUM);
+					distr.parseFromJSON(distrJSON);
+				}
+
+				// Otherwise, set the distribution to that of the previously added distribution (if there is one)
+				else if (prevDistributions.length > 0) {
+					var ele = $(prevDistributions[prevDistributions.length-1]);
+					var prevDistrName = ele.find(".dropdown").val();
+					distr = new (eval(prevDistrName))(DISTRIBUTION_NUM);
+				}
+
+				// If this is the first distribution, default it to uniform
+				else distr = new Uniform(DISTRIBUTION_NUM);
+
+
+				DISTRIBUTION_OBJECTS[DISTRIBUTION_NUM] = distr;
+				
+				
+				$("#distributionsDiv").append(getDistributionTemplate(DISTRIBUTION_NUM, distr.getColour()));
+
+				// Append distributions to dropdown
+				for (var i = 0; i < DISTRIBUTIONS.length; i ++){
+					var dist_i = DISTRIBUTIONS[i];
+					$("#select_distribution_" + DISTRIBUTION_NUM).append(`<option value="` + dist_i.name + `" >` + dist_i.name + `</option>`);
+				}
+
+				
+				
+				$("#select_distribution_" + DISTRIBUTION_NUM).val(distr.getName());
+
+				var distrNum = DISTRIBUTION_NUM;
+				var addColourPicked = function() {
+					getColourPicker($("#distributionRow_" + distrNum).find(".colourbox"), distrNum, distr.getColour(), function(col, distNum) {
+						setCol(parseFloat(distNum), col);
+					});
+				}
+				$("#distributionRow_" + DISTRIBUTION_NUM).find(".colourbox").click(addColourPicked);
+
+
 				DISTRIBUTION_NUM ++;
 
 			}
 
 
-
-			function getDistributionTemplate(num) {
-
-
-				return `
-					<div class="distributionRow" id="distributionRow_` + num + `">
-
-						Distribution:
-						<select class="dropdown" id="select_distribution_` + num + `" onchange="setParams();">
-								<option value="beta">Beta</option>
-								<option value="bactrian">Bactrian</option>
-								<option value="modal">Modal beta</option>
-								<!--<option value="bactrianbeta">Bactrian beta</option>-->
-				
-						</select>
-
-			
-
-						<span class="distr distr_modal distr_bactrianbeta">
-							 c = <input type="number" step="0.05" min=0 max=1 class="numberinput cranberry" onclick="$(this).select()" id="c_input_` + num + `" style="width:5em;" value="0.5" onchange="setParams();">
-						</span>
-
-						<span class="distr distr_modal distr_bactrianbeta">
-							s = <input type="number" step="0.5" min=0 max=40 class="numberinput cranberry" onclick="$(this).select()" id="s_input_` + num + `" style="width:5em;" value="1.0" onchange="setParams();"> 
-						</span>
-
-						<span class="distr distr_bactrianbeta">
-							k = <input type="number" step="0.5" class="numberinput cranberry" onclick="$(this).select()" id="k_input_` + num + `" style="width:5em;" value="10" onchange="setParams();"> 
-						</span>
-
-						<span class="distr distr_beta">
-							&alpha; = <input type="number" step="0.5" min=0 class="numberinput cranberry" onclick="$(this).select()" id="alpha_input_` + num + `" style="width:5em;" value="1.0" onchange="setParams();">
-						</span>
-						
-						<span class="distr distr_beta">
-							&beta; = <input type="number" step="0.5" min=0 class="numberinput cranberry" onclick="$(this).select()" id="beta_input_` + num + `" style="width:5em;" value="1.0" onchange="setParams();"> 
-						</span>
-
-						<span class="distr distr_bactrian">
-							m = <input type="number" step="0.02" min=0 max="1" class="numberinput cranberry" onclick="$(this).select()" id="bactrian_input_` + num + `" style="width:5em;" value="0.9" onchange="setParams();"> 
-						</span>
-					</div>`;
-					
-
-
-
+			// Sets the colour of a distribution
+			function setCol(distrNum, col) {
+				if (DISTRIBUTION_OBJECTS[distrNum] == null) return;
+				DISTRIBUTION_OBJECTS[distrNum].setColour(col);
+				$("#distributionRow_" + distrNum).find(".colourbox").css("background-color", col);
+				setParams();
 			}
 
 
+			function deleteDistribution(num) {
+				$("#distributionRow_" + num).remove();
+				DISTRIBUTION_OBJECTS[num] = null;
+				setParams(true);
+			}
+
+
+
+			function getDistributionTemplate(num, col) {
+
+
+
+				return `
+
+					<tr class="distributionRow" id="distributionRow_` + num + `">
+						<td>
+							Distribution:
+							<select class="dropdown" id="select_distribution_` + num + `" onchange="setParams();">
+							</select>	
+						</td>
+					
+						<td class="paramrow">
+						
+						</td>
+
+
+						<td>
+							<span class="colourbox" title="` + col + `" style="background-color:` + col + `"></span>	
+						</td>
+
+						<td>
+							<span class="btn" title="Delete distribution" onclick="deleteDistribution(` + num + `)">&times;</span>	
+						</td>
+
+
+
+					</tr>`;
+
+			}
 
 
 
@@ -795,13 +828,18 @@
 
 
 
-		<div id="main">
+		<div id="main" style="text-align:center">
 
 			<svg id="plotSVG" />
 
 
 			
-			<div id="distributionsDiv"> </div>
+			<table id="distributionsDiv" style="margin:auto" cellspacing="1"> 
+
+				
+			</table>
+
+			<span class="btn" title="Add new distribution" onclick="newDistributionRow(); setParams();">&plus; Distribution</span>	
 
 
 		</div>
