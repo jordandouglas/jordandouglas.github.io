@@ -11,6 +11,7 @@ class Parameter {
 		this.maxVal = maxVal;
 		this.step = step;
 		this.value = defaultVal;
+		this.inclusiveLimit = [false, false];
 	}
 	
 	getName() {
@@ -24,6 +25,11 @@ class Parameter {
 		this.value = this.validate(x);
 		span.find("input").val(this.value);
 	}
+
+	// Set a lower (0) or upper (1) limit to inclusive instead of exclusive (default)
+	setInclusive(limit, invlusive = true) {
+		this.inclusiveLimit[limit] = invlusive;
+	}	
 
 	set(x) {
 		this.value = this.validate(x);
@@ -42,8 +48,8 @@ class Parameter {
 
 	validate(x) {
 		if (x == null) return 1; 
-		if (this.minVal != null && x < this.minVal) return this.minVal + 0.5 * this.step;
-		if (this.maxVal != null && x > this.maxVal) return this.maxVal - 0.5 * this.step;
+		if (this.minVal != null) if (x < this.minVal || (!this.inclusiveLimit[0] && x == this.minVal)) return this.minVal + 0.5 * this.step;
+		if (this.maxVal != null) if (x > this.maxVal || (!this.inclusiveLimit[1] && x == this.maxVal)) return this.maxVal - 0.5 * this.step;
 		return x;
 	}
 
@@ -207,6 +213,7 @@ class Bactrian extends Distribution {
 
 	initialise() {
 		this.m = new Parameter(this.distNum, "m", "m", 0.9, 0, 1, 0.02);
+		this.m.setInclusive(0);
 		this.parameters = [this.m];
 	}
 
