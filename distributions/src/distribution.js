@@ -42,8 +42,8 @@ class Parameter {
 
 	validate(x) {
 		if (x == null) return 1; 
-		if (this.minVal != null && x <= this.minVal) return this.minVal + 0.5 * this.step;
-		if (this.maxVal != null && x >= this.maxVal) return this.maxVal - 0.5 * this.step;
+		if (this.minVal != null && x < this.minVal) return this.minVal + 0.5 * this.step;
+		if (this.maxVal != null && x > this.maxVal) return this.maxVal - 0.5 * this.step;
 		return x;
 	}
 
@@ -294,12 +294,18 @@ class Beta extends Distribution {
 
 
 	prepareDensity() {
-		this.norm = math.gamma(this.alpha.get()) * math.gamma(this.beta.get()) / math.gamma(this.alpha.get() + this.beta.get());
+		var alpha = this.alpha.get();
+		var beta = this.beta.get();
+		if (alpha <= 0 || beta <= 0) this.norm = 1;
+		else this.norm = math.gamma(alpha) * math.gamma(beta) / math.gamma(alpha + beta);
 	}
 
 	getDensity(x) {
 		if (x <= 0 || x >= 1) return 0;
-		var density = Math.exp((this.alpha.get()-1)*Math.log(x) + (this.beta.get()-1)*Math.log(1-x)) / this.norm;
+		var alpha = this.alpha.get();
+		var beta = this.beta.get();
+		if (alpha <= 0 || beta <= 0) return 1;
+		var density = Math.exp((alpha-1)*Math.log(x) + (beta-1)*Math.log(1-x)) / this.norm;
 		return density;
 	}
 

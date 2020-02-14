@@ -825,6 +825,15 @@
 			}
 
 
+			function setDistribution(distrNum) {
+				if (DISTRIBUTION_OBJECTS[distrNum] == null) return;
+				var distrName = $("#select_distribution_" + distrNum).val();
+				DISTRIBUTION_OBJECTS[distrNum] = new (eval(distrName))(distrNum);
+				setParams();
+			}
+
+
+
 			// Sets the colour of a distribution
 			function setCol(distrNum, col) {
 				if (DISTRIBUTION_OBJECTS[distrNum] == null) return;
@@ -851,7 +860,7 @@
 					<tr class="distributionRow" id="distributionRow_` + num + `">
 						<td>
 							Distribution:
-							<select class="dropdown" id="select_distribution_` + num + `" onchange="setParams();">
+							<select class="dropdown" id="select_distribution_` + num + `" onchange="setDistribution(` + num + `);">
 							</select>	
 						</td>
 					
