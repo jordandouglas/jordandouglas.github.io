@@ -59,37 +59,87 @@
 				"#000000", "#606060", "#707070", "#A0A0A0", "#BEBEBE", "#d3d3d3", "#E0E0E0", "#FFFFFF"];
 
 
+				$(".unemdeddable").hide(0);	
 
-				var distrJSON = {distr: "LogNormal", p: [1, 2], col: "red"};
-				var distrJSON = {distr: "Normal", p: [1, 2]};
-				newDistributionRow({distr: "LogNormal", p: [1, 2], col: "red"});
-				newDistributionRow({distr: "Normal", p: [1, 2]});
+				// Parse distributions from url?
+				// Example: ?d=[LogNormal(2;1|red)]&w=500&h=500&e=true
+				if (location.href.indexOf("?") != -1){
+					var search = location.search.substring(1);
+					var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
 
-				//$("#select_distribution").val("modal")
+					// If e=true, then only render the svg
+					if (JSONurl.e == null || JSONurl.e == "false"){
+						$(".unemdeddable").show(0);	
+					} 
 
-				var svg = $("#plotSVG");
-				svg.height(450);
-				svg.width(700);
-				svg.html("");
-			
+					// Width and height
+					var svg = $("#plotSVG");
+					svg.height(JSONurl.h == null ? 450 : parseFloat(JSONurl.h));
+					svg.width(JSONurl.w == null ? 700 : parseFloat(JSONurl.w));
+					svg.html("");
 
-				var scaler = getSVGScaler(svg);
-				drawSVGAxes(svg, scaler);
 
-				setParams();
-				/*
-				getColourPicker($("#beta_input_1"), "colourpickertest", "red", function(colEle) {
-					var col = $(colEle).css('background-color');
-					alert('user picked ' + col);
-				});
-				*/
+					// Parse distributions
+					if (JSONurl.d != null && JSONurl.d.length != 0) { 
+						var d = JSONurl.d.substring(1, JSONurl.d.length-1);
+						var distributionStrings = d.split(",");
+						console.log(d, distributionStrings);
+						for (var i = 0; i < distributionStrings.length; i ++) {
+				
+							// Example: LogNormal(2;1|red). 1st we remove the trailing ')'
+							var distrStr = distributionStrings[i];
+							if (distrStr[distrStr.length-1] == ")") distrStr = distrStr.substring(0, distrStr.length-1);
+
+							// Distribution name
+							var distrName = distrStr.split("(")[0];
+
+							// Colour if available
+							var col = distrStr.split("|")[1];
+
+							// Parameters
+							var params = distrStr.split("(")[1].split("|")[0].split(";");
+							for (var j = 0; j < params.length; j ++){
+								var val = parseFloat(params[j]);
+								params[j] = val;
+							}
+
+							console.log("distrName", distrName);
+							console.log("col", col);
+							console.log("params", params);
+
+							var distrJSON = {distr: distrName, p: params == null ? [] : params, col: col};
+							
+							newDistributionRow(distrJSON);
+						}
+
+						setParams();
+					}
+
+					 
+					setParams();
+					console.log("JSONurl", JSONurl);
+			    
+				} else {
+
+					$(".unemdeddable").show(0);
+				
+					//newDistributionRow({distr: "LogNormal", p: [1, 2], col: "red"});
+					newDistributionRow({distr: "Bactrian", p: [0.9]});
+
+					//$("#select_distribution").val("modal")
+
+					var svg = $("#plotSVG");
+					svg.height(450);
+					svg.width(700);
+					svg.html("");
 				
 
+					//var scaler = getSVGScaler(svg);
+					//drawSVGAxes(svg, scaler);
 
-				var beta = new Beta(0);
-				//console.log(beta.toJSON());
+					setParams();
 
-
+				}
 
 
 			}
@@ -716,26 +766,34 @@
 
 			function newDistributionRow(distrJSON = null){
 				
-
+				
 
 				var distr;
 				var prevDistributions = $(".distributionRow");
 
-				// If a distribution is specified then add that one
-				if (distrJSON != null) { 
-					distr = new (eval(distrJSON.distr))(DISTRIBUTION_NUM);
-					distr.parseFromJSON(distrJSON);
-				}
+				try {
 
-				// Otherwise, set the distribution to that of the previously added distribution (if there is one)
-				else if (prevDistributions.length > 0) {
-					var ele = $(prevDistributions[prevDistributions.length-1]);
-					var prevDistrName = ele.find(".dropdown").val();
-					distr = new (eval(prevDistrName))(DISTRIBUTION_NUM);
-				}
+					// If a distribution is specified then add that one
+					if (distrJSON != null) { 
+						distr = new (eval(distrJSON.distr))(DISTRIBUTION_NUM);
+						distr.parseFromJSON(distrJSON);
+					}
 
-				// If this is the first distribution, default it to uniform
-				else distr = new Uniform(DISTRIBUTION_NUM);
+					// Otherwise, set the distribution to that of the previously added distribution (if there is one)
+					else if (prevDistributions.length > 0) {
+						var ele = $(prevDistributions[prevDistributions.length-1]);
+						var prevDistrName = ele.find(".dropdown").val();
+						distr = new (eval(prevDistrName))(DISTRIBUTION_NUM);
+					}
+
+					// If this is the first distribution, default it to uniform
+					else distr = new Uniform(DISTRIBUTION_NUM);
+
+				} 
+				catch (error) {
+					alert("Unable to parse distribution " + (distrJSON == null ? "" : JSON.stringify(distrJSON)));
+					return;
+				}
 
 
 				DISTRIBUTION_OBJECTS[DISTRIBUTION_NUM] = distr;
@@ -834,12 +892,12 @@
 
 
 			
-			<table id="distributionsDiv" style="margin:auto" cellspacing="1"> 
+			<table id="distributionsDiv" class="unemdeddable" style="margin:auto" cellspacing="1"> 
 
 				
 			</table>
 
-			<span class="btn" title="Add new distribution" onclick="newDistributionRow(); setParams();">&plus; Distribution</span>	
+			<span class="unemdeddable btn" style="display:none" title="Add new distribution" onclick="newDistributionRow(); setParams();">&plus; Distribution</span>	
 
 
 		</div>
