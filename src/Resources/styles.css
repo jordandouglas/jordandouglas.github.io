@@ -1298,6 +1298,11 @@ input:checked + .slider:before {
 }
 
 
+.button.embeddist{
+	background-color:#398684;
+	border-color:#398684;; 
+}
+
 .button:hover{
 	color:#008CBA; 
 	background-color:white;
