@@ -48,7 +48,7 @@
 
 				DISTRIBUTIONS = [InverseGamma, Normal, LogNormalMean, Gamma, 
 								LogNormal, Beta, Bactrian, Uniform, Exponential,
-								Laplace].sort() ;
+								Laplace, LogNormalMeanExponential].sort() ;
 				DISTRIBUTION_OBJECTS = [];
 
 				
@@ -767,7 +767,7 @@
 
 
 
-			function newDistributionRow(distrJSON = null){
+			function newDistributionRow(distrJSON = null, embedUnder = null){
 				
 				
 
@@ -823,6 +823,20 @@
 					});
 				}
 				$("#distributionRow_" + DISTRIBUTION_NUM).find(".colourbox").click(addColourPicked);
+
+
+
+
+
+
+				// If compound distribution add a new row under it
+				if (distr instanceof CompoundDistribution) {
+					//newDistributionRow();
+
+				}
+
+
+
 
 
 				DISTRIBUTION_NUM ++;

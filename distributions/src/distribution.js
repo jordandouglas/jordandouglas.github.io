@@ -485,3 +485,92 @@ class Laplace extends Distribution {
 
 
 
+
+
+class CompoundDistribution extends Distribution {
+
+	initialise() {
+		//this.rate = new Parameter(this.distNum, "rate", "&lambda;", 1, 0, null, 0.2);
+		this.parameters = [];
+		this.distributions = [];
+		this.desc = "Weighted sum of all other distributions.";
+
+	}
+
+
+
+	loadParams() {
+		for (var i = 0; i < this.distributions.length; i ++ ){
+			this.distributions[i].loadParams();
+		}
+		this.prepareDensity();
+	}
+
+
+	getXRange() {
+		var xRange = [Infinity, -Infinity];
+		for (var i = 0; i < this.distributions.length; i ++ ){
+			var xRange_dist = this.distributions[i].getXRange();
+			if (xRange_dist[0] < xRange[0]) xRange[0] = xRange_dist[0];
+			if (xRange_dist[1] > xRange[1]) xRange[1] = xRange_dist[1];
+		}
+
+		if (this.distributions.length == 0) xRange = [0, 1];
+		return xRange;
+	}
+
+	getDensity(x) {
+		var density = 0;
+		for (var i = 0; i < this.distributions.length; i ++ ){
+			density += this.distributions[i].getDensity(x);
+		}
+		return density;
+	}
+
+}
+
+
+
+
+
+
+
+
+class LogNormalMeanExponential extends Distribution {
+
+	initialise() {
+		this.weight = new Parameter(this.distNum, "weight", "w", 0.5, 0, 1, 0.1);
+		this.sigma = new Parameter(this.distNum, "sigma", "&sigma;", 0.5, 0, null, 0.05);
+		this.parameters = [this.weight, this.sigma];
+		this.desc = "Log-normal distribution where the mean is 'mean' and the standard deviation in log-space is 'sigma'.";
+
+		this.weight.setInclusive(0);
+		this.weight.setInclusive(1);
+	
+	}
+
+
+	getXRange() {
+		
+		var sigma = this.sigma.get();
+		var mu = - sigma*sigma/2;
+		return [0, Math.exp(mu) * 3];
+	}
+
+
+	getDensity(x) {
+		if (x <= 0) return 0;
+		var weight = this.weight.get();
+		var sigma = this.sigma.get();
+		var mu =  - sigma*sigma/2;
+		var exponent =  ((Math.log(x)-mu)**2) /(2*sigma*sigma);
+		var density = weight / (x * sigma * Math.sqrt(2*Math.PI)) * Math.exp(-exponent);
+
+		density += (1 - weight) * Math.exp(-x);
+
+		return density;
+	}
+
+}
+
+
