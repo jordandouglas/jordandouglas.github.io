@@ -11,7 +11,7 @@ body {
 	min-height:100%;
 	margin:0;
 	padding:0;
-	
+	%font-size:10px;
 
 	@media screen and (orientation:portrait) {
 		text-size-adjust: 160%;
@@ -19,9 +19,10 @@ body {
 	@media screen and (orientation:landscape) {
 		text-size-adjust: 100%;
 	}
-
+	
 	
 }
+
 
 
 
@@ -34,6 +35,20 @@ body {
 
 }
 
+
+#main.json {
+	margin-left:0%;
+	text-align:left;
+}
+
+
+#distributionsDiv{
+	margin:auto;
+}
+
+#distributionsDiv.json{
+	margin:initial;
+}
 
 #plotSVG {
 
@@ -113,7 +128,6 @@ input[type=number] {
 	padding:5;
 	color:white;
 	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
-
 }
 
 
@@ -128,6 +142,7 @@ input[type=number] {
 	right: 5px;
 	content: "";
 	z-index: 98;
+	
 }
 
 .dropdown select{
@@ -136,6 +151,7 @@ input[type=number] {
 	position: relative;
 	z-index: 99;
 	background: none;
+	
 }
 
 .thicklines {
