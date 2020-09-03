@@ -481,7 +481,72 @@ class Laplace extends Distribution {
 }
 
 
+class Weibull extends Distribution {
 
+	initialise() {
+		this.shape = new Parameter(this.distNum, "shape", "k", 0.5, 0, null, 0.1);
+		this.scale = new Parameter(this.distNum, "scale", "&lambda;", 0.5, 0, null, 0.05);
+		this.parameters = [this.shape, this.scale];
+		this.desc = "Weibull distribution where k is the shape and lambda is the scale.";
+
+	}
+
+
+	getXRange() {
+		
+		var shape = this.shape.get();
+		var scale = this.scale.get();
+		
+		var median = scale * Math.pow(Math.log(2), 1/shape);
+		return [0, median*5];
+	}
+
+
+	getDensity(x) {
+		if (x < 0) return 0;
+		
+		var shape = this.shape.get();
+		var scale = this.scale.get();
+
+		var density = shape/scale * Math.pow(x/scale, shape-1) * Math.exp(-Math.pow(x/scale, shape));
+		return density;
+	}
+
+}
+
+
+
+class WeibullMedianOne extends Distribution {
+
+	initialise() {
+		this.shape = new Parameter(this.distNum, "shape", "k", 0.5, 0, null, 0.1);
+		this.parameters = [this.shape];
+		this.desc = "Weibull distribution where k is the shape and the median is always 1.";
+
+	}
+
+
+	getXRange() {
+		
+		var shape = this.shape.get();
+		var scale = Math.exp(-1/shape * Math.log(Math.log(2)));
+		
+		var median = scale * Math.pow(Math.log(2), 1/shape);
+		return [0, median*5];
+	}
+
+
+	getDensity(x) {
+		if (x < 0) return 0;
+		
+		var shape = this.shape.get();
+		var scale = Math.exp(-1/shape * Math.log(Math.log(2)));
+
+		var density = shape/scale * Math.pow(x/scale, shape-1) * Math.exp(-Math.pow(x/scale, shape));
+		return density;
+	}
+
+}
 
 
 
@@ -572,5 +637,9 @@ class LogNormalMeanExponential extends Distribution {
 	}
 
 }
+
+
+
+
 
 
