@@ -1,0 +1,1535 @@
+<html>
+<head>
+<title>Bringing balance to phylogenetic MCMC proposals</title>
+	<style>
+
+
+	@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
+	* {box-sizing:border-box}
+
+
+	body {
+		font-family: "Source Sans Pro", "Arial"; 
+		color:white;
+	}
+
+
+	h1, h2, h3 {
+		%text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+	}
+
+	.mySlides {
+		display: none;
+		position:relative;
+		max-width: 1200px;
+		height: 720px;
+		position: relative;
+		margin: auto;
+		background-color:#506680;
+		font-family:Arial;
+		page-break-inside: avoid;
+		color:white;	
+		border-radius: 5px;
+
+	}
+
+	li { list-style-position: inside; }
+	
+	.code {
+		font-family:'Courier New';
+		
+	}
+
+
+	.chaptersmall{
+		font-size: 80%;
+		 white-space: nowrap;
+	}
+
+
+	.currenttopic{
+		padding:5 20;
+		background-color:white;
+		color:#506680;
+		border-radius: 5px;
+		border-color:black;
+		border-style:solid;
+		border-width:2px;
+	}
+
+
+
+	img, iframe {
+		border-width:1px;
+		border-style:solid;
+		border-color:black;
+		border-radius:1px;
+		background-color:white;
+		padding:1px;
+	}
+
+	
+	.comment {
+		color: #FFB6C1;
+	}
+
+	/* Next & previous buttons */
+	.prev, .next {
+	  cursor: pointer;
+	  position: absolute;
+	  top: 50%;
+	  width: auto;
+	  margin-top: -22px;
+	  padding: 16px;
+	  color: white;
+	  font-weight: bold;
+	  font-size: 18px;
+	  transition: 0.6s ease;
+	  border-radius: 0 3px 3px 0;
+	  -webkit-touch-callout: none; /* iOS Safari */
+		    -webkit-user-select: none; /* Safari */
+		     -khtml-user-select: none; /* Konqueror HTML */
+		       -moz-user-select: none; /* Firefox */
+		        -ms-user-select: none; /* Internet Explorer/Edge */
+		            user-select: none; /* Non-prefixed version, currently
+		                                  supported by Chrome and Opera */
+	}
+
+	/* Position the "next button" to the right */
+	.next {
+	  right: 0;
+	  border-radius: 3px 0 0 3px;
+	}
+
+	/* On hover, add a black background color with a little bit see-through */
+	.prev:hover, .next:hover {
+	  background-color: rgba(0,0,0,0.8);
+	}
+
+
+	/* Number text (1/3 etc) */
+	.numbertext {
+	  color: white;
+	  font-size: 16px;
+	  padding: 8px 12px;
+	  position: absolute;
+	  top: 0;
+	  font-weight: bold;
+	}	
+
+
+	a {
+
+		%color:#FFB6C1; /* pink */
+		color:#ccff00;
+		text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+
+	}
+
+
+	b {
+		color:#15F4EE; /* pink */
+	}
+
+	i {
+		color:#ccff00; /* yellow */
+	}
+	
+
+
+	/* The dots/bullets/indicators */
+	.dot {
+	  cursor:pointer;
+	  height: 13px;
+	  width: 13px;
+	  margin: 0 2px;
+	  background-color: #778899;
+	  border-radius: 50%;
+	  display: inline-block;
+	  transition: background-color 0.6s ease;
+	}
+
+	.active, .dot:hover {
+	  background-color: #2F4F4F; 
+	}
+
+	/* Fading animation */
+	.fade {
+	  -webkit-animation-name: fade;
+	  -webkit-animation-duration: 1.5s;
+	  animation-name: fade;
+	  animation-duration: 1.5s;
+	}
+
+	@-webkit-keyframes fade {
+	  from {opacity: .4} 
+	  to {opacity: 1}
+	}
+
+	@keyframes fade {
+	  from {opacity: .4} 
+	  to {opacity: 1}
+	}
+	
+	h2 {
+		color:white;
+	}
+	
+	
+	
+	li {
+		color: white;
+	}
+
+	ul li {
+		color: white;
+		list-style-type: none;
+	}
+
+	ul li:before {
+		color: white;
+		float: left;
+		margin: 0 0 0 -1em;
+		width: 1em;
+		content: '\2022';
+	}
+	.code ol { 
+	    	counter-reset: item;
+	    	
+	}
+	
+
+	.code ol li { 
+		display: block; 
+		
+	}
+	
+	
+	.code ol li:before { 
+	    content: counter(item) "  "; 
+	    counter-increment: item;
+		color:#FFB6C1;
+		font-weight: bold;
+		-webkit-touch-callout: none; /* iOS Safari */
+		    -webkit-user-select: none; /* Safari */
+		     -khtml-user-select: none; /* Konqueror HTML */
+		       -moz-user-select: none; /* Firefox */
+		        -ms-user-select: none; /* Internet Explorer/Edge */
+		            user-select: none; /* Non-prefixed version, currently
+		                                  supported by Chrome and Opera */
+	}
+	
+	</style>
+
+<script src="jquery-1.12.4.min.js"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+<script>
+
+
+function init(){
+	
+	slideIndex = 1;
+	showSlides(slideIndex);
+
+	var pageNums = $(".numbertext");
+	for (var i = 0; i < pageNums.length; i ++ ){
+		var ele = $(pageNums[i]);
+		ele.html((i+1) + " / " + pageNums.length);
+	}
+	
+}
+
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function printerFriendlyMode(){
+	$(".mySlides").show();
+	$("#bottomdots").hide();
+
+	$(".mySlides").css("width", 1500);
+	//$(".mySlides").css("height", 800);
+
+
+	$(".questionDiv").css("background-color", "");
+	$(".answerDiv").show(true);
+}
+
+
+function showSlides(n) {
+
+	$("#bottomdots").show(true);
+
+
+	$(".mySlides").css("width", 1200);
+	//$(".mySlides").css("height", 720);
+
+	var i;
+	var slides = document.getElementsByClassName("mySlides");
+	var dots = document.getElementsByClassName("dot");
+	if (n > slides.length) {slideIndex = 1} 
+	if (n < 1) {slideIndex = slides.length}
+	for (i = 0; i < slides.length; i++) {
+		slides[i].style.display = "none"; 
+	}
+	for (i = 0; i < dots.length; i++) {
+		dots[i].className = dots[i].className.replace(" active", "");
+	}
+
+
+
+
+	slides[slideIndex-1].style.display = "block"; 
+	dots[slideIndex-1].className += " active";
+}
+
+
+function show(element){
+
+	var id = $(element).attr("id");
+	var toShow = id.substring(1);
+	$("#" + id).hide(true);
+	$("#" + toShow).show(true);
+
+}
+
+function showAnswer(element){
+
+	var toShow = $(element).attr("id").substring(1);
+	$(element).css("background-color", "");
+	$("#" + toShow).show(true);
+
+}
+
+
+
+
+window.onkeyup = function(e) {
+
+   var key = e.keyCode ? e.keyCode : e.which;
+	if (key == 39 && !$("input").is(':focus')) { // Right arrow
+		plusSlides(1);
+	}else if (key == 37 && !$("input").is(':focus')) { // Left arrow
+		plusSlides(-1);
+	}else if (key == 40 && !$("input").is(':focus')) { // Down arrow
+		plusSlides(1);
+	}else if (key == 38 && !$("input").is(':focus')) { // Up arrow
+		plusSlides(-1);
+	}else if (key == 32) { // Space
+		plusSlides(1);
+	}else if (key == 8) { // Backspace
+		plusSlides(-1);
+	}
+	
+
+   
+}
+
+
+
+</script>
+
+</head>
+
+
+<body  onload="init()">
+<div class="slideshow-container">
+	
+  <div class="mySlides fade">
+    <div class="numbertext"></div>
+    <h2 style="text-align:center"><br></h2>
+    	<div style="text-align:center; width:100%; font-size:40px">
+			
+				<br>
+				
+				<h1>Bringing Balance to Phylogenetic MCMC Operators</h1>
+
+				<br>
+
+				<h2> NZ Phylogenomics Conference 2021 </h2>
+				<h3> Jordan Douglas, University of Auckland </h3>
+
+		</div>
+  </div>
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center">Bayesian phylogenetic inference</h2>
+		<div style="width:100%">
+			
+
+
+		<table cellpadding=10 style="margin-top:-50px">
+			<tr>
+			
+
+				<td style="width:50px; font-size:40px"> </td>
+
+				<td style="font-size:40px;">
+
+					<br>
+
+					<ul>
+
+						<li> <b>Input:</b> A multiple sequence alignment, a model </li> <br>
+
+						<li> <b>Output:</b> A posterior distribution of trees + parameters   </li><br>
+
+						<li> <b>Algorithm:</b> Inference is performed by Markov chain Monte Carlo (MCMC)  </li><br>
+
+						<li> In MCMC, parameter space is traversed using <i>operators</i> or <i>proposals</i>  </li>
+
+					</ul>
+
+
+
+
+					
+
+				</td>
+
+				<td style="width:50px; font-size:40px"> </td>
+
+
+
+				</tr>
+
+			</table>
+
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center">Designing efficient MCMC proposals</h2>
+		<div style="width:100%">
+			
+
+
+			<table cellpadding=10 style="margin-top:-50px">
+			<tr>
+			<td style="width:50px; font-size:50px"> </td>
+
+
+			<td style="font-size:36px;text-align:center">
+
+
+
+					<img src="Images/eg1.png" style="width:60%; margin-left:0%; margin-top:1%"></img>
+					<img src="Images/eg2.png" style="width:60%; margin-left:0%; margin-top:1%"></img>
+					<img src="Images/eg3.png" style="width:60%; margin-left:0%; margin-top:1%"></img>
+					<img src="Images/eg4.png" style="width:60%; margin-left:0%; margin-top:1%"></img>
+					<img src="Images/eg5.png" style="width:60%; margin-left:0%; margin-top:1%"></img>
+
+			</td>
+
+
+			<td style="width:50px; font-size:40px"> </td>
+
+
+			</tr>
+			</table>
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center">Seeking balance</h2>
+		<div style="width:100%">
+			
+
+
+		<table cellpadding=10 style="margin-top:-50px">
+			<tr>
+			
+
+				<td style="width:50px; font-size:40px"> </td>
+
+				<td style="font-size:40px; text-align:center; width:100%">
+
+					<br>
+
+
+					Each point is a parameter <br><br>
+
+
+					<img src="Images/balance.png" style="width:100%; "></img> <br><br>
+
+
+					If a parameter is overexplored, resources are wasted
+
+					
+					
+
+
+					
+
+				</td>
+
+				<td style="width:50px; font-size:40px"> </td>
+
+
+
+				</tr>
+
+			</table>
+
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> Imbalanced mixing is a problem  </h2>
+		<div style="width:100%">
+			
+		
+						
+				<table cellpadding=10 style="margin-top:-40px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:36px">
+							
+
+
+
+							The trace of a parameter through MCMC is used to calculate its <i>effective sample size</i> (ESS) <br>
+
+							
+
+
+							<br>
+ 
+								<img src="Images/goodmix.png" style="width:49%;  float:left;"/>
+								<img src="Images/badmix.png" style="width:49%; float:right;"/> 
+
+
+							<div style="font-size:18px;">
+								Tracer (Rambaut et al.)
+							</div>
+
+
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+
+
+					<tr>
+					
+
+						
+						
+					
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center">What impacts a parameter's explorability? </h2>
+		<div style="width:100%">
+			
+
+
+			<table cellpadding=10 style="margin-top:0px">
+			<tr>
+			<td style="width:50px; font-size:50px"> </td>
+
+
+			<td style="font-size:40px">
+
+
+				
+				<ol>
+
+					<li> The phylogenetic <i>model</i> (eg. complex models tend to mix slower) </li> <br>
+
+					<li> The biological <i>data</i> (eg. larger trees come with larger search spaces) </li>  <br>
+
+					<li> The <i>proposal</i> kernels (eg. proposals are sampled by their proposal probabilities) </li>  <br>
+					
+
+				</ol>
+
+
+			</td>
+
+
+			<td style="width:50px; font-size:40px"> </td>
+
+
+			</tr>
+			</table>
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> <br>Unifying parameters with explorativities  </h2>
+		<div style="width:100%">
+			
+		
+				<table cellpadding=10 style="margin-top:-30px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:38px">
+							
+								Let <b>$\mathcal{P}$</b> be a parameter, or an area of parameter space <br><br>
+
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> <br>Unifying parameters with explorativities  </h2>
+		<div style="width:100%">
+			
+		
+				<table cellpadding=10 style="margin-top:-30px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:38px">
+							
+								Let <b>$\mathcal{P}$</b> be a parameter, or an area of parameter space <br><br>
+
+								Let <b>$\mathcal{O}$</b> be an operator which generates proposals for <b>$\mathcal{P}$</b> <br><br>
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> <br>Unifying parameters with explorativities  </h2>
+		<div style="width:100%">
+			
+		
+				<table cellpadding=10 style="margin-top:-30px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:38px">
+							
+								Let <b>$\mathcal{P}$</b> be a parameter, or an area of parameter space <br><br>
+
+								Let <b>$\mathcal{O}$</b> be an operator which generates proposals for <b>$\mathcal{P}$</b> <br><br>
+
+								Let <b>$\mathcal{E}$</b> be the explorativity of <b>$\mathcal{P}$</b> (measured by ESS for example) <br><br>
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> <br> POEMs </h2>
+		<div style="width:100%">
+			
+		
+				<table cellpadding=10 style="margin-top:-30px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:38px">
+							
+								Let <b>$\mathcal{P}$</b> be a parameter, or an area of parameter space <br><br>
+
+								Let <b>$\mathcal{O}$</b> be an operator which generates proposals for <b>$\mathcal{P}$</b> <br><br>
+
+								Let <b>$\mathcal{E}$</b> be the explorativity of <b>$\mathcal{P}$</b> (measured by ESS for example) <br><br>
+
+								Let <b>$\mathcal{M}$</b> be the map which ties these three together  <br><br>
+
+						</td>
+
+
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> The six POEMs of phylogeny  </h2>
+		<div style="width:100%">
+			
+		
+				<table cellpadding=10 style="margin-top:-30px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:38px">
+							
+
+						<img src="Images/POEMS.png" style="width:68%; margin-left:16%; margin-top:-2%"></img>
+
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> Objective: <i>maximise</i> $\mathcal{B}$  </h2>
+		<div style="width:100%">
+			
+		
+						
+				<table cellpadding=10 style="margin-top:-50px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:36px">
+							
+
+							$$ \mathcal{B} = -logit \sqrt{\sum\limits_{i=1}^6 \Big( \mathcal{E}_f(i) - \frac{1}{6} \Big)^2}  $$
+
+
+							where $\mathcal{E}_f(i)$ is the fractional ESS of POEM $i$. <br><br><br><br>
+
+							If all 6 POEMs are mixing equally well, then $\mathcal{E}_f(i)$ will equal $\frac{1}{6}$ and $\mathcal{B}$ will be maximised  - <i>perfect balance</i> 
+
+
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+
+
+
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> Objective: find $w$ which <i>maximises</i> $\mathcal{B}$  </h2>
+		<div style="width:100%">
+			
+		
+						
+				<table cellpadding=10 style="margin-top:-50px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:36px">
+							
+
+						
+								<img src="Images/weights.png" style="width:90%; margin-left:5%;"></img> <br>
+
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+
+
+
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> Gaussian Processes  </h2>
+		<div style="width:100%">
+			
+		
+				<table cellpadding=10 style="margin-top:-50px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:34px">
+							
+
+
+
+							<img src="Images/GP1.png" style="width:80%; margin-left:10%;"></img> <br>
+
+						
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> Gaussian Processes  </h2>
+		<div style="width:100%">
+			
+		
+				<table cellpadding=10 style="margin-top:-50px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:34px">
+							
+
+
+
+							<img src="Images/GP2.png" style="width:80%; margin-left:10%;"></img> <br>
+
+						
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> Observation  </h2>
+		<div style="width:100%">
+			
+		
+						
+				<table cellpadding=10 style="margin-top:-0px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:42px">
+							<br>
+
+							<ul>
+
+								<li> It is rare for a biologist to run MCMC only once </li> <br><br>
+
+								<li> In practise, building a phylogenetic model is an <b>iterative process</b> of model adjustment and data subsampling </li>  <br>
+
+								
+
+							</ul>
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+
+
+					<tr>
+					
+
+						
+						
+					
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> Objective: Bayesian Optimisation  </h2>
+		<div style="width:100%">
+			
+		
+				<table cellpadding=10 style="margin-top:-50px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:38px">
+							
+
+							<br><br>
+
+							Two components:
+
+							<ol>
+
+								<li> <b>Prior distribution</b>  - a database of previous observations from other MCMC sessions </li><br>
+
+								<li> <b>An acquisition function</b>  - to select a proposal probability vector $w$ for the next iteration  </li><br>
+
+							</ol>
+
+
+							<i>Gaussian Processes</i> are the probabilistic model behind this learning process
+
+						
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> 1. Simulating datapoints for the prior  </h2>
+		<div style="width:100%">
+			
+		
+				<table cellpadding=10 style="margin-top:-50px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:34px; text-align:center">
+							
+
+
+							<img src="Images/priortable.png" style="width:90%; margin-left:5%;"></img> <br><br><br>
+
+							47 biological datasets of varying taxon count / alignment size, each sampled for $n$ MCMC sessions
+
+						
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> 1. Training a Gaussian Process  </h2>
+		<div style="width:100%">
+			
+		
+				<table cellpadding=10 style="margin-top:-50px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:34px">
+							
+
+
+							<img src="Images/database.png" style="width:100%; margin-left:0%;"></img> <br>
+
+							1000's of rows. Each row is a single MCMC session <br><br>
+
+							<b>Covariates:</b> ntaxa, nsites, tree model, 6 POEM weights, ... <br><br>
+
+							<b>Target feature:</b> balance $\mathcal{B}$  <br><br>
+
+							<b>Model adequacy:</b> a Gaussian Process can predict $\mathcal{B}$ with <i>$\rho=0.5$</i>  &#128533;
+
+						
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> Objective: Bayesian Optimisation  </h2>
+		<div style="width:100%">
+			
+		
+				<table cellpadding=10 style="margin-top:-50px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:38px">
+							
+
+							<br><br>
+
+							Two components:
+
+							<ol>
+
+								<li> <strike style="color:#d3d3d3"> <b>Prior distribution</b>  - a database of previous observations from other MCMC sessions </strike> </li><br>
+
+								<li> <b>An acquisition function</b>  - to select a proposal probability vector for the next iteration  </li><br>
+
+							</ol>
+
+
+						
+
+						
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> 2. What's better? <i>$w_1$</i> or <b>$w_2$</b>
+			
+		
+						
+				<table cellpadding=10 style="margin-top:-50px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:36px; text-align:center">
+							
+
+							<br>
+								<img src="Images/GP3.png" style="width:80%;"></img> <br> 
+
+
+							Balance between <i>exploitation</i> and <b>exploration</b> 
+
+
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+
+
+					<tr>
+					
+
+						
+						
+					
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> Results  </h2>
+		<div style="width:100%">
+			
+		
+				<table cellpadding=10 style="margin-top:-50px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:38px; text-align:center">
+							
+
+							<img src="Images/BO1.png" style="width:80%;"></img> <br> 
+						
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> More results  </h2>
+		<div style="width:100%">
+			
+		
+				<table cellpadding=10 style="margin-top:-50px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:38px; text-align:center">
+							
+
+							<img src="Images/BO2.png" style="width:80%;"></img> <br> 
+						
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+<div class="mySlides fade">
+    <div class="numbertext"></div>
+    	<div style="width:100%; font-size:40px">	
+		
+		<h2 style="text-align:center"> Conclusion and outlook </h2>
+		<div style="width:100%">
+			
+		
+						
+				<table cellpadding=10 style="margin-top:-40px">
+					<tr>
+						<td style="width:50px"></td>
+
+
+						<td style="width:99%; font-size:43px">
+							
+
+							<br>
+
+							<ol>
+								<li>
+									Initial operator weights can be set using a <i>prior database</i><br><br>
+
+								</li>
+
+								<li>
+									Weights can be improved iteratively using <i>Bayesian optimisation</i><br><br>
+
+								</li>
+
+								<li>
+									Still tweaking model and running experiments to quantify the extent of improvement
+								</li>
+
+							</ol>
+
+
+						</td>
+						
+						
+						<td style="width:50px"></td>
+						
+					</tr>
+
+
+					<tr>
+					
+
+						
+						
+					
+					</tr>
+					
+				
+
+				</table>
+		
+
+		
+		</div>
+	</div>
+ </div>
+
+
+
+
+
+
+
+  <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+  <a class="next" onclick="plusSlides(1)">&#10095;</a>
+</div>
+<br>
+
+<div id="bottomdots" style="text-align:center; position:relative; z-index:10">
+	<span class="dot" onclick="currentSlide(1)"></span> 
+	<span class="dot" onclick="currentSlide(2)"></span> 
+	<span class="dot" onclick="currentSlide(3)"></span> 
+	<span class="dot" onclick="currentSlide(4)"></span> 
+	<span class="dot" onclick="currentSlide(5)"></span> 
+	<span class="dot" onclick="currentSlide(6)"></span> 
+	<span class="dot" onclick="currentSlide(7)"></span> 
+	<span class="dot" onclick="currentSlide(8)"></span> 
+	<span class="dot" onclick="currentSlide(9)"></span> 
+	<span class="dot" onclick="currentSlide(10)"></span> 
+	<span class="dot" onclick="currentSlide(11)"></span> 
+	<span class="dot" onclick="currentSlide(12)"></span> 
+	<span class="dot" onclick="currentSlide(13)"></span> 
+	<span class="dot" onclick="currentSlide(14)"></span> 
+	<span class="dot" onclick="currentSlide(15)"></span> 
+	<span class="dot" onclick="currentSlide(16)"></span> 
+	<span class="dot" onclick="currentSlide(17)"></span> 
+	<span class="dot" onclick="currentSlide(18)"></span> 
+	<span class="dot" onclick="currentSlide(19)"></span> 
+	<span class="dot" onclick="currentSlide(20)"></span> 
+	<span class="dot" onclick="currentSlide(21)"></span> 
+	<span class="dot" onclick="currentSlide(22)"></span> 
+	<span class="dot" onclick="currentSlide(23)"></span> 
+	<span class="dot" onclick="currentSlide(24)"></span> 
+
+
+
+	<span id="printerfriendly" style="width:50px; z-index:11; height:50px; padding: 2 2; font-size:20px; color:#2F4F4F; cursor:pointer" title = "Enable printer friendly mode" onclick="printerFriendlyMode()">P</span>
+	
+</div>
+
+</body>
+</html>
