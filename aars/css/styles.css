@@ -26,12 +26,20 @@ body {
 #main{
 	%background-color:#d3d3d3;
 	padding:1em;
+	height:2000px;
 }
 
 
 #main a{
 	color: #366BA1;
 }
+
+
+.pdblabel{
+	font-size: 0.9em;
+	font-style:italic;
+}
+
 
 div.svgDiv{
   width: 100%;
@@ -46,6 +54,9 @@ svg{
 }
 
 
+#tertiaryTable tr td div canvas{
+	border:1px solid #333;
+}
 
 svg text.alpha{
 	fill: #366BA1;

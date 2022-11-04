@@ -16,7 +16,7 @@ AA_COLS = {A: "#80a0f0", I: "#80a0f0", L: "#80a0f0", M: "#80a0f0", F: "#80a0f0",
 
 
 // http://bioinformatica.isa.cnr.it/SUSAN/NAR2/dsspweb.html#:~:text=DSSP%20assigns%20seven%20different%20secondary,no%20secondary%20structure%20is%20recognized
-AA_COLS_2 = {E: "#fe2c54", H: "#0d98ba", G: "#0d98ba",  T:"#d3d3d3", L: "white", S: "#d3d3d3", I: "#0d98ba", B: "#d3d3d3"};
+AA_COLS_2 = {E: "#FFC20A", H: "#0C7BDC", G: "#0C7BDC", I: "#0C7BDC", T:"#d3d3d3", L: "white", S: "#d3d3d3",  B: "#d3d3d3"};
 
 
 MIN_SSE_LEN = 4;
@@ -31,14 +31,15 @@ SEC_HEIGHT = 20;
 NT_FONT_SIZE = 11;
 ALN_LABEL_WIDTH = 300;
 
-LEVEL_1_COL = "#FFA500dd";
-LEVEL_2_COL = "#696969";
+LEVEL_1_COL = "#fa2a5599";
+LEVEL_2_COL = "#a6a6a6";
 LEVEL_3_COL = "#d3d3d3";
 
-STRAND_ARROW_HEAD_LEN_1 = 7;
-STRAND_ARROW_HEAD_LEN_2 = 8;
-STRAND_ARROW_BASE_WIDTH = 8;
+STRAND_ARROW_HEAD_LEN_1 = 6;
+STRAND_ARROW_HEAD_LEN_2 = 7;
+STRAND_ARROW_BASE_WIDTH = 6;
 STRAND_ARROW_HEAD_WIDTH = 15;
+HELIX_WIDTH = 12;
 
 function renderaaRS(aaRS, aaRS_full_name){
 
@@ -63,6 +64,13 @@ function renderaaRS(aaRS, aaRS_full_name){
     renderAlignment($("#alignment"), "Primary structure", true);
     renderAlignment($("#alignment2"), "Secondary structure", false);
     renderSecondary($("#secondary"));
+	
+	
+	
+	$("#tertiaryTable").prepend("<div>Click on a secondary structure above to view its tertiary structure.</div>");
+	$("#tertiaryTable").prepend("<h2>Tertiary structure</h2>");
+	renderTertiary("align.pdb", "superposition");
+	//$("#tertiary").parent().css("text-align", "center");
 
 
   // Synchronise scroll bars
@@ -78,8 +86,54 @@ function renderaaRS(aaRS, aaRS_full_name){
 
   })
 
-
+	
 }
+
+function renderTertiary(pdb, id = "tertiary"){
+	
+	console.log(pdb);
+	
+	var options = {
+	  width: 400,
+	  height: 400,
+	  antialias: true,
+	  quality : 'medium'
+	};
+	
+	//pv.Viewer.rm("");
+	$("#" + id).html("");
+	//$("#" + id).html("");
+	var viewer = pv.Viewer(document.getElementById(id), options);
+	viewer.rm("*");
+	
+	// https://pv.readthedocs.io/en/v1.8.1/intro.html
+ // asynchronously load the PDB file for the dengue methyl transferase from the server and display it in the viewer.
+  pv.io.fetchPdb("data/" + pdb, function(structure) {
+	  
+
+	  
+      // display the protein as cartoon, coloring the secondary structure
+      // elements in a rainbow gradient.
+      //viewer.cartoon('protein', structure, { color : color.ssSuccession() });
+	  if (id == "tertiary"){
+		   viewer.cartoon('protein', structure, { color : color.rainbow() });
+	  }else{
+		   viewer.cartoon('protein', structure, { color : color.byChain() });
+	  }
+	 
+      viewer.centerOn(structure);
+	  viewer.setZoom(150);
+	  $("#" + id).append("<div class='pdblabel'>" + pdb + "</div>");
+	  
+  });
+  
+  
+
+	
+	
+	
+}
+
 
 
 function renderSecondary(svg){
@@ -120,20 +174,26 @@ function renderSecondary(svg){
       var textCol = "black";
       var col = level == 1 ? LEVEL_1_COL : level == 2 ? LEVEL_2_COL : LEVEL_3_COL;
       var txt = feature;
+	  var lw = 0;
+	  if (level == 3){
+       lw = 0;
+      }
+	  
       if (level == 0){
         continue;
       }else{
-        drawSVGobj(svg, "rect", {x: x1-SEC_WIDTH, y: SEC_HEIGHT, width: x2-x1, height:SEC_HEIGHT*nseq, style:"stroke-width:0px; stroke:black; fill:" + col});
+		drawSVGobj(svg, "rect", {x: x1-SEC_WIDTH, y: SEC_HEIGHT, width: x2-x1, height:SEC_HEIGHT*nseq + FEATURE_HEIGHT*(level-1), style:"stroke-width:" +  lw + "px; stroke:black; fill:" + "white"});
+        drawSVGobj(svg, "rect", {x: x1-SEC_WIDTH, y: SEC_HEIGHT, width: x2-x1, height:SEC_HEIGHT*nseq + FEATURE_HEIGHT*(level-1), style:"stroke-width:" +  lw + "px; stroke:black; fill:" + col});
       }
 
 
 
-      drawSVGobj(svg, "text", {x: x1-SEC_WIDTH + (x2-x1)/2, y: y, style: "text-anchor:middle; dominant-baseline:central; font-size:16px; fill:" + textCol}, value=txt)
+      drawSVGobj(svg, "text", {x: x1-SEC_WIDTH, y: y, style: "text-anchor:start; dominant-baseline:central; font-size:14px; fill:" + textCol}, value=txt)
 
     }
 
 
-  // Site numbering
+	// Site numbering
     for (var site = 0; site < nsites; site++){
       if (site == 0 || (site+1) % 50 == 0){
         var y = SEC_HEIGHT*0.5;
@@ -151,9 +211,15 @@ function renderSecondary(svg){
 
 
       var accPrint = acc.replace(".pdb", "");
-      var cls = DATA.isAlpha[[acc]] ? "alpha" : "pdb";
-      var textEle = drawSVGobj(svg, "a", {x: x, y: y, href: url, target:"_blank"})
-      drawSVGobj(textEle, "text", {x: x, y: y, class: cls, style: "text-anchor:end; dominant-baseline:central; font-size:" + NT_FONT_SIZE + "px"}, value=accPrint)
+      //var textEle = drawSVGobj(svg, "a", {x: x, y: y, href: url, target:"_blank"})
+	  
+
+	  
+      var ele = drawSVGobj(svg, "text", {x: x, y: y, pdb: acc, style: "text-anchor:end; cursor:pointer; fill:#333; dominant-baseline:central; font-size:" + NT_FONT_SIZE + "px"}, value=accPrint)
+		$(ele).bind("click", function(event){
+			renderTertiary("structures/" + event.target.getAttribute("pdb"));
+		});
+
 
     }
 
@@ -189,7 +255,7 @@ function renderSecondary(svg){
         var sse = SSEs[i];
 
 
-        var startX = (sse.start-1)*SEC_WIDTH + ALN_LABEL_WIDTH;
+        var startX = (sse.start)*SEC_WIDTH + ALN_LABEL_WIDTH;
         var endX = (sse.stop+1)*SEC_WIDTH + ALN_LABEL_WIDTH;
 
 
@@ -204,7 +270,7 @@ function renderSecondary(svg){
         else if ((sse.element == "H" || sse.element == "G" || sse.element == "I")  && sse.stop - sse.start + 1 >= MIN_SSE_LEN){
 
           //console.log(acc, "helix", sse);
-          drawSVGobj(svg, "rect", {x: startX, y: y-STRAND_ARROW_HEAD_WIDTH/2, width: endX-startX, height: STRAND_ARROW_HEAD_WIDTH, style: "stroke-width:0px; stroke:black; fill:" + AA_COLS_2["H"]} )
+          drawSVGobj(svg, "rect", {rx: 2, x: startX, y: y-HELIX_WIDTH/2, width: endX-startX, height: HELIX_WIDTH, style: "stroke-width:1px; stroke:black; fill:" + AA_COLS_2["H"]} );
 
         }
 
@@ -224,7 +290,7 @@ function renderSecondary(svg){
           points += " " + x2 + "," + (y+STRAND_ARROW_BASE_WIDTH/2);
           points += " " + startX + "," + (y+STRAND_ARROW_BASE_WIDTH/2);
 
-          drawSVGobj(svg, "polygon", {points: points, style: "stroke-width:0px; stroke:black; fill:" + AA_COLS_2["E"]} )
+          drawSVGobj(svg, "polygon", {points: points, style: "stroke-width:1px; stroke:black; fill:" + AA_COLS_2["E"]} )
 
         }
 
@@ -234,7 +300,7 @@ function renderSecondary(svg){
 
           //console.log(acc, "loop", sse);
 
-          drawSVGobj(svg, "line", {x1: startX, x2: endX, y1: y, y2: y, style: "stroke-width:1px; stroke:black"} )
+          drawSVGobj(svg, "line", {x1: startX, x2: endX, y1: y, y2: y, style: "stroke-linecap:round; stroke-width:1px; stroke:black"} )
 
         }
 
@@ -268,7 +334,7 @@ function renderAlignment(svgAlign, main, isPrimary = true){
 
     var features = DATA.features;
 
-    //nsites = 800;
+    nsites = 200;
 
     console.log("rendering alignment with", nseq, nsites)
 
