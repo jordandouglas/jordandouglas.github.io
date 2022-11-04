@@ -25,7 +25,8 @@ MIN_SSE_LEN = 4;
 SVG_WIDTH = 800;
 NT_WIDTH = 14;
 NT_HEIGHT = 14;
-FEATURE_HEIGHT = 20;
+FEATURE_HEIGHT_ALN = 18;
+FEATURE_HEIGHT_SEC = 30;
 SEC_WIDTH = 1.2;
 SEC_HEIGHT = 20;
 NT_FONT_SIZE = 11;
@@ -34,6 +35,7 @@ ALN_LABEL_WIDTH = 300;
 LEVEL_1_COL = "#fa2a5599";
 LEVEL_2_COL = "#a6a6a6";
 LEVEL_3_COL = "#d3d3d3";
+LEVEL_4_COL = "#eeeeee";
 
 STRAND_ARROW_HEAD_LEN_1 = 6;
 STRAND_ARROW_HEAD_LEN_2 = 7;
@@ -152,7 +154,7 @@ function renderSecondary(svg){
 
     svg.hide();
     svg.html("");
-    svg.height(SEC_HEIGHT*(nseq+1) + FEATURE_HEIGHT*3);
+    svg.height(SEC_HEIGHT*(nseq+1) + FEATURE_HEIGHT_SEC*5);
     svg.width(SEC_WIDTH*(nsites+10) + ALN_LABEL_WIDTH);
 
 
@@ -163,7 +165,7 @@ function renderSecondary(svg){
       var level = features[feature].level;
       if (range == "") continue;
       range = range.split("-")
-      var y = SEC_HEIGHT*(nseq+1) + FEATURE_HEIGHT*(level-0.5);
+      var y = SEC_HEIGHT*(nseq+1) + FEATURE_HEIGHT_SEC*(level-0.5);
       var x1 = SEC_WIDTH*(parseFloat(range[0])) + ALN_LABEL_WIDTH;
       var x2 = x1 + NT_WIDTH;
       if (range.length == 2){
@@ -172,24 +174,31 @@ function renderSecondary(svg){
 
 
       var textCol = "black";
-      var col = level == 1 ? LEVEL_1_COL : level == 2 ? LEVEL_2_COL : LEVEL_3_COL;
+      var col = level == 1 ? LEVEL_1_COL : level == 2 ? LEVEL_2_COL : level == 3 ? LEVEL_3_COL : LEVEL_4_COL;
       var txt = feature;
-	  var lw = 0;
-	  if (level == 3){
-       lw = 0;
+	  var lw = 0; //0.7;
+	  if (level == 4){
+       lw = 0.7;
       }
 	  
       if (level == 0){
         continue;
       }else{
-		drawSVGobj(svg, "rect", {x: x1-SEC_WIDTH, y: SEC_HEIGHT, width: x2-x1, height:SEC_HEIGHT*nseq + FEATURE_HEIGHT*(level-1), style:"stroke-width:" +  lw + "px; stroke:black; fill:" + "white"});
-        drawSVGobj(svg, "rect", {x: x1-SEC_WIDTH, y: SEC_HEIGHT, width: x2-x1, height:SEC_HEIGHT*nseq + FEATURE_HEIGHT*(level-1), style:"stroke-width:" +  lw + "px; stroke:black; fill:" + col});
+		drawSVGobj(svg, "rect", {x: x1-SEC_WIDTH, y: SEC_HEIGHT, width: x2-x1, height:SEC_HEIGHT*nseq + FEATURE_HEIGHT_SEC*(level-1), style:"stroke-width:" +  lw + "px; stroke:black; fill:" + "white"});
+        drawSVGobj(svg, "rect", {x: x1-SEC_WIDTH, y: SEC_HEIGHT, width: x2-x1, height:SEC_HEIGHT*nseq + FEATURE_HEIGHT_SEC*(level-1), style:"stroke-width:" +  lw + "px; stroke:black; fill:" + col});
       }
 
 
-
-      drawSVGobj(svg, "text", {x: x1-SEC_WIDTH, y: y, style: "text-anchor:start; dominant-baseline:central; font-size:14px; fill:" + textCol}, value=txt)
-
+	  var points = (x1-NT_WIDTH/4) + "," + (y-SEC_HEIGHT/8) + " " + (x1+NT_WIDTH/4) + "," + (y-SEC_HEIGHT/8) + " " + x1 + "," + (y-SEC_HEIGHT/2);
+	  drawSVGobj(svg, "polygon", {points: points, style: "stroke-width:0px; stroke:black; fill:" + "white"} ) // Triangle
+	  drawSVGobj(svg, "polygon", {points: points, style: "stroke-width:0.7px; stroke:black; fill:" + col} ) // Triangle
+	  
+	  if (feature == "Motif 3"){
+		   drawSVGobj(svg, "text", {x: x1+NT_WIDTH/4, y: y-SEC_HEIGHT/20, style: "text-anchor:end; dominant-baseline:hanging; font-size:14px; fill:" + textCol}, value=txt)
+	  }else{
+		   drawSVGobj(svg, "text", {x: x1-NT_WIDTH/4, y: y-SEC_HEIGHT/20, style: "text-anchor:start; dominant-baseline:hanging; font-size:14px; fill:" + textCol}, value=txt)
+	  }
+     
     }
 
 
@@ -343,7 +352,7 @@ function renderAlignment(svgAlign, main, isPrimary = true){
     
     svgAlign.hide();
     svgAlign.html("");
-    svgAlign.height(NT_HEIGHT*(nseq+1) + FEATURE_HEIGHT*3);
+    svgAlign.height(NT_HEIGHT*(nseq+1) + FEATURE_HEIGHT_ALN*4.1);
     svgAlign.width(NT_WIDTH*(nsites+2) + ALN_LABEL_WIDTH);
 
 
@@ -418,7 +427,7 @@ function renderAlignment(svgAlign, main, isPrimary = true){
       var level = features[feature].level;
       if (range == "") continue;
       range = range.split("-")
-      var y = NT_HEIGHT*(nseq+1) + FEATURE_HEIGHT*(level-0.5);
+      var y = NT_HEIGHT*(nseq+1) + FEATURE_HEIGHT_ALN*(level-0.5);
       var x1 = NT_WIDTH*(parseFloat(range[0])) + ALN_LABEL_WIDTH;
       var x2 = x1 + NT_WIDTH;
       if (range.length == 2){
@@ -427,15 +436,15 @@ function renderAlignment(svgAlign, main, isPrimary = true){
 
       console.log(feature, range, x1, x2);
 
-      var textCol = level == 1 || level == 3 ? "black" : "white";
-      var col = level == 1 ? LEVEL_1_COL : level == 2 ? LEVEL_2_COL : LEVEL_3_COL;
+      var textCol = level == 1 || level >= 3 ? "black" : "white";
+      var col = level == 1 ? LEVEL_1_COL : level == 2 ? LEVEL_2_COL : level == 3 ? LEVEL_3_COL : LEVEL_4_COL;
       var txt = feature;
       if (level == 0){
         txt = "*";
         textCol = "black";
-        y = y + FEATURE_HEIGHT;
+        y = y + FEATURE_HEIGHT_ALN;
       }else{
-        drawSVGobj(svgAlign, "rect", {x: x1-NT_WIDTH, y: y-FEATURE_HEIGHT/2, width: x2-x1, height:FEATURE_HEIGHT, style:"fill:" + col});
+        drawSVGobj(svgAlign, "rect", {x: x1-NT_WIDTH, y: y-FEATURE_HEIGHT_ALN/2, width: x2-x1, height:FEATURE_HEIGHT_ALN, style:"stroke-width:0.7px; stroke:black; fill:" + col});
       }
 
 
