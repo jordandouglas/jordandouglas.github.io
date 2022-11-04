@@ -1,0 +1,53 @@
+
+
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+
+body { 
+	font-family: "Source Sans Pro", "Arial"; 
+	text-size-adjust: 200%;
+	%background-color:#ebe9e7;
+}
+
+
+
+@media only screen and ( min-device-width: 1000px ) {
+	.mobile-display{
+		display:none;
+	}
+}
+
+
+
+body {
+	margin:2%;
+}
+
+#main{
+	%background-color:#d3d3d3;
+	padding:1em;
+}
+
+
+#main a{
+	color: #366BA1;
+}
+
+div.svgDiv{
+  width: 100%;
+  border:1px solid #333;
+  overflow-x: scroll;
+  margin: 1em;
+}
+
+
+svg{
+  padding: 1em;
+}
+
+
+
+svg text.alpha{
+	fill: #366BA1;
+
+}
