@@ -334,7 +334,7 @@ function renderAlignment(svgAlign, main, isPrimary = true){
 
     var features = DATA.features;
 
-    nsites = 200;
+    //nsites = 200;
 
     console.log("rendering alignment with", nseq, nsites)
 
