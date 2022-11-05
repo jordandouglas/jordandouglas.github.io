@@ -16,10 +16,10 @@ AA_COLS = {A: "#80a0f0", I: "#80a0f0", L: "#80a0f0", M: "#80a0f0", F: "#80a0f0",
 
 
 // http://bioinformatica.isa.cnr.it/SUSAN/NAR2/dsspweb.html#:~:text=DSSP%20assigns%20seven%20different%20secondary,no%20secondary%20structure%20is%20recognized
-AA_COLS_2 = {E: "#FFC20A", H: "#0C7BDC", G: "#0C7BDC", I: "#0C7BDC", T:"#d3d3d3", L: "white", S: "#d3d3d3",  B: "#d3d3d3"};
+AA_COLS_2 = {E: "#FFC20A", H: "#0C7BDC", G: "#0C7BDC", I: "#0C7BDC", T:"#d3d3d3", N: "white", S: "#d3d3d3",  B: "#d3d3d3"};
 
 
-MIN_SSE_LEN = 4;
+MIN_SSE_LEN = 3;
 
 
 SVG_WIDTH = 800;
@@ -35,13 +35,13 @@ ALN_LABEL_WIDTH = 300;
 LEVEL_1_COL = "#fa2a5599";
 LEVEL_2_COL = "#a6a6a6";
 LEVEL_3_COL = "#d3d3d3";
-LEVEL_4_COL = "#eeeeee";
+LEVEL_4_COL = "#ffffff";
 
-STRAND_ARROW_HEAD_LEN_1 = 6;
-STRAND_ARROW_HEAD_LEN_2 = 7;
+STRAND_ARROW_HEAD_LEN_1 = 4;
+STRAND_ARROW_HEAD_LEN_2 = 5;
 STRAND_ARROW_BASE_WIDTH = 6;
-STRAND_ARROW_HEAD_WIDTH = 15;
-HELIX_WIDTH = 12;
+STRAND_ARROW_HEAD_WIDTH = 13;
+HELIX_WIDTH = 11;
 
 function renderaaRS(aaRS, aaRS_full_name){
 
@@ -58,31 +58,33 @@ function renderaaRS(aaRS, aaRS_full_name){
   main.children("h1").html(aaRS_full_name + " (" + aaRS + ")");
 
 
+	$("#notes").before("<h2>Notes</h21>");
 
   loadAllFiles(function(){
 
 
     console.log(DATA);
-    renderAlignment($("#alignment"), "Primary structure", true);
-    renderAlignment($("#alignment2"), "Secondary structure", false);
+    renderAlignment("alignment", "Primary structure", true);
+    renderAlignment("alignment2", "Secondary structure", false);
     renderSecondary($("#secondary"));
+	$("#secondary").parent().after("<div class='footnote'>Extended strands and helices are displayed only if at least " + MIN_SSE_LEN + " residues in length.</div>");
 	
 	
 	
 	$("#tertiaryTable").prepend("<div>Click on a secondary structure above to view its tertiary structure.</div>");
 	$("#tertiaryTable").prepend("<h2>Tertiary structure</h2>");
-	renderTertiary("align.pdb", "superposition");
+	renderTertiary("data/align.pdb", "superposition");
 	//$("#tertiary").parent().css("text-align", "center");
 
 
   // Synchronise scroll bars
-  $("#alignment").parent().scroll(function () { 
-    $("#alignment2").parent().scrollTop($("#alignment").parent().scrollTop());
-    $("#alignment2").parent().scrollLeft($("#alignment").parent().scrollLeft());
+  $("#alignment").scroll(function () { 
+    $("#alignment2").scrollTop($("#alignment").scrollTop());
+    $("#alignment2").scrollLeft($("#alignment").scrollLeft());
   });
-  $("#alignment2").parent().scroll(function () { 
-    $("#alignment").parent().scrollTop($("#alignment2").parent().scrollTop());
-    $("#alignment").parent().scrollLeft($("#alignment2").parent().scrollLeft());
+  $("#alignment2").scroll(function () { 
+    $("#alignment").scrollTop($("#alignment2").scrollTop());
+    $("#alignment").scrollLeft($("#alignment2").scrollLeft());
   });
 
 
@@ -110,7 +112,7 @@ function renderTertiary(pdb, id = "tertiary"){
 	
 	// https://pv.readthedocs.io/en/v1.8.1/intro.html
  // asynchronously load the PDB file for the dengue methyl transferase from the server and display it in the viewer.
-  pv.io.fetchPdb("data/" + pdb, function(structure) {
+  pv.io.fetchPdb(pdb, function(structure) {
 	  
 
 	  
@@ -207,7 +209,7 @@ function renderSecondary(svg){
       if (site == 0 || (site+1) % 50 == 0){
         var y = SEC_HEIGHT*0.5;
         var x = SEC_WIDTH*(site) + ALN_LABEL_WIDTH;
-        drawSVGobj(svg, "text", {x: x, y: y, style: "text-anchor:start; dominant-baseline:central; font-family:Courier New; font-size:" + NT_FONT_SIZE + "px"}, value=site+1)
+        drawSVGobj(svg, "text", {x: x, y: y, style: "text-anchor:start; dominant-baseline:central; font-family:Source sans pro; font-size:" + NT_FONT_SIZE + "px"}, value=site+1)
       }
     }
 
@@ -224,9 +226,9 @@ function renderSecondary(svg){
 	  
 
 	  
-      var ele = drawSVGobj(svg, "text", {x: x, y: y, pdb: acc, style: "text-anchor:end; cursor:pointer; fill:#333; dominant-baseline:central; font-size:" + NT_FONT_SIZE + "px"}, value=accPrint)
+      var ele = drawSVGobj(svg, "text", {x: x, y: y, pdb: acc, style: "text-anchor:end; cursor:pointer; fill:#366BA1; dominant-baseline:central; font-size:" + NT_FONT_SIZE + "px"}, value=accPrint)
 		$(ele).bind("click", function(event){
-			renderTertiary("structures/" + event.target.getAttribute("pdb"));
+			renderTertiary("data/structures/" + event.target.getAttribute("pdb"));
 		});
 
 
@@ -331,7 +333,204 @@ function renderSecondary(svg){
 }
 
 
-function renderAlignment(svgAlign, main, isPrimary = true){
+var PIXEL_RATIO = (function () {
+    var ctx = document.createElement("canvas").getContext("2d"),
+        dpr = window.devicePixelRatio || 1,
+        bsr = ctx.webkitBackingStorePixelRatio ||
+              ctx.mozBackingStorePixelRatio ||
+              ctx.msBackingStorePixelRatio ||
+              ctx.oBackingStorePixelRatio ||
+              ctx.backingStorePixelRatio || 1;
+
+    return dpr / bsr;
+})();
+
+
+createHiDPICanvas = function(w, h, ratio) {
+    if (!ratio) { ratio = PIXEL_RATIO; }
+    var can = document.createElement("canvas");
+    can.width = w * ratio;
+    can.height = h * ratio;
+    can.style.width = w + "px";
+    can.style.height = h + "px";
+    can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
+    return can;
+}
+
+//Create canvas with the device resolution.
+//var myCanvas = createHiDPICanvas(500, 250);
+
+
+
+
+function renderAlignment(divID, main, isPrimary = true){
+	
+
+	// Number of sequences
+    var alignment = isPrimary ? DATA.alignment : DATA.secondary;
+    var accessions = DATA.accessions;
+    var nseq = accessions.length;
+    var nsites = alignment[accessions[0]].length;
+
+    var features = DATA.features;
+	
+	
+	
+	
+	// Canvas size
+	var w = NT_WIDTH*(nsites+2) + ALN_LABEL_WIDTH;
+	var h = NT_HEIGHT*(nseq+1) + FEATURE_HEIGHT_ALN*4.1;
+	var canvas = createHiDPICanvas(w, h, 2);
+	$("#" + divID).append(canvas);
+	//var canvas = document.getElementById(canvasID);
+	//Create canvas with a custom resolution.
+	
+	//canvas.width  = w;
+	//canvas.height = h;
+	var ctx = canvas.getContext("2d");
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.textBaseline = "middle";
+	
+	
+	// Sequence labels
+    for (var seqNum = 0; seqNum < nseq; seqNum++){
+      var acc = accessions[seqNum];
+      var y = NT_HEIGHT*(seqNum+1.5)
+      var x = ALN_LABEL_WIDTH - 10;
+      var url = DATA.urls[acc];
+
+
+      var accPrint = acc.replace(".pdb", "");
+      var cls = DATA.isAlpha[[acc]] ? "alpha" : "pdb";
+  
+	  ctx.font = NT_FONT_SIZE + "px Source sans pro";
+	  ctx.textAlign = "end";
+	  ctx.fillText(accPrint, x, y);
+
+    }
+	
+	 // Site numbering
+    for (var site = 0; site < nsites; site++){
+      if (site == 0 || (site+1) % 10 == 0){
+        var y = NT_HEIGHT*0.5;
+        var x = NT_WIDTH*(site+0.5) + ALN_LABEL_WIDTH;
+		
+		//ctx.font = NT_FONT_SIZE + "px Courier New";
+		ctx.textAlign = "start";
+		ctx.fillText(site+1, x, y);
+
+      }
+    }
+	
+	
+	 // Draw the alignment
+    for (var seqNum = 0; seqNum < nseq; seqNum++){
+
+      var acc = accessions[seqNum];
+      var seq = alignment[acc];
+      var y = NT_HEIGHT*(seqNum+1.5)
+      //console.log(acc, seq);
+      for (var site = 0; site < nsites; site++){
+        var x = NT_WIDTH*(site+0.5) + ALN_LABEL_WIDTH;
+        var aa = seq[site];
+
+
+        //if (aa == "-" && !isPrimary) continue;
+        if (aa == "-") continue;
+
+
+        // Rect
+        if (aa != "-") {
+          var col = "white";
+          if (isPrimary){
+            col = AA_COLS[aa];
+          }else{
+            col = AA_COLS_2[aa];
+          }
+		  
+			ctx.beginPath();
+			ctx.fillStyle = col;
+			ctx.fillRect(x-NT_WIDTH/2, y-NT_HEIGHT/2, NT_WIDTH, NT_HEIGHT);
+			ctx.stroke();
+          
+        }
+
+
+		// Text
+		ctx.textAlign = "center";
+		ctx.fillStyle = "black";
+		ctx.fillText(aa, x, y);
+
+
+
+      }
+
+
+    }
+
+
+
+
+    // Features
+    for (var feature in features){
+
+      var range = features[feature].range;
+      var level = features[feature].level;
+      if (range == "") continue;
+      range = range.split("-")
+      var y = NT_HEIGHT*(nseq+1) + FEATURE_HEIGHT_ALN*(level-0.5);
+      var x1 = NT_WIDTH*(parseFloat(range[0])) + ALN_LABEL_WIDTH;
+      var x2 = x1 + NT_WIDTH;
+      if (range.length == 2){
+        x2 = NT_WIDTH*(parseFloat(range[1]) + 1) + ALN_LABEL_WIDTH;
+      }
+
+      console.log(feature, range, x1, x2);
+
+      var textCol = level == 1 || level >= 3 ? "black" : "white";
+      var col = level == 1 ? LEVEL_1_COL : level == 2 ? LEVEL_2_COL : level == 3 ? LEVEL_3_COL : LEVEL_4_COL;
+      var txt = feature;
+      if (level == 0){
+        txt = "*";
+        textCol = "black";
+        y = y + FEATURE_HEIGHT_ALN;
+      }else{
+		  
+		  
+		  ctx.beginPath();
+		  ctx.fillStyle = col;
+		  ctx.fillRect(x1-NT_WIDTH, y-FEATURE_HEIGHT_ALN/2, x2-x1, FEATURE_HEIGHT_ALN);
+		  ctx.stroke();
+		  ctx.strokeRect(x1-NT_WIDTH, y-FEATURE_HEIGHT_ALN/2, x2-x1, FEATURE_HEIGHT_ALN);
+		  
+        //drawSVGobj(svgAlign, "rect", {x: x1-NT_WIDTH, y: y-FEATURE_HEIGHT_ALN/2, width: x2-x1, height:FEATURE_HEIGHT_ALN, style:"stroke-width:0.7px; stroke:black; fill:" + col});
+      }
+
+
+
+		// Text
+		ctx.fillStyle = textCol;
+		ctx.font = "14px Source sans pro";
+		ctx.fillText(txt, x1-NT_WIDTH + (x2-x1)/2, y);
+
+
+		//drawSVGobj(svgAlign, "text", {x: x1-NT_WIDTH + (x2-x1)/2, y: y, style: "text-anchor:middle; dominant-baseline:central; font-size:16px; fill:" + textCol}, value=txt)
+
+    }
+
+	
+	
+	
+	// Download fasta
+	$("#" + divID).before("<h2>" + main + "</h2>");
+	if (isPrimary) $("#" + divID).after("<a href='data/align.ali' style='float:right'>Download fasta</a>");
+	
+	
+}
+
+
+// Obsolete 
+function renderAlignmentSVG(svgAlign, main, isPrimary = true){
 
 
 
@@ -650,7 +849,7 @@ function loadStructure(structures, resolve = function() { } ){
 
           var line = lines[firstLine + siteNum];
           var ss = line.substring(16, 17);
-          if (ss == " ") ss = "L";
+          if (ss == " ") ss = "N";
           sequence += ss;
           siteNum ++;
 

@@ -43,14 +43,28 @@ body {
 
 div.svgDiv{
   width: 100%;
-  border:1px solid #333;
+  %border:1px solid #333;
   overflow-x: scroll;
   margin: 1em;
 }
 
 
+.svgDiv canvas{
+	overflow:auto
+}
+
+
+.svgDiv svg{
+	overflow:auto
+}
+
+
 svg{
   padding: 1em;
+}
+
+.footnote{
+	font-size:0.7em;
 }
 
 
@@ -61,4 +75,11 @@ svg{
 svg text.alpha{
 	fill: #366BA1;
 
+}
+
+
+#notes{
+	text-align:justify;
+	padding:0.5em;
+	
 }
