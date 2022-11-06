@@ -2,6 +2,8 @@
 
 # sudo apt-get install dssp
 
+cd data
+
 rm -f structures.txt
 touch structures.txt
 

@@ -11,7 +11,8 @@ AA_COLS = {A: "#80a0f0", I: "#80a0f0", L: "#80a0f0", M: "#80a0f0", F: "#80a0f0",
           C: "#f08080",
           G: "#f09048",
           P: "#c0c000",
-          H: "#15a4a4", Y: "#15a4a4"};
+          H: "#15a4a4", Y: "#15a4a4",
+          X: "#ffffff"};
 
 
 
@@ -23,8 +24,8 @@ MIN_SSE_LEN = 3;
 
 
 SVG_WIDTH = 800;
-NT_WIDTH = 14;
-NT_HEIGHT = 14;
+NT_WIDTH = 10;
+NT_HEIGHT = 13;
 FEATURE_HEIGHT_ALN = 18;
 FEATURE_HEIGHT_SEC = 30;
 SEC_WIDTH = 1.2;
@@ -380,7 +381,9 @@ function renderAlignment(divID, main, isPrimary = true){
 	// Canvas size
 	var w = NT_WIDTH*(nsites+2) + ALN_LABEL_WIDTH;
 	var h = NT_HEIGHT*(nseq+1) + FEATURE_HEIGHT_ALN*4.1;
-	var canvas = createHiDPICanvas(w, h, 2);
+  var maxCanvasWidth = 30000;
+  var ratio = Math.min(maxCanvasWidth / w, 3); 
+	var canvas = createHiDPICanvas(w, h, ratio);
 	$("#" + divID).append(canvas);
 	//var canvas = document.getElementById(canvasID);
 	//Create canvas with a custom resolution.
@@ -407,17 +410,25 @@ function renderAlignment(divID, main, isPrimary = true){
 	  ctx.textAlign = "end";
 	  ctx.fillText(accPrint, x, y);
 
+
     }
 	
 	 // Site numbering
     for (var site = 0; site < nsites; site++){
       if (site == 0 || (site+1) % 10 == 0){
         var y = NT_HEIGHT*0.5;
-        var x = NT_WIDTH*(site+0.5) + ALN_LABEL_WIDTH;
-		
-		//ctx.font = NT_FONT_SIZE + "px Courier New";
-		ctx.textAlign = "start";
-		ctx.fillText(site+1, x, y);
+        var x = NT_WIDTH*(site+0.25) + ALN_LABEL_WIDTH;
+      	
+      	//ctx.font = NT_FONT_SIZE + "px Courier New";
+      	ctx.textAlign = "start";
+      	ctx.fillText(site+1, x, y);
+
+
+        // Stroke
+        ctx.beginPath();
+        ctx.moveTo(x-NT_WIDTH/4, y+NT_HEIGHT/2);
+        ctx.lineTo(x-NT_WIDTH/4, y-NT_HEIGHT/2);
+        ctx.stroke();
 
       }
     }
@@ -450,7 +461,7 @@ function renderAlignment(divID, main, isPrimary = true){
 		  
 			ctx.beginPath();
 			ctx.fillStyle = col;
-			ctx.fillRect(x-NT_WIDTH/2, y-NT_HEIGHT/2, NT_WIDTH, NT_HEIGHT);
+			ctx.fillRect(x-NT_WIDTH/2, y-NT_HEIGHT/2, NT_WIDTH+1, NT_HEIGHT);
 			ctx.stroke();
           
         }
