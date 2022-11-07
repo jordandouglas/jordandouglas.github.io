@@ -8,7 +8,7 @@ rm -f structures.txt
 touch structures.txt
 
 
-rm -r dssp
+rm -r -f dssp
 mkdir -p dssp
 for f in structures/*.pdb;
 do
@@ -22,4 +22,40 @@ do
 done
 
 
-../../../../../DeepAlign/3DCOMB -i structures.txt -o align
+#../../../../../DeepAlign/3DCOMB -i structures.txt -o align
+
+
+
+
+# Features
+rm -r -f domains
+mkdir domains
+Rscript ../../../scripts/mkdomains.R
+cd domains
+
+
+for d in *;
+do
+	echo "aligning feature: $d"
+	cd $d
+	rm -r -f dssp
+	mkdir -p dssp
+
+	rm -f structures.txt
+	touch structures.txt
+
+	for f in structures/*.pdb;
+	do
+
+		mkdssp -i $f -o $f.dssp
+		mv $f.dssp dssp/.
+		echo $f >> structures.txt
+
+	done
+
+
+	../../../../../../../DeepAlign/3DCOMB -i structures.txt -o align
+	cd ../
+
+
+done

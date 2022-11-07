@@ -26,7 +26,7 @@ body {
 #main{
 	%background-color:#d3d3d3;
 	padding:1em;
-	height:2000px;
+	height:2500px;
 }
 
 
@@ -103,3 +103,14 @@ svg text.alpha{
 }
 
 
+.dropdownDiv{
+	padding: 1em;
+
+}
+
+.dropdownDiv select{
+	background-color: #696969;
+	color: white;
+	padding: 0.5em;
+	width: 200px;
+}

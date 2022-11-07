@@ -68,14 +68,36 @@ function renderaaRS(aaRS, aaRS_full_name){
     renderAlignment("alignment", "Primary structure", true);
     renderAlignment("alignment2", "Secondary structure", false);
     renderSecondary($("#secondary"));
-	$("#secondary").parent().after("<div class='footnote'>Extended strands and helices are displayed only if at least " + MIN_SSE_LEN + " residues in length.</div>");
 	
 	
+
+
+
+  // Footnote
+   $("#secondary").parent().after("<div class='footnote'>Extended strands and helices are displayed only if at least " + MIN_SSE_LEN + " residues in length.</div>");
+  
+
+
+
+  // Tertiary dropdown
+  $("#tertiaryTable").append("<div class='dropdownDiv'>Domain: <select id='domainSelect'></select></div>");
+  var dropdown = $("#domainSelect");
+  dropdown.append("<option value='_full'> Full protein </option>");
+  for (var f in DATA.features){
+    if (DATA.features[f].level > 1){
+      dropdown.append("<option value='" + f + "'>" + f + "</option>");
+    }
+    
+  }
+  $(dropdown).on("change", function(){
+    $("#tertiary").html("");
+    renderTertiary("align.pdb", "superposition");
+  });
+
 	
 	$("#tertiaryTable").prepend("<div>Click on a secondary structure above to view its tertiary structure.</div>");
 	$("#tertiaryTable").prepend("<h2>Tertiary structure</h2>");
 	renderTertiary("data/align.pdb", "superposition");
-	//$("#tertiary").parent().css("text-align", "center");
 
 
   // Synchronise scroll bars
@@ -97,6 +119,18 @@ function renderaaRS(aaRS, aaRS_full_name){
 function renderTertiary(pdb, id = "tertiary"){
 	
 	console.log(pdb);
+
+
+  // Which domain?
+  var domain = $("#domainSelect").val();
+  var domainDir = domain.replaceAll(" ", "_");
+  if (domain != "_full"){
+    pdb = pdb.replace("data/", "")
+    pdb = "data/domains/" + domainDir + "/" + pdb ;
+  }else{
+    pdb = pdb;
+  }
+
 	
 	var options = {
 	  width: 400,
