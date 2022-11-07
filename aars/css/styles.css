@@ -83,3 +83,23 @@ svg text.alpha{
 	padding:0.5em;
 	
 }
+
+
+#contents{
+	background-color: #d3d3d377;
+	width: 400px;
+}
+
+
+#contents img{
+	width: 25px;
+	height:  25px;
+	vertical-align: middle;
+}
+
+#contents div{
+	padding: 0.2em;
+	margin-left: 0.2em;
+}
+
+
